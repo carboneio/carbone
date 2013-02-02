@@ -1,0 +1,34 @@
+########################## GLOB syntax
+syntax:glob
+
+nbproject/**
+
+runtime/**
+
+node_modules/**
+
+*.bak
+.DS_Store
+**_hgignore
+
+########################## regexp syntax
+syntax: regexp
+
+^assets/*
+server/config/development\.js
+\.idea
+\.buildpath
+\.project
+\.settings
+\.sublime-project
+\.sublime-workspace
+\.goutput.+
+~$
+MCD.pdf
+client/build/*.js
+syntax: glob
+re:^client/build/
+server/config/config\.js
+server/install\.sh
+*\.rdb
+public/css/*\.css

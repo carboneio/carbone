@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+var index = require('../lib/index');
+
+/*var command = require('../lib/command');
+var _action = process.argv[2];
+
+switch(_action){
+  case 'command':
+    generate(process.argv.slice(3));
+    break;
+  default:
+}
+*/
+
+index.generate({'test':'data'}, './content.xml.zip');

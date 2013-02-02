@@ -1,0 +1,13 @@
+{
+  "name": "kendoc",
+  "description": "Document parser and generator",
+  "version": "0.1.0",
+  "private": true,
+  "bin" : "bin/kendoc",
+  "main": "./lib",
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": ">=1.7.4"
+  },
+  "engines": { "node": ">= 0.8.6" }
+}

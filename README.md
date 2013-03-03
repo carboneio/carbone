@@ -30,6 +30,15 @@ Conversion dans d'autre format : http://pc-freak.net/blog/convert-doc-pdf-linux-
 6. [node-json2officexml](https://github.com/pimetrai/node-json2officexml)
 
 
+Convert ot pdf :
+
+May use these source :
+- docbook (docbook-utils ou docbook2pdf) mais le format n'est peut-être pas adpété 
+- xps (xpstopdf on linux)
+- ePub (pas gagné)
+- djvu (ox2a, djvutopdf)
+- abiworld
+
 XML Parser :
 
 https://github.com/polotek/libxmljs : good but dependency on external library libxmljs

@@ -5,113 +5,8 @@ var fs = require('fs');
 var helper = require('../lib/helper');
 
 describe('Kendoc', function(){
-  
-  describe('cleanTag', function(){
-    it('should clean and remove any xml which are arround the tag', function(){
-      assert.equal(kendoc.cleanTag('menu<xmla>why[1].test'), 'menuwhy[1].test');
-      assert.equal(kendoc.cleanTag('  menu<xmla>why[1].test    '), 'menuwhy[1].test');
-      assert.equal(kendoc.cleanTag('menu<some xml data>why<sqs>[1<sas  >].test'), 'menuwhy[1].test');
-      //assert.equal('menuwhy[1].test', kendoc.cleanTag('menu<some xml data>why<sqs>[1<sas  >\n<qqs>].test'));
-      assert.equal(kendoc.cleanTag('menu</w:t></w:r><w:r w:rsidR="00013394"><w:t>why</w:t></w:r><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:bookmarkEnd w:id="0"/><w:r w:rsidR="00013394"><w:t>[1].</w:t></w:r><w:r w:rsidR="00013394"><w:t>test</w:t></w:r><w:r w:rsidR="00013394"><w:t xml:space="preserve">'),
-      'menuwhy[1].test');
-    });
-  });
 
-  describe('extractTags', function(){
-    it('should replace the tag in xml by the data in the object', function(){
-      var _data = {
-        'menu' : 'blabla',
-        'names' : 'Morpheus and Neo',
-        'address' : {
-          'city' : 'Nebuchadnezzar',
-          'zip' : '2999'
-        }
-      };
-      assert.equal(kendoc.extractTags('<xmlstart>{{menu}}</xmlend>', _data), '<xmlstart>blabla</xmlend>');
-      assert.equal(kendoc.extractTags('<xmlstart>  {{  menu  }} </xmlend>', _data), '<xmlstart>  blabla </xmlend>');
-      assert.equal(kendoc.extractTags('<xmlstart>{{names}}</xmlend>', _data), '<xmlstart>Morpheus and Neo</xmlend>');
-      assert.equal(kendoc.extractTags('<xmlstart>{{me<interxml>n<bullshit>u}}</xmlend>', _data), '<xmlstart>blabla<interxml><bullshit></xmlend>');
-      assert.equal(kendoc.extractTags('<xmlstart>{{address.city}} {{address.zip}}</xmlend>', _data), '<xmlstart>Nebuchadnezzar 2999</xmlend>');
-    });
-    it.skip('should works also with array', function(){
-      var _data = {
-        'menu' : [{
-          'date' : 20120101
-        },{
-          'date' : 20120102
-        }]
-      };
-      assert.equal(kendoc.extractTags('{{menu[i].date}} ', _data), '20120101 20120102');
-    });
-    it('should remove the tag in xml if there is no corresponding data in the object', function(){
-      var _data = {
-        'AAmenu' : 'blabla',
-        'address' : {
-          'AAcity' : 'Nebuchadnezzar',
-          'zip' : '2999'
-        }
-      };
-      assert.equal(kendoc.extractTags('<xmlstart>{{menu}}</xmlend>', _data), '<xmlstart></xmlend>');
-      assert.equal(kendoc.extractTags('<xmlstart>{{me<interxml>n<bullshit>u}}</xmlend>', _data), '<xmlstart><interxml><bullshit></xmlend>');
-      assert.equal(kendoc.extractTags('<xmlstart>{{address.city}} {{address.zip}}</xmlend>', _data), '<xmlstart> 2999</xmlend>');
-      assert.equal(kendoc.extractTags('<xmlstart>{{cars.wheels}}</xmlend>', _data), '<xmlstart></xmlend>');
-    });
-  });
-
-  describe('cleanXml', function(){
-    it('should extract the tag from xml', function(){
-      assert.equal(kendoc.cleanXml('menu</xmlend>bla'), '</xmlend>');
-      assert.equal(kendoc.cleanXml('menu</xmlend><text b>A<qskjhdq>bla'), '</xmlend><text b><qskjhdq>');
-    });
-  });
-
-  describe('detectCommonPoint', function(){
-    it('should detect the common point', function(){
-      assert.equal(kendoc.detectCommonPoint('menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle'), ' </tr><tr> ');
-      assert.equal(kendoc.detectCommonPoint('menu </p><p> bla </p><p> foot </p> </tr>   <tr> <p> basket </p><p> tennis </p><p> balle'), ' </tr>   <tr> ');
-      assert.equal(kendoc.detectCommonPoint('menu </p><p teddds> bla </p></xml><p> foot </p> </image></tr><tr> <p> basket </p><tag><p> tennis </p><p> balle'), '</tr><tr> ');
-      assert.equal(kendoc.detectCommonPoint('menu </p><p> </p></tr:w><tr:w color=test test=3> <p> basket </p> balle'), '</tr:w><tr:w color=test test=3> ');
-    });
-  });
-
-//  describe('detectArray', function(){
-//    it('should array', function(){
-//      assert.equal(kendoc.detectArray({2:'menu[i].date',10:'menu[i+1].date'}), {
-//        tags : [2, 10]
-//      });
-//    });
-//  });
-
-  describe('getSubsitition', function(){
-    it('should extract the tags from the xml, return the xml without the tags and a list of tags with their position in the xml', function(){
-      helper.assert(kendoc.getSubsitition('{{menu}}'), {
-        tags : [{'pos': 0, 'name':'menu'}], 
-        xml : ''
-      });
-      helper.assert(kendoc.getSubsitition('<div>{{menu}}<div>'), {
-        tags : [{'pos': 5, 'name':'menu'}], 
-        xml : '<div><div>'
-      });
-      helper.assert(kendoc.getSubsitition('<xmlstart>{{me<interxml>n<bullshit>u}}</xmlend>'), {
-        tags : [{'pos': 10, 'name':'menu'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend>'
-      });
-      helper.assert(kendoc.getSubsitition('<div>{{menu}}<div>{{city}}'), {
-        tags : [{'pos': 5, 'name':'menu'},{'pos':10, 'name':'city'}],
-        xml : '<div><div>'
-      });
-      helper.assert(kendoc.getSubsitition('<xmlstart>{{me<interxml>n<bullshit>u}}</xmlend><tga>{{ci<td>ty</td>}}<tga><bla>{{cars}}</bla>'), {
-        tags : [{'pos': 10, 'name':'menu'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
-      });
-      helper.assert(kendoc.getSubsitition('<xmlstart>{{me<interxml>n<bullshit>u[i].city}}</xmlend><tga>{{ci<td>ty</td>}}<tga><bla>{{cars[i].wheel}}</bla>'), {
-        tags : [{'pos': 10, 'name':'menu[i].city'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars[i].wheel'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
-      });
-    });
-  });
-
-  describe('compileXml', function(){
+  describe('compileXmlNew', function(){
     it('should return a function which generate the xml according to the descriptor and the data', function(){
       var _desc = {
         'staticData'  : {
@@ -138,7 +33,16 @@ describe('Kendoc', function(){
         'surname': 'Neo'
       };
       var _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), '<xml><p>Thomas</p><p>A. Anderson</p><p>Neo</p></xml>');
+      helper.assert(_fn(_data), [{
+          pos: [ 0, 8 ],
+          str: '<xml><p>Thomas' 
+        },{
+          pos: [ 0, 15 ],
+          str: '</p><p>A. Anderson' 
+        },{
+          pos: [ 0, 22 ],
+          str: '</p><p>Neo' 
+        }]);
     });
     it('should return nothing if the descriptor is empty', function(){
       var _desc = {};
@@ -389,7 +293,7 @@ describe('Kendoc', function(){
             +'<tr>walk on the walls</tr>'
         +' </xml>');
     });
-    it.only('should works even with a two nested arrays', function(){
+    it('should works even with a two nested arrays', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
@@ -400,6 +304,7 @@ describe('Kendoc', function(){
             'name':'',
             'parent' : '',
             'type': 'array',
+            'nestedPos' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
               {'before':'<tr><p>', 'obj': 'd0', 'attr':'firstname', 'position':13, 'after': ''            }, 
@@ -410,6 +315,7 @@ describe('Kendoc', function(){
             'name':'skills',
             'parent' : 'd0',
             'type': 'array',
+            'nestedPos' : 2,
             'position' : {'start': 13, 'end' :22},
             'xmlParts' : [
               {'before':'<tr>'  , 'obj': 'skills1', 'attr':'name', 'position':17, 'after': '</tr>'}, 
@@ -448,28 +354,94 @@ describe('Kendoc', function(){
         +' </xml>');
     });
   });
-
-
-//  describe('extractXmlToRepeat', function(){
-//    it('should extract the xml which will be repe the common point', function(){
-//      assert.equal(kendoc.extractXmlToRepeat('menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle'), ' </tr><tr> ');
-//    });
-//  });
-
-  /*describe('replaceByData', function(){
-    it('should replace the tag by the data', function(){
-      var _data = {
-        'menu' : [{
-          'date' : 20120101
+  
+  describe('generateXmlParts', function(){
+    it('should works even with a two nested arrays', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml> ',
+          'after' :' </xml>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'parent' : '',
+            'type': 'array',
+            'nestedPos' : 1,
+            'position' : {'start': 6, 'end' :38},
+            'xmlParts' : [
+              {'before':'<tr><p>', 'obj': 'd0', 'attr':'firstname', 'position':13, 'after': ''            }, 
+              {'before':'</p><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':29, 'after': '</p></tr>'  },
+            ]
+          },
+          'skills1':{
+            'name':'skills',
+            'parent' : 'd0',
+            'type': 'array',
+            'nestedPos' : 2,
+            'position' : {'start': 13, 'end' :22},
+            'xmlParts' : [
+              {'before':'<tr>'  , 'obj': 'skills1', 'attr':'name', 'position':17, 'after': '</tr>'}, 
+            ]
+          }
+        }
+      };
+      var _data = [{
+          'firstname':'Thomas', 
+          'lastname':'A. Anderson', 
+          'skills':[
+            {'name' : 'survive'},
+            {'name' : 'walk on the walls'}
+          ]
         },{
-          'date' : 20120102
-        }]
-      }
-      assert.equal(kendoc.extractTags('{{menu[i].date}} ', _data), '20120101 20120102');
+          'firstname':'Trinity',
+          'lastname':'Unknown',
+          'skills':[
+            {'name' : 'hack'}
+          ]
+        }
+      ];
+      var _fn = kendoc.getXMLBuilderFunction(_desc);
+      helper.assert(_fn(_data), [{ 
+          pos: [ 6, 0, 13 ],
+          str: '<tr><p>Thomas' 
+        },{ 
+          pos: [ 6, 0, 29 ],
+          str: '</p><p>A. Anderson</p></tr>' 
+        },{ 
+          pos: [ 6, 0, 17, 0 ],
+          str: '<tr>survive</tr>' 
+        },{ 
+          pos: [ 6, 0, 17, 1 ],
+          str: '<tr>walk on the walls</tr>' 
+        },{ 
+          pos: [ 6, 1, 13, 1 ],
+          str: '<tr><p>Trinity' 
+        },{ 
+          pos: [ 6, 1, 29, 1 ],
+          str: '</p><p>Unknown</p></tr>' 
+        },{ 
+          pos: [ 6, 1, 17, 0 ],
+          str: '<tr>hack</tr>'}
+      ]);
     });
-  });*/
+  });
 
-  describe('decomposeTags', function(){
+  describe.only('decomposeTags', function(){
+    it('should create a descriptor', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.site'}
+      ];
+      helper.assert(kendoc.decomposeTags(_tags), {
+        'd0':{
+          'name':'',
+          'type': 'object',
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'site', 'pos':20}
+          ]
+        }
+      });
+    });
     it('1should decompose all tags', function(){
       var _tags = [
         {'pos': 1 , 'name': 'd.menu[i].id'},
@@ -487,28 +459,37 @@ describe('Kendoc', function(){
         'd0':{
           'name':'',
           'type': 'object',
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'site', 'pos':80}
+          ]
         },
         'menu1':{
           'name':'menu',
           'type':'array',
-          'range':[
-            {'begin':1, 'end':40}
+          'range': {'start':1, 'end':40},
+          'xmlParts' : [
+            {'obj': 'menu1', 'attr':'id'  , 'pos':1},
+            {'obj': 'menu1', 'attr':'cars', 'pos':10}
           ]
         },
         'menuElement2':{
           'name':'menuElement',
           'type':'array',
-          'range':[
-            {'begin':20, 'end':30}
+          'range': {'start':20, 'end':30},
+          'xmlParts' : [
+            {'obj': 'menuElement2', 'attr':'id', 'pos':20}
           ]
         },
         'product3':{
           'name':'product',
-          'type':'object'
+          'type':'object',
+          'xmlParts' : [
+            {'obj': 'product3', 'attr':'id', 'pos':90}
+          ]
         },
       });
     });
-    it('2 should decompose all tags', function(){
+    it('2 should decompose all tags even if there are some objects within the array', function(){
       var _tags = [
         {'pos': 1  , 'name': 'd.menu[i].id'},
         {'pos': 10 , 'name': 'd.menu[i].cars'},
@@ -516,27 +497,38 @@ describe('Kendoc', function(){
         {'pos': 30 , 'name': 'd.product.id'},
         {'pos': 40 , 'name': 'd.menu[i].menuElement[0].id'},
         {'pos': 50 , 'name': 'd.menu[i+1].id'},
-        {'pos': 60 , 'name': 'd.menu[i+1].menuElement[1].id'}
+        {'pos': 60 , 'name': 'd.menu[i+1].menuElement[0].id'}
       ];
       helper.assert(kendoc.decomposeTags(_tags), {
         'd0':{
           'name':'',
           'type': 'object',
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'site', 'pos':20}
+          ]
         },
         'menu1':{
           'name':'menu',
           'type':'array', 
-          'range': [ 
-            { 'begin': 1, 'end': 50 } 
-          ] 
+          'range': { 'start': 1, 'end': 50 },
+          'xmlParts' : [
+            {'obj': 'menu1', 'attr':'id'  , 'pos':1},
+            {'obj': 'menu1', 'attr':'cars', 'pos':10}
+          ]
         },
         'product2':{
           'name':'product',
-          'type':'object'
+          'type':'object',
+          'xmlParts' : [
+            {'obj': 'product2', 'attr':'id', 'pos':30}
+          ]
         },
         'menuElement3':{
           'name':'menuElement',
-          'type':'array'
+          'type':'array',
+          'xmlParts' : [
+            {'obj': 'menuElement3', 'attr':'id', 'pos':40}
+          ]
         },
       });
     });
@@ -547,34 +539,43 @@ describe('Kendoc', function(){
         {'pos': 3 , 'name': 'd.menu[i+1][i].id'},
         {'pos': 4 , 'name': 'd.menu[i+1][i+1].id'},
         {'pos': 5 , 'name': 'd.product.id'},
-        {'pos': 6 , 'name': 'd.days[i]'}
+        {'pos': 6 , 'name': 'd.days[i].name'},
+        {'pos': 7 , 'name': 'd.days[i+1].name'}
       ];
       helper.assert(kendoc.decomposeTags(_tags), {
         'd0':{
           'name':'',
           'type': 'object',
+          'xmlParts' : []
         },
         'menu1':{
           'name':'menu',
           'type':'array',
-          'range': [ 
-            { 'begin': 1, 'end': 3 } 
-          ] 
+          'range': {'start': 1, 'end': 3 },
+          'xmlParts' : []
         },
         'menu2':{
           'name':'menu',
           'type':'array',
-          'range': [ 
-            { 'begin': 1, 'end': 2 } 
-          ] 
+          'range':{'start': 1, 'end': 2 },
+          'xmlParts' : [
+            {'obj': 'menu2', 'attr':'id', 'pos':1},
+          ]
         },
         'product3':{
           'name':'product',
-          'type':'object'
+          'type':'object',
+          'xmlParts' : [
+            {'obj': 'product3', 'attr':'id', 'pos':5}
+          ]
         },
         'days4':{
           'name':'days',
-          'type':'array'
+          'type':'array',
+          'range':{'start': 6, 'end': 7 },
+          'xmlParts' : [
+            {'obj': 'days4', 'attr':'name', 'pos':6}
+          ]
         }
       });
     });
@@ -588,68 +589,57 @@ describe('Kendoc', function(){
         'd0':{
           'name':'',
           'type': 'object',
+          'xmlParts' : []
         },
         'menu1':{
           'name':'menu',
-          'type':'array'
+          'type':'array',
+          'xmlParts' : []
         },
         'menu2':{
           'name':'menu',
-          'type':'array'
+          'type':'array',
+          'xmlParts' : []
         },
         'menu3':{
           'name':'menu',
-          'type':'array'
+          'type':'array',
+          'xmlParts' : []
         },
         'product4':{
           'name':'product',
-          'type':'array'
+          'type':'array',
+          'xmlParts' : []
         },
         'site5':{
           'name':'site',
-          'type':'object'
+          'type':'object',
+          'xmlParts' : [
+            {'obj': 'site5', 'attr':'id', 'pos':1},
+          ]
         },
         'product6':{
           'name':'product',
-          'type':'object'
+          'type':'object',
+          'xmlParts' : [
+            {'obj': 'product6', 'attr':'id', 'pos':2},
+          ]
         },
         'cars7':{
           'name':'cars',
-          'type':'object'
+          'type':'object',
+          'xmlParts' : []
         },
         'product8':{
           'name':'product',
-          'type':'object'
+          'type':'object',
+          'xmlParts' : [
+            {'obj': 'product8', 'attr':'id', 'pos':3},
+          ]
         }
       });
     });
   });
-
-
-  /*before(function(done){
-  });
-  
-  after( function(done){
-  });*/
-
-//  describe('Public methods', function(){
-//    describe('generate(data, doc, callback)', function(){
-//      it('', function(){
-//      /**
-//       */
-//      });
-//      describe('tests', function(){
-//        beforeEach( function(done){
-//          done();
-//        });
-//
-//        it('should unzip the file', function(done){
-//          //kendoc.generate({'menu':'test'}, 'test/template.docx', 'test/generated.docx');
-//        });
-//      });/*End of descript test */
-//    });
-//  });
-//
 });
 
 

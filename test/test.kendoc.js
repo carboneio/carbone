@@ -427,7 +427,7 @@ describe('Kendoc', function(){
     });
   });
 
-  describe.only('decomposeTags', function(){
+  describe('decomposeTags', function(){
     it('should create a descriptor', function(){
       var _tags = [
         {'pos': 20, 'name': 'd.site'}
@@ -436,6 +436,8 @@ describe('Kendoc', function(){
         'd0':{
           'name':'',
           'type': 'object',
+          'parent':'',
+          /*'depth' : 0,*/
           'xmlParts' : [
             {'obj': 'd0', 'attr':'site', 'pos':20}
           ]
@@ -459,6 +461,8 @@ describe('Kendoc', function(){
         'd0':{
           'name':'',
           'type': 'object',
+          'parent':'',
+          /*'depth' : 0,*/
           'xmlParts' : [
             {'obj': 'd0', 'attr':'site', 'pos':80}
           ]
@@ -466,6 +470,8 @@ describe('Kendoc', function(){
         'menu1':{
           'name':'menu',
           'type':'array',
+          'parent':'d0',
+          /*'depth' : 2,*/
           'range': {'start':1, 'end':40},
           'xmlParts' : [
             {'obj': 'menu1', 'attr':'id'  , 'pos':1},
@@ -475,6 +481,8 @@ describe('Kendoc', function(){
         'menuElement2':{
           'name':'menuElement',
           'type':'array',
+          'parent':'menu1',
+          /*'depth' : 4,*/
           'range': {'start':20, 'end':30},
           'xmlParts' : [
             {'obj': 'menuElement2', 'attr':'id', 'pos':20}
@@ -483,6 +491,8 @@ describe('Kendoc', function(){
         'product3':{
           'name':'product',
           'type':'object',
+          'parent':'d0',
+          /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product3', 'attr':'id', 'pos':90}
           ]
@@ -503,6 +513,8 @@ describe('Kendoc', function(){
         'd0':{
           'name':'',
           'type': 'object',
+          'parent':'',
+          /*'depth' : 0,*/
           'xmlParts' : [
             {'obj': 'd0', 'attr':'site', 'pos':20}
           ]
@@ -510,6 +522,8 @@ describe('Kendoc', function(){
         'menu1':{
           'name':'menu',
           'type':'array', 
+          'parent':'d0',
+          /*'depth' : 2,*/
           'range': { 'start': 1, 'end': 50 },
           'xmlParts' : [
             {'obj': 'menu1', 'attr':'id'  , 'pos':1},
@@ -519,6 +533,8 @@ describe('Kendoc', function(){
         'product2':{
           'name':'product',
           'type':'object',
+          'parent':'d0',
+          /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product2', 'attr':'id', 'pos':30}
           ]
@@ -526,6 +542,8 @@ describe('Kendoc', function(){
         'menuElement3':{
           'name':'menuElement',
           'type':'array',
+          'parent':'menu1',
+          /*'depth' : 4,*/
           'xmlParts' : [
             {'obj': 'menuElement3', 'attr':'id', 'pos':40}
           ]
@@ -546,17 +564,23 @@ describe('Kendoc', function(){
         'd0':{
           'name':'',
           'type': 'object',
+          'parent':'',
+          /*'depth' : 0,*/
           'xmlParts' : []
         },
         'menu1':{
           'name':'menu',
           'type':'array',
+          'parent':'d0',
+          /*'depth' : 2,*/
           'range': {'start': 1, 'end': 3 },
           'xmlParts' : []
         },
         'menu2':{
           'name':'menu',
           'type':'array',
+          'parent':'menu1',
+          /*'depth' : 3,*/
           'range':{'start': 1, 'end': 2 },
           'xmlParts' : [
             {'obj': 'menu2', 'attr':'id', 'pos':1},
@@ -565,6 +589,8 @@ describe('Kendoc', function(){
         'product3':{
           'name':'product',
           'type':'object',
+          'parent':'d0',
+          /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product3', 'attr':'id', 'pos':5}
           ]
@@ -572,6 +598,8 @@ describe('Kendoc', function(){
         'days4':{
           'name':'days',
           'type':'array',
+          'parent':'d0',
+          /*'depth' : 2,*/
           'range':{'start': 6, 'end': 7 },
           'xmlParts' : [
             {'obj': 'days4', 'attr':'name', 'pos':6}
@@ -589,31 +617,43 @@ describe('Kendoc', function(){
         'd0':{
           'name':'',
           'type': 'object',
+          'parent':'',
+          /*'depth' : 0,*/
           'xmlParts' : []
         },
         'menu1':{
           'name':'menu',
           'type':'array',
+          'parent':'d0',
+          /*'depth' : 2,*/
           'xmlParts' : []
         },
         'menu2':{
           'name':'menu',
           'type':'array',
+          'parent':'menu1',
+          /*'depth' : 4,*/
           'xmlParts' : []
         },
         'menu3':{
           'name':'menu',
           'type':'array',
+          'parent':'menu2',
+          /*'depth' : 6,*/
           'xmlParts' : []
         },
         'product4':{
           'name':'product',
           'type':'array',
+          'parent':'menu3',
+          /*'depth' : 8,*/
           'xmlParts' : []
         },
         'site5':{
           'name':'site',
           'type':'object',
+          'parent':'product4',
+          /*'depth' : 7,*/
           'xmlParts' : [
             {'obj': 'site5', 'attr':'id', 'pos':1},
           ]
@@ -621,6 +661,8 @@ describe('Kendoc', function(){
         'product6':{
           'name':'product',
           'type':'object',
+          'parent':'d0',
+          /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product6', 'attr':'id', 'pos':2},
           ]
@@ -628,11 +670,15 @@ describe('Kendoc', function(){
         'cars7':{
           'name':'cars',
           'type':'object',
+          'parent':'d0',
+          /*'depth' : 1,*/
           'xmlParts' : []
         },
         'product8':{
           'name':'product',
           'type':'object',
+          'parent':'cars7',
+          /*'depth' : 2,*/
           'xmlParts' : [
             {'obj': 'product8', 'attr':'id', 'pos':3},
           ]

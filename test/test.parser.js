@@ -4,7 +4,7 @@ var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
 
-describe('parser', function(){
+describe.only('parser', function(){
   
   describe('cleanTag', function(){
     it('should clean and remove any xml which are arround the tag', function(){
@@ -65,8 +65,36 @@ describe('parser', function(){
     });
   });
 
+  describe('findClosingTagIndex', function(){
+    it('should return the index of the closing tag on the right', function(){
+      assert.equal(parser.findClosingTagIndex('<tr>sqdsqd</tr>sqdsd', 'tr'), 15);
+      assert.equal(parser.findClosingTagIndex('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqdsd', 'tr'), 35);
+      assert.equal(parser.findClosingTagIndex('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd<tr></tr>sd', 'tr'), 35);
+      assert.equal(parser.findClosingTagIndex('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd</tr></tr>sd', 'tr'), 35);
+    });
+    it('should return -1 when the closing tag is not found', function(){
+      assert.equal(parser.findClosingTagIndex('<tr>sqdsqdsd', 'tr'), -1);
+      assert.equal(parser.findClosingTagIndex('<tr>sqdsqd<tr></tr>sqdsd', 'tr'), -1);
+    });
+  });
+
+  describe('findOpeningTagIndex', function(){
+    it('should return the index of the opening tag on the left', function(){
+      assert.equal(parser.findOpeningTagIndex('aasas<tr>sqdsqd</tr>', 'tr'), 5);
+      assert.equal(parser.findOpeningTagIndex('aasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr'), 5);
+      assert.equal(parser.findOpeningTagIndex('a<tr></tr>sdasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr'), 16);
+      assert.equal(parser.findOpeningTagIndex('a<tr><tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr'), 13);
+      assert.equal(parser.findOpeningTagIndex('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr'), 14);
+      assert.equal(parser.findOpeningTagIndex('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>', 'tr'), 17);
+    });
+    it('should return -1 when the opening tag is not found', function(){
+      assert.equal(parser.findOpeningTagIndex('aasqdsqd</tr>', 'tr'), -1);
+      assert.equal(parser.findOpeningTagIndex('aasas<tr></tr>sqdsqd</tr>', 'tr'), -1);
+    });
+  });
+
   describe('detectCommonPoint', function(){
-    it('should detect the common point', function(){
+    it('1. should detect the common point', function(){
       var _str = 'menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle';
       helper.assert(parser.detectCommonPoint(_str), {'tag':'</tr><tr>', 'pos': 40 });
 
@@ -79,40 +107,52 @@ describe('parser', function(){
       _str = 'menu </p><p> </p></tr:w><tr:w color=test test=3> <p> basket </p> balle';
       helper.assert(parser.detectCommonPoint(_str), {'tag':'</tr:w><tr:w color=test test=3>', 'pos': 24 });
     });
+    it('2. should detect the common point', function(){
+      var _str = '<h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> ';
+      helper.assert(parser.detectCommonPoint(_str), {'tag':'</tr> <tr A>', 'pos': 55 });
+    });
   });
 
 
   describe('detectRepetition', function(){
-    it('should detect the repetition', function(){
+    it('1. should detect the repetition', function(){
       var _xml = 'qsjh k <tr> menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
-      var _pivot = {'tag' : '<tr></tr>', 'pos': 52};
-      var _expectedRange = {start: 7,  end : 52};
+      var _pivot = {'tag' : '</tr><tr>', 'pos': 52};
+      var _expectedRange = {startEven: 7,  endEven : 52, startOdd:52, endOdd:102};
       helper.assert(parser.detectRepetition(_xml, _pivot), _expectedRange);
     });
 
-    it('should detect the repetition even if the start tag contains some meta data', function(){
-      var _xml = 'qsjh k <tr w:blue color=test> menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
-      var _pivot = {'tag' : '<tr></tr>', 'pos': 70};
-      var _expectedRange = {start: 7,  end : 70};
+    it('2. should detect the repetition even if the start tag contains some meta data', function(){
+      var _xml = 'qsjh k <tr w:blue color=test> menu </p><p> bla </p><p> foot </p> </tr><tr w:blue color=test> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
+      var _pivot = {'tag' : '</tr><tr>', 'pos': 70};
+      var _expectedRange = {startEven: 7,  endEven : 70, startOdd:70, endOdd:138};
       helper.assert(parser.detectRepetition(_xml, _pivot), _expectedRange);
     });
 
-    it('should detect the repetition even if there a lot of similar tags in the middle', function(){
-      var _xml = '<tr> qsjh k <tr> menu </tr><tr> bla </tr><tr> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd </tr>';
-      var _pivot = {'tag' : '<tr></tr>', 'pos': 61};
-      var _expectedRange = {start: 12,  end : 61};
+    it('3. should detect the repetition even if there a lot of similar tags and nested in the middle', function(){
+      var _xml = '<tr> qsjh k </tr><tr>start<tr><tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr><tr>   <tr> menu </tr><tr> bla </tr><tr><tr> balle </tr></tr> end </tr> <tr> </tr>';
+      var _pivot = {'tag' : '</tr><tr>', 'pos': 87};
+      var _expectedRange = {startEven: 17,  endEven : 87, startOdd:87, endOdd:158};
       helper.assert(parser.detectRepetition(_xml, _pivot), _expectedRange);
     });
 
-    it('should throw an error if the start tag is not found', function(){
+    it('5. should detect the repetition even there is some spaces in the pivot', function(){
+      var _xml = 'qsjh k <tr> menu </p><p> bla </p><p> foot </p> </tr>   <tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
+      var _pivot = {'tag' : '</tr><tr>', 'pos': 53};
+      var _expectedRange = {startEven: 7,  endEven : 53, startOdd:53, endOdd:105};
+      helper.assert(parser.detectRepetition(_xml, _pivot), _expectedRange);
+    });
+
+    it.skip('4. should throw an error if the start tag is not found', function(){
       var _xml = 'qsjh k <qsd:blue color=test> menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
-      var _pivot = {'tag' : '<tr></tr>', 'pos': 70};
-      assert.throws(function(){parser.detectRepetition(_xml, _pivot)}, /Repetition/);
+      var _pivot = {'tag' : '</tr><tr>', 'pos': 70};
+      var _expectedRange = {startEven: 0,  endEven : 70, startOdd:70, endOdd:70};
+      helper.assert(parser.detectRepetition(_xml, _pivot), _expectedRange);
     });
   });
 
 
-  describe('generateXml', function(){
+  describe.skip('generateXml', function(){
     it('should repeat and generate all the possible cases', function(){
       var _data ={
         'menu[i]':3
@@ -175,7 +215,7 @@ describe('parser', function(){
       helper.assert(_data, _expected);
     });
 
-    it('should sort the array even if some arrays are incomplete, undefined values are appears first', function(){
+    it('should sort the array even if some arrays are incomplete, undefined values appears first', function(){
       var _data     = [{'pos':[4, 4, 2]}, {'pos':[4, 4, 1]}, {'pos':[2, 4   ]}, {'pos':[1, 9, 1]}, {'pos':[2, 3   ]}, {'pos':[1      ]}];
       var _expected = [{'pos':[1      ]}, {'pos':[1, 9, 1]}, {'pos':[2, 3   ]}, {'pos':[2, 4   ]}, {'pos':[4, 4, 1]}, {'pos':[4, 4, 2]}];
       parser.sortXmlString(_data, 3)
@@ -242,16 +282,17 @@ describe('parser', function(){
   describe('extractXmlParts', function(){
     it('should extract xml parts', function(){
       var _xml = '<div></div>';
-      var _tags = [
-        {'pos': 5, 'name': 'd.menu'},
-      ];
       var _descriptor = {
         'd0':{
           'name':'',
-          'type': 'object',
+          'type':'object',
+          'parent':'',
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'menu', 'pos':5}
+          ]
         }
       };
-      helper.assert(parser.extractXmlParts(_xml, _tags, _descriptor), {
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
         'staticData'  : {
           'before':'<div>',
           'after' :'</div>'
@@ -259,9 +300,248 @@ describe('parser', function(){
         'dynamicData' : {
           'd0':{
             'name':'',
-            'type': 'object',
+            'type':'object',
+            'parent':'',
             'xmlParts' : [
-              {'before':'', 'obj': 'd0', 'attr':'menu', 'position':5, 'after': ''}
+              {'obj': 'd0', 'attr':'menu', 'pos':5, 'before':'', 'after':''}
+            ]
+          }
+        }
+      });
+    });
+    it('2 should extract xml parts', function(){
+      var _xml = '<div><p><h1></h1></p></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'object',
+          'parent':'',
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'menu', 'pos':5},
+            {'obj': 'd0', 'attr':'val', 'pos':8},
+            {'obj': 'd0', 'attr':'test', 'pos':12}
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</h1></p></div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'object',
+            'parent':'',
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'menu' , 'pos':5, 'before':'', 'after':''},
+              {'obj': 'd0', 'attr':'val'  , 'pos':8, 'before':'<p>', 'after':''},
+              {'obj': 'd0', 'attr':'test' , 'pos':12, 'before':'<h1>', 'after':''}
+            ]
+          }
+        }
+      });
+    });
+    it('3 should extract xml parts', function(){
+      var _xml = '<div><tr> <h1> </h1> </tr><tr> <h1> </h1> </tr></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'array',
+          'parent':'',
+          'range' : {'start':9, 'end':30}, /* Approximative range */
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'menu', 'pos':9},
+            {'obj': 'd0', 'attr':'val', 'pos':14},
+            {'obj': 'd0', 'attr':'test', 'pos':20}
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'array',
+            'parent':'',
+            'range' : {'start':5, 'end':26}, /* exact range */
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'menu' , 'pos':9, 'before':'<tr>', 'after':''},
+              {'obj': 'd0', 'attr':'val'  , 'pos':14, 'before':' <h1>', 'after':''},
+              {'obj': 'd0', 'attr':'test' , 'pos':20, 'before':' </h1>', 'after':' </tr>'}
+            ]
+          }
+        }
+      });
+    });
+    
+    it('4 should extract xml parts', function(){
+      var _xml = '<div><tr> <h1> </h1> <p></p> </tr><tr> <h1> </h1> <p></p> </tr></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'array',
+          'parent':'',
+          'range' : {'start':9, 'end':38}, /* Approximative range */
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'menu', 'pos':9},
+            {'obj': 'd0', 'attr':'val', 'pos':14},
+            {'obj': 'd0', 'attr':'test', 'pos':20}
+          ]
+        },
+        'info1':{
+          'name':'info',
+          'type':'object',
+          'parent':'d0',
+          'xmlParts' : [
+            {'obj': 'info1', 'attr':'id', 'pos':24}
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'array',
+            'parent':'',
+            'range' : {'start':5, 'end':34}, /* exact range */
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'menu' , 'pos':9, 'before':'<tr>', 'after':''},
+              {'obj': 'd0', 'attr':'val'  , 'pos':14, 'before':' <h1>', 'after':''},
+              {'obj': 'd0', 'attr':'test' , 'pos':20, 'before':' </h1>', 'after':''}
+            ]
+          },
+          'info1':{
+            'name':'info',
+            'type':'object',
+            'parent':'d0',
+            'xmlParts' : [
+              {'obj': 'info1', 'attr':'id', 'pos':24, 'before': ' <p>', 'after':'</p> </tr>'}
+            ]
+          }
+        }
+      });
+    });
+
+    it('5 should extract xml parts: two nested arrays', function(){
+      var _xml = '<div><tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'array',
+          'parent':'',
+          'range' : {'start':11, 'end':75}, /* Approximative range */
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'menu', 'pos':11},
+          ]
+        },
+        'element1':{
+          'name':'element',
+          'type':'array',
+          'parent':'d0',
+          'range' : {'start':26, 'end':46}, /* Approximative range */
+          'xmlParts' : [
+            {'obj': 'element1', 'attr':'id', 'pos':26}
+          ]
+        },
+        'info1':{
+          'name':'info',
+          'type':'object',
+          'parent':'d0',
+          'xmlParts' : [
+            {'obj': 'info1', 'attr':'id', 'pos':56}
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'array',
+            'parent':'',
+            'range' : {'start':5, 'end':67}, /* exact range */
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'menu' , 'pos':11, 'before':'<tr A>', 'after':''},
+            ]
+          },
+          'element1':{
+            'name':'element',
+            'type':'array',
+            'parent':'d0',
+            'range' : {'start':16, 'end':36}, /* exact range */
+            'xmlParts' : [
+              {'obj': 'element1', 'attr':'id', 'pos':26, 'before':'<tr B> <p>', 'after':'</p> </tr>'}
+            ]
+          },
+          'info1':{
+            'name':'info',
+            'type':'object',
+            'parent':'d0',
+            'xmlParts' : [
+              {'obj': 'info1', 'attr':'id', 'pos':56, 'before': '', 'after':'</h1> </tr>'}
+            ]
+          }
+        }
+      });
+    });
+
+    it('6 should extract xml parts: two nested arrays', function(){
+      var _xml = '<div><tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'array',
+          'parent':'',
+          'range' : {'start':11, 'end':75}, /* Approximative range */
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'menu', 'pos':11},
+            {'obj': 'd0', 'attr':'val', 'pos':56}
+          ]
+        },
+        'element1':{
+          'name':'element',
+          'type':'array',
+          'parent':'d0',
+          'range' : {'start':26, 'end':46}, /* Approximative range */
+          'xmlParts' : [
+            {'obj': 'element1', 'attr':'id', 'pos':26}
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'array',
+            'parent':'',
+            'range' : {'start':5, 'end':67}, /* exact range */
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'menu', 'pos':11, 'before':'<tr A>', 'after':''},
+              {'obj': 'd0', 'attr':'val' , 'pos':56, 'before': '', 'after':'</h1> </tr>'}
+            ]
+          },
+          'element1':{
+            'name':'element',
+            'type':'array',
+            'parent':'d0',
+            'range' : {'start':16, 'end':36}, /* exact range */
+            'xmlParts' : [
+              {'obj': 'element1', 'attr':'id', 'pos':26, 'before':'<tr B> <p>', 'after':'</p> </tr>'}
             ]
           }
         }

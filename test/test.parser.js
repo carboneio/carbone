@@ -303,10 +303,10 @@ describe('parser', function(){
             'name':'',
             'type':'object',
             'parent':'',
-            /*'depth': 0,*/
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'menu', 'pos':5, 'before':'', 'after':''}
-            ]
+              {'obj': 'd0', 'attr':'menu', 'pos':5, 'depth' : 0}
+            ],
+            'depth' : 0
           }
         }
       });
@@ -336,10 +336,11 @@ describe('parser', function(){
             'type':'object',
             'parent':'',
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'menu' , 'pos':5, 'before':'', 'after':''},
-              {'obj': 'd0', 'attr':'val'  , 'pos':8, 'before':'<p>', 'after':''},
-              {'obj': 'd0', 'attr':'test' , 'pos':12, 'before':'<h1>', 'after':''}
-            ]
+              {'obj': 'd0', 'attr':'menu' , 'pos':5 , 'depth' : 0, 'after':'<p>'},
+              {'obj': 'd0', 'attr':'val'  , 'pos':8 , 'depth' : 0, 'after':'<h1>'},
+              {'obj': 'd0', 'attr':'test' , 'pos':12, 'depth' : 0}
+            ],
+            'depth' : 0
           }
         }
       });
@@ -371,16 +372,19 @@ describe('parser', function(){
             'parent':'',
             'range' : {'start':5, 'end':26}, /* exact range */
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'menu' , 'pos':9, 'before':'<tr>', 'after':''},
-              {'obj': 'd0', 'attr':'val'  , 'pos':14, 'before':' <h1>', 'after':''},
-              {'obj': 'd0', 'attr':'test' , 'pos':20, 'before':' </h1>', 'after':' </tr>'}
-            ]
+              {'obj': 'd0', 'attr':'menu' , 'pos':9,  'depth' : 1,  'after':' <h1>'},
+              {'obj': 'd0', 'attr':'val'  , 'pos':14, 'depth' : 1,  'after':' </h1>'},
+              {'obj': 'd0', 'attr':'test' , 'pos':20, 'depth' : 1},
+              {'obj': 'd0', 'array':'start' , 'pos':5, 'depth' : 1,  'after':'<tr>'},
+              {'obj': 'd0', 'array':'end'   , 'pos':26, 'depth' : 1, 'before':' </tr>'}
+            ],
+            'depth' : 1
           }
         }
       });
     });
     
-    it('4 should extract xml parts', function(){
+    it('4 should extract xml parts nested object in an array', function(){
       var _xml = '<div><tr> <h1> </h1> <p></p> </tr><tr> <h1> </h1> <p></p> </tr></div>';
       var _descriptor = {
         'd0':{
@@ -415,18 +419,22 @@ describe('parser', function(){
             'parent':'',
             'range' : {'start':5, 'end':34}, /* exact range */
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'menu' , 'pos':9, 'before':'<tr>', 'after':''},
-              {'obj': 'd0', 'attr':'val'  , 'pos':14, 'before':' <h1>', 'after':''},
-              {'obj': 'd0', 'attr':'test' , 'pos':20, 'before':' </h1>', 'after':''}
-            ]
+              {'obj': 'd0', 'attr':'menu' , 'pos':9,  'depth': 1,  'after':' <h1>'},
+              {'obj': 'd0', 'attr':'val'  , 'pos':14, 'depth': 1,  'after':' </h1>'},
+              {'obj': 'd0', 'attr':'test' , 'pos':20, 'depth': 1,  'after':' <p>'},
+              {'obj': 'd0', 'array':'start', 'pos':5,  'depth': 1, 'after':'<tr>'},
+              {'obj': 'd0', 'array':'end'  , 'pos':34, 'depth': 1, 'before':'</p> </tr>'}
+            ],
+            'depth' : 1
           },
           'info1':{
             'name':'info',
             'type':'object',
             'parent':'d0',
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'id', 'pos':24, 'before': ' <p>', 'after':'</p> </tr>'}
-            ]
+              {'obj': 'info1', 'attr':'id', 'pos':24, 'depth': 1}
+            ],
+            'depth' : 1
           }
         }
       });
@@ -474,8 +482,11 @@ describe('parser', function(){
             'parent':'',
             'range' : {'start':5, 'end':67}, /* exact range */
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'menu' , 'pos':11, 'before':'<tr A>', 'after':''},
-            ]
+              {'obj': 'd0', 'attr':'menu'   , 'pos':11, 'depth':1, 'after': ' <h1>'},
+              {'obj': 'd0', 'array':'start' , 'pos':5,  'depth':1, 'after': '<tr A>'},
+              {'obj': 'd0', 'array':'end'   , 'pos':67, 'depth':1, 'before':'</h1> </tr>'},
+            ],
+            'depth':1
           },
           'element1':{
             'name':'element',
@@ -483,16 +494,20 @@ describe('parser', function(){
             'parent':'d0',
             'range' : {'start':16, 'end':36}, /* exact range */
             'xmlParts' : [
-              {'obj': 'element1', 'attr':'id', 'pos':26, 'before':'<tr B> <p>', 'after':'</p> </tr>'}
-            ]
+              {'obj': 'element1', 'attr':'id', 'pos':26, 'depth':2},
+              {'obj': 'element1', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
+              {'obj': 'element1', 'array':'end'  , 'pos':36, 'depth':2, 'before':'</p> </tr>'}
+            ],
+            'depth':2
           },
           'info1':{
             'name':'info',
             'type':'object',
             'parent':'d0',
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'id', 'pos':56, 'before': '', 'after':'</h1> </tr>'}
-            ]
+              {'obj': 'info1', 'attr':'id', 'pos':56, 'depth':1}
+            ],
+            'depth':1
           }
         }
       });
@@ -533,9 +548,12 @@ describe('parser', function(){
             'parent':'',
             'range' : {'start':5, 'end':67}, /* exact range */
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'menu', 'pos':11, 'before':'<tr A>', 'after':''},
-              {'obj': 'd0', 'attr':'val' , 'pos':56, 'before': '', 'after':'</h1> </tr>'}
-            ]
+              {'obj': 'd0', 'attr':'menu'  , 'pos':11, 'depth':1, 'after' : ' <h1>' },
+              {'obj': 'd0', 'attr':'val'   , 'pos':56, 'depth':1, },
+              {'obj': 'd0', 'array':'start', 'pos':5,  'depth':1,  'after':'<tr A>'},
+              {'obj': 'd0', 'array':'end'  , 'pos':67, 'depth':1,  'before':'</h1> </tr>'}
+            ],
+            'depth':1
           },
           'element1':{
             'name':'element',
@@ -543,8 +561,11 @@ describe('parser', function(){
             'parent':'d0',
             'range' : {'start':16, 'end':36}, /* exact range */
             'xmlParts' : [
-              {'obj': 'element1', 'attr':'id', 'pos':26, 'before':'<tr B> <p>', 'after':'</p> </tr>'}
-            ]
+              {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
+              {'obj': 'element1', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
+              {'obj': 'element1', 'array':'end'  , 'pos':36, 'depth':2, 'before':'</p> </tr>'}
+            ],
+            'depth':2
           }
         }
       });
@@ -581,7 +602,11 @@ describe('parser', function(){
             'type':'array',
             'parent':'',
             'range' : {'start':16 , 'end':36 }, /* exact range */
-            'xmlParts' : []
+            'xmlParts' : [
+              {'obj': 'd0', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
+              {'obj': 'd0', 'array':'end'  , 'pos':36, 'depth':2, 'before':'</p> </tr>'},
+            ],
+            'depth':2
           },
           'element1':{
             'name':'element',
@@ -589,8 +614,11 @@ describe('parser', function(){
             'parent':'d0',
             'range' : {'start':5, 'end': 67}, /* exact range */
             'xmlParts' : [
-              {'obj': 'element1', 'attr':'id', 'pos':26, 'before':'<tr A> <h1><tr B> <p>', 'after':'</p> </tr></h1> </tr>'}
-            ]
+              {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
+              {'obj': 'element1', 'array':'start', 'pos':5,  'depth':1, 'after':'<tr A> <h1>'},
+              {'obj': 'element1', 'array':'end'  , 'pos':67, 'depth':1, 'before':'</h1> </tr>'}
+            ],
+            'depth':1
           }
         }
       });

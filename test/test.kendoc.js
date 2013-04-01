@@ -6,23 +6,48 @@ var helper = require('../lib/helper');
 
 describe('Kendoc', function(){
 
-  describe('compileXmlNew', function(){
-    it('should return a function which generate the xml according to the descriptor and the data', function(){
+  describe.skip('compileXmlNew', function(){
+    it('should return nothing if the descriptor is empty', function(){
+      var _desc = {};
+      var _data = {
+        'firstname':'Thomas',
+        'lastname':'A. Anderson',
+        'surname': 'Neo'
+      };
+      var _fn = kendoc.getXMLBuilderFunction(_desc);
+      helper.assert(_fn(_data), '');
+    });
+  });
+  
+  describe('generateXmlParts', function(){
+    it('should return return an array of xml parts for static data if dynamicData is empty', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml>',
+          'after' :'</xml>'
+        },
+        'hierarchy'   : [],
+        'dynamicData' : {}
+      };
+      var _fn = kendoc.getXMLBuilderFunction(_desc);
+      helper.assert(_fn(null), [{pos:[0], str:'<xml>'}, {pos:[1], str:'</xml>'}]);
+    });
+    it('should return a function which return an array of xml parts according to the descriptor and the data', function(){
       var _desc = {
         'staticData'  : {
           'before':'',
           'after' :'</p></xml>'
         },
+        'hierarchy'   : ['d0'],
         'dynamicData' : {
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'object',
-            'position' : {'start': 0, 'end' :22},
             'xmlParts' : [
-              {'before':'<xml><p>', 'obj': 'd0', 'attr':'firstname', 'position':8 , 'after': ''}, 
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':15, 'after': ''},
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'surname'  , 'position':22, 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'before':'<xml><p>', 'after': ''}, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'before':'</p><p>' , 'after': ''},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'before':'</p><p>' , 'after': ''}
             ]
           }
         }
@@ -34,87 +59,49 @@ describe('Kendoc', function(){
       };
       var _fn = kendoc.getXMLBuilderFunction(_desc);
       helper.assert(_fn(_data), [{
-          pos: [ 0, 8 ],
+          pos: [8  ],
           str: '<xml><p>Thomas' 
         },{
-          pos: [ 0, 15 ],
+          pos: [15 ],
           str: '</p><p>A. Anderson' 
         },{
-          pos: [ 0, 22 ],
+          pos: [22 ],
           str: '</p><p>Neo' 
-        }]);
+        },{
+          pos: [23 ],
+          str: '</p></xml>' 
+        }]
+      );
     });
-    it('should return nothing if the descriptor is empty', function(){
-      var _desc = {};
-      var _data = {
-        'firstname':'Thomas',
-        'lastname':'A. Anderson',
-        'surname': 'Neo'
-      };
-      var _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), '');
-    });
-    it('should return only the xml if the data is empty or null or of one of the attribute doea not exist', function(){
+    it('should return only the xml if the data is empty or null or if one of the attribute does not exist', function(){
       var _desc = {
         'staticData'  : {
           'before':'',
           'after' :'</p></xml>'
         },
+        'hierarchy'   : ['d0'],
         'dynamicData' : {
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'object',
-            'position' : {'start': 0, 'end' :22},
             'xmlParts' : [
-              {'before':'<xml><p>', 'obj': 'd0', 'attr':'firstname', 'position':8, 'after': ''}, 
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':15, 'after': ''},
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'surname'  , 'position':22, 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'before':'<xml><p>', 'after': ''}, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'before':'</p><p>' , 'after': ''},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'before':'</p><p>' , 'after': ''}
             ]
           }
         }
       };
-      var _data = {};
       var _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), '<xml><p></p><p></p><p></p></xml>');
-
-      _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(null), '<xml><p></p><p></p><p></p></xml>');
-
+      var _data = {};
+      helper.assert(_fn(_data), [{pos:[8], str:'<xml><p>'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>'}, {pos:[23], str:'</p></xml>'}]);
+      helper.assert(_fn(null) , [{pos:[8], str:'<xml><p>'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>'}, {pos:[23], str:'</p></xml>'}]);
       _data = {
         'firstname':'Thomas',
         'surname': 'Neo'
       };
-      _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), '<xml><p>Thomas</p><p></p><p>Neo</p></xml>');
-    });
-    it('should return the xml in the correct order even if the descriptor is unordered', function(){
-      var _desc = {
-        'staticData'  : {
-          'before':'',
-          'after' :'</p></xml>'
-        },
-        'dynamicData' : {
-          'd0':{
-            'name':'',
-            'parent' : '',
-            'type': 'object',
-            'position' : {'start': 0, 'end' :22},
-            'xmlParts' : [
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'surname'  , 'position':22, 'after': ''},
-              {'before':'<xml><p>', 'obj': 'd0', 'attr':'firstname', 'position':8, 'after': ''}, 
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':15, 'after': ''}
-            ]
-          }
-        }
-      };
-      var _data = {
-        'firstname':'Thomas',
-        'lastname':'A. Anderson',
-        'surname': 'Neo'
-      };
-      var _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), '<xml><p>Thomas</p><p>A. Anderson</p><p>Neo</p></xml>');
+      helper.assert(_fn(_data) , [{pos:[8], str:'<xml><p>Thomas'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>Neo'}, {pos:[23], str:'</p></xml>'}]);
     });
     it('should works even if there is a nested object in the descriptor', function(){
       var _desc = {
@@ -122,26 +109,25 @@ describe('Kendoc', function(){
           'before':'',
           'after' :'</p></xml>'
         },
+        'hierarchy'   : ['d0', 'info1'],
         'dynamicData' : {
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'object',
-            'position' : {'start': 0, 'end' :40},
             'xmlParts' : [
-              {'before':'<xml><p>' , 'obj': 'd0', 'attr':'firstname', 'position':8, 'after': ''}, 
-              {'before':'</p><p>'  , 'obj': 'd0', 'attr':'lastname' , 'position':15, 'after': ''},
-              {'before':'</br><p>' , 'obj': 'd0', 'attr':'surname'  , 'position':40, 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8,  'before':'<xml><p>', 'after': ''}, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'before':'</p><p>' , 'after': ''},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':40, 'before':'</br><p>', 'after': ''}
             ]
           },
           'info1':{
             'name':'info',
             'parent' : 'd0',
             'type': 'object',
-            'position' : {'start': 15, 'end' :32},
             'xmlParts' : [
-              {'before':'</p><br>' , 'obj': 'info1', 'attr':'movie', 'position':23, 'after': '' }, 
-              {'before':'</br><br>', 'obj': 'info1', 'attr':'job'  , 'position':32, 'after': '' }
+              {'obj': 'info1', 'attr':'movie', 'pos':23, 'before':'</p><br>' , 'after': '' }, 
+              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'before':'</br><br>', 'after': '' }
             ]
           }
         }
@@ -156,24 +142,92 @@ describe('Kendoc', function(){
         }
       };
       var _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), '<xml><p>Thomas</p><p>A. Anderson</p><br>matrix</br><br>developer</br><p>Neo</p></xml>');
+      helper.assert(_fn(_data), [{ 
+          pos: [ 8 ],
+          str: '<xml><p>Thomas' 
+        },{ 
+          pos: [ 15 ],
+          str: '</p><p>A. Anderson' 
+        },{ 
+          pos: [ 40 ],
+          str: '</br><p>Neo' 
+        },{ 
+          pos: [ 23 ],
+          str: '</p><br>matrix' 
+        },{ 
+          pos: [ 32 ],
+          str: '</br><br>developer' 
+        },{ 
+          pos: [ 41 ],
+          str: '</p></xml>' 
+        }
+      ]);
     });
-
+    it('should travel the object in the correct order using the "hierarchy" array even if the dynamicData object is not declared in correct order', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'',
+          'after' :'</p></xml>'
+        },
+        'hierarchy'   : ['d0', 'info1'],
+        'dynamicData' : {
+          'info1':{
+            'name':'info',
+            'parent' : 'd0',
+            'type': 'object',
+            'xmlParts' : [
+              {'obj': 'info1', 'attr':'movie', 'pos':23, 'before':'</p><br>' , 'after': '' }, 
+              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'before':'</br><br>', 'after': '' }
+            ]
+          }, 
+          'd0':{
+            'name':'',
+            'parent' : '',
+            'type': 'object',
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'firstname', 'pos':8,  'before':'<xml><p>', 'after': ''}, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'before':'</p><p>' , 'after': ''},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':40, 'before':'</br><p>', 'after': ''}
+            ]
+          }
+        }
+      };
+      var _data = {
+        'firstname':'Thomas',
+        'lastname':'A. Anderson',
+        'surname': 'Neo',
+        'info':{
+          'movie': 'matrix',
+          'job' : 'developer'
+        }
+      };
+      var _fn = kendoc.getXMLBuilderFunction(_desc);
+      helper.assert(_fn(_data), [
+        { pos:[ 8  ], str: '<xml><p>Thomas'},
+        { pos:[ 15 ], str: '</p><p>A. Anderson'},
+        { pos:[ 40 ], str: '</br><p>Neo'},
+        { pos:[ 23 ], str: '</p><br>matrix'},
+        { pos:[ 32 ], str: '</br><br>developer'},
+        { pos:[ 41 ], str: '</p></xml>' }
+      ]);
+    });
     it('should works if the main object is an array of object', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
           'after' :' </xml>'
         },
+        'hierarchy'   : ['d0'],
         'dynamicData' : {
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'array',
+            'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'before':'<tr><p>', 'obj': 'd0', 'attr':'firstname', 'position':13, 'after': ''            }, 
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':20, 'after': '</p></tr>'  },
+              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'<tr><p>', 'after': ''           }, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  },
             ]
           }
         }
@@ -183,205 +237,229 @@ describe('Kendoc', function(){
         {'firstname':'Trinity',  'lastname':'Unknown'}
       ];
       var _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), '<xml> <tr><p>Thomas</p><p>A. Anderson</p></tr><tr><p>Trinity</p><p>Unknown</p></tr> </xml>');
+      helper.assert(_fn(_data), [
+        { pos:[ 0        ], str: '<xml> '},
+        { pos:[ 6, 0, 13 ], str: '<tr><p>Thomas'},
+        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson</p></tr>'},
+        { pos:[ 6, 1, 13 ], str: '<tr><p>Trinity'},
+        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown</p></tr>'},
+        { pos:[ 30       ], str: ' </xml>' }
+      ]);
     });
-
-    it('should works even with a nested object in an array', function(){
+    it('should works if there is an object in the array', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
           'after' :' </xml>'
         },
+        'hierarchy'   : ['d0', 'info1'],
         'dynamicData' : {
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'array',
-            'position' : {'start': 6, 'end' :47},
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'before':'<tr><p>'  , 'obj': 'd0', 'attr':'firstname', 'position':13, 'after': ''           }, 
-              {'before':'</h1><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':38, 'after': '</p></tr>'  },
+              {'obj': 'd0', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           }, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  },
             ]
           },
           'info1':{
             'name':'info',
             'parent' : 'd0',
             'type': 'object',
-            'position' : {'start': 13, 'end' :24},
+            'depth' : 1,
             'xmlParts' : [
-              {'before':'</p><h1>' , 'obj': 'info1', 'attr':'movie', 'position':21, 'after': '' }, 
-              {'before':'</h1><h1>', 'obj': 'info1', 'attr':'job'  , 'position':30, 'after': '' }
+              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>', 'after': ''    }, 
             ]
           }
         }
       };
       var _data = [
-        {
-          'firstname':'Thomas', 
-          'lastname':'A. Anderson', 
-          'info':{
-            'movie': 'matrix',
-            'job' : 'developer'
-          }
-        },
-        {
-          'firstname':'Trinity',
-          'lastname':'Unknown',
-          'info':{
-            'movie': 'matrix',
-            'job' : 'hacker'
-          }
-        }
+        {'firstname':'Thomas' ,  'lastname':'A. Anderson', 'info' : {'movie': 'matrix'} },
+        {'firstname':'Trinity',  'lastname':'Unknown', 'info' : {'movie': 'matrix2'}}
       ];
       var _fn = kendoc.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), 
-        '<xml> '
-          +'<tr><p>Thomas</p>'
-            +'<h1>matrix</h1><h1>developer</h1>'
-            +'<p>A. Anderson</p>'
-          +'</tr>'
-          +'<tr><p>Trinity</p>'
-            +'<h1>matrix</h1><h1>hacker</h1>'
-            +'<p>Unknown</p>'
-          +'</tr>'
-        +' </xml>');
+      helper.assert(_fn(_data), [
+        { pos:[ 0        ], str: '<xml> '},
+        { pos:[ 6, 0, 10 ], str: '<tr>Thomas'},
+        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson</p></tr>'},
+        { pos:[ 6, 0, 13 ], str: '<p>matrix'},
+        { pos:[ 6, 1, 10 ], str: '<tr>Trinity'},
+        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown</p></tr>'},
+        { pos:[ 6, 1, 13 ], str: '<p>matrix2'},
+        { pos:[ 30       ], str: ' </xml>' }
+      ]);
     });
-
-    it('should works even with a nested array in the main object', function(){
+    it('should works if there are three nested objects in the array (with one missing object in the last row) ', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
           'after' :' </xml>'
         },
+        'hierarchy'   : ['d0', 'info1', 'info2', 'info3'],
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'parent' : '',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :29},
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           }, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  },
+            ]
+          },
+          'info1':{
+            'name':'info',
+            'parent' : 'd0',
+            'type': 'object',
+            'depth' : 1,
+            'xmlParts' : [
+              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>', 'after': ''    }, 
+            ]
+          },
+          'info2':{
+            'name':'info',
+            'parent' : 'info1',
+            'type': 'object',
+            'depth' : 1,
+            'xmlParts' : [
+              {'obj': 'info2', 'attr':'style', 'pos':14, 'depth':1, 'before':'', 'after': ''    }, 
+            ]
+          },
+          'info3':{
+            'name':'info',
+            'parent' : 'info2',
+            'type': 'object',
+            'depth' : 1,
+            'xmlParts' : [
+              {'obj': 'info3', 'attr':'rate', 'pos':15, 'depth':1, 'before':'', 'after': ''    }, 
+            ]
+          }
+        }
+      };
+      var _data = [
+        {'firstname':'Thomas' ,  'lastname':'A. Anderson', 
+          'info' : {
+            'movie': 'matrix', 
+            'info' : {
+              'style' : 'sf',
+              'info' : {
+                'rate' : '10'
+              }
+            }
+          } 
+        },
+        {'firstname':'Trinity',  'lastname':'Unknown', 
+          'info' : {
+            'movie': 'matrix2', 
+            'info' : {
+              'style' : 'sf2'
+            }
+          } 
+        }
+      ];
+      var _fn = kendoc.getXMLBuilderFunction(_desc);
+      helper.assert(_fn(_data), [
+        { pos:[ 0        ], str: '<xml> '},
+        { pos:[ 6, 0, 10 ], str: '<tr>Thomas'},
+        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson</p></tr>'},
+        { pos:[ 6, 0, 13 ], str: '<p>matrix'},
+        { pos:[ 6, 0, 14 ], str: 'sf'},
+        { pos:[ 6, 0, 15 ], str: '10'},
+        { pos:[ 6, 1, 10 ], str: '<tr>Trinity'},
+        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown</p></tr>'},
+        { pos:[ 6, 1, 13 ], str: '<p>matrix2'},
+        { pos:[ 6, 1, 14 ], str: 'sf2'},
+        { pos:[ 6, 1, 15 ], str: ''},
+        { pos:[ 30       ], str: ' </xml>' }
+      ]);
+    });
+    it('should works if there are two adjacents array of objects', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml> ',
+          'after' :' </xml>'
+        },
+        'hierarchy'   : ['d0', 'movies1', 'cars2'],
         'dynamicData' : {
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'object',
-            'position' : {'start': 0, 'end' :24},
-            'xmlParts' : [
-              {'before':'<p>'     , 'obj': 'd0', 'attr':'firstname', 'position':10, 'after': ''}, 
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':20, 'after': '</p>'}
-            ]
+            'xmlParts' : []
           },
-          'skills1':{
-            'name':'skills',
+          'movies1':{
+            'name':'movies',
             'parent' : 'd0',
             'type': 'array',
-            'position' : {'start': 24, 'end' :32},
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :15},
             'xmlParts' : [
-              {'before':'<tr>'  , 'obj': 'skills1', 'attr':'name', 'position':28, 'after': '</tr>'}, 
+              {'obj': 'movies1', 'attr':'title', 'pos':10, 'depth':1, 'before':'<tr>', 'after': '</tr>'    }, 
+            ]
+          },
+          'cars2':{
+            'name':'cars',
+            'parent' : 'd0',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 20, 'end' :29},
+            'xmlParts' : [
+              {'obj': 'cars2', 'attr':'brand', 'pos':24, 'depth':1, 'before':'<trow>', 'after': '</trow>'  }, 
             ]
           }
         }
       };
       var _data = {
-        'firstname':'Thomas',
-        'lastname':'Anderson',
-        'skills':[
-          {'name' : 'survive'},
-          {'name' : 'walk on the walls'}
+        'movies' : [
+          {'title' : 'matrix' },
+          {'title' : 'Lord of War' }
+        ],
+        'cars' : [
+          {'brand' : 'Lumeneo' },
+          {'brand' : 'Tesla motors' }
         ]
       };
       var _fn = kendoc.getXMLBuilderFunction(_desc);
-      console.log('\n\n\n'+_fn(_data)+'\n\n\n');
-      helper.assert(_fn(_data), 
-        '<xml> '
-          +'<p>Thomas</p>'
-          +'<p>Anderson</p>'
-            +'<tr>survive</tr>'
-            +'<tr>walk on the walls</tr>'
-        +' </xml>');
+      helper.assert(_fn(_data), [
+        { pos:[ 0        ], str: '<xml> '},
+        { pos:[ 6 , 0, 10 ], str: '<tr>matrix</tr>'},
+        { pos:[ 6 , 1, 10 ], str: '<tr>Lord of War</tr>'},
+        { pos:[ 20, 0, 24 ], str: '<trow>Lumeneo</trow>'},
+        { pos:[ 20, 1, 24 ], str: '<trow>Tesla motors</trow>'},
+        { pos:[ 30       ], str: ' </xml>' }
+      ]);
     });
-    it('should works even with a two nested arrays', function(){
+    it('should works even with two nested arrays', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
           'after' :' </xml>'
         },
+        'hierarchy'   : ['d0', 'skills1'],
         'dynamicData' : {
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'array',
-            'nestedPos' : 1,
+            'depth' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
-              {'before':'<tr><p>', 'obj': 'd0', 'attr':'firstname', 'position':13, 'after': ''            }, 
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':29, 'after': '</p></tr>'  },
+              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'<tr><p>', 'after': ''            }, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':29, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  },
             ]
           },
           'skills1':{
             'name':'skills',
             'parent' : 'd0',
             'type': 'array',
-            'nestedPos' : 2,
+            'depth' : 2,
             'position' : {'start': 13, 'end' :22},
             'xmlParts' : [
-              {'before':'<tr>'  , 'obj': 'skills1', 'attr':'name', 'position':17, 'after': '</tr>'}, 
-            ]
-          }
-        }
-      };
-      var _data = [{
-          'firstname':'Thomas', 
-          'lastname':'A. Anderson', 
-          'skills':[
-            {'name' : 'survive'},
-            {'name' : 'walk on the walls'}
-          ]
-        },{
-          'firstname':'Trinity',
-          'lastname':'Unknown',
-          'skills':[
-            {'name' : 'hack'}
-          ]
-        }
-      ];
-      var _fn = kendoc.getXMLBuilderFunction(_desc);
-      console.log('\n\n\n'+_fn(_data)+'\n\n\n');
-      helper.assert(_fn(_data), 
-        '<xml> '
-          +'<tr><p>Thomas</p>'
-            +'<tr>survive</tr>'
-            +'<tr>walk on the walls</tr>'
-            +'<p>A. Anderson</p>'
-          +'</tr>'
-          +'<tr><p>Trinity</p>'
-            +'<tr>hack</tr>'
-            +'<p>Unknown</p>'
-          +'</tr>'
-        +' </xml>');
-    });
-  });
-  
-  describe('generateXmlParts', function(){
-    it('should works even with a two nested arrays', function(){
-      var _desc = {
-        'staticData'  : {
-          'before':'<xml> ',
-          'after' :' </xml>'
-        },
-        'dynamicData' : {
-          'd0':{
-            'name':'',
-            'parent' : '',
-            'type': 'array',
-            'nestedPos' : 1,
-            'position' : {'start': 6, 'end' :38},
-            'xmlParts' : [
-              {'before':'<tr><p>', 'obj': 'd0', 'attr':'firstname', 'position':13, 'after': ''            }, 
-              {'before':'</p><p>' , 'obj': 'd0', 'attr':'lastname' , 'position':29, 'after': '</p></tr>'  },
-            ]
-          },
-          'skills1':{
-            'name':'skills',
-            'parent' : 'd0',
-            'type': 'array',
-            'nestedPos' : 2,
-            'position' : {'start': 13, 'end' :22},
-            'xmlParts' : [
-              {'before':'<tr>'  , 'obj': 'skills1', 'attr':'name', 'position':17, 'after': '</tr>'}, 
+              {'obj': 'skills1', 'attr':'name', 'pos':17, 'depth':2, 'before':'<tr>', 'after': '</tr>'}, 
             ]
           }
         }
@@ -403,6 +481,9 @@ describe('Kendoc', function(){
       ];
       var _fn = kendoc.getXMLBuilderFunction(_desc);
       helper.assert(_fn(_data), [{ 
+          pos: [ 0 ],
+          str: '<xml> ' 
+        },{ 
           pos: [ 6, 0, 13 ],
           str: '<tr><p>Thomas' 
         },{ 
@@ -415,16 +496,94 @@ describe('Kendoc', function(){
           pos: [ 6, 0, 17, 1 ],
           str: '<tr>walk on the walls</tr>' 
         },{ 
-          pos: [ 6, 1, 13, 1 ],
+          pos: [ 6, 1, 13 ],
           str: '<tr><p>Trinity' 
         },{ 
-          pos: [ 6, 1, 29, 1 ],
+          pos: [ 6, 1, 29 ],
           str: '</p><p>Unknown</p></tr>' 
         },{ 
           pos: [ 6, 1, 17, 0 ],
-          str: '<tr>hack</tr>'}
+          str: '<tr>hack</tr>'
+        },{ 
+          pos: [ 39 ],
+          str: ' </xml>'
+        }
       ]);
     });
+    it('should works even with two nested arrays used in the inverse order', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml> ',
+          'after' :' </xml>'
+        },
+        'hierarchy'   : ['d0', 'skills1'],
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'parent' : '',
+            'type': 'array',
+            'depth' : 2,
+            'position' : {'start': 13, 'end' :22},
+            'xmlParts' : [
+            ]
+          },
+          'skills1':{
+            'name':'skills',
+            'parent' : 'd0',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :38},
+            'xmlParts' : [
+              {'obj': 'skills1', 'attr':''    , 'pos': 6 , 'depth':1, 'before':'<tr>', 'after': '' },
+              {'obj': 'skills1', 'attr':'name', 'pos': 15, 'depth':2, 'before':'<td>'   , 'after': '</td>'     }, 
+              {'obj': 'skills1', 'attr':''    , 'pos': 35, 'depth':1, 'after':'</tr>', 'before': '' }
+            ]
+          }
+        }
+      };
+      var _data = [{
+          'firstname':'Thomas', 
+          'lastname':'A. Anderson', 
+          'skills':[
+            {'name' : 'skill1_1'},
+            {'name' : 'skill1_2'},
+            {'name' : 'skill1_3'}
+          ]
+        },{
+          'firstname':'Trinity',
+          'lastname':'Unknown',
+          'skills':[
+            {'name' : 'skill2_1'},
+            {'name' : 'skill2_2'},
+            {'name' : 'skill2_3'}
+          ]
+        }
+      ];
+      var _fn = kendoc.getXMLBuilderFunction(_desc);
+      helper.assert(_fn(_data), [ 
+        { pos: [ 0            ], str: '<xml> ' },
+        { pos: [ 13, 0, 6     ], str: '<tr>' },
+        { pos: [ 13, 0, 15, 0 ], str: '<td>skill1_1</td>' },
+        { pos: [ 13, 0, 35    ], str: '</tr>' },
+        { pos: [ 13, 1, 6     ], str: '<tr>' },
+        { pos: [ 13, 1, 15, 0 ], str: '<td>skill1_2</td>' },
+        { pos: [ 13, 1, 35    ], str: '</tr>' },
+        { pos: [ 13, 2, 6     ], str: '<tr>' },
+        { pos: [ 13, 2, 15, 0 ], str: '<td>skill1_3</td>' },
+        { pos: [ 13, 2, 35    ], str: '</tr>' },
+        { pos: [ 13, 0, 6     ], str: '<tr>' },
+        { pos: [ 13, 0, 15, 1 ], str: '<td>skill2_1</td>' },
+        { pos: [ 13, 0, 35    ], str: '</tr>' },
+        { pos: [ 13, 1, 6     ], str: '<tr>' },
+        { pos: [ 13, 1, 15, 1 ], str: '<td>skill2_2</td>' },
+        { pos: [ 13, 1, 35    ], str: '</tr>' },
+        { pos: [ 13, 2, 6     ], str: '<tr>' },
+        { pos: [ 13, 2, 15, 1 ], str: '<td>skill2_3</td>' },
+        { pos: [ 13, 2, 35    ], str: '</tr>' },
+        { pos: [ 39           ], str: ' </xml>' } 
+      ]);
+    });
+
   });
 
   describe('decomposeTags', function(){
@@ -495,6 +654,41 @@ describe('Kendoc', function(){
           /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product3', 'attr':'id', 'pos':90}
+          ]
+        },
+      });
+    });
+    it('2 inverse order should decompose all tags', function(){
+      var _tags = [
+        {'pos': 10, 'name': 'd.menu[i].menuElement[i].id'},
+        {'pos': 20, 'name': 'd.menu[i+1].menuElement[i].id'},
+        {'pos': 30, 'name': 'd.menu[i].menuElement[i+1].id'},
+        {'pos': 40, 'name': 'd.menu[i+1].menuElement[i+1].id'}
+      ];
+      helper.assert(kendoc.decomposeTags(_tags), {
+        'd0':{
+          'name':'',
+          'type': 'object',
+          'parent':'',
+          /*'depth' : 0,*/
+          'xmlParts' : []
+        },
+        'menu1':{
+          'name':'menu',
+          'type':'array',
+          'parent':'d0',
+          /*'depth' : 2,*/
+          'range': {'start':10, 'end':20},
+          'xmlParts' : []
+        },
+        'menuElement2':{
+          'name':'menuElement',
+          'type':'array',
+          'parent':'menu1',
+          /*'depth' : 4,*/
+          'range': {'start':10, 'end':30},
+          'xmlParts' : [
+            {'obj': 'menuElement2', 'attr':'id', 'pos':10}
           ]
         },
       });

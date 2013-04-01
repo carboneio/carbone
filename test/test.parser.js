@@ -4,7 +4,7 @@ var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
 
-describe.only('parser', function(){
+describe('parser', function(){
   
   describe('cleanTag', function(){
     it('should clean and remove any xml which are arround the tag', function(){
@@ -287,6 +287,7 @@ describe.only('parser', function(){
           'name':'',
           'type':'object',
           'parent':'',
+          /*'depth': null,*/
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':5}
           ]
@@ -302,6 +303,7 @@ describe.only('parser', function(){
             'name':'',
             'type':'object',
             'parent':'',
+            /*'depth': 0,*/
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu', 'pos':5, 'before':'', 'after':''}
             ]
@@ -352,7 +354,7 @@ describe.only('parser', function(){
           'range' : {'start':9, 'end':30}, /* Approximative range */
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':9},
-            {'obj': 'd0', 'attr':'val', 'pos':14},
+            {'obj': 'd0', 'attr':'val' , 'pos':14},
             {'obj': 'd0', 'attr':'test', 'pos':20}
           ]
         }
@@ -542,6 +544,52 @@ describe.only('parser', function(){
             'range' : {'start':16, 'end':36}, /* exact range */
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id', 'pos':26, 'before':'<tr B> <p>', 'after':'</p> </tr>'}
+            ]
+          }
+        }
+      });
+    });
+
+    it('7 should extract xml parts: two nested arrays inverse order', function(){
+      var _xml = '<div><tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'array',
+          'parent':'',
+          'range' : {'start':26, 'end':46}, /* Approximative range */
+          'xmlParts' : []
+        },  
+        'element1':{
+          'name':'element',
+          'type':'array',
+          'parent':'d0',
+          'range' : {'start':11, 'end': 75}, /* Approximative range */
+          'xmlParts' : [
+            {'obj': 'element1', 'attr':'id', 'pos':26}
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'array',
+            'parent':'',
+            'range' : {'start':16 , 'end':36 }, /* exact range */
+            'xmlParts' : []
+          },
+          'element1':{
+            'name':'element',
+            'type':'array',
+            'parent':'d0',
+            'range' : {'start':5, 'end': 67}, /* exact range */
+            'xmlParts' : [
+              {'obj': 'element1', 'attr':'id', 'pos':26, 'before':'<tr A> <h1><tr B> <p>', 'after':'</p> </tr></h1> </tr>'}
             ]
           }
         }

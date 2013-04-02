@@ -143,54 +143,14 @@ describe('parser', function(){
       helper.assert(parser.detectRepetition(_xml, _pivot), _expectedRange);
     });
 
-    it.skip('4. should throw an error if the start tag is not found', function(){
+    it('4. should returnu -1 if the start tag is not found', function(){
       var _xml = 'qsjh k <qsd:blue color=test> menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
       var _pivot = {'tag' : '</tr><tr>', 'pos': 70};
-      var _expectedRange = {startEven: 0,  endEven : 70, startOdd:70, endOdd:70};
+      var _expectedRange = {startEven: -1,  endEven : 70, startOdd:70, endOdd:69};
       helper.assert(parser.detectRepetition(_xml, _pivot), _expectedRange);
     });
   });
 
-
-  describe.skip('generateXml', function(){
-    it('should repeat and generate all the possible cases', function(){
-      var _data ={
-        'menu[i]':3
-      };
-      assert.equal(parser.generateXml(_data, '<tr>{{menu[i].id}}</tr>'), '<tr>{{menu[0].id}}</tr><tr>{{menu[1].id}}</tr><tr>{{menu[2].id}}</tr>');
-    });
-    it('should works with multiple keys', function(){
-      var _data ={
-        'menu[i]':2
-      };
-      assert.equal(parser.generateXml(_data, '<tr>{{menu[i].id}}<br>{{menu[i].label}}</tr>'), '<tr>{{menu[0].id}}<br>{{menu[0].label}}</tr><tr>{{menu[1].id}}<br>{{menu[1].label}}</tr>');
-    });
-    it('should repeat only the last part of the array (the iterator)', function(){
-      var _data = {
-        'menu[test=1][0][i]':2
-      };
-      assert.equal(parser.generateXml(_data, '<tr>{{menu[test=1][0][i].id}}</tr>'), '<tr>{{menu[test=1][0][0].id}}</tr><tr>{{menu[test=1][0][1].id}}</tr>');
-    });
-    it('should works also when the iterator is not "i"', function(){
-      var _data = {
-        'menu[test=1][0][dish.id+1]':2
-      };
-      assert.equal(parser.generateXml(_data, '<tr>{{menu[test=1][0][dish.id + 1].id}}</tr>'), '<tr>{{menu[test=1][0][0].id}}</tr><tr>{{menu[test=1][0][1].id}}</tr>');
-    });
-    it('should works with whitespaces. It should remove whitespace only on the iterator', function(){
-      var _data = {
-        ' menu [ test =1 ] [0] [ dish .id + 1 ]':2
-      };
-      assert.equal(parser.generateXml(_data, '<tr>{{ menu [ test =1 ] [0] [ dish .id + 1 ].id}}</tr>'), '<tr>{{ menu [ test =1 ] [0] [0].id}}</tr><tr>{{ menu [ test =1 ] [0] [1].id}}</tr>');
-    });
-    it('should repeat nested arrays', function(){
-      var _data ={
-        'menu[i]':3,
-        'menu[i][i]':2
-      };
-      assert.equal(parser.generateXml(_data, '<tr>{{menu[i].id}}<td>{{menu[i].element[i].id}}</td></tr>'), '<tr>{{menu[0].id}}</tr><tr>{{menu[1].id}}</tr><tr>{{menu[2].id}}</tr>');
-    });
-  });
 
 
   describe('sortXmlString', function(){

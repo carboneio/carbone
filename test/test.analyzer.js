@@ -33,10 +33,11 @@ describe('Analyzer', function(){
             'name':'',
             'parent' : '',
             'type': 'object',
+            'depth':0, 
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'before':'<xml><p>', 'after': ''}, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'before':'</p><p>' , 'after': ''},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'before':'</p><p>' , 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': ''}, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': ''},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': ''}
             ]
           }
         }
@@ -74,10 +75,11 @@ describe('Analyzer', function(){
             'name':'',
             'parent' : '',
             'type': 'object',
+            'depth':0, 
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'before':'<xml><p>', 'after': ''}, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'before':'</p><p>' , 'after': ''},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'before':'</p><p>' , 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': ''}, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': ''},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': ''}
             ]
           }
         }
@@ -104,19 +106,21 @@ describe('Analyzer', function(){
             'name':'',
             'parent' : '',
             'type': 'object',
+            'depth':0, 
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8,  'before':'<xml><p>', 'after': ''}, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'before':'</p><p>' , 'after': ''},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':40, 'before':'</br><p>', 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>', 'after': ''}, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': ''},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>', 'after': ''}
             ]
           },
           'info1':{
             'name':'info',
             'parent' : 'd0',
             'type': 'object',
+            'depth':0, 
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':23, 'before':'</p><br>' , 'after': '' }, 
-              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'before':'</br><br>', 'after': '' }
+              {'obj': 'info1', 'attr':'movie', 'pos':23, 'depth':0,  'before':'</p><br>' , 'after': '' }, 
+              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'depth':0,  'before':'</br><br>', 'after': '' }
             ]
           }
         }
@@ -164,19 +168,21 @@ describe('Analyzer', function(){
             'name':'info',
             'parent' : 'd0',
             'type': 'object',
+            'depth':0, 
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':23, 'before':'</p><br>' , 'after': '' }, 
-              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'before':'</br><br>', 'after': '' }
+              {'obj': 'info1', 'attr':'movie', 'pos':23,  'depth':0, 'before':'</p><br>' , 'after': '' }, 
+              {'obj': 'info1', 'attr':'job'  , 'pos':32,  'depth':0, 'before':'</br><br>', 'after': '' }
             ]
           }, 
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'object',
+            'depth':0, 
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8,  'before':'<xml><p>', 'after': ''}, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'before':'</p><p>' , 'after': ''},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':40, 'before':'</br><p>', 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>', 'after': ''}, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' , 'after': ''},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>', 'after': ''}
             ]
           }
         }
@@ -610,7 +616,6 @@ describe('Analyzer', function(){
           'name':'',
           'type': 'object',
           'parent':'',
-          /*'depth' : 0,*/
           'xmlParts' : [
             {'obj': 'd0', 'attr':'site', 'pos':80}
           ]
@@ -619,8 +624,7 @@ describe('Analyzer', function(){
           'name':'menu',
           'type':'array',
           'parent':'d0',
-          /*'depth' : 2,*/
-          'range': {'start':1, 'end':40},
+          'position': {'start':1, 'end':40},
           'xmlParts' : [
             {'obj': 'menu1', 'attr':'id'  , 'pos':1},
             {'obj': 'menu1', 'attr':'cars', 'pos':10}
@@ -630,8 +634,7 @@ describe('Analyzer', function(){
           'name':'menuElement',
           'type':'array',
           'parent':'menu1',
-          /*'depth' : 4,*/
-          'range': {'start':20, 'end':30},
+          'position': {'start':20, 'end':30},
           'xmlParts' : [
             {'obj': 'menuElement2', 'attr':'id', 'pos':20}
           ]
@@ -640,7 +643,6 @@ describe('Analyzer', function(){
           'name':'product',
           'type':'object',
           'parent':'d0',
-          /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product3', 'attr':'id', 'pos':90}
           ]
@@ -666,16 +668,14 @@ describe('Analyzer', function(){
           'name':'menu',
           'type':'array',
           'parent':'d0',
-          /*'depth' : 2,*/
-          'range': {'start':10, 'end':20},
+          'position': {'start':10, 'end':20},
           'xmlParts' : []
         },
         'menuElement2':{
           'name':'menuElement',
           'type':'array',
           'parent':'menu1',
-          /*'depth' : 4,*/
-          'range': {'start':10, 'end':30},
+          'position': {'start':10, 'end':30},
           'xmlParts' : [
             {'obj': 'menuElement2', 'attr':'id', 'pos':10}
           ]
@@ -697,7 +697,6 @@ describe('Analyzer', function(){
           'name':'',
           'type': 'object',
           'parent':'',
-          /*'depth' : 0,*/
           'xmlParts' : [
             {'obj': 'd0', 'attr':'site', 'pos':20}
           ]
@@ -706,8 +705,7 @@ describe('Analyzer', function(){
           'name':'menu',
           'type':'array', 
           'parent':'d0',
-          /*'depth' : 2,*/
-          'range': { 'start': 1, 'end': 50 },
+          'position': { 'start': 1, 'end': 50 },
           'xmlParts' : [
             {'obj': 'menu1', 'attr':'id'  , 'pos':1},
             {'obj': 'menu1', 'attr':'cars', 'pos':10}
@@ -717,7 +715,6 @@ describe('Analyzer', function(){
           'name':'product',
           'type':'object',
           'parent':'d0',
-          /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product2', 'attr':'id', 'pos':30}
           ]
@@ -726,7 +723,6 @@ describe('Analyzer', function(){
           'name':'menuElement',
           'type':'array',
           'parent':'menu1',
-          /*'depth' : 4,*/
           'xmlParts' : [
             {'obj': 'menuElement3', 'attr':'id', 'pos':40}
           ]
@@ -748,23 +744,20 @@ describe('Analyzer', function(){
           'name':'',
           'type': 'object',
           'parent':'',
-          /*'depth' : 0,*/
           'xmlParts' : []
         },
         'menu1':{
           'name':'menu',
           'type':'array',
           'parent':'d0',
-          /*'depth' : 2,*/
-          'range': {'start': 1, 'end': 3 },
+          'position': {'start': 1, 'end': 3 },
           'xmlParts' : []
         },
         'menu2':{
           'name':'menu',
           'type':'array',
           'parent':'menu1',
-          /*'depth' : 3,*/
-          'range':{'start': 1, 'end': 2 },
+          'position':{'start': 1, 'end': 2 },
           'xmlParts' : [
             {'obj': 'menu2', 'attr':'id', 'pos':1},
           ]
@@ -773,7 +766,6 @@ describe('Analyzer', function(){
           'name':'product',
           'type':'object',
           'parent':'d0',
-          /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product3', 'attr':'id', 'pos':5}
           ]
@@ -782,8 +774,7 @@ describe('Analyzer', function(){
           'name':'days',
           'type':'array',
           'parent':'d0',
-          /*'depth' : 2,*/
-          'range':{'start': 6, 'end': 7 },
+          'position':{'start': 6, 'end': 7 },
           'xmlParts' : [
             {'obj': 'days4', 'attr':'name', 'pos':6}
           ]
@@ -801,42 +792,36 @@ describe('Analyzer', function(){
           'name':'',
           'type': 'object',
           'parent':'',
-          /*'depth' : 0,*/
           'xmlParts' : []
         },
         'menu1':{
           'name':'menu',
           'type':'array',
           'parent':'d0',
-          /*'depth' : 2,*/
           'xmlParts' : []
         },
         'menu2':{
           'name':'menu',
           'type':'array',
           'parent':'menu1',
-          /*'depth' : 4,*/
           'xmlParts' : []
         },
         'menu3':{
           'name':'menu',
           'type':'array',
           'parent':'menu2',
-          /*'depth' : 6,*/
           'xmlParts' : []
         },
         'product4':{
           'name':'product',
           'type':'array',
           'parent':'menu3',
-          /*'depth' : 8,*/
           'xmlParts' : []
         },
         'site5':{
           'name':'site',
           'type':'object',
           'parent':'product4',
-          /*'depth' : 7,*/
           'xmlParts' : [
             {'obj': 'site5', 'attr':'id', 'pos':1},
           ]
@@ -845,7 +830,6 @@ describe('Analyzer', function(){
           'name':'product',
           'type':'object',
           'parent':'d0',
-          /*'depth' : 1,*/
           'xmlParts' : [
             {'obj': 'product6', 'attr':'id', 'pos':2},
           ]
@@ -854,14 +838,12 @@ describe('Analyzer', function(){
           'name':'cars',
           'type':'object',
           'parent':'d0',
-          /*'depth' : 1,*/
           'xmlParts' : []
         },
         'product8':{
           'name':'product',
           'type':'object',
           'parent':'cars7',
-          /*'depth' : 2,*/
           'xmlParts' : [
             {'obj': 'product8', 'attr':'id', 'pos':3},
           ]

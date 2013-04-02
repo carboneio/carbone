@@ -181,6 +181,37 @@ describe('parser', function(){
       parser.sortXmlString(_data, 3)
       helper.assert(_data, _expected);
     });
+
+    it('should sort a complex array (sort depth of 3) of xml parts and return an concatenate string', function(){
+      var _data     = [ 
+        { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
+        { 'pos': [ 0        ], 'str': '<xml> '       },
+        { 'pos': [ 6, 1, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 1, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 6, 0, 14 ], 'str': 'Lumeneo'      },
+        { 'pos': [ 6, 0, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 0, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 6, 2, 14 ], 'str': 'Toyota'       },
+        { 'pos': [ 6, 2, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 2, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 24       ], 'str': '</xml>'       } 
+      ];
+      var _expected     = [ 
+        { 'pos': [ 0        ], 'str': '<xml> '       },
+        { 'pos': [ 6, 0, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 0, 14 ], 'str': 'Lumeneo'      },
+        { 'pos': [ 6, 0, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 6, 1, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
+        { 'pos': [ 6, 1, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 6, 2, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 2, 14 ], 'str': 'Toyota'       },
+        { 'pos': [ 6, 2, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 24       ], 'str': '</xml>'       } 
+      ];
+      parser.sortXmlString(_data, 10);
+      helper.assert(_data, _expected);
+    });
   });
 
   describe('concatString', function(){
@@ -206,6 +237,22 @@ describe('parser', function(){
       helper.assert(parser.concatString(_data, 3), '123456');
     });
 
+    it('should sort a complex array (sort depth of 3) of xml parts and return an concatenate string', function(){
+      var _data     = [ 
+        { 'pos': [ 0        ], 'str': '<xml>' },
+        { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
+        { 'pos': [ 6, 1, 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 1, 23 ], 'str': '</tr>' },
+        { 'pos': [ 6, 0, 14 ], 'str': 'Lumeneo' },
+        { 'pos': [ 6, 0, 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 0, 23 ], 'str': '</tr>' },
+        { 'pos': [ 6, 2, 14 ], 'str': 'Toyota' },
+        { 'pos': [ 6, 2, 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 2, 23 ], 'str': '</tr>' },
+        { 'pos': [ 24       ], 'str': '</xml>' } 
+      ];
+      helper.assert(parser.concatString(_data, 5), '<xml><tr>Lumeneo</tr><tr>Tesla motors</tr><tr>Toyota</tr></xml>');
+    });
   });
 
 
@@ -240,6 +287,32 @@ describe('parser', function(){
 
 
   describe('extractXmlParts', function(){
+    it('should extract return the staticData if there is no dynamic data', function(){
+      var _xml = '<div></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'object',
+          'parent':'',
+          'xmlParts' : []
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div></div>',
+          'after' :''
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'object',
+            'parent':'',
+            'xmlParts' : [],
+            /*'depth' : 0*/
+          }
+        }
+      });
+    });
     it('should extract xml parts', function(){
       var _xml = '<div></div>';
       var _descriptor = {

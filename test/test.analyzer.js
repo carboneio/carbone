@@ -221,8 +221,10 @@ describe('Analyzer', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'<tr><p>', 'after': ''           }, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  },
+              {'obj': 'd0', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'  },
+              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'after' : '</p><p>' }, 
+              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1  },
+              {'obj': 'd0', 'array':'end'     , 'pos':29, 'depth':1,  'before': '</p></tr>'  }
             ]
           }
         }
@@ -234,10 +236,14 @@ describe('Analyzer', function(){
       var _fn = analyzer.getXMLBuilderFunction(_desc);
       helper.assert(_fn(_data), [
         { pos:[ 0        ], str: '<xml> '},
-        { pos:[ 6, 0, 13 ], str: '<tr><p>Thomas'},
-        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson</p></tr>'},
-        { pos:[ 6, 1, 13 ], str: '<tr><p>Trinity'},
-        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown</p></tr>'},
+        { pos:[ 6, 0, 6 ], str: '<tr><p>'},
+        { pos:[ 6, 0, 13 ], str: 'Thomas</p><p>'},
+        { pos:[ 6, 0, 20 ], str: 'A. Anderson'},
+        { pos:[ 6, 0, 29 ], str: '</p></tr>'},
+        { pos:[ 6, 1, 6 ] , str: '<tr><p>'},
+        { pos:[ 6, 1, 13 ], str: 'Trinity</p><p>'},
+        { pos:[ 6, 1, 20 ], str: 'Unknown'},
+        { pos:[ 6, 1, 29 ], str: '</p></tr>'},
         { pos:[ 30       ], str: ' </xml>' }
       ]);
     });
@@ -853,6 +859,20 @@ describe('Analyzer', function(){
   });
 
   describe('reOrderHierarchy', function(){
+    it('should consider the depth is 0 when it is not specified', function(){
+      var _data = {
+        'staticData': {},
+        'dynamicData': {
+          'd0'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], },
+          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d0'      , 'xmlParts' : [], 'depth':1}
+        }
+      };
+      helper.assert(analyzer.reOrderHierarchy(_data), {
+        'staticData': {},
+        'dynamicData': _data.dynamicData,
+        'hierarchy' : ['d0', 'menu1']
+      });
+    });
     it('should generate an array which contains the order of hierarchy', function(){
       var _data = {
         'staticData': {},

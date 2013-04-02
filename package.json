@@ -1,13 +1,13 @@
 {
-  "name": "kendoc",
+  "name": "carbone",
   "description": "Document parser and generator",
   "version": "0.1.0",
   "private": true,
-  "bin" : "bin/kendoc",
+  "bin" : "bin/carbone",
   "main": "./lib",
   "dependencies": {},
   "devDependencies": {
-    "mocha": ">=1.7.4"
+    "mocha": ">=1.8.2"
   },
-  "engines": { "node": ">= 0.8.6" }
+  "engines": { "node": ">= 0.10.0" }
 }

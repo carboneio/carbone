@@ -1,22 +1,22 @@
 var assert = require('assert');
-var kendoc = require('../lib/index');
+var carbone = require('../lib/index');
 var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
 
-describe('Kendoc', function(){
+describe('Carbone', function(){
 
   describe('buildXML', function(){
     it('should return the xml if no data is passed', function(){
       var _xml = '<xml> </xml>';
-      var _xmlBuilt = kendoc.buildXML(_xml);
+      var _xmlBuilt = carbone.buildXML(_xml);
       helper.assert(_xmlBuilt, '<xml> </xml>');
     });
 
     it('should the simple tag with the data', function(){
       var _xml = '<xml> {{d.title}} </xml>';
       var _data = {'title' : 'boo'};
-      var _xmlBuilt = kendoc.buildXML(_xml, _data);
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo </xml>');
     });
 
@@ -28,7 +28,7 @@ describe('Kendoc', function(){
           'id' : 5
         }
       };
-      var _xmlBuilt = kendoc.buildXML(_xml, _data);
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo <br> 5 </xml>');
     });
 
@@ -37,7 +37,7 @@ describe('Kendoc', function(){
       var _data = {
         'bullshit' : 'boo'
       };
-      var _xmlBuilt = kendoc.buildXML(_xml, _data);
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml>  <br>  </xml>');
     });
 
@@ -46,7 +46,7 @@ describe('Kendoc', function(){
       var _data = {
         'title' : 'boo'
       };
-      var _xmlBuilt = kendoc.buildXML(_xml, _data);
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo <br>  </xml>');
     });
 
@@ -57,7 +57,7 @@ describe('Kendoc', function(){
         {'brand' : 'Tesla motors'},
         {'brand' : 'Toyota'}
       ];
-      var _xmlBuilt = kendoc.buildXML(_xml, _data);
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
     });
 
@@ -70,7 +70,7 @@ describe('Kendoc', function(){
           {'brand' : 'Toyota'}
         ]
       };
-      var _xmlBuilt = kendoc.buildXML(_xml, _data);
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
     });
   });

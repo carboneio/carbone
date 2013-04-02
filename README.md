@@ -1,4 +1,4 @@
-Kendoc
+Carbone
 ======
 
 >A document parser and generator (docx, xlsx, odt, pdf, ...). It can be used for reporting like jasperreport.

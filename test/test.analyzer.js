@@ -851,6 +851,53 @@ describe('Analyzer', function(){
       });
     });
   });
+
+  describe('reOrderHierarchy', function(){
+    it('should generate an array which contains the order of hierarchy', function(){
+      var _data = {
+        'staticData': {},
+        'dynamicData': {
+          'd0'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0},
+          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d0'      , 'xmlParts' : [], 'depth':1},
+          'menu2'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu1'   , 'xmlParts' : [], 'depth':2},
+          'menu3'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu2'   , 'xmlParts' : [], 'depth':3},
+          'product4':{'name':'product', 'type':'array'  , 'parent':'menu3'   , 'xmlParts' : [], 'depth':4},
+          'site5'   :{'name':'site'   , 'type':'object' , 'parent':'product4', 'xmlParts' : [], 'depth':4},
+          'product6':{'name':'product', 'type':'object' , 'parent':'d0'      , 'xmlParts' : [], 'depth':0},
+          'cars7'   :{'name':'cars'   , 'type':'object' , 'parent':'d0'      , 'xmlParts' : [], 'depth':0},
+          'product8':{'name':'product', 'type':'object' , 'parent':'cars7'   , 'xmlParts' : [], 'depth':0}
+        }
+      };
+
+      helper.assert(analyzer.reOrderHierarchy(_data), {
+        'staticData': {},
+        'dynamicData': _data.dynamicData,
+        'hierarchy' : ['d0', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
+      });
+    });
+    it.skip('should work even if the dynamicData is not in the correct order; DO THIS TEST!!! ', function(){
+      var _data = {
+        'staticData': {},
+        'dynamicData': {
+          'product4':{'name':'product', 'type':'array'  , 'parent':'menu3'   , 'xmlParts' : [], 'depth':4},
+          'menu3'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu2'   , 'xmlParts' : [], 'depth':3},
+          'd0'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0},
+          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d0'      , 'xmlParts' : [], 'depth':1},
+          'cars7'   :{'name':'cars'   , 'type':'object' , 'parent':'d0'      , 'xmlParts' : [], 'depth':0},
+          'menu2'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu1'   , 'xmlParts' : [], 'depth':2},
+          'product8':{'name':'product', 'type':'object' , 'parent':'cars7'   , 'xmlParts' : [], 'depth':0},
+          'product6':{'name':'product', 'type':'object' , 'parent':'d0'      , 'xmlParts' : [], 'depth':0},
+          'site5'   :{'name':'site'   , 'type':'object' , 'parent':'product4', 'xmlParts' : [], 'depth':4}
+        }
+      };
+
+      helper.assert(analyzer.reOrderHierarchy(_data), {
+        'staticData': {},
+        'dynamicData': _data.dynamicData,
+        'hierarchy' : ['d0', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
+      });
+    });
+  });
 });
 
 

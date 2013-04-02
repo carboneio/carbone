@@ -16,47 +16,6 @@ describe('parser', function(){
       'menuwhy[1].test');
     });
   });
-/* (\{.+?)(.+?\})[\s\S]*\1\+1\2 */
-  describe('extractTags', function(){
-    it('should replace the tag in xml by the data in the object', function(){
-      var _data = {
-        'menu' : 'blabla',
-        'names' : 'Morpheus and Neo',
-        'address' : {
-          'city' : 'Nebuchadnezzar',
-          'zip' : '2999'
-        }
-      };
-      assert.equal(parser.extractTags('<xmlstart>{{menu}}</xmlend>', _data), '<xmlstart>blabla</xmlend>');
-      assert.equal(parser.extractTags('<xmlstart>  {{  menu  }} </xmlend>', _data), '<xmlstart>  blabla </xmlend>');
-      assert.equal(parser.extractTags('<xmlstart>{{names}}</xmlend>', _data), '<xmlstart>Morpheus and Neo</xmlend>');
-      assert.equal(parser.extractTags('<xmlstart>{{me<interxml>n<bullshit>u}}</xmlend>', _data), '<xmlstart>blabla<interxml><bullshit></xmlend>');
-      assert.equal(parser.extractTags('<xmlstart>{{address.city}} {{address.zip}}</xmlend>', _data), '<xmlstart>Nebuchadnezzar 2999</xmlend>');
-    });
-    it.skip('should works also with array', function(){
-      var _data = {
-        'menu' : [{
-          'date' : 20120101
-        },{
-          'date' : 20120102
-        }]
-      };
-      assert.equal(parser.extractTags('{{menu[i].date}} ', _data), '20120101 20120102');
-    });
-    it('should remove the tag in xml if there is no corresponding data in the object', function(){
-      var _data = {
-        'AAmenu' : 'blabla',
-        'address' : {
-          'AAcity' : 'Nebuchadnezzar',
-          'zip' : '2999'
-        }
-      };
-      assert.equal(parser.extractTags('<xmlstart>{{menu}}</xmlend>', _data), '<xmlstart></xmlend>');
-      assert.equal(parser.extractTags('<xmlstart>{{me<interxml>n<bullshit>u}}</xmlend>', _data), '<xmlstart><interxml><bullshit></xmlend>');
-      assert.equal(parser.extractTags('<xmlstart>{{address.city}} {{address.zip}}</xmlend>', _data), '<xmlstart> 2999</xmlend>');
-      assert.equal(parser.extractTags('<xmlstart>{{cars.wheels}}</xmlend>', _data), '<xmlstart></xmlend>');
-    });
-  });
 
   describe('cleanXml', function(){
     it('should extract the tag from xml', function(){

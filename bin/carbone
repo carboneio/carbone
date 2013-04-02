@@ -13,4 +13,23 @@ switch(_action){
 }
 */
 
-index.generate({'test':'data'}, './content.xml.zip');
+var _data = {
+  'companyName': 'ideolys',
+  'companyAddress' : '52 rue Jacques Yves Cousteau',
+  'name' : 'Neo',
+  'todos':[{
+    'title' : 'Mission 1',
+    'desc' : 'follow the white rabbit',
+    'priority' : 'low'
+  },{
+    'title' : 'Mission 2',
+    'desc' : 'find the matrix',
+    'priority' : 'medium'
+  },{
+    'title' : 'Mission 3',
+    'desc' : 'destroy the matrix',
+    'priority' : 'high'
+  }]
+}
+
+index.generate(_data, './test/datasets/test_word_A.docx');

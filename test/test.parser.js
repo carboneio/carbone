@@ -242,6 +242,12 @@ describe('parser', function(){
         xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
       });
     });
+    it('should remove unwanted characters', function(){
+      helper.assert(parser.getSubsitition('<div>{menu}<div> \n   {city}'), {
+        tags : [{'pos': 5, 'name':'menu'},{'pos':15, 'name':'city'}],
+        xml : '<div><div>     '
+      });
+    });
   });
 
 

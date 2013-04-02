@@ -312,7 +312,7 @@ describe('parser', function(){
           'name':'',
           'type':'array',
           'parent':'',
-          'position' : {'start':9, 'end':30}, /* Approximative range */
+          'position' : {'start':9, 'end':30}, /* Approximative position */
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':9},
             {'obj': 'd0', 'attr':'val' , 'pos':14},
@@ -330,7 +330,7 @@ describe('parser', function(){
             'name':'',
             'type':'array',
             'parent':'',
-            'position' : {'start':5, 'end':26}, /* exact range */
+            'position' : {'start':5, 'end':26}, /* exact position */
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu' , 'pos':9,  'depth' : 1,  'after':' <h1>'},
               {'obj': 'd0', 'attr':'val'  , 'pos':14, 'depth' : 1,  'after':' </h1>'},
@@ -351,7 +351,7 @@ describe('parser', function(){
           'name':'',
           'type':'array',
           'parent':'',
-          'position' : {'start':9, 'end':38}, /* Approximative range */
+          'position' : {'start':9, 'end':38}, /* Approximative position */
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':9},
             {'obj': 'd0', 'attr':'val', 'pos':14},
@@ -377,7 +377,7 @@ describe('parser', function(){
             'name':'',
             'type':'array',
             'parent':'',
-            'position' : {'start':5, 'end':34}, /* exact range */
+            'position' : {'start':5, 'end':34}, /* exact position */
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu' , 'pos':9,  'depth': 1,  'after':' <h1>'},
               {'obj': 'd0', 'attr':'val'  , 'pos':14, 'depth': 1,  'after':' </h1>'},
@@ -407,7 +407,7 @@ describe('parser', function(){
           'name':'',
           'type':'array',
           'parent':'',
-          'position' : {'start':11, 'end':75}, /* Approximative range */
+          'position' : {'start':11, 'end':75}, /* Approximative position */
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':11},
           ]
@@ -416,7 +416,7 @@ describe('parser', function(){
           'name':'element',
           'type':'array',
           'parent':'d0',
-          'position' : {'start':26, 'end':46}, /* Approximative range */
+          'position' : {'start':26, 'end':46}, /* Approximative position */
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -440,7 +440,7 @@ describe('parser', function(){
             'name':'',
             'type':'array',
             'parent':'',
-            'position' : {'start':5, 'end':67}, /* exact range */
+            'position' : {'start':5, 'end':67}, /* exact position */
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'   , 'pos':11, 'depth':1, 'after': ' <h1>'},
               {'obj': 'd0', 'array':'start' , 'pos':5,  'depth':1, 'after': '<tr A>'},
@@ -452,7 +452,7 @@ describe('parser', function(){
             'name':'element',
             'type':'array',
             'parent':'d0',
-            'position' : {'start':16, 'end':36}, /* exact range */
+            'position' : {'start':16, 'end':36}, /* exact position */
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id', 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
@@ -480,7 +480,7 @@ describe('parser', function(){
           'name':'',
           'type':'array',
           'parent':'',
-          'position' : {'start':11, 'end':75}, /* Approximative range */
+          'position' : {'start':11, 'end':75}, /* Approximative position */
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':11},
             {'obj': 'd0', 'attr':'val', 'pos':56}
@@ -490,7 +490,7 @@ describe('parser', function(){
           'name':'element',
           'type':'array',
           'parent':'d0',
-          'position' : {'start':26, 'end':46}, /* Approximative range */
+          'position' : {'start':26, 'end':46}, /* Approximative position */
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -506,7 +506,7 @@ describe('parser', function(){
             'name':'',
             'type':'array',
             'parent':'',
-            'position' : {'start':5, 'end':67}, /* exact range */
+            'position' : {'start':5, 'end':67}, /* exact position */
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'  , 'pos':11, 'depth':1, 'after' : ' <h1>' },
               {'obj': 'd0', 'attr':'val'   , 'pos':56, 'depth':1, },
@@ -519,7 +519,7 @@ describe('parser', function(){
             'name':'element',
             'type':'array',
             'parent':'d0',
-            'position' : {'start':16, 'end':36}, /* exact range */
+            'position' : {'start':16, 'end':36}, /* exact position */
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
@@ -538,14 +538,14 @@ describe('parser', function(){
           'name':'',
           'type':'array',
           'parent':'',
-          'position' : {'start':26, 'end':46}, /* Approximative range */
+          'position' : {'start':26, 'end':46}, /* Approximative position */
           'xmlParts' : []
         },  
         'element1':{
           'name':'element',
           'type':'array',
           'parent':'d0',
-          'position' : {'start':11, 'end': 75}, /* Approximative range */
+          'position' : {'start':11, 'end': 75}, /* Approximative position */
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -561,7 +561,7 @@ describe('parser', function(){
             'name':'',
             'type':'array',
             'parent':'',
-            'position' : {'start':16 , 'end':36 }, /* exact range */
+            'position' : {'start':16 , 'end':36 }, /* exact position */
             'xmlParts' : [
               {'obj': 'd0', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
               {'obj': 'd0', 'array':'end'  , 'pos':36, 'depth':2, 'before':'</p> </tr>'},
@@ -572,7 +572,7 @@ describe('parser', function(){
             'name':'element',
             'type':'array',
             'parent':'d0',
-            'position' : {'start':5, 'end': 67}, /* exact range */
+            'position' : {'start':5, 'end': 67}, /* exact position */
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':5,  'depth':1, 'after':'<tr A> <h1>'},

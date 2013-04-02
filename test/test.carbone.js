@@ -14,14 +14,14 @@ describe('Carbone', function(){
     });
 
     it('should the simple tag with the data', function(){
-      var _xml = '<xml> {{d.title}} </xml>';
+      var _xml = '<xml> {d.title} </xml>';
       var _data = {'title' : 'boo'};
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo </xml>');
     });
 
     it('should works with two nested objects', function(){
-      var _xml = '<xml> {{d.title}} <br> {{d.city.id}} </xml>';
+      var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
         'title' : 'boo', 
         'city' :{
@@ -33,7 +33,7 @@ describe('Carbone', function(){
     });
 
     it('1. should remove the tags of the data is not what you expect', function(){
-      var _xml = '<xml> {{d.title}} <br> {{d.city.id}} </xml>';
+      var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
         'bullshit' : 'boo'
       };
@@ -42,7 +42,7 @@ describe('Carbone', function(){
     });
 
     it('2. should remove the tags part of the data is not provided', function(){
-      var _xml = '<xml> {{d.title}} <br> {{d.city.id}} </xml>';
+      var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
         'title' : 'boo'
       };
@@ -51,7 +51,7 @@ describe('Carbone', function(){
     });
 
     it.skip('1. should automatically repeat the xml (even with strange tags) if there is a simple array', function(){
-      var _xml = '<xml> <t_row> {{d[i].brand}} </t_row><t_row> {{d[i+1].brand}} </t_row></xml>';
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1].brand} </t_row></xml>';
       var _data = [
         {'brand' : 'Lumeneo'},
         {'brand' : 'Tesla motors'},
@@ -62,7 +62,7 @@ describe('Carbone', function(){
     });
 
     it('2. should handle array in an object', function(){
-      var _xml = '<xml><t_row> {{d.cars[i].brand}} </t_row><t_row> {{d.cars[i+1].brand}} </t_row></xml>';
+      var _xml = '<xml><t_row> {d.cars[i].brand} </t_row><t_row> {d.cars[i+1].brand} </t_row></xml>';
       var _data = {
         'cars':[
           {'brand' : 'Lumeneo'},

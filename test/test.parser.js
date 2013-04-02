@@ -217,27 +217,27 @@ describe('parser', function(){
 
   describe('getSubsitition', function(){
     it('should extract the tags from the xml, return the xml without the tags and a list of tags with their position in the xml', function(){
-      helper.assert(parser.getSubsitition('{{menu}}'), {
+      helper.assert(parser.getSubsitition('{menu}'), {
         tags : [{'pos': 0, 'name':'menu'}], 
         xml : ''
       });
-      helper.assert(parser.getSubsitition('<div>{{menu}}<div>'), {
+      helper.assert(parser.getSubsitition('<div>{menu}<div>'), {
         tags : [{'pos': 5, 'name':'menu'}], 
         xml : '<div><div>'
       });
-      helper.assert(parser.getSubsitition('<xmlstart>{{me<interxml>n<bullshit>u}}</xmlend>'), {
+      helper.assert(parser.getSubsitition('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>'), {
         tags : [{'pos': 10, 'name':'menu'}], 
         xml : '<xmlstart><interxml><bullshit></xmlend>'
       });
-      helper.assert(parser.getSubsitition('<div>{{menu}}<div>{{city}}'), {
+      helper.assert(parser.getSubsitition('<div>{menu}<div>{city}'), {
         tags : [{'pos': 5, 'name':'menu'},{'pos':10, 'name':'city'}],
         xml : '<div><div>'
       });
-      helper.assert(parser.getSubsitition('<xmlstart>{{me<interxml>n<bullshit>u}}</xmlend><tga>{{ci<td>ty</td>}}<tga><bla>{{cars}}</bla>'), {
+      helper.assert(parser.getSubsitition('<xmlstart>{me<interxml>n<bullshit>u}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars}</bla>'), {
         tags : [{'pos': 10, 'name':'menu'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars'}], 
         xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
       });
-      helper.assert(parser.getSubsitition('<xmlstart>{{me<interxml>n<bullshit>u[i].city}}</xmlend><tga>{{ci<td>ty</td>}}<tga><bla>{{cars[i].wheel}}</bla>'), {
+      helper.assert(parser.getSubsitition('<xmlstart>{me<interxml>n<bullshit>u[i].city}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars[i].wheel}</bla>'), {
         tags : [{'pos': 10, 'name':'menu[i].city'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars[i].wheel'}], 
         xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
       });

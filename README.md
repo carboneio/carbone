@@ -30,7 +30,7 @@ Conversion dans d'autre format : http://pc-freak.net/blog/convert-doc-pdf-linux-
 6. [node-json2officexml](https://github.com/pimetrai/node-json2officexml)
 
 
-Convert ot pdf :
+Convert to pdf :
 
 May use these source :
 - docbook (docbook-utils ou docbook2pdf) mais le format n'est peut-être pas adpété 
@@ -70,3 +70,69 @@ http://www.opendope.org/opendope_conventions_v2.3.html
 -> comment gérer les répétitions et conditions
 
 -> inspiration : http://templater.info/
+
+---
+
+# Getting started
+
+## Install
+First you have to install carbone in your project via `npm` :
+
+```bash
+npm install carbone
+```
+
+## Include in project
+Just like all other node modules you have to `require` carbone :
+
+```javascript
+var carbone = require('carbone');
+```
+
+## First example
+
+### File structure
+For this example we will have following structure of files and folders :
+
+```bash
+|-- carbone-example/
+    |-- templates/
+        |-- my-file.docx
+    |-- app.js
+```
+
+Create and save **my-file.docx** in the **templates** folder with only the following line inside it :
+
+```text
+Hello {d.firstname} {d.lastname} !
+```
+
+Open a **Terminal** and go to the **carbone-example** folder :
+
+```bash
+cd carbone-example
+```
+
+Install carbone in this folder
+
+```javascript
+npm install carbone
+```
+
+Open **app.js** file and write :
+
+```javascript
+var fs = require('fs');
+var carbone = require('carbone');
+
+var data = {
+  firstname : 'John',
+  lastname : 'Doe'
+};
+
+carbone.render('templates/my-file.docx', data, function(result){
+  fs.writeFileSync('result.docx', result);
+});
+```
+
+Now go into **carbone-example** folder and look at the **result.docx** file !

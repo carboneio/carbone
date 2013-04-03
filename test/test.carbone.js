@@ -23,7 +23,7 @@ describe('Carbone', function(){
     it('should works with two nested objects', function(){
       var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
-        'title' : 'boo', 
+        'title' : 'boo',
         'city' :{
           'id' : 5
         }
@@ -74,7 +74,32 @@ describe('Carbone', function(){
       assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
     });
   });
-  
+
+  describe('render', function(){
+    it('should render a template and give result with replacements', function(done){
+      var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.docx');
+      carbone.render(_filePath, data, function(result){
+        fs.writeFileSync(_resultFilePath, result);
+        carbone.unzip(_resultFilePath, function(dir){
+          var _xmlExpectedPath = path.join(dir, 'word', 'document.xml');
+          var _xmlExpectedContent = fs.readFileSync(_xmlExpectedPath, 'utf8');
+          assert.equal(_xmlExpectedContent.indexOf('field1'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('field2'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('field_1'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('field_2'), -1);
+          fs.unlinkSync(_resultFilePath);
+          helper.rmDirRecursive(dir);
+          done();
+        });
+      });
+    });
+  });
+
 });
 
 

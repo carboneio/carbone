@@ -1,5 +1,5 @@
 var assert = require('assert');
-var kendoc = require('../lib/index');
+var carbone = require('../lib/index');
 var analyzer = require('../lib/analyzer');
 var path  = require('path');
 var fs = require('fs');
@@ -7,7 +7,7 @@ var helper = require('../lib/helper');
 
 describe('Analyzer', function(){
 
- 
+
   describe('generateXmlParts', function(){
     it('should return return an array of xml parts for static data if dynamicData is empty', function(){
       var _desc = {
@@ -21,6 +21,41 @@ describe('Analyzer', function(){
       var _fn = analyzer.getXMLBuilderFunction(_desc);
       helper.assert(_fn(null), [{pos:[0], str:'<xml>'}, {pos:[1], str:'</xml>'}]);
     });
+    it('should return a function which return an array of xml parts according to the descriptor and the data and the formatters', function(done){
+      var _desc = {
+        'staticData'  : {
+          'before':'',
+          'after' :'</xml>'
+        },
+        'hierarchy'   : ['d0'],
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'parent' : '',
+            'type': 'object',
+            'depth':0,
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'number', 'pos':5 , 'depth':0, 'before':'<xml>', 'after': '', 'formatters' : [ 'int' ]}
+            ]
+          }
+        }
+      };
+      var _data = {
+        'number' : 24.55
+      };
+      var _fn = analyzer.getXMLBuilderFunction(_desc);
+      carbone.cacheFormatters(function(){
+        helper.assert(_fn(_data, carbone.formatters), [{
+            pos: [5  ],
+            str: '<xml>24'
+          },{
+            pos: [6 ],
+            str: '</xml>'
+          }]
+        );
+        done();
+      });
+    });
     it('should return a function which return an array of xml parts according to the descriptor and the data', function(){
       var _desc = {
         'staticData'  : {
@@ -33,11 +68,11 @@ describe('Analyzer', function(){
             'name':'',
             'parent' : '',
             'type': 'object',
-            'depth':0, 
+            'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': ''}, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': ''},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []}
             ]
           }
         }
@@ -50,16 +85,16 @@ describe('Analyzer', function(){
       var _fn = analyzer.getXMLBuilderFunction(_desc);
       helper.assert(_fn(_data), [{
           pos: [8  ],
-          str: '<xml><p>Thomas' 
+          str: '<xml><p>Thomas'
         },{
           pos: [15 ],
-          str: '</p><p>A. Anderson' 
+          str: '</p><p>A. Anderson'
         },{
           pos: [22 ],
-          str: '</p><p>Neo' 
+          str: '</p><p>Neo'
         },{
           pos: [23 ],
-          str: '</p></xml>' 
+          str: '</p></xml>'
         }]
       );
     });
@@ -75,11 +110,11 @@ describe('Analyzer', function(){
             'name':'',
             'parent' : '',
             'type': 'object',
-            'depth':0, 
+            'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': ''}, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': ''},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []}
             ]
           }
         }
@@ -106,21 +141,21 @@ describe('Analyzer', function(){
             'name':'',
             'parent' : '',
             'type': 'object',
-            'depth':0, 
+            'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>', 'after': ''}, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': ''},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>', 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>', 'after': '', 'formatters' : []}
             ]
           },
           'info1':{
             'name':'info',
             'parent' : 'd0',
             'type': 'object',
-            'depth':0, 
+            'depth':0,
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':23, 'depth':0,  'before':'</p><br>' , 'after': '' }, 
-              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'depth':0,  'before':'</br><br>', 'after': '' }
+              {'obj': 'info1', 'attr':'movie', 'pos':23, 'depth':0,  'before':'</p><br>' , 'after': '', 'formatters' : [] },
+              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'depth':0,  'before':'</br><br>', 'after': '', 'formatters' : [] }
             ]
           }
         }
@@ -135,24 +170,24 @@ describe('Analyzer', function(){
         }
       };
       var _fn = analyzer.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), [{ 
+      helper.assert(_fn(_data), [{
           pos: [ 8 ],
-          str: '<xml><p>Thomas' 
-        },{ 
+          str: '<xml><p>Thomas'
+        },{
           pos: [ 15 ],
-          str: '</p><p>A. Anderson' 
-        },{ 
+          str: '</p><p>A. Anderson'
+        },{
           pos: [ 40 ],
-          str: '</br><p>Neo' 
-        },{ 
+          str: '</br><p>Neo'
+        },{
           pos: [ 23 ],
-          str: '</p><br>matrix' 
-        },{ 
+          str: '</p><br>matrix'
+        },{
           pos: [ 32 ],
-          str: '</br><br>developer' 
-        },{ 
+          str: '</br><br>developer'
+        },{
           pos: [ 41 ],
-          str: '</p></xml>' 
+          str: '</p></xml>'
         }
       ]);
     });
@@ -168,21 +203,21 @@ describe('Analyzer', function(){
             'name':'info',
             'parent' : 'd0',
             'type': 'object',
-            'depth':0, 
+            'depth':0,
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':23,  'depth':0, 'before':'</p><br>' , 'after': '' }, 
-              {'obj': 'info1', 'attr':'job'  , 'pos':32,  'depth':0, 'before':'</br><br>', 'after': '' }
+              {'obj': 'info1', 'attr':'movie', 'pos':23,  'depth':0, 'before':'</p><br>' , 'after': '', 'formatters' : [] },
+              {'obj': 'info1', 'attr':'job'  , 'pos':32,  'depth':0, 'before':'</br><br>', 'after': '', 'formatters' : [] }
             ]
-          }, 
+          },
           'd0':{
             'name':'',
             'parent' : '',
             'type': 'object',
-            'depth':0, 
+            'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>', 'after': ''}, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' , 'after': ''},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>', 'after': ''}
+              {'obj': 'd0', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
+              {'obj': 'd0', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
+              {'obj': 'd0', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>', 'after': '', 'formatters' : []}
             ]
           }
         }
@@ -222,7 +257,7 @@ describe('Analyzer', function(){
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
               {'obj': 'd0', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'  },
-              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'after' : '</p><p>' }, 
+              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'after' : '</p><p>' },
               {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1  },
               {'obj': 'd0', 'array':'end'     , 'pos':29, 'depth':1,  'before': '</p></tr>'  }
             ]
@@ -262,8 +297,8 @@ describe('Analyzer', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           }, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  },
+              {'obj': 'd0', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           },
+              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
             ]
           },
           'info1':{
@@ -272,7 +307,7 @@ describe('Analyzer', function(){
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>', 'after': ''    }, 
+              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>', 'after': ''    }
             ]
           }
         }
@@ -308,8 +343,8 @@ describe('Analyzer', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           }, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  },
+              {'obj': 'd0', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           },
+              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
             ]
           },
           'info1':{
@@ -318,7 +353,7 @@ describe('Analyzer', function(){
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>', 'after': ''    }, 
+              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>', 'after': ''    }
             ]
           },
           'info2':{
@@ -327,7 +362,7 @@ describe('Analyzer', function(){
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
-              {'obj': 'info2', 'attr':'style', 'pos':14, 'depth':1, 'before':'', 'after': ''    }, 
+              {'obj': 'info2', 'attr':'style', 'pos':14, 'depth':1, 'before':'', 'after': ''    }
             ]
           },
           'info3':{
@@ -336,30 +371,30 @@ describe('Analyzer', function(){
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
-              {'obj': 'info3', 'attr':'rate', 'pos':15, 'depth':1, 'before':'', 'after': ''    }, 
+              {'obj': 'info3', 'attr':'rate', 'pos':15, 'depth':1, 'before':'', 'after': ''    }
             ]
           }
         }
       };
       var _data = [
-        {'firstname':'Thomas' ,  'lastname':'A. Anderson', 
+        {'firstname':'Thomas' ,  'lastname':'A. Anderson',
           'info' : {
-            'movie': 'matrix', 
+            'movie': 'matrix',
             'info' : {
               'style' : 'sf',
               'info' : {
                 'rate' : '10'
               }
             }
-          } 
+          }
         },
-        {'firstname':'Trinity',  'lastname':'Unknown', 
+        {'firstname':'Trinity',  'lastname':'Unknown',
           'info' : {
-            'movie': 'matrix2', 
+            'movie': 'matrix2',
             'info' : {
               'style' : 'sf2'
             }
-          } 
+          }
         }
       ];
       var _fn = analyzer.getXMLBuilderFunction(_desc);
@@ -399,7 +434,7 @@ describe('Analyzer', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :15},
             'xmlParts' : [
-              {'obj': 'movies1', 'attr':'title', 'pos':10, 'depth':1, 'before':'<tr>', 'after': '</tr>'    }, 
+              {'obj': 'movies1', 'attr':'title', 'pos':10, 'depth':1, 'before':'<tr>', 'after': '</tr>'    }
             ]
           },
           'cars2':{
@@ -409,7 +444,7 @@ describe('Analyzer', function(){
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
             'xmlParts' : [
-              {'obj': 'cars2', 'attr':'brand', 'pos':24, 'depth':1, 'before':'<trow>', 'after': '</trow>'  }, 
+              {'obj': 'cars2', 'attr':'brand', 'pos':24, 'depth':1, 'before':'<trow>', 'after': '</trow>'  }
             ]
           }
         }
@@ -449,8 +484,8 @@ describe('Analyzer', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'<tr><p>', 'after': ''            }, 
-              {'obj': 'd0', 'attr':'lastname' , 'pos':29, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  },
+              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'<tr><p>', 'after': ''            },
+              {'obj': 'd0', 'attr':'lastname' , 'pos':29, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
             ]
           },
           'skills1':{
@@ -460,14 +495,14 @@ describe('Analyzer', function(){
             'depth' : 2,
             'position' : {'start': 13, 'end' :22},
             'xmlParts' : [
-              {'obj': 'skills1', 'attr':'name', 'pos':17, 'depth':2, 'before':'<tr>', 'after': '</tr>'}, 
+              {'obj': 'skills1', 'attr':'name', 'pos':17, 'depth':2, 'before':'<tr>', 'after': '</tr>'}
             ]
           }
         }
       };
       var _data = [{
-          'firstname':'Thomas', 
-          'lastname':'A. Anderson', 
+          'firstname':'Thomas',
+          'lastname':'A. Anderson',
           'skills':[
             {'name' : 'survive'},
             {'name' : 'walk on the walls'}
@@ -481,31 +516,31 @@ describe('Analyzer', function(){
         }
       ];
       var _fn = analyzer.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), [{ 
+      helper.assert(_fn(_data), [{
           pos: [ 0 ],
-          str: '<xml> ' 
-        },{ 
+          str: '<xml> '
+        },{
           pos: [ 6, 0, 13 ],
-          str: '<tr><p>Thomas' 
-        },{ 
+          str: '<tr><p>Thomas'
+        },{
           pos: [ 6, 0, 29 ],
-          str: '</p><p>A. Anderson</p></tr>' 
-        },{ 
+          str: '</p><p>A. Anderson</p></tr>'
+        },{
           pos: [ 6, 0, 17, 0 ],
-          str: '<tr>survive</tr>' 
-        },{ 
+          str: '<tr>survive</tr>'
+        },{
           pos: [ 6, 0, 17, 1 ],
-          str: '<tr>walk on the walls</tr>' 
-        },{ 
+          str: '<tr>walk on the walls</tr>'
+        },{
           pos: [ 6, 1, 13 ],
-          str: '<tr><p>Trinity' 
-        },{ 
+          str: '<tr><p>Trinity'
+        },{
           pos: [ 6, 1, 29 ],
-          str: '</p><p>Unknown</p></tr>' 
-        },{ 
+          str: '</p><p>Unknown</p></tr>'
+        },{
           pos: [ 6, 1, 17, 0 ],
           str: '<tr>hack</tr>'
-        },{ 
+        },{
           pos: [ 39 ],
           str: ' </xml>'
         }
@@ -536,15 +571,15 @@ describe('Analyzer', function(){
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
               {'obj': 'skills1', 'attr':''    , 'pos': 6 , 'depth':1, 'before':'<tr>', 'after': '' },
-              {'obj': 'skills1', 'attr':'name', 'pos': 15, 'depth':2, 'before':'<td>'   , 'after': '</td>'     }, 
+              {'obj': 'skills1', 'attr':'name', 'pos': 15, 'depth':2, 'before':'<td>'   , 'after': '</td>'     },
               {'obj': 'skills1', 'attr':''    , 'pos': 35, 'depth':1, 'after':'</tr>', 'before': '' }
             ]
           }
         }
       };
       var _data = [{
-          'firstname':'Thomas', 
-          'lastname':'A. Anderson', 
+          'firstname':'Thomas',
+          'lastname':'A. Anderson',
           'skills':[
             {'name' : 'skill1_1'},
             {'name' : 'skill1_2'},
@@ -561,7 +596,7 @@ describe('Analyzer', function(){
         }
       ];
       var _fn = analyzer.getXMLBuilderFunction(_desc);
-      helper.assert(_fn(_data), [ 
+      helper.assert(_fn(_data), [
         { pos: [ 0            ], str: '<xml> ' },
         { pos: [ 13, 0, 6     ], str: '<tr>' },
         { pos: [ 13, 0, 15, 0 ], str: '<td>skill1_1</td>' },
@@ -581,7 +616,7 @@ describe('Analyzer', function(){
         { pos: [ 13, 2, 6     ], str: '<tr>' },
         { pos: [ 13, 2, 15, 1 ], str: '<td>skill2_3</td>' },
         { pos: [ 13, 2, 35    ], str: '</tr>' },
-        { pos: [ 39           ], str: ' </xml>' } 
+        { pos: [ 39           ], str: ' </xml>' }
       ]);
     });
 
@@ -599,7 +634,7 @@ describe('Analyzer', function(){
           'parent':'',
           /*'depth' : 0,*/
           'xmlParts' : [
-            {'obj': 'd0', 'attr':'site', 'pos':20}
+            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':20}
           ]
         }
       });
@@ -623,7 +658,7 @@ describe('Analyzer', function(){
           'type': 'object',
           'parent':'',
           'xmlParts' : [
-            {'obj': 'd0', 'attr':'site', 'pos':80}
+            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':80}
           ]
         },
         'menu1':{
@@ -632,8 +667,8 @@ describe('Analyzer', function(){
           'parent':'d0',
           'position': {'start':1, 'end':40},
           'xmlParts' : [
-            {'obj': 'menu1', 'attr':'id'  , 'pos':1},
-            {'obj': 'menu1', 'attr':'cars', 'pos':10}
+            {'attr':'id', 'formatters' : [], 'obj': 'menu1', 'pos':1},
+            {'attr':'cars', 'formatters' : [], 'obj': 'menu1', 'pos':10}
           ]
         },
         'menuElement2':{
@@ -642,7 +677,7 @@ describe('Analyzer', function(){
           'parent':'menu1',
           'position': {'start':20, 'end':30},
           'xmlParts' : [
-            {'obj': 'menuElement2', 'attr':'id', 'pos':20}
+            {'attr':'id', 'formatters' : [], 'obj': 'menuElement2', 'pos':20}
           ]
         },
         'product3':{
@@ -650,9 +685,9 @@ describe('Analyzer', function(){
           'type':'object',
           'parent':'d0',
           'xmlParts' : [
-            {'obj': 'product3', 'attr':'id', 'pos':90}
+            {'attr':'id', 'formatters' : [], 'obj': 'product3', 'pos':90}
           ]
-        },
+        }
       });
     });
     it('2 inverse order should decompose all tags', function(){
@@ -683,9 +718,9 @@ describe('Analyzer', function(){
           'parent':'menu1',
           'position': {'start':10, 'end':30},
           'xmlParts' : [
-            {'obj': 'menuElement2', 'attr':'id', 'pos':10}
+            {'attr':'id', 'formatters' : [], 'obj': 'menuElement2', 'pos':10}
           ]
-        },
+        }
       });
     });
     it('2 should decompose all tags even if there are some objects within the array', function(){
@@ -704,17 +739,17 @@ describe('Analyzer', function(){
           'type': 'object',
           'parent':'',
           'xmlParts' : [
-            {'obj': 'd0', 'attr':'site', 'pos':20}
+            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':20}
           ]
         },
         'menu1':{
           'name':'menu',
-          'type':'array', 
+          'type':'array',
           'parent':'d0',
           'position': { 'start': 1, 'end': 50 },
           'xmlParts' : [
-            {'obj': 'menu1', 'attr':'id'  , 'pos':1},
-            {'obj': 'menu1', 'attr':'cars', 'pos':10}
+            {'attr':'id'  , 'formatters' : [], 'obj': 'menu1', 'pos':1},
+            {'attr':'cars', 'formatters' : [], 'obj': 'menu1', 'pos':10}
           ]
         },
         'product2':{
@@ -722,7 +757,7 @@ describe('Analyzer', function(){
           'type':'object',
           'parent':'d0',
           'xmlParts' : [
-            {'obj': 'product2', 'attr':'id', 'pos':30}
+            {'attr':'id', 'formatters' : [], 'obj': 'product2', 'pos':30}
           ]
         },
         'menuElement3':{
@@ -730,9 +765,9 @@ describe('Analyzer', function(){
           'type':'array',
           'parent':'menu1',
           'xmlParts' : [
-            {'obj': 'menuElement3', 'attr':'id', 'pos':40}
+            {'attr':'id', 'formatters' : [], 'obj': 'menuElement3', 'pos':40}
           ]
-        },
+        }
       });
     });
     it('should decompose all tags even with multi-dimension array', function(){
@@ -765,7 +800,7 @@ describe('Analyzer', function(){
           'parent':'menu1',
           'position':{'start': 1, 'end': 2 },
           'xmlParts' : [
-            {'obj': 'menu2', 'attr':'id', 'pos':1},
+            {'attr':'id', 'formatters' : [], 'obj': 'menu2', 'pos':1}
           ]
         },
         'product3':{
@@ -773,7 +808,7 @@ describe('Analyzer', function(){
           'type':'object',
           'parent':'d0',
           'xmlParts' : [
-            {'obj': 'product3', 'attr':'id', 'pos':5}
+            {'attr':'id', 'formatters' : [], 'obj': 'product3', 'pos':5}
           ]
         },
         'days4':{
@@ -782,7 +817,7 @@ describe('Analyzer', function(){
           'parent':'d0',
           'position':{'start': 6, 'end': 7 },
           'xmlParts' : [
-            {'obj': 'days4', 'attr':'name', 'pos':6}
+            {'attr':'name', 'formatters' : [], 'obj': 'days4', 'pos':6}
           ]
         }
       });
@@ -791,7 +826,7 @@ describe('Analyzer', function(){
       var _tags = [
         {'pos': 1 , 'name': 'd.menu[1][0][1].product[0].site.id'},
         {'pos': 2 , 'name': 'd.product.id'},
-        {'pos': 3 , 'name': 'd.cars.product.id'},
+        {'pos': 3 , 'name': 'd.cars.product.id'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
         'd0':{
@@ -829,7 +864,7 @@ describe('Analyzer', function(){
           'type':'object',
           'parent':'product4',
           'xmlParts' : [
-            {'obj': 'site5', 'attr':'id', 'pos':1},
+            {'attr':'id', 'formatters' : [], 'obj': 'site5', 'pos':1}
           ]
         },
         'product6':{
@@ -837,7 +872,7 @@ describe('Analyzer', function(){
           'type':'object',
           'parent':'d0',
           'xmlParts' : [
-            {'obj': 'product6', 'attr':'id', 'pos':2},
+            {'attr':'id', 'formatters' : [], 'obj': 'product6', 'pos':2}
           ]
         },
         'cars7':{
@@ -851,7 +886,28 @@ describe('Analyzer', function(){
           'type':'object',
           'parent':'cars7',
           'xmlParts' : [
-            {'obj': 'product8', 'attr':'id', 'pos':3},
+            {'attr':'id', 'formatters' : [], 'obj': 'product8', 'pos':3}
+          ]
+        }
+      });
+    });
+    it('1should decompose all tags and formatters', function(){
+      var _tags = [
+        {'pos': 10, 'name': 'd.site'},
+        {'pos': 20, 'name': 'd.number:int'},
+        {'pos': 30, 'name': 'd.date:parse("Y")'},
+        {'pos': 40, 'name': 'd.date:parse("YYYYMMDD"):format("DD/MM/YYYY")'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd0':{
+          'name':'',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':10},
+            {'attr':'number', 'formatters' : [ 'int' ], 'obj': 'd0', 'pos':20},
+            {'attr':'date', 'formatters' : [ 'parse("Y")' ], 'obj': 'd0', 'pos':30},
+            {'attr':'date', 'formatters' : [ 'parse("YYYYMMDD")', 'format("DD/MM/YYYY")' ], 'obj': 'd0', 'pos':40}
           ]
         }
       });
@@ -863,7 +919,7 @@ describe('Analyzer', function(){
       var _data = {
         'staticData': {},
         'dynamicData': {
-          'd0'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], },
+          'd0'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [] },
           'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d0'      , 'xmlParts' : [], 'depth':1}
         }
       };
@@ -918,6 +974,42 @@ describe('Analyzer', function(){
       });
     });
   });
+
+  describe('getFormatterString', function(){
+    it('should return a simple call of a function for a formatter without arguments', function(){
+      var actual = analyzer.getFormatterString('d.number', [ 'int' ]);
+      assert.equal(actual, 'formatters.int.apply(d.number)');
+    });
+    it('should return a simple call of a function for a formatter without arguments but called with parenthesis', function(){
+      var actual = analyzer.getFormatterString('d.number', [ 'int()' ]);
+      assert.equal(actual, 'formatters.int.apply(d.number)');
+    });
+    it('should return a call of a function for a formatter with one argument', function(){
+      var actual = analyzer.getFormatterString('d.number', [ 'toFixed(2)' ]);
+      assert.equal(actual, 'formatters.toFixed.apply(d.number, [ 2 ])');
+    });
+    it('should return a call of a function for a formatter with one argument which is a string', function(){
+      var actual = analyzer.getFormatterString('d.date', [ "format('YYYYMMDD')" ]);
+      assert.equal(actual, "formatters.format.apply(d.date, [ 'YYYYMMDD' ])");
+    });
+    it('should return a call of a function for a formatter with two arguments', function(){
+      var actual = analyzer.getFormatterString('d.number', [ 'formatter(2, 3)' ]);
+      assert.equal(actual, 'formatters.formatter.apply(d.number, [ 2, 3 ])');
+    });
+    it('should return two calls of functions for two chained formatters', function(){
+      var actual = analyzer.getFormatterString('d.number', [ 'int', 'toFixed(2)' ]);
+      assert.equal(actual, 'formatters.toFixed.apply(formatters.int.apply(d.number), [ 2 ])');
+    });
+    it('should return two calls of functions for two chained formatters each with arguments', function(){
+      var actual = analyzer.getFormatterString('d.number', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ]);
+      assert.equal(actual, 'formatters.formatter2.apply(formatters.formatter1.apply(d.number, [ 4, 5 ]), [ 2, 3 ])');
+    });
+    it('should return call of the formatter when quotes used are "Word quotes" : "’"', function(){
+      var actual = analyzer.getFormatterString('d.date', [ 'format(‘YYYY/MM/DD’)' ]);
+      assert.equal(actual, 'formatters.format.apply(d.date, [ \'YYYY/MM/DD\' ])');
+    });
+  });
+
 });
 
 

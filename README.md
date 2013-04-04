@@ -73,6 +73,8 @@ http://www.opendope.org/opendope_conventions_v2.3.html
 
 ---
 
+---
+
 # Getting started
 
 ## Install
@@ -89,7 +91,10 @@ Just like all other node modules you have to `require` carbone :
 var carbone = require('carbone');
 ```
 
+---
+
 ## First example
+In this example we will generate a file with two variables inside it.
 
 ### File structure
 For this example we will have following structure of files and folders :
@@ -135,4 +140,71 @@ carbone.render('templates/my-file.docx', data, function(result){
 });
 ```
 
+Now you just have to execute this file in terminal :
+
+```bash
+node app.js
+```
+
 Now go into **carbone-example** folder and look at the **result.docx** file !
+
+---
+
+## Formatters usage example
+In this example we will generate a file with variables and formatters for a date and a number.
+
+### File structure
+For this example we will have following structure of files and folders :
+
+```bash
+|-- carbone-example-formatter/
+    |-- templates/
+        |-- my-file.docx
+    |-- app.js
+```
+
+Create and save **my-file.docx** in the **templates** folder with the following lines inside it :
+
+```text
+Hello {d.firstname} {d.lastname} !
+You are {d.age:int} years old.
+Today’s date is {d.date:format('YYYY/MM/DD')}.
+```
+
+Open a **Terminal** and go to the **carbone-example-formatter** folder :
+
+```bash
+cd carbone-example-formatter
+```
+
+Install carbone in this folder
+
+```javascript
+npm install carbone
+```
+
+Open **app.js** file and write :
+
+```javascript
+var fs = require('fs');
+var carbone = require('carbone');
+
+var data = {
+  firstname : 'John',
+  lastname : 'Doe',
+  age : 24.55,
+  date : new Date()
+};
+
+carbone.render('templates/my-file.docx', data, function(result){
+  fs.writeFileSync('result.docx', result);
+});
+```
+
+Now you just have to execute this file in terminal :
+
+```bash
+node app.js
+```
+
+Now go into **carbone-example-formatter** folder and look at the **result.docx** file !

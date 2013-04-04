@@ -5,7 +5,9 @@
   "private": true,
   "bin" : "bin/carbone",
   "main": "./lib",
-  "dependencies": {},
+  "dependencies": {
+    "moment" : "=2.0.0"
+  },
   "devDependencies": {
     "mocha": ">=1.8.2"
   },

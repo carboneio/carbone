@@ -76,7 +76,7 @@ describe('Carbone', function(){
   });
 
   describe('render', function(){
-    it('should render a template and give result with replacements', function(done){
+    it('should render a template (docx) and give result with replacements', function(done){
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var data = {
         field1 : 'field_1',
@@ -96,6 +96,27 @@ describe('Carbone', function(){
           helper.rmDirRecursive(dir);
           done();
         });
+      });
+    });
+    it('should render a template (doc XML 2003) and give result with replacements', function(done){
+      var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.xml');
+      carbone.render(_filePath, data, function(result){
+        fs.writeFileSync(_resultFilePath, result);
+        /*carbone.unzip(_resultFilePath, function(dir){
+          var _xmlExpectedPath = path.join(dir, 'word', 'document.xml');*/
+          var _xmlExpectedContent = fs.readFileSync(_resultFilePath, 'utf8');
+          assert.equal(_xmlExpectedContent.indexOf('field1'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('field2'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('field_1'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('field_2'), -1);
+          fs.unlinkSync(_resultFilePath);
+          done();
+        /*});*/
       });
     });
   });

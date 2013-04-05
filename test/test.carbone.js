@@ -118,6 +118,21 @@ describe('Carbone', function(){
     });
   });
 
+  describe('renderPDF', function(){
+    it('should render a template (docx), generate to PDF and give output', function(done){
+      var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      carbone.renderPDF(_filePath, data, function(result){
+        var buf = new Buffer(result);
+        assert.equal(buf.slice(0, 4).toString(), '%PDF');
+        done();
+      });
+    });
+  });
+
   describe('general', function(){
     it('should create the folder "temp" if not exists and not throw an error', function(done){
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');

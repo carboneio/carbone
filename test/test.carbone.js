@@ -133,6 +133,39 @@ describe('Carbone', function(){
     });
   });
 
+  describe('cacheFormatters', function(){
+    it('should cache formatters available in carbone', function(done){
+      carbone.formatters = {};
+      assert.equal(Object.keys(carbone.formatters).length, 0);
+      carbone.cacheFormatters(function(){
+        assert.notEqual(Object.keys(carbone.formatters).length, 0);
+        done();
+      });
+    });
+    it('should cache formatters available in carbone and custom formatters', function(done){
+      carbone.formatters = {};
+      carbone.addFormatters({
+        'yesOrNo' : function(d){ return 2; }
+      });
+      carbone.cacheFormatters(function(){
+        assert.equal(typeof carbone.formatters['yesOrNo'], 'function');
+        done();
+      });
+    });
+  });
+
+  describe('addFormatters', function(){
+    it('should add a formatter to the list of custom formatters', function(){
+      carbone.addFormatters({
+        'yesOrNo' : function(d){
+          return d === true ? 'yes' : 'no';
+        }
+      });
+      assert.notEqual(typeof carbone.customFormatters['yesOrNo'], 'undefined');
+      assert.equal(carbone.customFormatters['yesOrNo'](true), 'yes');
+    });
+  });
+
   describe('general', function(){
     it('should create the folder "temp" if not exists and not throw an error', function(done){
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');

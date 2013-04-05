@@ -4,29 +4,29 @@ module.exports = {
    * Converts a number to an INT
    * @return {Number}
    */
-  int : function(){
-    return parseInt(this, 10);
+  int : function(d){
+    return parseInt(d, 10);
   },
   /**
    * Converts a number with English specifications (decimal separator is '.')
    * @return {String}
    */
-  toEN : function(){
-    return (this + '').replace(/,/g, '.');
+  toEN : function(d){
+    return (d + '').replace(/,/g, '.');
   },
   /**
    * Converts a number into string, keeping only <nb> decimals
    * @param  {Number} nb
    * @return {String}
    */
-  toFixed : function(nb){
-    return parseFloat(this).toFixed(nb);
+  toFixed : function(d, nb){
+    return parseFloat(d).toFixed(nb);
   },
   /**
    * Converts a number with French specifications (decimal separator is ',')
    * @return {String}
    */
-  toFR : function(){
-    return (this + '').replace(/\./g, ',');
+  toFR : function(d){
+    return (d + '').replace(/\./g, ',');
   }
 };

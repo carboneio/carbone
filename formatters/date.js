@@ -7,23 +7,23 @@ module.exports = {
    * @param  {String} patternOut
    * @return {String}
    */
-  convert : function(patternIn, patternOut){
-    return moment(this, patternIn).format(patternOut);
+  convert : function(d, patternIn, patternOut){
+    return moment(d, patternIn).format(patternOut);
   },
   /**
    * Converts a date to a string with given pattern
    * @param  {String} pattern
    * @return {String}
    */
-  format : function(pattern){
-    return moment(this).format(pattern);
+  format : function(d, pattern){
+    return moment(d).format(pattern);
   },
   /**
    * Converts a string with given pattern to date
    * @param  {String} pattern
    * @return {Date}
    */
-  parse : function(pattern){
-    return moment(this, pattern).toDate();
+  parse : function(d, pattern){
+    return moment(d, pattern).toDate();
   }
 };

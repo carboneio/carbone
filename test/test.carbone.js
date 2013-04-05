@@ -121,6 +121,7 @@ describe('Carbone', function(){
   describe('renderPDF', function(){
     it('should render a template (docx), generate to PDF and give output', function(done){
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
+      var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
@@ -128,7 +129,13 @@ describe('Carbone', function(){
       carbone.renderPDF(_filePath, data, function(result){
         var buf = new Buffer(result);
         assert.equal(buf.slice(0, 4).toString(), '%PDF');
-        done();
+        var bufPDF = new Buffer(buf.length);
+        fs.open(_pdfResultPath, 'r', function(status, fd){
+          fs.read(fd, bufPDF, 0, buf.length, 0, function(err, bytesRead, buffer){
+            assert.equal(buf.slice(0, -550).toString(), buffer.slice(0, -550).toString());
+            done();
+          });
+        });
       });
     });
   });

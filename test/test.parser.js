@@ -248,6 +248,9 @@ describe('parser', function(){
         xml : '<div><div>     '
       });
     });
+    it('should convert conflicting characters', function(){
+      assert.equal(parser.getSubsitition("<div>{menu}<div> it's \n   {city}").xml, "<div><div> it\\\'s     ");
+    });
   });
 
 

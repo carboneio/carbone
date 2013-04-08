@@ -895,8 +895,8 @@ describe('Analyzer', function(){
       var _tags = [
         {'pos': 10, 'name': 'd.site'},
         {'pos': 20, 'name': 'd.number:int'},
-        {'pos': 30, 'name': 'd.date:parse("Y")'},
-        {'pos': 40, 'name': 'd.date:parse("YYYYMMDD"):format("DD/MM/YYYY")'}
+        {'pos': 30, 'name': 'd.date:parse(Y)'},
+        {'pos': 40, 'name': 'd.date:parse(YYYYMMDD):format(DD/MM/YYYY)'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
         'd0':{
@@ -906,8 +906,29 @@ describe('Analyzer', function(){
           'xmlParts' : [
             {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':10},
             {'attr':'number', 'formatters' : [ 'int' ], 'obj': 'd0', 'pos':20},
-            {'attr':'date', 'formatters' : [ 'parse("Y")' ], 'obj': 'd0', 'pos':30},
-            {'attr':'date', 'formatters' : [ 'parse("YYYYMMDD")', 'format("DD/MM/YYYY")' ], 'obj': 'd0', 'pos':40}
+            {'attr':'date', 'formatters' : [ 'parse(Y)' ], 'obj': 'd0', 'pos':30},
+            {'attr':'date', 'formatters' : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], 'obj': 'd0', 'pos':40}
+          ]
+        }
+      });
+    });
+    it('should clean unwanted spaces', function(){
+      var _tags = [
+        {'pos': 10, 'name': ' d.site'},
+        {'pos': 20, 'name': 'd. number:int '},
+        {'pos': 30, 'name': 'd . date:parse(Y)'},
+        {'pos': 40, 'name': 'd.date: parse(YYYYMMDD) :format(DD/MM/YYYY)'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd0':{
+          'name':'',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':10},
+            {'attr':'number', 'formatters' : [ 'int' ], 'obj': 'd0', 'pos':20},
+            {'attr':'date', 'formatters' : [ 'parse(Y)' ], 'obj': 'd0', 'pos':30},
+            {'attr':'date', 'formatters' : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], 'obj': 'd0', 'pos':40}
           ]
         }
       });

@@ -30,7 +30,18 @@ Conversion dans d'autre format : http://pc-freak.net/blog/convert-doc-pdf-linux-
 6. [node-json2officexml](https://github.com/pimetrai/node-json2officexml)
 
 
-Convert to pdf :
+NOuvelle solution pour crére un PDF :
+-------------------------------------
+Utiliser un XDP:
+
+- http://blogs.adobe.com/livecyclelane/2009/10/sample_-_dynamic_assembly_of_xdp_form.html
+- Inclure un pdf dans un xdp : http://stackoverflow.com/questions/6697708/xdp-file-using-remote-pdf
+  |- il doit être possible de faire l'inverse
+- http://forums.adobe.com/message/1336535?tstart=0
+
+
+
+Convert ot pdf :
 
 May use these source :
 - docbook (docbook-utils ou docbook2pdf) mais le format n'est peut-être pas adpété 

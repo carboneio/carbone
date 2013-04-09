@@ -346,6 +346,7 @@ describe('parser', function(){
         }
       });
     });
+
     it('3 should extract xml parts', function(){
       var _xml = '<div><tr> <h1> </h1> </tr><tr> <h1> </h1> </tr></div>';
       var _descriptor = {
@@ -378,6 +379,62 @@ describe('parser', function(){
               {'obj': 'd0', 'attr':'test' , 'pos':20, 'depth' : 1},
               {'obj': 'd0', 'array':'start' , 'pos':5, 'depth' : 1,  'after':'<tr>'},
               {'obj': 'd0', 'array':'end'   , 'pos':26, 'depth' : 1, 'before':' </tr>'}
+            ],
+            'depth' : 1
+          }
+        }
+      });
+    });
+
+    it('3 should extract xml parts even if there are some dynamic data just after the array', function(){
+      var _xml = '<div><tr> <h1> </h1> </tr><tr> <h1> </h1> </tr><p></p></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'object',
+          'parent':'',
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'info', 'pos':50}
+          ]
+        },
+        'menu1':{
+          'name':'menu',
+          'type':'array',
+          'parent':'d0',
+          'position' : {'start':9, 'end':30}, /* Approximative position */
+          'xmlParts' : [
+            {'obj': 'menu1', 'attr':'menu', 'pos':9},
+            {'obj': 'menu1', 'attr':'val' , 'pos':14},
+            {'obj': 'menu1', 'attr':'test', 'pos':20}
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</p></div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'object',
+            'parent':'',
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'info', 'pos':50, 'depth' : 0, 'before':'<p>'}
+            ],
+            'depth' : 0
+          },
+          'menu1':{
+            'name':'menu',
+            'type':'array',
+            'parent':'d0',
+            'position' : {'start':5, 'end':26}, /* exact position */
+            'xmlParts' : [
+              {'obj': 'menu1', 'attr':'menu' , 'pos':9,  'depth' : 1,  'after':' <h1>'},
+              {'obj': 'menu1', 'attr':'val'  , 'pos':14, 'depth' : 1,  'after':' </h1>'},
+              {'obj': 'menu1', 'attr':'test' , 'pos':20, 'depth' : 1},
+              {'obj': 'menu1', 'array':'start' , 'pos':5, 'depth' : 1,  'after':'<tr>'},
+              {'obj': 'menu1', 'array':'end'   , 'pos':26, 'depth' : 1, 'before':' </tr>'}
             ],
             'depth' : 1
           }

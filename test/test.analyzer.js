@@ -413,6 +413,7 @@ describe('Analyzer', function(){
         { pos:[ 30       ], str: ' </xml>' }
       ]);
     });
+    it('TODO: should works if there are two adjacents array of objects and some xml data in between');
     it('should works if there are two adjacents array of objects', function(){
       var _desc = {
         'staticData'  : {

@@ -8,7 +8,7 @@ module.exports = {
    * @return {String}
    */
   convert : function(d, patternIn, patternOut){
-    return moment(d, patternIn).format(patternOut);
+    return moment(d + '', patternIn).format(patternOut);
   },
   /**
    * Converts a date to a string with given pattern
@@ -24,6 +24,6 @@ module.exports = {
    * @return {Date}
    */
   parse : function(d, pattern){
-    return moment(d, pattern).toDate();
+    return moment(d + '', pattern).toDate();
   }
 };

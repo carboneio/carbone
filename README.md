@@ -1,19 +1,50 @@
-Carbone
-======
+CarboneJS
+=========
 
->A document parser and generator (docx, xlsx, odt, pdf, ...). It can be used for reporting like jasperreport.
+- **Fast, Simple and Powerful report generator** in any XML-based formats : DOCX, XLSX, ODT, PPTX, ODS, ...
+- **Generate PDF** thanks to the integrated document converter (depends on LibreOffice)
 
 Features
 --------
 
 - Report generator based on templates.
-
+- Efficient use of LibreOffice to convert documents 
+- Automatically restart LibreOffice if it crahes
+- Configurable number of LibreOffice servers
+- Retry conversion automatically
 
 Dependencies
 ------------
 
-1. Node.js
-2. Npm (package manager for Node)
+Minimal dependencies:
+
+```bash
+  sudo apt-get install zip unzip 
+```
+
+If you want to use the docuemnt converter, install LibreOffice (version 4.x is better):
+
+```bash
+  sudo add-apt-repository ppa:libreoffice/ppa
+  sudo apt-get update
+  sudo apt-get install libreoffice
+```
+
+
+TODO
+-----
+- get the list of supported format 
+- convert presentation/spreadsheet to pdf
+mettre un message d'erreur clair quand unzip n'est pas installé (ligne 160 indes.js throw error)
+
+
+Other similar solutions
+-----------------------
+- http://templater.info/
+- http://docxpert.eu/
+- xdocreports : https://code.google.com/p/xdocreport
+- JODReport : http://jodreports.sourceforge.net/
+- https://www.docmosis.com
 
 
 Source inspiration
@@ -30,8 +61,52 @@ Conversion dans d'autre format : http://pc-freak.net/blog/convert-doc-pdf-linux-
 6. [node-json2officexml](https://github.com/pimetrai/node-json2officexml)
 
 
+Methode retenue :
+-----------------
+- Utiliser le srcipt de unoconv (version pur Python 3 : https://github.com/xrmx/unoconv/tree/fc59dd90f03cf88f4cf16c07204809f2239284ee)
+- Utiliser python qui est fourni avec LibreOffice : /Applications/LibreOffice.app/Contents/MacOS/python
+- Essayer d'éexuter Python tel quel, si il y a une erreur du type "dyld: Library not loaded:" 
+    - essayer de trouver la librairie ailleurs sur MAC : find / -name 'libintl.8.dylib'
+    - créer un lien dans /usr/local/libodep/lib/libintl.8.dylib : 
+        - mkdir -p /usr/local/libodep/lib/
+        - ln -s /Applications/MAMP_2013-02-07_19-41-05/Library/lib/libintl.8.dylib /usr/local/libodep/lib/libintl.8.dylib
+
+Test pipe avec unoconv_py3:
+1. start a server (pass by a pipe): /Applications/LibreOffice.app/Contents/MacOS/python python/unoconv_py3 -l --pipe bla
+2. launch a conversion            : python/unoconv_py3 --pipe bla -f pdf --stdout python/bon-commande-18.odt > test.pdf
+
+Test pipe avec unoconv_py3_stream:
+1. start a server (pass by a pipe): /Applications/LibreOffice.app/Contents/MacOS/python python/unoconv_py3 -l --pipe bla
+2. launch a conversion            : cat python/bon-commande-18.odt | python/unoconv_py3_stream --stdout --pipe bla > test2.pdf
+
+Alternative direct to start a server: 
+--------------------------------------
+/Applications/LibreOffice.app/Contents/MacOS/soffice --headless --invisible --nocrashreport --nodefault --nologo --nofirststartwizard --norestore --quickstart --nolockcheck --accept="socket,host=127.0.0.1,port=2002;urp;StarOffice.ComponentContext"
+
+/Applications/LibreOffice.app/Contents/MacOS/soffice --headless --invisible --nocrashreport --nodefault --nologo --nofirststartwizard --norestore --quickstart --nolockcheck --accept="pipe,name=bla;urp;StarOffice.ComponentContext"
+
+Comment lancer plusieurs instance de libreoffice en même temps :
+https://bugs.freedesktop.org/show_bug.cgi?id=37531
+-env:UserInstallation=file:///home/user/.libreoffice-alt
+
+
+
+http://stackoverflow.com/questions/15860543/dyld-library-not-loaded-usr-local-libodep-lib-libintl-8-dylib
+
+Utiliser directement le serveur de libreoffice et se connecter dessus :
+Lancer libre office en listener :
+soffice "-accept=socket,host=127.0.0.1,port=2003,tcpNoDelay=1;urp;" -headless -nodefault -nofirststartwizard -nolockcheck -nologo -norestore
+Comment compiler LibreOffice en mode headless :
+https://wiki.documentfoundation.org/Development/HeadlessBuild
+
+
+
+
 NOuvelle solution pour crére un PDF :
 -------------------------------------
+A priori the best one : xdocreport
+http://angelozerr.wordpress.com/2012/12/06/how-to-convert-docxodt-to-pdfhtml-with-java/
+
 Utiliser un XDP:
 
 - http://blogs.adobe.com/livecyclelane/2009/10/sample_-_dynamic_assembly_of_xdp_form.html
@@ -80,7 +155,7 @@ http://www.docx4java.org/svn/docx4j/trunk/docx4j/docs/Docx4j_GettingStarted.html
 http://www.opendope.org/opendope_conventions_v2.3.html 
 -> comment gérer les répétitions et conditions
 
--> inspiration : http://templater.info/
+
 
 ---
 

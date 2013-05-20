@@ -1,7 +1,7 @@
 {
   "name": "carbone",
   "description": "Document parser and generator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "bin" : "bin/carbone",
   "main": "./lib",

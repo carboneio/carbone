@@ -24,11 +24,17 @@ Minimal dependencies:
 
 If you want to use the docuemnt converter, install LibreOffice (version 4.x is better):
 
+On Linux:
+Be careful, LibreOffice which is provided by the PPA libreoffice/libreoffice-4-0 and libreoffice/ppa does not bundled python 3.3. And we must use the python of LibreOffice to convert document. The best solution is to download the LibreOffice Package from the offical website and install it manually:
+
 ```bash
-  sudo add-apt-repository ppa:libreoffice/ppa
-  sudo apt-get update
-  sudo apt-get install libreoffice
+  wget http://download.documentfoundation.org/libreoffice/stable/4.0.3/deb/x86_64/LibreOffice_4.0.3_Linux_x86-64_deb.tar.gz
+  tar -zxvf LibreOffice_4.0.3_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_4.0.3_Linux_x86-64_deb
+  cd DEBS
+  sudo dpkg -i *.deb
 ```
+The ppa seams to be compiled with  --enable-python=system
 
 
 TODO

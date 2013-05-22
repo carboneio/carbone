@@ -140,12 +140,12 @@ describe('Converter', function(){
         function theEnd(){
           var _end = new Date();
           var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
-          console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' rows\n\n\n');
+          console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions\n\n\n');
           for (var i = 0; i < _results.length; i++) {
             var _buf = new Buffer(_results[i]);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           };
-          assert.equal((_elapsed < 200), true);
+          assert.equal((_elapsed < 300), true);
           done(); 
         }
       });

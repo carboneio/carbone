@@ -29,13 +29,6 @@ connection = "pipe,name=%s;urp;StarOffice.ComponentContext" % (args.pipe)
 outputFormat = args.format
 
 
-def die(ret, msg=None):
-    "Print optional error and exit with errorcode"
-    if msg:
-        print(msg, file=sys.stderr)
-    sys.exit(ret)
-
-
 ### And now that we have those classes, build on them
 class OutputStream( unohelper.Base, XOutputStream ):
     def __init__( self ):
@@ -76,10 +69,10 @@ try:
     try:
         unocontext = resolver.resolve("uno:%s" % connection)
     except NoConnectException as e:
-        die(1, "Existing listener not found. Unable start listener by parameters. Aborting.")
+        sys.exit(100) # Existing listener not found. Unable start listener by parameters. Aborting.
 
     if not unocontext:
-        die(1, "Unable to connect or start own listener. Aborting.")
+        sys.exit(101) # Unable to connect or start own listener. Aborting.
 
     ### And some more LibreOffice magic
     unosvcmgr = unocontext.ServiceManager
@@ -89,7 +82,10 @@ try:
     document = None
     inputprops = UnoProps(Hidden=True, ReadOnly=True, UpdateDocMode=QUIET_UPDATE)
     inputurl = unohelper.absolutize(cwd, unohelper.systemPathToFileUrl(inputFile))
-    document = desktop.loadComponentFromURL( inputurl , "_blank", 0, inputprops )
+    document = desktop.loadComponentFromURL( inputurl , "_blank", 0, inputprops)
+
+    if not document:
+        sys.exit(102) # The document could not be opened.
 
     ### Update document links (update sub-documents)
     try:
@@ -120,6 +116,6 @@ try:
 
 # (SystemError,RuntimeException,DisposedException,IllegalArgumentException,IOException,CannotConvertException,UnoException)
 except Exception as e:
-    die(1,  e)
+    sys.exit(1)
 
-die(0)
+sys.exit(0)

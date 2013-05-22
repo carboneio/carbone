@@ -28,10 +28,17 @@ On Linux:
 Be careful, LibreOffice which is provided by the PPA libreoffice/libreoffice-4-0 and libreoffice/ppa does not bundled python 3.3. And we must use the python of LibreOffice to convert document. The best solution is to download the LibreOffice Package from the offical website and install it manually:
 
 ```bash
+  # remove all old version of LibreOffice
+  sudo apt-get remove --purge libreoffice-core libreoffice-common
+  sudo apt-get autoremove --purge
+
+  # Download LibreOffice 64 bits version for ubuntu 64 bits
   wget http://download.documentfoundation.org/libreoffice/stable/4.0.3/deb/x86_64/LibreOffice_4.0.3_Linux_x86-64_deb.tar.gz
   tar -zxvf LibreOffice_4.0.3_Linux_x86-64_deb.tar.gz
   cd LibreOffice_4.0.3_Linux_x86-64_deb
   cd DEBS
+
+  # Install it
   sudo dpkg -i *.deb
 ```
 The ppa seams to be compiled with  --enable-python=system

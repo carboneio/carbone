@@ -18,6 +18,7 @@ describe('Carbone', function(){
 
   describe('buildXML', function(){
     it('should work if the same array is repeated two times in the xml <tr>d[i].product</tr>    <tr>d[i].product</tr>');
+    it('should not generate two object "dishes1" and "dishes 2" if there is a space between "dishes" and "[" in some tags: <tr>d.dishes [i]</tr>    <tr>d.dishes[i]</tr>');
 
     it('should return the xml if no data is passed', function(){
       var _xml = '<xml> </xml>';

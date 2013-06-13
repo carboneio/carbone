@@ -281,7 +281,7 @@ describe('parser', function(){
         }
       });
     });
-    it('should extract xml parts', function(){
+    it('should extract xml parts in the staticData object', function(){
       var _xml = '<div></div>';
       var _descriptor = {
         'd0':{
@@ -312,7 +312,7 @@ describe('parser', function(){
         }
       });
     });
-    it('2 should extract xml parts', function(){
+    it('2 should extract xml parts for each tag attribute', function(){
       var _xml = '<div><p><h1></h1></p></div>';
       var _descriptor = {
         'd0':{
@@ -347,7 +347,7 @@ describe('parser', function(){
       });
     });
 
-    it('3 should extract xml parts', function(){
+    it('3 should extract xml parts of an array', function(){
       var _xml = '<div><tr> <h1> </h1> </tr><tr> <h1> </h1> </tr></div>';
       var _descriptor = {
         'd0':{
@@ -442,7 +442,7 @@ describe('parser', function(){
       });
     });
     
-    it('4 should extract xml parts nested object in an array', function(){
+    it('4 should extract xml parts even if there is a nested object in an array', function(){
       var _xml = '<div><tr> <h1> </h1> <p></p> </tr><tr> <h1> </h1> <p></p> </tr></div>';
       var _descriptor = {
         'd0':{
@@ -498,7 +498,149 @@ describe('parser', function(){
       });
     });
 
-    it('5 should extract xml parts: two nested arrays', function(){
+    it('4 should extract xml parts even if there are two adjacents arrays', function(){
+      var _xml = '<div><tr1> </tr1><tr1> </tr1> <tr2> </tr2><tr2> </tr2></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'parent' : '',
+          'type': 'object',
+          'xmlParts' : []
+        },
+        'movies1':{
+          'name':'movies',
+          'parent' : 'd0',
+          'type': 'array',
+          'depth' : 1,
+          'position' : {'start': 10, 'end' :22}, /* Approximative position */
+          'xmlParts' : [
+            {'obj': 'movies1', 'attr':'title', 'pos':11, 'depth':1 }
+          ]
+        },
+        'cars2':{
+          'name':'cars',
+          'parent' : 'd0',
+          'type': 'array',
+          'depth' : 1,
+          'position' : {'start': 35, 'end' :48},
+          'xmlParts' : [
+            {'obj': 'cars2', 'attr':'brand', 'pos':36, 'depth':1 }
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'parent' : '',
+            'type': 'object',
+            'xmlParts' : []
+          },
+          'movies1':{
+            'name':'movies',
+            'parent' : 'd0',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 5, 'end' :17},
+            'xmlParts' : [
+              {'obj': 'movies1',  'attr': 'title', 'pos': 11, 'depth':1 },
+              {'obj': 'movies1', 'array': 'start', 'pos': 5 , 'depth': 1,'after': '<tr1> ' },
+              {'obj': 'movies1', 'array': 'end'  , 'pos': 17, 'depth': 1,'before': '</tr1>' } 
+            ]
+          },
+          'cars2':{
+            'name':'cars',
+            'parent' : 'd0',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 30, 'end' :42},
+            'xmlParts' : [
+              {'obj': 'cars2',  'attr': 'brand', 'pos': 36,'depth':1 },
+              {'obj': 'cars2', 'array': 'start', 'pos': 30,'depth': 1,'after': '<tr2> ' },
+              {'obj': 'cars2', 'array': 'end'  , 'pos': 42,'depth': 1,'before': '</tr2>' } 
+            ],
+            'before': ' '
+          }
+        }
+      });
+    });
+
+    it('4 should extract xml parts even if there is some xml between two adjacents arrays. It should add a "before" attribute on the last array part', function(){
+      var _xml = '<div><tr1> </tr1><tr1> </tr1> <b> <tr2> </tr2><tr2> </tr2></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'parent' : '',
+          'type': 'object',
+          'xmlParts' : []
+        },
+        'movies1':{
+          'name':'movies',
+          'parent' : 'd0',
+          'type': 'array',
+          'depth' : 1,
+          'position' : {'start': 10, 'end' :22}, /* Approximative position */
+          'xmlParts' : [
+            {'obj': 'movies1', 'attr':'title', 'pos':11, 'depth':1 }
+          ]
+        },
+        'cars2':{
+          'name':'cars',
+          'parent' : 'd0',
+          'type': 'array',
+          'depth' : 1,
+          'position' : {'start': 39, 'end' :52},
+          'xmlParts' : [
+            {'obj': 'cars2', 'attr':'brand', 'pos':40, 'depth':1 }
+          ]
+        }
+      };
+      helper.assert(parser.extractXmlParts(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div>',
+          'after' :'</div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'parent' : '',
+            'type': 'object',
+            'xmlParts' : []
+          },
+          'movies1':{
+            'name':'movies',
+            'parent' : 'd0',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 5, 'end' :17},
+            'xmlParts' : [
+              {'obj': 'movies1',  'attr': 'title', 'pos': 11, 'depth':1 },
+              {'obj': 'movies1', 'array': 'start', 'pos': 5 , 'depth': 1,'after': '<tr1> ' },
+              {'obj': 'movies1', 'array': 'end'  , 'pos': 17, 'depth': 1,'before': '</tr1>' } 
+            ]
+          },
+          'cars2':{
+            'name':'cars',
+            'parent' : 'd0',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 34, 'end' :46},
+            'xmlParts' : [
+              {'obj': 'cars2',  'attr': 'brand', 'pos': 40,'depth':1 },
+              {'obj': 'cars2', 'array': 'start', 'pos': 34,'depth': 1,'after': '<tr2> ' },
+              {'obj': 'cars2', 'array': 'end'  , 'pos': 46,'depth': 1,'before': '</tr2>' } 
+            ],
+            'before' : ' <b> '
+          }
+        }
+      });
+    });
+
+    it('5 should extract xml parts even if there are two nested arrays and an object', function(){
       var _xml = '<div><tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr></div>';
       var _descriptor = {
         'd0':{
@@ -571,7 +713,7 @@ describe('parser', function(){
       });
     });
 
-    it('6 should extract xml parts: two nested arrays', function(){
+    it('6 should extract xml parts even if there are two nested arrays', function(){
       var _xml = '<div><tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr></div>';
       var _descriptor = {
         'd0':{
@@ -629,7 +771,7 @@ describe('parser', function(){
       });
     });
 
-    it('7 should extract xml parts: two nested arrays inverse order', function(){
+    it('7 should extract xml parts even if the two nested arrays are in inverse order', function(){
       var _xml = '<div><tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr></div>';
       var _descriptor = {
         'd0':{

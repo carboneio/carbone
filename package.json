@@ -11,5 +11,5 @@
   "devDependencies": {
     "mocha": ">=1.8.2"
   },
-  "engines": { "node": ">= 0.10.0" }
+  "engines": { "node": ">= 0.8.0" }
 }

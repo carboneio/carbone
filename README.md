@@ -49,6 +49,7 @@ The ppa seams to be compiled with  --enable-python=system
 
 TODO
 -----
+- Essayer de développer un module UNO C++ pour éviter de passer par python (peut-être plus rapide) : http://api.libreoffice.org/examples/examples.html#Cpp_examples
 - get the list of supported format 
 - convert presentation/spreadsheet to pdf
 mettre un message d'erreur clair quand unzip n'est pas installé (ligne 160 indes.js throw error)

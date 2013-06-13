@@ -413,7 +413,6 @@ describe('Analyzer', function(){
         { pos:[ 30       ], str: ' </xml>' }
       ]);
     });
-    it('TODO: should works if there are two adjacents array of objects and some xml data in between');
     it('should works if there are two adjacents array of objects', function(){
       var _desc = {
         'staticData'  : {
@@ -468,6 +467,64 @@ describe('Analyzer', function(){
         { pos:[ 20, 0, 24 ], str: '<trow>Lumeneo</trow>'},
         { pos:[ 20, 1, 24 ], str: '<trow>Tesla motors</trow>'},
         { pos:[ 30       ], str: ' </xml>' }
+      ]);
+    });
+    it('2 should works if there are two adjacents array of objects and some xml data in between', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml> ',
+          'after' :' </xml>'
+        },
+        'hierarchy'   : ['d0', 'movies1', 'cars2'],
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'parent' : '',
+            'type': 'object',
+            'xmlParts' : []
+          },
+          'movies1':{
+            'name':'movies',
+            'parent' : 'd0',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :15},
+            'before' : '<T>',
+            'xmlParts' : [
+              {'obj': 'movies1', 'attr':'title', 'pos':10, 'depth':1, 'before':'<tr>', 'after': '</tr>'    }
+            ]
+          },
+          'cars2':{
+            'name':'cars',
+            'parent' : 'd0',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 20, 'end' :29},
+            'xmlParts' : [
+              {'obj': 'cars2', 'attr':'brand', 'pos':24, 'depth':1, 'before':'<trow>', 'after': '</trow>'  }
+            ]
+          }
+        }
+      };
+      var _data = {
+        'movies' : [
+          {'title' : 'matrix' },
+          {'title' : 'Lord of War' }
+        ],
+        'cars' : [
+          {'brand' : 'Lumeneo' },
+          {'brand' : 'Tesla motors' }
+        ]
+      };
+      var _fn = analyzer.getXMLBuilderFunction(_desc);
+      helper.assert(_fn(_data), [
+        { pos:[ 0         ], str: '<xml> '},
+        { pos:[ 6         ], str: '<T>'},
+        { pos:[ 6 , 0, 10 ], str: '<tr>matrix</tr>'},
+        { pos:[ 6 , 1, 10 ], str: '<tr>Lord of War</tr>'},
+        { pos:[ 20, 0, 24 ], str: '<trow>Lumeneo</trow>'},
+        { pos:[ 20, 1, 24 ], str: '<trow>Tesla motors</trow>'},
+        { pos:[ 30        ], str: ' </xml>' }
       ]);
     });
     it('should works even with two nested arrays', function(){

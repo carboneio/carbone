@@ -8,16 +8,16 @@ var helper = require('../lib/helper');
 describe('Analyzer', function(){
 
 
-  describe('decomposeTags', function(){
-    it('should return an empty descriptor if there are no tags', function(){
-      var _tags = [];
-      helper.assert(analyzer.decomposeTags(_tags), {});
+  describe('decomposeMarkers', function(){
+    it('should return an empty descriptor if there are no markers', function(){
+      var _markers = [];
+      helper.assert(analyzer.decomposeMarkers(_markers), {});
     });
     it('should create a descriptor which be used to build the xml generator', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.site'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -29,11 +29,11 @@ describe('Analyzer', function(){
       });
     });
     it('should detect multiple attributes', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.site'},
         {'pos': 30, 'name': 'd.name'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -46,10 +46,10 @@ describe('Analyzer', function(){
       });
     });
     it('should accept two levels of object', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.site.name'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -67,12 +67,12 @@ describe('Analyzer', function(){
       });
     });
     it('should accept two levels of object and many attributes', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 10, 'name': 'd.movie'},
         {'pos': 20, 'name': 'd.site.name'},
         {'pos': 30, 'name': 'd.site.id'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -93,11 +93,11 @@ describe('Analyzer', function(){
       });
     });
     it('should manage arrays', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd[i].site'},
         {'pos': 30, 'name': 'd[i+1].site'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name': 'd',
           'type': 'array',
@@ -110,13 +110,13 @@ describe('Analyzer', function(){
       });
     });
     it('should manage arrays with nested objects', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd[i].site.id'},
         {'pos': 25, 'name': 'd[i].movie'},
         {'pos': 30, 'name': 'd[i+1].site.id'},
         {'pos': 35, 'name': 'd[i+1].movie'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name': 'd',
           'type': 'array',
@@ -137,11 +137,11 @@ describe('Analyzer', function(){
       });
     });
     it('should manage arrays within an object', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.site[i].id'},
         {'pos': 30, 'name': 'd.site[i+1].id'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name': 'd',
           'type': 'object',
@@ -160,12 +160,12 @@ describe('Analyzer', function(){
       });
     });
     it('should manage arrays even if there are some attributes aside', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.site[i].id'},
         {'pos': 28, 'name': 'd.movie'},
         {'pos': 30, 'name': 'd.site[i+1].id'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name': 'd',
           'type': 'object',
@@ -186,7 +186,7 @@ describe('Analyzer', function(){
       });
     });
     it('54should manage nested arrays', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 1 , 'name': 'd.menu[i].id'},
         {'pos': 10, 'name': 'd.menu[i].cars'},
         {'pos': 20, 'name': 'd.menu[i].menuElement[i].id'},
@@ -198,7 +198,7 @@ describe('Analyzer', function(){
         {'pos': 80, 'name': 'd.site'},
         {'pos': 90, 'name': 'd.product.id'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type':'object',
@@ -236,14 +236,14 @@ describe('Analyzer', function(){
         }
       });
     });
-    it('2 inverse order should decompose all tags', function(){
-      var _tags = [
+    it('2 inverse order should decompose all markers', function(){
+      var _markers = [
         {'pos': 10, 'name': 'd.menu[i].menuElement[i].id'},
         {'pos': 20, 'name': 'd.menu[i+1].menuElement[i].id'},
         {'pos': 30, 'name': 'd.menu[i].menuElement[i+1].id'},
         {'pos': 40, 'name': 'd.menu[i+1].menuElement[i+1].id'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -269,8 +269,8 @@ describe('Analyzer', function(){
         }
       });
     });
-    it.skip('2 should decompose all tags even if there are some objects within the array', function(){
-      var _tags = [
+    it.skip('2 should decompose all markers even if there are some objects within the array', function(){
+      var _markers = [
         {'pos': 1  , 'name': 'd.menu[i].id'},
         {'pos': 10 , 'name': 'd.menu[i].cars'},
         {'pos': 20 , 'name': 'd.site'},
@@ -279,7 +279,7 @@ describe('Analyzer', function(){
         {'pos': 50 , 'name': 'd.menu[i+1].id'},
         {'pos': 60 , 'name': 'd.menu[i+1].menuElement[0].id'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -317,7 +317,7 @@ describe('Analyzer', function(){
       });
     });
     it('should manage multidimensional arrays and multiple arrays', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 1 , 'name': 'd.menu[i][i].id'},
         {'pos': 2 , 'name': 'd.menu[i][i+1].id'},
         {'pos': 3 , 'name': 'd.menu[i+1][i].id'},
@@ -326,7 +326,7 @@ describe('Analyzer', function(){
         {'pos': 6 , 'name': 'd.days[i].name'},
         {'pos': 7 , 'name': 'd.days[i+1].name'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -369,12 +369,12 @@ describe('Analyzer', function(){
       });
     });
     it.skip('should decompose even with very complex arrays', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 1 , 'name': 'd.menu[1][0][1].product[0].site.id'},
         {'pos': 2 , 'name': 'd.product.id'},
         {'pos': 3 , 'name': 'd.cars.product.id'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'',
           'type': 'object',
@@ -438,10 +438,10 @@ describe('Analyzer', function(){
       });
     });
     it('should extract basic formatters', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.number:int'},
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -453,10 +453,10 @@ describe('Analyzer', function(){
       });
     });
     it('should extract basic three formatters', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.number:int:float:decimal'},
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -468,10 +468,10 @@ describe('Analyzer', function(){
       });
     });
     it('should ignore whitespaces in formatters', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.number : int  :   float   :  decimal'},
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -483,10 +483,10 @@ describe('Analyzer', function(){
       });
     });
     it('should detect formatters with parenthesis', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.number:parse(YYYYMMDD)'},
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -498,13 +498,13 @@ describe('Analyzer', function(){
       });
     });
     it('should detect multiple formatters', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 10, 'name': 'd.site'},
         {'pos': 20, 'name': 'd.number:int'},
         {'pos': 30, 'name': 'd.date:parse(Y)'},
         {'pos': 40, 'name': 'd.date:parse(YYYYMMDD):format(DD/MM/YYYY)'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -519,10 +519,10 @@ describe('Analyzer', function(){
       });
     });
     it('should detect formatters even if we use special character in the parenthesis', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd.number:parse(YY, YY:MM:D.ZZ [Z]menu[i+1][i] d.bla)'},
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',
@@ -534,10 +534,10 @@ describe('Analyzer', function(){
       });
     });
     it.skip('should detect formatter even in the iterator of an array', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 20, 'name': 'd[day:weekday].meteo'},
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'array',
@@ -549,13 +549,13 @@ describe('Analyzer', function(){
       });
     });
     it('should clean unwanted spaces', function(){
-      var _tags = [
+      var _markers = [
         {'pos': 10, 'name': ' d.site'},
         {'pos': 20, 'name': 'd. number:int '},
         {'pos': 30, 'name': 'd . date:parse(Y)'},
         {'pos': 40, 'name': 'd.date: parse(YYYYMMDD) :format(DD/MM/YYYY)'}
       ];
-      helper.assert(analyzer.decomposeTags(_tags), {
+      helper.assert(analyzer.decomposeMarkers(_markers), {
         'd':{
           'name':'d',
           'type': 'object',

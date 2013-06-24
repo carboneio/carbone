@@ -45,29 +45,25 @@ describe('builder', function(){
       builder.sortXmlParts(_data)
       helper.assert(_data, _expected);
     });
-
     it('should sort the array with a depth of 2', function(){
       var _data     = [{'pos':[40, 4]}, {'pos':[40, 3]}, {'pos':[51, 100]}, {'pos':[29, 8  ]}];
       var _expected = [{'pos':[29, 8]}, {'pos':[40, 3]}, {'pos':[40, 4  ]}, {'pos':[51, 100]}];
       builder.sortXmlParts(_data, 2)
       helper.assert(_data, _expected);
     });
-
     it('should sort the array with a depth of 3', function(){
       var _data     = [{'pos':[4, 4, 2]}, {'pos':[4, 4, 1]}, {'pos':[4, 3, 2]}, {'pos':[1, 9, 1]}, {'pos':[2, 5, 6]}, {'pos':[1, 8, 9]}];
       var _expected = [{'pos':[1, 8, 9]}, {'pos':[1, 9, 1]}, {'pos':[2, 5, 6]}, {'pos':[4, 3, 2]}, {'pos':[4, 4, 1]}, {'pos':[4, 4, 2]}];
       builder.sortXmlParts(_data, 3)
       helper.assert(_data, _expected);
     });
-
     it('should sort the array even if some arrays are incomplete, undefined values appears first', function(){
       var _data     = [{'pos':[4, 4, 2]}, {'pos':[4, 4, 1]}, {'pos':[2, 4   ]}, {'pos':[1, 9, 1]}, {'pos':[2, 3   ]}, {'pos':[1      ]}];
       var _expected = [{'pos':[1      ]}, {'pos':[1, 9, 1]}, {'pos':[2, 3   ]}, {'pos':[2, 4   ]}, {'pos':[4, 4, 1]}, {'pos':[4, 4, 2]}];
       builder.sortXmlParts(_data, 3)
       helper.assert(_data, _expected);
     });
-
-    it('should sort a complex array (sort depth of 3) of xml parts and return an concatenate string', function(){
+    it('should sort a complex array (sort depth of 3) of xml parts', function(){
       var _data     = [ 
         { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
         { 'pos': [ 0        ], 'str': '<xml> '       },
@@ -100,7 +96,7 @@ describe('builder', function(){
   });
 
   describe('assembleXmlParts', function(){
-    it('should sort the array of xml parts and return an concatenate string', function(){
+    it('should sort the array of xml parts according to the "pos" attribute and assemble all strings', function(){
       var _data     = [
         {'pos':[40], 'str': '4'}, 
         {'pos':[19], 'str': '2'}, 
@@ -109,8 +105,7 @@ describe('builder', function(){
       ];
       helper.assert(builder.assembleXmlParts(_data), '1234');
     });
-
-    it('should sort a complex array (sort depth of 3) of xml parts and return an concatenate string', function(){
+    it('should sort a complex array (sort depth of 3) of xml parts and assemble all strings', function(){
       var _data     = [
         {'pos':[4, 4, 2], 'str': '6'},
         {'pos':[4, 4, 1], 'str': '5'},
@@ -121,8 +116,7 @@ describe('builder', function(){
       ];
       helper.assert(builder.assembleXmlParts(_data, 3), '123456');
     });
-
-    it('should sort a complex array (sort depth of 3) of xml parts and return an concatenate string', function(){
+    it('should sort a complex array and assemble all strings', function(){
       var _data     = [ 
         { 'pos': [ 0        ], 'str': '<xml>' },
         { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
@@ -140,8 +134,8 @@ describe('builder', function(){
     });
   });
 
-  describe('generateXmlParts', function(){
-    it('should return return an array of xml parts for static data if dynamicData is empty', function(){
+  describe('getBuilderFunction', function(){
+    it('should return a function which returns an array of xml parts for static data if dynamicData is empty', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml>',
@@ -153,7 +147,7 @@ describe('builder', function(){
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(null), [{pos:[0], str:'<xml>'}, {pos:[1], str:'</xml>'}]);
     });
-    it('should return a function which return an array of xml parts according to the descriptor and the data and the formatters', function(done){
+    it('should return an array of xml parts according to the descriptor, the data and the formatters', function(done){
       var _desc = {
         'staticData'  : {
           'before':'',
@@ -188,7 +182,7 @@ describe('builder', function(){
         done();
       });
     });
-    it('should return a function which return an array of xml parts according to the descriptor and the data', function(){
+    it('should manage multiple attributes in the main object "d"', function(){
       var _desc = {
         'staticData'  : {
           'before':'',
@@ -261,7 +255,7 @@ describe('builder', function(){
       };
       helper.assert(_fn(_data) , [{pos:[8], str:'<xml><p>Thomas'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>Neo'}, {pos:[23], str:'</p></xml>'}]);
     });
-    it('should works even if there is a nested object in the descriptor', function(){
+    it('should work even if there is a nested object in the descriptor', function(){
       var _desc = {
         'staticData'  : {
           'before':'',

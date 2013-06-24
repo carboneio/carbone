@@ -27,15 +27,15 @@ describe('Analyzer', function(){
           'before':'',
           'after' :'</xml>'
         },
-        'hierarchy'   : ['d0'],
+        'hierarchy'   : ['d'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'number', 'pos':5 , 'depth':0, 'before':'<xml>', 'after': '', 'formatters' : [ 'int' ]}
+              {'obj': 'd', 'attr':'number', 'pos':5 , 'depth':0, 'before':'<xml>', 'after': '', 'formatters' : [ 'int' ]}
             ]
           }
         }
@@ -62,17 +62,17 @@ describe('Analyzer', function(){
           'before':'',
           'after' :'</p></xml>'
         },
-        'hierarchy'   : ['d0'],
+        'hierarchy'   : ['d'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []}
+              {'obj': 'd', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
+              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
+              {'obj': 'd', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []}
             ]
           }
         }
@@ -104,17 +104,17 @@ describe('Analyzer', function(){
           'before':'',
           'after' :'</p></xml>'
         },
-        'hierarchy'   : ['d0'],
+        'hierarchy'   : ['d'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []}
+              {'obj': 'd', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
+              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
+              {'obj': 'd', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []}
             ]
           }
         }
@@ -135,22 +135,22 @@ describe('Analyzer', function(){
           'before':'',
           'after' :'</p></xml>'
         },
-        'hierarchy'   : ['d0', 'info1'],
+        'hierarchy'   : ['d', 'info1'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>', 'after': '', 'formatters' : []}
+              {'obj': 'd', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
+              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
+              {'obj': 'd', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>', 'after': '', 'formatters' : []}
             ]
           },
           'info1':{
             'name':'info',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
@@ -197,11 +197,11 @@ describe('Analyzer', function(){
           'before':'',
           'after' :'</p></xml>'
         },
-        'hierarchy'   : ['d0', 'info1'],
+        'hierarchy'   : ['d', 'info1'],
         'dynamicData' : {
           'info1':{
             'name':'info',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
@@ -209,15 +209,15 @@ describe('Analyzer', function(){
               {'obj': 'info1', 'attr':'job'  , 'pos':32,  'depth':0, 'before':'</br><br>', 'after': '', 'formatters' : [] }
             ]
           },
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
-              {'obj': 'd0', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
-              {'obj': 'd0', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>', 'after': '', 'formatters' : []}
+              {'obj': 'd', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
+              {'obj': 'd', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
+              {'obj': 'd', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>', 'after': '', 'formatters' : []}
             ]
           }
         }
@@ -247,19 +247,19 @@ describe('Analyzer', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d0'],
+        'hierarchy'   : ['d'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd0', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'  },
-              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'after' : '</p><p>' },
-              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1  },
-              {'obj': 'd0', 'array':'end'     , 'pos':29, 'depth':1,  'before': '</p></tr>'  }
+              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'  },
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1, 'after' : '</p><p>' },
+              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1  },
+              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1,  'before': '</p></tr>'  }
             ]
           }
         }
@@ -288,22 +288,22 @@ describe('Analyzer', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d0', 'info1'],
+        'hierarchy'   : ['d', 'info1'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           },
-              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
+              {'obj': 'd', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           },
+              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
             ]
           },
           'info1':{
             'name':'info',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
@@ -334,22 +334,22 @@ describe('Analyzer', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d0', 'info1', 'info2', 'info3'],
+        'hierarchy'   : ['d', 'info1', 'info2', 'info3'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           },
-              {'obj': 'd0', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
+              {'obj': 'd', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           },
+              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
             ]
           },
           'info1':{
             'name':'info',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
@@ -419,9 +419,9 @@ describe('Analyzer', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d0', 'movies1', 'cars2'],
+        'hierarchy'   : ['d', 'movies1', 'cars2'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'object',
@@ -429,7 +429,7 @@ describe('Analyzer', function(){
           },
           'movies1':{
             'name':'movies',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :15},
@@ -439,7 +439,7 @@ describe('Analyzer', function(){
           },
           'cars2':{
             'name':'cars',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
@@ -475,9 +475,9 @@ describe('Analyzer', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d0', 'movies1', 'cars2'],
+        'hierarchy'   : ['d', 'movies1', 'cars2'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'object',
@@ -485,7 +485,7 @@ describe('Analyzer', function(){
           },
           'movies1':{
             'name':'movies',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :15},
@@ -496,7 +496,7 @@ describe('Analyzer', function(){
           },
           'cars2':{
             'name':'cars',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
@@ -533,22 +533,22 @@ describe('Analyzer', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d0', 'skills1'],
+        'hierarchy'   : ['d', 'skills1'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
-              {'obj': 'd0', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'<tr><p>', 'after': ''            },
-              {'obj': 'd0', 'attr':'lastname' , 'pos':29, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'<tr><p>', 'after': ''            },
+              {'obj': 'd', 'attr':'lastname' , 'pos':29, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
             ]
           },
           'skills1':{
             'name':'skills',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 13, 'end' :22},
@@ -610,9 +610,9 @@ describe('Analyzer', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d0', 'skills1'],
+        'hierarchy'   : ['d', 'skills1'],
         'dynamicData' : {
-          'd0':{
+          'd':{
             'name':'',
             'parent' : '',
             'type': 'array',
@@ -623,7 +623,7 @@ describe('Analyzer', function(){
           },
           'skills1':{
             'name':'skills',
-            'parent' : 'd0',
+            'parent' : 'd',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
@@ -681,23 +681,183 @@ describe('Analyzer', function(){
   });
 
   describe('decomposeTags', function(){
-    it('should create a descriptor', function(){
+    it('should return an empty descriptor if there are no tags', function(){
+      var _tags = [];
+      helper.assert(analyzer.decomposeTags(_tags), {});
+    });
+    it('should create a descriptor which be used to build the xml generator', function(){
       var _tags = [
         {'pos': 20, 'name': 'd.site'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
-        'd0':{
-          'name':'',
+        'd':{
+          'name':'d',
           'type': 'object',
           'parent':'',
-          /*'depth' : 0,*/
           'xmlParts' : [
-            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':20}
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
           ]
         }
       });
     });
-    it('1should decompose all tags', function(){
+    it('should detect multiple attributes', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.site'},
+        {'pos': 30, 'name': 'd.name'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20},
+            {'attr':'name', 'formatters' : [], 'obj': 'd', 'pos':30}
+          ]
+        }
+      });
+    });
+    it('should accept two levels of object', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.site.name'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name':'site',
+          'type': 'object',
+          'parent':'d',
+          'xmlParts' : [
+            {'attr':'name', 'formatters' : [], 'obj': 'dsite', 'pos':20},
+          ]
+        }
+      });
+    });
+    it('should accept two levels of object and many attributes', function(){
+      var _tags = [
+        {'pos': 10, 'name': 'd.movie'},
+        {'pos': 20, 'name': 'd.site.name'},
+        {'pos': 30, 'name': 'd.site.id'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'movie', 'formatters' : [], 'obj': 'd', 'pos':10}
+          ]
+        },
+        'dsite':{
+          'name':'site',
+          'type': 'object',
+          'parent':'d',
+          'xmlParts' : [
+            {'attr':'name', 'formatters' : [], 'obj': 'dsite', 'pos':20},
+            {'attr':'id'  , 'formatters' : [], 'obj': 'dsite', 'pos':30}
+          ]
+        }
+      });
+    });
+    it('should manage arrays', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd[i].site'},
+        {'pos': 30, 'name': 'd[i+1].site'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name': 'd',
+          'type': 'array',
+          'parent':'',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
+          ]
+        }
+      });
+    });
+    it('should manage arrays with nested objects', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd[i].site.id'},
+        {'pos': 25, 'name': 'd[i].movie'},
+        {'pos': 30, 'name': 'd[i+1].site.id'},
+        {'pos': 35, 'name': 'd[i+1].movie'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name': 'd',
+          'type': 'array',
+          'parent':'',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'movie', 'formatters' : [], 'obj': 'd', 'pos':25}
+          ]
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'object',
+          'parent':'d',
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20}
+          ]
+        }
+      });
+    });
+    it('should manage arrays within an object', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.site[i].id'},
+        {'pos': 30, 'name': 'd.site[i+1].id'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20}
+          ]
+        }
+      });
+    });
+    it('should manage arrays even if there are some attributes aside', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.site[i].id'},
+        {'pos': 28, 'name': 'd.movie'},
+        {'pos': 30, 'name': 'd.site[i+1].id'}
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'movie', 'formatters' : [], 'obj': 'd', 'pos':28}
+          ]
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20}
+          ]
+        }
+      });
+    });
+    it('54should manage nested arrays', function(){
       var _tags = [
         {'pos': 1 , 'name': 'd.menu[i].id'},
         {'pos': 10, 'name': 'd.menu[i].cars'},
@@ -711,39 +871,39 @@ describe('Analyzer', function(){
         {'pos': 90, 'name': 'd.product.id'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
-        'd0':{
-          'name':'',
-          'type': 'object',
+        'd':{
+          'name':'d',
+          'type':'object',
           'parent':'',
           'xmlParts' : [
-            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':80}
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':80}
           ]
         },
-        'menu1':{
+        'dmenu':{
           'name':'menu',
           'type':'array',
-          'parent':'d0',
+          'parent':'d',
           'position': {'start':1, 'end':40},
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'menu1', 'pos':1},
-            {'attr':'cars', 'formatters' : [], 'obj': 'menu1', 'pos':10}
+            {'attr':'id', 'formatters' : [], 'obj': 'dmenu', 'pos':1},
+            {'attr':'cars', 'formatters' : [], 'obj': 'dmenu', 'pos':10}
           ]
         },
-        'menuElement2':{
+        'dmenumenuElement':{
           'name':'menuElement',
           'type':'array',
-          'parent':'menu1',
+          'parent':'dmenu',
           'position': {'start':20, 'end':30},
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'menuElement2', 'pos':20}
+            {'attr':'id', 'formatters' : [], 'obj': 'dmenumenuElement', 'pos':20}
           ]
         },
-        'product3':{
+        'dproduct':{
           'name':'product',
           'type':'object',
-          'parent':'d0',
+          'parent':'d',
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'product3', 'pos':90}
+            {'attr':'id', 'formatters' : [], 'obj': 'dproduct', 'pos':90}
           ]
         }
       });
@@ -756,32 +916,32 @@ describe('Analyzer', function(){
         {'pos': 40, 'name': 'd.menu[i+1].menuElement[i+1].id'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
-        'd0':{
-          'name':'',
+        'd':{
+          'name':'d',
           'type': 'object',
           'parent':'',
           /*'depth' : 0,*/
           'xmlParts' : []
         },
-        'menu1':{
+        'dmenu':{
           'name':'menu',
           'type':'array',
-          'parent':'d0',
+          'parent':'d',
           'position': {'start':10, 'end':20},
           'xmlParts' : []
         },
-        'menuElement2':{
+        'dmenumenuElement':{
           'name':'menuElement',
           'type':'array',
-          'parent':'menu1',
+          'parent':'dmenu',
           'position': {'start':10, 'end':30},
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'menuElement2', 'pos':10}
+            {'attr':'id', 'formatters' : [], 'obj': 'dmenumenuElement', 'pos':10}
           ]
         }
       });
     });
-    it('2 should decompose all tags even if there are some objects within the array', function(){
+    it.skip('2 should decompose all tags even if there are some objects within the array', function(){
       var _tags = [
         {'pos': 1  , 'name': 'd.menu[i].id'},
         {'pos': 10 , 'name': 'd.menu[i].cars'},
@@ -792,43 +952,43 @@ describe('Analyzer', function(){
         {'pos': 60 , 'name': 'd.menu[i+1].menuElement[0].id'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
-        'd0':{
-          'name':'',
+        'd':{
+          'name':'d',
           'type': 'object',
           'parent':'',
           'xmlParts' : [
-            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':20}
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
           ]
         },
-        'menu1':{
+        'dmenu':{
           'name':'menu',
           'type':'array',
-          'parent':'d0',
+          'parent':'d',
           'position': { 'start': 1, 'end': 50 },
           'xmlParts' : [
-            {'attr':'id'  , 'formatters' : [], 'obj': 'menu1', 'pos':1},
-            {'attr':'cars', 'formatters' : [], 'obj': 'menu1', 'pos':10}
+            {'attr':'id'  , 'formatters' : [], 'obj': 'dmenu', 'pos':1},
+            {'attr':'cars', 'formatters' : [], 'obj': 'dmenu', 'pos':10}
           ]
         },
-        'product2':{
+        'dproduct':{
           'name':'product',
           'type':'object',
-          'parent':'d0',
+          'parent':'d',
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'product2', 'pos':30}
+            {'attr':'id', 'formatters' : [], 'obj': 'dproduct', 'pos':30}
           ]
         },
-        'menuElement3':{
+        'dmenumenuElement':{
           'name':'menuElement',
           'type':'array',
-          'parent':'menu1',
+          'parent':'dmenu',
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'menuElement3', 'pos':40}
+            {'attr':'id', 'formatters' : [], 'obj': 'dmenumenuElement' ,'pos':40, 'condition':0}
           ]
         }
       });
     });
-    it('should decompose all tags even with multi-dimension array', function(){
+    it('should manage multidimensional arrays and multiple arrays', function(){
       var _tags = [
         {'pos': 1 , 'name': 'd.menu[i][i].id'},
         {'pos': 2 , 'name': 'd.menu[i][i+1].id'},
@@ -839,55 +999,55 @@ describe('Analyzer', function(){
         {'pos': 7 , 'name': 'd.days[i+1].name'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
-        'd0':{
-          'name':'',
+        'd':{
+          'name':'d',
           'type': 'object',
           'parent':'',
           'xmlParts' : []
         },
-        'menu1':{
+        'dmenu':{
           'name':'menu',
           'type':'array',
-          'parent':'d0',
+          'parent':'d',
           'position': {'start': 1, 'end': 3 },
           'xmlParts' : []
         },
-        'menu2':{
-          'name':'menu',
+        'dmenu_':{
+          'name':'',
           'type':'array',
-          'parent':'menu1',
+          'parent':'dmenu',
           'position':{'start': 1, 'end': 2 },
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'menu2', 'pos':1}
+            {'attr':'id', 'formatters' : [], 'obj': 'dmenu_', 'pos':1}
           ]
         },
-        'product3':{
+        'dproduct':{
           'name':'product',
           'type':'object',
-          'parent':'d0',
+          'parent':'d',
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'product3', 'pos':5}
+            {'attr':'id', 'formatters' : [], 'obj': 'dproduct', 'pos':5}
           ]
         },
-        'days4':{
+        'ddays':{
           'name':'days',
           'type':'array',
-          'parent':'d0',
+          'parent':'d',
           'position':{'start': 6, 'end': 7 },
           'xmlParts' : [
-            {'attr':'name', 'formatters' : [], 'obj': 'days4', 'pos':6}
+            {'attr':'name', 'formatters' : [], 'obj': 'ddays', 'pos':6}
           ]
         }
       });
     });
-    it('should decompose even with very complex arrays', function(){
+    it.skip('should decompose even with very complex arrays', function(){
       var _tags = [
         {'pos': 1 , 'name': 'd.menu[1][0][1].product[0].site.id'},
         {'pos': 2 , 'name': 'd.product.id'},
         {'pos': 3 , 'name': 'd.cars.product.id'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
-        'd0':{
+        'd':{
           'name':'',
           'type': 'object',
           'parent':'',
@@ -896,7 +1056,7 @@ describe('Analyzer', function(){
         'menu1':{
           'name':'menu',
           'type':'array',
-          'parent':'d0',
+          'parent':'d',
           'xmlParts' : []
         },
         'menu2':{
@@ -928,7 +1088,7 @@ describe('Analyzer', function(){
         'product6':{
           'name':'product',
           'type':'object',
-          'parent':'d0',
+          'parent':'d',
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'product6', 'pos':2}
           ]
@@ -936,7 +1096,7 @@ describe('Analyzer', function(){
         'cars7':{
           'name':'cars',
           'type':'object',
-          'parent':'d0',
+          'parent':'d',
           'xmlParts' : []
         },
         'product8':{
@@ -949,7 +1109,67 @@ describe('Analyzer', function(){
         }
       });
     });
-    it('1should decompose all tags and formatters', function(){
+    it('should extract basic formatters', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.number:int'},
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'number', 'formatters' : [ 'int' ], 'obj': 'd', 'pos':20},
+          ]
+        }
+      });
+    });
+    it('should extract basic three formatters', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.number:int:float:decimal'},
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'number', 'formatters' : [ 'int' ,'float', 'decimal' ], 'obj': 'd', 'pos':20},
+          ]
+        }
+      });
+    });
+    it('should ignore whitespaces in formatters', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.number : int  :   float   :  decimal'},
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'number', 'formatters' : [ 'int' ,'float', 'decimal' ], 'obj': 'd', 'pos':20},
+          ]
+        }
+      });
+    });
+    it('should detect formatters with parenthesis', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.number:parse(YYYYMMDD)'},
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'number', 'formatters' : [ 'parse(YYYYMMDD)'], 'obj': 'd', 'pos':20},
+          ]
+        }
+      });
+    });
+    it('should detect multiple formatters', function(){
       var _tags = [
         {'pos': 10, 'name': 'd.site'},
         {'pos': 20, 'name': 'd.number:int'},
@@ -957,15 +1177,45 @@ describe('Analyzer', function(){
         {'pos': 40, 'name': 'd.date:parse(YYYYMMDD):format(DD/MM/YYYY)'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
-        'd0':{
-          'name':'',
+        'd':{
+          'name':'d',
           'type': 'object',
           'parent':'',
           'xmlParts' : [
-            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':10},
-            {'attr':'number', 'formatters' : [ 'int' ], 'obj': 'd0', 'pos':20},
-            {'attr':'date', 'formatters' : [ 'parse(Y)' ], 'obj': 'd0', 'pos':30},
-            {'attr':'date', 'formatters' : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], 'obj': 'd0', 'pos':40}
+            {'attr':'site'  , 'formatters' : []                                         , 'obj': 'd', 'pos':10},
+            {'attr':'number', 'formatters' : [ 'int' ]                                  , 'obj': 'd', 'pos':20},
+            {'attr':'date'  , 'formatters' : [ 'parse(Y)' ]                             , 'obj': 'd', 'pos':30},
+            {'attr':'date'  , 'formatters' : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], 'obj': 'd', 'pos':40}
+          ]
+        }
+      });
+    });
+    it('should detect formatters even if we use special character in the parenthesis', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd.number:parse(YY, YY:MM:D.ZZ [Z]menu[i+1][i] d.bla)'},
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'number', 'formatters' : [ 'parse(YY,YY:MM:D.ZZ[Z]menu[i+1][i]d.bla)'], 'obj': 'd', 'pos':20},
+          ]
+        }
+      });
+    });
+    it.skip('should detect formatter even in the iterator of an array', function(){
+      var _tags = [
+        {'pos': 20, 'name': 'd[day:weekday].meteo'},
+      ];
+      helper.assert(analyzer.decomposeTags(_tags), {
+        'd':{
+          'name':'d',
+          'type': 'array',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'meteo', 'formatters' : [ 'weekday=1'], 'obj': 'd', 'pos':20},
           ]
         }
       });
@@ -978,15 +1228,15 @@ describe('Analyzer', function(){
         {'pos': 40, 'name': 'd.date: parse(YYYYMMDD) :format(DD/MM/YYYY)'}
       ];
       helper.assert(analyzer.decomposeTags(_tags), {
-        'd0':{
-          'name':'',
+        'd':{
+          'name':'d',
           'type': 'object',
           'parent':'',
           'xmlParts' : [
-            {'attr':'site', 'formatters' : [], 'obj': 'd0', 'pos':10},
-            {'attr':'number', 'formatters' : [ 'int' ], 'obj': 'd0', 'pos':20},
-            {'attr':'date', 'formatters' : [ 'parse(Y)' ], 'obj': 'd0', 'pos':30},
-            {'attr':'date', 'formatters' : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], 'obj': 'd0', 'pos':40}
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':10},
+            {'attr':'number', 'formatters' : [ 'int' ], 'obj': 'd', 'pos':20},
+            {'attr':'date', 'formatters' : [ 'parse(Y)' ], 'obj': 'd', 'pos':30},
+            {'attr':'date', 'formatters' : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], 'obj': 'd', 'pos':40}
           ]
         }
       });
@@ -998,28 +1248,28 @@ describe('Analyzer', function(){
       var _data = {
         'staticData': {},
         'dynamicData': {
-          'd0'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [] },
-          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d0'      , 'xmlParts' : [], 'depth':1}
+          'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [] },
+          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1}
         }
       };
       helper.assert(analyzer.reOrderHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
-        'hierarchy' : ['d0', 'menu1']
+        'hierarchy' : ['d', 'menu1']
       });
     });
     it('should generate an array which contains the order of hierarchy', function(){
       var _data = {
         'staticData': {},
         'dynamicData': {
-          'd0'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0},
-          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d0'      , 'xmlParts' : [], 'depth':1},
+          'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0},
+          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1},
           'menu2'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu1'   , 'xmlParts' : [], 'depth':2},
           'menu3'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu2'   , 'xmlParts' : [], 'depth':3},
           'product4':{'name':'product', 'type':'array'  , 'parent':'menu3'   , 'xmlParts' : [], 'depth':4},
           'site5'   :{'name':'site'   , 'type':'object' , 'parent':'product4', 'xmlParts' : [], 'depth':4},
-          'product6':{'name':'product', 'type':'object' , 'parent':'d0'      , 'xmlParts' : [], 'depth':0},
-          'cars7'   :{'name':'cars'   , 'type':'object' , 'parent':'d0'      , 'xmlParts' : [], 'depth':0},
+          'product6':{'name':'product', 'type':'object' , 'parent':'d'      , 'xmlParts' : [], 'depth':0},
+          'cars7'   :{'name':'cars'   , 'type':'object' , 'parent':'d'      , 'xmlParts' : [], 'depth':0},
           'product8':{'name':'product', 'type':'object' , 'parent':'cars7'   , 'xmlParts' : [], 'depth':0}
         }
       };
@@ -1027,7 +1277,7 @@ describe('Analyzer', function(){
       helper.assert(analyzer.reOrderHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
-        'hierarchy' : ['d0', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
+        'hierarchy' : ['d', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
       });
     });
     it.skip('should work even if the dynamicData is not in the correct order; DO THIS TEST!!! ', function(){
@@ -1036,12 +1286,12 @@ describe('Analyzer', function(){
         'dynamicData': {
           'product4':{'name':'product', 'type':'array'  , 'parent':'menu3'   , 'xmlParts' : [], 'depth':4},
           'menu3'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu2'   , 'xmlParts' : [], 'depth':3},
-          'd0'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0},
-          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d0'      , 'xmlParts' : [], 'depth':1},
-          'cars7'   :{'name':'cars'   , 'type':'object' , 'parent':'d0'      , 'xmlParts' : [], 'depth':0},
+          'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0},
+          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1},
+          'cars7'   :{'name':'cars'   , 'type':'object' , 'parent':'d'      , 'xmlParts' : [], 'depth':0},
           'menu2'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu1'   , 'xmlParts' : [], 'depth':2},
           'product8':{'name':'product', 'type':'object' , 'parent':'cars7'   , 'xmlParts' : [], 'depth':0},
-          'product6':{'name':'product', 'type':'object' , 'parent':'d0'      , 'xmlParts' : [], 'depth':0},
+          'product6':{'name':'product', 'type':'object' , 'parent':'d'      , 'xmlParts' : [], 'depth':0},
           'site5'   :{'name':'site'   , 'type':'object' , 'parent':'product4', 'xmlParts' : [], 'depth':4}
         }
       };
@@ -1049,7 +1299,7 @@ describe('Analyzer', function(){
       helper.assert(analyzer.reOrderHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
-        'hierarchy' : ['d0', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
+        'hierarchy' : ['d', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
       });
     });
   });

@@ -26,7 +26,7 @@ describe('Carbone', function(){
       helper.assert(_xmlBuilt, '<xml> </xml>');
     });
 
-    it('should the simple tag with the data', function(){
+    it('should replace a simple tag by the data', function(){
       var _xml = '<xml> {d.title} </xml>';
       var _data = {'title' : 'boo'};
       var _xmlBuilt = carbone.buildXML(_xml, _data);

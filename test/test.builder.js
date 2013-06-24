@@ -7,6 +7,138 @@ var helper = require('../lib/helper');
 
 describe('builder', function(){
 
+  describe('getFormatterString', function(){
+    it('should return a simple call of a function for a formatter without arguments', function(){
+      var actual = builder.getFormatterString('d.number', [ 'int' ]);
+      assert.equal(actual, 'formatters.int(d.number)');
+    });
+    it('should return a simple call of a function for a formatter without arguments but called with parenthesis', function(){
+      var actual = builder.getFormatterString('d.number', [ 'int()' ]);
+      assert.equal(actual, 'formatters.int(d.number)');
+    });
+    it('should return a call of a function for a formatter with one argument', function(){
+      var actual = builder.getFormatterString('d.number', [ 'toFixed(2)' ]);
+      assert.equal(actual, 'formatters.toFixed(d.number, \'2\')');
+    });
+    it('should return a call of a function for a formatter with one argument which is a string', function(){
+      var actual = builder.getFormatterString('d.date', [ "format(YYYYMMDD)" ]);
+      assert.equal(actual, "formatters.format(d.date, 'YYYYMMDD')");
+    });
+    it('should return a call of a function for a formatter with two arguments', function(){
+      var actual = builder.getFormatterString('d.number', [ 'formatter(2, 3)' ]);
+      assert.equal(actual, 'formatters.formatter(d.number, \'2\', \'3\')');
+    });
+    it('should return two calls of functions for two chained formatters', function(){
+      var actual = builder.getFormatterString('d.number', [ 'int', 'toFixed(2)' ]);
+      assert.equal(actual, 'formatters.toFixed(formatters.int(d.number), \'2\')');
+    });
+    it('should return two calls of functions for two chained formatters each with arguments', function(){
+      var actual = builder.getFormatterString('d.number', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ]);
+      assert.equal(actual, 'formatters.formatter2(formatters.formatter1(d.number, \'4\', \'5\'), \'2\', \'3\')');
+    });
+  });
+
+  describe('sortXmlParts', function(){
+    it('should sort the array with a depth of 1 by default', function(){
+      var _data     = [{'pos':[40]}, {'pos':[19]}, {'pos':[2 ]}, {'pos':[20]}];
+      var _expected = [{'pos':[2 ]}, {'pos':[19]}, {'pos':[20]}, {'pos':[40]}];
+      builder.sortXmlParts(_data)
+      helper.assert(_data, _expected);
+    });
+
+    it('should sort the array with a depth of 2', function(){
+      var _data     = [{'pos':[40, 4]}, {'pos':[40, 3]}, {'pos':[51, 100]}, {'pos':[29, 8  ]}];
+      var _expected = [{'pos':[29, 8]}, {'pos':[40, 3]}, {'pos':[40, 4  ]}, {'pos':[51, 100]}];
+      builder.sortXmlParts(_data, 2)
+      helper.assert(_data, _expected);
+    });
+
+    it('should sort the array with a depth of 3', function(){
+      var _data     = [{'pos':[4, 4, 2]}, {'pos':[4, 4, 1]}, {'pos':[4, 3, 2]}, {'pos':[1, 9, 1]}, {'pos':[2, 5, 6]}, {'pos':[1, 8, 9]}];
+      var _expected = [{'pos':[1, 8, 9]}, {'pos':[1, 9, 1]}, {'pos':[2, 5, 6]}, {'pos':[4, 3, 2]}, {'pos':[4, 4, 1]}, {'pos':[4, 4, 2]}];
+      builder.sortXmlParts(_data, 3)
+      helper.assert(_data, _expected);
+    });
+
+    it('should sort the array even if some arrays are incomplete, undefined values appears first', function(){
+      var _data     = [{'pos':[4, 4, 2]}, {'pos':[4, 4, 1]}, {'pos':[2, 4   ]}, {'pos':[1, 9, 1]}, {'pos':[2, 3   ]}, {'pos':[1      ]}];
+      var _expected = [{'pos':[1      ]}, {'pos':[1, 9, 1]}, {'pos':[2, 3   ]}, {'pos':[2, 4   ]}, {'pos':[4, 4, 1]}, {'pos':[4, 4, 2]}];
+      builder.sortXmlParts(_data, 3)
+      helper.assert(_data, _expected);
+    });
+
+    it('should sort a complex array (sort depth of 3) of xml parts and return an concatenate string', function(){
+      var _data     = [ 
+        { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
+        { 'pos': [ 0        ], 'str': '<xml> '       },
+        { 'pos': [ 6, 1, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 1, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 6, 0, 14 ], 'str': 'Lumeneo'      },
+        { 'pos': [ 6, 0, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 0, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 6, 2, 14 ], 'str': 'Toyota'       },
+        { 'pos': [ 6, 2, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 2, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 24       ], 'str': '</xml>'       } 
+      ];
+      var _expected     = [ 
+        { 'pos': [ 0        ], 'str': '<xml> '       },
+        { 'pos': [ 6, 0, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 0, 14 ], 'str': 'Lumeneo'      },
+        { 'pos': [ 6, 0, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 6, 1, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
+        { 'pos': [ 6, 1, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 6, 2, 6  ], 'str': '<tr>'         },
+        { 'pos': [ 6, 2, 14 ], 'str': 'Toyota'       },
+        { 'pos': [ 6, 2, 23 ], 'str': '</tr>'        },
+        { 'pos': [ 24       ], 'str': '</xml>'       } 
+      ];
+      builder.sortXmlParts(_data, 10);
+      helper.assert(_data, _expected);
+    });
+  });
+
+  describe('assembleXmlParts', function(){
+    it('should sort the array of xml parts and return an concatenate string', function(){
+      var _data     = [
+        {'pos':[40], 'str': '4'}, 
+        {'pos':[19], 'str': '2'}, 
+        {'pos':[2 ], 'str': '1'}, 
+        {'pos':[20], 'str': '3'}
+      ];
+      helper.assert(builder.assembleXmlParts(_data), '1234');
+    });
+
+    it('should sort a complex array (sort depth of 3) of xml parts and return an concatenate string', function(){
+      var _data     = [
+        {'pos':[4, 4, 2], 'str': '6'},
+        {'pos':[4, 4, 1], 'str': '5'},
+        {'pos':[2, 4   ], 'str': '4'},
+        {'pos':[1, 9, 1], 'str': '2'},
+        {'pos':[2, 3   ], 'str': '3'},
+        {'pos':[1      ], 'str': '1'}
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 3), '123456');
+    });
+
+    it('should sort a complex array (sort depth of 3) of xml parts and return an concatenate string', function(){
+      var _data     = [ 
+        { 'pos': [ 0        ], 'str': '<xml>' },
+        { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
+        { 'pos': [ 6, 1, 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 1, 23 ], 'str': '</tr>' },
+        { 'pos': [ 6, 0, 14 ], 'str': 'Lumeneo' },
+        { 'pos': [ 6, 0, 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 0, 23 ], 'str': '</tr>' },
+        { 'pos': [ 6, 2, 14 ], 'str': 'Toyota' },
+        { 'pos': [ 6, 2, 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 2, 23 ], 'str': '</tr>' },
+        { 'pos': [ 24       ], 'str': '</xml>' } 
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 5), '<xml><tr>Lumeneo</tr><tr>Tesla motors</tr><tr>Toyota</tr></xml>');
+    });
+  });
 
   describe('generateXmlParts', function(){
     it('should return return an array of xml parts for static data if dynamicData is empty', function(){
@@ -18,7 +150,7 @@ describe('builder', function(){
         'hierarchy'   : [],
         'dynamicData' : {}
       };
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(null), [{pos:[0], str:'<xml>'}, {pos:[1], str:'</xml>'}]);
     });
     it('should return a function which return an array of xml parts according to the descriptor and the data and the formatters', function(done){
@@ -43,7 +175,7 @@ describe('builder', function(){
       var _data = {
         'number' : 24.55
       };
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       carbone.cacheFormatters(function(){
         helper.assert(_fn(_data, carbone.formatters), [{
             pos: [5  ],
@@ -82,7 +214,7 @@ describe('builder', function(){
         'lastname':'A. Anderson',
         'surname': 'Neo'
       };
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [{
           pos: [8  ],
           str: '<xml><p>Thomas'
@@ -119,7 +251,7 @@ describe('builder', function(){
           }
         }
       };
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       var _data = {};
       helper.assert(_fn(_data), [{pos:[8], str:'<xml><p>'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>'}, {pos:[23], str:'</p></xml>'}]);
       helper.assert(_fn(null) , [{pos:[8], str:'<xml><p>'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>'}, {pos:[23], str:'</p></xml>'}]);
@@ -169,7 +301,7 @@ describe('builder', function(){
           'job' : 'developer'
         }
       };
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [{
           pos: [ 8 ],
           str: '<xml><p>Thomas'
@@ -231,7 +363,7 @@ describe('builder', function(){
           'job' : 'developer'
         }
       };
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
         { pos:[ 8  ], str: '<xml><p>Thomas'},
         { pos:[ 15 ], str: '</p><p>A. Anderson'},
@@ -268,7 +400,7 @@ describe('builder', function(){
         {'firstname':'Thomas' ,  'lastname':'A. Anderson'},
         {'firstname':'Trinity',  'lastname':'Unknown'}
       ];
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
         { pos:[ 0        ], str: '<xml> '},
         { pos:[ 6, 0, 6 ], str: '<tr><p>'},
@@ -316,7 +448,7 @@ describe('builder', function(){
         {'firstname':'Thomas' ,  'lastname':'A. Anderson', 'info' : {'movie': 'matrix'} },
         {'firstname':'Trinity',  'lastname':'Unknown', 'info' : {'movie': 'matrix2'}}
       ];
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
         { pos:[ 0        ], str: '<xml> '},
         { pos:[ 6, 0, 10 ], str: '<tr>Thomas'},
@@ -397,7 +529,7 @@ describe('builder', function(){
           }
         }
       ];
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
         { pos:[ 0        ], str: '<xml> '},
         { pos:[ 6, 0, 10 ], str: '<tr>Thomas'},
@@ -459,7 +591,7 @@ describe('builder', function(){
           {'brand' : 'Tesla motors' }
         ]
       };
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
         { pos:[ 0        ], str: '<xml> '},
         { pos:[ 6 , 0, 10 ], str: '<tr>matrix</tr>'},
@@ -516,7 +648,7 @@ describe('builder', function(){
           {'brand' : 'Tesla motors' }
         ]
       };
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
         { pos:[ 0         ], str: '<xml> '},
         { pos:[ 6         ], str: '<T>'},
@@ -573,7 +705,7 @@ describe('builder', function(){
           ]
         }
       ];
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [{
           pos: [ 0 ],
           str: '<xml> '
@@ -653,7 +785,7 @@ describe('builder', function(){
           ]
         }
       ];
-      var _fn = builder.getXMLBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
         { pos: [ 0            ], str: '<xml> ' },
         { pos: [ 13, 0, 6     ], str: '<tr>' },
@@ -680,37 +812,6 @@ describe('builder', function(){
 
   });
 
-
-  describe('getFormatterString', function(){
-    it('should return a simple call of a function for a formatter without arguments', function(){
-      var actual = builder.getFormatterString('d.number', [ 'int' ]);
-      assert.equal(actual, 'formatters.int(d.number)');
-    });
-    it('should return a simple call of a function for a formatter without arguments but called with parenthesis', function(){
-      var actual = builder.getFormatterString('d.number', [ 'int()' ]);
-      assert.equal(actual, 'formatters.int(d.number)');
-    });
-    it('should return a call of a function for a formatter with one argument', function(){
-      var actual = builder.getFormatterString('d.number', [ 'toFixed(2)' ]);
-      assert.equal(actual, 'formatters.toFixed(d.number, \'2\')');
-    });
-    it('should return a call of a function for a formatter with one argument which is a string', function(){
-      var actual = builder.getFormatterString('d.date', [ "format(YYYYMMDD)" ]);
-      assert.equal(actual, "formatters.format(d.date, 'YYYYMMDD')");
-    });
-    it('should return a call of a function for a formatter with two arguments', function(){
-      var actual = builder.getFormatterString('d.number', [ 'formatter(2, 3)' ]);
-      assert.equal(actual, 'formatters.formatter(d.number, \'2\', \'3\')');
-    });
-    it('should return two calls of functions for two chained formatters', function(){
-      var actual = builder.getFormatterString('d.number', [ 'int', 'toFixed(2)' ]);
-      assert.equal(actual, 'formatters.toFixed(formatters.int(d.number), \'2\')');
-    });
-    it('should return two calls of functions for two chained formatters each with arguments', function(){
-      var actual = builder.getFormatterString('d.number', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ]);
-      assert.equal(actual, 'formatters.formatter2(formatters.formatter1(d.number, \'4\', \'5\'), \'2\', \'3\')');
-    });
-  });
 
 });
 

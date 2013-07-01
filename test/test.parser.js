@@ -6,6 +6,44 @@ var helper = require('../lib/helper');
 
 describe('parser', function(){
   
+  describe('findMarkers', function(){
+    it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml', function(){
+      helper.assert(parser.findMarkers('{menu}'), {
+        markers : [{'pos': 0, 'name':'menu'}], 
+        xml : ''
+      });
+      helper.assert(parser.findMarkers('<div>{menu}<div>'), {
+        markers : [{'pos': 5, 'name':'menu'}], 
+        xml : '<div><div>'
+      });
+      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>'), {
+        markers : [{'pos': 10, 'name':'menu'}], 
+        xml : '<xmlstart><interxml><bullshit></xmlend>'
+      });
+      helper.assert(parser.findMarkers('<div>{menu}<div>{city}'), {
+        markers : [{'pos': 5, 'name':'menu'},{'pos':10, 'name':'city'}],
+        xml : '<div><div>'
+      });
+      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars}</bla>'), {
+        markers : [{'pos': 10, 'name':'menu'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars'}], 
+        xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
+      });
+      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u[i].city}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars[i].wheel}</bla>'), {
+        markers : [{'pos': 10, 'name':'menu[i].city'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars[i].wheel'}], 
+        xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
+      });
+    });
+    it('should remove unwanted characters', function(){
+      helper.assert(parser.findMarkers('<div>{menu}<div> \n   {city}'), {
+        markers : [{'pos': 5, 'name':'menu'},{'pos':15, 'name':'city'}],
+        xml : '<div><div>     '
+      });
+    });
+    it('should convert conflicting characters', function(){
+      assert.equal(parser.findMarkers("<div>{menu}<div> it's \n   {city}").xml, "<div><div> it\\\'s     ");
+    });
+  });
+
   describe('cleanMarker', function(){
     it('should remove extra whitespaces and remove xml which are in the marker', function(){
       assert.equal(parser.cleanMarker('menu<xmla>why[1].test')                            , 'menuwhy[1].test');
@@ -25,19 +63,6 @@ describe('parser', function(){
     });
   });
 
-  describe('findClosingTagPosition', function(){
-    it('should return the index of the closing tag on the right', function(){
-      assert.equal(parser.findClosingTagPosition('<tr>sqdsqd</tr>sqdsd', 'tr'), 15);
-      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqdsd', 'tr'), 35);
-      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd<tr></tr>sd', 'tr'), 35);
-      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd</tr></tr>sd', 'tr'), 35);
-    });
-    it('should return -1 when the closing tag is not found', function(){
-      assert.equal(parser.findClosingTagPosition('<tr>sqdsqdsd', 'tr'), -1);
-      assert.equal(parser.findClosingTagPosition('<tr>sqdsqd<tr></tr>sqdsd', 'tr'), -1);
-    });
-  });
-
   describe('findOpeningTagPosition', function(){
     it('should return the index of the opening tag on the left', function(){
       assert.equal(parser.findOpeningTagPosition('aasas<tr>sqdsqd</tr>', 'tr'), 5);
@@ -50,6 +75,19 @@ describe('parser', function(){
     it('should return -1 when the opening tag is not found', function(){
       assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>', 'tr'), -1);
       assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>', 'tr'), -1);
+    });
+  });
+
+  describe('findClosingTagPosition', function(){
+    it('should return the index of the closing tag on the right', function(){
+      assert.equal(parser.findClosingTagPosition('<tr>sqdsqd</tr>sqdsd', 'tr'), 15);
+      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqdsd', 'tr'), 35);
+      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd<tr></tr>sd', 'tr'), 35);
+      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd</tr></tr>sd', 'tr'), 35);
+    });
+    it('should return -1 when the closing tag is not found', function(){
+      assert.equal(parser.findClosingTagPosition('<tr>sqdsqdsd', 'tr'), -1);
+      assert.equal(parser.findClosingTagPosition('<tr>sqdsqd<tr></tr>sqdsd', 'tr'), -1);
     });
   });
 
@@ -106,45 +144,6 @@ describe('parser', function(){
       var _pivot = {'tag' : '</tr><tr>', 'pos': 70};
       var _expectedRange = {startEven: -1,  endEven : 70, startOdd:70, endOdd:69};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
-    });
-  });
-
-
-  describe('findMarkers', function(){
-    it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml', function(){
-      helper.assert(parser.findMarkers('{menu}'), {
-        markers : [{'pos': 0, 'name':'menu'}], 
-        xml : ''
-      });
-      helper.assert(parser.findMarkers('<div>{menu}<div>'), {
-        markers : [{'pos': 5, 'name':'menu'}], 
-        xml : '<div><div>'
-      });
-      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>'), {
-        markers : [{'pos': 10, 'name':'menu'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend>'
-      });
-      helper.assert(parser.findMarkers('<div>{menu}<div>{city}'), {
-        markers : [{'pos': 5, 'name':'menu'},{'pos':10, 'name':'city'}],
-        xml : '<div><div>'
-      });
-      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars}</bla>'), {
-        markers : [{'pos': 10, 'name':'menu'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
-      });
-      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u[i].city}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars[i].wheel}</bla>'), {
-        markers : [{'pos': 10, 'name':'menu[i].city'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars[i].wheel'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
-      });
-    });
-    it('should remove unwanted characters', function(){
-      helper.assert(parser.findMarkers('<div>{menu}<div> \n   {city}'), {
-        markers : [{'pos': 5, 'name':'menu'},{'pos':15, 'name':'city'}],
-        xml : '<div><div>     '
-      });
-    });
-    it('should convert conflicting characters', function(){
-      assert.equal(parser.findMarkers("<div>{menu}<div> it's \n   {city}").xml, "<div><div> it\\\'s     ");
     });
   });
 

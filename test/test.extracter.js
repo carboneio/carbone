@@ -1143,7 +1143,7 @@ describe('extracter', function(){
   });
 
 
-  describe('reOrderHierarchy', function(){
+  describe('buildSortedHierarchy', function(){
     it('should consider the depth is 0 when it is not specified', function(){
       var _data = {
         'staticData': {},
@@ -1152,7 +1152,7 @@ describe('extracter', function(){
           'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1}
         }
       };
-      helper.assert(extracter.reOrderHierarchy(_data), {
+      helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
         'hierarchy' : ['d', 'menu1']
@@ -1174,7 +1174,7 @@ describe('extracter', function(){
         }
       };
 
-      helper.assert(extracter.reOrderHierarchy(_data), {
+      helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
         'hierarchy' : ['d', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
@@ -1196,7 +1196,7 @@ describe('extracter', function(){
         }
       };
 
-      helper.assert(extracter.reOrderHierarchy(_data), {
+      helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
         'hierarchy' : ['d', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']

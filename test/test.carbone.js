@@ -18,21 +18,17 @@ describe('Carbone', function(){
 
   describe('buildXML', function(){
     it('should work if the same array is repeated two times in the xml <tr>d[i].product</tr>    <tr>d[i].product</tr>');
-    it('should not generate two object "dishes1" and "dishes 2" if there is a space between "dishes" and "[" in some tags: <tr>d.dishes [i]</tr>    <tr>d.dishes[i]</tr>');
-
     it('should return the xml if no data is passed', function(){
       var _xml = '<xml> </xml>';
       var _xmlBuilt = carbone.buildXML(_xml);
       helper.assert(_xmlBuilt, '<xml> </xml>');
     });
-
     it('should replace a simple tag by the data', function(){
       var _xml = '<xml> {d.title} </xml>';
       var _data = {'title' : 'boo'};
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo </xml>');
     });
-
     it('should works with two nested objects', function(){
       var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
@@ -44,8 +40,7 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo <br> 5 </xml>');
     });
-
-    it('1. should remove the tags of the data is not what you expect', function(){
+    it('should remove the tags if the data is not what you expect', function(){
       var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
         'bullshit' : 'boo'
@@ -53,8 +48,7 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml>  <br>  </xml>');
     });
-
-    it('2. should remove the tags part of the data is not provided', function(){
+    it('should remove the tags part if the data is not provided', function(){
       var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
         'title' : 'boo'
@@ -62,8 +56,7 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo <br>  </xml>');
     });
-
-    it.skip('1. should automatically repeat the xml (even with strange tags) if there is a simple array', function(){
+    it('should automatically repeat the xml if the root is an array of objects', function(){
       var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1].brand} </t_row></xml>';
       var _data = [
         {'brand' : 'Lumeneo'},
@@ -73,8 +66,7 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
     });
-
-    it('2. should handle array in an object', function(){
+    it('should handle array in an object', function(){
       var _xml = '<xml><t_row> {d.cars[i].brand} </t_row><t_row> {d.cars[i+1].brand} </t_row></xml>';
       var _data = {
         'cars':[
@@ -85,6 +77,43 @@ describe('Carbone', function(){
       };
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it('should work if there is a whitespace between "cars" and "[" in some tags', function(){
+      var _xml = '<xml><t_row> {d.cars[i].brand} </t_row><t_row> {d.cars [i+1].brand} </t_row></xml>';
+      var _data = {
+        'cars':[
+          {'brand' : 'Lumeneo'},
+          {'brand' : 'Tesla motors'},
+          {'brand' : 'Toyota'}
+        ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it('should manage nested arrays', function(){
+      var _xml = 
+         '<xml>'
+        +  '<t_row><td>{d.cars[i].wheels[i].size  }</td><td>{d.cars[i].wheels[i+1].size  }</td></t_row>'
+        +  '<t_row><td>{d.cars[i+1].wheels[i].size}</td><td>{d.cars[i+1].wheels[i+1].size}</td></t_row>'
+        +'</xml>';
+      var _data = {
+        'cars':[
+          {
+            'wheels' : [
+              {'size': 'A'},
+              {'size': 'B'}
+            ]
+          },{
+            'wheels' : [
+              {'size': 'C'},
+              {'size': 'D'},
+              {'size': 'E'}
+            ]
+          }
+        ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
     });
   });
 

@@ -1149,13 +1149,26 @@ describe('extracter', function(){
         'staticData': {},
         'dynamicData': {
           'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [] },
-          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1}
+          'menu1'  :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1}
         }
       };
       helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
         'hierarchy' : ['d', 'menu1']
+      });
+    });
+    it('should not generate an array with undefined values if the "d" is an array (depth>0)', function(){
+      var _data = {
+        'staticData': {},
+        'dynamicData': {
+          'd': {'name':'d'       , 'type':'array' , 'parent':''  , 'xmlParts' : [], 'depth':1},
+        }
+      };
+      helper.assert(extracter.buildSortedHierarchy(_data), {
+        'staticData': {},
+        'dynamicData': _data.dynamicData,
+        'hierarchy' : ['d']
       });
     });
     it('should generate an array which contains the order of hierarchy', function(){

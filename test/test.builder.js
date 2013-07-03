@@ -161,7 +161,7 @@ describe('builder', function(){
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'number', 'pos':5 , 'depth':0, 'before':'<xml>', 'after': '', 'formatters' : [ 'int' ]}
+              {'obj': 'd', 'attr':'number', 'pos':5 , 'depth':0, 'before':'<xml>', 'formatters' : [ 'int' ]}
             ]
           }
         }
@@ -171,14 +171,10 @@ describe('builder', function(){
       };
       var _fn = builder.getBuilderFunction(_desc);
       carbone.cacheFormatters(function(){
-        helper.assert(_fn(_data, carbone.formatters), [{
-            pos: [5  ],
-            str: '<xml>24'
-          },{
-            pos: [6 ],
-            str: '</xml>'
-          }]
-        );
+        helper.assert(_fn(_data, carbone.formatters), [
+          {pos: [5 ],str: '<xml>24'},
+          {pos: [6 ],str: '</xml>'}
+        ]);
         done();
       });
     });
@@ -196,9 +192,9 @@ describe('builder', function(){
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
-              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
-              {'obj': 'd', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []}
+              {'obj': 'd', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'formatters' : []},
+              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'formatters' : []},
+              {'obj': 'd', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'formatters' : []}
             ]
           }
         }
@@ -209,22 +205,14 @@ describe('builder', function(){
         'surname': 'Neo'
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [{
-          pos: [8  ],
-          str: '<xml><p>Thomas'
-        },{
-          pos: [15 ],
-          str: '</p><p>A. Anderson'
-        },{
-          pos: [22 ],
-          str: '</p><p>Neo'
-        },{
-          pos: [23 ],
-          str: '</p></xml>'
-        }]
-      );
+      helper.assert(_fn(_data), [
+        {pos: [8  ],str: '<xml><p>Thomas'},
+        {pos: [15 ],str: '</p><p>A. Anderson'},
+        {pos: [22 ],str: '</p><p>Neo'},
+        {pos: [23 ],str: '</p></xml>'}
+      ]);
     });
-    it('should return only the xml if the data is empty or null or if one of the attribute does not exist', function(){
+    it('should return only the xml if the data is empty or null or if one of the attribute does not exist. (the object formatters is not provided)', function(){
       var _desc = {
         'staticData'  : {
           'before':'',
@@ -238,9 +226,9 @@ describe('builder', function(){
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
-              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
-              {'obj': 'd', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []}
+              {'obj': 'd', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>'},
+              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' },
+              {'obj': 'd', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' }
             ]
           }
         }
@@ -269,9 +257,9 @@ describe('builder', function(){
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
-              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
-              {'obj': 'd', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>', 'after': '', 'formatters' : []}
+              {'obj': 'd', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>'},
+              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' },
+              {'obj': 'd', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>'}
             ]
           },
           'info1':{
@@ -280,8 +268,8 @@ describe('builder', function(){
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':23, 'depth':0,  'before':'</p><br>' , 'after': '', 'formatters' : [] },
-              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'depth':0,  'before':'</br><br>', 'after': '', 'formatters' : [] }
+              {'obj': 'info1', 'attr':'movie', 'pos':23, 'depth':0,  'before':'</p><br>' },
+              {'obj': 'info1', 'attr':'job'  , 'pos':32, 'depth':0,  'before':'</br><br>'}
             ]
           }
         }
@@ -296,28 +284,16 @@ describe('builder', function(){
         }
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [{
-          pos: [ 8 ],
-          str: '<xml><p>Thomas'
-        },{
-          pos: [ 15 ],
-          str: '</p><p>A. Anderson'
-        },{
-          pos: [ 40 ],
-          str: '</br><p>Neo'
-        },{
-          pos: [ 23 ],
-          str: '</p><br>matrix'
-        },{
-          pos: [ 32 ],
-          str: '</br><br>developer'
-        },{
-          pos: [ 41 ],
-          str: '</p></xml>'
-        }
+      helper.assert(_fn(_data), [
+        { pos: [ 8 ] , str: '<xml><p>Thomas'},
+        { pos: [ 15 ], str: '</p><p>A. Anderson'},
+        { pos: [ 40 ], str: '</br><p>Neo'},
+        { pos: [ 23 ], str: '</p><br>matrix'},
+        { pos: [ 32 ], str: '</br><br>developer'},
+        { pos: [ 41 ], str: '</p></xml>'}
       ]);
     });
-    it('should travel the object in the correct order using the "hierarchy" array even if the dynamicData object is not declared in correct order', function(){
+    it('should travel the object in the correct order using the "hierarchy" array even if the dynamicData object is not built in correct order', function(){
       var _desc = {
         'staticData'  : {
           'before':'',
@@ -331,8 +307,8 @@ describe('builder', function(){
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':23,  'depth':0, 'before':'</p><br>' , 'after': '', 'formatters' : [] },
-              {'obj': 'info1', 'attr':'job'  , 'pos':32,  'depth':0, 'before':'</br><br>', 'after': '', 'formatters' : [] }
+              {'obj': 'info1', 'attr':'movie', 'pos':23,  'depth':0, 'before':'</p><br>'  },
+              {'obj': 'info1', 'attr':'job'  , 'pos':32,  'depth':0, 'before':'</br><br>' }
             ]
           },
           'd':{
@@ -341,9 +317,9 @@ describe('builder', function(){
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>', 'after': '', 'formatters' : []},
-              {'obj': 'd', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' , 'after': '', 'formatters' : []},
-              {'obj': 'd', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>', 'after': '', 'formatters' : []}
+              {'obj': 'd', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>'},
+              {'obj': 'd', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' },
+              {'obj': 'd', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>'}
             ]
           }
         }
@@ -367,7 +343,7 @@ describe('builder', function(){
         { pos:[ 41 ], str: '</p></xml>' }
       ]);
     });
-    it('should works if the main object is an array of object', function(){
+    it('should work if the main object is an array of object', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
@@ -382,10 +358,10 @@ describe('builder', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'  },
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1, 'after' : '</p><p>' },
-              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1  },
-              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1,  'before': '</p></tr>'  }
+              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1,                        },
+              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before' : '</p><p>'   },
+              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
             ]
           }
         }
@@ -398,17 +374,17 @@ describe('builder', function(){
       helper.assert(_fn(_data), [
         { pos:[ 0        ], str: '<xml> '},
         { pos:[ 6, 0, 6 ], str: '<tr><p>'},
-        { pos:[ 6, 0, 13 ], str: 'Thomas</p><p>'},
-        { pos:[ 6, 0, 20 ], str: 'A. Anderson'},
+        { pos:[ 6, 0, 13 ], str: 'Thomas'},
+        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson'},
         { pos:[ 6, 0, 29 ], str: '</p></tr>'},
         { pos:[ 6, 1, 6 ] , str: '<tr><p>'},
-        { pos:[ 6, 1, 13 ], str: 'Trinity</p><p>'},
-        { pos:[ 6, 1, 20 ], str: 'Unknown'},
+        { pos:[ 6, 1, 13 ], str: 'Trinity'},
+        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown'},
         { pos:[ 6, 1, 29 ], str: '</p></tr>'},
         { pos:[ 30       ], str: ' </xml>' }
       ]);
     });
-    it('should works if there is an object in the array', function(){
+    it('should work if there is an object in the array', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
@@ -423,8 +399,10 @@ describe('builder', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           },
-              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
+              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'       },
+              {'obj': 'd', 'attr':'firstname', 'pos':10, 'depth':1, 'before':''           },
+              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'    },
+              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>' }
             ]
           },
           'info1':{
@@ -433,7 +411,7 @@ describe('builder', function(){
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>', 'after': ''    }
+              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>'      }
             ]
           }
         }
@@ -443,18 +421,22 @@ describe('builder', function(){
         {'firstname':'Trinity',  'lastname':'Unknown', 'info' : {'movie': 'matrix2'}}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [
-        { pos:[ 0        ], str: '<xml> '},
-        { pos:[ 6, 0, 10 ], str: '<tr>Thomas'},
-        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson</p></tr>'},
-        { pos:[ 6, 0, 13 ], str: '<p>matrix'},
-        { pos:[ 6, 1, 10 ], str: '<tr>Trinity'},
-        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown</p></tr>'},
-        { pos:[ 6, 1, 13 ], str: '<p>matrix2'},
-        { pos:[ 30       ], str: ' </xml>' }
+      helper.assert(_fn(_data), [ 
+        { pos: [ 0        ], str: '<xml> ' },
+        { pos: [ 6, 0, 6  ], str: '<tr>' },
+        { pos: [ 6, 0, 10 ], str: 'Thomas' },
+        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson' },
+        { pos: [ 6, 0, 29 ], str: '</p></tr>' },
+        { pos: [ 6, 0, 13 ], str: '<p>matrix' },
+        { pos: [ 6, 1, 6  ], str: '<tr>' },
+        { pos: [ 6, 1, 10 ], str: 'Trinity' },
+        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown' },
+        { pos: [ 6, 1, 29 ], str: '</p></tr>' },
+        { pos: [ 6, 1, 13 ], str: '<p>matrix2' },
+        { pos: [ 30       ], str: ' </xml>' } 
       ]);
     });
-    it('should works if there are three nested objects in the array (with one missing object in the last row) ', function(){
+    it('should work if there are three nested objects in the array (with one missing object in the last row) ', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
@@ -469,8 +451,10 @@ describe('builder', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':10, 'depth':1, 'before':'<tr>', 'after': ''           },
-              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
+              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'        },
+              {'obj': 'd', 'attr':'firstname', 'pos':10, 'depth':1, 'before':''            },
+              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'     },
+              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
             ]
           },
           'info1':{
@@ -479,7 +463,7 @@ describe('builder', function(){
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
-              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>', 'after': ''    }
+              {'obj': 'info1', 'attr':'movie', 'pos':13, 'depth':1, 'before':'<p>' }
             ]
           },
           'info2':{
@@ -488,7 +472,7 @@ describe('builder', function(){
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
-              {'obj': 'info2', 'attr':'style', 'pos':14, 'depth':1, 'before':'', 'after': ''    }
+              {'obj': 'info2', 'attr':'style', 'pos':14, 'depth':1, 'before':'' }
             ]
           },
           'info3':{
@@ -497,7 +481,7 @@ describe('builder', function(){
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
-              {'obj': 'info3', 'attr':'rate', 'pos':15, 'depth':1, 'before':'', 'after': ''    }
+              {'obj': 'info3', 'attr':'rate', 'pos':15, 'depth':1, 'before':'' }
             ]
           }
         }
@@ -524,22 +508,26 @@ describe('builder', function(){
         }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [
-        { pos:[ 0        ], str: '<xml> '},
-        { pos:[ 6, 0, 10 ], str: '<tr>Thomas'},
-        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson</p></tr>'},
-        { pos:[ 6, 0, 13 ], str: '<p>matrix'},
-        { pos:[ 6, 0, 14 ], str: 'sf'},
-        { pos:[ 6, 0, 15 ], str: '10'},
-        { pos:[ 6, 1, 10 ], str: '<tr>Trinity'},
-        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown</p></tr>'},
-        { pos:[ 6, 1, 13 ], str: '<p>matrix2'},
-        { pos:[ 6, 1, 14 ], str: 'sf2'},
-        { pos:[ 6, 1, 15 ], str: ''},
-        { pos:[ 30       ], str: ' </xml>' }
+      helper.assert(_fn(_data), [ 
+        { pos: [ 0        ], str: '<xml> ' },
+        { pos: [ 6, 0, 6  ], str: '<tr>' },
+        { pos: [ 6, 0, 10 ], str: 'Thomas' },
+        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson' },
+        { pos: [ 6, 0, 29 ], str: '</p></tr>' },
+        { pos: [ 6, 0, 13 ], str: '<p>matrix' },
+        { pos: [ 6, 0, 14 ], str: 'sf' },
+        { pos: [ 6, 0, 15 ], str: '10' },
+        { pos: [ 6, 1, 6  ], str: '<tr>' },
+        { pos: [ 6, 1, 10 ], str: 'Trinity' },
+        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown' },
+        { pos: [ 6, 1, 29 ], str: '</p></tr>' },
+        { pos: [ 6, 1, 13 ], str: '<p>matrix2' },
+        { pos: [ 6, 1, 14 ], str: 'sf2' },
+        { pos: [ 6, 1, 15 ], str: '' },
+        { pos: [ 30       ], str: ' </xml>' } 
       ]);
     });
-    it('should works if there are two adjacents array of objects', function(){
+    it('should work if there are two adjacents array of objects', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
@@ -560,7 +548,9 @@ describe('builder', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :15},
             'xmlParts' : [
-              {'obj': 'movies1', 'attr':'title', 'pos':10, 'depth':1, 'before':'<tr>', 'after': '</tr>'    }
+              {'obj': 'movies1', 'array':'start' , 'pos':6 , 'depth':1, 'after': '<tr>'  },
+              {'obj': 'movies1', 'attr' :'title' , 'pos':10, 'depth':1, 'before':''      },
+              {'obj': 'movies1', 'array':'end'   , 'pos':15, 'depth':1, 'before':'</tr>' }
             ]
           },
           'cars2':{
@@ -570,7 +560,9 @@ describe('builder', function(){
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
             'xmlParts' : [
-              {'obj': 'cars2', 'attr':'brand', 'pos':24, 'depth':1, 'before':'<trow>', 'after': '</trow>'  }
+              {'obj': 'cars2', 'array':'start' , 'pos':20, 'depth':1, 'after': '<trow>'  },
+              {'obj': 'cars2', 'attr' :'brand' , 'pos':24, 'depth':1, 'before':''        },
+              {'obj': 'cars2', 'array':'end'   , 'pos':29, 'depth':1, 'before': '</trow>'}
             ]
           }
         }
@@ -586,16 +578,24 @@ describe('builder', function(){
         ]
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [
-        { pos:[ 0        ], str: '<xml> '},
-        { pos:[ 6 , 0, 10 ], str: '<tr>matrix</tr>'},
-        { pos:[ 6 , 1, 10 ], str: '<tr>Lord of War</tr>'},
-        { pos:[ 20, 0, 24 ], str: '<trow>Lumeneo</trow>'},
-        { pos:[ 20, 1, 24 ], str: '<trow>Tesla motors</trow>'},
-        { pos:[ 30       ], str: ' </xml>' }
+      helper.assert(_fn(_data), [ 
+        { pos: [ 0         ], str: '<xml> ' },
+        { pos: [ 6 , 0, 6  ], str: '<tr>' },
+        { pos: [ 6 , 0, 10 ], str: 'matrix' },
+        { pos: [ 6 , 0, 15 ], str: '</tr>' },
+        { pos: [ 6 , 1, 6  ], str: '<tr>' },
+        { pos: [ 6 , 1, 10 ], str: 'Lord of War' },
+        { pos: [ 6 , 1, 15 ], str: '</tr>' },
+        { pos: [ 20, 0, 20 ], str: '<trow>' },
+        { pos: [ 20, 0, 24 ], str: 'Lumeneo' },
+        { pos: [ 20, 0, 29 ], str: '</trow>' },
+        { pos: [ 20, 1, 20 ], str: '<trow>' },
+        { pos: [ 20, 1, 24 ], str: 'Tesla motors' },
+        { pos: [ 20, 1, 29 ], str: '</trow>' },
+        { pos: [ 30        ], str: ' </xml>' } 
       ]);
     });
-    it('2 should works if there are two adjacents array of objects and some xml data in between', function(){
+    it('should work if there are some xml between two adjacents arrays', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
@@ -617,7 +617,9 @@ describe('builder', function(){
             'position' : {'start': 6, 'end' :15},
             'before' : '<T>',
             'xmlParts' : [
-              {'obj': 'movies1', 'attr':'title', 'pos':10, 'depth':1, 'before':'<tr>', 'after': '</tr>'    }
+              {'obj': 'movies1', 'array':'start' , 'pos':6 , 'depth':1, 'after': '<tr>'  },
+              {'obj': 'movies1', 'attr' :'title' , 'pos':10, 'depth':1, 'before':''      },
+              {'obj': 'movies1', 'array':'end'   , 'pos':15, 'depth':1, 'before':'</tr>' }
             ]
           },
           'cars2':{
@@ -626,8 +628,11 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
+            'before' : '<T2>',
             'xmlParts' : [
-              {'obj': 'cars2', 'attr':'brand', 'pos':24, 'depth':1, 'before':'<trow>', 'after': '</trow>'  }
+              {'obj': 'cars2', 'array':'start' , 'pos':20, 'depth':1, 'after': '<trow>'  },
+              {'obj': 'cars2', 'attr' :'brand' , 'pos':24, 'depth':1, 'before':''        },
+              {'obj': 'cars2', 'array':'end'   , 'pos':29, 'depth':1, 'before': '</trow>'}
             ]
           }
         }
@@ -643,17 +648,26 @@ describe('builder', function(){
         ]
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [
-        { pos:[ 0         ], str: '<xml> '},
-        { pos:[ 6         ], str: '<T>'},
-        { pos:[ 6 , 0, 10 ], str: '<tr>matrix</tr>'},
-        { pos:[ 6 , 1, 10 ], str: '<tr>Lord of War</tr>'},
-        { pos:[ 20, 0, 24 ], str: '<trow>Lumeneo</trow>'},
-        { pos:[ 20, 1, 24 ], str: '<trow>Tesla motors</trow>'},
-        { pos:[ 30        ], str: ' </xml>' }
+      helper.assert(_fn(_data), [ 
+        { pos: [ 0         ], str: '<xml> ' },
+        { pos: [ 6         ], str: '<T>' },
+        { pos: [ 6 , 0, 6  ], str: '<tr>' },
+        { pos: [ 6 , 0, 10 ], str: 'matrix' },
+        { pos: [ 6 , 0, 15 ], str: '</tr>' },
+        { pos: [ 6 , 1, 6  ], str: '<tr>' },
+        { pos: [ 6 , 1, 10 ], str: 'Lord of War' },
+        { pos: [ 6 , 1, 15 ], str: '</tr>' },
+        { pos: [ 20        ], str: '<T2>' },
+        { pos: [ 20, 0, 20 ], str: '<trow>' },
+        { pos: [ 20, 0, 24 ], str: 'Lumeneo' },
+        { pos: [ 20, 0, 29 ], str: '</trow>' },
+        { pos: [ 20, 1, 20 ], str: '<trow>' },
+        { pos: [ 20, 1, 24 ], str: 'Tesla motors' },
+        { pos: [ 20, 1, 29 ], str: '</trow>' },
+        { pos: [ 30        ], str: ' </xml>' } 
       ]);
     });
-    it('should works even with two nested arrays', function(){
+    it('should manage nested arrays', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
@@ -668,8 +682,10 @@ describe('builder', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'<tr><p>', 'after': ''            },
-              {'obj': 'd', 'attr':'lastname' , 'pos':29, 'depth':1, 'before':'</p><p>', 'after': '</p></tr>'  }
+              {'obj': 'd', 'array': 'start'  , 'pos':6 , 'depth':1, 'after': '<tr><p>'   },
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'',         },
+              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'   },
+              {'obj': 'd', 'array': 'end'    , 'pos':38, 'depth':1, 'before':'</p></tr>' }
             ]
           },
           'skills1':{
@@ -677,9 +693,11 @@ describe('builder', function(){
             'parent' : 'd',
             'type': 'array',
             'depth' : 2,
-            'position' : {'start': 13, 'end' :22},
+            'position' : {'start': 20, 'end' :29},
             'xmlParts' : [
-              {'obj': 'skills1', 'attr':'name', 'pos':17, 'depth':2, 'before':'<tr>', 'after': '</tr>'}
+              {'obj': 'skills1', 'array': 'start', 'pos':20, 'depth':2, 'after': '<tr>'  },
+              {'obj': 'skills1', 'attr':'name'   , 'pos':24, 'depth':2                   },
+              {'obj': 'skills1', 'array': 'end'  , 'pos':29, 'depth':2, 'before':'</tr>' }
             ]
           }
         }
@@ -700,37 +718,140 @@ describe('builder', function(){
         }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [{
-          pos: [ 0 ],
-          str: '<xml> '
-        },{
-          pos: [ 6, 0, 13 ],
-          str: '<tr><p>Thomas'
-        },{
-          pos: [ 6, 0, 29 ],
-          str: '</p><p>A. Anderson</p></tr>'
-        },{
-          pos: [ 6, 0, 17, 0 ],
-          str: '<tr>survive</tr>'
-        },{
-          pos: [ 6, 0, 17, 1 ],
-          str: '<tr>walk on the walls</tr>'
-        },{
-          pos: [ 6, 1, 13 ],
-          str: '<tr><p>Trinity'
-        },{
-          pos: [ 6, 1, 29 ],
-          str: '</p><p>Unknown</p></tr>'
-        },{
-          pos: [ 6, 1, 17, 0 ],
-          str: '<tr>hack</tr>'
-        },{
-          pos: [ 39 ],
-          str: ' </xml>'
-        }
-      ]);
+      var _xmlParts = _fn(_data);
+      builder.sortXmlParts(_xmlParts, 100);
+      helper.assert(_xmlParts, [ 
+        { pos: [ 0               ], str: '<xml> ' },
+        { pos: [ 6, 0, 6         ], str: '<tr><p>' },
+        { pos: [ 6, 0, 13        ], str: 'Thomas' },
+        { pos: [ 6, 0, 20        ], str: '</p><p>A. Anderson' },
+        { pos: [ 6, 0, 20, 0, 20 ], str: '<tr>' },
+        { pos: [ 6, 0, 20, 0, 24 ], str: 'survive' },
+        { pos: [ 6, 0, 20, 0, 29 ], str: '</tr>' },
+        { pos: [ 6, 0, 20, 1, 20 ], str: '<tr>' },
+        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls' },
+        { pos: [ 6, 0, 20, 1, 29 ], str: '</tr>' },
+        { pos: [ 6, 0, 38        ], str: '</p></tr>' },
+        { pos: [ 6, 1, 6         ], str: '<tr><p>' },
+        { pos: [ 6, 1, 13        ], str: 'Trinity' },
+        { pos: [ 6, 1, 20        ], str: '</p><p>Unknown' },
+        { pos: [ 6, 1, 20, 0, 20 ], str: '<tr>' },
+        { pos: [ 6, 1, 20, 0, 24 ], str: 'hack' },
+        { pos: [ 6, 1, 20, 0, 29 ], str: '</tr>' },
+        { pos: [ 6, 1, 38        ], str: '</p></tr>' },
+        { pos: [ 39              ], str: ' </xml>' } ]
+      );
     });
-    it('should works even with two nested arrays used in the inverse order', function(){
+    it('should manage three level of arrays.\
+        It should not crash if the third array is empty or does not exist\
+        It should keep the xml which is between the second and the third array', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml> ',
+          'after' :' </xml>'
+        },
+        'hierarchy'   : ['d', 'skills1', 'when2'],
+        'dynamicData' : {
+          'd':{
+            'name':'',
+            'parent' : '',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :48},
+            'xmlParts' : [
+              {'obj': 'd', 'array': 'start'  , 'pos':6 , 'depth':1, 'after': '<tr><p>'   },
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'',         },
+              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'   },
+              {'obj': 'd', 'array': 'end'    , 'pos':48, 'depth':1, 'before':'</p></tr>' }
+            ]
+          },
+          'skills1':{
+            'name':'skills',
+            'parent' : 'd',
+            'type': 'array',
+            'depth' : 2,
+            'position' : {'start': 20, 'end' :39},
+            'xmlParts' : [
+              {'obj': 'skills1', 'array': 'start', 'pos':20, 'depth':2, 'after': '<tr>'  },
+              {'obj': 'skills1', 'attr':'name'   , 'pos':24, 'depth':2                   },
+              {'obj': 'skills1', 'array': 'end'  , 'pos':39, 'depth':2, 'before':'</tr>' }
+            ]
+          },
+          'when2':{
+            'name':'when',
+            'parent' : 'skills1',
+            'type': 'array',
+            'depth' : 3,
+            'position' : {'start': 25, 'end' :34},
+            'before' : '<days>',
+            'xmlParts' : [
+              {'obj': 'when2', 'array': 'start', 'pos':25, 'depth':3, 'after': '<d>'  },
+              {'obj': 'when2', 'attr' : 'day'  , 'pos':28, 'depth':3                   },
+              {'obj': 'when2', 'array': 'end'  , 'pos':34, 'depth':3, 'before':'</d>' }
+            ]
+          }
+        }
+      };
+      var _data = [{
+          'firstname':'Thomas',
+          'lastname':'A. Anderson',
+          'skills':[
+            {
+              'name' : 'survive',
+              'when' : [
+                {'day':'monday'},
+                {'day':'thursday'},
+                {'day':'friday'}
+              ]
+            },
+            {'name' : 'walk on the walls'}
+          ]
+        },{
+          'firstname':'Trinity',
+          'lastname':'Unknown',
+          'skills':[
+            {'name' : 'hack'}
+          ]
+        }
+      ];
+      var _fn = builder.getBuilderFunction(_desc);
+      var _xmlParts = _fn(_data);
+      builder.sortXmlParts(_xmlParts, 100);
+      helper.assert(_xmlParts, [ 
+        { pos: [ 0 ], str: '<xml> ' },
+        { pos: [ 6, 0, 6 ], str: '<tr><p>' },
+        { pos: [ 6, 0, 13 ], str: 'Thomas' },
+        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson' },
+        { pos: [ 6, 0, 20, 0, 20 ], str: '<tr>' },
+        { pos: [ 6, 0, 20, 0, 24 ], str: 'survive' },
+        { pos: [ 6, 0, 20, 0, 25 ], str: '<days>' },
+        { pos: [ 6, 0, 20, 0, 25, 0, 25 ], str: '<d>' },
+        { pos: [ 6, 0, 20, 0, 25, 0, 28 ], str: 'monday' },
+        { pos: [ 6, 0, 20, 0, 25, 0, 34 ], str: '</d>' },
+        { pos: [ 6, 0, 20, 0, 25, 1, 25 ], str: '<d>' },
+        { pos: [ 6, 0, 20, 0, 25, 1, 28 ], str: 'thursday' },
+        { pos: [ 6, 0, 20, 0, 25, 1, 34 ], str: '</d>' },
+        { pos: [ 6, 0, 20, 0, 25, 2, 25 ], str: '<d>' },
+        { pos: [ 6, 0, 20, 0, 25, 2, 28 ], str: 'friday' },
+        { pos: [ 6, 0, 20, 0, 25, 2, 34 ], str: '</d>' },
+        { pos: [ 6, 0, 20, 0, 39 ], str: '</tr>' },
+        { pos: [ 6, 0, 20, 1, 20 ], str: '<tr>' },
+        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls' },
+        { pos: [ 6, 0, 20, 1, 25 ], str: '<days>' },
+        { pos: [ 6, 0, 20, 1, 39 ], str: '</tr>' },
+        { pos: [ 6, 0, 48 ], str: '</p></tr>' },
+        { pos: [ 6, 1, 6 ], str: '<tr><p>' },
+        { pos: [ 6, 1, 13 ], str: 'Trinity' },
+        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown' },
+        { pos: [ 6, 1, 20, 0, 20 ], str: '<tr>' },
+        { pos: [ 6, 1, 20, 0, 24 ], str: 'hack' },
+        { pos: [ 6, 1, 20, 0, 25 ], str: '<days>' },
+        { pos: [ 6, 1, 20, 0, 39 ], str: '</tr>' },
+        { pos: [ 6, 1, 48 ], str: '</p></tr>' },
+        { pos: [ 49 ], str: ' </xml>' } ]
+      );
+    });
+    it('should work even with two nested arrays used in the inverse order', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',
@@ -754,9 +875,11 @@ describe('builder', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
-              {'obj': 'skills1', 'attr':''    , 'pos': 6 , 'depth':1, 'before':'<tr>', 'after': '' },
-              {'obj': 'skills1', 'attr':'name', 'pos': 15, 'depth':2, 'before':'<td>'   , 'after': '</td>'     },
-              {'obj': 'skills1', 'attr':''    , 'pos': 35, 'depth':1, 'after':'</tr>', 'before': '' }
+              {'obj': 'skills1', 'array':'start', 'pos':6 , 'depth':1 , 'after' : '<tr>' },
+              {'obj': 'd'      , 'array': 'start', 'pos':13, 'depth':2, 'after': '<td>'  },
+              {'obj': 'skills1', 'attr' :'name' , 'pos':15 , 'depth':2, 'before': ''     },
+              {'obj': 'd'      , 'array': 'end'  , 'pos':22, 'depth':2, 'before':'</td>' },
+              {'obj': 'skills1', 'array':'end'  , 'pos':38 , 'depth':1, 'before': '</tr>'}
             ]
           }
         }
@@ -780,27 +903,41 @@ describe('builder', function(){
         }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [
-        { pos: [ 0            ], str: '<xml> ' },
-        { pos: [ 13, 0, 6     ], str: '<tr>' },
-        { pos: [ 13, 0, 15, 0 ], str: '<td>skill1_1</td>' },
-        { pos: [ 13, 0, 35    ], str: '</tr>' },
-        { pos: [ 13, 1, 6     ], str: '<tr>' },
-        { pos: [ 13, 1, 15, 0 ], str: '<td>skill1_2</td>' },
-        { pos: [ 13, 1, 35    ], str: '</tr>' },
-        { pos: [ 13, 2, 6     ], str: '<tr>' },
-        { pos: [ 13, 2, 15, 0 ], str: '<td>skill1_3</td>' },
-        { pos: [ 13, 2, 35    ], str: '</tr>' },
-        { pos: [ 13, 0, 6     ], str: '<tr>' },
-        { pos: [ 13, 0, 15, 1 ], str: '<td>skill2_1</td>' },
-        { pos: [ 13, 0, 35    ], str: '</tr>' },
-        { pos: [ 13, 1, 6     ], str: '<tr>' },
-        { pos: [ 13, 1, 15, 1 ], str: '<td>skill2_2</td>' },
-        { pos: [ 13, 1, 35    ], str: '</tr>' },
-        { pos: [ 13, 2, 6     ], str: '<tr>' },
-        { pos: [ 13, 2, 15, 1 ], str: '<td>skill2_3</td>' },
-        { pos: [ 13, 2, 35    ], str: '</tr>' },
-        { pos: [ 39           ], str: ' </xml>' }
+      var _xmlParts = _fn(_data);
+      builder.sortXmlParts(_xmlParts, 100);
+      helper.assert(_xmlParts, [ 
+        { pos: [ 0              ], str: '<xml> ' },
+        { pos: [ 6, 0, 6        ], str: '<tr>' },
+        { pos: [ 6, 0, 6        ], str: '<tr>' },
+        { pos: [ 6, 0, 6, 0, 13 ], str: '<td>' },
+        { pos: [ 6, 0, 6, 0, 15 ], str: 'skill1_1' },
+        { pos: [ 6, 0, 6, 0, 22 ], str: '</td>' },
+        { pos: [ 6, 0, 6, 1, 13 ], str: '<td>' },
+        { pos: [ 6, 0, 6, 1, 15 ], str: 'skill2_1' },
+        { pos: [ 6, 0, 6, 1, 22 ], str: '</td>' },
+        { pos: [ 6, 0, 38       ], str: '</tr>' },
+        { pos: [ 6, 0, 38       ], str: '</tr>' },
+        { pos: [ 6, 1, 6        ], str: '<tr>' },
+        { pos: [ 6, 1, 6        ], str: '<tr>' },
+        { pos: [ 6, 1, 6, 0, 13 ], str: '<td>' },
+        { pos: [ 6, 1, 6, 0, 15 ], str: 'skill1_2' },
+        { pos: [ 6, 1, 6, 0, 22 ], str: '</td>' },
+        { pos: [ 6, 1, 6, 1, 13 ], str: '<td>' },
+        { pos: [ 6, 1, 6, 1, 15 ], str: 'skill2_2' },
+        { pos: [ 6, 1, 6, 1, 22 ], str: '</td>' },
+        { pos: [ 6, 1, 38       ], str: '</tr>' },
+        { pos: [ 6, 1, 38       ], str: '</tr>' },
+        { pos: [ 6, 2, 6        ], str: '<tr>' },
+        { pos: [ 6, 2, 6        ], str: '<tr>' },
+        { pos: [ 6, 2, 6, 0, 13 ], str: '<td>' },
+        { pos: [ 6, 2, 6, 0, 15 ], str: 'skill1_3' },
+        { pos: [ 6, 2, 6, 0, 22 ], str: '</td>' },
+        { pos: [ 6, 2, 6, 1, 13 ], str: '<td>' },
+        { pos: [ 6, 2, 6, 1, 15 ], str: 'skill2_3' },
+        { pos: [ 6, 2, 6, 1, 22 ], str: '</td>' },
+        { pos: [ 6, 2, 38       ], str: '</tr>' },
+        { pos: [ 6, 2, 38       ], str: '</tr>' },
+        { pos: [ 39            ], str: ' </xml>' } 
       ]);
     });
 

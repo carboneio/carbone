@@ -1144,11 +1144,11 @@ describe('extracter', function(){
 
 
   describe('buildSortedHierarchy', function(){
-    it('should consider the depth is 0 when it is not specified', function(){
+    it('should not use the depth attribute to resolve dependency', function(){
       var _data = {
         'staticData': {},
         'dynamicData': {
-          'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [] },
+          'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':5 },
           'menu1'  :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1}
         }
       };
@@ -1162,7 +1162,7 @@ describe('extracter', function(){
       var _data = {
         'staticData': {},
         'dynamicData': {
-          'd': {'name':'d'       , 'type':'array' , 'parent':''  , 'xmlParts' : [], 'depth':1},
+          'd': {'name':'d' , 'type':'array' , 'parent':''  , 'xmlParts' : [], 'depth':1},
         }
       };
       helper.assert(extracter.buildSortedHierarchy(_data), {
@@ -1171,12 +1171,12 @@ describe('extracter', function(){
         'hierarchy' : ['d']
       });
     });
-    it('should generate an array which contains the order of hierarchy', function(){
+    it('The returned array should describe in which order the builder should travel the dynamicData without using depth attribute', function(){
       var _data = {
         'staticData': {},
         'dynamicData': {
-          'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0},
-          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1},
+          'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':500},
+          'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':4},
           'menu2'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu1'   , 'xmlParts' : [], 'depth':2},
           'menu3'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu2'   , 'xmlParts' : [], 'depth':3},
           'product4':{'name':'product', 'type':'array'  , 'parent':'menu3'   , 'xmlParts' : [], 'depth':4},
@@ -1193,22 +1193,23 @@ describe('extracter', function(){
         'hierarchy' : ['d', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
       });
     });
-    it.skip('should work even if the dynamicData is not in the correct order; DO THIS TEST!!! ', function(){
+    it('"cars7" should appears before "product8" because "cars7" is the parent of "product8".\
+        "d" should be the first\
+        "product6" should appears before "cars7" because "product6" has no children', function(){
       var _data = {
         'staticData': {},
         'dynamicData': {
           'product4':{'name':'product', 'type':'array'  , 'parent':'menu3'   , 'xmlParts' : [], 'depth':4},
           'menu3'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu2'   , 'xmlParts' : [], 'depth':3},
-          'd'      :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0},
           'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'      , 'xmlParts' : [], 'depth':1},
-          'cars7'   :{'name':'cars'   , 'type':'object' , 'parent':'d'      , 'xmlParts' : [], 'depth':0},
           'menu2'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu1'   , 'xmlParts' : [], 'depth':2},
           'product8':{'name':'product', 'type':'object' , 'parent':'cars7'   , 'xmlParts' : [], 'depth':0},
+          'cars7'   :{'name':'cars'   , 'type':'object' , 'parent':'d'      , 'xmlParts' : [], 'depth':0},
           'product6':{'name':'product', 'type':'object' , 'parent':'d'      , 'xmlParts' : [], 'depth':0},
-          'site5'   :{'name':'site'   , 'type':'object' , 'parent':'product4', 'xmlParts' : [], 'depth':4}
+          'site5'   :{'name':'site'   , 'type':'object' , 'parent':'product4', 'xmlParts' : [], 'depth':4},
+          'd'       :{'name':''       , 'type':'object' , 'parent':''        , 'xmlParts' : [], 'depth':0}
         }
       };
-
       helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,

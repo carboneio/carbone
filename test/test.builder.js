@@ -851,7 +851,7 @@ describe('builder', function(){
         { pos: [ 49 ], str: ' </xml>' } ]
       );
     });
-    it('should work even with two nested arrays used in the inverse order', function(){
+    it('should work even with two nested arrays used in the inverse order. TODO: IMPROVE', function(){
       var _desc = {
         'staticData'  : {
           'before':'<xml> ',

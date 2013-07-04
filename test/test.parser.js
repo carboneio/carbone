@@ -42,21 +42,48 @@ describe('parser', function(){
     it('should convert conflicting characters', function(){
       assert.equal(parser.findMarkers("<div>{menu}<div> it's \n   {city}").xml, "<div><div> it\\\'s     ");
     });
+    it('should remove whitespaces which are inside {} and not inside <>. It should not count them for the position', function(){
+      helper.assert(parser.findMarkers(' <div>   {  menu  }   <div>   {   city  } '), {
+        markers : [{'pos': 9, 'name':'menu'},{'pos':20, 'name':'city'}],
+        xml : ' <div>      <div>    '
+      });
+      helper.assert(parser.findMarkers(' <xmlstart> {  me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {ci  <td>  ty  </td>  } <tga><bla>{cars[i].wheel}</bla>'), {
+        markers : [{'pos': 12, 'name':'menu[i].city'},{'pos':52, 'name':'city'},{'pos':72, 'name':'cars[i].wheel'}], 
+        xml : ' <xmlstart> <interxml><bull  sh it> </xmlend> <tga> <td></td> <tga><bla></bla>'
+      });
+    });
   });
-
-  describe('cleanMarker', function(){
-    it('should remove extra whitespaces and remove xml which are in the marker', function(){
-      assert.equal(parser.cleanMarker('menu<xmla>why[1].test')                            , 'menuwhy[1].test');
-      assert.equal(parser.cleanMarker('  menu<xmla>why[1].test    ')                      , 'menuwhy[1].test');
-      assert.equal(parser.cleanMarker('menu<some xml data>why<sqs>[1<sas  >].test')       , 'menuwhy[1].test');
-      assert.equal(parser.cleanMarker('menu<some xml data>why<sqs>[1<sas  >\n<qqs>].test'), 'menuwhy[1].test');
-      assert.equal(parser.cleanMarker('menu<some xml data>why<sqs>[1<sas  >\t<qqs>].test'), 'menuwhy[1].test');
-      assert.equal(parser.cleanMarker('menu</w:t></w:r><w:r w:rsidR="00013394"><w:t>why</w:t></w:r><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:bookmarkEnd w:id="0"/><w:r w:rsidR="00013394"><w:t>[1].</w:t></w:r><w:r w:rsidR="00013394"><w:t>test</w:t></w:r><w:r w:rsidR="00013394"><w:t xml:space="preserve">'),
+  
+  describe('extractMarker', function(){
+    it('should extract the marker from the xml and keep whitespaces and special characters (-> very important)', function(){
+      assert.equal(parser.extractMarker('menu<xmla>why[1].test'), 'menuwhy[1].test');
+      assert.equal(parser.extractMarker('  menu<xmla>why[1].test    '), '  menuwhy[1].test    ');
+      assert.equal(parser.extractMarker('  menu <xmla> why[ $ <tr> dead = <bd> true + 1 ].test : int    '), '  menu  why[ $  dead =  true + 1 ].test : int    ');
+      assert.equal(parser.extractMarker('menu<some xml data>why<sqs>[1<sas  >].test'), 'menuwhy[1].test');
+      assert.equal(parser.extractMarker(' menu  <some xml data>  why  <sqs> [ 1 <sas  >] . test '), ' menu    why   [ 1 ] . test ');
+      assert.equal(parser.extractMarker('menu<some xml data>why<sqs>[1<sas  >\n<qqs>].test'), 'menuwhy[1\n].test');
+      assert.equal(parser.extractMarker('menu<some xml data>why<sqs>[1<sas  >\t<qqs>].test'), 'menuwhy[1\t].test');
+      assert.equal(parser.extractMarker('menu</w:t></w:r><w:r w:rsidR="00013394"><w:t>why</w:t></w:r><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:bookmarkEnd w:id="0"/><w:r w:rsidR="00013394"><w:t>[1].</w:t></w:r><w:r w:rsidR="00013394"><w:t>test</w:t></w:r><w:r w:rsidR="00013394"><w:t xml:space="preserve">'),
       'menuwhy[1].test');
     });
   });
 
+  describe('cleanMarker', function(){
+    it('should remove whitespaces and special characters in the markers', function(){
+      assert.equal(parser.cleanMarker(' menuwhy[1].test    ')         , 'menuwhy[1].test');
+      assert.equal(parser.cleanMarker(' menu    why   [ 1 ] . test ') , 'menuwhy[1].test');
+      assert.equal(parser.cleanMarker('menuwhy[1\n].test')            , 'menuwhy[1].test');
+      assert.equal(parser.cleanMarker('menuwhy[1\t].test')            , 'menuwhy[1].test');
+      assert.equal(parser.cleanMarker('menuwhy[ i + 1 \n ].test')     , 'menuwhy[i+1].test');
+      assert.equal(parser.cleanMarker(' menu  . t   .b :  int ')      , 'menu.t.b:int');
+    });
+  });
+
   describe('cleanXml', function(){
+    it('should extract only the xml (it removes all markers from xml)', function(){
+      assert.equal(parser.cleanXml('menu</xmlend>bla'), '</xmlend>');
+      assert.equal(parser.cleanXml('menu</xmlend><text b>A<qskjhdq>bla'), '</xmlend><text b><qskjhdq>');
+    });
     it('should extract only the xml (it removes all markers from xml)', function(){
       assert.equal(parser.cleanXml('menu</xmlend>bla'), '</xmlend>');
       assert.equal(parser.cleanXml('menu</xmlend><text b>A<qskjhdq>bla'), '</xmlend><text b><qskjhdq>');

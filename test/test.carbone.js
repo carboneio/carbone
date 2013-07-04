@@ -98,23 +98,27 @@ describe('Carbone', function(){
         +'</xml>';
       var _data = {
         'cars':[
-          {
-            'wheels' : [
-              {'size': 'A'},
-              {'size': 'B'}
-            ]
-          },{
-            'wheels' : [
-              {'size': 'C'},
-              {'size': 'D'},
-              {'size': 'E'}
-            ]
-          }
+          {'wheels': [ {'size': 'A'}, {'size': 'B'}               ]},
+          {'wheels': [ {'size': 'C'}, {'size': 'D'},{'size': 'E'} ]}
         ]
       };
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
     });
+    it('should works if two adjacents arrays are used. It should work even if there are a lot of whitespaces ', function(){
+      var _xml = 
+         '<xml>'
+        +  '<t_cars>   <td>{  d.cars[i].brand   } </td> <td>{   d.cars[i+1].brand   } </td> </t_cars>'
+        +  '<t_wheels> <td>{  d.wheels[i].size  } </td> <td>{   d.wheels[i+1].size  } </td> </t_wheels>'
+        +'</xml>';
+      var _data = {
+        'cars'  : [ {'brand': 'Tesla'}, {'brand': 'Lumeneo'}, {'brand': 'Venturi'} ],
+        'wheels': [ {'size': 'A'},      {'size': 'B'} ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_cars>   <td>Tesla </td><td>Lumeneo </td><td>Venturi </td> </t_cars><t_wheels> <td>A </td><td>B </td> </t_wheels></xml>');
+    });
+
   });
 
   describe('render', function(){

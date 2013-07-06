@@ -9,32 +9,32 @@ describe('builder', function(){
 
   describe('getFormatterString', function(){
     it('should return a simple call of a function for a formatter without arguments', function(){
-      var actual = builder.getFormatterString('d.number', [ 'int' ]);
-      assert.equal(actual, 'formatters.int(d.number)');
+      var _actual = builder.getFormatterString('d.number', [ 'int' ]);
+      assert.equal(_actual, 'formatters.int(d.number)');
     });
     it('should return a simple call of a function for a formatter without arguments but called with parenthesis', function(){
-      var actual = builder.getFormatterString('d.number', [ 'int()' ]);
-      assert.equal(actual, 'formatters.int(d.number)');
+      var _actual = builder.getFormatterString('d.number', [ 'int()' ]);
+      assert.equal(_actual, 'formatters.int(d.number)');
     });
     it('should return a call of a function for a formatter with one argument', function(){
-      var actual = builder.getFormatterString('d.number', [ 'toFixed(2)' ]);
-      assert.equal(actual, 'formatters.toFixed(d.number, \'2\')');
+      var _actual = builder.getFormatterString('d.number', [ 'toFixed(2)' ]);
+      assert.equal(_actual, 'formatters.toFixed(d.number, \'2\')');
     });
     it('should return a call of a function for a formatter with one argument which is a string', function(){
-      var actual = builder.getFormatterString('d.date', [ "format(YYYYMMDD)" ]);
-      assert.equal(actual, "formatters.format(d.date, 'YYYYMMDD')");
+      var _actual = builder.getFormatterString('d.date', [ "format(YYYYMMDD)" ]);
+      assert.equal(_actual, "formatters.format(d.date, 'YYYYMMDD')");
     });
     it('should return a call of a function for a formatter with two arguments', function(){
-      var actual = builder.getFormatterString('d.number', [ 'formatter(2, 3)' ]);
-      assert.equal(actual, 'formatters.formatter(d.number, \'2\', \'3\')');
+      var _actual = builder.getFormatterString('d.number', [ 'formatter(2, 3)' ]);
+      assert.equal(_actual, 'formatters.formatter(d.number, \'2\', \'3\')');
     });
     it('should return two calls of functions for two chained formatters', function(){
-      var actual = builder.getFormatterString('d.number', [ 'int', 'toFixed(2)' ]);
-      assert.equal(actual, 'formatters.toFixed(formatters.int(d.number), \'2\')');
+      var _actual = builder.getFormatterString('d.number', [ 'int', 'toFixed(2)' ]);
+      assert.equal(_actual, 'formatters.toFixed(formatters.int(d.number), \'2\')');
     });
     it('should return two calls of functions for two chained formatters each with arguments', function(){
-      var actual = builder.getFormatterString('d.number', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ]);
-      assert.equal(actual, 'formatters.formatter2(formatters.formatter1(d.number, \'4\', \'5\'), \'2\', \'3\')');
+      var _actual = builder.getFormatterString('d.number', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ]);
+      assert.equal(_actual, 'formatters.formatter2(formatters.formatter1(d.number, \'4\', \'5\'), \'2\', \'3\')');
     });
   });
 

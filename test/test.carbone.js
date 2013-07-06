@@ -29,6 +29,28 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo </xml>');
     });
+    it('should replace null or undefined data by an empty string', function(){
+      var _xml = '<xml> {d.title} </xml>';
+      var _xmlBuilt = carbone.buildXML(_xml, {'title' : null});
+      helper.assert(_xmlBuilt, '<xml>  </xml>');
+      _xmlBuilt = carbone.buildXML(_xml, {'title' : undefined});
+      helper.assert(_xmlBuilt, '<xml>  </xml>');
+    });
+    it('should escape special characters > < & " \' for XML', function(){
+      var _xml = '<xml> {d.title} </xml>';
+      var _xmlBuilt = carbone.buildXML(_xml, {'title' : '&'});
+      helper.assert(_xmlBuilt, '<xml> &amp; </xml>');
+      _xmlBuilt = carbone.buildXML(_xml, {'title' : '<'});
+      helper.assert(_xmlBuilt, '<xml> &lt; </xml>');
+      _xmlBuilt = carbone.buildXML(_xml, {'title' : '>'});
+      helper.assert(_xmlBuilt, '<xml> &gt; </xml>');
+      _xmlBuilt = carbone.buildXML(_xml, {'title' : '\''});
+      helper.assert(_xmlBuilt, '<xml> &apos; </xml>');
+      _xmlBuilt = carbone.buildXML(_xml, {'title' : '"'});
+      helper.assert(_xmlBuilt, '<xml> &quot; </xml>');
+      _xmlBuilt = carbone.buildXML(_xml, {'title' : 'a & b " c <table> <> \' " & <'});
+      helper.assert(_xmlBuilt, '<xml> a &amp; b &quot; c &lt;table&gt; &lt;&gt; &apos; &quot; &amp; &lt; </xml>');
+    });
     it('should works with two nested objects', function(){
       var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
@@ -105,19 +127,21 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
     });
-    it('should works if two adjacents arrays are used. It should work even if there are a lot of whitespaces ', function(){
+    it('should work with two adjacents arrays and some xml in between. It should work even if there are a lot of whitespaces ', function(){
       var _xml = 
          '<xml>'
-        +  '<t_cars>   <td>{  d.cars[i].brand   } </td> <td>{   d.cars[i+1].brand   } </td> </t_cars>'
-        +  '<t_wheels> <td>{  d.wheels[i].size  } </td> <td>{   d.wheels[i+1].size  } </td> </t_wheels>'
+        +  '<t_cars>   <td>{  d.cars[ i ].brand   } </td> <td>{   d.cars[i + 1 ].brand   } </td> </t_cars>'
+        +  '<oo> hello </oo>'
+        +  '<t_wheels> <td>{  d.wheels[ i ].size  } </td> <td>{   d.wheels[ i + 1].size  } </td> </t_wheels>'
         +'</xml>';
       var _data = {
         'cars'  : [ {'brand': 'Tesla'}, {'brand': 'Lumeneo'}, {'brand': 'Venturi'} ],
         'wheels': [ {'size': 'A'},      {'size': 'B'} ]
       };
       var _xmlBuilt = carbone.buildXML(_xml, _data);
-      assert.equal(_xmlBuilt, '<xml><t_cars>   <td>Tesla </td><td>Lumeneo </td><td>Venturi </td> </t_cars><t_wheels> <td>A </td><td>B </td> </t_wheels></xml>');
+      assert.equal(_xmlBuilt, '<xml><t_cars>   <td>Tesla </td><td>Lumeneo </td><td>Venturi </td> </t_cars><oo> hello </oo><t_wheels> <td>A </td><td>B </td> </t_wheels></xml>');
     });
+
 
   });
 

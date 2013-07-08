@@ -37,7 +37,7 @@ describe('Carbone', function(){
       _xmlBuilt = carbone.buildXML(_xml, {'title' : undefined});
       helper.assert(_xmlBuilt, '<xml>  </xml>');
     });
-    it('should escape special characters > < & " \' for XML', function(){
+    it('should escape special characters > < & for XML', function(){
       var _xml = '<xml> {d.title} </xml>';
       var _xmlBuilt = carbone.buildXML(_xml, {'title' : '&'});
       helper.assert(_xmlBuilt, '<xml> &amp; </xml>');
@@ -45,14 +45,15 @@ describe('Carbone', function(){
       helper.assert(_xmlBuilt, '<xml> &lt; </xml>');
       _xmlBuilt = carbone.buildXML(_xml, {'title' : '>'});
       helper.assert(_xmlBuilt, '<xml> &gt; </xml>');
+     /* 
+      Apparently,  Word and LibreOffice accept " and ' directly in XML.
       _xmlBuilt = carbone.buildXML(_xml, {'title' : '\''});
       helper.assert(_xmlBuilt, '<xml> &apos; </xml>');
       _xmlBuilt = carbone.buildXML(_xml, {'title' : '"'});
-      helper.assert(_xmlBuilt, '<xml> &quot; </xml>');
-      _xmlBuilt = carbone.buildXML(_xml, {'title' : 'a & b " c <table> <> \' " & <'});
-      helper.assert(_xmlBuilt, '<xml> a &amp; b &quot; c &lt;table&gt; &lt;&gt; &apos; &quot; &amp; &lt; </xml>');
+      helper.assert(_xmlBuilt, '<xml> &quot; </xml>');*/
+      _xmlBuilt = carbone.buildXML(_xml, {'title' : 'a & b c <table> <> & <'});
+      helper.assert(_xmlBuilt, '<xml> a &amp; b c &lt;table&gt; &lt;&gt; &amp; &lt; </xml>');
     });
-
     it('should works with two nested objects', function(){
       var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {

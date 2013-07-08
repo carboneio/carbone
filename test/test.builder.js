@@ -45,6 +45,12 @@ describe('builder', function(){
       builder.sortXmlParts(_data)
       helper.assert(_data, _expected);
     });
+    it('should sort the array even with strings', function(){
+      var _data     = [{'pos':['zz']}, {'pos':['ab']}, {'pos':['a' ]}, {'pos':['ac']}];
+      var _expected = [{'pos':['a' ]}, {'pos':['ab']}, {'pos':['ac']}, {'pos':['zz']}];
+      builder.sortXmlParts(_data)
+      helper.assert(_data, _expected);
+    });
     it('should sort the array with a depth of 2', function(){
       var _data     = [{'pos':[40, 4]}, {'pos':[40, 3]}, {'pos':[51, 100]}, {'pos':[29, 8  ]}];
       var _expected = [{'pos':[29, 8]}, {'pos':[40, 3]}, {'pos':[40, 4  ]}, {'pos':[51, 100]}];
@@ -129,6 +135,22 @@ describe('builder', function(){
         { 'pos': [ 6, 2, 6  ], 'str': '<tr>' },
         { 'pos': [ 6, 2, 23 ], 'str': '</tr>' },
         { 'pos': [ 24       ], 'str': '</xml>' } 
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 5), '<xml><tr>Lumeneo</tr><tr>Tesla motors</tr><tr>Toyota</tr></xml>');
+    });
+    it('should accept to sort strings', function(){
+      var _data     = [ 
+        { 'pos': [ 0           ], 'str': '<xml>' },
+        { 'pos': [ 6, 'ab', 14 ], 'str': 'Tesla motors' },
+        { 'pos': [ 6, 'ab', 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 'ab', 23 ], 'str': '</tr>' },
+        { 'pos': [ 6, 'aa', 14 ], 'str': 'Lumeneo' },
+        { 'pos': [ 6, 'aa', 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 'aa', 23 ], 'str': '</tr>' },
+        { 'pos': [ 6, 'c' , 14 ], 'str': 'Toyota' },
+        { 'pos': [ 6, 'c' , 6  ], 'str': '<tr>' },
+        { 'pos': [ 6, 'c' , 23 ], 'str': '</tr>' },
+        { 'pos': [ 24          ], 'str': '</xml>' } 
       ];
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml><tr>Lumeneo</tr><tr>Tesla motors</tr><tr>Toyota</tr></xml>');
     });
@@ -851,6 +873,84 @@ describe('builder', function(){
         { pos: [ 49 ], str: ' </xml>' } ]
       );
     });
+    it('should work with a custom iterator. It should keep the array interator', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml> ',
+          'after' :' </xml>'
+        },
+        'hierarchy'   : ['d'],
+        'dynamicData' : {
+          'd':{
+            'name':'',
+            'parent' : '',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :29},
+            'iterator' : {'attr': 'sort'},
+            'xmlParts' : [
+              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'     },
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1,                        },
+              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</tr>'  }
+            ]
+          }
+        }
+      };
+      var _data = [
+        {'firstname':'Thomas' , 'sort':31},
+        {'firstname':'Trinity', 'sort':11}
+      ];
+      var _fn = builder.getBuilderFunction(_desc);
+      helper.assert(_fn(_data), [
+        { pos:[ 0            ], str: '<xml> '},
+        { pos:[ 6, 31, 0, 6  ], str: '<tr>'},
+        { pos:[ 6, 31, 0, 13 ], str: 'Thomas'},
+        { pos:[ 6, 31, 0, 29 ], str: '</tr>'},
+        { pos:[ 6, 11, 1, 6  ], str: '<tr>'},
+        { pos:[ 6, 11, 1, 13 ], str: 'Trinity'},
+        { pos:[ 6, 11, 1, 29 ], str: '</tr>'},
+        { pos:[ 30           ], str: ' </xml>' }
+      ]);
+    });
+    it('should work even if the custom iterator is inside an object', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml> ',
+          'after' :' </xml>'
+        },
+        'hierarchy'   : ['d'],
+        'dynamicData' : {
+          'd':{
+            'name':'',
+            'parent' : '',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :29},
+            'iterator' : {'obj': 'movie', 'attr':'sort'},
+            'xmlParts' : [
+              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'     },
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1,                        },
+              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</tr>'  }
+            ]
+          }
+        }
+      };
+      var _data = [
+        {'firstname':'Thomas' , 'movie':{'sort':31}},
+        {'firstname':'Trinity', 'movie':{'sort':11}}
+      ];
+      var _fn = builder.getBuilderFunction(_desc);
+      helper.assert(_fn(_data), [
+        { pos:[ 0              ], str: '<xml> '},
+        { pos:[ 6, 31, 0, 6  ], str: '<tr>'},
+        { pos:[ 6, 31, 0, 13 ], str: 'Thomas'},
+        { pos:[ 6, 31, 0, 29 ], str: '</tr>'},
+        { pos:[ 6, 11, 1, 6  ], str: '<tr>'},
+        { pos:[ 6, 11, 1, 13 ], str: 'Trinity'},
+        { pos:[ 6, 11, 1, 29 ], str: '</tr>'},
+        { pos:[ 30             ], str: ' </xml>' }
+      ]);
+    });
     it('should work even with two nested arrays used in the inverse order. TODO: IMPROVE', function(){
       var _desc = {
         'staticData'  : {
@@ -875,11 +975,11 @@ describe('builder', function(){
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
-              {'obj': 'skills1', 'array':'start', 'pos':6 , 'depth':1 , 'after' : '<tr>' },
+              {'obj': 'skills1', 'array':'start' , 'pos':6 , 'depth':1 , 'after' : '<tr>' },
               {'obj': 'd'      , 'array': 'start', 'pos':13, 'depth':2, 'after': '<td>'  },
-              {'obj': 'skills1', 'attr' :'name' , 'pos':15 , 'depth':2, 'before': ''     },
+              {'obj': 'skills1', 'attr' :'name'  , 'pos':15 , 'depth':2, 'before': ''     },
               {'obj': 'd'      , 'array': 'end'  , 'pos':22, 'depth':2, 'before':'</td>' },
-              {'obj': 'skills1', 'array':'end'  , 'pos':38 , 'depth':1, 'before': '</tr>'}
+              {'obj': 'skills1', 'array':'end'   , 'pos':38 , 'depth':1, 'before': '</tr>'}
             ]
           }
         }

@@ -109,6 +109,43 @@ describe('extracter', function(){
         }
       });
     });
+    it('should manage arrays with custom iterator', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd[ sort ].site'},
+        {'pos': 30, 'name': 'd[ sort + 1].site'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'array',
+          'parent':'',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
+          ],
+          'iterator' : {'attr' : 'sort'}
+        }
+      });
+    });
+    it('should manage arrays and detect that the iterator is within a sub-object.\
+        it should ignore whitespaces', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd[ movie.sort ].site'},
+        {'pos': 30, 'name': 'd[ movie . sort   +1].site'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'array',
+          'parent':'',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
+          ],
+          'iterator' : {'obj':'movie', 'attr' : 'sort'}
+        }
+      });
+    });
     it('should manage arrays with nested objects', function(){
       var _markers = [
         {'pos': 20, 'name': 'd[i].site.id'},
@@ -185,7 +222,7 @@ describe('extracter', function(){
         }
       });
     });
-    it('54should manage nested arrays', function(){
+    it('should manage nested arrays', function(){
       var _markers = [
         {'pos': 1 , 'name': 'd.menu[i].id'},
         {'pos': 10, 'name': 'd.menu[i].cars'},

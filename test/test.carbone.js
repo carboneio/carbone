@@ -18,6 +18,7 @@ describe('Carbone', function(){
 
   describe('buildXML', function(){
     it('should work if the same array is repeated two times in the xml <tr>d[i].product</tr>    <tr>d[i].product</tr>');
+    it.skip('should escape special characters > < & " \' even if a formatter is used');
     it('should return the xml if no data is passed', function(){
       var _xml = '<xml> </xml>';
       var _xmlBuilt = carbone.buildXML(_xml);
@@ -51,6 +52,7 @@ describe('Carbone', function(){
       _xmlBuilt = carbone.buildXML(_xml, {'title' : 'a & b " c <table> <> \' " & <'});
       helper.assert(_xmlBuilt, '<xml> a &amp; b &quot; c &lt;table&gt; &lt;&gt; &apos; &quot; &amp; &lt; </xml>');
     });
+
     it('should works with two nested objects', function(){
       var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
       var _data = {
@@ -100,6 +102,54 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
     });
+    it('should accept custom iterators and sort the data using this iterator', function(){
+      var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
+      var _data = {
+        'cars':[
+          {'brand' : 'Lumeneo'     , 'sort':3},
+          {'brand' : 'Tesla motors', 'sort':1},
+          {'brand' : 'Toyota'      , 'sort':2}
+        ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_row> Tesla motors </t_row><t_row> Toyota </t_row><t_row> Lumeneo </t_row></xml>');
+    });
+    it('should use the default order of the array if the custom iterator cannot be used (always equals 1)', function(){
+      var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
+      var _data = {
+        'cars':[
+          {'brand' : 'Lumeneo'     , 'sort':1},
+          {'brand' : 'Tesla motors', 'sort':1},
+          {'brand' : 'Toyota'      , 'sort':1}
+        ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it('should use the default order of the array if the custom iterator is null', function(){
+      var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
+      var _data = {
+        'cars':[
+          {'brand' : 'Lumeneo'     , 'sort':null},
+          {'brand' : 'Tesla motors', 'sort':null},
+          {'brand' : 'Toyota'      , 'sort':null}
+        ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it.skip('should use the default order of the array if the custom iterator is undefined', function(){
+      var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
+      var _data = {
+        'cars':[
+          {'brand' : 'Lumeneo'     , 'sort':undefined},
+          {'brand' : 'Tesla motors', 'sort':undefined},
+          {'brand' : 'Toyota'      , 'sort':undefined}
+        ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    });
     it('should work if there is a whitespace between "cars" and "[" in some tags', function(){
       var _xml = '<xml><t_row> {d.cars[i].brand} </t_row><t_row> {d.cars [i+1].brand} </t_row></xml>';
       var _data = {
@@ -126,6 +176,27 @@ describe('Carbone', function(){
       };
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
+    });
+    it('should manage nested arrays with complex iterators', function(){
+      var _xml = 
+         '<xml>'
+        +  '<t_row><td>{d.cars[driver.name].wheels[size].size  }</td><td>{d.cars[driver.name].wheels[size+1].size  }</td></t_row>'
+        +  '<t_row><td>{d.cars[driver.name+1].wheels[size].size}</td><td>{d.cars[driver.name+1].wheels[size+1].size}</td></t_row>'
+        +'</xml>';
+      var _data = {
+        'cars':[
+          {
+            'wheels': [ {'size': 'B'}, {'size': 'A'}                ],
+            'driver': {'name' : 'david'}
+          },
+          {
+            'wheels': [ {'size': 'D'}, {'size': 'C'}, {'size': 'E'} ],
+            'driver': {'name' : 'bob'}
+          }
+        ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_row><td>C</td><td>D</td><td>E</td></t_row><t_row><td>A</td><td>B</td></t_row></xml>');
     });
     it('should work with two adjacents arrays and some xml in between. It should work even if there are a lot of whitespaces ', function(){
       var _xml = 

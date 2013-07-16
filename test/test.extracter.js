@@ -196,6 +196,133 @@ describe('extracter', function(){
         }
       });
     });
+    it('should manage arrays with conditions. It should transform = to ==', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i=1].id'},
+        {'pos': 30, 'name': 'd.site[i=0].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20/*, 'end': 30*/ },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':'i', 'operator':'==', 'right':'1'}]},
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':30, 'conditions':[{'left':'i', 'operator':'==', 'right':'0'}]}
+          ]
+        }
+      });
+    });
+    it('should detect multiple conditions separated by a comma', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[ i = 1, sort >  310].id'},
+        {'pos': 30, 'name': 'd.site[ i = 0,   bank < 54,  lang = en].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20/*, 'end': 30 */},
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[
+              {'left':'i', 'operator':'==', 'right':'1'},
+              {'left':'sort', 'operator':'>', 'right':'310'}
+            ]},
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':30, 'conditions':[
+              {'left':'i', 'operator':'==', 'right':'0'},
+              {'left':'bank', 'operator':'<', 'right':'54'},
+              {'left':'lang', 'operator':'==', 'right':'en'}
+            ]}
+          ]
+        }
+      });
+    });
+    it('should accept iterators and condition in an array', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[sort > 10, i].id'},
+        {'pos': 30, 'name': 'd.site[sort > 10, i+1].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':'sort', 'operator':'>', 'right':'10'}]}
+          ]
+        }
+      });
+    });
+    it.skip('should accept than the condition appears after the iterator', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i   , sort > 10].id'},
+        {'pos': 30, 'name': 'd.site[i+1 , sort > 10].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':'sort', 'operator':'>', 'right':'10'}]}
+          ]
+        }
+      });
+    });
+    it.skip('should accept multiple occurrences of the same array', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i].id'},
+        {'pos': 30, 'name': 'd.site[i+1].id'},
+        {'pos': 40, 'name': 'd.site[i].id'},
+        {'pos': 50, 'name': 'd.site[i+1].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'similar': ['dsite2'],
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20}
+          ]
+        }
+      });
+    });
     it('should manage arrays even if there are some attributes aside', function(){
       var _markers = [
         {'pos': 20, 'name': 'd.site[i].id'},
@@ -557,7 +684,7 @@ describe('extracter', function(){
     });
     it('should detect formatters even if we use special character in the parenthesis', function(){
       var _markers = [
-        {'pos': 20, 'name': 'd.number:parse(YY, YY:MM:D.ZZ [Z]menu[i+1][i] d.bla)'},
+        {'pos': 20, 'name': 'd.number:parse(YY, YY:MM:D.ZZ [Z]menu[i+1][i] d.bla, i=0)'},
       ];
       helper.assert(extracter.splitMarkers(_markers), {
         'd':{
@@ -565,7 +692,7 @@ describe('extracter', function(){
           'type': 'object',
           'parent':'',
           'xmlParts' : [
-            {'attr':'number', 'formatters' : [ 'parse(YY,YY:MM:D.ZZ[Z]menu[i+1][i]d.bla)'], 'obj': 'd', 'pos':20},
+            {'attr':'number', 'formatters' : [ 'parse(YY,YY:MM:D.ZZ[Z]menu[i+1][i]d.bla,i=0)'], 'obj': 'd', 'pos':20},
           ]
         }
       });

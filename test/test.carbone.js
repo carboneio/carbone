@@ -213,7 +213,76 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_cars>   <td>Tesla </td><td>Lumeneo </td><td>Venturi </td> </t_cars><oo> hello </oo><t_wheels> <td>A </td><td>B </td> </t_wheels></xml>');
     });
-
+    it('should accept condition "=" in arrays', function(){
+      var _xml = '<xml> <t_row> {d[speed=100,i].brand} </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':100},
+        {'brand' : 'Tesla motors', 'speed':200},
+        {'brand' : 'Toyota'      , 'speed':100}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it('should accept condition ">" in arrays', function(){
+      var _xml = '<xml> <t_row> {d[speed>100,i].brand} </t_row><t_row> {d[  speed >  100 ,  i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':50},
+        {'brand' : 'Tesla motors', 'speed':200},
+        {'brand' : 'Toyota'      , 'speed':100}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row></xml>');
+    });
+    it('should accept condition "<" in arrays', function(){
+      var _xml = '<xml> <t_row> {d[speed<200,i].brand} </t_row><t_row> {d[  speed <  200 ,  i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':150},
+        {'brand' : 'Tesla motors', 'speed':200},
+        {'brand' : 'Toyota'      , 'speed':100}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it('should accept multiple conditions in arrays', function(){
+      var _xml = '<xml> <t_row> {d[speed=100, high < 15, i].brand} </t_row><t_row> {d[speed=100, high < 15,i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':100, 'high':12},
+        {'brand' : 'Tesla motors', 'speed':200, 'high':5},
+        {'brand' : 'Toyota'      , 'speed':100, 'high':44}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row></xml>');
+    });
+    it('should accept conditions in a nested object', function(){
+      var _xml = '<xml> <t_row> {d[ speed . high > 13, i].brand} </t_row><t_row> {d[ speed.high > 13,i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':{'high':12, 'low':1}},
+        {'brand' : 'Tesla motors', 'speed':{'high':5 , 'low':2 }},
+        {'brand' : 'Toyota'      , 'speed':{'high':44, 'low':20}}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row></xml>');
+    });
+    it('should accept two conditions on the same object-attribute. It should accept extra whitespaces in the condition', function(){
+      var _xml = '<xml> <t_row> {d[ speed . high > 8, s pe ed.h igh < 20, i].brand} </t_row><t_row> {d[ speed.high > 8, speed.high < 20, i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':{'high':12, 'low':1}},
+        {'brand' : 'Tesla motors', 'speed':{'high':5 , 'low':2 }},
+        {'brand' : 'Toyota'      , 'speed':{'high':44, 'low':20}}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row></xml>');
+    });
+    it.skip('should work if the same array is repeated two times in the xml', function(){
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1].brand} </t_row><t_row> {d[i].brand} </t_row><t_row> {d[i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'},
+        {'brand' : 'Tesla motors'},
+        {'brand' : 'Toyota'}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    });
 
   });
 

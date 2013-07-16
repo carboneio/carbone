@@ -38,6 +38,77 @@ describe('builder', function(){
     });
   });
 
+  describe('getFilterString', function(){
+    it('should return an empty string if code is empty, attr is empty, the conditions array is not defined', function(){
+      var _actual = builder.getFilterString('myObj', [{'left':'sort', 'operator':'>', 'right':'10'}]);
+      assert.equal(_actual, '');
+      _actual = builder.getFilterString('myObj', []);
+      assert.equal(_actual, '');
+      _actual = builder.getFilterString('myObj');
+      assert.equal(_actual, '');
+      _actual = builder.getFilterString('', [{'left':'sort', 'operator':'>', 'right':'10'}], 'attr');
+      assert.equal(_actual, '');
+    });
+    it('should return a string which contain an "if-condition"', function(){
+      var _conditions = [
+        {'left':'sort', 'operator':'>', 'right':'10'}
+      ];
+      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      assert.equal(_actual, 'if((myObj && myObj["sort"]>10)){\n code;\n }');
+    });
+    it('should accept multiple conditions', function(){
+      var _conditions = [
+        {'left':'sort', 'operator':'>', 'right':'10'},
+        {'left':'id', 'operator':'<', 'right':'15'}
+      ];
+      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      assert.equal(_actual, 'if((myObj && myObj["sort"]>10 && myObj["id"]<15)){\n code;\n }');
+    });
+    it('should accept than the left part of the condition is in an object', function(){
+      var _conditions = [
+        {'left':'menu.sort', 'operator':'>', 'right':'10'},
+      ];
+      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif((_menu_filter && _menu_filter["sort"]>10)){\n code;\n }');
+    });
+    it('should add a prefix on the declared variable', function(){
+      var _conditions = [
+        {'left':'menu.sort', 'operator':'>', 'right':'10'},
+      ];
+      var _actual = builder.getFilterString('myObj', _conditions, 'code', 'prefix');
+      assert.equal(_actual, 'var _prefixmenu_filter=myObj["menu"];\nif((_prefixmenu_filter && _prefixmenu_filter["sort"]>10)){\n code;\n }');
+    });
+    it('should not declare the same variable twice if there are two conditions on the same variable', function(){
+      var _conditions = [
+        {'left':'menu.sort', 'operator':'>', 'right':'10'},
+        {'left':'menu.sort', 'operator':'<', 'right':'20'},
+      ];
+      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif((_menu_filter && _menu_filter["sort"]>10 && _menu_filter["sort"]<20)){\n code;\n }');
+    });
+    it('should iverse the condition', function(){
+      var _conditions = [
+        {'left':'menu.sort', 'operator':'>', 'right':'10'},
+        {'left':'menu.sort', 'operator':'<', 'right':'20'},
+      ];
+      var _actual = builder.getFilterString('myObj', _conditions, 'code', '', true);
+      assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif(!(_menu_filter && _menu_filter["sort"]>10 && _menu_filter["sort"]<20)){\n code;\n }');
+    });
+    it('should accept multiple conditions nested in an object', function(){
+      var _conditions = [
+        {'left':'menu.sort', 'operator':'>', 'right':'10'},
+        {'left':'car.sort', 'operator':'<', 'right':'20'},
+      ];
+      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      assert.equal(_actual, 
+        'var _menu_filter=myObj["menu"];\n'+
+        'var _car_filter=myObj["car"];\n'+
+        'if((_menu_filter && _menu_filter["sort"]>10 && _car_filter && _car_filter["sort"]<20)){\n'+
+        ' code;\n }'
+      );
+    });
+  });
+
   describe('sortXmlParts', function(){
     it('should sort the array with a depth of 1 by default', function(){
       var _data     = [{'pos':[40]}, {'pos':[19]}, {'pos':[2 ]}, {'pos':[20]}];
@@ -170,7 +241,7 @@ describe('builder', function(){
       ];
       helper.assert(builder.assembleXmlParts(_data, 3), '123456');
     });
-    it('should sort a complex array and assemble all strings', function(){
+    it('should sort a complex array and assemble all strings. It should keep all the parts if rowShow,rowStart,rowEnd are undefined', function(){
       var _data     = [ 
         { 'pos': [ 0        ], 'str': '<xml>' },
         { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
@@ -186,7 +257,7 @@ describe('builder', function(){
       ];
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml><tr>Lumeneo</tr><tr>Tesla motors</tr><tr>Toyota</tr></xml>');
     });
-    it('should accept to sort strings', function(){
+    it('should accept to sort strings.', function(){
       var _data     = [ 
         { 'pos': [ 0           ], 'str': '<xml>' },
         { 'pos': [ 6, 'ab', 14 ], 'str': 'Tesla motors' },
@@ -201,6 +272,56 @@ describe('builder', function(){
         { 'pos': [ 24          ], 'str': '</xml>' } 
       ];
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml><tr>Lumeneo</tr><tr>Tesla motors</tr><tr>Toyota</tr></xml>');
+    });
+    it('should remove the entire row of an array if all attributes "rowShow" equals false', function(){
+      var _data     = [
+        { pos:[ 0        ], str: '<xml> '                   },
+        { pos:[ 6, 0, 6  ], str: '<tr><p>'  , rowStart:true },
+        { pos:[ 6, 0, 13 ], str: 'Thomas'   , rowShow:true  },
+        { pos:[ 6, 0, 29 ], str: '</p></tr>', rowEnd:true   },
+        { pos:[ 6, 1, 6  ] , str: '<tr><p>' , rowStart:true },
+        { pos:[ 6, 1, 13 ], str: 'Trinity'  , rowShow:false },
+        { pos:[ 6, 1, 29 ], str: '</p></tr>', rowEnd:true   },
+        { pos:[ 30       ], str: ' </xml>'                  }
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 3), '<xml> <tr><p>Thomas</p></tr> </xml>');
+    });
+    it('should remove all rows if rowShow is undefined', function(){
+      var _data     = [
+        { pos:[ 0        ], str: '<xml> '                   },
+        { pos:[ 6, 0, 6  ], str: '<tr><p>'  , rowStart:true },
+        { pos:[ 6, 0, 13 ], str: 'Thomas'                   },
+        { pos:[ 6, 0, 29 ], str: '</p></tr>', rowEnd:true   },
+        { pos:[ 6, 1, 6  ] , str: '<tr><p>' , rowStart:true },
+        { pos:[ 6, 1, 13 ], str: 'Trinity'                  },
+        { pos:[ 6, 1, 29 ], str: '</p></tr>', rowEnd:true   },
+        { pos:[ 30       ], str: ' </xml>'                  }
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 3), '<xml>  </xml>');
+    });
+    it('should remove (nested array) the entire row of an array if all attributes "rowShow" equals false', function(){
+      var _data     = [ 
+        { pos: [ 0               ], str: '<xml> '             },
+        { pos: [ 6, 0, 6         ], str: '<tr><p>'            ,rowStart:true},
+        { pos: [ 6, 0, 13        ], str: 'Thomas'             ,rowShow:false},
+        { pos: [ 6, 0, 20        ], str: '</p><p>A. Anderson' ,rowShow:false},
+        { pos: [ 6, 0, 20, 0, 20 ], str: '<tr>'               ,rowStart:true},
+        { pos: [ 6, 0, 20, 0, 24 ], str: 'survive'            ,rowShow:false},
+        { pos: [ 6, 0, 20, 0, 29 ], str: '</tr>'              ,rowEnd:true},
+        { pos: [ 6, 0, 20, 1, 20 ], str: '<tr>'               ,rowStart:true},
+        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls'  ,rowShow:true}, // <-- at least one part to keep 
+        { pos: [ 6, 0, 20, 1, 29 ], str: '</tr>'              ,rowEnd:true},
+        { pos: [ 6, 0, 38        ], str: '</p></tr>'          ,rowEnd:true},
+        { pos: [ 6, 1, 6         ], str: '<tr><p>'            ,rowStart:true},
+        { pos: [ 6, 1, 13        ], str: 'Trinity'            ,rowShow:false},
+        { pos: [ 6, 1, 20        ], str: '</p><p>Unknown'     ,rowShow:false},
+        { pos: [ 6, 1, 20, 0, 20 ], str: '<tr>'               ,rowStart:true},
+        { pos: [ 6, 1, 20, 0, 24 ], str: 'hack'               ,rowShow:false},
+        { pos: [ 6, 1, 20, 0, 29 ], str: '</tr>'              ,rowEnd:true},
+        { pos: [ 6, 1, 38        ], str: '</p></tr>'          ,rowEnd:true},
+        { pos: [ 39              ], str: ' </xml>'            } 
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 5), '<xml> <tr><p>Thomas</p><p>A. Anderson<tr>walk on the walls</tr></p></tr> </xml>');
     });
   });
 
@@ -442,16 +563,54 @@ describe('builder', function(){
       ];
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
-        { pos:[ 0        ], str: '<xml> '},
-        { pos:[ 6, 0, 6 ], str: '<tr><p>'},
-        { pos:[ 6, 0, 13 ], str: 'Thomas'},
-        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson'},
-        { pos:[ 6, 0, 29 ], str: '</p></tr>'},
-        { pos:[ 6, 1, 6 ] , str: '<tr><p>'},
-        { pos:[ 6, 1, 13 ], str: 'Trinity'},
-        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown'},
-        { pos:[ 6, 1, 29 ], str: '</p></tr>'},
-        { pos:[ 30       ], str: ' </xml>' }
+        { pos:[ 0        ], str: '<xml> '                           },
+        { pos:[ 6, 0, 6 ], str: '<tr><p>'            , rowStart:true},
+        { pos:[ 6, 0, 13 ], str: 'Thomas'            , rowShow:true },
+        { pos:[ 6, 0, 20 ], str: '</p><p>A. Anderson', rowShow:true },
+        { pos:[ 6, 0, 29 ], str: '</p></tr>'         , rowEnd:true  },
+        { pos:[ 6, 1, 6 ] , str: '<tr><p>'           , rowStart:true},
+        { pos:[ 6, 1, 13 ], str: 'Trinity'           , rowShow:true },
+        { pos:[ 6, 1, 20 ], str: '</p><p>Unknown'    , rowShow:true },
+        { pos:[ 6, 1, 29 ], str: '</p></tr>'         , rowEnd:true  },
+        { pos:[ 30       ], str: ' </xml>'                          }
+      ]);
+    });
+    it('should insert an empty string and set rowShow=false if the condition is not satisfied', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<xml> ',
+          'after' :' </xml>'
+        },
+        'hierarchy'   : ['d'],
+        'dynamicData' : {
+          'd':{
+            'name':'',
+            'parent' : '',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 6, 'end' :29},
+            'xmlParts' : [
+              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1                          , 'conditions':[{'left':'show', 'operator':'==', 'right':'1'}] },
+              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
+            ]
+          }
+        }
+      };
+      var _data = [
+        {'firstname':'Thomas' ,  'lastname':'A. Anderson', 'show':'0'},
+        {'firstname':'Trinity',  'lastname':'Unknown'    , 'show':'1'}
+      ];
+      var _fn = builder.getBuilderFunction(_desc);
+      helper.assert(_fn(_data), [
+        { pos:[ 0        ], str: '<xml> '                  },
+        { pos:[ 6, 0, 6 ], str: '<tr><p>'   , rowStart:true},
+        { pos:[ 6, 0, 13 ], str: ''         , rowShow:false},
+        { pos:[ 6, 0, 29 ], str: '</p></tr>', rowEnd:true  },
+        { pos:[ 6, 1, 6 ] , str: '<tr><p>'  , rowStart:true},
+        { pos:[ 6, 1, 13 ], str: 'Trinity'  , rowShow:true },
+        { pos:[ 6, 1, 29 ], str: '</p></tr>', rowEnd:true  },
+        { pos:[ 30       ], str: ' </xml>'                 }
       ]);
     });
     it('should work if there is an object in the array', function(){
@@ -492,18 +651,18 @@ describe('builder', function(){
       ];
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [ 
-        { pos: [ 0        ], str: '<xml> ' },
-        { pos: [ 6, 0, 6  ], str: '<tr>' },
-        { pos: [ 6, 0, 10 ], str: 'Thomas' },
-        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson' },
-        { pos: [ 6, 0, 29 ], str: '</p></tr>' },
-        { pos: [ 6, 0, 13 ], str: '<p>matrix' },
-        { pos: [ 6, 1, 6  ], str: '<tr>' },
-        { pos: [ 6, 1, 10 ], str: 'Trinity' },
-        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown' },
-        { pos: [ 6, 1, 29 ], str: '</p></tr>' },
-        { pos: [ 6, 1, 13 ], str: '<p>matrix2' },
-        { pos: [ 30       ], str: ' </xml>' } 
+        { pos: [ 0        ], str: '<xml> '                            },
+        { pos: [ 6, 0, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 0, 10 ], str: 'Thomas'             , rowShow:true },
+        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson' , rowShow:true },
+        { pos: [ 6, 0, 29 ], str: '</p></tr>'          , rowEnd:true  },
+        { pos: [ 6, 0, 13 ], str: '<p>matrix'          , rowShow:true },
+        { pos: [ 6, 1, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 1, 10 ], str: 'Trinity'            , rowShow:true },
+        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown'     , rowShow:true },
+        { pos: [ 6, 1, 29 ], str: '</p></tr>'          , rowEnd:true  },
+        { pos: [ 6, 1, 13 ], str: '<p>matrix2'         , rowShow:true },
+        { pos: [ 30       ], str: ' </xml>'                           } 
       ]);
     });
     it('should work if there are three nested objects in the array (with one missing object in the last row) ', function(){
@@ -579,22 +738,22 @@ describe('builder', function(){
       ];
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [ 
-        { pos: [ 0        ], str: '<xml> ' },
-        { pos: [ 6, 0, 6  ], str: '<tr>' },
-        { pos: [ 6, 0, 10 ], str: 'Thomas' },
-        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson' },
-        { pos: [ 6, 0, 29 ], str: '</p></tr>' },
-        { pos: [ 6, 0, 13 ], str: '<p>matrix' },
-        { pos: [ 6, 0, 14 ], str: 'sf' },
-        { pos: [ 6, 0, 15 ], str: '10' },
-        { pos: [ 6, 1, 6  ], str: '<tr>' },
-        { pos: [ 6, 1, 10 ], str: 'Trinity' },
-        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown' },
-        { pos: [ 6, 1, 29 ], str: '</p></tr>' },
-        { pos: [ 6, 1, 13 ], str: '<p>matrix2' },
-        { pos: [ 6, 1, 14 ], str: 'sf2' },
-        { pos: [ 6, 1, 15 ], str: '' },
-        { pos: [ 30       ], str: ' </xml>' } 
+        { pos: [ 0        ], str: '<xml> '                            },
+        { pos: [ 6, 0, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 0, 10 ], str: 'Thomas'             , rowShow:true },
+        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson' , rowShow:true },
+        { pos: [ 6, 0, 29 ], str: '</p></tr>'          , rowEnd:true  },
+        { pos: [ 6, 0, 13 ], str: '<p>matrix'          , rowShow:true },
+        { pos: [ 6, 0, 14 ], str: 'sf'                 , rowShow:true },
+        { pos: [ 6, 0, 15 ], str: '10'                 , rowShow:true },
+        { pos: [ 6, 1, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 1, 10 ], str: 'Trinity'            , rowShow:true },
+        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown'     , rowShow:true },
+        { pos: [ 6, 1, 29 ], str: '</p></tr>'          , rowEnd:true  },
+        { pos: [ 6, 1, 13 ], str: '<p>matrix2'         , rowShow:true },
+        { pos: [ 6, 1, 14 ], str: 'sf2'                , rowShow:true },
+        { pos: [ 6, 1, 15 ], str: ''                   , rowShow:true },
+        { pos: [ 30       ], str: ' </xml>'                           } 
       ]);
     });
     it('should work if there are two adjacents array of objects', function(){
@@ -649,20 +808,20 @@ describe('builder', function(){
       };
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [ 
-        { pos: [ 0         ], str: '<xml> ' },
-        { pos: [ 6 , 0, 6  ], str: '<tr>' },
-        { pos: [ 6 , 0, 10 ], str: 'matrix' },
-        { pos: [ 6 , 0, 15 ], str: '</tr>' },
-        { pos: [ 6 , 1, 6  ], str: '<tr>' },
-        { pos: [ 6 , 1, 10 ], str: 'Lord of War' },
-        { pos: [ 6 , 1, 15 ], str: '</tr>' },
-        { pos: [ 20, 0, 20 ], str: '<trow>' },
-        { pos: [ 20, 0, 24 ], str: 'Lumeneo' },
-        { pos: [ 20, 0, 29 ], str: '</trow>' },
-        { pos: [ 20, 1, 20 ], str: '<trow>' },
-        { pos: [ 20, 1, 24 ], str: 'Tesla motors' },
-        { pos: [ 20, 1, 29 ], str: '</trow>' },
-        { pos: [ 30        ], str: ' </xml>' } 
+        { pos: [ 0         ], str: '<xml> '                            },
+        { pos: [ 6 , 0, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6 , 0, 10 ], str: 'matrix'             , rowShow:true },
+        { pos: [ 6 , 0, 15 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 6 , 1, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6 , 1, 10 ], str: 'Lord of War'        , rowShow:true },
+        { pos: [ 6 , 1, 15 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 20, 0, 20 ], str: '<trow>'             , rowStart:true},
+        { pos: [ 20, 0, 24 ], str: 'Lumeneo'            , rowShow:true },
+        { pos: [ 20, 0, 29 ], str: '</trow>'            , rowEnd:true  },
+        { pos: [ 20, 1, 20 ], str: '<trow>'             , rowStart:true},
+        { pos: [ 20, 1, 24 ], str: 'Tesla motors'       , rowShow:true },
+        { pos: [ 20, 1, 29 ], str: '</trow>'            , rowEnd:true  },
+        { pos: [ 30        ], str: ' </xml>'                           } 
       ]);
     });
     it('should work if there are some xml between two adjacents arrays', function(){
@@ -719,22 +878,22 @@ describe('builder', function(){
       };
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [ 
-        { pos: [ 0         ], str: '<xml> ' },
-        { pos: [ 6         ], str: '<T>' },
-        { pos: [ 6 , 0, 6  ], str: '<tr>' },
-        { pos: [ 6 , 0, 10 ], str: 'matrix' },
-        { pos: [ 6 , 0, 15 ], str: '</tr>' },
-        { pos: [ 6 , 1, 6  ], str: '<tr>' },
-        { pos: [ 6 , 1, 10 ], str: 'Lord of War' },
-        { pos: [ 6 , 1, 15 ], str: '</tr>' },
-        { pos: [ 20        ], str: '<T2>' },
-        { pos: [ 20, 0, 20 ], str: '<trow>' },
-        { pos: [ 20, 0, 24 ], str: 'Lumeneo' },
-        { pos: [ 20, 0, 29 ], str: '</trow>' },
-        { pos: [ 20, 1, 20 ], str: '<trow>' },
-        { pos: [ 20, 1, 24 ], str: 'Tesla motors' },
-        { pos: [ 20, 1, 29 ], str: '</trow>' },
-        { pos: [ 30        ], str: ' </xml>' } 
+        { pos: [ 0         ], str: '<xml> '                            },
+        { pos: [ 6         ], str: '<T>'                               },
+        { pos: [ 6 , 0, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6 , 0, 10 ], str: 'matrix'             , rowShow:true },
+        { pos: [ 6 , 0, 15 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 6 , 1, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6 , 1, 10 ], str: 'Lord of War'        , rowShow:true },
+        { pos: [ 6 , 1, 15 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 20        ], str: '<T2>'               ,              },
+        { pos: [ 20, 0, 20 ], str: '<trow>'             , rowStart:true},
+        { pos: [ 20, 0, 24 ], str: 'Lumeneo'            , rowShow:true },
+        { pos: [ 20, 0, 29 ], str: '</trow>'            , rowEnd:true  },
+        { pos: [ 20, 1, 20 ], str: '<trow>'             , rowStart:true},
+        { pos: [ 20, 1, 24 ], str: 'Tesla motors'       , rowShow:true },
+        { pos: [ 20, 1, 29 ], str: '</trow>'            , rowEnd:true  },
+        { pos: [ 30        ], str: ' </xml>'                           } 
       ]);
     });
     it('should manage nested arrays', function(){
@@ -791,24 +950,24 @@ describe('builder', function(){
       var _xmlParts = _fn(_data);
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [ 
-        { pos: [ 0               ], str: '<xml> ' },
-        { pos: [ 6, 0, 6         ], str: '<tr><p>' },
-        { pos: [ 6, 0, 13        ], str: 'Thomas' },
-        { pos: [ 6, 0, 20        ], str: '</p><p>A. Anderson' },
-        { pos: [ 6, 0, 20, 0, 20 ], str: '<tr>' },
-        { pos: [ 6, 0, 20, 0, 24 ], str: 'survive' },
-        { pos: [ 6, 0, 20, 0, 29 ], str: '</tr>' },
-        { pos: [ 6, 0, 20, 1, 20 ], str: '<tr>' },
-        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls' },
-        { pos: [ 6, 0, 20, 1, 29 ], str: '</tr>' },
-        { pos: [ 6, 0, 38        ], str: '</p></tr>' },
-        { pos: [ 6, 1, 6         ], str: '<tr><p>' },
-        { pos: [ 6, 1, 13        ], str: 'Trinity' },
-        { pos: [ 6, 1, 20        ], str: '</p><p>Unknown' },
-        { pos: [ 6, 1, 20, 0, 20 ], str: '<tr>' },
-        { pos: [ 6, 1, 20, 0, 24 ], str: 'hack' },
-        { pos: [ 6, 1, 20, 0, 29 ], str: '</tr>' },
-        { pos: [ 6, 1, 38        ], str: '</p></tr>' },
+        { pos: [ 0               ], str: '<xml> '                            },
+        { pos: [ 6, 0, 6         ], str: '<tr><p>'            , rowStart:true},
+        { pos: [ 6, 0, 13        ], str: 'Thomas'             , rowShow:true },
+        { pos: [ 6, 0, 20        ], str: '</p><p>A. Anderson' , rowShow:true },
+        { pos: [ 6, 0, 20, 0, 20 ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 0, 20, 0, 24 ], str: 'survive'            , rowShow:true },
+        { pos: [ 6, 0, 20, 0, 29 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 6, 0, 20, 1, 20 ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls'  , rowShow:true },
+        { pos: [ 6, 0, 20, 1, 29 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 6, 0, 38        ], str: '</p></tr>'          , rowEnd:true  },
+        { pos: [ 6, 1, 6         ], str: '<tr><p>'            , rowStart:true},
+        { pos: [ 6, 1, 13        ], str: 'Trinity'            , rowShow:true },
+        { pos: [ 6, 1, 20        ], str: '</p><p>Unknown'     , rowShow:true },
+        { pos: [ 6, 1, 20, 0, 20 ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 1, 20, 0, 24 ], str: 'hack'               , rowShow:true },
+        { pos: [ 6, 1, 20, 0, 29 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 6, 1, 38        ], str: '</p></tr>'          , rowEnd:true  },
         { pos: [ 39              ], str: ' </xml>' } ]
       );
     });
@@ -888,36 +1047,36 @@ describe('builder', function(){
       var _xmlParts = _fn(_data);
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [ 
-        { pos: [ 0 ], str: '<xml> ' },
-        { pos: [ 6, 0, 6 ], str: '<tr><p>' },
-        { pos: [ 6, 0, 13 ], str: 'Thomas' },
-        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson' },
-        { pos: [ 6, 0, 20, 0, 20 ], str: '<tr>' },
-        { pos: [ 6, 0, 20, 0, 24 ], str: 'survive' },
-        { pos: [ 6, 0, 20, 0, 25 ], str: '<days>' },
-        { pos: [ 6, 0, 20, 0, 25, 0, 25 ], str: '<d>' },
-        { pos: [ 6, 0, 20, 0, 25, 0, 28 ], str: 'monday' },
-        { pos: [ 6, 0, 20, 0, 25, 0, 34 ], str: '</d>' },
-        { pos: [ 6, 0, 20, 0, 25, 1, 25 ], str: '<d>' },
-        { pos: [ 6, 0, 20, 0, 25, 1, 28 ], str: 'thursday' },
-        { pos: [ 6, 0, 20, 0, 25, 1, 34 ], str: '</d>' },
-        { pos: [ 6, 0, 20, 0, 25, 2, 25 ], str: '<d>' },
-        { pos: [ 6, 0, 20, 0, 25, 2, 28 ], str: 'friday' },
-        { pos: [ 6, 0, 20, 0, 25, 2, 34 ], str: '</d>' },
-        { pos: [ 6, 0, 20, 0, 39 ], str: '</tr>' },
-        { pos: [ 6, 0, 20, 1, 20 ], str: '<tr>' },
-        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls' },
-        { pos: [ 6, 0, 20, 1, 25 ], str: '<days>' },
-        { pos: [ 6, 0, 20, 1, 39 ], str: '</tr>' },
-        { pos: [ 6, 0, 48 ], str: '</p></tr>' },
-        { pos: [ 6, 1, 6 ], str: '<tr><p>' },
-        { pos: [ 6, 1, 13 ], str: 'Trinity' },
-        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown' },
-        { pos: [ 6, 1, 20, 0, 20 ], str: '<tr>' },
-        { pos: [ 6, 1, 20, 0, 24 ], str: 'hack' },
-        { pos: [ 6, 1, 20, 0, 25 ], str: '<days>' },
-        { pos: [ 6, 1, 20, 0, 39 ], str: '</tr>' },
-        { pos: [ 6, 1, 48 ], str: '</p></tr>' },
+        { pos: [ 0 ], str: '<xml> '                                          },
+        { pos: [ 6, 0, 6 ], str: '<tr><p>'                    , rowStart:true},
+        { pos: [ 6, 0, 13 ], str: 'Thomas'                    , rowShow:true },
+        { pos: [ 6, 0, 20 ], str: '</p><p>A. Anderson'        , rowShow:true },
+        { pos: [ 6, 0, 20, 0, 20 ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 0, 20, 0, 24 ], str: 'survive'            , rowShow:true },
+        { pos: [ 6, 0, 20, 0, 25 ], str: '<days>'                            },
+        { pos: [ 6, 0, 20, 0, 25, 0, 25 ], str: '<d>'         , rowStart:true},
+        { pos: [ 6, 0, 20, 0, 25, 0, 28 ], str: 'monday'      , rowShow:true },
+        { pos: [ 6, 0, 20, 0, 25, 0, 34 ], str: '</d>'        , rowEnd:true  },
+        { pos: [ 6, 0, 20, 0, 25, 1, 25 ], str: '<d>'         , rowStart:true},
+        { pos: [ 6, 0, 20, 0, 25, 1, 28 ], str: 'thursday'    , rowShow:true },
+        { pos: [ 6, 0, 20, 0, 25, 1, 34 ], str: '</d>'        , rowEnd:true  },
+        { pos: [ 6, 0, 20, 0, 25, 2, 25 ], str: '<d>'         , rowStart:true},
+        { pos: [ 6, 0, 20, 0, 25, 2, 28 ], str: 'friday'      , rowShow:true },
+        { pos: [ 6, 0, 20, 0, 25, 2, 34 ], str: '</d>'        , rowEnd:true  },
+        { pos: [ 6, 0, 20, 0, 39 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 6, 0, 20, 1, 20 ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls'  , rowShow:true },
+        { pos: [ 6, 0, 20, 1, 25 ], str: '<days>'                            },
+        { pos: [ 6, 0, 20, 1, 39 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 6, 0, 48 ], str: '</p></tr>'                 , rowEnd:true  },
+        { pos: [ 6, 1, 6 ], str: '<tr><p>'                    , rowStart:true},
+        { pos: [ 6, 1, 13 ], str: 'Trinity'                   , rowShow:true },
+        { pos: [ 6, 1, 20 ], str: '</p><p>Unknown'            , rowShow:true },
+        { pos: [ 6, 1, 20, 0, 20 ], str: '<tr>'               , rowStart:true},
+        { pos: [ 6, 1, 20, 0, 24 ], str: 'hack'               , rowShow:true },
+        { pos: [ 6, 1, 20, 0, 25 ], str: '<days>'                            },
+        { pos: [ 6, 1, 20, 0, 39 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 6, 1, 48 ], str: '</p></tr>'                 , rowEnd:true  },
         { pos: [ 49 ], str: ' </xml>' } ]
       );
     });
@@ -950,14 +1109,14 @@ describe('builder', function(){
       ];
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
-        { pos:[ 0            ], str: '<xml> '},
-        { pos:[ 6, 31, 0, 6  ], str: '<tr>'},
-        { pos:[ 6, 31, 0, 13 ], str: 'Thomas'},
-        { pos:[ 6, 31, 0, 29 ], str: '</tr>'},
-        { pos:[ 6, 11, 1, 6  ], str: '<tr>'},
-        { pos:[ 6, 11, 1, 13 ], str: 'Trinity'},
-        { pos:[ 6, 11, 1, 29 ], str: '</tr>'},
-        { pos:[ 30           ], str: ' </xml>' }
+        { pos:[ 0            ], str: '<xml> '                   },
+        { pos:[ 6, 31, 0, 6  ], str: '<tr>'      , rowStart:true},
+        { pos:[ 6, 31, 0, 13 ], str: 'Thomas'    , rowShow:true },
+        { pos:[ 6, 31, 0, 29 ], str: '</tr>'     , rowEnd:true  },
+        { pos:[ 6, 11, 1, 6  ], str: '<tr>'      , rowStart:true},
+        { pos:[ 6, 11, 1, 13 ], str: 'Trinity'   , rowShow:true },
+        { pos:[ 6, 11, 1, 29 ], str: '</tr>'     , rowEnd:true  },
+        { pos:[ 30           ], str: ' </xml>'                  }
       ]);
     });
     it('should work even if the custom iterator is inside an object', function(){
@@ -989,14 +1148,14 @@ describe('builder', function(){
       ];
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
-        { pos:[ 0              ], str: '<xml> '},
-        { pos:[ 6, 31, 0, 6  ], str: '<tr>'},
-        { pos:[ 6, 31, 0, 13 ], str: 'Thomas'},
-        { pos:[ 6, 31, 0, 29 ], str: '</tr>'},
-        { pos:[ 6, 11, 1, 6  ], str: '<tr>'},
-        { pos:[ 6, 11, 1, 13 ], str: 'Trinity'},
-        { pos:[ 6, 11, 1, 29 ], str: '</tr>'},
-        { pos:[ 30             ], str: ' </xml>' }
+        { pos:[ 0              ], str: '<xml> '                 },
+        { pos:[ 6, 31, 0, 6  ], str: '<tr>'      , rowStart:true},
+        { pos:[ 6, 31, 0, 13 ], str: 'Thomas'    , rowShow:true },
+        { pos:[ 6, 31, 0, 29 ], str: '</tr>'     , rowEnd:true  },
+        { pos:[ 6, 11, 1, 6  ], str: '<tr>'      , rowStart:true},
+        { pos:[ 6, 11, 1, 13 ], str: 'Trinity'   , rowShow:true },
+        { pos:[ 6, 11, 1, 29 ], str: '</tr>'     , rowEnd:true  },
+        { pos:[ 30             ], str: ' </xml>'                }
       ]);
     });
     it('should work even with two nested arrays used in the inverse order. TODO: IMPROVE', function(){
@@ -1054,38 +1213,38 @@ describe('builder', function(){
       var _xmlParts = _fn(_data);
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [ 
-        { pos: [ 0              ], str: '<xml> ' },
-        { pos: [ 6, 0, 6        ], str: '<tr>' },
-        { pos: [ 6, 0, 6        ], str: '<tr>' },
-        { pos: [ 6, 0, 6, 0, 13 ], str: '<td>' },
-        { pos: [ 6, 0, 6, 0, 15 ], str: 'skill1_1' },
-        { pos: [ 6, 0, 6, 0, 22 ], str: '</td>' },
-        { pos: [ 6, 0, 6, 1, 13 ], str: '<td>' },
-        { pos: [ 6, 0, 6, 1, 15 ], str: 'skill2_1' },
-        { pos: [ 6, 0, 6, 1, 22 ], str: '</td>' },
-        { pos: [ 6, 0, 38       ], str: '</tr>' },
-        { pos: [ 6, 0, 38       ], str: '</tr>' },
-        { pos: [ 6, 1, 6        ], str: '<tr>' },
-        { pos: [ 6, 1, 6        ], str: '<tr>' },
-        { pos: [ 6, 1, 6, 0, 13 ], str: '<td>' },
-        { pos: [ 6, 1, 6, 0, 15 ], str: 'skill1_2' },
-        { pos: [ 6, 1, 6, 0, 22 ], str: '</td>' },
-        { pos: [ 6, 1, 6, 1, 13 ], str: '<td>' },
-        { pos: [ 6, 1, 6, 1, 15 ], str: 'skill2_2' },
-        { pos: [ 6, 1, 6, 1, 22 ], str: '</td>' },
-        { pos: [ 6, 1, 38       ], str: '</tr>' },
-        { pos: [ 6, 1, 38       ], str: '</tr>' },
-        { pos: [ 6, 2, 6        ], str: '<tr>' },
-        { pos: [ 6, 2, 6        ], str: '<tr>' },
-        { pos: [ 6, 2, 6, 0, 13 ], str: '<td>' },
-        { pos: [ 6, 2, 6, 0, 15 ], str: 'skill1_3' },
-        { pos: [ 6, 2, 6, 0, 22 ], str: '</td>' },
-        { pos: [ 6, 2, 6, 1, 13 ], str: '<td>' },
-        { pos: [ 6, 2, 6, 1, 15 ], str: 'skill2_3' },
-        { pos: [ 6, 2, 6, 1, 22 ], str: '</td>' },
-        { pos: [ 6, 2, 38       ], str: '</tr>' },
-        { pos: [ 6, 2, 38       ], str: '</tr>' },
-        { pos: [ 39            ], str: ' </xml>' } 
+        { pos: [ 0              ], str: '<xml> '                   },
+        { pos: [ 6, 0, 6        ], str: '<tr>'      , rowStart:true},
+        { pos: [ 6, 0, 6        ], str: '<tr>'      , rowStart:true},
+        { pos: [ 6, 0, 6, 0, 13 ], str: '<td>'      , rowStart:true},
+        { pos: [ 6, 0, 6, 0, 15 ], str: 'skill1_1'  , rowShow:true },
+        { pos: [ 6, 0, 6, 0, 22 ], str: '</td>'     , rowEnd:true  },
+        { pos: [ 6, 0, 6, 1, 13 ], str: '<td>'      , rowStart:true},
+        { pos: [ 6, 0, 6, 1, 15 ], str: 'skill2_1'  , rowShow:true },
+        { pos: [ 6, 0, 6, 1, 22 ], str: '</td>'     , rowEnd:true  },
+        { pos: [ 6, 0, 38       ], str: '</tr>'     , rowEnd:true  },
+        { pos: [ 6, 0, 38       ], str: '</tr>'     , rowEnd:true  },
+        { pos: [ 6, 1, 6        ], str: '<tr>'      , rowStart:true},
+        { pos: [ 6, 1, 6        ], str: '<tr>'      , rowStart:true},
+        { pos: [ 6, 1, 6, 0, 13 ], str: '<td>'      , rowStart:true},
+        { pos: [ 6, 1, 6, 0, 15 ], str: 'skill1_2'  , rowShow:true },
+        { pos: [ 6, 1, 6, 0, 22 ], str: '</td>'     , rowEnd:true  },
+        { pos: [ 6, 1, 6, 1, 13 ], str: '<td>'      , rowStart:true},
+        { pos: [ 6, 1, 6, 1, 15 ], str: 'skill2_2'  , rowShow:true },
+        { pos: [ 6, 1, 6, 1, 22 ], str: '</td>'     , rowEnd:true  },
+        { pos: [ 6, 1, 38       ], str: '</tr>'     , rowEnd:true  },
+        { pos: [ 6, 1, 38       ], str: '</tr>'     , rowEnd:true  },
+        { pos: [ 6, 2, 6        ], str: '<tr>'      , rowStart:true},
+        { pos: [ 6, 2, 6        ], str: '<tr>'      , rowStart:true},
+        { pos: [ 6, 2, 6, 0, 13 ], str: '<td>'      , rowStart:true},
+        { pos: [ 6, 2, 6, 0, 15 ], str: 'skill1_3'  , rowShow:true },
+        { pos: [ 6, 2, 6, 0, 22 ], str: '</td>'     , rowEnd:true  },
+        { pos: [ 6, 2, 6, 1, 13 ], str: '<td>'      , rowStart:true},
+        { pos: [ 6, 2, 6, 1, 15 ], str: 'skill2_3'  , rowShow:true },
+        { pos: [ 6, 2, 6, 1, 22 ], str: '</td>'     , rowEnd:true  },
+        { pos: [ 6, 2, 38       ], str: '</tr>'     , rowEnd:true  },
+        { pos: [ 6, 2, 38       ], str: '</tr>'     , rowEnd:true  },
+        { pos: [ 39            ], str: ' </xml>'                   } 
       ]);
     });
 

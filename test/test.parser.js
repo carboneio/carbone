@@ -133,6 +133,12 @@ describe('parser', function(){
       _str = '<h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> ';
       helper.assert(parser.findPivot(_str), {'tag':'</tr> <tr A>', 'pos': 55 });
     });
+    it('should detect the pivot point even if the repetition is not an array or list', function(){
+      var _str = '</h1> <h1></h1> <h1></h1> <h1></h1> <h1> <h2>';
+      helper.assert(parser.findPivot(_str), {'tag':'</h1> <h1>', 'pos': 35 });
+      var _str = '</h1> <h1></h1> <h1></h1> <h3></h3> <h1> <h2>';
+      helper.assert(parser.findPivot(_str), {'tag':'</h3> <h1>', 'pos': 35 });
+    });
   });
 
   describe('findRepetitionPosition', function(){

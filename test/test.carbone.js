@@ -178,6 +178,50 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
     });
+    it('should manage two adjacents arrays within an array. It should accept partial repetitions (only {d[i+1].site.label} is set)', function(){
+      var _xml = 
+         '<xml>'
+        +  '<table>'
+        +  '<h1>{d[i].site.label}</h1>'
+        +  '<cell><t_row>{d[i].cars[i].size}</t_row>'
+        +  '<t_row>{d[i].cars[i+1].size}</t_row></cell>'
+        +  '<cell><t_row>{d[i].trucks[i].size}</t_row>'
+        +  '<t_row>{d[i].trucks[i+1].size}</t_row></cell>'
+        +  '</table>'
+        +  '<table>'
+        +  '<h1>{d[i+1].site.label}</h1>'
+        +  '</table>'
+        +'</xml>';
+      var _data = [{
+        'site' : {'label':'site_A'},
+        'cars' : [ {'size': 'A'}, {'size': 'B'}  ],
+        'trucks' : [ {'size': 'X'} ]
+      }];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><table><h1>site_A</h1><cell><t_row>A</t_row><t_row>B</t_row></cell><cell><t_row>X</t_row></cell></table></xml>');
+    });
+    it('should manage nested object with two adjacents arrays within an array. It should accept partial repetitions (only {d[i+1].site.label} is set)', function(){
+      var _xml = 
+         '<xml>'
+        +  '<table>'
+        +  '<h1>{d[i].site.label}</h1>'
+        +  '<cell><t_row><td>{d[i].cars[i].size}</td><td>{d[i].cars[i].spec.qty}</td></t_row>'
+        +  '<t_row><td>{d[i].cars[i+1].size}</td><td>{d[i].cars[i+1].spec.qty}</td></t_row></cell>'
+        +  '<cell><t_row><td>{d[i].trucks[i].size}</td></t_row>'
+        +  '<t_row><td>{d[i].trucks[i+1].size}</td></t_row></cell>'
+        +  '</table>'
+        +  '<table>'
+        +  '<h1>{d[i+1].site.label}</h1>'
+        +  '</table>'
+        +'</xml>';
+      var _data = [{
+        'site' : {'label':'site_A'},
+        'cars' : [ {'size': 'A', 'spec':{'qty': 1}}, {'size': 'B', 'spec':{'qty': 2}}  ],
+        'trucks' : [ {'size': 'X'} ]
+      }];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><table><h1>site_A</h1><cell><t_row><td>A</td><td>1</td></t_row><t_row><td>B</td><td>2</td></t_row></cell><cell><t_row><td>X</td></t_row></cell></table></xml>');
+    });
     it('should manage nested arrays with complex iterators', function(){
       var _xml = 
          '<xml>'

@@ -824,6 +824,83 @@ describe('builder', function(){
         { pos: [ 30        ], str: ' </xml>'                           } 
       ]);
     });
+    it('Ashould work if there are two adjacents array of objects within main array', function(){
+      var _desc = {
+        'staticData'  : {
+          'before':'<x> ',
+          'after' :' </x>'
+        },
+        'hierarchy'   : ['d', 'movies1', 'cars2'],
+        'dynamicData' : {
+          'd':{
+            'name':'',
+            'parent' : '',
+            'type': 'array',
+            'depth' : 1,
+            'position' : {'start': 4, 'end' :35},
+            'xmlParts' : [
+              {'obj': 'd', 'array':'start' , 'pos':4  , 'depth':1, 'after': '<tab>'  },
+              {'obj': 'd', 'array':'end'   , 'pos':35 , 'depth':1, 'after': '</tab>'  },
+            ]
+          },
+          'movies1':{
+            'name':'movies',
+            'parent' : 'd',
+            'type': 'array',
+            'depth' : 2,
+            'position' : {'start': 6, 'end' :15},
+            'xmlParts' : [
+              {'obj': 'movies1', 'array':'start' , 'pos':6 , 'depth':2, 'after': '<tr>'  },
+              {'obj': 'movies1', 'attr' :'title' , 'pos':10, 'depth':2, 'before':''      },
+              {'obj': 'movies1', 'array':'end'   , 'pos':15, 'depth':2, 'before':'</tr>' }
+            ]
+          },
+          'cars2':{
+            'name':'cars',
+            'parent' : 'd',
+            'type': 'array',
+            'depth' : 2,
+            'position' : {'start': 20, 'end' :29},
+            'xmlParts' : [
+              {'obj': 'cars2', 'array':'start' , 'pos':20, 'depth':2, 'after': '<trow>'  },
+              {'obj': 'cars2', 'attr' :'brand' , 'pos':24, 'depth':2, 'before':''        },
+              {'obj': 'cars2', 'array':'end'   , 'pos':29, 'depth':2, 'before': '</trow>'}
+            ]
+          }
+        }
+      };
+      var _data = [{
+        'movies' : [
+          {'title' : 'matrix' },
+          {'title' : 'Lord of War' }
+        ],
+        'cars' : [
+          {'brand' : 'Lumeneo' },
+          {'brand' : 'Tesla motors' }
+        ]
+      }];
+      var _fn = builder.getBuilderFunction(_desc);
+      var _xmlParts = _fn(_data);
+      builder.sortXmlParts(_xmlParts, 100);
+      helper.assert(_xmlParts, [ 
+        { pos: [ 0               ], str: '<x> '                              },
+        { pos: [ 4, 0, 4         ], str: '<tab>'              , rowStart:true},
+        { pos: [ 4, 0, 6 , 0, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 4, 0, 6 , 0, 10 ], str: 'matrix'             , rowShow:true },
+        { pos: [ 4, 0, 6 , 0, 15 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 4, 0, 6 , 1, 6  ], str: '<tr>'               , rowStart:true},
+        { pos: [ 4, 0, 6 , 1, 10 ], str: 'Lord of War'        , rowShow:true },
+        { pos: [ 4, 0, 6 , 1, 15 ], str: '</tr>'              , rowEnd:true  },
+        { pos: [ 4, 0, 20, 0, 20 ], str: '<trow>'             , rowStart:true},
+        { pos: [ 4, 0, 20, 0, 24 ], str: 'Lumeneo'            , rowShow:true },
+        { pos: [ 4, 0, 20, 0, 29 ], str: '</trow>'            , rowEnd:true  },
+        { pos: [ 4, 0, 20, 1, 20 ], str: '<trow>'             , rowStart:true},
+        { pos: [ 4, 0, 20, 1, 24 ], str: 'Tesla motors'       , rowShow:true },
+        { pos: [ 4, 0, 20, 1, 29 ], str: '</trow>'            , rowEnd:true  },
+        { pos: [ 4, 0, 35        ], str: '</tab>'              , rowEnd:true },
+        { pos: [ 36              ], str: ' </x>'                             } 
+      ]);
+    });
     it('should work if there are some xml between two adjacents arrays', function(){
       var _desc = {
         'staticData'  : {

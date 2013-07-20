@@ -103,6 +103,27 @@ describe('parser', function(){
       assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>', 'tr'), -1);
       assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>', 'tr'), -1);
     });
+    it('should accept a third parameter which indicates that the opening tag is before it.\
+        It forces the algorithm to find the opening tag before this position', function(){
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 14), 3);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 22), 3);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 23), 3);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 30), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 37), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 40), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 88), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 54), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 1000), 23);
+
+      assert.equal(parser.findOpeningTagPosition('xx <td> <td> tab </td> </td>', 'td', 13), 3);
+
+      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqdsqd</tr>', 'tr',9), 5);
+      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 11), 5);
+      assert.equal(parser.findOpeningTagPosition('a<tr></tr>sdasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 22), 16);
+      assert.equal(parser.findOpeningTagPosition('a<tr><tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 20), 13);
+      assert.equal(parser.findOpeningTagPosition('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 23), 14);
+      assert.equal(parser.findOpeningTagPosition('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>', 'tr', 37), 17);
+    });
   });
 
   describe('findClosingTagPosition', function(){
@@ -133,11 +154,13 @@ describe('parser', function(){
       _str = '<h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> ';
       helper.assert(parser.findPivot(_str), {'tag':'</tr> <tr A>', 'pos': 55 });
     });
-    it('should detect the pivot point even if the repetition is not an array or list', function(){
+    it('should detect the pivot point even if the repetition is not an array or a list', function(){
       var _str = '</h1> <h1></h1> <h1></h1> <h1></h1> <h1> <h2>';
       helper.assert(parser.findPivot(_str), {'tag':'</h1> <h1>', 'pos': 35 });
       var _str = '</h1> <h1></h1> <h1></h1> <h3></h3> <h1> <h2>';
       helper.assert(parser.findPivot(_str), {'tag':'</h3> <h1>', 'pos': 35 });
+      var _str = ' </t_row> <t_row></t_row> <t_row> ';
+      helper.assert(parser.findPivot(_str), {'tag':'</t_row> <t_row>', 'pos': 25 });
     });
   });
 
@@ -177,6 +200,13 @@ describe('parser', function(){
       var _pivot = {'tag' : '</tr><tr>', 'pos': 70};
       var _expectedRange = {startEven: -1,  endEven : 70, startOdd:70, endOdd:69};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
+    });
+    it('should accept a third parameter which indicates that the beginning of the repetition is before it', function(){
+      var _xml = ' <t_row> </t_row> <t_row>useless</t_row><t_row> </t_row>';
+      var _pivot = {'tag' : '</t_row> <t_row>', 'pos': 40};
+      var _expectedRange = {startEven: 1,  endEven : 40, startOdd:40, endOdd:56};
+      var _roughStart = 9;
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
     });
   });
 

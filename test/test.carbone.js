@@ -91,6 +91,15 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
     });
+    it('should works even if there are some empty rows between the two repetition markers', function(){
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row> <t_row></t_row> <t_row> {d[i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'},
+        {'brand' : 'Tesla motors'}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row> <t_row></t_row><t_row> Tesla motors </t_row> <t_row></t_row></xml>');
+    });
     it('should handle array in an object', function(){
       var _xml = '<xml><t_row> {d.cars[i].brand} </t_row><t_row> {d.cars[i+1].brand} </t_row></xml>';
       var _data = {
@@ -221,6 +230,71 @@ describe('Carbone', function(){
       }];
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><table><h1>site_A</h1><cell><t_row><td>A</td><td>1</td></t_row><t_row><td>B</td><td>2</td></t_row></cell><cell><t_row><td>X</td></t_row></cell></table></xml>');
+    });
+    it('1. should manage 3 levels of arrays with nested objects even if the xml tags are the same everywhere (td)', function(){
+      var _xml = 
+         '<xml>'
+        +  '<td>'
+          +  '<h1>{d[i].site.label}</h1>'
+          +  '<td>'
+            +  '<td>{d[i].cars[i].name} {d[i].cars[i].autonomy} <td>{d[i].cars[i].spec.weight}</td></td>'
+              +  '<td>{d[i].cars[i].wheels[i].strengh} {d[i].cars[i].wheels[i].tire.brand}</td>'
+              +  '<td>{d[i].cars[i].wheels[i+1].strengh} {d[i].cars[i].wheels[i+1].tire.brand}</td>'
+          +  '</td>'
+          +  '<td>'
+            +  '<td>{d[i].cars[i+1].name} {d[i].cars[i+1].autonomy} <td>{d[i].cars[i+1].spec.weight}</td></td>'
+          +  '</td>'
+          +  '<td>'
+            +  '<td>{d[i].trucks[i].name}</td>'
+            +  '<td>{d[i].trucks[i+1].name}</td>'
+          +  '</td>'
+        +  '</td>'
+        +  '<td>'
+          +  '<h1>{d[i+1].site.label}</h1>'
+        +  '</td>'
+        +'</xml>';
+      var _data = [{
+        'site' : {'label':'site_A'},
+        'cars' : [ 
+          { 
+            'name': 'prius', 
+            'autonomy': 7, 
+            'spec': {'weight': 1},
+            'wheels':[
+              {'strengh':'s1', 'tire':{'brand':'mich'}}
+            ]
+          }, 
+          { 
+            'name': 'civic', 
+            'autonomy': 0, 
+            'spec': {'weight': 2},
+            'wheels':[
+              {'strengh':'s2', 'tire':{'brand':'mich'}}
+            ]
+          },
+        ],
+        'trucks' : [ {'name': 'scania'}, {'name': 'renault'} ]
+      }];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      var _expectedResult = 
+         '<xml>'
+        +  '<td>'
+          +  '<h1>site_A</h1>'
+          +  '<td>'
+            +  '<td>prius 7 <td>1</td></td>'
+              +  '<td>s1 mich</td>'
+          +  '</td>'
+          +  '<td>'
+            +  '<td>civic 0 <td>2</td></td>'
+              +  '<td>s2 mich</td>'
+          +  '</td>'
+          +  '<td>'
+            +  '<td>scania</td>'
+            +  '<td>renault</td>'
+          +  '</td>'
+        +  '</td>'
+        +'</xml>';
+      assert.equal(_xmlBuilt, _expectedResult);
     });
     it('should manage nested arrays with complex iterators', function(){
       var _xml = 

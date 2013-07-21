@@ -274,7 +274,7 @@ describe('extracter', function(){
         }
       });
     });
-    it.skip('should accept than the condition appears after the iterator', function(){
+    it('should accept than the condition appears after the iterator', function(){
       var _markers = [
         {'pos': 20, 'name': 'd.site[i   , sort > 10].id'},
         {'pos': 30, 'name': 'd.site[i+1 , sort > 10].id'}

@@ -219,6 +219,118 @@ describe('builder', function(){
       {"pos": [39],                                "str": "</xml>"}
     ]*/
   });
+  describe('forEachArrayExit call a function for each array we are leaving', function(){
+    it('should never call the callback if _currentlyVisitedArrays is empty', function(){
+      var _currentlyVisitedArrays = [];
+      var _objDependencyDescriptor = {
+        'd' :{'type': 'array', 'parent':''},
+        'cars' :{'type': 'array', 'parent':'d'}
+      };
+      var _nextAttrName = '';
+      var _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function(arrayLeft){
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 0);
+
+      _nextAttrName = '';
+      _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, {}, _nextAttrName, function(arrayLeft){
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 0);
+
+      _nextAttrName = 'cars';
+      _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function(arrayLeft){
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 0);
+    });
+    it('should call the callback once if we are leaving the array "cars".\
+      It should return the name of the array we are leaving.\
+      It should remove the array name in _currentlyVisitedArrays', function(){
+      var _currentlyVisitedArrays = ['d', 'cars'];
+      var _objDependencyDescriptor = {
+        'd' :{'type': 'array', 'parent':''},
+        'cars' :{'type': 'array', 'parent':'d'},
+        'test' :{'type': 'array', 'parent':'d'}
+      };
+      var _nextAttrName = 'test';
+      var _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function(arrayLeft){
+        helper.assert(arrayLeft, 'cars');
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 1);
+      helper.assert(_currentlyVisitedArrays, ['d']);
+    });
+    it('should call the callback for each array we are leaving', function(){
+      var _currentlyVisitedArrays = ['d', 'cars', 'wheels'];
+      var _objDependencyDescriptor = {
+        'd'      :{'type': 'array', 'parent':''},
+        'cars'   :{'type': 'array', 'parent':'d'},
+        'wheels' :{'type': 'array', 'parent':'cars'},
+        'site'   :{'type': 'object', 'parent':'d'}
+      };
+      var _nextAttrName = 'site';
+      var _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function(arrayLeft){
+        var _leftArrays = ['wheels', 'cars'];
+        helper.assert(arrayLeft, _leftArrays[_nbArrayExit]);
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 2);
+      helper.assert(_currentlyVisitedArrays, ['d']);
+    });
+    it('2. should call the callback for each array we are leaving', function(){
+      var _currentlyVisitedArrays = ['d', 'cars', 'wheels'];
+      var _objDependencyDescriptor = {
+        'd'      :{'type': 'array', 'parent':''},
+        'cars'   :{'type': 'array', 'parent':'d'},
+        'wheels' :{'type': 'array', 'parent':'cars'},
+        'site'   :{'type': 'object', 'parent':'cars'}
+      };
+      var _nextAttrName = 'site';
+      var _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function(arrayLeft){
+        var _leftArrays = ['wheels'];
+        helper.assert(arrayLeft, _leftArrays[_nbArrayExit]);
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 1);
+      helper.assert(_currentlyVisitedArrays, ['d', 'cars']);
+    });
+    it('should works even if the arrays are nested in objects', function(){
+      var _currentlyVisitedArrays = ['d', 'cars', 'wheels'];
+      var _objDependencyDescriptor = {
+        'd'      :{'type': 'array' , 'parent':''},
+        'obj'    :{'type': 'object', 'parent':'d'},
+        'cars'   :{'type': 'array' , 'parent':'obj'},
+        'spec'   :{'type': 'object', 'parent':'cars'},
+        'wheels' :{'type': 'array' , 'parent':'spec'},
+        'site'   :{'type': 'object', 'parent':'wheels'},
+        'players':{'type': 'array', 'parent':'obj'}
+      };
+      var _nextAttrName = 'site';
+      var _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function(arrayLeft){
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 0);
+      helper.assert(_currentlyVisitedArrays, ['d', 'cars', 'wheels']);
+
+      _nextAttrName = 'players';
+      _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function(arrayLeft){
+        var _leftArrays = ['wheels', 'cars'];
+        helper.assert(arrayLeft, _leftArrays[_nbArrayExit]);
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 2);
+      helper.assert(_currentlyVisitedArrays, ['d']);
+    });
+  });
 
   describe('assembleXmlParts', function(){
     it('should sort the array of xml parts according to the "pos" attribute and assemble all strings', function(){

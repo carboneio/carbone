@@ -253,28 +253,34 @@ describe('Carbone', function(){
           +  '<h1>{d[i+1].site.label}</h1>'
         +  '</td>'
         +'</xml>';
-      var _data = [{
-        'site' : {'label':'site_A'},
-        'cars' : [ 
-          { 
-            'name': 'prius', 
-            'autonomy': 7, 
-            'spec': {'weight': 1},
-            'wheels':[
-              {'strengh':'s1', 'tire':{'brand':'mich'}}
-            ]
-          }, 
-          { 
-            'name': 'civic', 
-            'autonomy': 0, 
-            'spec': {'weight': 2},
-            'wheels':[
-              {'strengh':'s2', 'tire':{'brand':'mich'}}
-            ]
-          },
-        ],
-        'trucks' : [ {'name': 'scania'}, {'name': 'renault'} ]
-      }];
+      var _data = [
+        {
+          'site' : {'label':'site_A'},
+          'cars' : [ 
+            { 
+              'name': 'prius', 
+              'autonomy': 7, 
+              'spec': {'weight': 1},
+              'wheels':[
+                {'strengh':'s1', 'tire':{'brand':'mich'}}
+              ]
+            }, 
+            { 
+              'name': 'civic', 
+              'autonomy': 0, 
+              'spec': {'weight': 2},
+              'wheels':[
+                {'strengh':'s2', 'tire':{'brand':'mich'}}
+              ]
+            },
+          ],
+          'trucks' : [ {'name': 'scania'} ]
+        },{
+          'site' : {'label':'site_B'},
+          'cars' : [ ],
+          'trucks' : [ {'name': 'daf'}, {'name': 'hyundai'} ]
+        }
+      ];
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       var _expectedResult = 
          '<xml>'
@@ -290,7 +296,13 @@ describe('Carbone', function(){
           +  '</td>'
           +  '<td>'
             +  '<td>scania</td>'
-            +  '<td>renault</td>'
+          +  '</td>'
+        +  '</td>'
+        +  '<td>'
+          +  '<h1>site_B</h1>'
+          +  '<td>'
+            +  '<td>daf</td>'
+            +  '<td>hyundai</td>'
           +  '</td>'
         +  '</td>'
         +'</xml>';

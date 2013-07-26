@@ -363,8 +363,28 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row></xml>');
     });
+    it('should accept condition encoded ">" in arrays', function(){
+      var _xml = '<xml> <t_row> {d[speed&gt;100,i].brand} </t_row><t_row> {d[  speed &gt;  100 ,  i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':50},
+        {'brand' : 'Tesla motors', 'speed':200},
+        {'brand' : 'Toyota'      , 'speed':100}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row></xml>');
+    });
     it('should accept condition "<" in arrays', function(){
       var _xml = '<xml> <t_row> {d[speed<200,i].brand} </t_row><t_row> {d[  speed <  200 ,  i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':150},
+        {'brand' : 'Tesla motors', 'speed':200},
+        {'brand' : 'Toyota'      , 'speed':100}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it('should accept condition encoded "<" in arrays', function(){
+      var _xml = '<xml> <t_row> {d[speed&lt;200,i].brand} </t_row><t_row> {d[  speed &lt;  200 ,  i+1].brand} </t_row></xml>';
       var _data = [
         {'brand' : 'Lumeneo'     , 'speed':150},
         {'brand' : 'Tesla motors', 'speed':200},

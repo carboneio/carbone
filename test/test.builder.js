@@ -40,66 +40,66 @@ describe('builder', function(){
 
   describe('getFilterString', function(){
     it('should return an empty string if code is empty, attr is empty, the conditions array is not defined', function(){
-      var _actual = builder.getFilterString('myObj', [{'left':'sort', 'operator':'>', 'right':'10'}]);
+      var _actual = builder.getFilterString([{'left':{'parent':'myObj','attr':'sort'}, 'operator':'>', 'right':'10'}]);
       assert.equal(_actual, '');
-      _actual = builder.getFilterString('myObj', []);
+      _actual = builder.getFilterString([]);
       assert.equal(_actual, '');
-      _actual = builder.getFilterString('myObj');
+      _actual = builder.getFilterString();
       assert.equal(_actual, '');
-      _actual = builder.getFilterString('', [{'left':'sort', 'operator':'>', 'right':'10'}], 'attr');
+      _actual = builder.getFilterString('d', 'code');
       assert.equal(_actual, '');
     });
     it('should return a string which contain an "if-condition"', function(){
       var _conditions = [
-        {'left':'sort', 'operator':'>', 'right':'10'}
+        {'left':{'parent':'myObj','attr':'sort'}, 'operator':'>', 'right':'10'}
       ];
-      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      var _actual = builder.getFilterString(_conditions, 'code');
       assert.equal(_actual, 'if((myObj && myObj["sort"]>10)){\n code;\n }');
     });
     it('should accept multiple conditions', function(){
       var _conditions = [
-        {'left':'sort', 'operator':'>', 'right':'10'},
-        {'left':'id', 'operator':'<', 'right':'15'}
+        {'left':{'parent':'myObj','attr':'sort'}, 'operator':'>', 'right':'10'},
+        {'left':{'parent':'myObj','attr':'id'}, 'operator':'<', 'right':'15'}
       ];
-      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      var _actual = builder.getFilterString(_conditions, 'code');
       assert.equal(_actual, 'if((myObj && myObj["sort"]>10 && myObj["id"]<15)){\n code;\n }');
     });
     it('should accept than the left part of the condition is in an object', function(){
       var _conditions = [
-        {'left':'menu.sort', 'operator':'>', 'right':'10'},
+        {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'>', 'right':'10'},
       ];
-      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      var _actual = builder.getFilterString(_conditions, 'code');
       assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif((_menu_filter && _menu_filter["sort"]>10)){\n code;\n }');
     });
     it('should add a prefix on the declared variable', function(){
       var _conditions = [
-        {'left':'menu.sort', 'operator':'>', 'right':'10'},
+        {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'>', 'right':'10'},
       ];
-      var _actual = builder.getFilterString('myObj', _conditions, 'code', 'prefix');
+      var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
       assert.equal(_actual, 'var _prefixmenu_filter=myObj["menu"];\nif((_prefixmenu_filter && _prefixmenu_filter["sort"]>10)){\n code;\n }');
     });
     it('should not declare the same variable twice if there are two conditions on the same variable', function(){
       var _conditions = [
-        {'left':'menu.sort', 'operator':'>', 'right':'10'},
-        {'left':'menu.sort', 'operator':'<', 'right':'20'},
+        {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'>', 'right':'10'},
+        {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'<', 'right':'20'},
       ];
-      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      var _actual = builder.getFilterString(_conditions, 'code');
       assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif((_menu_filter && _menu_filter["sort"]>10 && _menu_filter["sort"]<20)){\n code;\n }');
     });
     it('should iverse the condition', function(){
       var _conditions = [
-        {'left':'menu.sort', 'operator':'>', 'right':'10'},
-        {'left':'menu.sort', 'operator':'<', 'right':'20'},
+        {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'>', 'right':'10'},
+        {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'<', 'right':'20'},
       ];
-      var _actual = builder.getFilterString('myObj', _conditions, 'code', '', true);
+      var _actual = builder.getFilterString(_conditions, 'code', '', true);
       assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif(!(_menu_filter && _menu_filter["sort"]>10 && _menu_filter["sort"]<20)){\n code;\n }');
     });
     it('should accept multiple conditions nested in an object', function(){
       var _conditions = [
-        {'left':'menu.sort', 'operator':'>', 'right':'10'},
-        {'left':'car.sort', 'operator':'<', 'right':'20'},
+        {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'>', 'right':'10'},
+        {'left':{'parent':'myObj','attr':'car.sort'}, 'operator':'<', 'right':'20'},
       ];
-      var _actual = builder.getFilterString('myObj', _conditions, 'code');
+      var _actual = builder.getFilterString(_conditions, 'code');
       assert.equal(_actual, 
         'var _menu_filter=myObj["menu"];\n'+
         'var _car_filter=myObj["car"];\n'+
@@ -703,7 +703,7 @@ describe('builder', function(){
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
               {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1                          , 'conditions':[{'left':'show', 'operator':'==', 'right':'1'}] },
+              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1                          , 'conditions':[{'left':{'parent':'d','attr':'show'}, 'operator':'==', 'right':'1'}] },
               {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
             ]
           }

@@ -18,7 +18,7 @@ describe('Carbone', function(){
 
   describe('buildXML', function(){
     it('should work if the same array is repeated two times in the xml <tr>d[i].product</tr>    <tr>d[i].product</tr>');
-    it.skip('should escape special characters > < & " \' even if a formatter is used');
+    it.skip('should escape special characters > < & " \' even if a formatter is used (output of a formatter)');
     it('should return the xml if no data is passed', function(){
       var _xml = '<xml> </xml>';
       var _xmlBuilt = carbone.buildXML(_xml);
@@ -352,6 +352,21 @@ describe('Carbone', function(){
       ];
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it('should manage conditions with nested arrays', function(){
+      var _xml = 
+         '<xml>'
+        +  '<t_row><td>{d.cars[speed>10, i].wheels[size>6, i].size  }</td><td>{d.cars[speed>10, i].wheels[size>6, i+1].size  }</td></t_row>'
+        +  '<t_row><td>{d.cars[speed>10, i+1].wheels[size>6, i].size}</td><td>{d.cars[speed>10, i+1].wheels[size>6, i+1].size}</td></t_row>'
+        +'</xml>';
+      var _data = {
+        'cars':[
+          {'wheels': [ {'size': 5}, {'size': 10}              ], 'speed':5},
+          {'wheels': [ {'size': 5}, {'size': 10},{'size': 20} ], 'speed':20}
+        ]
+      };
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      assert.equal(_xmlBuilt, '<xml><t_row><td>10</td><td>20</td></t_row></xml>');
     });
     it('should accept condition ">" in arrays', function(){
       var _xml = '<xml> <t_row> {d[speed>100,i].brand} </t_row><t_row> {d[  speed >  100 ,  i+1].brand} </t_row></xml>';

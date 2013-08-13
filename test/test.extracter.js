@@ -214,8 +214,8 @@ describe('extracter', function(){
           'parent':'d',
           'position': { 'start': 20/*, 'end': 30*/ },
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':'i', 'operator':'==', 'right':'1'}]},
-            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':30, 'conditions':[{'left':'i', 'operator':'==', 'right':'0'}]}
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'i'}, 'operator':'==', 'right':'1'}]},
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':30, 'conditions':[{'left':{'parent':'dsite', 'attr':'i'}, 'operator':'==', 'right':'0'}]}
           ]
         }
       });
@@ -239,13 +239,13 @@ describe('extracter', function(){
           'position': { 'start': 20/*, 'end': 30 */},
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[
-              {'left':'i', 'operator':'==', 'right':'1'},
-              {'left':'sort', 'operator':'>', 'right':'310'}
+              {'left':{'parent':'dsite', 'attr':'i'}, 'operator':'==', 'right':'1'},
+              {'left':{'parent':'dsite', 'attr':'sort'}, 'operator':'>', 'right':'310'}
             ]},
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':30, 'conditions':[
-              {'left':'i', 'operator':'==', 'right':'0'},
-              {'left':'bank', 'operator':'<', 'right':'54'},
-              {'left':'lang', 'operator':'==', 'right':'en'}
+              {'left':{'parent':'dsite', 'attr':'i'}, 'operator':'==', 'right':'0'},
+              {'left':{'parent':'dsite', 'attr':'bank'}, 'operator':'<', 'right':'54'},
+              {'left':{'parent':'dsite', 'attr':'lang'}, 'operator':'==', 'right':'en'}
             ]}
           ]
         }
@@ -269,7 +269,7 @@ describe('extracter', function(){
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':'sort', 'operator':'>', 'right':'10'}]}
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'sort'}, 'operator':'>', 'right':'10'}]}
           ]
         }
       });
@@ -292,7 +292,90 @@ describe('extracter', function(){
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
           'xmlParts' : [
-            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':'sort', 'operator':'>', 'right':'10'}]}
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'sort'}, 'operator':'>', 'right':'10'}]}
+          ]
+        }
+      });
+    });
+    it('should manage conditions in nested array (should keep the parent name)', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd[sort > 10, i].site[i].id'},
+        {'pos': 25, 'name': 'd[sort > 10, i].site[i+1].id'},
+        {'pos': 30, 'name': 'd[sort > 10, i+1].site[i].id'},
+        {'pos': 35, 'name': 'd[sort > 10, i+1].site[i+1].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'array',
+          'parent':'',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 25 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'d', 'attr':'sort'}, 'operator':'>', 'right':'10'}]}
+          ]
+        }
+      });
+    });
+    it('2. should manage conditions in nested array (complex array))', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd[i][sort > 10, i].id'},
+        {'pos': 25, 'name': 'd[i][sort > 10, i+1].id'},
+        {'pos': 30, 'name': 'd[i+1][sort > 10, i].id'},
+        {'pos': 35, 'name': 'd[i+1][sort > 10, i+1].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'array',
+          'parent':'',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : []
+        },
+        'd_':{
+          'name': '',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 25 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'd_', 'pos':20, 'conditions':[{'left':{'parent':'d_', 'attr':'sort'}, 'operator':'>', 'right':'10'}]}
+          ]
+        }
+      });
+    });
+    it.skip('should accept conditions with a formatters', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i   , sort:int > 10].id'},
+        {'pos': 30, 'name': 'd.site[i+1 , sort:int > 10].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 
+              'conditions':[
+                {
+                  'left':{'parent':'dsite', 'attr':'sort', 'formatters':['int']},
+                  'operator':'>',
+                  'right':'10'
+                }
+              ]
+            }
           ]
         }
       });

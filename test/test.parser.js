@@ -7,35 +7,36 @@ var helper = require('../lib/helper');
 describe('parser', function(){
   
   describe('findMarkers', function(){
-    it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml', function(){
+    it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
+        it should add the root object.', function(){
       helper.assert(parser.findMarkers('{menu}'), {
-        markers : [{'pos': 0, 'name':'menu'}], 
+        markers : [{'pos': 0, 'name':'_root.menu'}], 
         xml : ''
       });
       helper.assert(parser.findMarkers('<div>{menu}<div>'), {
-        markers : [{'pos': 5, 'name':'menu'}], 
+        markers : [{'pos': 5, 'name':'_root.menu'}], 
         xml : '<div><div>'
       });
       helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>'), {
-        markers : [{'pos': 10, 'name':'menu'}], 
+        markers : [{'pos': 10, 'name':'_root.menu'}], 
         xml : '<xmlstart><interxml><bullshit></xmlend>'
       });
       helper.assert(parser.findMarkers('<div>{menu}<div>{city}'), {
-        markers : [{'pos': 5, 'name':'menu'},{'pos':10, 'name':'city'}],
+        markers : [{'pos': 5, 'name':'_root.menu'},{'pos':10, 'name':'_root.city'}],
         xml : '<div><div>'
       });
       helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars}</bla>'), {
-        markers : [{'pos': 10, 'name':'menu'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars'}], 
+        markers : [{'pos': 10, 'name':'_root.menu'},{'pos':44, 'name':'_root.city'},{'pos':63, 'name':'_root.cars'}], 
         xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
       });
       helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u[i].city}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars[i].wheel}</bla>'), {
-        markers : [{'pos': 10, 'name':'menu[i].city'},{'pos':44, 'name':'city'},{'pos':63, 'name':'cars[i].wheel'}], 
+        markers : [{'pos': 10, 'name':'_root.menu[i].city'},{'pos':44, 'name':'_root.city'},{'pos':63, 'name':'_root.cars[i].wheel'}], 
         xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
       });
     });
     it('should remove unwanted characters', function(){
       helper.assert(parser.findMarkers('<div>{menu}<div> \n   {city}'), {
-        markers : [{'pos': 5, 'name':'menu'},{'pos':15, 'name':'city'}],
+        markers : [{'pos': 5, 'name':'_root.menu'},{'pos':15, 'name':'_root.city'}],
         xml : '<div><div>     '
       });
     });
@@ -44,11 +45,11 @@ describe('parser', function(){
     });
     it('should remove whitespaces which are inside {} and not inside <>. It should not count them for the position', function(){
       helper.assert(parser.findMarkers(' <div>   {  menu  }   <div>   {   city  } '), {
-        markers : [{'pos': 9, 'name':'menu'},{'pos':20, 'name':'city'}],
+        markers : [{'pos': 9, 'name':'_root.menu'},{'pos':20, 'name':'_root.city'}],
         xml : ' <div>      <div>    '
       });
       helper.assert(parser.findMarkers(' <xmlstart> {  me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {ci  <td>  ty  </td>  } <tga><bla>{cars[i].wheel}</bla>'), {
-        markers : [{'pos': 12, 'name':'menu[i].city'},{'pos':52, 'name':'city'},{'pos':72, 'name':'cars[i].wheel'}], 
+        markers : [{'pos': 12, 'name':'_root.menu[i].city'},{'pos':52, 'name':'_root.city'},{'pos':72, 'name':'_root.cars[i].wheel'}], 
         xml : ' <xmlstart> <interxml><bull  sh it> </xmlend> <tga> <td></td> <tga><bla></bla>'
       });
     });

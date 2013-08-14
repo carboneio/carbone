@@ -30,6 +30,13 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> boo </xml>');
     });
+    it('should accept a second object which is accessible with the marker {c.}, c as "complement"', function(){
+      var _xml = '<xml> {d.title} {c.date} </xml>';
+      var _data = {'title' : 'boo'};
+      var _complement = {'date' : 'today'};
+      var _xmlBuilt = carbone.buildXML(_xml, _data, _complement);
+      helper.assert(_xmlBuilt, '<xml> boo today </xml>');
+    });
     it('should replace null or undefined data by an empty string', function(){
       var _xml = '<xml> {d.title} </xml>';
       var _xmlBuilt = carbone.buildXML(_xml, {'title' : null});
@@ -490,6 +497,62 @@ describe('Carbone', function(){
         assert.notEqual(_xmlExpectedContent.indexOf('field_2'), -1);
         fs.unlinkSync(_resultFilePath);
         done();
+      });
+    });
+    it('should accept a second data object with the marker {c.}', function(done){
+      var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
+      var _data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var _complement = {
+        author1 : 'author_1',
+        author2 : 'author_2'
+      };
+      var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.xml');
+      carbone.render(_filePath, _data, _complement, function(result){
+        fs.writeFileSync(_resultFilePath, result);
+        var _xmlExpectedContent = fs.readFileSync(_resultFilePath, 'utf8');
+        assert.equal(_xmlExpectedContent.indexOf('field1'), -1);
+        assert.equal(_xmlExpectedContent.indexOf('field2'), -1);
+        assert.notEqual(_xmlExpectedContent.indexOf('field_1'), -1);
+        assert.notEqual(_xmlExpectedContent.indexOf('field_2'), -1);
+        assert.equal(_xmlExpectedContent.indexOf('author1'), -1);
+        assert.equal(_xmlExpectedContent.indexOf('author2'), -1);
+        assert.notEqual(_xmlExpectedContent.indexOf('author_1'), -1);
+        assert.notEqual(_xmlExpectedContent.indexOf('author_2'), -1);
+        fs.unlinkSync(_resultFilePath);
+        done();
+      });
+    });
+    it('(zipped file) should accept a second data object with the marker {c.}', function(done){
+      var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
+      var _data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var _complement = {
+        author1 : 'author_1',
+        author2 : 'author_2'
+      };
+      var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.docx');
+      carbone.render(_filePath, _data, _complement, function(result){
+        fs.writeFileSync(_resultFilePath, result);
+        carbone.unzip(_resultFilePath, function(dir){
+          var _xmlExpectedPath = path.join(dir, 'word', 'document.xml');
+          var _xmlExpectedContent = fs.readFileSync(_xmlExpectedPath, 'utf8');
+          assert.equal(_xmlExpectedContent.indexOf('field1'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('field2'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('field_1'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('field_2'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('author1'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('author2'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('author_1'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('author_2'), -1);
+          fs.unlinkSync(_resultFilePath);
+          helper.rmDirRecursive(dir);
+          done();
+        });
       });
     });
   });

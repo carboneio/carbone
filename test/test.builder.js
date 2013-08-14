@@ -456,15 +456,15 @@ describe('builder', function(){
           'before':'',
           'after' :'</xml>'
         },
-        'hierarchy'   : ['d'],
+        'hierarchy'   : ['_root'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'number', 'pos':5 , 'depth':0, 'before':'<xml>', 'formatters' : [ 'int' ]}
+              {'obj': '_root', 'attr':'number', 'pos':5 , 'depth':0, 'before':'<xml>', 'formatters' : [ 'int' ]}
             ]
           }
         }
@@ -481,23 +481,23 @@ describe('builder', function(){
         done();
       });
     });
-    it('should manage multiple attributes in the main object "d"', function(){
+    it('should manage multiple attributes in the main object "_root"', function(){
       var _desc = {
         'staticData'  : {
           'before':'',
           'after' :'</p></xml>'
         },
-        'hierarchy'   : ['d'],
+        'hierarchy'   : ['_root'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'formatters' : []},
-              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'formatters' : []},
-              {'obj': 'd', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'formatters' : []}
+              {'obj': '_root', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>', 'formatters' : []},
+              {'obj': '_root', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' , 'formatters' : []},
+              {'obj': '_root', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' , 'formatters' : []}
             ]
           }
         }
@@ -521,17 +521,17 @@ describe('builder', function(){
           'before':'',
           'after' :'</p></xml>'
         },
-        'hierarchy'   : ['d'],
+        'hierarchy'   : ['_root'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>'},
-              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' },
-              {'obj': 'd', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' }
+              {'obj': '_root', 'attr':'firstname', 'pos':8 , 'depth':0, 'before':'<xml><p>'},
+              {'obj': '_root', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' },
+              {'obj': '_root', 'attr':'surname'  , 'pos':22, 'depth':0, 'before':'</p><p>' }
             ]
           }
         }
@@ -552,22 +552,22 @@ describe('builder', function(){
           'before':'',
           'after' :'</p></xml>'
         },
-        'hierarchy'   : ['d', 'info1'],
+        'hierarchy'   : ['_root', 'info1'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>'},
-              {'obj': 'd', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' },
-              {'obj': 'd', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>'}
+              {'obj': '_root', 'attr':'firstname', 'pos':8,  'depth':0, 'before':'<xml><p>'},
+              {'obj': '_root', 'attr':'lastname' , 'pos':15, 'depth':0, 'before':'</p><p>' },
+              {'obj': '_root', 'attr':'surname'  , 'pos':40, 'depth':0, 'before':'</br><p>'}
             ]
           },
           'info1':{
             'name':'info',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
@@ -602,11 +602,11 @@ describe('builder', function(){
           'before':'',
           'after' :'</p></xml>'
         },
-        'hierarchy'   : ['d', 'info1'],
+        'hierarchy'   : ['_root', 'info1'],
         'dynamicData' : {
           'info1':{
             'name':'info',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
@@ -614,15 +614,15 @@ describe('builder', function(){
               {'obj': 'info1', 'attr':'job'  , 'pos':32,  'depth':0, 'before':'</br><br>' }
             ]
           },
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'object',
             'depth':0,
             'xmlParts' : [
-              {'obj': 'd', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>'},
-              {'obj': 'd', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' },
-              {'obj': 'd', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>'}
+              {'obj': '_root', 'attr':'firstname', 'pos':8,   'depth':0, 'before':'<xml><p>'},
+              {'obj': '_root', 'attr':'lastname' , 'pos':15,  'depth':0, 'before':'</p><p>' },
+              {'obj': '_root', 'attr':'surname'  , 'pos':40,  'depth':0, 'before':'</br><p>'}
             ]
           }
         }
@@ -652,19 +652,19 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d'],
+        'hierarchy'   : ['_root'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1,                        },
-              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before' : '</p><p>'   },
-              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
+              {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
+              {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1,                        },
+              {'obj': '_root', 'attr':'lastname' , 'pos':20, 'depth':1, 'before' : '</p><p>'   },
+              {'obj': '_root', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
             ]
           }
         }
@@ -693,18 +693,18 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d'],
+        'hierarchy'   : ['_root'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1                          , 'conditions':[{'left':{'parent':'d','attr':'show'}, 'operator':'==', 'right':'1'}] },
-              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
+              {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
+              {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1                          , 'conditions':[{'left':{'parent':'_root','attr':'show'}, 'operator':'==', 'right':'1'}] },
+              {'obj': '_root', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
             ]
           }
         }
@@ -731,24 +731,24 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d', 'info1'],
+        'hierarchy'   : ['_root', 'info1'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'       },
-              {'obj': 'd', 'attr':'firstname', 'pos':10, 'depth':1, 'before':''           },
-              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'    },
-              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>' }
+              {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'       },
+              {'obj': '_root', 'attr':'firstname', 'pos':10, 'depth':1, 'before':''           },
+              {'obj': '_root', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'    },
+              {'obj': '_root', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>' }
             ]
           },
           'info1':{
             'name':'info',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
@@ -783,24 +783,24 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d', 'info1', 'info2', 'info3'],
+        'hierarchy'   : ['_root', 'info1', 'info2', 'info3'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
             'xmlParts' : [
-              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'        },
-              {'obj': 'd', 'attr':'firstname', 'pos':10, 'depth':1, 'before':''            },
-              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'     },
-              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
+              {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'        },
+              {'obj': '_root', 'attr':'firstname', 'pos':10, 'depth':1, 'before':''            },
+              {'obj': '_root', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'     },
+              {'obj': '_root', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</p></tr>'  }
             ]
           },
           'info1':{
             'name':'info',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'object',
             'depth' : 1,
             'xmlParts' : [
@@ -874,9 +874,9 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d', 'movies1', 'cars2'],
+        'hierarchy'   : ['_root', 'movies1', 'cars2'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'object',
@@ -884,7 +884,7 @@ describe('builder', function(){
           },
           'movies1':{
             'name':'movies',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :15},
@@ -896,7 +896,7 @@ describe('builder', function(){
           },
           'cars2':{
             'name':'cars',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
@@ -942,22 +942,22 @@ describe('builder', function(){
           'before':'<x> ',
           'after' :' </x>'
         },
-        'hierarchy'   : ['d', 'movies1', 'cars2'],
+        'hierarchy'   : ['_root', 'movies1', 'cars2'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 4, 'end' :35},
             'xmlParts' : [
-              {'obj': 'd', 'array':'start' , 'pos':4  , 'depth':1, 'after': '<tab>'  },
-              {'obj': 'd', 'array':'end'   , 'pos':35 , 'depth':1, 'after': '</tab>'  },
+              {'obj': '_root', 'array':'start' , 'pos':4  , 'depth':1, 'after': '<tab>'  },
+              {'obj': '_root', 'array':'end'   , 'pos':35 , 'depth':1, 'after': '</tab>'  },
             ]
           },
           'movies1':{
             'name':'movies',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 6, 'end' :15},
@@ -969,7 +969,7 @@ describe('builder', function(){
           },
           'cars2':{
             'name':'cars',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 20, 'end' :29},
@@ -1019,9 +1019,9 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d', 'movies1', 'cars2'],
+        'hierarchy'   : ['_root', 'movies1', 'cars2'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'object',
@@ -1029,7 +1029,7 @@ describe('builder', function(){
           },
           'movies1':{
             'name':'movies',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :15},
@@ -1042,7 +1042,7 @@ describe('builder', function(){
           },
           'cars2':{
             'name':'cars',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
@@ -1091,24 +1091,24 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d', 'skills1'],
+        'hierarchy'   : ['_root', 'skills1'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
-              {'obj': 'd', 'array': 'start'  , 'pos':6 , 'depth':1, 'after': '<tr><p>'   },
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'',         },
-              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'   },
-              {'obj': 'd', 'array': 'end'    , 'pos':38, 'depth':1, 'before':'</p></tr>' }
+              {'obj': '_root', 'array': 'start'  , 'pos':6 , 'depth':1, 'after': '<tr><p>'   },
+              {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'',         },
+              {'obj': '_root', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'   },
+              {'obj': '_root', 'array': 'end'    , 'pos':38, 'depth':1, 'before':'</p></tr>' }
             ]
           },
           'skills1':{
             'name':'skills',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 20, 'end' :29},
@@ -1168,24 +1168,24 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d', 'skills1', 'when2'],
+        'hierarchy'   : ['_root', 'skills1', 'when2'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :48},
             'xmlParts' : [
-              {'obj': 'd', 'array': 'start'  , 'pos':6 , 'depth':1, 'after': '<tr><p>'   },
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'',         },
-              {'obj': 'd', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'   },
-              {'obj': 'd', 'array': 'end'    , 'pos':48, 'depth':1, 'before':'</p></tr>' }
+              {'obj': '_root', 'array': 'start'  , 'pos':6 , 'depth':1, 'after': '<tr><p>'   },
+              {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'',         },
+              {'obj': '_root', 'attr':'lastname' , 'pos':20, 'depth':1, 'before':'</p><p>'   },
+              {'obj': '_root', 'array': 'end'    , 'pos':48, 'depth':1, 'before':'</p></tr>' }
             ]
           },
           'skills1':{
             'name':'skills',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 20, 'end' :39},
@@ -1275,9 +1275,9 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d'],
+        'hierarchy'   : ['_root'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
@@ -1285,9 +1285,9 @@ describe('builder', function(){
             'position' : {'start': 6, 'end' :29},
             'iterator' : {'attr': 'sort'},
             'xmlParts' : [
-              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'     },
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1,                        },
-              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</tr>'  }
+              {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'     },
+              {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1,                        },
+              {'obj': '_root', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</tr>'  }
             ]
           }
         }
@@ -1314,9 +1314,9 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d'],
+        'hierarchy'   : ['_root'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
@@ -1324,9 +1324,9 @@ describe('builder', function(){
             'position' : {'start': 6, 'end' :29},
             'iterator' : {'obj': 'movie', 'attr':'sort'},
             'xmlParts' : [
-              {'obj': 'd', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'     },
-              {'obj': 'd', 'attr':'firstname', 'pos':13, 'depth':1,                        },
-              {'obj': 'd', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</tr>'  }
+              {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'     },
+              {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1,                        },
+              {'obj': '_root', 'array':'end'     , 'pos':29, 'depth':1, 'before': '</tr>'  }
             ]
           }
         }
@@ -1353,9 +1353,9 @@ describe('builder', function(){
           'before':'<xml> ',
           'after' :' </xml>'
         },
-        'hierarchy'   : ['d', 'skills1'],
+        'hierarchy'   : ['_root', 'skills1'],
         'dynamicData' : {
-          'd':{
+          '_root':{
             'name':'',
             'parent' : '',
             'type': 'array',
@@ -1366,15 +1366,15 @@ describe('builder', function(){
           },
           'skills1':{
             'name':'skills',
-            'parent' : 'd',
+            'parent' : '_root',
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
             'xmlParts' : [
               {'obj': 'skills1', 'array':'start' , 'pos':6 , 'depth':1 , 'after' : '<tr>' },
-              {'obj': 'd'      , 'array': 'start', 'pos':13, 'depth':2, 'after': '<td>'  },
+              {'obj': '_root'  , 'array': 'start', 'pos':13, 'depth':2, 'after': '<td>'  },
               {'obj': 'skills1', 'attr' :'name'  , 'pos':15 , 'depth':2, 'before': ''     },
-              {'obj': 'd'      , 'array': 'end'  , 'pos':22, 'depth':2, 'before':'</td>' },
+              {'obj': '_root'  , 'array': 'end'  , 'pos':22, 'depth':2, 'before':'</td>' },
               {'obj': 'skills1', 'array':'end'   , 'pos':38 , 'depth':1, 'before': '</tr>'}
             ]
           }

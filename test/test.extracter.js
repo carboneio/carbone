@@ -1244,11 +1244,11 @@ describe('extracter', function(){
             'name':'',
             'type':'array',
             'parent':'',
-            'position' : {'start':5, 'end':67}, /* exact position */
+            'position' : {'start':5, 'end':68}, /* exact position */
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'   , 'pos':11, 'depth':1, 'after': ' <h1>'},
               {'obj': 'd0', 'array':'start' , 'pos':5,  'depth':1, 'after': '<tr A>'},
-              {'obj': 'd0', 'array':'end'   , 'pos':67, 'depth':1, 'before':'</h1> </tr>'},
+              {'obj': 'd0', 'array':'end'   , 'pos':68, 'depth':1, 'before':'</h1> </tr> '},
             ],
             'depth':1
           },
@@ -1310,12 +1310,12 @@ describe('extracter', function(){
             'name':'',
             'type':'array',
             'parent':'',
-            'position' : {'start':5, 'end':67}, /* exact position */
+            'position' : {'start':5, 'end':68}, /* exact position */
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'  , 'pos':11, 'depth':1, 'after' : ' <h1>' },
               {'obj': 'd0', 'attr':'val'   , 'pos':56, 'depth':1, },
               {'obj': 'd0', 'array':'start', 'pos':5,  'depth':1,  'after':'<tr A>'},
-              {'obj': 'd0', 'array':'end'  , 'pos':67, 'depth':1,  'before':'</h1> </tr>'}
+              {'obj': 'd0', 'array':'end'  , 'pos':68, 'depth':1,  'before':'</h1> </tr> '}
             ],
             'depth':1
           },
@@ -1376,11 +1376,11 @@ describe('extracter', function(){
             'name':'element',
             'type':'array',
             'parent':'d0',
-            'position' : {'start':5, 'end': 67}, /* Exact position */
+            'position' : {'start':5, 'end': 68}, /* Exact position */
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':5,  'depth':1, 'after':'<tr A> <h1>'},
-              {'obj': 'element1', 'array':'end'  , 'pos':67, 'depth':1, 'before':'</h1> </tr>'}
+              {'obj': 'element1', 'array':'end'  , 'pos':68, 'depth':1, 'before':'</h1> </tr> '}
             ],
             'depth':1
           }

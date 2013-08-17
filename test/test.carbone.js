@@ -105,7 +105,7 @@ describe('Carbone', function(){
         {'brand' : 'Tesla motors'}
       ];
       var _xmlBuilt = carbone.buildXML(_xml, _data);
-      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row> <t_row></t_row><t_row> Tesla motors </t_row> <t_row></t_row></xml>');
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row> <t_row></t_row> <t_row> Tesla motors </t_row> <t_row></t_row> </xml>');
     });
     it('should handle array in an object', function(){
       var _xml = '<xml><t_row> {d.cars[i].brand} </t_row><t_row> {d.cars[i+1].brand} </t_row></xml>';
@@ -178,6 +178,15 @@ describe('Carbone', function(){
       };
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    });
+    it.skip('should work even if there are only self-closing tags', function(){
+      var _xml = '<xml> <br/> {d[i].brand} <br/> <br/><br/> <br/> {d[i+1].brand} <br/></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'},
+        {'brand' : 'Tesla motors'}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <br/> Lumeneo <br/> <br/><br/> <br/> Tesla motors <br/> <br/><br/> </xml>');
     });
     it('should manage nested arrays', function(){
       var _xml = 
@@ -348,7 +357,7 @@ describe('Carbone', function(){
         'wheels': [ {'size': 'A'},      {'size': 'B'} ]
       };
       var _xmlBuilt = carbone.buildXML(_xml, _data);
-      assert.equal(_xmlBuilt, '<xml><t_cars>   <td>Tesla </td><td>Lumeneo </td><td>Venturi </td> </t_cars><oo> hello </oo><t_wheels> <td>A </td><td>B </td> </t_wheels></xml>');
+      assert.equal(_xmlBuilt, '<xml><t_cars>   <td>Tesla </td> <td>Lumeneo </td> <td>Venturi </td>  </t_cars><oo> hello </oo><t_wheels> <td>A </td> <td>B </td>  </t_wheels></xml>');
     });
     it('should accept condition "=" in arrays', function(){
       var _xml = '<xml> <t_row> {d[speed=100,i].brand} </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
@@ -455,7 +464,15 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
     });
-
+    it.skip('should not crash if the markes are not correct (see comment below)')
+    /*
+      [
+        { "pos": 11586, "name": "d.fromDate:convert(YYYYMMDD,DD/MM/YYYY)" },
+        { "pos": 12854, "name": "d[i].date" },
+        { "pos": 13469, "name": "d[type=2,i].value:toFixed(2)" },
+        { "pos": 13723,  "name": "d[i+1].date" }
+      ]
+    */
   });
 
   describe('render', function(){
@@ -555,6 +572,18 @@ describe('Carbone', function(){
         });
       });
     });
+    /*it.skip('AAAfile test', function(done){
+      var _filePath = path.resolve('./test/datasets/menuOkSimple.xml');
+      var _dataPath = path.resolve('./test/datasets/menu.json');
+      var _data = require(_dataPath);
+      var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.xml');
+      carbone.render(_filePath, _data, function(result){
+        fs.writeFileSync(_resultFilePath, result);
+        var _xmlExpectedContent = fs.readFileSync(_resultFilePath, 'utf8');
+        //fs.unlinkSync(_resultFilePath);
+        done();
+      });
+    });*/
   });
 
   describe('renderPDF', function(){

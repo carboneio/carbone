@@ -103,6 +103,7 @@ describe('parser', function(){
     it('should return -1 when the opening tag is not found', function(){
       assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>', 'tr'), -1);
       assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>', 'tr'), -1);
+      assert.equal(parser.findOpeningTagPosition('<p></p></p><p></p></p><br/>', '',22), -1);
     });
     it('should accept a third parameter which indicates that the opening tag is before it.\
         It forces the algorithm to find the opening tag before this position', function(){
@@ -125,6 +126,26 @@ describe('parser', function(){
       assert.equal(parser.findOpeningTagPosition('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 23), 14);
       assert.equal(parser.findOpeningTagPosition('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>', 'tr', 37), 17);
     });
+    it('should always return a valid xml markup from the opening tag position to the end if an empty string is passed.\
+             even if there are self-closing tags...', function(){
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>', '',13), 11);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>', '',11), 6);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>', '',10), 6);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>', '',6), 0);
+
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p>', '',13), 3); //should return 3 in order to have a valid xml markup
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>', '',16), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>', '',17), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>', '',18), 17);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>', '',16), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>', '',17), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>', '',18), 17);
+
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/> <p><p></p></p><p></p>', '',17), 3);
+    });
+    it('should accept variable in xml', function(){
+      assert.equal(parser.findOpeningTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p><p></p>', '',48), 24);
+    });
   });
 
   describe('findClosingTagPosition', function(){
@@ -137,76 +158,257 @@ describe('parser', function(){
     it('should return -1 when the closing tag is not found', function(){
       assert.equal(parser.findClosingTagPosition('<tr>sqdsqdsd', 'tr'), -1);
       assert.equal(parser.findClosingTagPosition('<tr>sqdsqd<tr></tr>sqdsd', 'tr'), -1);
+      assert.equal(parser.findClosingTagPosition('<br/><p><p></p></p></p><br/>', '', 21), -1);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 10000), -1);
+    });
+    it('should accept a third parameter which indicates that the closing tag is after it.\
+        It forces the algorithm to find the closing tag after this position', function(){
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 0), 25);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 22), 25);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 24), 25);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 25), 42);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 40), 42);
+    });
+    it('should always return a valid xml markup from the beginning to the closing tag position if an empty string is passed.\
+             even if there are self-closing tags...', function(){
+      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', '', 13), 17);
+      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', '', 12), 17);
+      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', '', 11), 12);
+      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', '', 0), 6);
+
+      assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>', ''), 14); 
+      assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>', '',13), 14);
+      assert.equal(parser.findClosingTagPosition('<br/><p><p></p></p></p><br/>', '', 6), 19);
+    });
+    it('should accept variable in xml', function(){
+      assert.equal(parser.findClosingTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p></p></p></p>', ''), 106);
     });
   });
 
   describe('findPivot', function(){
-    it('should detect the pivot point, where the transition between two rows (or columns) happens', function(){
-      var _str = '</td> </tr><tr> <td>';
-      helper.assert(parser.findPivot(_str), {'tag':'</tr><tr>', 'pos': 11 });
-      _str = 'menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle';
-      helper.assert(parser.findPivot(_str), {'tag':'</tr><tr>', 'pos': 40 });
-      _str = 'menu </p><p> bla </p><p> foot </p> </tr>   <tr> <p> basket </p><p> tennis </p><p> balle';
-      helper.assert(parser.findPivot(_str), {'tag':'</tr>   <tr>', 'pos': 40 });
-      _str = 'menu </p><p teddds> bla </p></xml><p> foot </p> </image></tr><tr> <p> basket </p><tag><p> tennis </p><p> balle';
-      helper.assert(parser.findPivot(_str), {'tag':'</tr><tr>', 'pos': 61 });
-      _str = 'menu </p><p> </p></tr:w><tr:w color=test test=3> <p> basket </p> balle';
-      helper.assert(parser.findPivot(_str), {'tag':'</tr:w><tr:w color=test test=3>', 'pos': 24 });
-      _str = '<h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> ';
-      helper.assert(parser.findPivot(_str), {'tag':'</tr> <tr A>', 'pos': 55 });
+    it('should return null if the pivot cannot be found', function(){
+      var _str = '';
+      helper.assert(parser.findPivot(_str), null);
+      _str = '</tr></tr></tr></tr>';
+      helper.assert(parser.findPivot(_str), null);
+      _str = '</tr>';
+      helper.assert(parser.findPivot(_str), null);
+      _str = '<tr><tr><tr>';
+      helper.assert(parser.findPivot(_str), null);
+      _str = '<tr><tr><tr></tr>';
+      helper.assert(parser.findPivot(_str), null);
+      _str = '<tr><tr><tr></tr></tr></tr>';
+      helper.assert(parser.findPivot(_str), null);
+      _str = '<tr><tr><tr></tr></tr></tr></tr>';
+      helper.assert(parser.findPivot(_str), null);
+      _str = '</tr></tr></tr></tr>';
+      helper.assert(parser.findPivot(_str), null);
     });
-    it('should detect the pivot point even if the repetition is not an array or a list', function(){
+    it('should detect the pivot point. It represents the transition between the two repeated parts', function(){
+      var _str = '</td> </tr><tr> <td>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tr', 'pos': 11 },
+        'part2Start':{'tag':'tr', 'pos': 11 }
+      });
+      _str = 'menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tr', 'pos': 40 },
+        'part2Start':{'tag':'tr', 'pos': 40 }
+      });
+      _str = 'menu </p><p> bla </p><p> foot </p> </tr>   <tr> <p> basket </p><p> tennis </p><p> balle';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tr', 'pos': 43 },
+        'part2Start':{'tag':'tr', 'pos': 43 }
+      });
+      _str = 'menu </p><p teddds> bla </p></xml><p> foot </p> </image></tr><tr> <p> basket </p><tag><p> tennis </p><p> balle';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tr', 'pos': 61 },
+        'part2Start':{'tag':'tr', 'pos': 61 }
+      });
+      _str = '<h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> ';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tr', 'pos': 56 },
+        'part2Start':{'tag':'tr', 'pos': 56 }
+      });
+    });
+    it('should work even if there are some tags between the two repeated parts (+ complex case)', function(){
+      var _str = '</p></p></tr><tr><p></p></tr></tab><inter><p></p></inter><tab><p></p><p><tr><td><p></p><a></a>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tab', 'pos': 35 },
+        'part2Start':{'tag':'tab', 'pos': 57 }
+      });
+    });
+    it('should work even if the opening tag of the second part is not the same as the closing tag of the first part', function(){
+      var _str = '</p></p></tr><tr><p></p></tr></tab><inter><p></p></inter><tab2><p></p><p><tr><td><p></p><a></a>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tab', 'pos': 35 },
+        'part2Start':{'tag':'tab2', 'pos': 57 }
+      });
+    });
+    it('should accept tags with variables', function(){
+      var _str = 'menu </p><p> </p></tr:w><tr:w color=test test=3> <p> basket </p> balle';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tr:w', 'pos': 24 },
+        'part2Start':{'tag':'tr:w', 'pos': 24 }
+      });
+    });
+    it('should detect the pivot point even if the repetition is not an array or a list (flat representation)', function(){
       var _str = '</h1> <h1></h1> <h1></h1> <h1></h1> <h1> <h2>';
-      helper.assert(parser.findPivot(_str), {'tag':'</h1> <h1>', 'pos': 35 });
-      var _str = '</h1> <h1></h1> <h1></h1> <h3></h3> <h1> <h2>';
-      helper.assert(parser.findPivot(_str), {'tag':'</h3> <h1>', 'pos': 35 });
-      var _str = ' </t_row> <t_row></t_row> <t_row> ';
-      helper.assert(parser.findPivot(_str), {'tag':'</t_row> <t_row>', 'pos': 25 });
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'h1', 'pos': 6 },
+        'part2Start':{'tag':'h1', 'pos': 36 }
+      });
+      _str = '</h1> <h1></h1> <h1></h1> <h3></h3> <h1> <h2>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'h1', 'pos': 6 },
+        'part2Start':{'tag':'h1', 'pos': 36 }
+      });
+      _str = ' </t_row> <t_row></t_row> <t_row> ';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'t_row', 'pos': 10 },
+        'part2Start':{'tag':'t_row', 'pos': 26 }
+      });
+    });
+    it('should accept self-closing tags and add a boolean "selfClosing" if the tag is a self-closing one', function(){
+      var _str = '</p></p></tr><tr><p></p></tr></tab><inter/><br/><tab2><p></p><p><tr><td><p></p><a></a>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tab', 'pos': 35 },
+        'part2Start':{'tag':'tab2', 'pos': 48 }
+      });
+      _str = '</p></p><br/></tr><tr><p></p></tr><br/></tab><inter/><br/><tab><p></p><p><tr><td><br/><p><br/></p><a></a>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tab', 'pos': 45 },
+        'part2Start':{'tag':'tab', 'pos': 58 }
+      });
+      _str = '<br/><br/><br/>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'br', 'pos': 5, 'selfClosing':true},
+        'part2Start':{'tag':'br', 'pos': 10, 'selfClosing':true}
+      });
+      _str = '<br/><br/><tr>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'br', 'pos': 5, 'selfClosing':true},
+        'part2Start':{'tag':'tr', 'pos': 10 }
+      });
+      _str = '<br/></tr><br/>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'tr', 'pos': 10 },
+        'part2Start':{'tag':'br', 'pos': 10, 'selfClosing':true}
+      });
+    });
+    it('should accept very complex case', function(){
+      var _str = '<w:rPr><w:b/><w:b-cs/><w:color w:val="FFFFFF"/></w:rPr><w:t></w:t></w:r></w:p></w:tc></w:tr><w:tr wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidTr="00137A31"><w:trPr><w:trHeight w:val="1760"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="10012" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="auto"/></w:tcPr><w:p wsp:rsidR="00137A31" wsp:rsidRPr="00F62BCC" wsp:rsidRDefault="00137A31" wsp:rsidP="007057CC"><w:pPr><w:rPr><w:b/><w:b-cs/></w:rPr></w:pPr></w:p></w:tc></w:tr></w:tbl><w:p wsp:rsidR="00F62BCC" wsp:rsidRDefault="00F62BCC"><w:pPr><w:rPr><w:sz w:val="32"/></w:rPr></w:pPr></w:p><w:tbl><w:tblPr><w:tblpPr w:leftFromText="180" w:rightFromText="180" w:horzAnchor="page" w:tblpX="1009"/><w:tblW w:w="10081" w:type="dxa"/><w:tblBorders><w:top w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/><w:left w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/><w:bottom w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/><w:right w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/></w:tblBorders><w:tblLook w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="10081"/></w:tblGrid><w:tr wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidTr="00F62BCC"><w:trPr><w:trHeight w:val="98"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="10081" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="4F81BD"/></w:tcPr><w:p wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidRDefault="00F62BCC" wsp:rsidP="007E678B"><w:pPr><w:rPr><w:b/><w:b-cs/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r wsp:rsidRPr="00F62BCC"><w:rPr><w:b/><w:b-cs/><w:color w:val="FFFFFF"/></w:rPr>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'w:tbl', 'pos': 485 },
+        'part2Start':{'tag':'w:tbl', 'pos': 593 }
+      });
     });
   });
 
   describe('findRepetitionPosition', function(){
+    it('should return null of the pivot is null', function(){
+      var _xml = '<tr>  </tr><tr> </tr>';
+      helper.assert(parser.findRepetitionPosition(_xml, null), null);
+    });
     it('should detect the repetition', function(){
       var _xml = '<tr>  </tr><tr> </tr>';
-      var _pivot = {'tag' : '</tr><tr>', 'pos': 11};
+      var _pivot = {
+        'part1End'  :{'tag':'tr', 'pos': 11 },
+        'part2Start':{'tag':'tr', 'pos': 11 }
+      };
       var _expectedRange = {startEven: 0,  endEven : 11, startOdd:11, endOdd:21};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
-    it('should detect the repetition', function(){
+    it('2. should detect the repetition', function(){
       var _xml = 'qsjh k <tr> menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
-      var _pivot = {'tag' : '</tr><tr>', 'pos': 52};
+      var _pivot = {
+        'part1End'  :{'tag':'tr', 'pos': 52 },
+        'part2Start':{'tag':'tr', 'pos': 52 }
+      };
       var _expectedRange = {startEven: 7,  endEven : 52, startOdd:52, endOdd:102};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should detect the repetition even if the start tag contains some meta data', function(){
       var _xml = 'qsjh k <tr w:blue color=test> menu </p><p> bla </p><p> foot </p> </tr><tr w:blue color=test> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
-      var _pivot = {'tag' : '</tr><tr>', 'pos': 70};
+      var _pivot = {
+        'part1End'  :{'tag':'tr', 'pos': 70 },
+        'part2Start':{'tag':'tr', 'pos': 70 }
+      };
       var _expectedRange = {startEven: 7,  endEven : 70, startOdd:70, endOdd:138};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should detect the repetition even if there a lot of similar tags and nested tags in the middle', function(){
       var _xml = '<tr> qsjh k </tr><tr>start<tr><tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr><tr>   <tr> menu </tr><tr> bla </tr><tr><tr> balle </tr></tr> end </tr> <tr> </tr>';
-      var _pivot = {'tag' : '</tr><tr>', 'pos': 87};
+      var _pivot = {
+        'part1End'  :{'tag':'tr', 'pos': 87 },
+        'part2Start':{'tag':'tr', 'pos': 87 }
+      };
       var _expectedRange = {startEven: 17,  endEven : 87, startOdd:87, endOdd:158};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should detect the repetition even there is some whitespaces in the pivot', function(){
       var _xml = 'qsjh k <tr> menu </p><p> bla </p><p> foot </p> </tr>   <tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
-      var _pivot = {'tag' : '</tr><tr>', 'pos': 53};
+      var _pivot = {
+        'part1End'  :{'tag':'tr', 'pos': 53 },
+        'part2Start':{'tag':'tr', 'pos': 53 }
+      };
       var _expectedRange = {startEven: 7,  endEven : 53, startOdd:53, endOdd:105};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should return -1 if the start tag is not found', function(){
       var _xml = 'qsjh k <qsd:blue color=test> menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
-      var _pivot = {'tag' : '</tr><tr>', 'pos': 70};
+      var _pivot = {
+        'part1End'  :{'tag':'tr', 'pos': 70 },
+        'part2Start':{'tag':'tr', 'pos': 70 }
+      };
       var _expectedRange = {startEven: -1,  endEven : 70, startOdd:70, endOdd:69};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should accept a third parameter which indicates that the beginning of the repetition is before it', function(){
       var _xml = ' <t_row> </t_row> <t_row>useless</t_row><t_row> </t_row>';
-      var _pivot = {'tag' : '</t_row> <t_row>', 'pos': 40};
+      var _pivot = {
+        'part1End'  :{'tag':'t_row', 'pos': 40 },
+        'part2Start':{'tag':'t_row', 'pos': 40 }
+      };
       var _expectedRange = {startEven: 1,  endEven : 40, startOdd:40, endOdd:56};
       var _roughStart = 9;
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
+    });
+    it('should work even if there are some tags between the two repeated parts (+ complex case)', function(){
+      var _xml = '<tab><p></p><tab><tr><p><p></p></p></tr><tr><p></p></tr></tab><inter><p></p></inter><tab><p></p><p><tr><td><p></p><a></a></td></tr></p></tab><p></p></tab>';
+      var _pivot = {
+        'part1End'  :{'tag':'tab', 'pos': 62 },
+        'part2Start':{'tag':'tab', 'pos': 84 }
+      };
+      var _expectedRange = {startEven: 12,  endEven : 84, startOdd:84, endOdd:141};
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
+    });
+    it('should work even if there are some self-closing tags', function(){
+      var _xml = '<tab><p></p><tab><br/><tr><p><br/><p></p></p></tr><tr><p></p></tr></tab><inter/><br/><tab><p></p><p><tr><td><p></p><a></a></td></tr></p></tab><p></p></tab>';
+      var _pivot = {
+        'part1End'  :{'tag':'tab', 'pos': 72 },
+        'part2Start':{'tag':'tab', 'pos': 85 }
+      };
+      var _expectedRange = {startEven: 12,  endEven : 85, startOdd:85, endOdd:142};
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
+    });
+    it('should work even if the opening tag of the second part is not the same as the closing tag of the first part', function(){
+      var _xml = '<tab><p></p><tab><br/><tr><p><br/><p></p></p></tr><tr><p></p></tr></tab><inter/><br/><tab2><p></p><p><tr><td><p></p><a></a></td></tr></p></tab2><p></p></tab>';
+      var _pivot = {
+        'part1End'  :{'tag':'tab', 'pos': 72 },
+        'part2Start':{'tag':'tab2', 'pos': 85 }
+      };
+      var _expectedRange = {startEven: 12,  endEven : 85, startOdd:85, endOdd:144};
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
+    });
+    it('should accept self-closing tags', function(){
+      var _xml = '<doc><br/><br/><br/><br/></doc>';
+      var _pivot = {
+        'part1End'  :{'tag':'br', 'pos': 10, 'selfClosing':true},
+        'part2Start':{'tag':'br', 'pos': 15, 'selfClosing':true}
+      };
+      var _expectedRange = {startEven: 5,  endEven : 15, startOdd:15, endOdd:20};
+      var _roughStart = 11;
       helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
     });
   });

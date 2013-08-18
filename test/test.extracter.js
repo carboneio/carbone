@@ -911,6 +911,41 @@ describe('extracter', function(){
       });
     });
 
+    it('should not return bad data if the start position (12) of the array equals the position of one attribute (menu)', function(){
+      var _xml = '<div><p></p><br/></div>';
+      var _descriptor = {
+        'd0':{
+          'name':'',
+          'type':'array',
+          'parent':'',
+          'position' : {'start':12, 'end':17}, /* Approximative position */
+          'xmlParts' : [
+            {'obj': 'd0', 'attr':'menu', 'pos':12},
+          ]
+        }
+      };
+      helper.assert(extracter.splitXml(_xml, _descriptor), {
+        'staticData'  : {
+          'before':'<div><p></p>',
+          'after' :'</div>'
+        },
+        'dynamicData' : {
+          'd0':{
+            'name':'',
+            'type':'array',
+            'parent':'',
+            'position' : {'start':12, 'end':17}, /* exact position */
+            'xmlParts' : [
+              {'obj': 'd0', 'attr':'menu'   , 'pos':12, 'depth' : 1},
+              {'obj': 'd0', 'array':'start' , 'pos':12, 'depth' : 1,  'after':''},
+              {'obj': 'd0', 'array':'end'   , 'pos':17, 'depth' : 1, 'before':'<br/>'}
+            ],
+            'depth' : 1
+          }
+        }
+      });
+    });
+
     it('3 should extract xml parts of an array', function(){
       var _xml = '<div><tr> <h1> </h1> </tr><tr> <h1> </h1> </tr></div>';
       var _descriptor = {

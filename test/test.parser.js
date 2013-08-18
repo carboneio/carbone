@@ -93,95 +93,109 @@ describe('parser', function(){
 
   describe('findOpeningTagPosition', function(){
     it('should return the index of the opening tag on the left', function(){
-      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqdsqd</tr>', 'tr'), 5);
-      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr'), 5);
-      assert.equal(parser.findOpeningTagPosition('a<tr></tr>sdasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr'), 16);
-      assert.equal(parser.findOpeningTagPosition('a<tr><tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr'), 13);
-      assert.equal(parser.findOpeningTagPosition('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr'), 14);
-      assert.equal(parser.findOpeningTagPosition('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>', 'tr'), 17);
+      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqdsqd</tr>'), 5);
+      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>'), 5);
+      assert.equal(parser.findOpeningTagPosition('a<tr></tr>sdasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>'), 16);
+      assert.equal(parser.findOpeningTagPosition('a<tr><tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>'), 13);
+      assert.equal(parser.findOpeningTagPosition('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>'), 14);
+      assert.equal(parser.findOpeningTagPosition('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>'), 17);
     });
     it('should return -1 when the opening tag is not found', function(){
-      assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>', 'tr'), -1);
-      assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>', 'tr'), -1);
-      assert.equal(parser.findOpeningTagPosition('<p></p></p><p></p></p><br/>', '',22), -1);
+      assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>'), -1);
+      assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>'), -1);
+      assert.equal(parser.findOpeningTagPosition('<p></p></p><p></p></p><br/>',22), -1);
+      assert.equal(parser.findOpeningTagPosition('</p><p><p><br/></p></p><br/>',4), -1);
     });
     it('should accept a third parameter which indicates that the opening tag is before it.\
         It forces the algorithm to find the opening tag before this position', function(){
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 14), 3);
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 22), 3);
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 23), 3);
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 30), 23);
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 37), 23);
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 40), 23);
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 88), 23);
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 54), 23);
-      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 't_row', 1000), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 14), 3);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 22), 3);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 23), 22);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 30), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 37), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 40), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 88), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 54), 23);
+      assert.equal(parser.findOpeningTagPosition('xx <t_row> qq </t_row> <t_row>useless</t_row>', 1000), 23);
 
-      assert.equal(parser.findOpeningTagPosition('xx <td> <td> tab </td> </td>', 'td', 13), 3);
+      assert.equal(parser.findOpeningTagPosition('xx <td> <td> tab </td> </td>', 13), 3);
 
-      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqdsqd</tr>', 'tr',9), 5);
-      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 11), 5);
-      assert.equal(parser.findOpeningTagPosition('a<tr></tr>sdasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 22), 16);
-      assert.equal(parser.findOpeningTagPosition('a<tr><tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 20), 13);
-      assert.equal(parser.findOpeningTagPosition('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 'tr', 23), 14);
-      assert.equal(parser.findOpeningTagPosition('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>', 'tr', 37), 17);
+      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqdsqd</tr>',9), 5);
+      assert.equal(parser.findOpeningTagPosition('aasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 11), 5);
+      assert.equal(parser.findOpeningTagPosition('a<tr></tr>sdasas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 22), 16);
+      assert.equal(parser.findOpeningTagPosition('a<tr><tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 20), 13);
+      assert.equal(parser.findOpeningTagPosition('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>', 23), 14);
+      assert.equal(parser.findOpeningTagPosition('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>', 37), 17);
     });
     it('should always return a valid xml markup from the opening tag position to the end if an empty string is passed.\
              even if there are self-closing tags...', function(){
-      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>', '',13), 11);
-      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>', '',11), 6);
-      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>', '',10), 6);
-      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>', '',6), 0);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>',13), 11);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>',11), 6);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>',10), 6);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/><file/>',6), 0);
 
-      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p>', '',13), 3); //should return 3 in order to have a valid xml markup
-      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>', '',16), 3);
-      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>', '',17), 3);
-      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>', '',18), 17);
-      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>', '',16), 3);
-      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>', '',17), 3);
-      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>', '',18), 17);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p>',13), 3); //should return 3 in order to have a valid xml markup
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>',16), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>',17), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/>',18), 17);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p><br/></p></p><br/>',25), 22);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p><br/></p></p><br/>',27), 22);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p><br/></p></p><br/>',22), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p><br/></p></p><br/>',6), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>',16), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>',17), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/><p></p>',18), 17);
 
-      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/> <p><p></p></p><p></p>', '',17), 3);
+      assert.equal(parser.findOpeningTagPosition('<p><p><p></p></p><br/> <p><p></p></p><p></p>',17), 3);
+    });
+    it('should not take into account the whitespaces between tags.\
+        it should always return a position which is lower than "indexWhereToStopSearch"', function(){
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/>   <file/>',11), 6);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/>   <file/>',12), 11);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/>   <file/>',14), 13);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br/> qszd  <file/>',16), 15);
+      assert.equal(parser.findOpeningTagPosition('<tar/><br color="3"/>   <file/>',24), 23);
     });
     it('should accept variable in xml', function(){
-      assert.equal(parser.findOpeningTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p><p></p>', '',48), 24);
+      assert.equal(parser.findOpeningTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p><p></p>',48), 24);
     });
   });
 
   describe('findClosingTagPosition', function(){
     it('should return the index of the closing tag on the right', function(){
-      assert.equal(parser.findClosingTagPosition('<tr>sqdsqd</tr>sqdsd', 'tr'), 15);
-      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqdsd', 'tr'), 35);
-      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd<tr></tr>sd', 'tr'), 35);
-      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd</tr></tr>sd', 'tr'), 35);
+      assert.equal(parser.findClosingTagPosition('<tr>sqdsqd</tr>sqdsd'), 15);
+      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqdsd'), 35);
+      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd<tr></tr>sd'), 35);
+      assert.equal(parser.findClosingTagPosition('<tr>sq<tr></tr>s<tr>s</tr>dsqd</tr>sqd</tr></tr>sd'), 35);
     });
     it('should return -1 when the closing tag is not found', function(){
-      assert.equal(parser.findClosingTagPosition('<tr>sqdsqdsd', 'tr'), -1);
-      assert.equal(parser.findClosingTagPosition('<tr>sqdsqd<tr></tr>sqdsd', 'tr'), -1);
-      assert.equal(parser.findClosingTagPosition('<br/><p><p></p></p></p><br/>', '', 21), -1);
-      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 10000), -1);
+      assert.equal(parser.findClosingTagPosition('<tr>sqdsqdsd'), -1);
+      assert.equal(parser.findClosingTagPosition('<tr>sqdsqd<tr></tr>sqdsd'), -1);
+      assert.equal(parser.findClosingTagPosition('<br/><p><p></p></p></p><br/>', 21), -1);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 10000), -1);
     });
     it('should accept a third parameter which indicates that the closing tag is after it.\
         It forces the algorithm to find the closing tag after this position', function(){
-      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 0), 25);
-      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 22), 25);
-      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 24), 25);
-      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 25), 42);
-      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 't_row', 40), 42);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 0), 25);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 22), 25);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 24), 25);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 25), 42);
+      assert.equal(parser.findClosingTagPosition('xx <t_row>useless</t_row> <t_row>a</t_row>', 40), 42);
     });
     it('should always return a valid xml markup from the beginning to the closing tag position if an empty string is passed.\
              even if there are self-closing tags...', function(){
-      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', '', 13), 17);
-      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', '', 12), 17);
-      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', '', 11), 12);
-      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', '', 0), 6);
+      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', 13), 17);
+      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', 12), 17);
+      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', 11), 12);
+      assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', 0), 6);
+      assert.equal(parser.findClosingTagPosition('<br/>'), 5);
 
-      assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>', ''), 14); 
-      assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>', '',13), 14);
-      assert.equal(parser.findClosingTagPosition('<br/><p><p></p></p></p><br/>', '', 6), 19);
+      assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>'), 14); 
+      assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>',13), 14);
+      assert.equal(parser.findClosingTagPosition('<br/><p><p></p></p></p><br/>', 6), 19);
     });
     it('should accept variable in xml', function(){
-      assert.equal(parser.findClosingTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p></p></p></p>', ''), 106);
+      assert.equal(parser.findClosingTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p></p></p></p>'), 106);
     });
   });
 
@@ -285,6 +299,16 @@ describe('parser', function(){
         'part1End'  :{'tag':'br', 'pos': 5, 'selfClosing':true},
         'part2Start':{'tag':'br', 'pos': 10, 'selfClosing':true}
       });
+      _str = '<br/><br/><br/><br/>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'br', 'pos': 5, 'selfClosing':true},
+        'part2Start':{'tag':'br', 'pos': 15, 'selfClosing':true}
+      });
+      _str = '<br/>';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'br', 'pos': 5, 'selfClosing':true},
+        'part2Start':{'tag':'br', 'pos': 5, 'selfClosing':true}
+      });
       _str = '<br/><br/><tr>';
       helper.assert(parser.findPivot(_str), {
         'part1End'  :{'tag':'br', 'pos': 5, 'selfClosing':true},
@@ -301,6 +325,13 @@ describe('parser', function(){
       helper.assert(parser.findPivot(_str), {
         'part1End'  :{'tag':'w:tbl', 'pos': 485 },
         'part2Start':{'tag':'w:tbl', 'pos': 593 }
+      });
+    });
+    it.skip('should accept non-XML structure', function(){
+      var _str = ' ';
+      helper.assert(parser.findPivot(_str), {
+        'part1End'  :{'tag':'', 'pos': 1 },
+        'part2Start':{'tag':'', 'pos': 1 }
       });
     });
   });
@@ -320,7 +351,7 @@ describe('parser', function(){
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('2. should detect the repetition', function(){
-      var _xml = 'qsjh k <tr> menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
+      var _xml = 'qsjh k <tr> menu <r/><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p>    balle </tr> dqd';
       var _pivot = {
         'part1End'  :{'tag':'tr', 'pos': 52 },
         'part2Start':{'tag':'tr', 'pos': 52 }
@@ -329,7 +360,7 @@ describe('parser', function(){
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should detect the repetition even if the start tag contains some meta data', function(){
-      var _xml = 'qsjh k <tr w:blue color=test> menu </p><p> bla </p><p> foot </p> </tr><tr w:blue color=test> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
+      var _xml = 'qsjh k <tr w:blue color=test> menu <r/><p> bla </p><p> foot </p> </tr><tr w:blue color=test> <p> basket </p><p> tennis </p>    balle </tr> dqd';
       var _pivot = {
         'part1End'  :{'tag':'tr', 'pos': 70 },
         'part2Start':{'tag':'tr', 'pos': 70 }
@@ -347,7 +378,7 @@ describe('parser', function(){
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should detect the repetition even there is some whitespaces in the pivot', function(){
-      var _xml = 'qsjh k <tr> menu </p><p> bla </p><p> foot </p> </tr>   <tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
+      var _xml = 'qsjh k <tr> menu <r/><p> bla </p><p> foot </p> </tr>   <tr> <p> basket </p><p> tennis </p>    balle </tr> dqd';
       var _pivot = {
         'part1End'  :{'tag':'tr', 'pos': 53 },
         'part2Start':{'tag':'tr', 'pos': 53 }
@@ -356,12 +387,12 @@ describe('parser', function(){
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should return -1 if the start tag is not found', function(){
-      var _xml = 'qsjh k <qsd:blue color=test> menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle </tr> dqd';
+      var _xml = 'qsjh k  qsd:blue color=test   menu <r/><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p>    balle </tr> dqd';
       var _pivot = {
         'part1End'  :{'tag':'tr', 'pos': 70 },
         'part2Start':{'tag':'tr', 'pos': 70 }
       };
-      var _expectedRange = {startEven: -1,  endEven : 70, startOdd:70, endOdd:69};
+      var _expectedRange = {startEven: -1,  endEven : 70, startOdd:70, endOdd:120};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should accept a third parameter which indicates that the beginning of the repetition is before it', function(){
@@ -409,6 +440,26 @@ describe('parser', function(){
       };
       var _expectedRange = {startEven: 5,  endEven : 15, startOdd:15, endOdd:20};
       var _roughStart = 11;
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
+    });
+    it('should accept only one self-closing tag between the two repeated parts', function(){
+      var _xml = '<doc><br/></doc>';
+      var _pivot = {
+        'part1End'  :{'tag':'br', 'pos': 10, 'selfClosing':true},
+        'part2Start':{'tag':'br', 'pos': 10, 'selfClosing':true}
+      };
+      var _expectedRange = {startEven: 5,  endEven : 10, startOdd:10, endOdd:10};
+      var _roughStart = 6;
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
+    });
+    it('should not over-estimate the length of the repeated parts', function(){
+      var _xml = '<xml><p><p><br/></p></p><br/><br/></xml>';
+      var _pivot = {
+        'part1End'  :{'tag':'br', 'pos': 29, 'selfClosing':true},
+        'part2Start':{'tag':'br', 'pos': 29, 'selfClosing':true}
+      };
+      var _expectedRange = {startEven: 24,  endEven : 29, startOdd:29, endOdd:34};
+      var _roughStart = 24;
       helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
     });
   });

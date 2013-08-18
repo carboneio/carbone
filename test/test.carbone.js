@@ -179,6 +179,15 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
     });
+    it('should detect repetition even if there is only one self-closing tag between the two parts (with whitespaces)', function(){
+      var _xml = '<xml><p><p><br/></p></p>{d[i].brand}  <br/>{d[i+1].brand}  <br/></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'},
+        {'brand' : 'Tesla motors'}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml><p><p><br/></p></p>Lumeneo  <br/>Tesla motors  <br/></xml>');
+    });
     it.skip('should work even if there are only self-closing tags', function(){
       var _xml = '<xml> <br/> {d[i].brand} <br/> <br/><br/> <br/> {d[i+1].brand} <br/></xml>';
       var _data = [

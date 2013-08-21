@@ -380,12 +380,16 @@ describe('extracter', function(){
         }
       });
     });
-    it.skip('should accept multiple occurrences of the same array', function(){
+    it('should accept multiple occurrences of the same array', function(){
       var _markers = [
         {'pos': 20, 'name': 'd.site[i].id'},
+        {'pos': 21, 'name': 'd.site[i].val'},
         {'pos': 30, 'name': 'd.site[i+1].id'},
+        {'pos': 31, 'name': 'd.site[i+1].val'},
         {'pos': 40, 'name': 'd.site[i].id'},
-        {'pos': 50, 'name': 'd.site[i+1].id'}
+        {'pos': 41, 'name': 'd.site[i].val'},
+        {'pos': 50, 'name': 'd.site[i+1].id'},
+        {'pos': 51, 'name': 'd.site[i+1].val'}
       ];
       helper.assert(extracter.splitMarkers(_markers), {
         'd':{
@@ -399,9 +403,218 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
-          'similar': ['dsite2'],
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20},
+            {'attr':'val', 'formatters' : [], 'obj': 'dsite', 'pos':21}
+          ]
+        },
+        'dsite$':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 40, 'end': 50 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40},
+            {'attr':'val', 'formatters' : [], 'obj': 'dsite$', 'pos':41}
+          ]
+        }
+      });
+    });
+    it('should accept at least three occurrences of the same array', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i].id'},
+        {'pos': 30, 'name': 'd.site[i+1].id'},
+        {'pos': 40, 'name': 'd.site[i].id'},
+        {'pos': 50, 'name': 'd.site[i+1].id'},
+        {'pos': 60, 'name': 'd.site[i].id'},
+        {'pos': 70, 'name': 'd.site[i+1].id'},
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20}
+          ]
+        },
+        'dsite$':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 40, 'end': 50 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40}
+          ]
+        },
+        'dsite$$':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 60, 'end': 70 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite$$', 'pos':60}
+          ]
+        }
+      });
+    });
+    it('should accept multiple occurrences of the same array with conditions', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i, id >1].id'},
+        {'pos': 30, 'name': 'd.site[i+1, id >1].id'},
+        {'pos': 40, 'name': 'd.site[i, val >2].id'},
+        {'pos': 50, 'name': 'd.site[i+1, val >2].id'},
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'id'}, 'operator':'>', 'right':'1'}]},
+          ]
+        },
+        'dsite$':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 40, 'end': 50 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40, 'conditions':[{'left':{'parent':'dsite$', 'attr':'val'}, 'operator':'>', 'right':'2'}]},
+          ]
+        }
+      });
+    });
+    it('should accept multiple occurrences of the same array with conditions and nested objects', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i, id >1].obj.id'},
+        {'pos': 30, 'name': 'd.site[i+1, id >1].obj.id'},
+        {'pos': 40, 'name': 'd.site[i, val >2].obj.id'},
+        {'pos': 50, 'name': 'd.site[i+1, val >2].obj.id'},
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : []
+        },
+        'dsiteobj':{
+          'name': 'obj',
+          'type': 'object',
+          'parent':'dsite',
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsiteobj', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'id'}, 'operator':'>', 'right':'1'}]},
+          ]
+        },
+        'dsite$':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 40, 'end': 50 },
+          'xmlParts' : []
+        },
+        'dsite$obj':{
+          'name': 'obj',
+          'type': 'object',
+          'parent':'dsite$',
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite$obj', 'pos':40, 'conditions':[{'left':{'parent':'dsite$', 'attr':'val'}, 'operator':'>', 'right':'2'}]},
+          ]
+        },
+      });
+    });
+    it('should accept multiple occurrences of the same array with conditions', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i, id >1].id'},
+        {'pos': 30, 'name': 'd.site[i+1, id >1].id'},
+        {'pos': 40, 'name': 'd.site[i, val >2].id'},
+        {'pos': 50, 'name': 'd.site[i+1, val >2].id'},
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'id'}, 'operator':'>', 'right':'1'}]},
+          ]
+        },
+        'dsite$':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 40, 'end': 50 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40, 'conditions':[{'left':{'parent':'dsite$', 'attr':'val'}, 'operator':'>', 'right':'2'}]},
+          ]
+        }
+      });
+    });
+    it('should accept multiple occurrences of the same array with nested object', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.site[i].id'},
+        {'pos': 21, 'name': 'd.site[i].val'},
+        {'pos': 30, 'name': 'd.site[i+1].id'},
+        {'pos': 31, 'name': 'd.site[i+1].val'},
+        {'pos': 40, 'name': 'd.site[i].id'},
+        {'pos': 41, 'name': 'd.site[i].val'},
+        {'pos': 50, 'name': 'd.site[i+1].id'},
+        {'pos': 51, 'name': 'd.site[i+1].val'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : []
+        },
+        'dsite':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 20, 'end': 30 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20},
+            {'attr':'val', 'formatters' : [], 'obj': 'dsite', 'pos':21}
+          ]
+        },
+        'dsite$':{
+          'name': 'site',
+          'type': 'array',
+          'parent':'d',
+          'position': { 'start': 40, 'end': 50 },
+          'xmlParts' : [
+            {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40},
+            {'attr':'val', 'formatters' : [], 'obj': 'dsite$', 'pos':41}
           ]
         }
       });
@@ -483,7 +696,7 @@ describe('extracter', function(){
         }
       });
     });
-    it('2 inverse order should decompose all markers', function(){
+    it.skip('2 inverse order should decompose all markers', function(){
       var _markers = [
         {'pos': 10, 'name': 'd.menu[i].menuElement[i].id'},
         {'pos': 20, 'name': 'd.menu[i+1].menuElement[i].id'},

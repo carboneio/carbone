@@ -463,7 +463,18 @@ describe('Carbone', function(){
       var _xmlBuilt = carbone.buildXML(_xml, _data);
       helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row></xml>');
     });
-    it.skip('should work if the same array is repeated two times in the xml', function(){
+    it.skip('should accept than the conditions is repeated multiples times (should not jave a variable declared two times in the builder)', function(){
+      //TODO
+      var _xml = '<xml> <t_row> {d[ speed . high > 8, s pe ed.h igh < 20, i].brand} </t_row><t_row> {d[ speed.high > 8, speed.high < 20, i+1].brand} </t_row></xml>';
+      var _data = [
+        {'brand' : 'Lumeneo'     , 'speed':{'high':12, 'low':1}},
+        {'brand' : 'Tesla motors', 'speed':{'high':5 , 'low':2 }},
+        {'brand' : 'Toyota'      , 'speed':{'high':44, 'low':20}}
+      ];
+      var _xmlBuilt = carbone.buildXML(_xml, _data);
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row></xml>');
+    });
+    it('AAshould work if the same array is repeated two times in the xml', function(){
       var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1].brand} </t_row><t_row> {d[i].brand} </t_row><t_row> {d[i+1].brand} </t_row></xml>';
       var _data = [
         {'brand' : 'Lumeneo'},

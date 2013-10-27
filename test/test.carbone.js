@@ -8,8 +8,7 @@ var converter = require('../lib/converter');
 var defaultOptions = {
   'mode' : 'pipe', 
   'pipeNamePrefix' : '_carbone',
-  'nbListeners' : 1,
-  'startDelay' : 4000,
+  'nbFactories' : 1,
   'startOnInit' : false,
   'nbAttemptMax' : 2
 };

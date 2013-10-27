@@ -14,8 +14,7 @@ var tempPath = path.join(__dirname, '../', 'temp');
 var defaultOptions = {
   'mode' : 'pipe', 
   'pipeNamePrefix' : '_carbone',
-  'nbListeners' : 1,
-  'startDelay' : 4000,
+  'nbFactories' : 1,
   'startOnInit' : false,
   'nbAttemptMax' : 2
 };
@@ -28,52 +27,52 @@ describe('Converter', function(){
         converter.init(defaultOptions, done);
       });
     });
-    it('should start one office listener and return a object which describes the listener (pid, ...)', function(done){
-      converter.init({'nbListeners':1, 'startOnInit':true}, function(listeners){
-        var _nbListeners = 0;
+    it('should start one conversion factory and return a object which describes the factories (pid, ...)', function(done){
+      converter.init({'nbFactories':1, 'startOnInit':true}, function(factories){
+        var _nbFactories = 0;
         var _cachePathRegex = new RegExp(tempPath);
-        for(var i in listeners){
-          _nbListeners++;
+        for(var i in factories){
+          _nbFactories++;
         }
-        helper.assert(_nbListeners, 1);
-        helper.assert(listeners[0].mode, 'pipe');
-        helper.assert(/_carbone/g.test(listeners[0].pipeName), true);
-        helper.assert(_cachePathRegex.test(listeners[0].userCachePath), true);
-        helper.assert(/[0-9]+/g.test(listeners[0].pid), true);
-        helper.assert(listeners[0].isReady, true);
-        helper.assert(listeners[0].isConverting, false);
+        helper.assert(_nbFactories, 1);
+        helper.assert(factories[0].mode, 'pipe');
+        helper.assert(/_carbone/g.test(factories[0].pipeName), true);
+        helper.assert(_cachePathRegex.test(factories[0].userCachePath), true);
+        helper.assert(/[0-9]+/g.test(factories[0].pid), true);
+        helper.assert(factories[0].isReady, true);
+        helper.assert(factories[0].isConverting, false);
         done(); 
       });
     });
-    it('should start 3 office listener and take into account the options object.\
-             the listeners should have different pids, and different cache path', function(done){
+    it('should start 3 conversion factory and take into account the options object.\
+             the factories should have different pids, and different cache path', function(done){
       var _customOptions = {
         'pipeNamePrefix': '_carboneTest',
-        'nbListeners': 3,
+        'nbFactories': 3,
         'startOnInit': true
       };
-      converter.init(_customOptions, function(listeners){
-        var _nbListeners = 0;
+      converter.init(_customOptions, function(factories){
+        var _nbFactories = 0;
         var _cachePathRegex = new RegExp(tempPath);
-        for(var i in listeners){
-          _nbListeners++;
+        for(var i in factories){
+          _nbFactories++;
         }
-        helper.assert(_nbListeners, 3);
+        helper.assert(_nbFactories, 3);
 
-        helper.assert(listeners[0].mode, 'pipe');
-        helper.assert(/_carboneTest/g.test(listeners[0].pipeName), true);
-        helper.assert(_cachePathRegex.test(listeners[0].userCachePath), true);
-        helper.assert(/[0-9]+/g.test(listeners[0].pid), true);
-        helper.assert(listeners[0].isReady, true);
+        helper.assert(factories[0].mode, 'pipe');
+        helper.assert(/_carboneTest/g.test(factories[0].pipeName), true);
+        helper.assert(_cachePathRegex.test(factories[0].userCachePath), true);
+        helper.assert(/[0-9]+/g.test(factories[0].pid), true);
+        helper.assert(factories[0].isReady, true);
 
-        helper.assert(listeners[2].mode, 'pipe');
-        helper.assert(/_carboneTest/g.test(listeners[0].pipeName), true);
-        helper.assert(_cachePathRegex.test(listeners[2].userCachePath), true);
-        helper.assert(/[0-9]+/g.test(listeners[2].pid), true);
-        helper.assert(listeners[2].isReady, true);
+        helper.assert(factories[2].mode, 'pipe');
+        helper.assert(/_carboneTest/g.test(factories[0].pipeName), true);
+        helper.assert(_cachePathRegex.test(factories[2].userCachePath), true);
+        helper.assert(/[0-9]+/g.test(factories[2].pid), true);
+        helper.assert(factories[2].isReady, true);
 
-        helper.assert((listeners[2].pid           != listeners[0].pid), true);
-        helper.assert((listeners[2].userCachePath != listeners[0].userCachePath), true);
+        helper.assert((factories[2].pid           != factories[0].pid), true);
+        helper.assert((factories[2].userCachePath != factories[0].userCachePath), true);
 
         done(); 
       });
@@ -86,7 +85,7 @@ describe('Converter', function(){
         converter.init(defaultOptions, done);
       });
     });
-    it('should render a pdf and start an office listener automatically if no listeners exist', function(done){
+    it('should render a pdf and start an conversion factory automatically if no factories exist', function(done){
       var _pdfResultPath = path.resolve('./test/datasets/test_odt_render_static.pdf');
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       converter.convertFile(_filePath, 'pdf', function(result){
@@ -101,17 +100,15 @@ describe('Converter', function(){
         });
       });
     });
-    it('should restart automatically the office listener if it crashes', function(done){
+    it('should restart automatically the conversion factory if it crashes', function(done){
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       var _results = [];
-      converter.init({'nbListeners':1, 'startOnInit':true}, function(listeners){
+      converter.init({'nbFactories':1, 'startOnInit':true}, function(factories){
         converter.convertFile(_filePath, 'pdf', function(result){
           var _buf = new Buffer(result);
           assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-
-          //kill LibreOffice listener
-          process.kill(listeners['0'].pid);
-
+          //kill LibreOffice thread
+          process.kill(factories['0'].pid);
           //try another conversion
           converter.convertFile(_filePath, 'pdf', function(result){
             var _buf = new Buffer(result);
@@ -121,8 +118,8 @@ describe('Converter', function(){
         });
       });
     });
-    it('should be fast to render a pdf with four LibreOffice listener', function(done){
-      converter.init({'nbListeners':4, 'startOnInit':true}, function(){
+    it('should be fast to render a pdf with four Factories', function(done){
+      converter.init({'nbFactories':4, 'startOnInit':true}, function(){
         var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
         var _nbExecuted = 200;
         var _results = [];
@@ -145,7 +142,50 @@ describe('Converter', function(){
             var _buf = new Buffer(_results[i]);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           };
-          assert.equal((_elapsed < 300), true);
+          assert.equal((_elapsed < 200), true);
+          done(); 
+        }
+      });
+    });
+    it('should be extremely robust. It should not loose any jobs even if the office or python thread crash randomly', function(done){
+      converter.init({'nbFactories':4, 'startOnInit':true, 'nbAttemptMax':10}, function(factories){
+        var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+        var _nbExecuted = 200;
+        var _crashModulo = 24;
+        var _results = [];
+        var _waitedResponse = _nbExecuted;
+        var _start = new Date();
+        for (var i = 0; i < _nbExecuted; i++) {
+          converter.convertFile(_filePath, 'pdf', function(result){
+            if(_waitedResponse % _crashModulo === 0){
+              var _factoryId = Math.floor((Math.random()*4)); //(0 -> 3)
+              var _threadChoice = Math.random(); //(0.0 -> 1.0)
+              var _factory = factories[_factoryId];
+              if(_factory){
+                if(_threadChoice > 0.5 && _factory.officeThread){
+                  _factory.officeThread.kill(); 
+                }
+                else if (_factory.pythonThread){
+                  _factory.pythonThread.kill(); 
+                }
+              }
+            }
+            _waitedResponse--;
+            _results.push(result);
+            if(_waitedResponse === 0){
+              theEnd();
+            }
+          });
+        };
+        function theEnd(){
+          var _end = new Date();
+          var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
+          console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions with '+(_nbExecuted/_crashModulo).toFixed(0)+' crashes\n\n\n');
+          for (var i = 0; i < _results.length; i++) {
+            var _buf = new Buffer(_results[i]);
+            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+          };
+          assert.equal((_elapsed < 200), true);
           done(); 
         }
       });
@@ -158,24 +198,28 @@ describe('Converter', function(){
         converter.init(defaultOptions, done);
       });
     });
-    it('should start one office listener and clean the temp directory', function(done){
-      converter.init({'nbListeners':1, 'startOnInit':true}, function(){
+    it('should start one conversion factory and clean the temp directory', function(done){
+      converter.init({'nbFactories':1, 'startOnInit':true}, function(){
         converter.exit(function(){
-          var _tempContent = helper.walkDirSync(tempPath);
-          assert.equal(_tempContent.length, 0);
-          done(); 
+          setTimeout(function(){
+            var _tempContent = helper.walkDirSync(tempPath);
+            assert.equal(_tempContent.length, 0);
+            done(); 
+          },200);
         });
       });
     });
     it('should not delete files which come from another carbone instance or another program', function(done){
       var _otherFile = path.join(tempPath, 'ovni.sql');
       fs.writeFileSync(_otherFile, 'test');
-      converter.init({'nbListeners':1, 'startOnInit':true}, function(){
+      converter.init({'nbFactories':1, 'startOnInit':true}, function(){
         converter.exit(function(){
-          var _tempContent = helper.walkDirSync(tempPath);
-          assert.equal(_tempContent.length, 1);
-          assert.equal(_tempContent[0], _otherFile);
-          exec('rm -rf '+_otherFile, done);
+          setTimeout(function(){
+            var _tempContent = helper.walkDirSync(tempPath);
+            assert.equal(_tempContent.length, 1);
+            assert.equal(_tempContent[0], _otherFile);
+            exec('rm -rf '+_otherFile, done);
+          },200);
         });
       });
     });

@@ -1,35 +1,20 @@
 #!/usr/bin/env node
 
-var index = require('../lib/index');
 
-/*var command = require('../lib/command');
+var server = require('../lib/server');
 var _action = process.argv[2];
 
 switch(_action){
-  case 'command':
-    generate(process.argv.slice(3));
+  case 'server':
+    server(process.argv.slice(3));
     break;
   default:
-}
-*/
-
-var _data = {
-  'companyName': 'ideolys',
-  'companyAddress' : '52 rue Jacques Yves Cousteau',
-  'name' : 'Neo',
-  'todos':[{
-    'title' : 'Mission 1',
-    'desc' : 'follow the white rabbit',
-    'priority' : 'low'
-  },{
-    'title' : 'Mission 2',
-    'desc' : 'find the matrix',
-    'priority' : 'medium'
-  },{
-    'title' : 'Mission 3',
-    'desc' : 'destroy the matrix',
-    'priority' : 'high'
-  }]
+    usage(); 
 }
 
-index.generate(_data, './test/datasets/test_word_A.docx');
+function usage(){
+  console.log('*************************************');
+  console.log('Carbone Usage:');
+  console.log('   carbone start [--help]');
+  process.exit();
+};

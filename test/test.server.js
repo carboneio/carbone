@@ -6,34 +6,80 @@ var http = require("http");
 var Socket = require('../lib/socket');  
 var url = require('url');
 var helper  = require('../lib/helper');
+var format  = require('../lib/format');
 var path = require('path');
+var carbone = require('../lib/index');
 var server;
-var tempPath = path.join(__dirname, '../', 'temp');
+var tempPath = path.join(__dirname,'tempfile');
+var os = require('os');
 
-var commandToTest = rootPath+'/bin/carbone'; 
 
-describe.skip('Carbone server commands', function(){
-
-  describe('sdsd', function(){
-    it('should start the server on port 4000 by default', function(done){
-      var _executionPath = rootPath+'/test';
-      executeServer(_executionPath, ['server'], function(){
-        var _pdfResultPath = path.resolve('./test/datasets/test_odt_render_static.pdf');
+describe('Server', function(){
+  describe('carbone server', function(){
+    beforeEach(function(){
+      helper.rmDirRecursive(tempPath);
+    });
+    after(function(){
+      helper.rmDirRecursive(tempPath);
+    });
+    it('should start the server on port 4000 and accept to receive conversion jobs via the socket', function(done){
+      fs.mkdirSync(tempPath, 0755);
+      executeServer(['server', '--port', 4000], function(){
         var _inputFile = path.resolve('./test/datasets/test_odt_render_static.odt');
         var _outputFile = path.join(tempPath, 'my_converted_file.pdf');
-        var _client = new Socket(4000, '127.0.0.1');
+        var _client = new Socket(4000, '127.0.0.1', 6000);
+        _client.on('error', function(err){});
         _client.startClient();
         var _job = {
           'inputFile'  : _inputFile,
           'outputFile' : _outputFile,
-          'format' : 'writer_pdf_Export'
+          'format' : format.document.pdf.format
         };
-        _client.send(_job);
-        _client.on('message', function(message){
+        _client.send(_job, function(err, res){
+          assert.equal(err, null);
+          assert.equal(res.data.success, true);
           fs.readFile(_outputFile, function(err, content){
             var _buf = new Buffer(content);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-            stopServer(done);
+            _client.send('shutdown', function(){
+              _client.stop(function(){
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+    it('should convert the document using the server on port 4001', function(done){
+      fs.mkdirSync(tempPath, 0755);
+      carbone.set({
+        'tempPath' : tempPath,
+        'port' : 4001,
+        'delegateToServer' : true,
+        'templatePath' : path.resolve('./test/datasets')
+      });
+      executeServer(['server', '--port', 4001], function(){
+        var _client = new Socket(4001, '127.0.0.1', 6000);
+        _client.startClient();
+        _client.on('error', function(err){});
+        var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+        var data = {
+          field1 : 'field_1',
+          field2 : 'field_2'
+        };
+        carbone.render('test_word_render_A.docx', data, 'pdf', function(err, result){
+          var buf = new Buffer(result);
+          assert.equal(buf.slice(0, 4).toString(), '%PDF');
+          var bufPDF = new Buffer(buf.length);
+          fs.open(_pdfResultPath, 'r', function(status, fd){
+            fs.read(fd, bufPDF, 0, buf.length, 0, function(err, bytesRead, buffer){
+              assert.equal(buf.slice(0, 100).toString(), buffer.slice(0, 100).toString());
+              //reset carbone
+              carbone.reset();
+              _client.send('shutdown', function(){
+                done();
+              });
+            });
           });
         });
       });
@@ -42,18 +88,24 @@ describe.skip('Carbone server commands', function(){
 });
 
 
-
-function executeServer(executionPath, params, callback){
-  server = spawn(commandToTest, params, {cwd: executionPath});
+function executeServer(params, callback){
+  var _commandToTest = rootPath+'/bin/carbone'; 
+  server = spawn(_commandToTest, params, {cwd: rootPath});
+  //server.stdout.on('data', function (data) {
+  //  console.log('\n\nstdout: ' + data+'\n\n');
+  //});
+  //server.stderr.on('data', function (data) {
+  //  console.log('\n\nstderr: ' + data+'\n\n');
+  //});
   setTimeout(function(){
     callback();
   }, 200);
 }
 
+//Unable to use a kill signal, I don't know why?
 function stopServer(callback){
   if(server){
-    process.kill(server.pid);
-    server = null;
+    server.kill()
   }
   setTimeout(function(){
     callback();

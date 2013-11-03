@@ -165,6 +165,9 @@ describe('file', function(){
       var _templatePath = path.resolve('./test/datasets');
       carbone.set({'templatePath': _templatePath});
     });
+    after(function(){
+      carbone.reset();
+    });
     it('should open the template, convert xml files into String, ...', function(done){
       file.openTemplate('test_word_render_A.docx', function(err, template){
         helper.assert(err, null);
@@ -196,7 +199,20 @@ describe('file', function(){
         done();
       });
     });
-    it('should detect files which contains markers (not all xml)');
+    it('should accept absolute path', function(done){
+      var _filePath =  path.resolve('./test/datasets','test_word_render_2003_XML.xml');
+      file.openTemplate(_filePath, function(err, template){
+        helper.assert(err, null);
+        helper.assert(template.isZipped, false);
+        helper.assert(template.files.length, 1);
+        var _file = template.files[0];
+        helper.assert(_file.isMarked, true);
+        helper.assert(_file.name, 'test_word_render_2003_XML.xml');
+        assert.equal(/field1/.test(_file.data), true);
+        done();
+      });
+    });
+    it.skip('should detect files which contains markers (not all xml)');
   });
 
 
@@ -206,6 +222,7 @@ describe('file', function(){
     });
     after(function(){
       helper.rmDirRecursive(testPath);
+      carbone.reset();
     });
     it('should zip and return a buffer if the report is a docx. It should convert string to buffer', function(done){
       var _report = {

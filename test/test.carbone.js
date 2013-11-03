@@ -17,6 +17,7 @@ describe('Carbone', function(){
     after(function(done){
       helper.rmDirRecursive(_tempPath);
       helper.rmDirRecursive(_templatePath);
+      carbone.reset();
       done();
     });
     it('should create automatically the template directory if it does not exists', function(done){
@@ -37,12 +38,13 @@ describe('Carbone', function(){
   describe('addTemplate', function(){
     var _templatePath = path.join(__dirname,'template');
     before(function(){
-      helper.rmDirRecursive(_templatePath)
+      helper.rmDirRecursive(_templatePath);
       fs.mkdirSync(_templatePath, '0755');
       carbone.set({'templatePath':_templatePath});
     });
     after(function(){
       helper.rmDirRecursive(_templatePath);
+      carbone.reset();
     });
     it('should save the template in the folder "templatePath"', function(done){
       var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
@@ -93,6 +95,7 @@ describe('Carbone', function(){
     });
     after(function(){
       helper.rmDirRecursive(_templatePath);
+      carbone.reset();
     });
     it('should remove the template from the Carbone datastore (templatePath)', function(done){
       var _fileId = '2.txt';
@@ -131,6 +134,9 @@ describe('Carbone', function(){
     });
     afterEach(function(){
       helper.rmDirRecursive(testPath);
+    });
+    after(function(){
+      carbone.reset();
     });
     it('should render a template (docx) and give result with replacements', function(done){
       var data = {
@@ -255,17 +261,17 @@ describe('Carbone', function(){
   });
 
 
-  describe.skip('renderPDF', function(){
+  describe('render and convert document', function(){
     var defaultOptions = {
-      'mode' : 'pipe', 
       'pipeNamePrefix' : '_carbone',
-      'nbFactories' : 1,
-      'startOnInit' : false,
-      'nbAttemptMax' : 2
+      'factories' : 1,
+      'startFactory' : false,
+      'attempts' : 2
     };
     afterEach(function(done){
       converter.exit(function(){
         converter.init(defaultOptions, done);
+        carbone.reset();
       });
     });
     it('should render a template (docx), generate to PDF and give output', function(done){
@@ -275,7 +281,8 @@ describe('Carbone', function(){
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      carbone.renderPDF(_filePath, data, function(result){
+      carbone.render(_filePath, data, 'pdf', function(err, result){
+        assert.equal(err, null);
         var buf = new Buffer(result);
         assert.equal(buf.slice(0, 4).toString(), '%PDF');
         var bufPDF = new Buffer(buf.length);

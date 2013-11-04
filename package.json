@@ -1,8 +1,8 @@
 {
-  "name": "carbone",
-  "description": "Document parser and generator",
+  "name": "local-carbone",
+  "description": "Simple and powerful reporting framework (docx, odt, pdf, xlsx, xml, ods, pptx, odp, ...)",
   "version": "0.6.0",
-  "private": true,
+  "private": false,
   "bin" : "bin/carbone",
   "main": "./lib",
   "dependencies": {

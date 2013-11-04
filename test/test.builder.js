@@ -473,13 +473,11 @@ describe('builder', function(){
         'number' : 24.55
       };
       var _fn = builder.getBuilderFunction(_desc);
-      carbone.cacheFormatters(function(){
-        helper.assert(_fn(_data, carbone.formatters), [
-          {pos: [5 ],str: '<xml>24'},
-          {pos: [6 ],str: '</xml>'}
-        ]);
-        done();
-      });
+      helper.assert(_fn(_data, carbone.formatters), [
+        {pos: [5 ],str: '<xml>24'},
+        {pos: [6 ],str: '</xml>'}
+      ]);
+      done();
     });
     it('should manage multiple attributes in the main object "_root"', function(){
       var _desc = {

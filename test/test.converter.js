@@ -9,17 +9,25 @@ var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
 var exec = require('child_process').exec;
-var tempPath = path.join(__dirname, '../', 'temp');
+var tempPath = path.join(__dirname, 'temp');
 
 var defaultOptions = {
-  'mode' : 'pipe', 
   'pipeNamePrefix' : '_carbone',
-  'nbFactories' : 1,
-  'startOnInit' : false,
-  'nbAttemptMax' : 2
+  'factories' : 1,
+  'startFactory' : false,
+  'attempts' : 2,
+  'tempPath': tempPath
 };
 
 describe('Converter', function(){
+  before(function(){
+    helper.rmDirRecursive(tempPath);
+    fs.mkdirSync(tempPath, '0755');
+  });
+  after(function(){
+    helper.rmDirRecursive(tempPath);
+    carbone.reset();
+  });
 
   describe('init', function(){
     afterEach(function(done){
@@ -28,7 +36,7 @@ describe('Converter', function(){
       });
     });
     it('should start one conversion factory and return a object which describes the factories (pid, ...)', function(done){
-      converter.init({'nbFactories':1, 'startOnInit':true}, function(factories){
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
         var _nbFactories = 0;
         var _cachePathRegex = new RegExp(tempPath);
         for(var i in factories){
@@ -48,8 +56,8 @@ describe('Converter', function(){
              the factories should have different pids, and different cache path', function(done){
       var _customOptions = {
         'pipeNamePrefix': '_carboneTest',
-        'nbFactories': 3,
-        'startOnInit': true
+        'factories': 3,
+        'startFactory': true
       };
       converter.init(_customOptions, function(factories){
         var _nbFactories = 0;
@@ -88,7 +96,7 @@ describe('Converter', function(){
     it('should render a pdf and start an conversion factory automatically if no factories exist', function(done){
       var _pdfResultPath = path.resolve('./test/datasets/test_odt_render_static.pdf');
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
-      converter.convertFile(_filePath, 'pdf', function(result){
+      converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
         var _buf = new Buffer(result);
         assert.equal(_buf.slice(0, 4).toString(), '%PDF');
         var bufPDF = new Buffer(_buf.length);
@@ -103,14 +111,14 @@ describe('Converter', function(){
     it('should restart automatically the conversion factory if it crashes', function(done){
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       var _results = [];
-      converter.init({'nbFactories':1, 'startOnInit':true}, function(factories){
-        converter.convertFile(_filePath, 'pdf', function(result){
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
+        converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
           var _buf = new Buffer(result);
           assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           //kill LibreOffice thread
           process.kill(factories['0'].pid);
           //try another conversion
-          converter.convertFile(_filePath, 'pdf', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
             var _buf = new Buffer(result);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
             done(); 
@@ -119,14 +127,14 @@ describe('Converter', function(){
       });
     });
     it('should be fast to render a pdf with four Factories', function(done){
-      converter.init({'nbFactories':4, 'startOnInit':true}, function(){
+      converter.init({'factories':4, 'startFactory':true, 'tempPath':tempPath}, function(){
         var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
         var _nbExecuted = 200;
         var _results = [];
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          converter.convertFile(_filePath, 'pdf', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
             _waitedResponse--;
             _results.push(result);
             if(_waitedResponse === 0){
@@ -148,7 +156,7 @@ describe('Converter', function(){
       });
     });
     it('should be extremely robust. It should not loose any jobs even if the office or python thread crash randomly', function(done){
-      converter.init({'nbFactories':4, 'startOnInit':true, 'nbAttemptMax':10}, function(factories){
+      converter.init({'factories':4, 'startFactory':true, 'tempPath':tempPath, 'attempts':10}, function(factories){
         var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
         var _nbExecuted = 200;
         var _crashModulo = 24;
@@ -156,7 +164,7 @@ describe('Converter', function(){
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          converter.convertFile(_filePath, 'pdf', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
             if(_waitedResponse % _crashModulo === 0){
               var _factoryId = Math.floor((Math.random()*4)); //(0 -> 3)
               var _threadChoice = Math.random(); //(0.0 -> 1.0)
@@ -199,7 +207,7 @@ describe('Converter', function(){
       });
     });
     it('should start one conversion factory and clean the temp directory', function(done){
-      converter.init({'nbFactories':1, 'startOnInit':true}, function(){
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(){
         converter.exit(function(){
           setTimeout(function(){
             var _tempContent = helper.walkDirSync(tempPath);
@@ -212,7 +220,7 @@ describe('Converter', function(){
     it('should not delete files which come from another carbone instance or another program', function(done){
       var _otherFile = path.join(tempPath, 'ovni.sql');
       fs.writeFileSync(_otherFile, 'test');
-      converter.init({'nbFactories':1, 'startOnInit':true}, function(){
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(){
         converter.exit(function(){
           setTimeout(function(){
             var _tempContent = helper.walkDirSync(tempPath);

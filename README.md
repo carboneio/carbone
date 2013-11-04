@@ -49,6 +49,16 @@ The ppa seams to be compiled with  --enable-python=system
 
 TODO
 -----
+
+- Eviter de lire le fichier 2 fois sur le disque (dans isZipped et dans openTemplate)
+- Enelver le readSync dans file.unzip
+- Cache template in file.js
+- Grouper automatiquement même sur un objet plat
+ d[i], d[i+1]  : normal
+ d[id], d[id+1] : groupement par id
+ d[id,i], d[id+1,i+1] : groupement par "id-i" comme actuellement quand on fait d[id], le i est ajouté automatiquement (pas bien finalement)
+
+
 - Essayer de développer un module UNO C++ pour éviter de passer par python (peut-être plus rapide) : http://api.libreoffice.org/examples/examples.html#Cpp_examples
 Tuto UNO C++ : http://www.linuxjournal.com/article/8608
 

@@ -32,3 +32,4 @@ server/config/config\.js
 server/install\.sh
 *\.rdb
 public/css/*\.css
+0perso/*

@@ -3,6 +3,7 @@ import sys
 import argparse
 import uno, unohelper
 import time
+import shlex
 from com.sun.star.beans import PropertyValue
 from com.sun.star.connection import NoConnectException
 from com.sun.star.document.UpdateDocMode import QUIET_UPDATE
@@ -54,7 +55,7 @@ def retryloop(attempts, timeout, delay=1):
 
 def convert(message):
     ### Parse the message 
-    messageSplit = message.split()
+    messageSplit = shlex.split(message)
     fileOption = parser.parse_args(args=messageSplit)
 
     document = None

@@ -35,6 +35,8 @@ describe('Converter', function(){
         converter.init(defaultOptions, done);
       });
     });
+    it.skip('should be able to convert in docx, doc... ');
+    it.skip('should accept temp directory with whitespaces');
     it('should start one conversion factory and return a object which describes the factories (pid, ...)', function(done){
       converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
         var _nbFactories = 0;

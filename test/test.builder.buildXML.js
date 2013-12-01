@@ -474,6 +474,30 @@ describe('builder.buildXML', function(){
     var _xmlBuilt = builder.buildXML(_xml, _data);
     helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
   });
+  it('should work if the same array is repeated two times in the xml and there are condition is in a sub array', function(){
+    var _xml = '<xml> <t_row> {d[i].brand} </t_row> '+ 
+                 '<t_row> <td> {d[i].cars[weight,weight<3].wheel.name} </td> <td> {d[i].cars[weight+1,weight<3].wheel.name} </td> </t_row>'+
+                 '<t_row> {d[i+1].brand} </t_row>'+
+                 '<t_row> {d[i].brand} </t_row> '+ 
+                 '<t_row> <td> {d[i].cars[weight,weight>2].wheel.name} </td> <td> {d[i].cars[weight+1,weight>2].wheel.name} </td> </t_row>'+
+                 '<t_row> {d[i+1].brand} </t_row> </xml>';
+    var _data = [
+      {
+        'brand' : 'Toyota',
+        'cars' : [ 
+          { 'name': 'prius', 'autonomy': 7, 'weight': 1, 'wheel' : { 'name' : 'norauto' } },
+          { 'name': 'yaris', 'autonomy': 2, 'weight': 3, 'wheel' : { 'name' : 'goodyear' } },
+          { 'name': 'civic', 'autonomy': 0, 'weight': 2, 'wheel' : { 'name' : 'michelin' } },
+          { 'name': 'auris', 'autonomy': 3, 'weight': 4, 'wheel' : { 'name' : 'continental' } }
+        ]
+      }
+    ];
+    var _xmlBuilt = builder.buildXML(_xml, _data);
+    assert.equal(_xmlBuilt, '<xml> <t_row> Toyota </t_row> '+
+                              '<t_row> <td> norauto </td> <td> michelin </td>  </t_row>'+
+                              '<t_row> Toyota </t_row> '+
+                              '<t_row> <td> goodyear </td> <td> continental </td>  </t_row> </xml>');
+  });
   it.skip('should not crash if the markes are not correct (see comment below)')
   /*
     [

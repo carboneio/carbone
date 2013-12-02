@@ -109,7 +109,7 @@ describe('builder.buildXML', function(){
     var _xmlBuilt = builder.buildXML(_xml, _data);
     assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
   });
-  it('should accept custom iterators and sort the data using this iterator', function(){
+  it('AAshould accept custom iterators and sort the data using this iterator', function(){
     var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
     var _data = {
       'cars':[
@@ -121,7 +121,7 @@ describe('builder.buildXML', function(){
     var _xmlBuilt = builder.buildXML(_xml, _data);
     assert.equal(_xmlBuilt, '<xml><t_row> Tesla motors </t_row><t_row> Toyota </t_row><t_row> Lumeneo </t_row></xml>');
   });
-  it('should use the default order of the array if the custom iterator cannot be used (always equals 1)', function(){
+  it('should use keep the first element of the array if the custom iterator is constant (always equals 1)', function(){
     var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
     var _data = {
       'cars':[
@@ -131,9 +131,35 @@ describe('builder.buildXML', function(){
       ]
     };
     var _xmlBuilt = builder.buildXML(_xml, _data);
-    assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    assert.equal(_xmlBuilt, '<xml><t_row> Tesla motors </t_row></xml>');
   });
-  it('should use the default order of the array if the custom iterator is null', function(){
+  it('should accept two iterators', function(){
+    var _xml = '<xml><t_row> {d.cars[sort,i].brand} </t_row><t_row> {d.cars[sort+1,i+1].brand} </t_row></xml>';
+    var _data = {
+      'cars':[
+        {'brand' : 'Lumeneo'     , 'sort':1},
+        {'brand' : 'Tesla motors', 'sort':2},
+        {'brand' : 'Toyota'      , 'sort':1}
+      ]
+    };
+    var _xmlBuilt = builder.buildXML(_xml, _data);
+    assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+  });
+  it('should accept three iterators', function(){
+    var _xml = '<xml><t_row> {d.cars[speed, sort,i].brand} </t_row><t_row> {d.cars[speed+1, sort+1, i+1].brand} </t_row></xml>';
+    var _data = {
+      'cars':[
+        {'brand' : 'fourth', 'speed':'c', 'sort':1},
+        {'brand' : 'fifth' , 'speed':'c', 'sort':1},
+        {'brand' : 'first' , 'speed':'a', 'sort':2},
+        {'brand' : 'third' , 'speed':'b', 'sort':2},
+        {'brand' : 'second', 'speed':'b', 'sort':1}
+      ]
+    };
+    var _xmlBuilt = builder.buildXML(_xml, _data);
+    assert.equal(_xmlBuilt, '<xml><t_row> first </t_row><t_row> second </t_row><t_row> third </t_row><t_row> fourth </t_row><t_row> fifth </t_row></xml>');
+  });
+  it('should select only one element if the iterator is always null ???', function(){
     var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
     var _data = {
       'cars':[
@@ -143,7 +169,7 @@ describe('builder.buildXML', function(){
       ]
     };
     var _xmlBuilt = builder.buildXML(_xml, _data);
-    assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+    assert.equal(_xmlBuilt, '<xml><t_row> Tesla motors </t_row></xml>');
   });
   it.skip('should use the default order of the array if the custom iterator is undefined', function(){
     var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';

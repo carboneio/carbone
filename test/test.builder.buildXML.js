@@ -524,7 +524,27 @@ describe('builder.buildXML', function(){
                               '<t_row> Toyota </t_row> '+
                               '<t_row> <td> goodyear </td> <td> continental </td>  </t_row> </xml>');
   });
-  it.skip('should not crash if the markes are not correct (see comment below)')
+  it('should accept conditionnal arrays without iterators', function(){
+    var _xml = '<xml> <t_row> {d[id=2].brand} </t_row><t_row> {d[id=1].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'id':1},
+      {'brand' : 'Tesla motors', 'id':2},
+      {'brand' : 'Toyota'      , 'id':3}
+    ];
+    var _xmlBuilt = builder.buildXML(_xml, _data);
+    helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row><t_row> Lumeneo </t_row></xml>');
+  });
+  it('should accept conditions on the main iterators "i"', function(){
+    var _xml = '<xml> <t_row> {d[i=2].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'id':1},
+      {'brand' : 'Tesla motors', 'id':2},
+      {'brand' : 'Toyota'      , 'id':3}
+    ];
+    var _xmlBuilt = builder.buildXML(_xml, _data);
+    helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+  });
+  /*it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [
       { "pos": 11586, "name": "d.fromDate:convert(YYYYMMDD,DD/MM/YYYY)" },

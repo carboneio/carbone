@@ -327,13 +327,13 @@ describe('parser', function(){
         'part2Start':{'tag':'w:tbl', 'pos': 593 }
       });
     });
-    it.skip('should accept non-XML structure', function(){
+    /*it.skip('should accept non-XML structure', function(){
       var _str = ' ';
       helper.assert(parser.findPivot(_str), {
         'part1End'  :{'tag':'', 'pos': 1 },
         'part2Start':{'tag':'', 'pos': 1 }
       });
-    });
+    });*/
   });
 
   describe('findRepetitionPosition', function(){

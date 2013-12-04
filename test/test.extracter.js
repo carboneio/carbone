@@ -1201,6 +1201,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':12, 'end':17}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':12},
           ]
@@ -1217,6 +1218,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':12, 'end':17}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'   , 'pos':12, 'depth' : 1},
               {'obj': 'd0', 'array':'start' , 'pos':12, 'depth' : 1,  'after':''},
@@ -1236,6 +1238,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':9, 'end':30}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':9},
             {'obj': 'd0', 'attr':'val' , 'pos':14},
@@ -1254,6 +1257,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':5, 'end':26}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu' , 'pos':9,  'depth' : 1,  'after':' <h1>'},
               {'obj': 'd0', 'attr':'val'  , 'pos':14, 'depth' : 1,  'after':' </h1>'},
@@ -1283,6 +1287,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d0',
           'position' : {'start':9, 'end':30}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'menu1', 'attr':'menu', 'pos':9},
             {'obj': 'menu1', 'attr':'val' , 'pos':14},
@@ -1310,6 +1315,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'d0',
             'position' : {'start':5, 'end':26}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'menu1', 'attr':'menu' , 'pos':9,  'depth' : 1,  'after':' <h1>'},
               {'obj': 'menu1', 'attr':'val'  , 'pos':14, 'depth' : 1,  'after':' </h1>'},
@@ -1331,6 +1337,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':9, 'end':38}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':9},
             {'obj': 'd0', 'attr':'val', 'pos':14},
@@ -1357,6 +1364,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':5, 'end':34}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu' , 'pos':9,  'depth': 1,  'after':' <h1>'},
               {'obj': 'd0', 'attr':'val'  , 'pos':14, 'depth': 1,  'after':' </h1>'},
@@ -1394,6 +1402,7 @@ describe('extracter', function(){
           'type': 'array',
           'depth' : 1,
           'position' : {'start': 10, 'end' :22}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'movies1', 'attr':'title', 'pos':11, 'depth':1 }
           ]
@@ -1404,6 +1413,7 @@ describe('extracter', function(){
           'type': 'array',
           'depth' : 1,
           'position' : {'start': 35, 'end' :48},
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'cars2', 'attr':'brand', 'pos':36, 'depth':1 }
           ]
@@ -1427,6 +1437,7 @@ describe('extracter', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 5, 'end' :17},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'movies1',  'attr': 'title', 'pos': 11, 'depth':1 },
               {'obj': 'movies1', 'array': 'start', 'pos': 5 , 'depth': 1,'after': '<tr1> ' },
@@ -1439,6 +1450,7 @@ describe('extracter', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 30, 'end' :42},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'cars2',  'attr': 'brand', 'pos': 36,'depth':1 },
               {'obj': 'cars2', 'array': 'start', 'pos': 30,'depth': 1,'after': '<tr2> ' },
@@ -1465,6 +1477,7 @@ describe('extracter', function(){
           'type': 'array',
           'depth' : 1,
           'position' : {'start': 10, 'end' :22}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'movies1', 'attr':'title', 'pos':11, 'depth':1 }
           ]
@@ -1475,6 +1488,7 @@ describe('extracter', function(){
           'type': 'array',
           'depth' : 1,
           'position' : {'start': 39, 'end' :52},
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'cars2', 'attr':'brand', 'pos':40, 'depth':1 }
           ]
@@ -1498,6 +1512,7 @@ describe('extracter', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 5, 'end' :17},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'movies1',  'attr': 'title', 'pos': 11, 'depth':1 },
               {'obj': 'movies1', 'array': 'start', 'pos': 5 , 'depth': 1,'after': '<tr1> ' },
@@ -1510,6 +1525,7 @@ describe('extracter', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 34, 'end' :46},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'cars2',  'attr': 'brand', 'pos': 40,'depth':1 },
               {'obj': 'cars2', 'array': 'start', 'pos': 34,'depth': 1,'after': '<tr2> ' },
@@ -1529,6 +1545,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':11, 'end':75}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':11},
           ]
@@ -1538,6 +1555,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d0',
           'position' : {'start':26, 'end':46}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -1562,6 +1580,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':5, 'end':68}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'   , 'pos':11, 'depth':1, 'after': ' <h1>'},
               {'obj': 'd0', 'array':'start' , 'pos':5,  'depth':1, 'after': '<tr A>'},
@@ -1574,6 +1593,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'d0',
             'position' : {'start':16, 'end':36}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id', 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
@@ -1602,6 +1622,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':11, 'end':75}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':11},
             {'obj': 'd0', 'attr':'val', 'pos':56}
@@ -1612,6 +1633,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d0',
           'position' : {'start':26, 'end':46}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -1628,6 +1650,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':5, 'end':68}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'  , 'pos':11, 'depth':1, 'after' : ' <h1>' },
               {'obj': 'd0', 'attr':'val'   , 'pos':56, 'depth':1, },
@@ -1641,6 +1664,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'d0',
             'position' : {'start':16, 'end':36}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
@@ -1660,6 +1684,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':26, 'end':46}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : []
         },  
         'element1':{
@@ -1667,6 +1692,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d0',
           'position' : {'start':11, 'end': 75}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -1683,6 +1709,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':16 , 'end':36 }, /* Exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
               {'obj': 'd0', 'array':'end'  , 'pos':36, 'depth':2, 'before':'</p> </tr>'},
@@ -1694,6 +1721,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'d0',
             'position' : {'start':5, 'end': 68}, /* Exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':5,  'depth':1, 'after':'<tr A> <h1>'},

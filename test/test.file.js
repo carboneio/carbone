@@ -212,7 +212,7 @@ describe('file', function(){
         done();
       });
     });
-    it.skip('should detect files which contains markers (not all xml)');
+    /*it.skip('should detect files which contains markers (not all xml)');*/
   });
 
 

@@ -78,6 +78,13 @@ describe('builder', function(){
       var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
       assert.equal(_actual, 'var _prefixmenu_filter=myObj["menu"];\nif((_prefixmenu_filter && _prefixmenu_filter["sort"]>10)){\n code;\n }');
     });
+    it('should handle the reserved index iterator "i"', function(){
+      var _conditions = [
+        {'left':{'parent':'myObj','attr':'i'}, 'operator':'>', 'right':'10'},
+      ];
+      var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((myObj_i >10)){\n code;\n }');
+    });
     it('should not declare the same variable twice if there are two conditions on the same variable', function(){
       var _conditions = [
         {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'>', 'right':'10'},
@@ -168,6 +175,12 @@ describe('builder', function(){
         { 'pos': [ 24       ], 'str': '</xml>'       } 
       ];
       builder.sortXmlParts(_data, 10);
+      helper.assert(_data, _expected);
+    });
+    it('should sort by rowShow first if "pos" are the same', function(){
+      var _data     = [{'pos':[4], 'rowShow':false}, {'pos':[4], 'rowShow':false}, {'pos':[4], 'rowShow':true }, {'pos':[1], 'rowShow':false}];
+      var _expected = [{'pos':[1], 'rowShow':false}, {'pos':[4], 'rowShow':true }, {'pos':[4], 'rowShow':false}, {'pos':[4], 'rowShow':false}];
+      builder.sortXmlParts(_data, 3);
       helper.assert(_data, _expected);
     });
     /*

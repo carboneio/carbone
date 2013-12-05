@@ -8,49 +8,85 @@ describe('parser', function(){
   
   describe('findMarkers', function(){
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
-        it should add the root object.', function(){
-      helper.assert(parser.findMarkers('{menu}'), {
-        markers : [{'pos': 0, 'name':'_root.menu'}], 
-        xml : ''
-      });
-      helper.assert(parser.findMarkers('<div>{menu}<div>'), {
-        markers : [{'pos': 5, 'name':'_root.menu'}], 
-        xml : '<div><div>'
-      });
-      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>'), {
-        markers : [{'pos': 10, 'name':'_root.menu'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend>'
-      });
-      helper.assert(parser.findMarkers('<div>{menu}<div>{city}'), {
-        markers : [{'pos': 5, 'name':'_root.menu'},{'pos':10, 'name':'_root.city'}],
-        xml : '<div><div>'
-      });
-      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars}</bla>'), {
-        markers : [{'pos': 10, 'name':'_root.menu'},{'pos':44, 'name':'_root.city'},{'pos':63, 'name':'_root.cars'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
-      });
-      helper.assert(parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u[i].city}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars[i].wheel}</bla>'), {
-        markers : [{'pos': 10, 'name':'_root.menu[i].city'},{'pos':44, 'name':'_root.city'},{'pos':63, 'name':'_root.cars[i].wheel'}], 
-        xml : '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>'
+        it should add the root object.', function(done){
+      parser.findMarkers('{menu}', function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 0, 'name':'_root.menu'}]);
+        helper.assert(cleanedXml, '');
+        done();
       });
     });
-    it('should remove unwanted characters', function(){
-      helper.assert(parser.findMarkers('<div>{menu}<div> \n   {city}'), {
-        markers : [{'pos': 5, 'name':'_root.menu'},{'pos':15, 'name':'_root.city'}],
-        xml : '<div><div>     '
+    it('2. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
+        it should add the root object.', function(done){
+      parser.findMarkers('<div>{menu}<div>', function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 5, 'name':'_root.menu'}]);
+        helper.assert(cleanedXml, '<div><div>');
+        done();
       });
     });
-    it('should convert conflicting characters', function(){
-      assert.equal(parser.findMarkers("<div>{menu}<div> it's \n   {city}").xml, "<div><div> it\\\'s     ");
-    });
-    it('should remove whitespaces which are inside {} and not inside <>. It should not count them for the position', function(){
-      helper.assert(parser.findMarkers(' <div>   {  menu  }   <div>   {   city  } '), {
-        markers : [{'pos': 9, 'name':'_root.menu'},{'pos':20, 'name':'_root.city'}],
-        xml : ' <div>      <div>    '
+    it('3. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
+        it should add the root object.', function(done){
+      parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>', function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 10, 'name':'_root.menu'}]);
+        helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend>');
+        done();
       });
-      helper.assert(parser.findMarkers(' <xmlstart> {  me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {ci  <td>  ty  </td>  } <tga><bla>{cars[i].wheel}</bla>'), {
-        markers : [{'pos': 12, 'name':'_root.menu[i].city'},{'pos':52, 'name':'_root.city'},{'pos':72, 'name':'_root.cars[i].wheel'}], 
-        xml : ' <xmlstart> <interxml><bull  sh it> </xmlend> <tga> <td></td> <tga><bla></bla>'
+    });
+    it('4. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
+        it should add the root object.', function(done){
+      parser.findMarkers('<div>{menu}<div>{city}', function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 5, 'name':'_root.menu'},{'pos':10, 'name':'_root.city'}]);
+        helper.assert(cleanedXml, '<div><div>');
+        done();
+      });
+    });
+    it('5. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
+        it should add the root object.', function(done){
+      parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars}</bla>', function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 10, 'name':'_root.menu'},{'pos':44, 'name':'_root.city'},{'pos':63, 'name':'_root.cars'}]);
+        helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>');
+        done();
+      });
+    });
+    it('6. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
+        it should add the root object.', function(done){
+      parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u[i].city}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars[i].wheel}</bla>', function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 10, 'name':'_root.menu[i].city'},{'pos':44, 'name':'_root.city'},{'pos':63, 'name':'_root.cars[i].wheel'}]);
+        helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>');
+        done();
+      });
+    });
+    it('should remove unwanted characters', function(done){
+      parser.findMarkers('<div>{menu}<div> \n   {city}', function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 5, 'name':'_root.menu'},{'pos':15, 'name':'_root.city'}]);
+        helper.assert(cleanedXml, '<div><div>     ');
+        done();
+      });
+    });
+    it('should convert conflicting characters', function(done){
+      parser.findMarkers("<div>{menu}<div> it's \n   {city}", function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(cleanedXml, "<div><div> it\\\'s     ");
+        done();
+      });
+    });
+    it('should remove whitespaces which are inside {} and not inside <>. It should not count them for the position', function(done){
+      parser.findMarkers(' <div>   {  menu  }   <div>   {   city  } ', function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 9, 'name':'_root.menu'},{'pos':20, 'name':'_root.city'}]);
+        helper.assert(cleanedXml, ' <div>      <div>    ');
+        parser.findMarkers(' <xmlstart> {  me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {ci  <td>  ty  </td>  } <tga><bla>{cars[i].wheel}</bla>', function(err, cleanedXml, markers){
+          helper.assert(err, null);
+          helper.assert(markers, [{'pos': 12, 'name':'_root.menu[i].city'},{'pos':52, 'name':'_root.city'},{'pos':72, 'name':'_root.cars[i].wheel'}]);
+          helper.assert(cleanedXml, ' <xmlstart> <interxml><bull  sh it> </xmlend> <tga> <td></td> <tga><bla></bla>');
+          done();
+        });
       });
     });
   });
@@ -88,6 +124,176 @@ describe('parser', function(){
     it('should extract only the xml (it removes all markers from xml)', function(){
       assert.equal(parser.cleanXml('menu</xmlend>bla'), '</xmlend>');
       assert.equal(parser.cleanXml('menu</xmlend><text b>A<qskjhdq>bla'), '</xmlend><text b><qskjhdq>');
+    });
+  });
+
+  describe('removeWhitespace', function(){
+    it('should do nothing if there is no whitespaces', function(){
+      assert.equal(parser.removeWhitespace('bla'), 'bla');
+    });
+    it('should remove whitespaces everywhere', function(){
+      assert.equal(parser.removeWhitespace(' the matrix  has  you  <neo>  '), 'thematrixhasyou<neo>');
+    });
+    it('should remove whitespaces everywhere except between double quotes', function(){
+      assert.equal(parser.removeWhitespace(' <trinity>  "the matrix  has  you"  <neo> <the> id=5  '), '<trinity>"the matrix  has  you"<neo><the>id=5');
+    });
+    it('should remove whitespaces everywhere except between simple quotes', function(){
+      assert.equal(parser.removeWhitespace(' <trinity>  \'the matrix  has  you\'  <neo> <the> id=5  '), '<trinity>\'the matrix  has  you\'<neo><the>id=5');
+    });
+    it('should accept escaped simple quotes', function(){
+      assert.equal(parser.removeWhitespace(' <trinity>  \'the matrix \\\' has  you\'  <neo> <the> id=5  '), '<trinity>\'the matrix \\\' has  you\'<neo><the>id=5');
+    });
+    it('should remove escaped double quotes', function(){
+      assert.equal(parser.removeWhitespace(' <trinity>  "the matrix \\"  has  you"  <neo> <the> id=5  '), '<trinity>"the matrix \\"  has  you"<neo><the>id=5');
+    });
+    it('should not crash if undefined or null is passed', function(){
+      assert.equal(parser.removeWhitespace(undefined), undefined);
+      assert.equal(parser.removeWhitespace(null), null);
+    });
+  });
+
+  describe('findVariables', function(){
+    it('should do nothing because there is no declared variables', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}</xmlend>');
+        helper.assert(variables, {});
+        done();
+      });
+    });
+    it('should extract variables from the xml', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def id=2}</div></xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
+        helper.assert(variables.def.code, 'id=2');
+        done();
+      });
+    });
+    it('should extract variables from the xml even if there are some xml tags everywhere', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/>  id<bla>=2}</div></xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div></xmlend>');
+        helper.assert(variables.def.code, 'id=2');
+        done();
+      });
+    });
+    it('should extract multiple variables ', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/>  id<bla>=2}</div>{ <br> # <bla> my_Var2 <br/>  test<bla>[1=5]}</xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div><br><bla><br/><bla></xmlend>');
+        helper.assert(variables['def'].code, 'id=2');
+        helper.assert(variables['my_Var2'].code, 'test[1=5]');
+        done();
+      });
+    });
+    it('should extract variables with parameters. It should replace parameters by $0, $1, ...', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b) id=$a,g=$b}</div></xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
+        helper.assert(variables['myFn'].code, 'id=_$0_,g=_$1_');
+        done();
+      });
+    });
+    it('should extract variables with parameters even if there are xml tags everywhere', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><tr><tr><tr/><tr/><td><td><tf></div></xmlend>');
+        helper.assert(variables['myFn'].code, 'id=_$0_,g=_$1_');
+        helper.assert(variables['myFn'].regex.test('<sdjh> test[$myFn(1, 2)] <td>' ), true);
+        helper.assert(variables['myFn'].regex.test('<sdjh> test[myFn(1, 2)] <td>' ), false);
+        done();
+      });
+    });
+    /*it.skip('should accept braces around the code', function(){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def {id=2}}</div></xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
+        helper.assert(variables.def.code, 'id=2');
+      });
+    });*/
+  });
+
+  describe('preprocessMarkers', function(){
+    it('should return the marker array if there is no variable declared', function(){
+      var _markers  = [{'pos': 10, 'name':'_root.menu'}];
+      parser.preprocessMarkers(_markers, {}, function(err, processedMarkers){
+        helper.assert(err, null);
+        helper.assert(processedMarkers, _markers);
+      });
+    });
+    it('should detect used variable and replace them in all markers', function(){
+      var _markers  = [
+        {'pos': 10, 'name':'_root.menu[$myVar]'}
+      ];
+      var _variables = {
+        'myVar' : {
+          'code' : 'id=1',
+          'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
+        }
+      }
+      parser.preprocessMarkers(_markers, _variables, function(err, processedMarkers){
+        helper.assert(err, null);
+        helper.assert(processedMarkers, [ {'pos': 10, 'name':'_root.menu[id=1]'}]);
+      });
+    });
+    it('should work in complex cases', function(){
+      var _markers  = [
+        {'pos': 10, 'name':'_root.menu[$myVar].test::int($myVar)'},
+        {'pos': 20, 'name':'_root.menu[$myVar].$car_shortcut.bla[$myVar].id'},
+        {'pos': 30, 'name':'nothing'}
+      ];
+      var _variables = {
+        'myVar' : {
+          'code' : 'id=1',
+          'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
+        },
+        'car_shortcut' : {
+          'code' : 'car . menu  [i = 1: int(sds, sqd)]',
+          'regex' : new RegExp('\\$car_shortcut(?:\\(([\\s\\S]+?)\\))?','g')
+        }
+      }
+      parser.preprocessMarkers(_markers, _variables, function(err, processedMarkers){
+        helper.assert(err, null);
+        helper.assert(processedMarkers, [
+          {'pos': 10, 'name':'_root.menu[id=1].test::int(id=1)'},
+          {'pos': 20, 'name':'_root.menu[id=1].car . menu  [i = 1: int(sds, sqd)].bla[id=1].id'},
+          {'pos': 30, 'name':'nothing'}
+        ]);
+      });
+    });
+    it('should accept variable with parameters', function(){
+      var _markers  = [
+        {'pos': 10, 'name':'_root.menu[$myVar(2)]'}
+      ];
+      var _variables = {
+        'myVar' : {
+          'code' : 'id=_$0_',
+          'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
+        }
+      }
+      parser.preprocessMarkers(_markers, _variables, function(err, processedMarkers){
+        helper.assert(err, null);
+        helper.assert(processedMarkers, [ {'pos': 10, 'name':'_root.menu[id=2]'}]);
+      });
+    });
+    it('should accept variable with multiple parameters', function(){
+      var _markers  = [
+        {'pos': 10, 'name':'_root.menu[$myVar(2, "bla")]'},
+        {'pos': 11, 'name':'_root.menu[$myVar(5, 6)] and $myVar(2, 3)'}
+      ];
+      var _variables = {
+        'myVar' : {
+          'code' : 'id=_$0_, text>_$1_',
+          'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
+        }
+      }
+      parser.preprocessMarkers(_markers, _variables, function(err, processedMarkers){
+        helper.assert(err, null);
+        helper.assert(processedMarkers, [
+          {'pos': 10, 'name':'_root.menu[id=2, text>"bla"]'},
+          {'pos': 11, 'name':'_root.menu[id=5, text>6] and id=2, text>3'}
+        ]);
+      });
     });
   });
 

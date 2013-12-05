@@ -215,7 +215,7 @@ describe('Carbone', function(){
         author2 : 'author_2'
       };
       var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.xml');
-      carbone.render('test_word_render_2003_XML.xml', _data, _complement, function(err, result){
+      carbone.render('test_word_render_2003_XML.xml', _data, {'complement':_complement}, function(err, result){
         assert.equal(err, null);
         assert.equal(result.indexOf('field1'), -1);
         assert.equal(result.indexOf('field2'), -1);
@@ -238,7 +238,7 @@ describe('Carbone', function(){
         author1 : 'author_1',
         author2 : 'author_2'
       };
-      carbone.render('test_word_render_A.docx', _data, _complement, function(err, result){
+      carbone.render('test_word_render_A.docx', _data, {'complement':_complement}, function(err, result){
         assert.equal(err, null);
         fs.mkdirSync(testPath, 0755);
         var _document = path.join(testPath, 'file.docx');
@@ -281,7 +281,7 @@ describe('Carbone', function(){
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      carbone.render(_filePath, data, 'pdf', function(err, result){
+      carbone.render(_filePath, data, {'convertTo':'pdf'}, function(err, result){
         assert.equal(err, null);
         var buf = new Buffer(result);
         assert.equal(buf.slice(0, 4).toString(), '%PDF');

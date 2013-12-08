@@ -634,6 +634,40 @@ describe('builder.buildXML', function(){
       done();
     });
   });
+  it('should be fast', function(done){
+    //generate data
+    var _nbExecuted = 10;
+    var _waitedResponse = _nbExecuted;
+    var _nbCountries = 100;
+    var _nbCities = 30;
+    var _data = generateData(_nbCountries, _nbCities);
+    var _xml =  '<xml>'
+               +'  <tr><h1>{d[i].id} - {d[i].name}</h1>'
+               +'    <td>{d[i].cities[i].id} - {d[i].cities[i].name}</td>'
+               +'    <td>{d[i].cities[i+1].id} - {d[i].cities[i+1].name}</td>'
+               +'  </tr>'
+               +'  <tr><h1>{d[i+1].id} - {d[i+1].name}</h1>'
+               +'    <td>{d[i+1].cities[i].id} - {d[i+1].cities[i].name}</td>'
+               +'    <td>{d[i+1].cities[i+1].id} - {d[i+1].cities[i+1].name}</td>'
+               +'  </tr>'
+               +'</xml>';
+    var _start = new Date();
+    for (var i = 0; i < _nbExecuted; i++) {
+      builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+        _waitedResponse--;
+        if(_waitedResponse === 0){
+          theEnd();
+        }
+      });
+    };
+    function theEnd(){
+      var _end = new Date();
+      var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
+      console.log('\n\n buildXML Time Elapsed : '+_elapsed + ' ms per call for '+_nbExecuted+' calls (usally around 20ms)\n\n\n');
+      assert.equal((_elapsed < 50), true);
+      done(); 
+    }
+  });
   /*it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [
@@ -647,3 +681,22 @@ describe('builder.buildXML', function(){
 });
 
 
+function generateData(nbCountries, nbCities){
+  var _data = [];
+  for (var i = 0; i < nbCountries ; i++) {
+    var _country = {
+      'id' : i,
+      'name' : 'country_'+i,
+      'cities' : []
+    };
+    for (var j = 0; j < nbCities; j++) {
+      var _city = {
+        'id':(j*i),
+        'name': 'city_'+(j*i)
+      };
+      _country.cities.push(_city);
+    };
+    _data.push(_country);
+  }
+  return _data;
+}

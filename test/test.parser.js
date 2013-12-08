@@ -153,6 +153,14 @@ describe('parser', function(){
   });
 
   describe('findVariables', function(){
+    it('should do nothing if the xml is null or undefined', function(done){
+      parser.findVariables(undefined, function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '');
+        helper.assert(variables, {});
+        done();
+      });
+    });
     it('should do nothing because there is no declared variables', function(done){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>', function(err, xml, variables){
         helper.assert(err, null);
@@ -166,6 +174,22 @@ describe('parser', function(){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables.def.code, 'id=2');
+        done();
+      });
+    });
+    it('should accept a pre-declared variable object', function(done){
+      var _variables ={
+        'otherVar' : {
+          'code' : 'i=5',
+          'regex' : /$otherVar/g
+        }
+      };
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def id=2}</div></xmlend>', _variables, function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
+        helper.assert(variables['def'].code, 'id=2');
+        helper.assert(variables['def'].regex.test('<sdjh> test[$def)] <td>' ), true);
+        helper.assert(variables['otherVar'].code, 'i=5');
         done();
       });
     });

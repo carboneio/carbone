@@ -622,7 +622,7 @@ describe('builder.buildXML', function(){
       done();
     });
   });
-  it('should accept declared variable', function(done){
+  it('should accept declared variable in xml', function(done){
     var _xml = '{#myVar i=2}<xml> <t_row> {d[$myVar].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
     var _data = [
       {'brand' : 'Lumeneo'     , 'id':1},
@@ -630,18 +630,6 @@ describe('builder.buildXML', function(){
       {'brand' : 'Toyota'      , 'id':3}
     ];
     builder.buildXML(_xml, _data, function(err, _xmlBuilt){
-      helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
-      done();
-    });
-  });
-  it.skip('should accept predeclared variables', function(done){
-    var _xml = '{#myVar i=2}<xml> <t_row> {d[$myVar].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
-    var _data = [
-      {'brand' : 'Lumeneo'     , 'id':1},
-      {'brand' : 'Tesla motors', 'id':2},
-      {'brand' : 'Toyota'      , 'id':3}
-    ];
-    builder.buildXML(_xml, _data, null, null,  function(err, _xmlBuilt){
       helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
       done();
     });

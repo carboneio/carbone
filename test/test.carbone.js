@@ -258,6 +258,27 @@ describe('Carbone', function(){
         });
       });
     });
+    it('should accept pre-declared variables and variables declared directly in the document.\
+      it should remove declared variables from the template', function(done){
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2',
+        field3 : 'field_3'
+      };
+      var options = {
+        'variableStr':'{#preVar1 d.field1} {#preVar2 d.field2}'
+      };
+      carbone.render('test_variables.xml', data, options, function(err, result){
+        assert.equal(result.indexOf('field1'), -1);
+        assert.equal(result.indexOf('field2'), -1);
+        assert.equal(result.indexOf('field3'), -1);
+        assert.equal(result.indexOf('myVar3'), -1); //should remove declared variables from the template
+        assert.notEqual(result.indexOf('field_1'), -1);
+        assert.notEqual(result.indexOf('field_2'), -1);
+        assert.notEqual(result.indexOf('field_3'), -1);
+        done();
+      });
+    });
   });
 
 

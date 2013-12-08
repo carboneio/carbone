@@ -279,6 +279,20 @@ describe('Carbone', function(){
         done();
       });
     });
+    it('should parse and return the report filename', function(done){
+      var data = {
+        field1 : 'field_1',
+        field2 : '2013',
+        field3 : 'field_3'
+      };
+      var options = {
+        'reportName':'report_{d.field2}'
+      };
+      carbone.render('test_variables.xml', data, options, function(err, result, reportName){
+        assert.equal(reportName, 'report_2013');
+        done();
+      });
+    });
   });
 
 

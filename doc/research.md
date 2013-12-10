@@ -13,6 +13,9 @@ TODO
 
 - TODO : séparer descriptor de pracours des tableaux du descriptor des parties XML. Cela permettrait sûrement d'éviter de parcours les données 2 fois si les markers sont répétés dans le rapport
 
+- TODO : faire des xmlPart qui utilise des String par référence au lieu d'insérer directement le text
+- TODO : do not crash if the error of LibreOffice is 102 (the document could not be opened)... except if the error occurs manu time?
+
 - Essayer de développer un module UNO C++ pour éviter de passer par python (peut-être plus rapide) : http://api.libreoffice.org/examples/examples.html#Cpp_examples
 Tuto UNO C++ : http://www.linuxjournal.com/article/8608
 

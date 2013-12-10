@@ -293,19 +293,6 @@ describe('Carbone', function(){
         done();
       });
     });
-    /*it.skip('should render spreadsheet', function(done){
-      var data = [{
-        id : 1,
-        name : 'field_1'
-      },{
-        id : 2,
-        name : 'field_2'
-      }];
-      carbone.render('test_spreadsheet.ods', data, function(err, result){
-        fs.writeFileSync('test.ods', result);
-        done();
-      });
-    });*/
   });
 
 
@@ -340,6 +327,22 @@ describe('Carbone', function(){
             done();
           });
         });
+      });
+    });
+    it('should render spreadsheet and convert it to a pdf', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{
+        id : 1,
+        name : 'field_1'
+      },{
+        id : 2,
+        name : 'field_2'
+      }];
+      carbone.render(_filePath, data, {'convertTo':'xls'}, function(err, result){
+        helper.assert(err, null);
+        //fs.writeFileSync('test.xls', result);
+        //TODO TODO TODO TODO TODO TODO TODO TODO : test the content of the xls
+        done();
       });
     });
   });

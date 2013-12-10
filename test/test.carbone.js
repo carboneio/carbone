@@ -293,6 +293,19 @@ describe('Carbone', function(){
         done();
       });
     });
+    /*it.skip('should render spreadsheet', function(done){
+      var data = [{
+        id : 1,
+        name : 'field_1'
+      },{
+        id : 2,
+        name : 'field_2'
+      }];
+      carbone.render('test_spreadsheet.ods', data, function(err, result){
+        fs.writeFileSync('test.ods', result);
+        done();
+      });
+    });*/
   });
 
 

@@ -11,6 +11,7 @@ TODO
  d[id], d[id+1] : groupement par id
  d[id,i], d[id+1,i+1] : groupement par "id-i" comme actuellement quand on fait d[id], le i est ajouté automatiquement (pas bien finalement)
 
+- TODO : séparer descriptor de pracours des tableaux du descriptor des parties XML. Cela permettrait sûrement d'éviter de parcours les données 2 fois si les markers sont répétés dans le rapport
 
 - Essayer de développer un module UNO C++ pour éviter de passer par python (peut-être plus rapide) : http://api.libreoffice.org/examples/examples.html#Cpp_examples
 Tuto UNO C++ : http://www.linuxjournal.com/article/8608
@@ -137,5 +138,33 @@ http://www.docx4java.org/svn/docx4j/trunk/docx4j/docs/Docx4j_GettingStarted.html
 http://www.opendope.org/opendope_conventions_v2.3.html 
 -> comment gérer les répétitions et conditions
 
+
+
+/*
+function binarySearch(value, arr) {
+  var length = arr.length;
+  var first = 0;
+  var last = length - 1,
+  var mid = ((last - first) >> 1);
+  var item;
+  if(length === 0 || arr[first] > value || arr[last] < value) {
+    return -1;
+  }
+  while (first - last) {
+    item = arr[mid];
+    if (value === item) {
+        return mid;
+    } else if (value < item) {
+        last = mid;
+    } else {
+        first = mid + 1;
+    }
+    mid = first + ((last - first) >> 1);
+  }
+  if (arr[last] !== value) {
+    return -1;
+  }
+  return last;
+}*/
 
 

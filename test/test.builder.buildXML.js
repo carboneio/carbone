@@ -668,6 +668,40 @@ describe('builder.buildXML', function(){
       done(); 
     }
   });
+  it('should "flat" the nested array', function(done){
+    var _xml = 
+       '<xml>'
+      +  '<tr>{d.cars[i].wheels[i].size  }</tr>'
+      +  '<tr>{d.cars[i+1].wheels[i+1].size}</tr>'
+      +'</xml>';
+    var _data = {
+      'cars':[
+        {'wheels': [ {'size': 'A'}, {'size': 'B'}               ]},
+        {'wheels': [ {'size': 'C'}, {'size': 'D'},{'size': 'E'} ]}
+      ]
+    };
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      assert.equal(_xmlBuilt, '<xml><tr>A</tr><tr>B</tr><tr>C</tr><tr>D</tr><tr>E</tr></xml>');
+      done();
+    });
+  });
+  it('should manage "holes" if we use the operatior "++" instead of "+1"', function(done){
+    var _xml = 
+       '<xml>'
+      +  '<t_row><td>{d.cars[i].wheels[size].size  }</td><td>{d.cars[i].wheels[size++].size  }</td></t_row>'
+      +  '<t_row><td>{d.cars[i+1].wheels[size].size}</td><td>{d.cars[i+1].wheels[size++].size}</td></t_row>'
+      +'</xml>';
+    var _data = {
+      'cars':[
+        {'wheels': [ {'size': 'D'}, {'size': 'E'}               ]},
+        {'wheels': [ {'size': 'C'}, {'size': 'D'},{'size': 'E'} ]}
+      ]
+    };
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      assert.equal(_xmlBuilt, '<xml><t_row><td></td><td>D</td><td>E</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
+      done();
+    });
+  });
   /*it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [

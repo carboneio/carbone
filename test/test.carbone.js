@@ -266,7 +266,7 @@ describe('Carbone', function(){
         field3 : 'field_3'
       };
       var options = {
-        'variableStr':'{#preVar1 d.field1} {#preVar2 d.field2}'
+        'variableStr':'{#preVar1= d.field1 } {#preVar2= d.field2 }'
       };
       carbone.render('test_variables.xml', data, options, function(err, result){
         assert.equal(result.indexOf('field1'), -1);

@@ -170,10 +170,19 @@ describe('parser', function(){
       });
     });
     it('should extract variables from the xml', function(done){
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def id=2}</div></xmlend>', function(err, xml, variables){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def=id=2}</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables.def.code, 'id=2');
+        done();
+      });
+    });
+    it('should extract variables even if there multiple variables next to each other and some whitespaces between the brace and the #', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def = id=2  } { #two = id=3}</div></xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div> </div></xmlend>');
+        helper.assert(variables['def'].code, 'id=2');
+        helper.assert(variables['two'].code, 'id=3');
         done();
       });
     });
@@ -184,7 +193,7 @@ describe('parser', function(){
           'regex' : /$otherVar/g
         }
       };
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def id=2}</div></xmlend>', _variables, function(err, xml, variables){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def= id=2}</div></xmlend>', _variables, function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables['def'].code, 'id=2');
@@ -194,15 +203,23 @@ describe('parser', function(){
       });
     });
     it('should extract variables from the xml even if there are some xml tags everywhere', function(done){
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/>  id<bla>=2}</div></xmlend>', function(err, xml, variables){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/> =  id<bla>=2    }</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div></xmlend>');
         helper.assert(variables.def.code, 'id=2');
         done();
       });
     });
+    it('should work if there are whitespaces and xml in the variable name and xml tags around each braces', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#de <br> f <br> =<br>id=2  <br>}</div></xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><br><br><br></div></xmlend>');
+        helper.assert(variables['def'].code, 'id=2');
+        done();
+      });
+    });
     it('should extract multiple variables ', function(done){
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/>  id<bla>=2}</div>{ <br> # <bla> my_Var2 <br/>  test<bla>[1=5]}</xmlend>', function(err, xml, variables){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def =<br/>  id<bla>=2  }</div>{ <br> # <bla> my_Var2= <br/>  test<bla>[1=5]}</xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div><br><bla><br/><bla></xmlend>');
         helper.assert(variables['def'].code, 'id=2');
@@ -211,7 +228,7 @@ describe('parser', function(){
       });
     });
     it('should extract variables with parameters. It should replace parameters by $0, $1, ...', function(done){
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b) id=$a,g=$b}</div></xmlend>', function(err, xml, variables){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b)=id=$a,g=$b}</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables['myFn'].code, 'id=_$0_,g=_$1_');
@@ -219,7 +236,7 @@ describe('parser', function(){
       });
     });
     it('should extract variables with parameters even if there are xml tags everywhere', function(done){
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>', function(err, xml, variables){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> = id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><tr><tr><tr/><tr/><td><td><tf></div></xmlend>');
         helper.assert(variables['myFn'].code, 'id=_$0_,g=_$1_');
@@ -228,13 +245,6 @@ describe('parser', function(){
         done();
       });
     });
-    /*it.skip('should accept braces around the code', function(){
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def {id=2}}</div></xmlend>', function(err, xml, variables){
-        helper.assert(err, null);
-        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
-        helper.assert(variables.def.code, 'id=2');
-      });
-    });*/
   });
 
   describe('preprocessMarkers', function(){

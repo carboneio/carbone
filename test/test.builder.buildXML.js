@@ -623,7 +623,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should accept declared variable in xml', function(done){
-    var _xml = '{#myVar i=2}<xml> <t_row> {d[$myVar].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
+    var _xml = '{#myVar= i=2  }<xml> <t_row> {d[$myVar].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
     var _data = [
       {'brand' : 'Lumeneo'     , 'id':1},
       {'brand' : 'Tesla motors', 'id':2},
@@ -693,12 +693,29 @@ describe('builder.buildXML', function(){
       +'</xml>';
     var _data = {
       'cars':[
-        {'wheels': [ {'size': 'D'}, {'size': 'E'}               ]},
-        {'wheels': [ {'size': 'C'}, {'size': 'D'},{'size': 'E'} ]}
+        {'wheels': [                {'size': 'D'}, {'size': 'E'}]},
+        {'wheels': [ {'size': 'C'}, {'size': 'D'}, {'size': 'E'}]}
       ]
     };
     builder.buildXML(_xml, _data, function(err, _xmlBuilt){
       assert.equal(_xmlBuilt, '<xml><t_row><td></td><td>D</td><td>E</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
+      done();
+    });
+  });
+  it('should manage "holes"(++) and it should not crash if we use a nested object', function(done){
+    var _xml = 
+       '<xml>'
+      +  '<t_row><td>{d.cars[i].wheels[size].obj.id  }</td><td>{d.cars[i].wheels[size++].obj.id  }</td></t_row>'
+      +  '<t_row><td>{d.cars[i+1].wheels[size].obj.id}</td><td>{d.cars[i+1].wheels[size++].obj.id}</td></t_row>'
+      +'</xml>';
+    var _data = {
+      'cars':[
+        {'wheels': [                                {'size': 'D', 'obj':{'id':2}}, {'size': 'E', 'obj':{'id':3}} ]},
+        {'wheels': [ {'size': 'C', 'obj':{'id':1}}, {'size': 'D', 'obj':{'id':2}}, {'size': 'E', 'obj':{'id':3}} ]}
+      ]
+    };
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      assert.equal(_xmlBuilt, '<xml><t_row><td></td><td>2</td><td>3</td></t_row><t_row><td>1</td><td>2</td><td>3</td></t_row></xml>');
       done();
     });
   });
@@ -711,7 +728,15 @@ describe('builder.buildXML', function(){
       { "pos": 13723,  "name": "d[i+1].date" }
     ]
   */
-
+  /*it.skip('should not crash if the markers does not exist');*/
+  /*
+    [
+      { "pos": 11586, "name": "d.fromDate:convert(YYYYMMDD,DD/MM/YYYY)" },
+      { "pos": 12854, "name": "d[i].date" },
+      { "pos": 13469, "name": "d[type=2,i].value:toFixed(2)" },
+      { "pos": 13723,  "name": "d[i+1].date" }
+    ]
+  */
 });
 
 

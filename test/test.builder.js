@@ -78,6 +78,13 @@ describe('builder', function(){
       var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
       assert.equal(_actual, 'var _prefixmenu_filter=myObj["menu"];\nif((_prefixmenu_filter && _prefixmenu_filter["sort"]>10)){\n code;\n }');
     });
+    it('should handle the reserved index iterator "i"', function(){
+      var _conditions = [
+        {'left':{'parent':'myObj','attr':'i'}, 'operator':'>', 'right':'10'},
+      ];
+      var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((myObj_i >10)){\n code;\n }');
+    });
     it('should not declare the same variable twice if there are two conditions on the same variable', function(){
       var _conditions = [
         {'left':{'parent':'myObj','attr':'menu.sort'}, 'operator':'>', 'right':'10'},
@@ -168,6 +175,12 @@ describe('builder', function(){
         { 'pos': [ 24       ], 'str': '</xml>'       } 
       ];
       builder.sortXmlParts(_data, 10);
+      helper.assert(_data, _expected);
+    });
+    it('should sort by rowShow first if "pos" are the same', function(){
+      var _data     = [{'pos':[4], 'rowShow':false}, {'pos':[4], 'rowShow':false}, {'pos':[4], 'rowShow':true }, {'pos':[1], 'rowShow':false}];
+      var _expected = [{'pos':[1], 'rowShow':false}, {'pos':[4], 'rowShow':true }, {'pos':[4], 'rowShow':false}, {'pos':[4], 'rowShow':false}];
+      builder.sortXmlParts(_data, 3);
       helper.assert(_data, _expected);
     });
     /*
@@ -658,6 +671,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
               {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1,                        },
@@ -699,6 +713,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr><p>'     },
               {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1                          , 'conditions':[{'left':{'parent':'_root','attr':'show'}, 'operator':'==', 'right':'1'}] },
@@ -737,6 +752,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'       },
               {'obj': '_root', 'attr':'firstname', 'pos':10, 'depth':1, 'before':''           },
@@ -789,6 +805,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'        },
               {'obj': '_root', 'attr':'firstname', 'pos':10, 'depth':1, 'before':''            },
@@ -886,6 +903,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :15},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'movies1', 'array':'start' , 'pos':6 , 'depth':1, 'after': '<tr>'  },
               {'obj': 'movies1', 'attr' :'title' , 'pos':10, 'depth':1, 'before':''      },
@@ -898,6 +916,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'cars2', 'array':'start' , 'pos':20, 'depth':1, 'after': '<trow>'  },
               {'obj': 'cars2', 'attr' :'brand' , 'pos':24, 'depth':1, 'before':''        },
@@ -948,6 +967,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 4, 'end' :35},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': '_root', 'array':'start' , 'pos':4  , 'depth':1, 'after': '<tab>'  },
               {'obj': '_root', 'array':'end'   , 'pos':35 , 'depth':1, 'after': '</tab>'  },
@@ -959,6 +979,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 6, 'end' :15},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'movies1', 'array':'start' , 'pos':6 , 'depth':2, 'after': '<tr>'  },
               {'obj': 'movies1', 'attr' :'title' , 'pos':10, 'depth':2, 'before':''      },
@@ -971,6 +992,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 20, 'end' :29},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'cars2', 'array':'start' , 'pos':20, 'depth':2, 'after': '<trow>'  },
               {'obj': 'cars2', 'attr' :'brand' , 'pos':24, 'depth':2, 'before':''        },
@@ -1031,6 +1053,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :15},
+            'iterators': [{ 'attr': 'i' }],
             'before' : '<T>',
             'xmlParts' : [
               {'obj': 'movies1', 'array':'start' , 'pos':6 , 'depth':1, 'after': '<tr>'  },
@@ -1044,6 +1067,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 20, 'end' :29},
+            'iterators': [{ 'attr': 'i' }],
             'before' : '<T2>',
             'xmlParts' : [
               {'obj': 'cars2', 'array':'start' , 'pos':20, 'depth':1, 'after': '<trow>'  },
@@ -1097,6 +1121,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
+            'iterators':[{'attr':'i'}],
             'xmlParts' : [
               {'obj': '_root', 'array': 'start'  , 'pos':6 , 'depth':1, 'after': '<tr><p>'   },
               {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'',         },
@@ -1110,6 +1135,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 20, 'end' :29},
+            'iterators':[{'attr':'i'}],
             'xmlParts' : [
               {'obj': 'skills1', 'array': 'start', 'pos':20, 'depth':2, 'after': '<tr>'  },
               {'obj': 'skills1', 'attr':'name'   , 'pos':24, 'depth':2                   },
@@ -1174,6 +1200,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :48},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': '_root', 'array': 'start'  , 'pos':6 , 'depth':1, 'after': '<tr><p>'   },
               {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1, 'before':'',         },
@@ -1187,6 +1214,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 20, 'end' :39},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'skills1', 'array': 'start', 'pos':20, 'depth':2, 'after': '<tr>'  },
               {'obj': 'skills1', 'attr':'name'   , 'pos':24, 'depth':2                   },
@@ -1199,6 +1227,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 3,
             'position' : {'start': 25, 'end' :34},
+            'iterators': [{ 'attr': 'i' }],
             'before' : '<days>',
             'xmlParts' : [
               {'obj': 'when2', 'array': 'start', 'pos':25, 'depth':3, 'after': '<d>'  },
@@ -1281,7 +1310,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
-            'iterator' : {'attr': 'sort'},
+            'iterators' : [{'attr': 'sort'},{'attr': 'i'}],
             'xmlParts' : [
               {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'     },
               {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1,                        },
@@ -1320,7 +1349,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :29},
-            'iterator' : {'obj': 'movie', 'attr':'sort'},
+            'iterators' : [{'obj': 'movie', 'attr':'sort'}, {'attr':'i'}],
             'xmlParts' : [
               {'obj': '_root', 'array':'start'   , 'pos':6 , 'depth':1, 'after': '<tr>'     },
               {'obj': '_root', 'attr':'firstname', 'pos':13, 'depth':1,                        },
@@ -1359,6 +1388,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 2,
             'position' : {'start': 13, 'end' :22},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
             ]
           },
@@ -1368,6 +1398,7 @@ describe('builder', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 6, 'end' :38},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'skills1', 'array':'start' , 'pos':6 , 'depth':1 , 'after' : '<tr>' },
               {'obj': '_root'  , 'array': 'start', 'pos':13, 'depth':2, 'after': '<td>'  },

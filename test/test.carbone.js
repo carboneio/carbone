@@ -215,7 +215,7 @@ describe('Carbone', function(){
         author2 : 'author_2'
       };
       var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.xml');
-      carbone.render('test_word_render_2003_XML.xml', _data, _complement, function(err, result){
+      carbone.render('test_word_render_2003_XML.xml', _data, {'complement':_complement}, function(err, result){
         assert.equal(err, null);
         assert.equal(result.indexOf('field1'), -1);
         assert.equal(result.indexOf('field2'), -1);
@@ -238,7 +238,7 @@ describe('Carbone', function(){
         author1 : 'author_1',
         author2 : 'author_2'
       };
-      carbone.render('test_word_render_A.docx', _data, _complement, function(err, result){
+      carbone.render('test_word_render_A.docx', _data, {'complement':_complement}, function(err, result){
         assert.equal(err, null);
         fs.mkdirSync(testPath, 0755);
         var _document = path.join(testPath, 'file.docx');
@@ -256,6 +256,41 @@ describe('Carbone', function(){
           assert.notEqual(_xmlExpectedContent.indexOf('author_2'), -1);
           done();
         });
+      });
+    });
+    it('should accept pre-declared variables and variables declared directly in the document.\
+      it should remove declared variables from the template', function(done){
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2',
+        field3 : 'field_3'
+      };
+      var options = {
+        'variableStr':'{#preVar1= d.field1 } {#preVar2= d.field2 }'
+      };
+      carbone.render('test_variables.xml', data, options, function(err, result){
+        assert.equal(result.indexOf('field1'), -1);
+        assert.equal(result.indexOf('field2'), -1);
+        assert.equal(result.indexOf('field3'), -1);
+        assert.equal(result.indexOf('myVar3'), -1); //should remove declared variables from the template
+        assert.notEqual(result.indexOf('field_1'), -1);
+        assert.notEqual(result.indexOf('field_2'), -1);
+        assert.notEqual(result.indexOf('field_3'), -1);
+        done();
+      });
+    });
+    it('should parse and return the report filename', function(done){
+      var data = {
+        field1 : 'field_1',
+        field2 : '2013',
+        field3 : 'field_3'
+      };
+      var options = {
+        'reportName':'report_{d.field2}'
+      };
+      carbone.render('test_variables.xml', data, options, function(err, result, reportName){
+        assert.equal(reportName, 'report_2013');
+        done();
       });
     });
   });
@@ -281,7 +316,7 @@ describe('Carbone', function(){
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      carbone.render(_filePath, data, 'pdf', function(err, result){
+      carbone.render(_filePath, data, {'convertTo':'pdf'}, function(err, result){
         assert.equal(err, null);
         var buf = new Buffer(result);
         assert.equal(buf.slice(0, 4).toString(), '%PDF');
@@ -292,6 +327,22 @@ describe('Carbone', function(){
             done();
           });
         });
+      });
+    });
+    it('should render spreadsheet and convert it to a pdf', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{
+        id : 1,
+        name : 'field_1'
+      },{
+        id : 2,
+        name : 'field_2'
+      }];
+      carbone.render(_filePath, data, {'convertTo':'xls'}, function(err, result){
+        helper.assert(err, null);
+        //fs.writeFileSync('test.xls', result);
+        //TODO TODO TODO TODO TODO TODO TODO TODO : test the content of the xls
+        done();
       });
     });
   });

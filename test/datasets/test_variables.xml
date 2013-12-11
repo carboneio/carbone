@@ -1,0 +1,6 @@
+<xml>
+  <h1> { $preVar1 } </h1>
+  <h2> { $myVar3 } </h2>
+  <h2> { $preVar2 } </h2>
+  <div> {#myVar3 = d.field3} </div>
+</xml>

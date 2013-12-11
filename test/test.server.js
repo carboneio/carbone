@@ -67,7 +67,7 @@ describe('Server', function(){
           field1 : 'field_1',
           field2 : 'field_2'
         };
-        carbone.render('test_word_render_A.docx', data, 'pdf', function(err, result){
+        carbone.render('test_word_render_A.docx', data, {'convertTo':'pdf'}, function(err, result){
           var buf = new Buffer(result);
           assert.equal(buf.slice(0, 4).toString(), '%PDF');
           var bufPDF = new Buffer(buf.length);

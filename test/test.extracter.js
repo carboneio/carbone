@@ -103,6 +103,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
           ]
@@ -120,10 +121,46 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'sort' }],
           'xmlParts' : [
             {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
-          ],
-          'iterator' : {'attr' : 'sort'}
+          ]
+        }
+      });
+    });
+    it('should detect iterator', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd[ i ].site'},
+        {'pos': 30, 'name': 'd[ i + 1].site'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'array',
+          'parent':'',
+          'position': { 'start': 20, 'end': 30 },
+          'iterators' : [{'attr' : 'i'}],
+          'xmlParts' : [
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
+          ]
+        }
+      });
+    });
+    it('AAAshould manage arrays with custom iterator', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd[ i , sort ].site'},
+        {'pos': 30, 'name': 'd[ i + 1, sort + 1 ].site'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name': 'd',
+          'type': 'array',
+          'parent':'',
+          'position': { 'start': 20, 'end': 30 },
+          'iterators' : [{'attr' : 'i'},{'attr' : 'sort'}],
+          'xmlParts' : [
+            {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
+          ]
         }
       });
     });
@@ -139,10 +176,10 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'',
           'position': { 'start': 20, 'end': 30 },
+          'iterators' : [{'obj':'movie', 'attr' : 'sort'}],
           'xmlParts' : [
             {'attr':'site', 'formatters' : [], 'obj': 'd', 'pos':20}
           ],
-          'iterator' : {'obj':'movie', 'attr' : 'sort'}
         }
       });
     });
@@ -159,6 +196,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'movie', 'formatters' : [], 'obj': 'd', 'pos':25}
           ]
@@ -190,6 +228,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20}
           ]
@@ -213,6 +252,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20/*, 'end': 30*/ },
+          'iterators': [],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'i'}, 'operator':'==', 'right':'1'}]},
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':30, 'conditions':[{'left':{'parent':'dsite', 'attr':'i'}, 'operator':'==', 'right':'0'}]}
@@ -237,6 +277,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20/*, 'end': 30 */},
+          'iterators': [],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[
               {'left':{'parent':'dsite', 'attr':'i'}, 'operator':'==', 'right':'1'},
@@ -268,6 +309,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'sort'}, 'operator':'>', 'right':'10'}]}
           ]
@@ -291,6 +333,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'sort'}, 'operator':'>', 'right':'10'}]}
           ]
@@ -310,6 +353,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : []
         },
         'dsite':{
@@ -317,6 +361,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 25 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'d', 'attr':'sort'}, 'operator':'>', 'right':'10'}]}
           ]
@@ -336,6 +381,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : []
         },
         'd_':{
@@ -343,6 +389,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 25 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'd_', 'pos':20, 'conditions':[{'left':{'parent':'d_', 'attr':'sort'}, 'operator':'>', 'right':'10'}]}
           ]
@@ -366,6 +413,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 
               'conditions':[
@@ -403,6 +451,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20},
             {'attr':'val', 'formatters' : [], 'obj': 'dsite', 'pos':21}
@@ -413,6 +462,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 40, 'end': 50 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40},
             {'attr':'val', 'formatters' : [], 'obj': 'dsite$', 'pos':41}
@@ -441,6 +491,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20}
           ]
@@ -450,6 +501,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 40, 'end': 50 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40}
           ]
@@ -459,6 +511,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 60, 'end': 70 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite$$', 'pos':60}
           ]
@@ -484,6 +537,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'id'}, 'operator':'>', 'right':'1'}]},
           ]
@@ -493,6 +547,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 40, 'end': 50 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40, 'conditions':[{'left':{'parent':'dsite$', 'attr':'val'}, 'operator':'>', 'right':'2'}]},
           ]
@@ -518,6 +573,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : []
         },
         'dsiteobj':{
@@ -533,6 +589,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 40, 'end': 50 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : []
         },
         'dsite$obj':{
@@ -564,6 +621,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20, 'conditions':[{'left':{'parent':'dsite', 'attr':'id'}, 'operator':'>', 'right':'1'}]},
           ]
@@ -573,6 +631,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 40, 'end': 50 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40, 'conditions':[{'left':{'parent':'dsite$', 'attr':'val'}, 'operator':'>', 'right':'2'}]},
           ]
@@ -602,6 +661,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20},
             {'attr':'val', 'formatters' : [], 'obj': 'dsite', 'pos':21}
@@ -612,6 +672,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 40, 'end': 50 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite$', 'pos':40},
             {'attr':'val', 'formatters' : [], 'obj': 'dsite$', 'pos':41}
@@ -639,6 +700,7 @@ describe('extracter', function(){
           'type': 'array',
           'parent':'d',
           'position': { 'start': 20, 'end': 30 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dsite', 'pos':20}
           ]
@@ -672,6 +734,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d',
           'position': {'start':1, 'end':40},
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dmenu', 'pos':1},
             {'attr':'cars', 'formatters' : [], 'obj': 'dmenu', 'pos':10}
@@ -682,6 +745,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'dmenu',
           'position': {'start':20, 'end':30},
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dmenumenuElement', 'pos':20}
           ]
@@ -716,6 +780,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d',
           'position': {'start':10, 'end':20},
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : []
         },
         'dmenumenuElement':{
@@ -723,6 +788,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'dmenu',
           'position': {'start':10, 'end':30},
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dmenumenuElement', 'pos':10}
           ]
@@ -798,6 +864,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d',
           'position': {'start': 1, 'end': 3 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : []
         },
         'dmenu_':{
@@ -805,6 +872,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'dmenu',
           'position':{'start': 1, 'end': 2 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'id', 'formatters' : [], 'obj': 'dmenu_', 'pos':1}
           ]
@@ -822,6 +890,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d',
           'position':{'start': 6, 'end': 7 },
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'attr':'name', 'formatters' : [], 'obj': 'ddays', 'pos':6}
           ]
@@ -1132,6 +1201,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':12, 'end':17}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':12},
           ]
@@ -1148,6 +1218,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':12, 'end':17}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'   , 'pos':12, 'depth' : 1},
               {'obj': 'd0', 'array':'start' , 'pos':12, 'depth' : 1,  'after':''},
@@ -1167,6 +1238,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':9, 'end':30}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':9},
             {'obj': 'd0', 'attr':'val' , 'pos':14},
@@ -1185,6 +1257,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':5, 'end':26}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu' , 'pos':9,  'depth' : 1,  'after':' <h1>'},
               {'obj': 'd0', 'attr':'val'  , 'pos':14, 'depth' : 1,  'after':' </h1>'},
@@ -1214,6 +1287,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d0',
           'position' : {'start':9, 'end':30}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'menu1', 'attr':'menu', 'pos':9},
             {'obj': 'menu1', 'attr':'val' , 'pos':14},
@@ -1241,6 +1315,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'d0',
             'position' : {'start':5, 'end':26}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'menu1', 'attr':'menu' , 'pos':9,  'depth' : 1,  'after':' <h1>'},
               {'obj': 'menu1', 'attr':'val'  , 'pos':14, 'depth' : 1,  'after':' </h1>'},
@@ -1262,6 +1337,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':9, 'end':38}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':9},
             {'obj': 'd0', 'attr':'val', 'pos':14},
@@ -1288,6 +1364,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':5, 'end':34}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu' , 'pos':9,  'depth': 1,  'after':' <h1>'},
               {'obj': 'd0', 'attr':'val'  , 'pos':14, 'depth': 1,  'after':' </h1>'},
@@ -1325,6 +1402,7 @@ describe('extracter', function(){
           'type': 'array',
           'depth' : 1,
           'position' : {'start': 10, 'end' :22}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'movies1', 'attr':'title', 'pos':11, 'depth':1 }
           ]
@@ -1335,6 +1413,7 @@ describe('extracter', function(){
           'type': 'array',
           'depth' : 1,
           'position' : {'start': 35, 'end' :48},
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'cars2', 'attr':'brand', 'pos':36, 'depth':1 }
           ]
@@ -1358,6 +1437,7 @@ describe('extracter', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 5, 'end' :17},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'movies1',  'attr': 'title', 'pos': 11, 'depth':1 },
               {'obj': 'movies1', 'array': 'start', 'pos': 5 , 'depth': 1,'after': '<tr1> ' },
@@ -1370,6 +1450,7 @@ describe('extracter', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 30, 'end' :42},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'cars2',  'attr': 'brand', 'pos': 36,'depth':1 },
               {'obj': 'cars2', 'array': 'start', 'pos': 30,'depth': 1,'after': '<tr2> ' },
@@ -1396,6 +1477,7 @@ describe('extracter', function(){
           'type': 'array',
           'depth' : 1,
           'position' : {'start': 10, 'end' :22}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'movies1', 'attr':'title', 'pos':11, 'depth':1 }
           ]
@@ -1406,6 +1488,7 @@ describe('extracter', function(){
           'type': 'array',
           'depth' : 1,
           'position' : {'start': 39, 'end' :52},
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'cars2', 'attr':'brand', 'pos':40, 'depth':1 }
           ]
@@ -1429,6 +1512,7 @@ describe('extracter', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 5, 'end' :17},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'movies1',  'attr': 'title', 'pos': 11, 'depth':1 },
               {'obj': 'movies1', 'array': 'start', 'pos': 5 , 'depth': 1,'after': '<tr1> ' },
@@ -1441,6 +1525,7 @@ describe('extracter', function(){
             'type': 'array',
             'depth' : 1,
             'position' : {'start': 34, 'end' :46},
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'cars2',  'attr': 'brand', 'pos': 40,'depth':1 },
               {'obj': 'cars2', 'array': 'start', 'pos': 34,'depth': 1,'after': '<tr2> ' },
@@ -1460,6 +1545,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':11, 'end':75}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':11},
           ]
@@ -1469,6 +1555,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d0',
           'position' : {'start':26, 'end':46}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -1493,6 +1580,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':5, 'end':68}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'   , 'pos':11, 'depth':1, 'after': ' <h1>'},
               {'obj': 'd0', 'array':'start' , 'pos':5,  'depth':1, 'after': '<tr A>'},
@@ -1505,6 +1593,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'d0',
             'position' : {'start':16, 'end':36}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id', 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
@@ -1533,6 +1622,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':11, 'end':75}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'd0', 'attr':'menu', 'pos':11},
             {'obj': 'd0', 'attr':'val', 'pos':56}
@@ -1543,6 +1633,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d0',
           'position' : {'start':26, 'end':46}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -1559,6 +1650,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':5, 'end':68}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'attr':'menu'  , 'pos':11, 'depth':1, 'after' : ' <h1>' },
               {'obj': 'd0', 'attr':'val'   , 'pos':56, 'depth':1, },
@@ -1572,6 +1664,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'d0',
             'position' : {'start':16, 'end':36}, /* exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
@@ -1591,6 +1684,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'',
           'position' : {'start':26, 'end':46}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : []
         },  
         'element1':{
@@ -1598,6 +1692,7 @@ describe('extracter', function(){
           'type':'array',
           'parent':'d0',
           'position' : {'start':11, 'end': 75}, /* Approximative position */
+          'iterators': [{ 'attr': 'i' }],
           'xmlParts' : [
             {'obj': 'element1', 'attr':'id', 'pos':26}
           ]
@@ -1614,6 +1709,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'',
             'position' : {'start':16 , 'end':36 }, /* Exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'd0', 'array':'start', 'pos':16, 'depth':2, 'after':'<tr B> <p>'},
               {'obj': 'd0', 'array':'end'  , 'pos':36, 'depth':2, 'before':'</p> </tr>'},
@@ -1625,6 +1721,7 @@ describe('extracter', function(){
             'type':'array',
             'parent':'d0',
             'position' : {'start':5, 'end': 68}, /* Exact position */
+            'iterators': [{ 'attr': 'i' }],
             'xmlParts' : [
               {'obj': 'element1', 'attr':'id'    , 'pos':26, 'depth':2},
               {'obj': 'element1', 'array':'start', 'pos':5,  'depth':1, 'after':'<tr A> <h1>'},

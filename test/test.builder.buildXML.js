@@ -743,25 +743,25 @@ describe('builder.buildXML', function(){
       done();
     });
   });
-  /*it('should work with conditions across nested arrays', function(done){
+  it('should work with conditions on nested arrays and with an object', function(done){
     var _xml = 
        '<xml>'
-      +  '<t_row>{d.menus[meal=0, weekday=2].dishes[sort=2].name}</t_row>'
-      +  '<t_row>{d.menus[meal=0, weekday=1].dishes[sort=2].name}</t_row>'
+      +  '<t_row>{d.menus[meal=0, weekday=2].dishes[sort=2].obj.name}</t_row>'
+      +  '<t_row>{d.menus[meal=0, weekday=1].dishes[sort=2].obj.name}</t_row>'
       +'</xml>';
     var _data = {
       'menus':[
-        {'weekday':1, 'meal':0, 'dishes': [ {'sort': 1, 'name':'A'}, {'sort': 2, 'name':'E'}                         ]},
-        {'weekday':2, 'meal':0, 'dishes': [ {'sort': 1, 'name':'B'}, {'sort': 2, 'name':'F'}                         ]},
-        {'weekday':1, 'meal':1, 'dishes': [ {'sort': 1, 'name':'C'}, {'sort': 2, 'name':'G'},{'sort': 3, 'name':'I'} ]},
-        {'weekday':2, 'meal':1, 'dishes': [ {'sort': 1, 'name':'D'}, {'sort': 2, 'name':'H'},{'sort': 3, 'name':'J'} ]}
+        {'weekday':1, 'meal':0, 'dishes': [ {'sort': 1, 'obj':{'name':'A'}}, {'sort': 2, 'obj':{'name':'E'}}                                 ]},
+        {'weekday':2, 'meal':0, 'dishes': [ {'sort': 1, 'obj':{'name':'B'}}, {'sort': 2, 'obj':{'name':'F'}}                                 ]},
+        {'weekday':1, 'meal':1, 'dishes': [ {'sort': 1, 'obj':{'name':'C'}}, {'sort': 2, 'obj':{'name':'G'}},{'sort': 3, 'obj':{'name':'I'}} ]},
+        {'weekday':2, 'meal':1, 'dishes': [ {'sort': 1, 'obj':{'name':'D'}}, {'sort': 2, 'obj':{'name':'H'}},{'sort': 3, 'obj':{'name':'J'}} ]}
       ]
     };
     builder.buildXML(_xml, _data, function(err, _xmlBuilt){
       assert.equal(_xmlBuilt, '<xml><t_row>F</t_row><t_row>E</t_row></xml>');
       done();
     });
-  });*/
+  });
   /*it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [

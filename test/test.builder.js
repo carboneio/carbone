@@ -487,7 +487,7 @@ describe('builder', function(){
       };
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data, carbone.formatters), [
-        {pos: [5 ],str: '<xml>24'},
+        {pos: [5 ],str: '<xml>24', rowShow:true},
         {pos: [6 ],str: '</xml>'}
       ]);
       done();
@@ -520,9 +520,9 @@ describe('builder', function(){
       };
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
-        {pos: [8  ],str: '<xml><p>Thomas'},
-        {pos: [15 ],str: '</p><p>A. Anderson'},
-        {pos: [22 ],str: '</p><p>Neo'},
+        {pos: [8  ],str: '<xml><p>Thomas', rowShow:true},
+        {pos: [15 ],str: '</p><p>A. Anderson', rowShow:true},
+        {pos: [22 ],str: '</p><p>Neo', rowShow:true},
         {pos: [23 ],str: '</p></xml>'}
       ]);
     });
@@ -549,13 +549,13 @@ describe('builder', function(){
       };
       var _fn = builder.getBuilderFunction(_desc);
       var _data = {};
-      helper.assert(_fn(_data), [{pos:[8], str:'<xml><p>'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>'}, {pos:[23], str:'</p></xml>'}]);
-      helper.assert(_fn(null) , [{pos:[8], str:'<xml><p>'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>'}, {pos:[23], str:'</p></xml>'}]);
+      helper.assert(_fn(_data), [{pos:[8], str:'<xml><p>', rowShow:true}, {pos:[15], str:'</p><p>', rowShow:true}, {pos:[22], str:'</p><p>', rowShow:true}, {pos:[23], str:'</p></xml>'}]);
+      helper.assert(_fn(null) , [{pos:[8], str:'<xml><p>', rowShow:true}, {pos:[15], str:'</p><p>', rowShow:true}, {pos:[22], str:'</p><p>', rowShow:true}, {pos:[23], str:'</p></xml>'}]);
       _data = {
         'firstname':'Thomas',
         'surname': 'Neo'
       };
-      helper.assert(_fn(_data) , [{pos:[8], str:'<xml><p>Thomas'}, {pos:[15], str:'</p><p>'}, {pos:[22], str:'</p><p>Neo'}, {pos:[23], str:'</p></xml>'}]);
+      helper.assert(_fn(_data) , [{pos:[8], str:'<xml><p>Thomas', rowShow:true}, {pos:[15], str:'</p><p>', rowShow:true}, {pos:[22], str:'</p><p>Neo', rowShow:true}, {pos:[23], str:'</p></xml>'}]);
     });
     it('should work even if there is a nested object in the descriptor', function(){
       var _desc = {
@@ -599,11 +599,11 @@ describe('builder', function(){
       };
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
-        { pos: [ 8 ] , str: '<xml><p>Thomas'},
-        { pos: [ 15 ], str: '</p><p>A. Anderson'},
-        { pos: [ 40 ], str: '</br><p>Neo'},
-        { pos: [ 23 ], str: '</p><br>matrix'},
-        { pos: [ 32 ], str: '</br><br>developer'},
+        { pos: [ 8 ] , str: '<xml><p>Thomas', rowShow:true},
+        { pos: [ 15 ], str: '</p><p>A. Anderson', rowShow:true},
+        { pos: [ 40 ], str: '</br><p>Neo', rowShow:true},
+        { pos: [ 23 ], str: '</p><br>matrix', rowShow:true},
+        { pos: [ 32 ], str: '</br><br>developer', rowShow:true},
         { pos: [ 41 ], str: '</p></xml>'}
       ]);
     });
@@ -649,11 +649,11 @@ describe('builder', function(){
       };
       var _fn = builder.getBuilderFunction(_desc);
       helper.assert(_fn(_data), [
-        { pos:[ 8  ], str: '<xml><p>Thomas'},
-        { pos:[ 15 ], str: '</p><p>A. Anderson'},
-        { pos:[ 40 ], str: '</br><p>Neo'},
-        { pos:[ 23 ], str: '</p><br>matrix'},
-        { pos:[ 32 ], str: '</br><br>developer'},
+        { pos:[ 8  ], str: '<xml><p>Thomas', rowShow:true},
+        { pos:[ 15 ], str: '</p><p>A. Anderson', rowShow:true},
+        { pos:[ 40 ], str: '</br><p>Neo', rowShow:true},
+        { pos:[ 23 ], str: '</p><br>matrix', rowShow:true},
+        { pos:[ 32 ], str: '</br><br>developer', rowShow:true},
         { pos:[ 41 ], str: '</p></xml>' }
       ]);
     });

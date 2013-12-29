@@ -76,6 +76,13 @@ Alternative direct to start a server:
 
 /Applications/LibreOffice.app/Contents/MacOS/soffice --headless --invisible --nocrashreport --nodefault --nologo --nofirststartwizard --norestore --quickstart --nolockcheck --accept="pipe,name=bla;urp;StarOffice.ComponentContext"
 
+Puis lancer le fichier python :
+/Applications/LibreOffice.app/Contents/MacOS/python converter.py --pipe bla
+
+Et écrire dans la console
+--input=/Users/dgrelaud/test.odt --format=writer_pdf_Export --output=/Users/dgrelaud/res.pd
+
+
 Comment lancer plusieurs instance de libreoffice en même temps :
 https://bugs.freedesktop.org/show_bug.cgi?id=37531
 -env:UserInstallation=file:///home/user/.libreoffice-alt

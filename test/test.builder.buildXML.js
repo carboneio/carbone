@@ -634,6 +634,30 @@ describe('builder.buildXML', function(){
       done();
     });
   });
+  it('should not confuse two variables which begin with the same word', function(done){
+    var _xml = '{#myVar2 = i=2  }{#myVar = i=1  }<xml> <t_row> {d[$myVar2].brand} </t_row><t_row> {d[$myVar].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'id':1},
+      {'brand' : 'Tesla motors', 'id':2},
+      {'brand' : 'Toyota'      , 'id':3}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
+  it('should not confuse two parameters which begin with the same word', function(done){
+    var _xml = '{#myVar($id, $idEnd) = i>$id,i<$idEnd  }<xml> <t_row> {d[$myVar(1,3)].brand} </t_row><t_row> {d[$myVar(0,2)].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'id':1},
+      {'brand' : 'Tesla motors', 'id':2},
+      {'brand' : 'Toyota'      , 'id':3}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
   it('should be fast', function(done){
     //generate data
     var _nbExecuted = 10;
@@ -719,6 +743,25 @@ describe('builder.buildXML', function(){
       done();
     });
   });
+  /*it('should work with conditions across nested arrays', function(done){
+    var _xml = 
+       '<xml>'
+      +  '<t_row>{d.menus[meal=0, weekday=2].dishes[sort=2].name}</t_row>'
+      +  '<t_row>{d.menus[meal=0, weekday=1].dishes[sort=2].name}</t_row>'
+      +'</xml>';
+    var _data = {
+      'menus':[
+        {'weekday':1, 'meal':0, 'dishes': [ {'sort': 1, 'name':'A'}, {'sort': 2, 'name':'E'}                         ]},
+        {'weekday':2, 'meal':0, 'dishes': [ {'sort': 1, 'name':'B'}, {'sort': 2, 'name':'F'}                         ]},
+        {'weekday':1, 'meal':1, 'dishes': [ {'sort': 1, 'name':'C'}, {'sort': 2, 'name':'G'},{'sort': 3, 'name':'I'} ]},
+        {'weekday':2, 'meal':1, 'dishes': [ {'sort': 1, 'name':'D'}, {'sort': 2, 'name':'H'},{'sort': 3, 'name':'J'} ]}
+      ]
+    };
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      assert.equal(_xmlBuilt, '<xml><t_row>F</t_row><t_row>E</t_row></xml>');
+      done();
+    });
+  });*/
   /*it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [

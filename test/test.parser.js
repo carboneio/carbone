@@ -157,7 +157,7 @@ describe('parser', function(){
       parser.findVariables(undefined, function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '');
-        helper.assert(variables, {});
+        helper.assert(variables, []);
         done();
       });
     });
@@ -165,7 +165,7 @@ describe('parser', function(){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}</xmlend>');
-        helper.assert(variables, {});
+        helper.assert(variables, []);
         done();
       });
     });
@@ -173,7 +173,8 @@ describe('parser', function(){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def=id=2}</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
-        helper.assert(variables.def.code, 'id=2');
+        helper.assert(variables[0].name, 'def');
+        helper.assert(variables[0].code, 'id=2');
         done();
       });
     });
@@ -181,24 +182,27 @@ describe('parser', function(){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def = id=2  } { #two = id=3}</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div> </div></xmlend>');
-        helper.assert(variables['def'].code, 'id=2');
-        helper.assert(variables['two'].code, 'id=3');
+        helper.assert(variables[0].name, 'def');
+        helper.assert(variables[0].code, 'id=2');
+        helper.assert(variables[1].name, 'two');
+        helper.assert(variables[1].code, 'id=3');
         done();
       });
     });
     it('should accept a pre-declared variable object', function(done){
-      var _variables ={
-        'otherVar' : {
+      var _variables = [{
+          'name': 'otherVar',
           'code' : 'i=5',
           'regex' : /$otherVar/g
-        }
-      };
+      }];
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#def= id=2}</div></xmlend>', _variables, function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
-        helper.assert(variables['def'].code, 'id=2');
-        helper.assert(variables['def'].regex.test('<sdjh> test[$def)] <td>' ), true);
-        helper.assert(variables['otherVar'].code, 'i=5');
+        helper.assert(variables[0].name, 'otherVar');
+        helper.assert(variables[0].code, 'i=5');
+        helper.assert(variables[1].name, 'def');
+        helper.assert(variables[1].code, 'id=2');
+        helper.assert(variables[1].regex.test('<sdjh> test[$def)] <td>' ), true);
         done();
       });
     });
@@ -206,7 +210,8 @@ describe('parser', function(){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/> =  id<bla>=2    }</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div></xmlend>');
-        helper.assert(variables.def.code, 'id=2');
+        helper.assert(variables[0].name, 'def');
+        helper.assert(variables[0].code, 'id=2');
         done();
       });
     });
@@ -214,7 +219,8 @@ describe('parser', function(){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#de <br> f <br> =<br>id=2  <br>}</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><br><br><br></div></xmlend>');
-        helper.assert(variables['def'].code, 'id=2');
+        helper.assert(variables[0].name, 'def');
+        helper.assert(variables[0].code, 'id=2');
         done();
       });
     });
@@ -222,8 +228,10 @@ describe('parser', function(){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def =<br/>  id<bla>=2  }</div>{ <br> # <bla> my_Var2= <br/>  test<bla>[1=5]}</xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div><br><bla><br/><bla></xmlend>');
-        helper.assert(variables['def'].code, 'id=2');
-        helper.assert(variables['my_Var2'].code, 'test[1=5]');
+        helper.assert(variables[0].name, 'def');
+        helper.assert(variables[0].code, 'id=2');
+        helper.assert(variables[1].name, 'my_Var2');
+        helper.assert(variables[1].code, 'test[1=5]');
         done();
       });
     });
@@ -231,7 +239,17 @@ describe('parser', function(){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b)=id=$a,g=$b}</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
-        helper.assert(variables['myFn'].code, 'id=_$0_,g=_$1_');
+        helper.assert(variables[0].name, 'myFn');
+        helper.assert(variables[0].code, 'id=_$0_,g=_$1_');
+        done();
+      });
+    });
+    it('should not confuse two parameters which begin with the same word', function(done){
+      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$ab)=id=$a,g=$ab}</div></xmlend>', function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
+        helper.assert(variables[0].name, 'myFn');
+        helper.assert(variables[0].code, 'id=_$0_,g=_$1_');
         done();
       });
     });
@@ -239,9 +257,10 @@ describe('parser', function(){
       parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> = id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>', function(err, xml, variables){
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><tr><tr><tr/><tr/><td><td><tf></div></xmlend>');
-        helper.assert(variables['myFn'].code, 'id=_$0_,g=_$1_');
-        helper.assert(variables['myFn'].regex.test('<sdjh> test[$myFn(1, 2)] <td>' ), true);
-        helper.assert(variables['myFn'].regex.test('<sdjh> test[myFn(1, 2)] <td>' ), false);
+        helper.assert(variables[0].name, 'myFn');
+        helper.assert(variables[0].code, 'id=_$0_,g=_$1_');
+        helper.assert(variables[0].regex.test('<sdjh> test[$myFn(1, 2)] <td>' ), true);
+        helper.assert(variables[0].regex.test('<sdjh> test[myFn(1, 2)] <td>' ), false);
         done();
       });
     });
@@ -250,7 +269,7 @@ describe('parser', function(){
   describe('preprocessMarkers', function(){
     it('should return the marker array if there is no variable declared', function(){
       var _markers  = [{'pos': 10, 'name':'_root.menu'}];
-      parser.preprocessMarkers(_markers, {}, function(err, processedMarkers){
+      parser.preprocessMarkers(_markers, [], function(err, processedMarkers){
         helper.assert(err, null);
         helper.assert(processedMarkers, _markers);
       });
@@ -259,12 +278,11 @@ describe('parser', function(){
       var _markers  = [
         {'pos': 10, 'name':'_root.menu[$myVar]'}
       ];
-      var _variables = {
-        'myVar' : {
-          'code' : 'id=1',
-          'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
-        }
-      }
+      var _variables = [{
+        'name' : 'myVar',
+        'code' : 'id=1',
+        'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
+      }];
       parser.preprocessMarkers(_markers, _variables, function(err, processedMarkers){
         helper.assert(err, null);
         helper.assert(processedMarkers, [ {'pos': 10, 'name':'_root.menu[id=1]'}]);
@@ -276,16 +294,17 @@ describe('parser', function(){
         {'pos': 20, 'name':'_root.menu[$myVar].$car_shortcut.bla[$myVar].id'},
         {'pos': 30, 'name':'nothing'}
       ];
-      var _variables = {
-        'myVar' : {
+      var _variables = [
+        {
+          'name' : 'myVar',
           'code' : 'id=1',
           'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
-        },
-        'car_shortcut' : {
+        },{
+          'name' : 'car_shortcut',
           'code' : 'car . menu  [i = 1: int(sds, sqd)]',
           'regex' : new RegExp('\\$car_shortcut(?:\\(([\\s\\S]+?)\\))?','g')
         }
-      }
+      ];
       parser.preprocessMarkers(_markers, _variables, function(err, processedMarkers){
         helper.assert(err, null);
         helper.assert(processedMarkers, [
@@ -299,12 +318,11 @@ describe('parser', function(){
       var _markers  = [
         {'pos': 10, 'name':'_root.menu[$myVar(2)]'}
       ];
-      var _variables = {
-        'myVar' : {
-          'code' : 'id=_$0_',
-          'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
-        }
-      }
+      var _variables = [{
+        'name': 'myVar',
+        'code' : 'id=_$0_',
+        'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
+      }];
       parser.preprocessMarkers(_markers, _variables, function(err, processedMarkers){
         helper.assert(err, null);
         helper.assert(processedMarkers, [ {'pos': 10, 'name':'_root.menu[id=2]'}]);
@@ -315,12 +333,11 @@ describe('parser', function(){
         {'pos': 10, 'name':'_root.menu[$myVar(2, "bla")]'},
         {'pos': 11, 'name':'_root.menu[$myVar(5, 6)] and $myVar(2, 3)'}
       ];
-      var _variables = {
-        'myVar' : {
-          'code' : 'id=_$0_, text>_$1_',
-          'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
-        }
-      }
+      var _variables = [{
+        'name': 'myVar',
+        'code' : 'id=_$0_, text>_$1_',
+        'regex' : new RegExp('\\$myVar(?:\\(([\\s\\S]+?)\\))?','g')
+      }];
       parser.preprocessMarkers(_markers, _variables, function(err, processedMarkers){
         helper.assert(err, null);
         helper.assert(processedMarkers, [

@@ -12,6 +12,10 @@ module.exports = {
   convert : function(d, patternIn, patternOut){
     return moment(d + '', patternIn).format(patternOut);
   },
+  
+  addDays : function(d, nbDay){
+    return moment(d).add('days', parseInt(nbDay));
+  },
   /**
    * Converts a date to a string with given pattern
    * @param  {String} pattern

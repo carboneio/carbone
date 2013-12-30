@@ -76,6 +76,20 @@ describe('parser', function(){
         done();
       });
     });
+    it('should keep whitespaces between simple quotes', function(done){
+      parser.findMarkers("<div>{menu:test('hello, world is great')}<div>", function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 5, 'name':'_root.menu:test(\'hello, world is great\')'}]);
+        done();
+      });
+    });
+    it('should keep whitespaces between encoded simple quotes, and it should convert encoded quotes', function(done){
+      parser.findMarkers("<div>{menu:test(&apos;hello, world is great&apos;)}<div>", function(err, cleanedXml, markers){
+        helper.assert(err, null);
+        helper.assert(markers, [{'pos': 5, 'name':'_root.menu:test(\'hello, world is great\')'}]);
+        done();
+      });
+    });
     it('should remove whitespaces which are inside {} and not inside <>. It should not count them for the position', function(done){
       parser.findMarkers(' <div>   {  menu  }   <div>   {   city  } ', function(err, cleanedXml, markers){
         helper.assert(err, null);
@@ -107,12 +121,11 @@ describe('parser', function(){
 
   describe('cleanMarker', function(){
     it('should remove whitespaces and special characters in the markers', function(){
-      assert.equal(parser.cleanMarker(' menuwhy[1].test    ')         , 'menuwhy[1].test');
-      assert.equal(parser.cleanMarker(' menu    why   [ 1 ] . test ') , 'menuwhy[1].test');
-      assert.equal(parser.cleanMarker('menuwhy[1\n].test')            , 'menuwhy[1].test');
+      assert.equal(parser.cleanMarker('menuwhy[1\n].\ntest')            , 'menuwhy[1].test');
       assert.equal(parser.cleanMarker('menuwhy[1\t].test')            , 'menuwhy[1].test');
-      assert.equal(parser.cleanMarker('menuwhy[ i + 1 \n ].test')     , 'menuwhy[i+1].test');
-      assert.equal(parser.cleanMarker(' menu  . t   .b :  int ')      , 'menu.t.b:int');
+      assert.equal(parser.cleanMarker(' menu &lt; &lt; ')      , ' menu < < ');
+      assert.equal(parser.cleanMarker(' menu &gt; &gt; ')      , ' menu > > ');
+      assert.equal(parser.cleanMarker(' menu &apos; &apos; ')      , ' menu \' \' ');
     });
   });
 
@@ -261,6 +274,24 @@ describe('parser', function(){
         helper.assert(variables[0].code, 'id=_$0_,g=_$1_');
         helper.assert(variables[0].regex.test('<sdjh> test[$myFn(1, 2)] <td>' ), true);
         helper.assert(variables[0].regex.test('<sdjh> test[myFn(1, 2)] <td>' ), false);
+        done();
+      });
+    });
+    it('should keep whitespaces between simple quotes', function(done){
+      parser.findVariables("<div>{#myFn = test ('hello, world is great')}<div>", function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<div><div>');
+        helper.assert(variables[0].name, 'myFn');
+        helper.assert(variables[0].code, 'test(\'hello, world is great\')');
+        done();
+      });
+    });
+    it('should keep whitespaces between encoded simple quotes, and it should convert encoded quotes', function(done){
+      parser.findVariables("<div>{#myFn = test (&apos;hello, world is great&apos;)}<div>", function(err, xml, variables){
+        helper.assert(err, null);
+        helper.assert(xml, '<div><div>');
+        helper.assert(variables[0].name, 'myFn');
+        helper.assert(variables[0].code, 'test(\'hello, world is great\')');
         done();
       });
     });

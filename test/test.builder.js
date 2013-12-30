@@ -24,8 +24,24 @@ describe('builder', function(){
       var _actual = builder.getFormatterString('d.date', [ "format(YYYYMMDD)" ]);
       assert.equal(_actual, "formatters.format(d.date, 'YYYYMMDD')");
     });
+    it('should keep whitespaces if it is a string', function(){
+      var _actual = builder.getFormatterString('d.date', [ "format('YYYY MM DD')" ]);
+      assert.equal(_actual, "formatters.format(d.date, 'YYYY MM DD')");
+    });
+    it('should keep anti-slash quotes', function(){
+      var _actual = builder.getFormatterString('d.date', [ "format('YYYY \' MM DD')" ]);
+      assert.equal(_actual, "formatters.format(d.date, 'YYYY \' MM DD')");
+    });
+    it('should keep parenthesis in the string', function(){
+      var _actual = builder.getFormatterString('d.date', [ "format('(YYYY) \' (MM) DD')" ]);
+      assert.equal(_actual, "formatters.format(d.date, '(YYYY) \' (MM) DD')");
+    });
     it('should return a call of a function for a formatter with two arguments', function(){
       var _actual = builder.getFormatterString('d.number', [ 'formatter(2, 3)' ]);
+      assert.equal(_actual, 'formatters.formatter(d.number, \'2\', \'3\')');
+    });
+    it('should remove extra whitespaces between arguments', function(){
+      var _actual = builder.getFormatterString('d.number', [ 'formatter(   2   ,   3   )' ]);
       assert.equal(_actual, 'formatters.formatter(d.number, \'2\', \'3\')');
     });
     it('should return two calls of functions for two chained formatters', function(){

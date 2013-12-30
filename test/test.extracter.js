@@ -1098,6 +1098,21 @@ describe('extracter', function(){
         }
       });
     });
+    it('should detect formatters with simple quotes, and it should keep whitespaces', function(){
+      var _markers = [
+        {'pos': 20, 'name': 'd.number:parse(\'YYYY MM DD\')'},
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        'd':{
+          'name':'d',
+          'type': 'object',
+          'parent':'',
+          'xmlParts' : [
+            {'attr':'number', 'formatters' : [ 'parse(\'YYYY MM DD\')'], 'obj': 'd', 'pos':20},
+          ]
+        }
+      });
+    });
   });
 
   describe('splitXml', function(){

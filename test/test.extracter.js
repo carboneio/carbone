@@ -1823,22 +1823,61 @@ describe('extracter', function(){
         'hierarchy' : ['d', 'product6', 'cars7', 'product8', 'menu1', 'menu2', 'menu3', 'product4', 'site5']
       });
     });
-    it('menu3 should appears before cars because it depends on product', function(){
+    it('product should appears before menu3 because the former is an objec and the latter is an array.\
+             cars should appears before menu1 because the former as a shorter branch', function(){
       var _data = {
         'staticData': {},
         'dynamicData':  {
           'd'       :{'name':''       , 'type':'array'  , 'parent':''        , 'xmlParts' : [], 'depth':500},
           'menu1'   :{'name':'menu'   , 'type':'array'  , 'parent':'d'       , 'xmlParts' : [], 'depth':4},
           'menu2'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu1'   , 'xmlParts' : [], 'depth':2},
-          'product' :{'name':'product', 'type':'object' , 'parent':'menu2'   , 'xmlParts' : [], 'depth':4},
           'menu3'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu2'   , 'xmlParts' : [], 'depth':3},
+          'product' :{'name':'product', 'type':'object' , 'parent':'menu2'   , 'xmlParts' : [], 'depth':4},
           'cars'    :{'name':'cars'   , 'type':'array'  , 'parent':'d'       , 'xmlParts' : [], 'depth':0},
         }
       };
       helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
-        'hierarchy' : ['d', 'menu1', 'menu2', 'product', 'menu3', 'cars']
+        'hierarchy' : ['d', 'cars', 'menu1', 'menu2', 'product', 'menu3']
+      });
+    });
+    it('should work with a lot of arrays with the same depth', function(){
+      var _data = {
+        'staticData': {},
+        'dynamicData': {
+          '_root'                         : {'name': '_root'       , 'type': 'object', 'parent': ''                      , 'xmlParts': []            },
+          '_rootdmenuElements$$$element'  : {'name': 'element'     , 'type': 'object', 'parent': '_rootdmenuElements$$$' , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$'           : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$$$$element' : {'name': 'element'     , 'type': 'object', 'parent': '_rootdmenuElements$$$$', 'xmlParts': [], 'depth': 1},
+          '_rootd'                        : {'name': 'd'           , 'type': 'array' , 'parent': '_root'                 , 'xmlParts': []            },
+          '_rootdmenuElementselement'     : {'name': 'element'     , 'type': 'object', 'parent': '_rootdmenuElements'    , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements'            : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$$$$'        : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$$element'   : {'name': 'element'     , 'type': 'object', 'parent': '_rootdmenuElements$$'  , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$element'    : {'name': 'element'     , 'type': 'object', 'parent': '_rootdmenuElements$'   , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$$'          : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$$$'         : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
+        }
+      };
+      extracter.buildSortedHierarchy(_data);
+      helper.assert(extracter.buildSortedHierarchy(_data), {
+        'staticData': {},
+        'dynamicData': _data.dynamicData,
+        'hierarchy' : [
+          '_root',
+          '_rootd',
+          '_rootdmenuElements$$$',
+          '_rootdmenuElements$$$element',
+          '_rootdmenuElements$$$$',
+          '_rootdmenuElements$$$$element',
+          '_rootdmenuElements',
+          '_rootdmenuElementselement',
+          '_rootdmenuElements$$',
+          '_rootdmenuElements$$element',
+          '_rootdmenuElements$',
+          '_rootdmenuElements$element',
+        ]
       });
     });
     it.skip('should push objects above while keeping the dependency ', function(){

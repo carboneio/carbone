@@ -41,6 +41,9 @@ Be careful, LibreOffice which is provided by the PPA libreoffice/libreoffice-4-0
 
   # Install LibreOffice. it should be possible to install only the base but I'm not sure
   sudo dpkg -i *.deb
+
+  # If you want to use Microsoft fonts in reports, you must install the fonts on the server (Andale Mono, Arial Black, Arial, Comic Sans MS, Courier New, Georgia, Impact,Times New Roman, Trebuchet, Verdana,Webdings)
+  sudo apt-get install ttf-mscorefonts-installer
 ```
 The ppa seams to be compiled with  --enable-python=system
 

@@ -1880,6 +1880,44 @@ describe('extracter', function(){
         ]
       });
     });
+    it('should place object-only branches at the beginning of the hierarchy', function(){
+      var _data = {
+        'staticData': {},
+        'dynamicData': {
+          '_root'                         : {'name': '_root'       , 'type': 'object', 'parent': ''                      , 'xmlParts': []            },
+          '_rootdmenuElements$'           : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
+          '_rootd'                        : {'name': 'd'           , 'type': 'array' , 'parent': '_root'                 , 'xmlParts': []            },
+          '_rootdmenuElementselement'     : {'name': 'element'     , 'type': 'object', 'parent': '_rootdmenuElements'    , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements'            : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$$element'   : {'name': 'element'     , 'type': 'object', 'parent': '_rootdmenuElements$$'  , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$element'    : {'name': 'element'     , 'type': 'object', 'parent': '_rootdmenuElements$'   , 'xmlParts': [], 'depth': 1},
+          '_rootdmenuElements$$'          : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
+          '_rootc'                        : {'name': 'c'           , 'type': 'object', 'parent': '_root'                 , 'xmlParts': []            },
+          '_rootccar'                     : {'name': 'car'         , 'type': 'object', 'parent': '_rootc'                , 'xmlParts': []            },
+          '_rootccarwheel'                : {'name': 'wheel'       , 'type': 'object', 'parent': '_rootccar'             , 'xmlParts': []            },
+          '_rootccarwheeltest'            : {'name': 'test'        , 'type': 'object', 'parent': '_rootccarwheel'        , 'xmlParts': []            }
+        }
+      };
+      extracter.buildSortedHierarchy(_data);
+      helper.assert(extracter.buildSortedHierarchy(_data), {
+        'staticData': {},
+        'dynamicData': _data.dynamicData,
+        'hierarchy' : [
+          '_root',
+          '_rootc',
+          '_rootccar',
+          '_rootccarwheel',
+          '_rootccarwheeltest',
+          '_rootd',
+          '_rootdmenuElements',
+          '_rootdmenuElementselement',
+          '_rootdmenuElements$$',
+          '_rootdmenuElements$$element',
+          '_rootdmenuElements$',
+          '_rootdmenuElements$element',
+        ]
+      });
+    });
     it.skip('should push objects above while keeping the dependency ', function(){
       var _data = {
         'staticData': {},

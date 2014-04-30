@@ -1860,23 +1860,22 @@ describe('extracter', function(){
           '_rootdmenuElements$$$'         : {'name': 'menuElements', 'type': 'array' , 'parent': '_rootd'                , 'xmlParts': [], 'depth': 1},
         }
       };
-      extracter.buildSortedHierarchy(_data);
       helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
         'hierarchy' : [
           '_root',
           '_rootd',
+          '_rootdmenuElements',
+          '_rootdmenuElementselement',
+          '_rootdmenuElements$',
+          '_rootdmenuElements$element',
+          '_rootdmenuElements$$',
+          '_rootdmenuElements$$element',
           '_rootdmenuElements$$$',
           '_rootdmenuElements$$$element',
           '_rootdmenuElements$$$$',
           '_rootdmenuElements$$$$element',
-          '_rootdmenuElements',
-          '_rootdmenuElementselement',
-          '_rootdmenuElements$$',
-          '_rootdmenuElements$$element',
-          '_rootdmenuElements$',
-          '_rootdmenuElements$element',
         ]
       });
     });
@@ -1898,7 +1897,6 @@ describe('extracter', function(){
           '_rootccarwheeltest'            : {'name': 'test'        , 'type': 'object', 'parent': '_rootccarwheel'        , 'xmlParts': []            }
         }
       };
-      extracter.buildSortedHierarchy(_data);
       helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
@@ -1911,14 +1909,45 @@ describe('extracter', function(){
           '_rootd',
           '_rootdmenuElements',
           '_rootdmenuElementselement',
-          '_rootdmenuElements$$',
-          '_rootdmenuElements$$element',
           '_rootdmenuElements$',
           '_rootdmenuElements$element',
+          '_rootdmenuElements$$',
+          '_rootdmenuElements$$element',
         ]
       });
     });
-    it.skip('should push objects above while keeping the dependency ', function(){
+    it('should keep the dependency between arrays while  all item of a branch', function(){
+      var _data = {
+        'staticData': {},
+        'dynamicData': {
+          '_root'                     : { 'name': '_root'         , 'type': 'object', 'parent': ''                   , 'depth': 1},
+          '_rootd'                    : { 'name': 'd'             , 'type': 'array' , 'parent': '_root'              , 'depth': 1},
+          '_rootd$menuElements'       : { 'name': 'menuElements'  , 'type': 'array' , 'parent': '_rootd$'            , 'depth': 2},
+          '_rootd$mealType'           : { 'name': 'mealType'      , 'type': 'object', 'parent': '_rootd$'            , 'depth': 1},
+          '_rootdmealType'            : { 'name': 'mealType'      , 'type': 'object', 'parent': '_rootd'             , 'depth': 1},
+          '_rootdmenuElements'        : { 'name': 'menuElements'  , 'type': 'array' , 'parent': '_rootd'             , 'depth': 2},
+          '_rootdmenuElementselement' : { 'name': 'element'       , 'type': 'object', 'parent': '_rootdmenuElements' , 'depth': 2},
+          '_rootd$'                   : { 'name': 'd'             , 'type': 'array' , 'parent': '_root'              , 'depth': 1},
+          '_rootd$menuElementselement': { 'name': 'element'       , 'type': 'object', 'parent': '_rootd$menuElements', 'depth': 2}
+        }
+      };
+      helper.assert(extracter.buildSortedHierarchy(_data), {
+        'staticData': {},
+        'dynamicData': _data.dynamicData,
+        'hierarchy' : [
+          '_root',
+          '_rootd',
+          '_rootdmealType',
+          '_rootdmenuElements',
+          '_rootdmenuElementselement',
+          '_rootd$',
+          '_rootd$mealType',
+          '_rootd$menuElements',
+          '_rootd$menuElementselement'
+        ]
+      });
+    });
+    it('should push objects above while keeping the dependency ', function(){
       var _data = {
         'staticData': {},
         'dynamicData':  {
@@ -1927,14 +1956,14 @@ describe('extracter', function(){
           'menu2'   :{'name':'menu'   , 'type':'object' , 'parent':'menu1'   , 'xmlParts' : [], 'depth':2},
           'menu3'   :{'name':'menu'   , 'type':'array'  , 'parent':'menu2'   , 'xmlParts' : [], 'depth':2},
           'cars1'   :{'name':'cars'   , 'type':'array'  , 'parent':'d'       , 'xmlParts' : [], 'depth':0},
-          'cars2'   :{'name':'cars'   , 'type':'object' , 'parent':'cars1'   , 'xmlParts' : [], 'depth':0},
-          'cars3'   :{'name':'cars'   , 'type':'array'  , 'parent':'cars2'   , 'xmlParts' : [], 'depth':0},
+          'cars02'  :{'name':'cars'   , 'type':'object' , 'parent':'cars1'   , 'xmlParts' : [], 'depth':0},
+          'cars3'   :{'name':'cars'   , 'type':'array'  , 'parent':'cars02'   , 'xmlParts' : [], 'depth':0},
         }
       };
       helper.assert(extracter.buildSortedHierarchy(_data), {
         'staticData': {},
         'dynamicData': _data.dynamicData,
-        'hierarchy' : ['d', 'menu2', 'menu3', 'menu1', 'cars2', 'cars3', 'cars1']
+        'hierarchy' : ['d', 'cars1', 'cars02', 'cars3', 'menu1', 'menu2', 'menu3']
       });
     });
   });

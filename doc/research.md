@@ -29,6 +29,39 @@ Tuto UNO C++ : http://www.linuxjournal.com/article/8608
 mettre un message d'erreur clair quand unzip n'est pas installé (ligne 160 indes.js throw error)
 
 
+Performance info 
+----------------
+Research
+---------
+
+SI on oublie un filtre dans un array, cela ne doit pas faire n'importe quoi
+
+Temps passé pour le rapport de menu 5 semaine : 
+
+openTemplate: 11ms
+
+findVariables: 1ms
+
+splitMarkers: 9ms
+
+splitXml: 25ms
+
+buildSortedHierarchy: 0ms
+
+getBuilderFunction: 7ms
+
+_builder: 25ms
+
+assembleXmlParts: 22ms
+
+walkFiles: 93ms
+
+buildFile: 122ms
+
+convert: 2578ms
+
+
+
 Other similar solutions
 -----------------------
 - http://templater.info/

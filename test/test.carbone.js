@@ -4,6 +4,7 @@ var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
 var converter = require('../lib/converter');
+var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname,'test_file');
 var spawn = require('child_process').spawn;
 
@@ -30,6 +31,15 @@ describe('Carbone', function(){
       helper.rmDirRecursive(_tempPath);
       carbone.set({'tempPath':_tempPath});
       helper.assert(fs.existsSync(_tempPath), true);
+      done();
+    });
+    it('should change the lang of of date formatter', function(done){
+      carbone.set({'lang':'fr'});
+      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'vendredi');
+      carbone.set({'lang':'en'});
+      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'Friday');
+      carbone.set({'lang':'fr'});
+      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'vendredi');
       done();
     });
   });

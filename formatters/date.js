@@ -1,7 +1,5 @@
 var moment = require('moment');
 
-moment.lang('fr');
-
 module.exports = {
   /**
    * Converts a date from a pattern to another pattern

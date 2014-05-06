@@ -177,13 +177,13 @@ describe('parser', function(){
         done();
       });
     });
-    it('should extract t(Mond<interxml>ay) and t(Tuesday is <bullshit>the second day of the week!) in order to transform them to Lundi (_found in objLang) and T_Tuesday is the second day of the week!_T (not found in the _objLang)', function(done){
+    it('should extract t(Mond<interxml>ay) and t(Tuesday is <bullshit>the second day of the week!) in order to transform them to Lundi (_found in objLang) and Tuesday is the second day of the week! (not found in the _objLang)', function(done){
       var _objLang = {
         'Monday' : 'Lundi'
       };
       parser.translate('<xmlstart>{me<interxml>n<bullshit>u}<div>{t(Mond<interxml>ay)}</div><div>{#def = id=2  }</div><div>{t(Tuesday is <bullshit>the second day of the week!)}</div></xmlend>', _objLang, function(err, xmlTranslated){
         helper.assert(err, null);
-        helper.assert(xmlTranslated, '<xmlstart>{me<interxml>n<bullshit>u}<div>Lundi<interxml></div><div>{#def = id=2  }</div><div>T_Tuesday is the second day of the week!_T<bullshit></div></xmlend>');
+        helper.assert(xmlTranslated, '<xmlstart>{me<interxml>n<bullshit>u}<div>Lundi<interxml></div><div>{#def = id=2  }</div><div>Tuesday is the second day of the week!<bullshit></div></xmlend>');
         done();
       });
     });
@@ -206,7 +206,7 @@ describe('parser', function(){
       };
       parser.translate('<xmlstart><div>{t(I saw a spi<interxml>rit(with green eyes and a trans<interxml>parent body) and I cried)}</div></xmlend>', _objLang, function(err, xmlTranslated){
         helper.assert(err, null);
-        helper.assert(xmlTranslated, '<xmlstart><div>J ai vu un esprit(avec des yeux verts et un corps transparent) et j ai cri&eacute;<interxml><interxml></div></xmlend>');
+        helper.assert(xmlTranslated, '<xmlstart><div>J ai vu un esprit(avec des yeux verts et un corps transparent) et j ai crié<interxml><interxml></div></xmlend>');
         done();
       });
     });
@@ -236,14 +236,24 @@ describe('parser', function(){
       var _objLang = {
         'price < 100' : 'prix < 100',
         'productPrice >= salePrice > mac\'doProductPrice' : 'prixProduit >= prixVente > prixProduitMac\'Do',
-        'ñôñË' : '¥€§'
       };
-      parser.translate('<xmlstart>{t(price &lt; 100)}<b>test{t(&ntilde;&ocirc;&ntilde;&Euml;)}</b><span>{t(productPrice &gteq; salePrice &gt; mac&apos;doProductPrice)}</span>', _objLang, function(err, xmlTranslated){
+      parser.translate('<xmlstart>{t(price &lt; 100)}<b>test</b><span>{t(productPrice &gt;= salePrice &gt; mac&apos;doProductPrice)}</span>', _objLang, function(err, xmlTranslated){
         helper.assert(err, null);
-        helper.assert(xmlTranslated, '<xmlstart>prix &lt; 100<b>test&yen;&euro;&sect;</b><span>prixProduit &gteq; prixVente &gt; prixProduitMac&apos;Do</span>');
+        helper.assert(xmlTranslated, '<xmlstart>prix &lt; 100<b>test</b><span>prixProduit &gt;= prixVente &gt; prixProduitMac&apos;Do</span>');
         done();
       });
     });
+    /*Should be activated if we encoded others special characters (non operators special characters)
+    it('should translate this sentence with special characters', function(done){
+      var _objLang = {
+        'ñôñË' : '¥€§'
+      };
+      parser.translate('<xmlstart><b>test{t(&ntilde;&ocirc;&ntilde;&Euml;)}</b></span>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xmlstart><b>test&yen;&euro;&sect;</b></span>');
+        done();
+      });
+    });*/
   });
 
   describe('findVariables', function(){

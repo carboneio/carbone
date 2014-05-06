@@ -6,6 +6,7 @@ var helper = require('../lib/helper');
 var converter = require('../lib/converter');
 var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname,'test_file');
+var params = require('../lib/params');
 var spawn = require('child_process').spawn;
 
 
@@ -266,6 +267,74 @@ describe('Carbone', function(){
           assert.notEqual(_xmlExpectedContent.indexOf('author_2'), -1);
           done();
         });
+      });
+    });
+    it('should translate the file and insert three product rows', function(done){
+      var _filePath = path.resolve('./test/datasets/test_odt_render_translate.odt');
+      var _data = [{
+        name : 'Bouteille de sirop d’érable 25cl',
+        qty : '4',
+        price : '8',
+        total : '32',
+      },{
+        name : 'Bouteille de cidre de glace 1L',
+        qty : '2',
+        price : '17.5',
+        total : '35',
+      },{
+        name : 'Sachet de Cranberry 200g',
+        qty : '3',
+        price : '2',
+        total : '6',
+      }];
+     
+      var _objLang = {
+        'en': {
+          'Canada Products' :   'Canada Products',
+          'productName' :       'Product name',
+          'Qty' :               'Quantity',
+          'unitPrice' :         'Unit price',
+          'I\'ve an Idea : Revenues ≥ Sales' : ' I\'ve an Idea : Revenues ≥ Sales'
+        },
+        'fr':{
+          'Canada Products' :   'Produits du Canada',
+          'productName' :       'Nom du produit',
+          'qty' :               'Quantité',
+          'unitPrice' :         'Prix unitaire',
+          'I\'ve an Idea : Revenues >= Sales' : 'J\'ai une idée : Chiffre d\'Affaire >= Ventes'
+        }
+      };
+
+      params.lang = 'fr';
+      params.objLang=_objLang;
+
+      carbone.render('test_odt_render_translate.odt', _data, function(err, result){
+        assert.equal(err, null);
+        fs.mkdirSync(testPath, 0755);
+        var _document = path.join(testPath, 'file.odt');
+        var _unzipPath = path.join(testPath, 'unzip');
+        fs.writeFileSync(_document, result);
+        unzipSystem(_document, _unzipPath, function(err, files){
+          var _xmlExpectedContent = files['content.xml'];
+          //Have words been translated ?
+          assert.equal(_xmlExpectedContent.indexOf('Canada Products'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('productName'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('qty'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('Unit price'), -1);
+          
+          assert.notEqual(_xmlExpectedContent.indexOf('Produits du Canada'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Nom du produit'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Quantité'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Prix unitaire'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('total'), -1); //total is not defined in this ObjLang. So it should be write with this word 'total'
+
+          //We have inserted three product rows 
+          assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de sirop d’érable 25cl'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de cidre de glace 1L'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Sachet de Cranberry 200g'), -1);
+          done();
+        });
+        
       });
     });
     it('should accept pre-declared variables and variables declared directly in the document.\

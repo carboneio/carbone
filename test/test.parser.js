@@ -165,6 +165,87 @@ describe('parser', function(){
     });
   });
 
+  describe('translate', function(){
+    
+    it('should do nothing if the xml is null or undefined', function(done){
+      var _objLang = {
+        'Monday' : 'Lundi'
+      };
+      parser.translate(undefined, _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '');
+        done();
+      });
+    });
+    it('should extract t(Mond<interxml>ay) and t(Tuesday is <bullshit>the second day of the week!) in order to transform them to Lundi (_found in objLang) and T_Tuesday is the second day of the week!_T (not found in the _objLang)', function(done){
+      var _objLang = {
+        'Monday' : 'Lundi'
+      };
+      parser.translate('<xmlstart>{me<interxml>n<bullshit>u}<div>{t(Mond<interxml>ay)}</div><div>{#def = id=2  }</div><div>{t(Tuesday is <bullshit>the second day of the week!)}</div></xmlend>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xmlstart>{me<interxml>n<bullshit>u}<div>Lundi<interxml></div><div>{#def = id=2  }</div><div>T_Tuesday is the second day of the week!_T<bullshit></div></xmlend>');
+        done();
+      });
+    });
+
+    it('should extract t(I have a dog) and t(I\'ve a cat) and translate it to J\'ai un chien and J\'ai un chat', function(done){
+      var _objLang = {
+        'I have a dog' : 'J\'ai un chien',
+        'I\'ve a cat'  : 'J\'ai un chat',
+      };
+      parser.translate('<xmlstart><div>{t(I have a dog)}</div><div>{t(I&apos;ve a cat)}</div></xmlend>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xmlstart><div>J&apos;ai un chien</div><div>J&apos;ai un chat</div></xmlend>');
+        done();
+      });
+    });
+
+    it('should extract t(I saw a spirit(with green eyes and a transparent body) and I cried) and translate this', function(done){
+      var _objLang = {
+        'I saw a spirit(with green eyes and a transparent body) and I cried' : 'J ai vu un esprit(avec des yeux verts et un corps transparent) et j ai crié'
+      };
+      parser.translate('<xmlstart><div>{t(I saw a spi<interxml>rit(with green eyes and a trans<interxml>parent body) and I cried)}</div></xmlend>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xmlstart><div>J ai vu un esprit(avec des yeux verts et un corps transparent) et j ai cri&eacute;<interxml><interxml></div></xmlend>');
+        done();
+      });
+    });
+
+    it('should translate this string and keep tags inside t(). The final result include <b> <i>', function(done){
+      var _objLang = {
+        'cat' : 'chat',
+        'dog' : 'chien'
+      };
+      parser.translate('<xmlstart><div><b>{</b>t(<i><b>cat</b></i>)}<b>thanks</b>{t(<i>do<interxml>g</i>)}</div></xmlend>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xmlstart><div><b>chat</b><i><b></b></i><b>thanks</b>chien<i><interxml></i></div></xmlend>');
+        done();
+      });
+    });
+    it('should translate the sentence and keep the smiley :)', function(done){
+      var _objLang = {
+        'my smiley :) ' : 'mon emoticon :) '
+      };
+      parser.translate('<xmlstart>{t(my smiley :) )}<b>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xmlstart>mon emoticon :) <b>');
+        done();
+      });
+    });
+    it('should translate this sentence with special characters', function(done){
+      var _objLang = {
+        'price < 100' : 'prix < 100',
+        'productPrice >= salePrice > mac\'doProductPrice' : 'prixProduit >= prixVente > prixProduitMac\'Do',
+        'ñôñË' : '¥€§'
+      };
+      parser.translate('<xmlstart>{t(price &lt; 100)}<b>test{t(&ntilde;&ocirc;&ntilde;&Euml;)}</b><span>{t(productPrice &gteq; salePrice &gt; mac&apos;doProductPrice)}</span>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xmlstart>prix &lt; 100<b>test&yen;&euro;&sect;</b><span>prixProduit &gteq; prixVente &gt; prixProduitMac&apos;Do</span>');
+        done();
+      });
+    });
+  });
+
   describe('findVariables', function(){
     it('should do nothing if the xml is null or undefined', function(done){
       parser.findVariables(undefined, function(err, xml, variables){

@@ -176,10 +176,10 @@ describe('parser', function(){
         done();
       });
     });
-    it('should not crash if objLang is undefined, and it should return unchanged xml', function(done){
+    it('should not crash if objLang is undefined, and it should replace translation markers by the "not translated" text', function(done){
       parser.translate('<xml> {t(yeah)} </xml>', undefined, function(err, xmlTranslated){
         helper.assert(err, null);
-        helper.assert(xmlTranslated, '<xml> {t(yeah)} </xml>');
+        helper.assert(xmlTranslated, '<xml> yeah </xml>');
         done();
       });
     });

@@ -287,7 +287,6 @@ describe('Carbone', function(){
         price : '2',
         total : '6',
       }];
-     
       var _objLang = {
         'en': {
           'Canada Products' :   'Canada Products',
@@ -304,10 +303,8 @@ describe('Carbone', function(){
           'I\'ve an Idea : Revenues >= Sales' : 'J\'ai une idée : Chiffre d\'Affaire >= Ventes'
         }
       };
-
-      params.lang = 'fr';
-      params.objLang=_objLang;
-
+      carbone.set({'lang':'fr'});
+      carbone.set({'objLang':_objLang});
       carbone.render('test_odt_render_translate.odt', _data, function(err, result){
         assert.equal(err, null);
         fs.mkdirSync(testPath, 0755);
@@ -321,20 +318,17 @@ describe('Carbone', function(){
           assert.equal(_xmlExpectedContent.indexOf('productName'), -1);
           assert.equal(_xmlExpectedContent.indexOf('qty'), -1);
           assert.equal(_xmlExpectedContent.indexOf('Unit price'), -1);
-          
           assert.notEqual(_xmlExpectedContent.indexOf('Produits du Canada'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Nom du produit'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Quantité'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Prix unitaire'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('total'), -1); //total is not defined in this ObjLang. So it should be write with this word 'total'
-
           //We have inserted three product rows 
           assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de sirop d’érable 25cl'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de cidre de glace 1L'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Sachet de Cranberry 200g'), -1);
           done();
         });
-        
       });
     });
     it('should accept pre-declared variables and variables declared directly in the document.\

@@ -166,17 +166,53 @@ describe('parser', function(){
   });
 
   describe('translate', function(){
-    
     it('should do nothing if the xml is null or undefined', function(done){
       var _objLang = {
         'Monday' : 'Lundi'
       };
       parser.translate(undefined, _objLang, function(err, xmlTranslated){
         helper.assert(err, null);
-        helper.assert(xmlTranslated, '');
+        helper.assert(xmlTranslated, undefined);
         done();
       });
     });
+    it('should not crash if objLang is undefined, and it should replace translation markers by the "not translated" text', function(done){
+      parser.translate('<xml> {t(yeah)} </xml>', undefined, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xml> yeah </xml>');
+        done();
+      });
+    });
+    it('should not consider marker which starts by "t" and which is not a translation marker', function(done){
+      var _objLang = {
+        'Monday' : 'Lundi'
+      };
+      parser.translate('<xml>{table}</xml>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xml>{table}</xml>');
+        done();
+      });
+    });
+    it('should not consider marker which starts by "t" and which is not a translation marker (variable marker)', function(done){
+      var _objLang = {
+        'Monday' : 'Lundi'
+      };
+      parser.translate('<xml>{#t($a) = myvar=$a} </xml>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xml>{#t($a) = myvar=$a} </xml>');
+        done();
+      });
+    });
+    /*it('not consider marker which starts by "t" and which is not a translation marker', function(done){
+      var _objLang = {
+        'Monday' : 'Lundi'
+      };
+      parser.translate('<xml>{tablet (option)}</xml>', _objLang, function(err, xmlTranslated){
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, '<xml>{tablet (option)}</xml>');
+        done();
+      });
+    });*/
     it('should extract t(Mond<interxml>ay) and t(Tuesday is <bullshit>the second day of the week!) in order to transform them to Lundi (_found in objLang) and Tuesday is the second day of the week! (not found in the _objLang)', function(done){
       var _objLang = {
         'Monday' : 'Lundi'
@@ -187,7 +223,6 @@ describe('parser', function(){
         done();
       });
     });
-
     it('should extract t(I have a dog) and t(I\'ve a cat) and translate it to J\'ai un chien and J\'ai un chat', function(done){
       var _objLang = {
         'I have a dog' : 'J\'ai un chien',
@@ -199,7 +234,6 @@ describe('parser', function(){
         done();
       });
     });
-
     it('should extract t(I saw a spirit(with green eyes and a transparent body) and I cried) and translate this', function(done){
       var _objLang = {
         'I saw a spirit(with green eyes and a transparent body) and I cried' : 'J ai vu un esprit(avec des yeux verts et un corps transparent) et j ai crié'
@@ -210,7 +244,6 @@ describe('parser', function(){
         done();
       });
     });
-
     it('should translate this string and keep tags inside t(). The final result include <b> <i>', function(done){
       var _objLang = {
         'cat' : 'chat',

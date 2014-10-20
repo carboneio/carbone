@@ -10,7 +10,7 @@ switch(_action){
     server(process.argv.slice(3));
     break;
   case "generateLang":
-    translator(process.argv.slice(3));
+    translator.handleParams(process.argv.slice(3));
     break;
   default:
     usage(); 

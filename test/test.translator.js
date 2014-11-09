@@ -8,7 +8,7 @@ var testPath = rootPath+'/test/test/';
 
 describe('translator', function(){
 
-  describe('generateLang(dir,lang)' ,function(){
+  describe.only('generateLang(dir,lang)' ,function(){
     var _lang = "test";
     var _templatePath = path.join(__dirname, 'datasets');
     var _dirLangPath = path.join(_templatePath,'lang');
@@ -107,7 +107,8 @@ describe('translator', function(){
       });
     });
 
-    it('4 translates are defined. This translates must be at the bottom of the lang file and theirs values should not be updated', function(done){
+    it('4 translates are defined. This translates must be at the bottom of the lang file \
+      and theirs values should not be updated', function(done){
       var expectedObjLang = {
         "Canada Products": "",
         "Delivery Date": "",
@@ -140,6 +141,65 @@ describe('translator', function(){
       var newObjLang = {
         "another translation is required": "une autre traduction est requise",
         "currency": "monnaie",
+        "Total": "Total",
+        "Total Amount": "Montant Total"
+      };
+      fs.writeFile(_fileLangPath, JSON.stringify(newObjLang, null, 2), function(err){
+        helper.assert(err, null);
+        //should create the lang directory and the test.json file
+        translator.generateLang(_templatePath,_lang);
+        setTimeout(function () {
+            fs.readFile(_fileLangPath, 'utf8', function (err,langData) {
+              var fixedResponse = langData.replace(/\\'/g, "'");
+              var objLang = ""
+              if (!err) {
+                objLang = JSON.parse(fixedResponse);
+              }
+              helper.assert(expectedObjLang, objLang);
+              done();
+            });
+          }, 3000);
+      });
+    });
+
+    it('6 translates are defined. 2 of them should be not found. These not found translates must be sorted and find at the \
+      top of the translate file with <!> below them', function(done){
+      var expectedObjLang = {
+        "<!>Error 404" : "",
+        "<!>not found" : "non trouve",
+        "Canada Products": "",
+        "Delivery Date": "",
+        "excl tax": "",
+        "From": "",
+        "FromDate": "",
+        "I need to be translate": "",
+        "I've an Idea : Revenues >= Sales": "",
+        "Internal Code": "",
+        "Order Date": "",
+        "Order number": "",
+        "productName": "",
+        "qty": "",
+        "Send Mode": "",
+        "Shipping Cost": "",
+        "Site": "",
+        "Source": "",
+        "Status": "",
+        "Supplier": "",
+        "Supplier orders multi-site report": "",
+        "toDate": "",
+        "total": "",
+        "unitPrice": "",
+        "another translation is required": "une autre traduction est requise",
+        "currency": "monnaie",
+        "Total": "Total",
+        "Total Amount": "Montant Total"
+      };
+
+      var newObjLang = {
+        "another translation is required": "une autre traduction est requise",
+        "currency": "monnaie",
+        "not found": "non trouve",
+        "Error 404": "",
         "Total": "Total",
         "Total Amount": "Montant Total"
       };

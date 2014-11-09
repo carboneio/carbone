@@ -8,7 +8,7 @@ var testPath = rootPath+'/test/test/';
 
 describe('translator', function(){
 
-  describe.only('generateLang(dir,lang)' ,function(){
+  describe('generateLang(dir,lang)' ,function(){
     var _lang = "test";
     var _templatePath = path.join(__dirname, 'datasets');
     var _dirLangPath = path.join(_templatePath,'lang');

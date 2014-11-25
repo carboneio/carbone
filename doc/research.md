@@ -2,6 +2,13 @@
 
 TODO
 -----
+Gérer Excel en convertissant les sharedString avant (pas obligatoire apparemen)
+https://social.msdn.microsoft.com/Forums/en-US/5dd1dd01-2117-41e2-8836-26252cf90c1a/how-fetch-numeric-and-non-numeric-data-in-excel-and-store-the-data-to-table-storage-in-azure?forum=oxmlsdk
+
+http://packageexplorer.codeplex.com/
+http://openxmldeveloper.org/discussions/development_tools/f/17/t/6958.aspx
+
+BUG ALEATOIRE : IL est possible que carbone se détache des thread LO... et reste dans un mode Python killed with 101
 
 Test :
 

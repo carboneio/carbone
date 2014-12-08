@@ -297,6 +297,7 @@ describe('Carbone', function(){
       };
       fs.writeFile(_fileLangPath, JSON.stringify(_objLang, null, 2), function(err){
       carbone.set({'lang':'fr'});
+      carbone.set({'objLang': _objLang});
         helper.assert(err, null);
         carbone.render('test_odt_render_translate.odt', _data, function(err, result){
           assert.equal(err, null);

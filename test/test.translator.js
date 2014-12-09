@@ -93,7 +93,7 @@ describe('translator', function(){
       }
 
       //should create the lang directory and the test.json file
-      translator.generateLang(_templatePath,_lang,function(err,result,bodyMsg,keyTypeCountArray){
+      translator.generateLang(_templatePath,_lang,function(err,result,bodyMsg,keyTypeCountObject){
         fs.readFile(_fileLangPath, 'utf8', function (err,langData) {
           helper.assert(err, null);
           var fixedResponse = langData.replace(/\\'/g, "'");
@@ -105,20 +105,17 @@ describe('translator', function(){
           helper.assert(expectedObjLang, objLang);
           //Does the generateLang result data correspondind to the file content ?
           helper.assert(objLang, result);
-          //newKeys
-          helper.assert(keyTypeCountArray[0], 26);
-          //Keep and/or updated keys
-          helper.assert(keyTypeCountArray[1], 0);
-          //Keys not found
-          helper.assert(keyTypeCountArray[2], 0);
-          //Old Keys not found
-          helper.assert(keyTypeCountArray[3], 0);
+          helper.assert(keyTypeCountObject['newKeys'], 26);
+          helper.assert(keyTypeCountObject['emptyExistingKeys'], 0);
+          helper.assert(keyTypeCountObject['updatedKeys'], 0);
+          helper.assert(keyTypeCountObject['deletedKeys'], 0);
+          helper.assert(keyTypeCountObject['oldDeletedKeys'], 0);
           done();
         });
       });
     });
 
-    it('4 translates are defined. This translates must be at the bottom of the lang file \
+    it('4 translates are defined, 1 is present but without value. These translates must be at the bottom of the lang file \
       and theirs values should not be updated', function(done){
       var expectedObjLang = {
         "Canada Products": "",
@@ -150,6 +147,7 @@ describe('translator', function(){
       };
 
       var newObjLang = {
+        "excl tax" : "",
         "another translation is required": "une autre traduction est requise",
         "currency": "monnaie",
         "Total": "Total",
@@ -157,16 +155,13 @@ describe('translator', function(){
       };
       fs.writeFile(_fileLangPath, JSON.stringify(newObjLang, null, 2), function(err){
         helper.assert(err, null);
-        translator.generateLang(_templatePath,_lang,function(err,result,bodyMsg,keyTypeCountArray){
+        translator.generateLang(_templatePath,_lang,function(err,result,bodyMsg,keyTypeCountObject){
           helper.assert(expectedObjLang, result);
-          //newKeys
-          helper.assert(keyTypeCountArray[0], 22);
-          //Keep and/or updated keys
-          helper.assert(keyTypeCountArray[1], 4);
-          //Keys not found
-          helper.assert(keyTypeCountArray[2], 0);
-          //Old Keys not found
-          helper.assert(keyTypeCountArray[3], 0);
+          helper.assert(keyTypeCountObject['newKeys'], 21);
+          helper.assert(keyTypeCountObject['emptyExistingKeys'], 1);
+          helper.assert(keyTypeCountObject['updatedKeys'], 4);
+          helper.assert(keyTypeCountObject['deletedKeys'], 0);
+          helper.assert(keyTypeCountObject['oldDeletedKeys'], 0);
           done();
         });
       });
@@ -206,6 +201,7 @@ describe('translator', function(){
       };
 
       var newObjLang = {
+        "excl tax" : "",
         "another translation is required": "une autre traduction est requise",
         "currency": "monnaie",
         "not found": "non trouve",
@@ -215,16 +211,13 @@ describe('translator', function(){
       };
       fs.writeFile(_fileLangPath, JSON.stringify(newObjLang, null, 2), function(err){
         helper.assert(err, null);
-        translator.generateLang(_templatePath,_lang,function(err,result,bodyMsg,keyTypeCountArray){
+        translator.generateLang(_templatePath,_lang,function(err,result,bodyMsg,keyTypeCountObject){
           helper.assert(expectedObjLang, result);
-          //newKeys
-          helper.assert(keyTypeCountArray[0], 22);
-          //Keep and/or updated keys
-          helper.assert(keyTypeCountArray[1], 4);
-          //Keys not found
-          helper.assert(keyTypeCountArray[2], 2);
-          //Old Keys not found
-          helper.assert(keyTypeCountArray[3], 0);
+          helper.assert(keyTypeCountObject['newKeys'], 21);
+          helper.assert(keyTypeCountObject['emptyExistingKeys'], 1);
+          helper.assert(keyTypeCountObject['updatedKeys'], 4);
+          helper.assert(keyTypeCountObject['deletedKeys'], 2);
+          helper.assert(keyTypeCountObject['oldDeletedKeys'], 0);
           done();
         });
       });
@@ -269,6 +262,7 @@ describe('translator', function(){
       var newObjLang = {
         "<!>False key" : "fausse clé",
         "<!>Old translate" : "vielle traduction",
+        "excl tax" : "",
         "another translation is required": "une autre traduction est requise",
         "currency": "monnaie",
         "not found": "non trouve",
@@ -278,16 +272,13 @@ describe('translator', function(){
       };
       fs.writeFile(_fileLangPath, JSON.stringify(newObjLang, null, 2), function(err){
         helper.assert(err, null);
-        translator.generateLang(_templatePath,_lang,function(err,result,bodyMsg,keyTypeCountArray){
+        translator.generateLang(_templatePath,_lang,function(err,result,bodyMsg,keyTypeCountObject){
           helper.assert(expectedObjLang, result);
-          //newKeys
-          helper.assert(keyTypeCountArray[0], 22);
-          //Keep and/or updated keys
-          helper.assert(keyTypeCountArray[1], 4);
-          //Keys not found
-          helper.assert(keyTypeCountArray[2], 2);
-          //Old Keys not found
-          helper.assert(keyTypeCountArray[3], 2);
+          helper.assert(keyTypeCountObject['newKeys'], 21);
+          helper.assert(keyTypeCountObject['emptyExistingKeys'], 1);
+          helper.assert(keyTypeCountObject['updatedKeys'], 4);
+          helper.assert(keyTypeCountObject['deletedKeys'], 2);
+          helper.assert(keyTypeCountObject['oldDeletedKeys'], 2);
           done();
         });
       });

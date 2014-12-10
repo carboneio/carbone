@@ -170,9 +170,9 @@ describe('parser', function(){
       var _objLang = {
         'Monday' : 'Lundi'
       };
-      parser.translate(undefined, _objLang, function(err, xmlTranslated){
+      parser.translate("", _objLang, function(err, xmlTranslated){
         helper.assert(err, null);
-        helper.assert(xmlTranslated, undefined);
+        helper.assert(xmlTranslated, '');
         done();
       });
     });

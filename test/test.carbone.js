@@ -10,7 +10,7 @@ var params = require('../lib/params');
 var spawn = require('child_process').spawn;
 
 
-describe.only('Carbone', function(){
+describe('Carbone', function(){
 
 
   describe('set', function(){

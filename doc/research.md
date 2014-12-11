@@ -15,6 +15,8 @@ Test :
 si variable dish1 et dish1Name la deuxième se confond avec la première
 si {d[id>1]} avant {d[mealType.sort]} -> {d[mealType.sort+1]}, l'extracteur monte trop haut et englobe {d[id>1]} par erreur
 
+- si pas de 'i', alors toujours prendre la première valeur qui correspond au filtre... SI il ya plusieurs valeur, afficher un warning quel que part.
+
 - Eviter de lire le fichier 2 fois sur le disque (dans isZipped et dans openTemplate)
 - Enelver le readSync dans file.unzip
 - Cache template in file.js

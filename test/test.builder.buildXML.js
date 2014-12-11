@@ -523,6 +523,18 @@ describe('builder.buildXML', function(){
       done();
     });
   });
+  it('should accept conditions using length of the array', function(done){
+    var _xml = '<xml> <t_row> {d[drivers.length>0, i].brand} </t_row><t_row> {d[drivers.length>0, i+1].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'drivers':['bob', 'martin']},
+      {'brand' : 'Tesla motors', 'drivers':[]},
+      {'brand' : 'Toyota'      , 'drivers':['david', 'leonardo']}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
+      done();
+    });
+  });
   it('should accept conditions in a nested object', function(done){
     var _xml = '<xml> <t_row> {d[ speed . high > 13, i].brand} </t_row><t_row> {d[ speed.high > 13,i+1].brand} </t_row></xml>';
     var _data = [

@@ -428,7 +428,7 @@ describe('Carbone', function(){
         id : 2,
         name : 'field_2'
       }];
-      carbone.render(_filePath, data, {'convertTo':'csv'}, function(err, result){
+      carbone.render(_filePath, data, {'convertTo': { 'formatName' : 'csv', 'formatOptions' : '124,34,0'}}, function(err, result){
         helper.assert(err, null);
         fs.writeFileSync('test.csv', result);
         var _expected = '||\n|1|field_1\n|2|field_2\n';

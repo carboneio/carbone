@@ -428,6 +428,11 @@ describe('Carbone', function(){
         id : 2,
         name : 'field_2'
       }];
+      // 'formatOptions' : 'A, B, C'
+      //  A : Field Separator
+      //  B : Text Delimiter
+      //  C : Character Set
+      // Full options available here : https://wiki.openoffice.org/wiki/Documentation/DevGuide/Spreadsheets/Filter_Options
       carbone.render(_filePath, data, {'convertTo': { 'formatName' : 'csv', 'formatOptions' : '124,34,0'}}, function(err, result){
         helper.assert(err, null);
         fs.writeFileSync('test.csv', result);

@@ -439,6 +439,18 @@ describe('Carbone', function(){
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
+        'convertTo' : null
+      };
+      carbone.render(_filePath, data, _options, function(err, result){
+        helper.assert(err, null);
+        done();
+      });
+    });
+    it('should render spreadsheet with raw options (complete)', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
         'convertTo' : {
           'formatName' : 'csv',
           'formatOptionsRaw' : '124,34,0'

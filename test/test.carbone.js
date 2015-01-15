@@ -421,6 +421,120 @@ describe('Carbone', function(){
     });
   });
 
+  describe('render and convert CSV with options', function (){
+    var defaultOptions = {
+      'pipeNamePrefix' : '_carbone',
+      'factories' : 1,
+      'startFactory' : false,
+      'attempts' : 2
+    };
+    afterEach(function(done){
+      converter.exit(function(){
+        converter.init(defaultOptions, done);
+        carbone.reset();
+      });
+    });
+    it('should render spreadsheet with raw options (complete)', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
+        'convertTo' : null
+      };
+      carbone.render(_filePath, data, _options, function(err, result){
+        helper.assert(err, null);
+        done();
+      });
+    });
+    it('should render spreadsheet with raw options (complete)', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
+        'convertTo' : {
+          'formatName' : 'csv',
+          'formatOptionsRaw' : '124,34,0'
+        }
+      };
+      carbone.render(_filePath, data, _options, function(err, result){
+        helper.assert(err, null);
+        fs.writeFileSync('test.csv', result);
+        var _expected = '||\n|1|field_1\n|2|field_2\n';
+        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
+          helper.assert(_expected, fileData);
+          done();
+        });
+      });
+    });
+    it('should render spreadsheet with raw options (incomplete)', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
+        'convertTo' : {
+          'formatName' : 'csv',
+          'formatOptionsRaw' : '124'
+        }
+      };
+      carbone.render(_filePath, data, _options, function(err, result){
+        helper.assert(err, null);
+        fs.writeFileSync('test.csv', result);
+        var _expected = '||\n|1|field_1\n|2|field_2\n';
+        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
+          helper.assert(_expected, fileData);
+          done();
+        });
+      });
+    });
+    it('should render spreadsheet with options (complete)', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
+        'convertTo' : {
+          'formatName' : 'csv',
+          'formatOptions' : {
+            'fieldSeparator'    : '+',
+            'textDelimiter'     : '"',
+            'characterSet'      : '0'
+          }
+        }
+      };
+      carbone.render(_filePath, data, _options, function(err, result){
+        helper.assert(err, null);
+        fs.writeFileSync('test.csv', result);
+        var _expected = '++\n+1+field_1\n+2+field_2\n';
+        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
+          helper.assert(_expected, fileData);
+          done();
+        });
+      });
+    });
+    it('should render spreadsheet with options (incomplete)', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
+        'convertTo' : {
+          'formatName' : 'csv',
+          'formatOptions' : {
+            'fieldSeparator'  : '*',
+            'characterSet'    : '9'
+          }
+        }
+      };
+      carbone.render(_filePath, data, _options, function(err, result){
+        helper.assert(err, null);
+        fs.writeFileSync('test.csv', result);
+        var _expected = '**\n*1*field_1\n*2*field_2\n';
+        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
+          helper.assert(_expected, fileData);
+          done();
+        });
+      });
+    });
+  });
+
 });
 
 

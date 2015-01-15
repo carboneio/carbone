@@ -21,6 +21,7 @@ parser.add_argument("-p", "--pipe")
 parser.add_argument("-i", "--input")
 parser.add_argument("-o", "--output")
 parser.add_argument("-f", "--format")
+parser.add_argument("-fo", "--formatOptions")
 
 
 def UnoProps(**args):
@@ -87,6 +88,8 @@ def convert(message):
             indexes.getByIndex(i).update()
 
     outputprops = UnoProps(FilterName=fileOption.format, Overwrite=True)
+    if fileOption.formatOptions != '':
+        outputprops += UnoProps(FilterOptions=fileOption.formatOptions)
     outputurl = unohelper.absolutize(cwd, unohelper.systemPathToFileUrl(fileOption.output) )
     document.storeToURL(outputurl, tuple(outputprops) )
 

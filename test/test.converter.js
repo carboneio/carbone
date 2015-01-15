@@ -98,7 +98,7 @@ describe('Converter', function(){
     it('should render a pdf and start an conversion factory automatically if no factories exist', function(done){
       var _pdfResultPath = path.resolve('./test/datasets/test_odt_render_static.pdf');
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
-      converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
         var _buf = new Buffer(result);
         assert.equal(_buf.slice(0, 4).toString(), '%PDF');
         var bufPDF = new Buffer(_buf.length);
@@ -114,13 +114,13 @@ describe('Converter', function(){
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       var _results = [];
       converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
-        converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
           var _buf = new Buffer(result);
           assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           //kill LibreOffice thread
           process.kill(factories['0'].pid);
           //try another conversion
-          converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
             var _buf = new Buffer(result);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
             done(); 
@@ -136,7 +136,7 @@ describe('Converter', function(){
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
             _waitedResponse--;
             _results.push(result);
             if(_waitedResponse === 0){
@@ -166,7 +166,7 @@ describe('Converter', function(){
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          converter.convertFile(_filePath, 'writer_pdf_Export', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
             if(_waitedResponse % _crashModulo === 0){
               var _factoryId = Math.floor((Math.random()*4)); //(0 -> 3)
               var _threadChoice = Math.random(); //(0.0 -> 1.0)

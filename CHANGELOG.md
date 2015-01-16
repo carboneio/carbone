@@ -37,4 +37,5 @@
   ```
 
   - Improve LibreOffice detection algorithm for Linux. Now, it supports any version of LibreOffice
+  - BUG fix: When two nested arrays were incremented in the same time `{d.tab[i+1].subtab[i+1]}`, it could generate bad XML in certain cases
 

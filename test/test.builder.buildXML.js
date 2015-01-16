@@ -704,7 +704,7 @@ describe('builder.buildXML', function(){
       done(); 
     }
   });
-  it('should "flat" the nested array', function(done){
+  it('should accept to increment two nested arrays in the same time. Thus, the nested array is flattened', function(done){
     var _xml = 
        '<xml>'
       +  '<tr>{d.cars[i].wheels[i].size  }</tr>'

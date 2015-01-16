@@ -1968,6 +1968,46 @@ describe('extracter', function(){
     });
   });
 
+  //Many complex cases are tested indirectly in other tests
+  describe('sortXmlParts', function(){
+    it('should sort the array of xml parts', function(){
+      var _data = [
+        { "obj": "_rootd", "pos": 31 },
+        { "obj": "_rootd", "pos": 14 }
+      ];
+      extracter.sortXmlParts(_data);
+      helper.assert(_data, [
+        { "obj": "_rootd", "pos": 14 },
+        { "obj": "_rootd", "pos": 31 }
+      ]);
+    });
+    it('should sort correctly nested arrays which start at the same position in xml.\
+      This happens when two arrays are incremented in the same time (d.tab[i+1].subtab[i+1])', function(){
+      //This test is sensible. 
+      var _data = [
+        { "obj": "_rootdother"           , "pos": 90                  },
+        { "obj": "_rootdfamiliesproducts", "pos": 50, 'array':'start' }, //sub array
+        { "obj": "_rootd"                , "pos": 31                  },
+        { "obj": "_rootdfamilies"        , "pos": 50, 'array':'start' }, //array
+        { "obj": "_rootdfamiliesproducts", "pos": 70, 'array':'end'   }, //sub array
+        { "obj": "_rootdfamilies"        , "pos": 70, 'array':'end'   }, //array
+        { "obj": "_rootdfamiliesproducts", "pos": 65                  }, //sub array attribute
+        { "obj": "_rootd"                , "pos": 14                  },
+      ];
+      extracter.sortXmlParts(_data);
+      helper.assert(_data, [
+        { "obj": "_rootd"                , "pos": 14                  },
+        { "obj": "_rootd"                , "pos": 31                  },
+        { "obj": "_rootdfamilies"        , "pos": 50, 'array':'start' }, //array
+        { "obj": "_rootdfamiliesproducts", "pos": 50, 'array':'start' }, //sub array
+        { "obj": "_rootdfamiliesproducts", "pos": 65                  }, //sub array attribute
+        { "obj": "_rootdfamiliesproducts", "pos": 70, 'array':'end'   }, //sub array
+        { "obj": "_rootdfamilies"        , "pos": 70, 'array':'end'   }, //array
+        { "obj": "_rootdother"           , "pos": 90                  }
+      ]);
+    });
+  });
+
 });
 
 

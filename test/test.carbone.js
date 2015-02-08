@@ -403,7 +403,7 @@ describe('Carbone', function(){
         });
       });
     });
-    it('should render spreadsheet and convert it to a pdf', function(done){
+    it('should render spreadsheet and convert it to a xls', function(done){
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{
         id : 1,

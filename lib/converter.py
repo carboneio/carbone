@@ -16,6 +16,8 @@ from com.sun.star.uno import RuntimeException
 
 desktop = None
 unocontext = None
+nbConsecutiveAttemptOpeningDocument = 0
+nbConsecutiveAttemptOpeningDocumentMax = 10
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", "--pipe")
 parser.add_argument("-i", "--input")
@@ -39,6 +41,17 @@ def send(message):
     sys.stdout.flush()
 
 
+def sendErrorOrExit():
+    ### Tell to python that we want to modify the global variable
+    global nbConsecutiveAttemptOpeningDocument 
+    nbConsecutiveAttemptOpeningDocument += 1
+    if nbConsecutiveAttemptOpeningDocument < nbConsecutiveAttemptOpeningDocumentMax:
+        send('400')  # The document could not be opened.
+    else:
+        nbConsecutiveAttemptOpeningDocument = 0
+        sys.exit(254) # Restart everything
+
+
 def retryloop(attempts, timeout, delay=1):
     starttime = time.time()
     success = set()
@@ -51,10 +64,11 @@ def retryloop(attempts, timeout, delay=1):
         if duration > timeout:
             break
         time.sleep(delay)
-    sys.exit(101) # Existing listener not found. Unable start listener by parameters. Aborting.
+    sys.exit(253) # Existing listener not found. Unable start listener by parameters. Aborting.
 
 
 def convert(message):
+    global nbConsecutiveAttemptOpeningDocument 
     ### Parse the message 
     messageSplit = shlex.split(message)
     fileOption = parser.parse_args(args=messageSplit)
@@ -63,10 +77,19 @@ def convert(message):
     inputprops = UnoProps(Hidden=True, ReadOnly=True, UpdateDocMode=QUIET_UPDATE)
     cwd = unohelper.systemPathToFileUrl( os.getcwd() )
     inputurl = unohelper.absolutize(cwd, unohelper.systemPathToFileUrl(fileOption.input))
-    document = desktop.loadComponentFromURL( inputurl , "_blank", 0, inputprops)
+
+    try:
+        document = desktop.loadComponentFromURL( inputurl , "_blank", 0, inputprops)
+    except:
+        sendErrorOrExit()
+        return
 
     if not document:
-        sys.exit(102) # The document could not be opened.
+        sendErrorOrExit()
+        return
+
+    ### Reset counter
+    nbConsecutiveAttemptOpeningDocument = 0
 
     ### Update document links (update sub-documents)
     try:
@@ -95,7 +118,7 @@ def convert(message):
 
     document.dispose()
     document.close(True)
-    send('END')
+    send('200') ### Document converted
 
 
 def listen():
@@ -117,8 +140,8 @@ context = uno.getComponentContext()
 svcmgr = context.ServiceManager
 resolver = svcmgr.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", context)
 
-### Try to open a connection with LibreOffice
-for retry in retryloop(attempts=10, timeout=10, delay=1):
+### Try to open a connection with LibreOffice. Let 60 seconds to start LibreOffice before restarting it.
+for retry in retryloop(attempts=60, timeout=60, delay=1):
     try:
         unocontext = resolver.resolve("uno:%s" % connectionStr)
     except NoConnectException:
@@ -126,14 +149,14 @@ for retry in retryloop(attempts=10, timeout=10, delay=1):
 
 ### Check that everything is ok
 if not unocontext:
-  sys.exit(101) # Unable to connect or start own listener. Aborting.
+    sys.exit(255) # Unable to connect or start own listener. Aborting.
 
 ### And some more LibreOffice magic
 unosvcmgr = unocontext.ServiceManager
 desktop = unosvcmgr.createInstanceWithContext("com.sun.star.frame.Desktop", unocontext)
 
 ### Send Ready signal to NodeJS and listen for document conversion
-send('READY')
+send('204') 
 listen()
 
 

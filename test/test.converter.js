@@ -98,7 +98,7 @@ describe('Converter', function(){
     it('should render a pdf and start an conversion factory automatically if no factories exist', function(done){
       var _pdfResultPath = path.resolve('./test/datasets/test_odt_render_static.pdf');
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
-      converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
         var _buf = new Buffer(result);
         assert.equal(_buf.slice(0, 4).toString(), '%PDF');
         var bufPDF = new Buffer(_buf.length);
@@ -114,13 +114,13 @@ describe('Converter', function(){
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       var _results = [];
       converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
-        converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
           var _buf = new Buffer(result);
           assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           //kill LibreOffice thread
           process.kill(factories['0'].pid);
           //try another conversion
-          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
             var _buf = new Buffer(result);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
             done(); 
@@ -136,7 +136,7 @@ describe('Converter', function(){
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
             _waitedResponse--;
             _results.push(result);
             if(_waitedResponse === 0){
@@ -161,12 +161,12 @@ describe('Converter', function(){
       converter.init({'factories':4, 'startFactory':true, 'tempPath':tempPath, 'attempts':10}, function(factories){
         var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
         var _nbExecuted = 200;
-        var _crashModulo = 24;
+        var _crashModulo = 28;
         var _results = [];
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(result){
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
             if(_waitedResponse % _crashModulo === 0){
               var _factoryId = Math.floor((Math.random()*4)); //(0 -> 3)
               var _threadChoice = Math.random(); //(0.0 -> 1.0)
@@ -198,6 +198,73 @@ describe('Converter', function(){
           assert.equal((_elapsed < 200), true);
           done(); 
         }
+      });
+    });
+    it('should not restart the conversion factory if the document is corrupted. It should return an error message', function(done){
+      var _filePath = path.resolve('./test/datasets/test_odt_render_corrupted.odt');
+      var _results = [];
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
+        var _officePID = factories['0'].pid;
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
+          assert.equal(err, 'Could not open document');
+          assert.equal(factories['0'].pid, _officePID);
+          done(); 
+        });
+      });
+    });
+    it('should still restart the conversion factory if the document could not be opened more than 10 times', function(done){
+      var _filePath = path.resolve('./test/datasets/test_odt_render_corrupted.odt');
+      var _nbAttemptMax = 9;
+      var _nbAttempt = _nbAttemptMax;
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
+        var _officePID = factories['0'].pid;
+        for (var i = 0; i < _nbAttemptMax; i++) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
+            _nbAttempt--;
+            assert.equal(err, 'Could not open document');
+            assert.equal(factories['0'].pid, _officePID);
+            //the 10th conversion will restart LibreOffice
+            if(_nbAttempt === 0){
+              converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
+                assert.equal(err, 'Could not open document');
+                assert.notEqual(factories['0'].pid, _officePID);
+                var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+                converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
+                  assert.equal(err, null);
+                  var _buf = new Buffer(result);
+                  assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+                  done(); 
+                });
+              });
+            }
+          });
+        };
+      });
+    });
+    it('should not restart the conversion factory if there is at least one success between 10 fails\
+      it should not crash if formatOption is undefined', function(done){
+      var _filePath = '';
+      var _filePathKO = path.resolve('./test/datasets/test_odt_render_corrupted.odt');
+      var _filePathOK = path.resolve('./test/datasets/test_odt_render_static.odt');
+      var _nbAttemptMax = 15;
+      var _nbAttempt = _nbAttemptMax;
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
+        var _officePID = factories['0'].pid;
+        for (var i = 0; i < _nbAttemptMax; i++) {
+          if(i===7){
+            _filePath = _filePathOK;
+          }
+          else{
+            _filePath = _filePathKO;
+          }
+          converter.convertFile(_filePath, 'writer_pdf_Export', undefined, function(err, result){
+            _nbAttempt--;
+            assert.equal(factories['0'].pid, _officePID);
+            if(_nbAttempt === 0){
+              done(); 
+            }
+          });
+        };
       });
     });
   });

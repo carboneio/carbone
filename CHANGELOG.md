@@ -1,8 +1,16 @@
 # CarboneJS
 
 ### v0.10.1
-
-  TODO
+  
+  - Do not restart LibreOffice if the document is corrupted (restart it only after 10 consecutive attemps)
+  - Return an error when the document cannot be converted
+  - Improve stability in general
+  - socket.js has been updated. It manages TLS communications
+  - Fix bugs in tests
+  - Compatible with Node v0.12
+  - Update zipfile dependency
+  
+  Warning: Cannot use moxie-zip 0.0.4 because this commit (https://github.com/spocke/moxie-zip/commit/cbc6af14dc2318bbcfcfa82ebaf183c525346ae2) creates wrong *.ods files. The empty directory Bitmap is replaced by a executable file.
 
 ### v0.10.0
 

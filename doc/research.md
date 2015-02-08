@@ -1,4 +1,5 @@
 
+zip rapport.ods -r * -x .DS_Store
 
 TODO
 -----
@@ -224,4 +225,11 @@ function binarySearch(value, arr) {
   return last;
 }*/
 
+
+VENTE
+-----
+- Faire une apli web sur lequel les utilisateurs déposent leur rapport, peuvent le façonner en ligne...
+- Proposer d'y inscrire des web services à requêter le manière régulière afin d'envoyer le rapport par email à quelqu'un
+- Possibilté de tout faire par API à distance (l'quivalent de la gestion de la table Report dans Easilys)
+- Gratuit pour 
 

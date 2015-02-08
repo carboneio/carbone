@@ -27,7 +27,7 @@ describe('Server', function(){
       executeServer(['server', '--port', 4000], function(){
         var _inputFile = path.resolve('./test/datasets/test_odt_render_static.odt');
         var _outputFile = path.join(tempPath, 'my_converted_file.pdf');
-        var _client = new Socket(4000, '127.0.0.1', 6000);
+        var _client = new Socket(4000, '127.0.0.1', 10000);
         _client.on('error', function(err){});
         _client.startClient();
         var _job = {
@@ -37,14 +37,13 @@ describe('Server', function(){
         };
         _client.send(_job, function(err, res){
           assert.equal(err, null);
-          assert.equal(res.data.success, true);
+          assert.equal(res.data.error, null);
           fs.readFile(_outputFile, function(err, content){
             var _buf = new Buffer(content);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-            _client.send('shutdown', function(){
-              _client.stop(function(){
-                done();
-              });
+            _client.send('shutdown');
+            _client.stop(function(){
+              setTimeout(done, 1000); //let the time to shutdown the server
             });
           });
         });
@@ -55,11 +54,11 @@ describe('Server', function(){
       carbone.set({
         'tempPath' : tempPath,
         'port' : 4001,
-        'delegateToServer' : true,
+        'delegateToServer' : false, //must be set to false otherwise it creates two client connection, one created by this test and another for carbone
         'templatePath' : path.resolve('./test/datasets')
       });
       executeServer(['server', '--port', 4001], function(){
-        var _client = new Socket(4001, '127.0.0.1', 6000);
+        var _client = new Socket(4001, '127.0.0.1', 10000);
         _client.startClient();
         _client.on('error', function(err){});
         var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
@@ -75,9 +74,10 @@ describe('Server', function(){
             fs.read(fd, bufPDF, 0, buf.length, 0, function(err, bytesRead, buffer){
               assert.equal(buf.slice(0, 100).toString(), buffer.slice(0, 100).toString());
               //reset carbone
-              carbone.reset();
-              _client.send('shutdown', function(){
-                done();
+              _client.send('shutdown');
+              _client.stop(function(){
+                carbone.reset();
+                setTimeout(done, 1000); //let the time to shutdown the server
               });
             });
           });

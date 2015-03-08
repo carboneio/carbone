@@ -11,6 +11,10 @@ http://openxmldeveloper.org/discussions/development_tools/f/17/t/6958.aspx
 
 BUG ALEATOIRE : IL est possible que carbone se détache des thread LO... et reste dans un mode Python killed with 101
 
+
+Gestion des images :  http://www.codeproject.com/Articles/20287/Generating-Word-Reports-Documents#InsertingImagesIntoDocument
+
+
 Test :
 
 si variable dish1 et dish1Name la deuxième se confond avec la première

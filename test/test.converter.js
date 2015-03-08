@@ -138,7 +138,9 @@ describe('Converter', function(){
         for (var i = 0; i < _nbExecuted; i++) {
           converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
             _waitedResponse--;
-            _results.push(result);
+            if(!err){
+              _results.push(result);
+            }
             if(_waitedResponse === 0){
               theEnd();
             }
@@ -181,7 +183,9 @@ describe('Converter', function(){
               }
             }
             _waitedResponse--;
-            _results.push(result);
+            if(!err){
+              _results.push(result);
+            }
             if(_waitedResponse === 0){
               theEnd();
             }

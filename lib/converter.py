@@ -130,33 +130,42 @@ def listen():
         exit(0)
 
 
+try:
 
-### parse arguments
-initParams = parser.parse_args()
+  ### parse arguments
+  initParams = parser.parse_args()
 
-### Connection to LibreOffice
-connectionStr = "pipe,name=%s;urp;StarOffice.ComponentContext" % (initParams.pipe)
-context = uno.getComponentContext()
-svcmgr = context.ServiceManager
-resolver = svcmgr.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", context)
+  ### Connection to LibreOffice
+  connectionStr = "pipe,name=%s;urp;StarOffice.ComponentContext" % (initParams.pipe)
+  context = uno.getComponentContext()
+  svcmgr = context.ServiceManager
+  resolver = svcmgr.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", context)
 
-### Try to open a connection with LibreOffice. Let 60 seconds to start LibreOffice before restarting it.
-for retry in retryloop(attempts=60, timeout=60, delay=1):
-    try:
-        unocontext = resolver.resolve("uno:%s" % connectionStr)
-    except NoConnectException:
-        retry()
+  ### Try to open a connection with LibreOffice. Let 60 seconds to start LibreOffice before restarting it.
+  for retry in retryloop(attempts=60, timeout=60, delay=1):
+      try:
+          unocontext = resolver.resolve("uno:%s" % connectionStr)
+      except NoConnectException:
+          retry()
 
-### Check that everything is ok
-if not unocontext:
-    sys.exit(255) # Unable to connect or start own listener. Aborting.
+  ### Check that everything is ok
+  if not unocontext:
+      sys.exit(255) # Unable to connect or start own listener. Aborting.
 
-### And some more LibreOffice magic
-unosvcmgr = unocontext.ServiceManager
-desktop = unosvcmgr.createInstanceWithContext("com.sun.star.frame.Desktop", unocontext)
+  ### And some more LibreOffice magic
+  unosvcmgr = unocontext.ServiceManager
+  desktop = unosvcmgr.createInstanceWithContext("com.sun.star.frame.Desktop", unocontext)
 
-### Send Ready signal to NodeJS and listen for document conversion
-send('204') 
-listen()
+  ### Send Ready signal to NodeJS and listen for document conversion
+  send('204')
+
+  listen()
+
+  ## Catch exit exception to avoid backtrace
+except KeyboardInterrupt:
+  try:
+    sys.exit(0)
+  except SystemExit:
+    os._exit(0)
 
 

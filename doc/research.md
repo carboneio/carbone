@@ -20,6 +20,7 @@ Test :
 si variable dish1 et dish1Name la deuxième se confond avec la première
 si {d[id>1]} avant {d[mealType.sort]} -> {d[mealType.sort+1]}, l'extracteur monte trop haut et englobe {d[id>1]} par erreur
 
+- Pouvoir rechercher des bout d'objet JSON et les remplacer ou à miniman pourvoir lancer un make test sur tous les rapport et vérifier les rapport qui utilisent des chmaps dipsarus
 - si pas de 'i', alors toujours prendre la première valeur qui correspond au filtre... SI il ya plusieurs valeur, afficher un warning quel que part.
 
 - Eviter de lire le fichier 2 fois sur le disque (dans isZipped et dans openTemplate)

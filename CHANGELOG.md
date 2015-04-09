@@ -1,10 +1,8 @@
 # CarboneJS
 
-### v0.10.2
-  - Fix: Translation sort upper and lower case order does not depend on user's language anymore
-
 ### v0.10.1
   
+  - Fix: Translation sort upper and lower case order does not depend on user's language anymore
   - Do not restart LibreOffice if the document is corrupted (restart it only after 10 consecutive attemps)
   - Return an error when the document cannot be converted
   - Improve stability in general

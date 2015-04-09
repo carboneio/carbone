@@ -547,6 +547,30 @@ describe('builder.buildXML', function(){
       done();
     });
   });
+  it('should accept comparison operatior !=', function(done){
+    var _xml = '<xml> <t_row> {d[ speed.high!=5, i].brand} </t_row><t_row> {d[ speed.high != 5,i+1].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'speed':{'high':12, 'low':1}},
+      {'brand' : 'Tesla motors', 'speed':{'high':5 , 'low':2 }},
+      {'brand' : 'Toyota'      , 'speed':{'high':44, 'low':20}}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept comparison operatior != with a lot of whitespaces', function(done){
+    var _xml = '<xml> <t_row> {d[ speed . high !  =  5, i].brand} </t_row><t_row> {d[ speed.high  !   = 5,  i+1].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'speed':{'high':12, 'low':1}},
+      {'brand' : 'Tesla motors', 'speed':{'high':5 , 'low':2 }},
+      {'brand' : 'Toyota'      , 'speed':{'high':44, 'low':20}}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
+      done();
+    });
+  });
   it('should accept two conditions on the same object-attribute. It should accept extra whitespaces in the condition', function(done){
     var _xml = '<xml> <t_row> {d[ speed . high > 8, s pe ed.h igh < 20, i].brand} </t_row><t_row> {d[ speed.high > 8, speed.high < 20, i+1].brand} </t_row></xml>';
     var _data = [

@@ -1,5 +1,7 @@
 # CarboneJS
 
+### v0.10.2
+
 ### v0.10.1
 
   - Allow the comparison operator `!=` in your template: `{d.cars[engine.power != 3].name}`

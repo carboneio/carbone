@@ -12,6 +12,7 @@ http://openxmldeveloper.org/discussions/development_tools/f/17/t/6958.aspx
 BUG ALEATOIRE : IL est possible que carbone se détache des thread LO... et reste dans un mode Python killed with 101
 - pouvoir remonter dans l'objet en utilisant deux point !!! d.site[i+1].emails[i+1]..label va répeter le label du site pour chaque site.
 
+- En mode carbone Studio : synchorniser les documents en les décomposant (cela permettrai d'envoyer que le fichier content.xml si seulement ce dernier a changé et économiserait des tonne de bande passante)
 
 Gestion des images :  http://www.codeproject.com/Articles/20287/Generating-Word-Reports-Documents#InsertingImagesIntoDocument
 

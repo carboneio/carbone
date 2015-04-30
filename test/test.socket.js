@@ -181,7 +181,7 @@ describe('Socket', function(){
             var _elapsed = (_end.getTime() - _start.getTime()); 
             var _elapsedPerTransmission = _elapsed/_nbExecuted; 
             console.log('\n\n Socket - Time Elapsed : '+_elapsedPerTransmission + ' ms per transmission (ping-pong) for '+_nbExecuted+' transmissions ('+_elapsed+'ms)\n\n\n');
-            assert.equal((_elapsed < 1400), true);
+            assert.equal((_elapsed < 2000), true);
             _client.stop(function(){
               stopServer(done);
             });

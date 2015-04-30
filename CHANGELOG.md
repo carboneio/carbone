@@ -63,22 +63,23 @@
 
   **Template:**
 
-  | site                | car name               | weight                         | brand                                |
-  | ------------------- | ---------------------- | ------------------------------ | ------------------------------------ |
-  | {d[i].site.label}   | d[i].cars[i].name}     | {d[i].cars[i].spec.weight}     | {d[i].cars[i].wheels[i].brand}       |
-  | {d[i+1].site.label} | d[i+1].cars[i+1].name} | {d[i+1].cars[i+1].spec.weight} | {d[i+1].cars[i+1].wheels[i+1].brand} |
+| site                | car name               | weight                         | brand                                |
+| ------------------- | ---------------------- | ------------------------------ | ------------------------------------ |
+| {d[i].site.label}   | d[i].cars[i].name}     | {d[i].cars[i].spec.weight}     | {d[i].cars[i].wheels[i].brand}       |
+| {d[i+1].site.label} | d[i+1].cars[i+1].name} | {d[i+1].cars[i+1].spec.weight} | {d[i+1].cars[i+1].wheels[i+1].brand} |
 
 
   **Result:**
 
-  | site                | car name               | weight                         | brand                                |
-  | ------------------- | ---------------------- | ------------------------------ | ------------------------------------ |
-  | site_A              | prius                  | 1                              |  mich                                |
-  | site_A              | prius                  | 1                              |  cont                                |
-  | site_A              | civic                  | 2                              |  mich                                |
-  | site_B              | modelS                 | 1                              |  mich                                |
-  | site_B              | modelS                 | 1                              |  uni                                 |
-  | site_B              | modelS                 | 1                              |  cont                                |
+| site                | car name               | weight                         | brand                                |
+| ------------------- | ---------------------- | ------------------------------ | ------------------------------------ |
+| site_A              | prius                  | 1                              |  mich                                |
+| site_A              | prius                  | 1                              |  cont                                |
+| site_A              | civic                  | 2                              |  mich                                |
+| site_B              | modelS                 | 1                              |  mich                                |
+| site_B              | modelS                 | 1                              |  uni                                 |
+| site_B              | modelS                 | 1                              |  cont                                |
+
 
 
   - Warning: cannot use moxie-zip 0.0.4 because this commit (https://github.com/spocke/moxie-zip/commit/cbc6af14dc2318bbcfcfa82ebaf183c525346ae2) creates wrong *.ods files. The empty directory Bitmap is replaced by a executable file.
@@ -121,4 +122,3 @@
 
   - Improve LibreOffice detection algorithm for Linux. Now, it supports any version of LibreOffice
   - BUG fix: When two nested arrays were incremented in the same time `{d.tab[i+1].subtab[i+1]}`, it could generate bad XML in certain cases
-

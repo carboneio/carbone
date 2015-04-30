@@ -3,6 +3,7 @@
 ### v0.10.1
 
   - Allow the comparison operator `!=` in your template: `{d.cars[engine.power != 3].name}`
+  - Add a newline at the end of the lang file
   - Fix: Translation, upper and lower case order does not depend on user's language anymore
   - Do not restart LibreOffice if the document is corrupted (restart it only after 10 consecutive attemps)
   - Return an error when the document cannot be converted

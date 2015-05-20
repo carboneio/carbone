@@ -3,6 +3,9 @@ zip rapport.ods -r * -x .DS_Store
 
 TODO
 -----
+Toujours renvoyer l'objet Error avec la stack complete : https://www.joyent.com/developers/node/design/errors
+
+
 Gérer Excel en convertissant les sharedString avant (pas obligatoire apparemen)
 https://social.msdn.microsoft.com/Forums/en-US/5dd1dd01-2117-41e2-8836-26252cf90c1a/how-fetch-numeric-and-non-numeric-data-in-excel-and-store-the-data-to-table-storage-in-azure?forum=oxmlsdk
 

@@ -1,7 +1,11 @@
 # CarboneJS
 
-### v0.10.2
+### v0.11.1
+  - CarboneJS Server can be used on a remote server. CarboneJS send the document by socket instead of writing a file locally (only when a document conversion occurs)
+  - Add two benchmarks tests
+  - Fix a random failure in a test
 
+  
 ### v0.10.1
 
   - Allow the comparison operator `!=` in your template: `{d.cars[engine.power != 3].name}`

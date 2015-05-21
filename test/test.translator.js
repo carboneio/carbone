@@ -86,8 +86,8 @@ describe('translator', function(){
         "Supplier": "",
         "Supplier orders multi-site report": "",
         "toDate": "",
-        "total": "",
         "Total": "",
+        "total": "",
         "Total Amount": "",
         "unitPrice": ""
       }
@@ -102,9 +102,9 @@ describe('translator', function(){
             objLang = JSON.parse(fixedResponse);
           }
           //Does the lang file content corresponding to the expectedData?
-          helper.assert(expectedObjLang, objLang);
+          helper.assert(objLang, expectedObjLang);
           //Does the generateLang result data correspondind to the file content ?
-          helper.assert(objLang, result);
+          helper.assert(result, objLang);
           helper.assert(keyTypeCountObject['newKeys'], 26);
           helper.assert(keyTypeCountObject['emptyExistingKeys'], 0);
           helper.assert(keyTypeCountObject['updatedKeys'], 0);

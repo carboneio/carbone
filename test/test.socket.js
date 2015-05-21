@@ -6,14 +6,19 @@ var http = require("http");
 var Socket = require('../lib/socket');  
 var url = require('url');
 var helper  = require('../lib/helper');
-var format  = require('../lib/format');
 var path = require('path');
 var server;
 var tempPath = path.join(__dirname,'tempfile');
 
-var commandToTest = rootPath+'/bin/carbone'; 
-
 describe('Socket', function(){
+
+  //after(function(done) {
+  //  require("child_process").exec("kill -9 `lsof -t -i:4000`", function() {
+  //    require("child_process").exec("kill -9 `lsof -t -i:4001`", function() {
+  //      done();
+  //    });
+  //  });
+  //});
 
   describe('client.send / events message, close, error, connect,...', function(){
     it('should start the server, connect a client, send a message from the server to the client and vice-versa and stop the client and server', function(done){
@@ -125,33 +130,34 @@ describe('Socket', function(){
         var _client = null;
         var _nbError = 0;
         var _nbReceived = 0;
-        _client = new Socket(4000, '127.0.0.1', 50);
-        _client.startClient(); 
+        _client = new Socket(4000, '127.0.0.1', {'timeout':50});
         _client.on('error', function(err){
           _nbError++;
         });
-        //The server adds a virtual latency if the "client1" message is received
-        _client.send('client1', function(err, response){
-          helper.assert(err, 'Timeout reached');
-          helper.assert(response, null);
-          _nbReceived++;
-          if(_nbReceived===3){ theEnd(); }
-        });
-        _client.send('client2', function(err, response){
-          helper.assert(response.data, 'client2server');
-          _nbReceived++;
-          if(_nbReceived===3){ theEnd(); }
-        });
-        _client.send('client3', function(err, response){
-          helper.assert(response.data, 'client3server');
-          _nbReceived++;
-          if(_nbReceived===3){ theEnd(); }
-        });
-        function theEnd(){
-          _client.stop(function(){
-            stopServer(done);
+        _client.startClient(function(){
+          //The server adds a virtual latency if the "client1" message is received
+          _client.send('client1', function(err, response){
+            helper.assert(err, 'Timeout reached');
+            helper.assert(response, null);
+            _nbReceived++;
+            if(_nbReceived===3){ theEnd(); }
           });
-        }
+          _client.send('client2', function(err, response){
+            helper.assert(response.data, 'client2server');
+            _nbReceived++;
+            if(_nbReceived===3){ theEnd(); }
+          });
+          _client.send('client3', function(err, response){
+            helper.assert(response.data, 'client3server');
+            _nbReceived++;
+            if(_nbReceived===3){ theEnd(); }
+          });
+          function theEnd(){
+            _client.stop(function(){
+              stopServer(done);
+            });
+          }
+        }); 
       });
     });
     it('should be fast', function(done){
@@ -175,7 +181,7 @@ describe('Socket', function(){
             var _elapsed = (_end.getTime() - _start.getTime()); 
             var _elapsedPerTransmission = _elapsed/_nbExecuted; 
             console.log('\n\n Socket - Time Elapsed : '+_elapsedPerTransmission + ' ms per transmission (ping-pong) for '+_nbExecuted+' transmissions ('+_elapsed+'ms)\n\n\n');
-            assert.equal((_elapsed < 1400), true);
+            assert.equal((_elapsed < 2000), true);
             _client.stop(function(){
               stopServer(done);
             });
@@ -185,7 +191,7 @@ describe('Socket', function(){
     });
     it('should works in all circumstances (queue, timeout, ...)', function(done){
       executeServer('response', function(){
-        var _client = new Socket(4000, '127.0.0.1', 50);
+        var _client = new Socket(4000, '127.0.0.1', {'timeout':50});
         var _nbExecuted = 100;
         var _nbTimeout = 0;
         var _nbReceivedInTime = 0;
@@ -307,8 +313,8 @@ describe('Socket', function(){
       var _nbConnect = 0;
       var _nbReceived = 0;
       var _nbCallback = 0;
-      _client = new Socket(4000, '127.0.0.1', 5000, 50);
-      _client.startClient(); 
+      _client = new Socket(4000, '127.0.0.1', {'timeout':5000, 'reconnectInterval':50});
+      _client.startClient();  
       _timer = setInterval(function(){
         _sent++;
         _client.send('message for a drunk server');
@@ -348,6 +354,182 @@ describe('Socket', function(){
       });
     });
   });
+
+  describe('client / server secure TLS connection', function() {
+    it('generateKeys should generate a public and private keys for TLS connection', function(done) {
+      var _publicFilename = path.join(__dirname, 'socket', 'keys', 'key.pub');
+      var _privateFilename = path.join(__dirname, 'socket', 'keys', 'key.pem');
+      Socket.generateKeys(_publicFilename, _privateFilename, function(err){
+        helper.assert(err+'', 'null');
+        helper.assert(/-----BEGIN CERTIFICATE-----/.test(fs.readFileSync(_publicFilename, 'utf8')), true); 
+        helper.assert(/-----BEGIN RSA PRIVATE KEY-----/.test(fs.readFileSync(_privateFilename, 'utf8')), true); 
+        fs.unlinkSync(_publicFilename); //remove key
+        fs.unlinkSync(_privateFilename); //remove key
+        done();
+      });
+    });
+
+    it('should send a message from clients to server with TLS', function(done) {
+      var _serverPrivKey = path.join(__dirname, 'socket', 'keys', 'server.pem');
+      var _serverPubKey = path.join(__dirname, 'socket', 'keys', 'server.pub');
+      var _clientPrivKey = path.join(__dirname, 'socket', 'keys', 'client.pem');
+      var _clientPubKey = path.join(__dirname, 'socket', 'keys', 'client.pub');
+      Socket.generateKeys(_serverPubKey, _serverPrivKey, function(err){
+        helper.assert(err+'', 'null');
+        Socket.generateKeys(_clientPubKey, _clientPrivKey, function(err){
+          helper.assert(err+'', 'null');
+          var _serverOptions = {
+            tls : {
+              key: fs.readFileSync(_serverPrivKey),
+              cert: fs.readFileSync(_serverPubKey),
+              ca: [fs.readFileSync(_clientPubKey)],
+              requestCert: true,
+              rejectUnauthorized: true
+            }
+          };
+          var _clientOptions = {
+            tls : {
+              key: fs.readFileSync(_clientPrivKey),
+              cert: fs.readFileSync(_clientPubKey),
+              rejectUnauthorized: false
+            }
+          };
+          var _server = new Socket(4001, '127.0.0.1', _serverOptions);
+          var _client = new Socket(4001, '127.0.0.1', _clientOptions);
+          _server.startServer(function() {
+            _client.startClient(function() {
+              _client.send("I'm a #sharp# message !");
+            });
+          });
+          _server.on("message", function(message) {
+            helper.assert(message.data, "I'm a #sharp# message !");
+            _client.stop(function(){
+              fs.unlinkSync(_serverPrivKey);
+              fs.unlinkSync(_serverPubKey);
+              fs.unlinkSync(_clientPrivKey);
+              fs.unlinkSync(_clientPubKey);
+              _server.stop(done);
+            });
+          });
+          _server.on('error', function(messageFromClient){
+            console.log(messageFromClient)
+          });
+          _client.on('error', function(messageFromClient){
+            console.log(messageFromClient)
+          });
+        });
+      });
+    });
+
+    it('should send multiple messages from server to clients with TLS', function(done) {
+      var _serverPrivKey = path.join(__dirname, 'socket', 'keys', 'server.pem');
+      var _serverPubKey = path.join(__dirname, 'socket', 'keys', 'server.pub');
+      var _client1PrivKey = path.join(__dirname, 'socket', 'keys', 'client1.pem');
+      var _client1PubKey = path.join(__dirname, 'socket', 'keys', 'client1.pub');
+      var _client2PrivKey = path.join(__dirname, 'socket', 'keys', 'client2.pem');
+      var _client2PubKey = path.join(__dirname, 'socket', 'keys', 'client2.pub');
+      Socket.generateKeys(_serverPubKey, _serverPrivKey, function(err){
+        helper.assert(err+'', 'null');
+        Socket.generateKeys(_client1PubKey, _client1PrivKey, function(err){
+          helper.assert(err+'', 'null');
+          Socket.generateKeys(_client2PubKey, _client2PrivKey, function(err){
+            helper.assert(err+'', 'null');
+            var _serverOptions = {
+              tls : {
+                key: fs.readFileSync(_serverPrivKey),
+                cert: fs.readFileSync(_serverPubKey),
+                ca: [fs.readFileSync(_client1PubKey), fs.readFileSync(_client2PubKey)],
+                requestCert: true,
+                rejectUnauthorized: true
+              }
+            };
+            var _client1Options = {
+              tls : {
+                key: fs.readFileSync(_client1PrivKey),
+                cert: fs.readFileSync(_client1PubKey),
+                rejectUnauthorized: false
+              }
+            };
+            var _client2Options = {
+              tls : {
+                key: fs.readFileSync(_client2PrivKey),
+                cert: fs.readFileSync(_client2PubKey),
+                rejectUnauthorized: false
+              }
+            };
+            var _server = new Socket(4001, '127.0.0.1', _serverOptions);
+            var _client1 = new Socket(4001, '127.0.0.1', _client1Options);
+            var _client2 = new Socket(4001, '127.0.0.1', _client2Options);
+
+            var _nbMessageReceived = 0;
+            _server.startServer(function() {
+              _client1.startClient();
+              _client2.startClient();
+            });
+            _server.on("connection", function(recipient) {
+              recipient.send("I'm a message to "+recipient.uid);
+              recipient.send("I'm a message to "+recipient.uid);
+              recipient.send("I'm a message to "+recipient.uid);
+              setTimeout(function() {
+                recipient.send("I'm a message to "+recipient.uid);
+                recipient.send("I'm a message to "+recipient.uid);
+              },100);
+            });
+            function receiver(message) {
+              _nbMessageReceived++;
+              helper.assert(message.data, "I'm a message to "+message.uid);
+              if(_nbMessageReceived >= 10) {
+                _client1.stop(function(){
+                  _client2.stop(function() {
+                    fs.unlinkSync(_serverPrivKey);
+                    fs.unlinkSync(_serverPubKey);
+                    fs.unlinkSync(_client1PrivKey);
+                    fs.unlinkSync(_client1PubKey);
+                    fs.unlinkSync(_client2PrivKey);
+                    fs.unlinkSync(_client2PubKey);
+                    _server.stop(done);
+                  });
+                });
+              }
+            }
+            _client1.on("message", receiver);
+            _client2.on("message", receiver);
+          });
+        });
+      });
+    });
+
+    /*it('should send files correctly', function(done) {
+      var _server = new Socket(4001, 'localhost');
+      _server.setTlsOptions(tlsServerOptions);
+      var _client = new Socket(4001, 'localhost');
+      _client.setTlsOptions(tlsClientOptions);
+
+      var _file = null;
+
+      _server.startServer(function() {
+        _client.startClient(function() {
+          _file = fs.readFileSync(path.join(__dirname, "socket", "test.tar.gz"), "base64");
+          _checksum = checksum(_file);
+          _fileStr = _file.toString();
+          _client.send({action: "FILE", file: _fileStr});
+        });
+      });
+      _server.on("message", function(message) {
+        helper.assert(message.data.file, _file); //check as base64 string
+        helper.assert(_checksum, checksum(message.data.file));
+        message.data.file = new Buffer(message.data.file, "base64");
+        fs.writeFileSync(path.join(__dirname, "socket", "test-recomposed.tar.gz"), message.data.file);
+
+        helper.assert(fs.readFileSync(path.join(__dirname, "socket", "test.tar.gz")),
+          fs.readFileSync(path.join(__dirname, "socket", "test-recomposed.tar.gz"))); //check as saved raw buffer
+
+        _client.stop(function(){
+            _server.stop(done);
+        });
+      });
+    });*/
+  });
 });
 
 var server;
@@ -355,7 +537,13 @@ function executeServer(filename, callback){
   server = spawn(path.join(__dirname,'socket', filename+'.js'), [], {cwd: __dirname});
   setTimeout(function(){
     callback();
-  }, 100);
+  }, 500);
+  /*server.stdout.on('data', function(out){
+    console.log('SERVER', out.toString())
+  })
+  server.stderr.on('data', function(out){
+    console.log('SERVER', out.toString())
+  })*/
 }
 
 function stopServer(callback){
@@ -364,5 +552,5 @@ function stopServer(callback){
   }
   setTimeout(function(){
     callback();
-  }, 200);
+  }, 500);
 }

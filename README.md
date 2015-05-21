@@ -34,7 +34,7 @@ Be careful, LibreOffice which is provided by the PPA libreoffice/libreoffice-4-0
   sudo apt-get install libxinerama1 libfontconfig1 libcups2
 
   # Download LibreOffice 64 bits version for ubuntu 64 bits
-  wget http://download.documentfoundation.org/libreoffice/stable/4.0.3/deb/x86_64/LibreOffice_4.0.3_Linux_x86-64_deb.tar.gz
+  wget http://download.documentfoundation.org/libreoffice/stable/4.3.6/deb/x86_64/LibreOffice_4.3.6_Linux_x86-64_deb.tar.gz
   tar -zxvf LibreOffice_4.0.3_Linux_x86-64_deb.tar.gz
   cd LibreOffice_4.0.3_Linux_x86-64_deb
   cd DEBS

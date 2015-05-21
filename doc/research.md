@@ -1,7 +1,11 @@
 
+zip rapport.ods -r * -x .DS_Store
 
 TODO
 -----
+Toujours renvoyer l'objet Error avec la stack complete : https://www.joyent.com/developers/node/design/errors
+
+
 Gérer Excel en convertissant les sharedString avant (pas obligatoire apparemen)
 https://social.msdn.microsoft.com/Forums/en-US/5dd1dd01-2117-41e2-8836-26252cf90c1a/how-fetch-numeric-and-non-numeric-data-in-excel-and-store-the-data-to-table-storage-in-azure?forum=oxmlsdk
 
@@ -9,12 +13,19 @@ http://packageexplorer.codeplex.com/
 http://openxmldeveloper.org/discussions/development_tools/f/17/t/6958.aspx
 
 BUG ALEATOIRE : IL est possible que carbone se détache des thread LO... et reste dans un mode Python killed with 101
+- pouvoir remonter dans l'objet en utilisant deux point !!! d.site[i+1].emails[i+1]..label va répeter le label du site pour chaque site.
+
+- En mode carbone Studio : synchorniser les documents en les décomposant (cela permettrai d'envoyer que le fichier content.xml si seulement ce dernier a changé et économiserait des tonne de bande passante)
+
+Gestion des images :  http://www.codeproject.com/Articles/20287/Generating-Word-Reports-Documents#InsertingImagesIntoDocument
+
 
 Test :
 
 si variable dish1 et dish1Name la deuxième se confond avec la première
 si {d[id>1]} avant {d[mealType.sort]} -> {d[mealType.sort+1]}, l'extracteur monte trop haut et englobe {d[id>1]} par erreur
 
+- Pouvoir rechercher des bout d'objet JSON et les remplacer ou à miniman pourvoir lancer un make test sur tous les rapport et vérifier les rapport qui utilisent des chmaps dipsarus
 - si pas de 'i', alors toujours prendre la première valeur qui correspond au filtre... SI il ya plusieurs valeur, afficher un warning quel que part.
 
 - Eviter de lire le fichier 2 fois sur le disque (dans isZipped et dans openTemplate)
@@ -224,4 +235,86 @@ function binarySearch(value, arr) {
   return last;
 }*/
 
+
+VENTE
+-----
+- Faire une apli web sur lequel les utilisateurs déposent leur rapport, peuvent le façonner en ligne... :
+  + Importer un template, générer un nom auto rapport_1 modifiable à la main.
+  + Pourvoir tester ce rapport avec des données, stocker ces données de tests
+  + Proposer le code en JS et PHP pour générer un rapport et l'obtenir
+  + AVoir des stats deu nombre de génération de rapport et sa taille
+  + Pouvoir être alerté dans 2 cas :
+    * Dysfonctionnement d'un rapport
+    * Atteinte d'un certain seuil de facturation
+
+
+Vente de CarboneJS
+===========================
+
+3 Offres :
+
+### 1. Version CarboneJS seul (sans le mode serveur ?) 
+  + CarboneJS seul Open source et gratuit installable via NPM sans l'interface de gestion ci-dessous et sans Studio (éditeur de rapport offline). Licence non contaminante type MIT.
+
+### 2. Version Online :
+
+  - Accès a une appli Web complète pour gérer tous ses rapports.
+  - Possibilité de classer/rechercher les rapports et d'avoir des namespaces
+  - Possibilté de créer des formatter
+  - Possibilité de générer et éditer le fichier de langue des rapports
+  - Importer un template, générer un nom auto (ex. rapport_1) modifiable à la main. Ce nom sert d'Id unique.
+  - Pourvoir tester ce rapport avec des données en ligne, possibilité de stocker ces données de tests
+  - Coin développeur : générer automatiquement le code (en JS, PHP, ...) pour générer le rapport et l'obtenir
+  - Avoir des stats de nombre de génération de chaque rapport et leur taille...
+  - Pouvoir être alerté par email dans 2 cas :
+    - Dysfonctionnement d'un rapport
+    - Atteinte d'un certain seuil de facturation
+  - Choisir la position géographique du Serveur : France, US, proposer d'en ajouter en nous contactant.
+  - Maitriser la version de LibreOffice et de Carbone. Pas de mise à jour forcée. 
+  - Les communications sont forcément en HTTPS.
+  - Les rapport générés ne sont pas conservés plus de X jours.
+  - Afficher un rapport de bug clair si il y a dysfonctionnement.
+  + Version gratuite très limité (3 rapport, limité en taille)
+
+##### Prix de l'offre online
+  
+  - 3 types de priorité à choisir au moment de la requête API. 
+    + High Priority (10 crédits par rapport)  : rapport instantané avec lien de téléchargement du rapport directement dans le retour du POST
+    + Medium Priority (5 crédits par rapport) : rapport avec un délai de création inférieur à xx Minutes. Web Hook ou pooling pour prévenir de la disponibilité. 
+    + Low Priority (1 crédit par rapport)     : rapport avec un délai de création de l'ordre de la journée. Web Hook ou pooling pour prévenir de la disponibilité. 
+  
+  - Taxe conversion : + 1 crédit si le rapport doit être converti d'un format à un autre (odt ->pdf, ...)
+  - Taxe envoi du rapport directement par email, fax : XX crédits (partenaire sendinblue ?)
+
+  Possibilité de définir un maximum au delà duquel la priorité descend automatiquement d'un niveau. (Maitrise du bugdet)
+
+  - Plusieurs forfaits : 
+    + Gratuit : 100 crédit offert à l'inscription en "Low priority" : accès au portail.
+    + 100  crédits / mois : 10 Euros / mois : accès au portail, au studio offline et X rapports selon la priorité
+    + 1000 crédits / mois : 100 Euros ...
+    + ...
+    + Si dépassement du crédit : XX centimes le rapport supplémentaire. Possibilité de bloquer pour éviter le dépassement du budget.
+    + Il faudrait prévoir un supplément pour les rapport long à calculer (taille, ...)
+    + 4000 Euros/mois : Dedicated server : capacity 3000 Reports/min
+    + 10 000 Euros/mois : Dedicated server : capacity 10 000 Reports/min...
+    
+
+### 3. Version Full "On Premises" à la carte :
+  - 59 Euros par user : Vente de CarboneJS Studio (appli lourde, code proprétaire) pour concevoir les rapports et 30% de reduc pour les versions majeure suivante 
+  - 1499 Euros par ??? : Vente de l'appli de gestion des rapports Web ci-dessus pour une installation complète sur le serveur du client. Code source uglifié ?
+  - 149 Euros par ??? : vente de CarboneJS Seul en mode serveur sans interface web de gestion
+
+
+### Autre Info :
+
+- Réduction valable sur tout le catalogues pour les contributeurs de CarboneJS et LibreOffice
+  + XX % pour les bugs trouvés
+  + XX % pour une amélioration de 30 % des performances
+  + ...
+  +
+- Cron intégré : Proposer d'y inscrire des web services à requêter le manière régulière afin d'envoyer un certain rapport par email à quelqu'un ()
+- En plus de l'interface Web, possibilté de tout faire par API à distance (l'équivalent de la gestion de la table Report dans Easilys). 
+- Un pourcentage est re-versé à 
+  + La fondation libreoffice
+  + A une association de défense des forêts
 

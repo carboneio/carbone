@@ -7,11 +7,11 @@
   "main": "./lib",
   "dependencies": {
     "moment" : "=2.0.0",
-    "zipfile" : "=0.4.2",
+    "zipfile" : "=0.5.7",
     "moxie-zip" : "=0.0.3"
   },
   "devDependencies": {
     "mocha": ">=1.8.2"
   },
-  "engines": { "node": ">= 0.8.0" }
+  "engines": { "node": ">= 0.10.0" }
 }

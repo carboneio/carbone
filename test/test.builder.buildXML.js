@@ -129,7 +129,22 @@ describe('builder.buildXML', function(){
       done();
     });
   });
-  it('AAshould accept custom iterators and sort the data using this iterator', function(done){
+  it('should repeat d.who if it is inside a repetition section', function(done){
+    var _xml = '<xml><tr>{d.who} {d.cars[i].brand} </tr><tr> {d.who} {d.cars[i+1].brand} </tr></xml>';
+    var _data = {
+      'who':'my',
+      'cars':[
+        {'brand' : 'Lumeneo'},
+        {'brand' : 'Tesla motors'},
+        {'brand' : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      assert.equal(_xmlBuilt, '<xml><tr>my Lumeneo </tr><tr>my Tesla motors </tr><tr>my Toyota </tr></xml>');
+      done();
+    });
+  });
+  it('should accept custom iterators and sort the data using this iterator', function(done){
     var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
     var _data = {
       'cars':[
@@ -395,6 +410,176 @@ describe('builder.buildXML', function(){
       done();
     });
   });
+  it('should repeat automatically all markers which are on the same row of a deeper array (third level here). It will flatten the JSON', function(done){
+    var _xml = 
+       '<xml>'
+      +  '<tr>'
+      +    '<td>{d[i].site.label}</td>'
+      +    '<td>{d[i].cars[i].name} {d[i].cars[i].autonomy}</td>'
+      +    '<td>{d[i].cars[i].spec.weight}</td>'
+      +    '<td>{d[i].cars[i].wheels[i].strengh} {d[i].cars[i].wheels[i].tire.brand}</td>'
+      +  '</tr>'
+      +  '<tr>'
+      +    '<td>{d[i+1].site.label}</td>'
+      +    '<td>{d[i+1].cars[i+1].name} {d[i+1].cars[i+1].autonomy}</td>'
+      +    '<td>{d[i+1].cars[i+1].spec.weight}</td>'
+      +    '<td>{d[i+1].cars[i+1].wheels[i+1].strengh} {d[i+1].cars[i+1].wheels[i+1].tire.brand}</td>'
+      +  '</tr>'
+      +'</xml>';
+    var _data = [
+      {
+        'site' : {'label':'site_A'},
+        'cars' : [ 
+          { 
+            'name': 'prius', 
+            'autonomy': 7, 
+            'spec': {'weight': 1},
+            'wheels':[
+              {'strengh':'s1', 'tire':{'brand':'mich'}},
+              {'strengh':'s2', 'tire':{'brand':'cont'}}
+            ]
+          }, 
+          { 
+            'name': 'civic', 
+            'autonomy': 0, 
+            'spec': {'weight': 2},
+            'wheels':[
+              {'strengh':'s2', 'tire':{'brand':'mich'}}
+            ]
+          },
+        ],
+      },{
+        'site' : {'label':'site_B'},
+        'cars' : [{ 
+            'name': 'modelS', 
+            'autonomy': 4, 
+            'spec': {'weight': 1},
+            'wheels':[
+              {'strengh':'s1', 'tire':{'brand':'mich'}},
+              {'strengh':'s2', 'tire':{'brand':'uni' }},
+              {'strengh':'s3', 'tire':{'brand':'cont'}}
+            ]
+          }
+        ],
+      }
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      var _expectedResult = 
+         '<xml>'
+        +  '<tr>'
+        +    '<td>site_A</td>'
+        +    '<td>prius 7</td>'
+        +    '<td>1</td>'
+        +    '<td>s1 mich</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>site_A</td>'
+        +    '<td>prius 7</td>'
+        +    '<td>1</td>'
+        +    '<td>s2 cont</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>site_A</td>'
+        +    '<td>civic 0</td>'
+        +    '<td>2</td>'
+        +    '<td>s2 mich</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>site_B</td>'
+        +    '<td>modelS 4</td>'
+        +    '<td>1</td>'
+        +    '<td>s1 mich</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>site_B</td>'
+        +    '<td>modelS 4</td>'
+        +    '<td>1</td>'
+        +    '<td>s2 uni</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>site_B</td>'
+        +    '<td>modelS 4</td>'
+        +    '<td>1</td>'
+        +    '<td>s3 cont</td>'
+        +  '</tr>'
+        +'</xml>';
+      assert.equal(_xmlBuilt, _expectedResult);
+      done();
+    });
+  });
+  it('should repeat automatically all markers which are on the same row of a deeper array\
+      Special case here where the third level is written first and the second level is not written', function(done){
+    var _xml = 
+       '<xml>'
+      +  '<tr>'
+      +    '<td>{d[i].cars[i].wheels[i].tire.brand}</td>'
+      +    '<td>{d[i].site.label}</td>'
+      +  '</tr>'
+      +  '<tr>'
+      +    '<td>{d[i+1].cars[i+1].wheels[i+1].tire.brand}</td>'
+      +    '<td>{d[i+1].site.label}</td>'
+      +  '</tr>'
+      +'</xml>';
+    var _data = [
+      {
+        'site' : {'label':'site_A'},
+        'cars' : [ 
+          { 
+            'wheels':[
+              {'tire':{'brand':'mich'}},
+              {'tire':{'brand':'cont'}}
+            ]
+          }, 
+          { 
+            'wheels':[
+              {'tire':{'brand':'mich'}}
+            ]
+          },
+        ],
+      },{
+        'site' : {'label':'site_B'},
+        'cars' : [{ 
+            'wheels':[
+              {'tire':{'brand':'mich'}},
+              {'tire':{'brand':'uni' }},
+              {'tire':{'brand':'cont'}}
+            ]
+          }
+        ],
+      }
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      var _expectedResult = 
+         '<xml>'
+        +  '<tr>'
+        +    '<td>mich</td>'
+        +    '<td>site_A</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>cont</td>'
+        +    '<td>site_A</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>mich</td>'
+        +    '<td>site_A</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>mich</td>'
+        +    '<td>site_B</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>uni</td>'
+        +    '<td>site_B</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>cont</td>'
+        +    '<td>site_B</td>'
+        +  '</tr>'
+        +'</xml>';
+      assert.equal(_xmlBuilt, _expectedResult);
+      done();
+    });
+  });
   it('should manage nested arrays with complex iterators', function(done){
     var _xml = 
        '<xml>'
@@ -544,6 +729,30 @@ describe('builder.buildXML', function(){
     ];
     builder.buildXML(_xml, _data, function(err, _xmlBuilt){
       helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept comparison operatior !=', function(done){
+    var _xml = '<xml> <t_row> {d[ speed.high!=5, i].brand} </t_row><t_row> {d[ speed.high != 5,i+1].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'speed':{'high':12, 'low':1}},
+      {'brand' : 'Tesla motors', 'speed':{'high':5 , 'low':2 }},
+      {'brand' : 'Toyota'      , 'speed':{'high':44, 'low':20}}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept comparison operatior != with a lot of whitespaces', function(done){
+    var _xml = '<xml> <t_row> {d[ speed . high !  =  5, i].brand} </t_row><t_row> {d[ speed.high  !   = 5,  i+1].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'speed':{'high':12, 'low':1}},
+      {'brand' : 'Tesla motors', 'speed':{'high':5 , 'low':2 }},
+      {'brand' : 'Toyota'      , 'speed':{'high':44, 'low':20}}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row></xml>');
       done();
     });
   });

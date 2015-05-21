@@ -115,12 +115,14 @@ describe('Converter', function(){
       var _results = [];
       converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
         converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
+          helper.assert(err+'', 'null');
           var _buf = new Buffer(result);
           assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           //kill LibreOffice thread
           process.kill(factories['0'].pid);
           //try another conversion
           converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
+            helper.assert(err+'', 'null');
             var _buf = new Buffer(result);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
             done(); 
@@ -149,7 +151,7 @@ describe('Converter', function(){
         function theEnd(){
           var _end = new Date();
           var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
-          console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions\n\n\n');
+          console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions (usally around 65ms) \n\n\n');
           for (var i = 0; i < _results.length; i++) {
             var _buf = new Buffer(_results[i]);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
@@ -218,19 +220,19 @@ describe('Converter', function(){
     });
     it('should still restart the conversion factory if the document could not be opened more than 10 times', function(done){
       var _filePath = path.resolve('./test/datasets/test_odt_render_corrupted.odt');
-      var _nbAttemptMax = 9;
+      var _nbAttemptMax = 10;
       var _nbAttempt = _nbAttemptMax;
-      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath, 'attempts':1}, function(factories){
         var _officePID = factories['0'].pid;
         for (var i = 0; i < _nbAttemptMax; i++) {
           converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
             _nbAttempt--;
-            assert.equal(err, 'Could not open document');
+            assert.equal(/Could/.test(err), true);
             assert.equal(factories['0'].pid, _officePID);
             //the 10th conversion will restart LibreOffice
             if(_nbAttempt === 0){
               converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
-                assert.equal(err, 'Could not open document');
+                assert.equal(/Could/.test(err), true);
                 assert.notEqual(factories['0'].pid, _officePID);
                 var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
                 converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
@@ -252,7 +254,7 @@ describe('Converter', function(){
       var _filePathOK = path.resolve('./test/datasets/test_odt_render_static.odt');
       var _nbAttemptMax = 15;
       var _nbAttempt = _nbAttemptMax;
-      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath, 'attempts':1}, function(factories){
         var _officePID = factories['0'].pid;
         for (var i = 0; i < _nbAttemptMax; i++) {
           if(i===7){

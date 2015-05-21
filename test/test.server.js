@@ -30,21 +30,21 @@ describe('Server', function(){
         var _client = new Socket(4000, '127.0.0.1', 10000);
         _client.on('error', function(err){});
         _client.startClient();
+        var _file = fs.readFileSync(_inputFile);
         var _job = {
           'inputFile'  : _inputFile,
+          'input' : _file.toString('base64'),
           'outputFile' : _outputFile,
           'format' : format.document.pdf.format
         };
         _client.send(_job, function(err, res){
           assert.equal(err, null);
           assert.equal(res.data.error, null);
-          fs.readFile(_outputFile, function(err, content){
-            var _buf = new Buffer(content);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-            _client.send('shutdown');
-            _client.stop(function(){
-              setTimeout(done, 1000); //let the time to shutdown the server
-            });
+          var _buf = new Buffer(res.data.output, 'base64');
+          assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+          _client.send('shutdown');
+          _client.stop(function(){
+            setTimeout(done, 1000); //let the time to shutdown the server
           });
         });
       });

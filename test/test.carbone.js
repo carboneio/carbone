@@ -171,13 +171,13 @@ describe('Carbone', function(){
         });
       });
     });
-    it.skip('should be FAST', function(done){
+    it('should be fast to render a document without conversion', function(done){
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      var _nbExecuted = 20;
+      var _nbExecuted = 10;
       var _results = [];
       var _waitedResponse = _nbExecuted;
       var _start = new Date();
@@ -193,7 +193,7 @@ describe('Carbone', function(){
       function theEnd(){
         var _end = new Date();
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
-        console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions\n\n\n');
+        console.log('\n\n Basic rendering: Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' attempts (usally around 10ms)\n\n\n');
         for (var i = 0; i < _results.length; i++) {
           var _buf = new Buffer(_results[i]);
           assert.equal((_buf.slice(0, 2).toString() === 'PK'), true);
@@ -417,6 +417,45 @@ describe('Carbone', function(){
         //fs.writeFileSync('test.xls', result);
         //TODO TODO TODO TODO TODO TODO TODO TODO : test the content of the xls
         done();
+      });
+    });
+    it('should be fast to render and convert to pdf', function(done){
+      converter.init({
+          'pipeNamePrefix' : '_carbone',
+          'factories' : 3,
+          'startFactory' : true,
+          'attempts' : 2
+        }, function(){
+
+        var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
+        var data = {
+          field1 : 'field_1',
+          field2 : 'field_2'
+        };
+        var _nbExecuted = 100;
+        var _results = [];
+        var _waitedResponse = _nbExecuted;
+        var _start = new Date();
+        for (var i = 0; i < _nbExecuted; i++) {
+          carbone.render(_filePath, data, {'convertTo':'pdf'}, function(err, result){
+            _waitedResponse--;
+            _results.push(result);
+            if(_waitedResponse === 0){
+              theEnd();
+            }
+          });
+        };
+        function theEnd(){
+          var _end = new Date();
+          var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
+          console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions (usally around 65ms) \n\n\n');
+          for (var i = 0; i < _results.length; i++) {
+            var _buf = new Buffer(_results[i]);
+            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+          };
+          //assert.equal((_elapsed < 200), true);
+          done(); 
+        }
       });
     });
   });

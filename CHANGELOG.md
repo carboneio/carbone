@@ -1,5 +1,7 @@
 # CarboneJS
 
+### v0.11.2
+
 ### v0.11.1
   - CarboneJS Server can be used on a remote server. CarboneJS send the document by socket instead of writing a file locally (only when a document conversion occurs)
   - CarboneJS Server 0.11 is still compatible with CarboneJS v0.10 clients

@@ -754,7 +754,10 @@ describe('builder', function(){
         { pos:[ 30       ], str: ' </xml>'                 }
       ]);
     });
-    it.only('shouBLABLA', function(){
+
+
+    //@see test line 822 in test.builder.buildXML.js that where we got our _desc data
+    it.only('when the template is not using i+1 kind of iterator ( but using filters ), xmlpart who are filtered out should not be added to the xmlParts array ( array to be sorted later ) except when no data fullfill the condition. This will help getting better performance result for this kind of template', function(){
       var _desc = {
         "staticData": {
           "before": "<xml> <t_row> ",
@@ -792,7 +795,7 @@ describe('builder', function(){
                       "attr": "id"
                     },
                     "operator": "==",
-                    "right": "2"
+                    "right": "3"
                   }
                 ],
                 "depth": 0,
@@ -810,11 +813,29 @@ describe('builder', function(){
                       "attr": "id"
                     },
                     "operator": "==",
+                    "right": "4"
+                  }
+                ],
+                "depth": 0,
+                "after": " </t_row><t_row> "
+              },
+              {
+                "attr": "brand",
+                "formatters": [],
+                "obj": "_rootd",
+                "pos": 56,
+                "conditions": [
+                  {
+                    "left": {
+                      "parent": "_rootd",
+                      "attr": "id"
+                    },
+                    "operator": "==",
                     "right": "1"
                   }
                 ],
                 "depth": 0
-              }
+              },
             ]
           }
         },
@@ -834,17 +855,25 @@ describe('builder', function(){
       //console.log('\n\n');
       //console.log(_fn(_data));
       //console.log('\n\n');
-      helper.assert(_fn(_data), [
-        { 'pos': [0] , 'str': '<xml> <t_row> '                                 },
-        //{ 'pos': [14], 'str': ' </t_row><t_row> '            , 'rowShow': false},
-        { 'pos': [31], 'str': 'Lumeneo'                      , 'rowShow': true },
-        { 'pos': [14], 'str': 'Tesla motors </t_row><t_row> ', 'rowShow': true },
-        //{ 'pos': [31], 'str': ''                             , 'rowShow': false},
-        //{ 'pos': [14], 'str': ' </t_row><t_row> '            , 'rowShow': false},
-        //{ 'pos': [31], 'str': ''                             , 'rowShow': false},
-        { 'pos': [32], 'str': ' </t_row></xml>'                                }
+
+      var _xmlParts = _fn(_data);
+      var _xmlResult = builder.assembleXmlParts(_xmlParts, 20);
+
+      helper.assert(_xmlResult, "<xml> <t_row> Toyota </t_row><t_row>  </t_row><t_row> Lumeneo </t_row></xml>");
+
+      helper.assert(_xmlParts, [
+        { 'pos': [0] , 'str': '<xml> <t_row> '                                      },
+        { 'pos': [ 14 ], str: 'Toyota </t_row><t_row> '         , 'rowShow': true   },
+        { 'pos': [ 14 ], str: ' </t_row><t_row> '               , 'rowShow': false  },
+        { 'pos': [ 31 ], str: ' </t_row><t_row> '               , 'rowShow': false  },
+        { 'pos': [ 56 ], str: 'Lumeneo'                         , 'rowShow': true   },
+        { 'pos': [57], 'str': ' </t_row></xml>'                                     }
       ]);
     });
+
+
+
+
     it('should work if there is an object in the array', function(){
       var _desc = {
         'staticData'  : {

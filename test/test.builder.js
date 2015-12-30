@@ -757,7 +757,7 @@ describe('builder', function(){
 
 
     //@see test line 822 in test.builder.buildXML.js that where we got our _desc data
-    it.only('when the template is not using i+1 kind of iterator ( but using filters ), xmlpart who are filtered out should not be added to the xmlParts array ( array to be sorted later ) except when no data fullfill the condition. This will help getting better performance result for this kind of template', function(){
+    it('when the template is not using i+1 kind of iterator ( but using filters ), xmlpart who are filtered out should not be added to the xmlParts array ( array to be sorted later ) except when no data fullfill the condition. This will help getting better performance result for this kind of template', function(){
       var _desc = {
         "staticData": {
           "before": "<xml> <t_row> ",
@@ -823,7 +823,7 @@ describe('builder', function(){
                 "attr": "brand",
                 "formatters": [],
                 "obj": "_rootd",
-                "pos": 56,
+                "pos": 49,
                 "conditions": [
                   {
                     "left": {
@@ -863,11 +863,11 @@ describe('builder', function(){
 
       helper.assert(_xmlParts, [
         { 'pos': [0] , 'str': '<xml> <t_row> '                                      },
-        { 'pos': [ 14 ], str: 'Toyota </t_row><t_row> '         , 'rowShow': true   },
-        { 'pos': [ 14 ], str: ' </t_row><t_row> '               , 'rowShow': false  },
-        { 'pos': [ 31 ], str: ' </t_row><t_row> '               , 'rowShow': false  },
-        { 'pos': [ 56 ], str: 'Lumeneo'                         , 'rowShow': true   },
-        { 'pos': [57], 'str': ' </t_row></xml>'                                     }
+        { 'pos': [ 14 ], 'str': 'Toyota </t_row><t_row> '         , 'rowShow': true   },
+        { 'pos': [ 14 ], 'str': ' </t_row><t_row> '               , 'rowShow': false  }, //fill position with the first element found ( even it's rowshow false ) it will eventually get replaced if a position 14 with a rowShow at true is found
+        { 'pos': [ 31 ], 'str': ' </t_row><t_row> '               , 'rowShow': false  }, //as such when nothing fill the condition the position will still be occupied by the first element (even if its rowshow is false )
+        { 'pos': [ 49 ], 'str': 'Lumeneo'                         , 'rowShow': true   },
+        { 'pos': [ 50 ], 'str': ' </t_row></xml>'                                     }
       ]);
     });
 

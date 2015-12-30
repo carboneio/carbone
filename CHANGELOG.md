@@ -1,6 +1,7 @@
 # CarboneJS
 
 ### v0.11.2
+  - Fix a performance issue when a template isn't using iterators at all, this issue caused the array of data to become really big in some cases even though only a small portion of the data was really used
 
 ### v0.11.1
   - CarboneJS Server can be used on a remote server. CarboneJS send the document by socket instead of writing a file locally (only when a document conversion occurs)

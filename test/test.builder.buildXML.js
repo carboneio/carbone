@@ -267,7 +267,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should manage nested arrays', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<t_row><td>{d.cars[i].wheels[i].size  }</td><td>{d.cars[i].wheels[i+1].size  }</td></t_row>'
       +  '<t_row><td>{d.cars[i+1].wheels[i].size}</td><td>{d.cars[i+1].wheels[i+1].size}</td></t_row>'
@@ -284,7 +284,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should manage two adjacents arrays within an array. It should accept partial repetitions (only {d[i+1].site.label} is set)', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<table>'
       +  '<h1>{d[i].site.label}</h1>'
@@ -308,7 +308,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should manage nested object with two adjacents arrays within an array. It should accept partial repetitions (only {d[i+1].site.label} is set)', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<table>'
       +  '<h1>{d[i].site.label}</h1>'
@@ -332,7 +332,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('1. should manage 3 levels of arrays with nested objects even if the xml tags are the same everywhere (td)', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<td>'
         +  '<h1>{d[i].site.label}</h1>'
@@ -356,18 +356,18 @@ describe('builder.buildXML', function(){
     var _data = [
       {
         'site' : {'label':'site_A'},
-        'cars' : [ 
-          { 
-            'name': 'prius', 
-            'autonomy': 7, 
+        'cars' : [
+          {
+            'name': 'prius',
+            'autonomy': 7,
             'spec': {'weight': 1},
             'wheels':[
               {'strengh':'s1', 'tire':{'brand':'mich'}}
             ]
-          }, 
-          { 
-            'name': 'civic', 
-            'autonomy': 0, 
+          },
+          {
+            'name': 'civic',
+            'autonomy': 0,
             'spec': {'weight': 2},
             'wheels':[
               {'strengh':'s2', 'tire':{'brand':'mich'}}
@@ -382,7 +382,7 @@ describe('builder.buildXML', function(){
       }
     ];
     builder.buildXML(_xml, _data, function(err, _xmlBuilt){
-      var _expectedResult = 
+      var _expectedResult =
          '<xml>'
         +  '<td>'
           +  '<h1>site_A</h1>'
@@ -411,7 +411,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should repeat automatically all markers which are on the same row of a deeper array (third level here). It will flatten the JSON', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<tr>'
       +    '<td>{d[i].site.label}</td>'
@@ -429,19 +429,19 @@ describe('builder.buildXML', function(){
     var _data = [
       {
         'site' : {'label':'site_A'},
-        'cars' : [ 
-          { 
-            'name': 'prius', 
-            'autonomy': 7, 
+        'cars' : [
+          {
+            'name': 'prius',
+            'autonomy': 7,
             'spec': {'weight': 1},
             'wheels':[
               {'strengh':'s1', 'tire':{'brand':'mich'}},
               {'strengh':'s2', 'tire':{'brand':'cont'}}
             ]
-          }, 
-          { 
-            'name': 'civic', 
-            'autonomy': 0, 
+          },
+          {
+            'name': 'civic',
+            'autonomy': 0,
             'spec': {'weight': 2},
             'wheels':[
               {'strengh':'s2', 'tire':{'brand':'mich'}}
@@ -450,9 +450,9 @@ describe('builder.buildXML', function(){
         ],
       },{
         'site' : {'label':'site_B'},
-        'cars' : [{ 
-            'name': 'modelS', 
-            'autonomy': 4, 
+        'cars' : [{
+            'name': 'modelS',
+            'autonomy': 4,
             'spec': {'weight': 1},
             'wheels':[
               {'strengh':'s1', 'tire':{'brand':'mich'}},
@@ -464,7 +464,7 @@ describe('builder.buildXML', function(){
       }
     ];
     builder.buildXML(_xml, _data, function(err, _xmlBuilt){
-      var _expectedResult = 
+      var _expectedResult =
          '<xml>'
         +  '<tr>'
         +    '<td>site_A</td>'
@@ -509,7 +509,7 @@ describe('builder.buildXML', function(){
   });
   it('should repeat automatically all markers which are on the same row of a deeper array\
       Special case here where the third level is written first and the second level is not written', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<tr>'
       +    '<td>{d[i].cars[i].wheels[i].tire.brand}</td>'
@@ -523,14 +523,14 @@ describe('builder.buildXML', function(){
     var _data = [
       {
         'site' : {'label':'site_A'},
-        'cars' : [ 
-          { 
+        'cars' : [
+          {
             'wheels':[
               {'tire':{'brand':'mich'}},
               {'tire':{'brand':'cont'}}
             ]
-          }, 
-          { 
+          },
+          {
             'wheels':[
               {'tire':{'brand':'mich'}}
             ]
@@ -538,7 +538,7 @@ describe('builder.buildXML', function(){
         ],
       },{
         'site' : {'label':'site_B'},
-        'cars' : [{ 
+        'cars' : [{
             'wheels':[
               {'tire':{'brand':'mich'}},
               {'tire':{'brand':'uni' }},
@@ -549,7 +549,7 @@ describe('builder.buildXML', function(){
       }
     ];
     builder.buildXML(_xml, _data, function(err, _xmlBuilt){
-      var _expectedResult = 
+      var _expectedResult =
          '<xml>'
         +  '<tr>'
         +    '<td>mich</td>'
@@ -581,7 +581,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should manage nested arrays with complex iterators', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<t_row><td>{d.cars[driver.name].wheels[size].size  }</td><td>{d.cars[driver.name].wheels[size+1].size  }</td></t_row>'
       +  '<t_row><td>{d.cars[driver.name+1].wheels[size].size}</td><td>{d.cars[driver.name+1].wheels[size+1].size}</td></t_row>'
@@ -604,7 +604,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should work with two adjacents arrays and some xml in between. It should work even if there are a lot of whitespaces ', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<t_cars>   <td>{  d.cars[ i ].brand   } </td> <td>{   d.cars[i + 1 ].brand   } </td> </t_cars>'
       +  '<oo> hello </oo>'
@@ -632,7 +632,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should manage conditions with nested arrays', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<t_row><td>{d.cars[speed>10, i].wheels[size>6, i].size  }</td><td>{d.cars[speed>10, i].wheels[size>6, i+1].size  }</td></t_row>'
       +  '<t_row><td>{d.cars[speed>10, i+1].wheels[size>6, i].size}</td><td>{d.cars[speed>10, i+1].wheels[size>6, i+1].size}</td></t_row>'
@@ -794,16 +794,16 @@ describe('builder.buildXML', function(){
     });
   });
   it('should work if the same array is repeated two times in the xml and there are condition is in a sub array', function(done){
-    var _xml = '<xml> <t_row> {d[i].brand} </t_row> '+ 
+    var _xml = '<xml> <t_row> {d[i].brand} </t_row> '+
                  '<t_row> <td> {d[i].cars[weight,weight<3].wheel.name} </td> <td> {d[i].cars[weight+1,weight<3].wheel.name} </td> </t_row>'+
                  '<t_row> {d[i+1].brand} </t_row>'+
-                 '<t_row> {d[i].brand} </t_row> '+ 
+                 '<t_row> {d[i].brand} </t_row> '+
                  '<t_row> <td> {d[i].cars[weight,weight>2].wheel.name} </td> <td> {d[i].cars[weight+1,weight>2].wheel.name} </td> </t_row>'+
                  '<t_row> {d[i+1].brand} </t_row> </xml>';
     var _data = [
       {
         'brand' : 'Toyota',
-        'cars' : [ 
+        'cars' : [
           { 'name': 'prius', 'autonomy': 7, 'weight': 1, 'wheel' : { 'name' : 'norauto' } },
           { 'name': 'yaris', 'autonomy': 2, 'weight': 3, 'wheel' : { 'name' : 'goodyear' } },
           { 'name': 'civic', 'autonomy': 0, 'weight': 2, 'wheel' : { 'name' : 'michelin' } },
@@ -910,11 +910,11 @@ describe('builder.buildXML', function(){
       var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
       console.log('\n\n buildXML Time Elapsed : '+_elapsed + ' ms per call for '+_nbExecuted+' calls (usally around 20ms)\n\n\n');
       assert.equal((_elapsed < 50), true);
-      done(); 
+      done();
     }
   });
   it('should accept to increment two nested arrays in the same time. Thus, the nested array is flattened', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<tr>{d.cars[i].wheels[i].size  }</tr>'
       +  '<tr>{d.cars[i+1].wheels[i+1].size}</tr>'
@@ -931,7 +931,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should manage "holes" if we use the operatior "++" instead of "+1"', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<t_row><td>{d.cars[i].wheels[size].size  }</td><td>{d.cars[i].wheels[size++].size  }</td></t_row>'
       +  '<t_row><td>{d.cars[i+1].wheels[size].size}</td><td>{d.cars[i+1].wheels[size++].size}</td></t_row>'
@@ -948,7 +948,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should manage "holes"(++) and it should not crash if we use a nested object', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<t_row><td>{d.cars[i].wheels[size].obj.id  }</td><td>{d.cars[i].wheels[size++].obj.id  }</td></t_row>'
       +  '<t_row><td>{d.cars[i+1].wheels[size].obj.id}</td><td>{d.cars[i+1].wheels[size++].obj.id}</td></t_row>'
@@ -965,7 +965,7 @@ describe('builder.buildXML', function(){
     });
   });
   it('should work with conditions on nested arrays and with an object', function(done){
-    var _xml = 
+    var _xml =
        '<xml>'
       +  '<t_row>{d.menus[meal=0, weekday=2].dishes[sort=2].obj.name}</t_row>'
       +  '<t_row>{d.menus[meal=0, weekday=1].dishes[sort=2].obj.name}</t_row>'

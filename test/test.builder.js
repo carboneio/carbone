@@ -123,7 +123,7 @@ describe('builder', function(){
         {'left':{'parent':'myObj','attr':'car.sort'}, 'operator':'<', 'right':'20'},
       ];
       var _actual = builder.getFilterString(_conditions, 'code');
-      assert.equal(_actual, 
+      assert.equal(_actual,
         'var _menu_filter=myObj["menu"];\n'+
         'var _car_filter=myObj["car"];\n'+
         'if((_menu_filter && _menu_filter["sort"]>10 && _car_filter && _car_filter["sort"]<20)){\n'+
@@ -164,7 +164,7 @@ describe('builder', function(){
       helper.assert(_data, _expected);
     });
     it('should sort a complex array (sort depth of 3) of xml parts', function(){
-      var _data     = [ 
+      var _data     = [
         { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
         { 'pos': [ 0        ], 'str': '<xml> '       },
         { 'pos': [ 6, 1, 6  ], 'str': '<tr>'         },
@@ -175,9 +175,9 @@ describe('builder', function(){
         { 'pos': [ 6, 2, 14 ], 'str': 'Toyota'       },
         { 'pos': [ 6, 2, 6  ], 'str': '<tr>'         },
         { 'pos': [ 6, 2, 23 ], 'str': '</tr>'        },
-        { 'pos': [ 24       ], 'str': '</xml>'       } 
+        { 'pos': [ 24       ], 'str': '</xml>'       }
       ];
-      var _expected     = [ 
+      var _expected     = [
         { 'pos': [ 0        ], 'str': '<xml> '       },
         { 'pos': [ 6, 0, 6  ], 'str': '<tr>'         },
         { 'pos': [ 6, 0, 14 ], 'str': 'Lumeneo'      },
@@ -188,7 +188,7 @@ describe('builder', function(){
         { 'pos': [ 6, 2, 6  ], 'str': '<tr>'         },
         { 'pos': [ 6, 2, 14 ], 'str': 'Toyota'       },
         { 'pos': [ 6, 2, 23 ], 'str': '</tr>'        },
-        { 'pos': [ 24       ], 'str': '</xml>'       } 
+        { 'pos': [ 24       ], 'str': '</xml>'       }
       ];
       builder.sortXmlParts(_data, 10);
       helper.assert(_data, _expected);
@@ -364,9 +364,9 @@ describe('builder', function(){
   describe('assembleXmlParts', function(){
     it('should sort the array of xml parts according to the "pos" attribute and assemble all strings', function(){
       var _data     = [
-        {'pos':[40], 'str': '4'}, 
-        {'pos':[19], 'str': '2'}, 
-        {'pos':[2 ], 'str': '1'}, 
+        {'pos':[40], 'str': '4'},
+        {'pos':[19], 'str': '2'},
+        {'pos':[2 ], 'str': '1'},
         {'pos':[20], 'str': '3'}
       ];
       helper.assert(builder.assembleXmlParts(_data), '1234');
@@ -383,7 +383,7 @@ describe('builder', function(){
       helper.assert(builder.assembleXmlParts(_data, 3), '123456');
     });
     it('should sort a complex array and assemble all strings. It should keep all the parts if rowShow,rowStart,rowEnd are undefined', function(){
-      var _data     = [ 
+      var _data     = [
         { 'pos': [ 0        ], 'str': '<xml>' },
         { 'pos': [ 6, 1, 14 ], 'str': 'Tesla motors' },
         { 'pos': [ 6, 1, 6  ], 'str': '<tr>' },
@@ -394,12 +394,12 @@ describe('builder', function(){
         { 'pos': [ 6, 2, 14 ], 'str': 'Toyota' },
         { 'pos': [ 6, 2, 6  ], 'str': '<tr>' },
         { 'pos': [ 6, 2, 23 ], 'str': '</tr>' },
-        { 'pos': [ 24       ], 'str': '</xml>' } 
+        { 'pos': [ 24       ], 'str': '</xml>' }
       ];
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml><tr>Lumeneo</tr><tr>Tesla motors</tr><tr>Toyota</tr></xml>');
     });
     it('should accept to sort strings.', function(){
-      var _data     = [ 
+      var _data     = [
         { 'pos': [ 0           ], 'str': '<xml>' },
         { 'pos': [ 6, 'ab', 14 ], 'str': 'Tesla motors' },
         { 'pos': [ 6, 'ab', 6  ], 'str': '<tr>' },
@@ -410,7 +410,7 @@ describe('builder', function(){
         { 'pos': [ 6, 'c' , 14 ], 'str': 'Toyota' },
         { 'pos': [ 6, 'c' , 6  ], 'str': '<tr>' },
         { 'pos': [ 6, 'c' , 23 ], 'str': '</tr>' },
-        { 'pos': [ 24          ], 'str': '</xml>' } 
+        { 'pos': [ 24          ], 'str': '</xml>' }
       ];
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml><tr>Lumeneo</tr><tr>Tesla motors</tr><tr>Toyota</tr></xml>');
     });
@@ -441,7 +441,7 @@ describe('builder', function(){
       helper.assert(builder.assembleXmlParts(_data, 3), '<xml>  </xml>');
     });
     it('should remove (nested array) the entire row of an array if all attributes "rowShow" equals false', function(){
-      var _data     = [ 
+      var _data     = [
         { pos: [ 0               ], str: '<xml> '             },
         { pos: [ 6, 0, 6         ], str: '<tr><p>'            ,rowStart:true},
         { pos: [ 6, 0, 13        ], str: 'Thomas'             ,rowShow:false},
@@ -450,7 +450,7 @@ describe('builder', function(){
         { pos: [ 6, 0, 20, 0, 24 ], str: 'survive'            ,rowShow:false},
         { pos: [ 6, 0, 20, 0, 29 ], str: '</tr>'              ,rowEnd:true},
         { pos: [ 6, 0, 20, 1, 20 ], str: '<tr>'               ,rowStart:true},
-        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls'  ,rowShow:true}, // <-- at least one part to keep 
+        { pos: [ 6, 0, 20, 1, 24 ], str: 'walk on the walls'  ,rowShow:true}, // <-- at least one part to keep
         { pos: [ 6, 0, 20, 1, 29 ], str: '</tr>'              ,rowEnd:true},
         { pos: [ 6, 0, 38        ], str: '</p></tr>'          ,rowEnd:true},
         { pos: [ 6, 1, 6         ], str: '<tr><p>'            ,rowStart:true},
@@ -460,7 +460,7 @@ describe('builder', function(){
         { pos: [ 6, 1, 20, 0, 24 ], str: 'hack'               ,rowShow:false},
         { pos: [ 6, 1, 20, 0, 29 ], str: '</tr>'              ,rowEnd:true},
         { pos: [ 6, 1, 38        ], str: '</p></tr>'          ,rowEnd:true},
-        { pos: [ 39              ], str: ' </xml>'            } 
+        { pos: [ 39              ], str: ' </xml>'            }
       ];
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml> <tr><p>Thomas</p><p>A. Anderson<tr>walk on the walls</tr></p></tr> </xml>');
     });
@@ -754,6 +754,126 @@ describe('builder', function(){
         { pos:[ 30       ], str: ' </xml>'                 }
       ]);
     });
+
+
+    //@see test line 822 in test.builder.buildXML.js that where we got our _desc data
+    it('when the template is not using i+1 kind of iterator ( but using filters ), xmlpart who are filtered out should not be added to the xmlParts array ( array to be sorted later ) except when no data fullfill the condition. This will help getting better performance result for this kind of template', function(){
+      var _desc = {
+        "staticData": {
+          "before": "<xml> <t_row> ",
+          "after": " </t_row></xml>"
+        },
+        "dynamicData": {
+          "_root": {
+            "name": "_root",
+            "type": "object",
+            "parent": "",
+            "parents": [],
+            "xmlParts": []
+          },
+          "_rootd": {
+            "name": "d",
+            "type": "array",
+            "parent": "_root",
+            "parents": [
+              "_root"
+            ],
+            "position": {
+              "start": 14
+            },
+            "iterators": [],
+            "xmlParts": [
+              {
+                "attr": "brand",
+                "formatters": [],
+                "obj": "_rootd",
+                "pos": 14,
+                "conditions": [
+                  {
+                    "left": {
+                      "parent": "_rootd",
+                      "attr": "id"
+                    },
+                    "operator": "==",
+                    "right": "3"
+                  }
+                ],
+                "depth": 0,
+                "after": " </t_row><t_row> "
+              },
+              {
+                "attr": "brand",
+                "formatters": [],
+                "obj": "_rootd",
+                "pos": 31,
+                "conditions": [
+                  {
+                    "left": {
+                      "parent": "_rootd",
+                      "attr": "id"
+                    },
+                    "operator": "==",
+                    "right": "4"
+                  }
+                ],
+                "depth": 0,
+                "after": " </t_row><t_row> "
+              },
+              {
+                "attr": "brand",
+                "formatters": [],
+                "obj": "_rootd",
+                "pos": 49,
+                "conditions": [
+                  {
+                    "left": {
+                      "parent": "_rootd",
+                      "attr": "id"
+                    },
+                    "operator": "==",
+                    "right": "1"
+                  }
+                ],
+                "depth": 0
+              },
+            ]
+          }
+        },
+        "hierarchy": [
+          "_root",
+          "_rootd"
+        ]
+      };
+      var _data = {
+        'd': [
+          {'brand' : 'Lumeneo'     , 'id':1},
+          {'brand' : 'Tesla motors', 'id':2},
+          {'brand' : 'Toyota'      , 'id':3}
+        ]
+      };
+      var _fn = builder.getBuilderFunction(_desc);
+      //console.log('\n\n');
+      //console.log(_fn(_data));
+      //console.log('\n\n');
+
+      var _xmlParts = _fn(_data);
+      var _xmlResult = builder.assembleXmlParts(_xmlParts, 20);
+
+      helper.assert(_xmlResult, "<xml> <t_row> Toyota </t_row><t_row>  </t_row><t_row> Lumeneo </t_row></xml>");
+
+      helper.assert(_xmlParts, [
+        { 'pos': [0] , 'str': '<xml> <t_row> '                                      },
+        { 'pos': [ 14 ], 'str': 'Toyota </t_row><t_row> '         , 'rowShow': true   },
+        { 'pos': [ 14 ], 'str': ' </t_row><t_row> '               , 'rowShow': false  }, //fill position with the first element found ( even it's rowshow false ) it will eventually get replaced if a position 14 with a rowShow at true is found
+        { 'pos': [ 31 ], 'str': ' </t_row><t_row> '               , 'rowShow': false  }, //as such when nothing fill the condition the position will still be occupied by the first element (even if its rowshow is false )
+        { 'pos': [ 49 ], 'str': 'Lumeneo'                         , 'rowShow': true   },
+        { 'pos': [ 50 ], 'str': ' </t_row></xml>'                                     }
+      ]);
+    });
+
+
+
+
     it('should work if there is an object in the array', function(){
       var _desc = {
         'staticData'  : {
@@ -792,7 +912,7 @@ describe('builder', function(){
         {'firstname':'Trinity',  'lastname':'Unknown', 'info' : {'movie': 'matrix2'}}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [ 
+      helper.assert(_fn(_data), [
         { pos: [ 0        ], str: '<xml> '                            },
         { pos: [ 6, 0, 6  ], str: '<tr>'               , rowStart:true},
         { pos: [ 6, 0, 10 ], str: 'Thomas'             , rowShow:true },
@@ -804,7 +924,7 @@ describe('builder', function(){
         { pos: [ 6, 1, 20 ], str: '</p><p>Unknown'     , rowShow:true },
         { pos: [ 6, 1, 29 ], str: '</p></tr>'          , rowEnd:true  },
         { pos: [ 6, 1, 13 ], str: '<p>matrix2'         , rowShow:true },
-        { pos: [ 30       ], str: ' </xml>'                           } 
+        { pos: [ 30       ], str: ' </xml>'                           }
       ]);
     });
     it('should work if there are three nested objects in the array (with one missing object in the last row) ', function(){
@@ -880,7 +1000,7 @@ describe('builder', function(){
         }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [ 
+      helper.assert(_fn(_data), [
         { pos: [ 0        ], str: '<xml> '                            },
         { pos: [ 6, 0, 6  ], str: '<tr>'               , rowStart:true},
         { pos: [ 6, 0, 10 ], str: 'Thomas'             , rowShow:true },
@@ -896,7 +1016,7 @@ describe('builder', function(){
         { pos: [ 6, 1, 13 ], str: '<p>matrix2'         , rowShow:true },
         { pos: [ 6, 1, 14 ], str: 'sf2'                , rowShow:true },
         { pos: [ 6, 1, 15 ], str: ''                   , rowShow:true },
-        { pos: [ 30       ], str: ' </xml>'                           } 
+        { pos: [ 30       ], str: ' </xml>'                           }
       ]);
     });
     it('should work if there are two adjacents array of objects', function(){
@@ -952,7 +1072,7 @@ describe('builder', function(){
         ]
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [ 
+      helper.assert(_fn(_data), [
         { pos: [ 0         ], str: '<xml> '                            },
         { pos: [ 6 , 0, 6  ], str: '<tr>'               , rowStart:true},
         { pos: [ 6 , 0, 10 ], str: 'matrix'             , rowShow:true },
@@ -966,7 +1086,7 @@ describe('builder', function(){
         { pos: [ 20, 1, 20 ], str: '<trow>'             , rowStart:true},
         { pos: [ 20, 1, 24 ], str: 'Tesla motors'       , rowShow:true },
         { pos: [ 20, 1, 29 ], str: '</trow>'            , rowEnd:true  },
-        { pos: [ 30        ], str: ' </xml>'                           } 
+        { pos: [ 30        ], str: ' </xml>'                           }
       ]);
     });
     it('Ashould work if there are two adjacents array of objects within main array', function(){
@@ -1030,7 +1150,7 @@ describe('builder', function(){
       var _fn = builder.getBuilderFunction(_desc);
       var _xmlParts = _fn(_data);
       builder.sortXmlParts(_xmlParts, 100);
-      helper.assert(_xmlParts, [ 
+      helper.assert(_xmlParts, [
         { pos: [ 0               ], str: '<x> '                              },
         { pos: [ 4, 0, 4         ], str: '<tab>'              , rowStart:true},
         { pos: [ 4, 0, 6 , 0, 6  ], str: '<tr>'               , rowStart:true},
@@ -1046,7 +1166,7 @@ describe('builder', function(){
         { pos: [ 4, 0, 20, 1, 24 ], str: 'Tesla motors'       , rowShow:true },
         { pos: [ 4, 0, 20, 1, 29 ], str: '</trow>'            , rowEnd:true  },
         { pos: [ 4, 0, 35        ], str: '</tab>'              , rowEnd:true },
-        { pos: [ 36              ], str: ' </x>'                             } 
+        { pos: [ 36              ], str: ' </x>'                             }
       ]);
     });
     it('should work if there are some xml between two adjacents arrays', function(){
@@ -1104,7 +1224,7 @@ describe('builder', function(){
         ]
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data), [ 
+      helper.assert(_fn(_data), [
         { pos: [ 0         ], str: '<xml> '                            },
         { pos: [ 6         ], str: '<T>'                               },
         { pos: [ 6 , 0, 6  ], str: '<tr>'               , rowStart:true},
@@ -1120,7 +1240,7 @@ describe('builder', function(){
         { pos: [ 20, 1, 20 ], str: '<trow>'             , rowStart:true},
         { pos: [ 20, 1, 24 ], str: 'Tesla motors'       , rowShow:true },
         { pos: [ 20, 1, 29 ], str: '</trow>'            , rowEnd:true  },
-        { pos: [ 30        ], str: ' </xml>'                           } 
+        { pos: [ 30        ], str: ' </xml>'                           }
       ]);
     });
     it('should manage nested arrays', function(){
@@ -1178,7 +1298,7 @@ describe('builder', function(){
       var _fn = builder.getBuilderFunction(_desc);
       var _xmlParts = _fn(_data);
       builder.sortXmlParts(_xmlParts, 100);
-      helper.assert(_xmlParts, [ 
+      helper.assert(_xmlParts, [
         { pos: [ 0               ], str: '<xml> '                            },
         { pos: [ 6, 0, 6         ], str: '<tr><p>'            , rowStart:true},
         { pos: [ 6, 0, 13        ], str: 'Thomas'             , rowShow:true },
@@ -1278,7 +1398,7 @@ describe('builder', function(){
       var _fn = builder.getBuilderFunction(_desc);
       var _xmlParts = _fn(_data);
       builder.sortXmlParts(_xmlParts, 100);
-      helper.assert(_xmlParts, [ 
+      helper.assert(_xmlParts, [
         { pos: [ 0 ], str: '<xml> '                                          },
         { pos: [ 6, 0, 6 ], str: '<tr><p>'                    , rowStart:true},
         { pos: [ 6, 0, 13 ], str: 'Thomas'                    , rowShow:true },
@@ -1446,7 +1566,7 @@ describe('builder', function(){
       var _fn = builder.getBuilderFunction(_desc);
       var _xmlParts = _fn(_data);
       builder.sortXmlParts(_xmlParts, 100);
-      helper.assert(_xmlParts, [ 
+      helper.assert(_xmlParts, [
         { pos: [ 0              ], str: '<xml> '                   },
         { pos: [ 6, 0, 6        ], str: '<tr>'      , rowStart:true},
         { pos: [ 6, 0, 6        ], str: '<tr>'      , rowStart:true},
@@ -1478,7 +1598,7 @@ describe('builder', function(){
         { pos: [ 6, 2, 6, 1, 22 ], str: '</td>'     , rowEnd:true  },
         { pos: [ 6, 2, 38       ], str: '</tr>'     , rowEnd:true  },
         { pos: [ 6, 2, 38       ], str: '</tr>'     , rowEnd:true  },
-        { pos: [ 39            ], str: ' </xml>'                   } 
+        { pos: [ 39            ], str: ' </xml>'                   }
       ]);
     });
 

@@ -1,5 +1,7 @@
 # CarboneJS
 
+### v0.11.3
+
 ### v0.11.2
   - Fix a performance issue when a template isn't using iterators at all, this issue caused the array of data to become really big in some cases even though only a small portion of the data was really used
 
@@ -9,7 +11,7 @@
   - Add two benchmarks tests
   - Fix a random failure in a test
 
-  
+
 ### v0.10.1
 
   - Allow the comparison operator `!=` in your template: `{d.cars[engine.power != 3].name}`
@@ -24,11 +26,11 @@
   - Fix bugs in tests
   - Compatible with Node v0.12
   - Update zipfile dependency
-  - Now, the repetition algorithm can flatten an array of objects!! 
+  - Now, the repetition algorithm can flatten an array of objects!!
     + it accepts to increment multiple arrays in the same time
     + it repeats automatically all markers that are on the same row of all nested arrays
-    
-    Example: 
+
+    Example:
 
   **Datas:**
 
@@ -36,17 +38,17 @@
       [
         {
           'site' : {'label':'site_A'},
-          'cars' : [ 
-            { 
-              'name': 'prius', 
+          'cars' : [
+            {
+              'name': 'prius',
               'spec': {'weight': 1},
               'wheels':[
                 {'brand':'mich'},
                 {'brand':'cont'}
               ]
-            }, 
-            { 
-              'name': 'civic', 
+            },
+            {
+              'name': 'civic',
               'spec': {'weight': 2},
               'wheels':[
                 {'brand':'mich'}
@@ -55,8 +57,8 @@
           ],
         },{
           'site' : {'label':'site_B'},
-          'cars' : [{ 
-              'name': 'modelS', 
+          'cars' : [{
+              'name': 'modelS',
               'spec': {'weight': 1},
               'wheels':[
                 {'brand':'mich'},
@@ -94,7 +96,7 @@
 
 ### v0.10.0
 
-  - Add new conversion options for CSV export 
+  - Add new conversion options for CSV export
 
   Now it is possible to pass conversion options to LibreOffice. The attribute `convertTo` can be an object instead of a string:
 
@@ -120,7 +122,7 @@
     var _options = {
       'convertTo' : {
         'formatName' : 'csv',
-        'formatOptionsRaw' : '124,34,0' 
+        'formatOptionsRaw' : '124,34,0'
       }
     };
     carbone.render(_filePath, data, _options, function(err, result){

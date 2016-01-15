@@ -1,5 +1,7 @@
 # CarboneJS
 
+### v0.11.4
+
 ### v0.11.3
   - Fixed crash when data contains a lot of nested arrays
 

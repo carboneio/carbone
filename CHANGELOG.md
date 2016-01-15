@@ -1,6 +1,7 @@
 # CarboneJS
 
 ### v0.11.3
+  - Fixed crash when data contains a lot of nested arrays
 
 ### v0.11.2
   - Fix a performance issue when a template isn't using iterators at all, this issue caused the array of data to become really big in some cases even though only a small portion of the data was really used

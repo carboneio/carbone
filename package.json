@@ -1,13 +1,13 @@
 {
   "name": "carbone",
   "description": "Simple and powerful reporting framework (docx, odt, pdf, xlsx, xml, ods, pptx, odp, ...)",
-  "version": "0.11.4",
+  "version": "0.12.0",
   "private": true,
   "bin" : "bin/carbone",
   "main": "./lib",
   "dependencies": {
     "moment" : "=2.0.0",
-    "zipfile" : "=0.5.7",
+    "zipfile" : "=0.5.9",
     "moxie-zip" : "=0.0.3"
   },
   "devDependencies": {

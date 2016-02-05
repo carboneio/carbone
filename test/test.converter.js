@@ -121,12 +121,15 @@ describe('Converter', function(){
           //kill LibreOffice thread
           process.kill(factories['0'].pid);
           //try another conversion
-          converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
-            helper.assert(err+'', 'null');
-            var _buf = new Buffer(result);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-            done(); 
-          });
+          //with Node v4, process.kill seems to be very slow. So I add a "setTimeout" but I'm not very happy with it
+          setTimeout(function(){
+            converter.convertFile(_filePath, 'writer_pdf_Export', '', function(err, result){
+              helper.assert(err+'', 'null');
+              var _buf = new Buffer(result);
+              assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+              done(); 
+            });
+          }, 200);
         });
       });
     });

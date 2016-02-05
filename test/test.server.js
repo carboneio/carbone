@@ -99,7 +99,7 @@ describe('Server', function(){
           var bufPDF = new Buffer(buf.length);
           fs.open(_pdfResultPath, 'r', function(status, fd){
             fs.read(fd, bufPDF, 0, buf.length, 0, function(err, bytesRead, buffer){
-              assert.equal(buf.slice(0, 100).toString(), buffer.slice(0, 100).toString());
+              assert.equal(buf.slice(0, 90).toString(), buffer.slice(0, 90).toString());
               //reset carbone
               _client.send('shutdown');
               _client.stop(function(){

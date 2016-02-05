@@ -1,6 +1,7 @@
 # CarboneJS
 
-### v0.11.4
+### v0.12.0
+  - Upgrade Zipfile, improve some tests for Node.js 4.x compatibility
 
 ### v0.11.3
   - Fixed crash when data contains a lot of nested arrays

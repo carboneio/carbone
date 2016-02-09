@@ -1,5 +1,7 @@
 # CarboneJS
 
+### v0.12.1
+
 ### v0.12.0
   - Upgrade Zipfile, improve some tests for Node.js 4.x compatibility
 

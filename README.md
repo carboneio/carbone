@@ -125,7 +125,16 @@ var data = {
   lastname : 'Doe'
 };
 
-carbone.render('templates/my-file.docx', data, function(result){
+carbone.set({
+  templatePath: 'templates'
+});
+
+carbone.render('my-file.docx', data, function(err, result){
+  if (err) {
+    console.error(err);
+    return;
+  }
+
   fs.writeFileSync('result.docx', result);
 });
 ```
@@ -186,7 +195,16 @@ var data = {
   date : new Date()
 };
 
-carbone.render('templates/my-file.docx', data, function(result){
+carbone.set({
+  templatePath: 'templates'
+});
+
+carbone.render('my-file.docx', data, function(err, result){
+  if (err) {
+    console.error(err);
+    return;
+  }
+
   fs.writeFileSync('result.docx', result);
 });
 ```

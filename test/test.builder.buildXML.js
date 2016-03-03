@@ -43,6 +43,14 @@ describe('builder.buildXML', function(){
       });
     });
   });
+  it('should replace null or undefined data inside a nested object by an empty string', function(done){
+    var _xml = '<xml> {d.foo.bar.baz} </xml>';
+    var _data = {};
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml>  </xml>');
+      done();
+    });
+  });
   it('should escape special characters > < & for XML', function(done){
     var _xml = '<xml> {d.title} </xml>';
     builder.buildXML(_xml, {'title' : '&'}, function(err, _xmlBuilt){

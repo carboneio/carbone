@@ -1,6 +1,7 @@
 # CarboneJS
 
 ### v0.12.1
+  - Fix: crashed when using a nested undefined object inside a template
 
 ### v0.12.0
   - Upgrade Zipfile, improve some tests for Node.js 4.x compatibility

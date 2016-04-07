@@ -1,6 +1,7 @@
 # CarboneJS
 
 ### v0.12.1
+  - Update documentation to install LibreOffice 5.1 on Ubuntu Server 
 
 ### v0.12.0
   - Upgrade Zipfile, improve some tests for Node.js 4.x compatibility

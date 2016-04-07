@@ -20,7 +20,7 @@ Minimal dependencies:
 - moxie-zip 
 - zipfile
 
-If you want to use the docuemnt converter, install LibreOffice (version 4.x is better):
+If you want to use the document converter, install LibreOffice:
 
 On Linux:
 Be careful, LibreOffice which is provided by the PPA libreoffice/libreoffice-4-0 and libreoffice/ppa does not bundled python 3.3. And we must use python of LibreOffice to convert documents. The best solution is to download the LibreOffice Package from the offical website and install it manually:
@@ -34,9 +34,12 @@ Be careful, LibreOffice which is provided by the PPA libreoffice/libreoffice-4-0
   sudo apt-get install libxinerama1 libfontconfig1 libcups2
 
   # Download LibreOffice 64 bits version for ubuntu 64 bits
-  wget http://download.documentfoundation.org/libreoffice/stable/4.3.6/deb/x86_64/LibreOffice_4.3.6_Linux_x86-64_deb.tar.gz
-  tar -zxvf LibreOffice_4.0.3_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_4.0.3_Linux_x86-64_deb
+  wget http://download.documentfoundation.org/libreoffice/stable/5.1.1/deb/x86_64/LibreOffice_5.1.1_Linux_x86-64_deb.tar.gz
+
+  # Install required dependencies on ubuntu server for LibreOffice 5.0+
+  sudo apt-get install libxinerama1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
+
+  cd LibreOffice_5.1.1_Linux_x86-64_deb
   cd DEBS
 
   # Install LibreOffice. it should be possible to install only the base but I'm not sure

@@ -221,6 +221,18 @@ describe('Converter', function(){
         });
       });
     });
+    it('should not restart the conversion factory if the document can be opened, but cannot be converted', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var _results = [];
+      converter.init({'factories':1, 'startFactory':true, 'tempPath':tempPath}, function(factories){
+        var _officePID = factories['0'].pid;
+        converter.convertFile(_filePath, 'MS Word 97', '', function(err, result){
+          assert.equal(err, 'Could not convert document');
+          assert.equal(factories['0'].pid, _officePID);
+          done(); 
+        });
+      });
+    });
     it('should still restart the conversion factory if the document could not be opened more than 10 times', function(done){
       var _filePath = path.resolve('./test/datasets/test_odt_render_corrupted.odt');
       var _nbAttemptMax = 10;

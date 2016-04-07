@@ -839,6 +839,30 @@ describe('builder.buildXML', function(){
       done();
     });
   });
+  it('should accept conditionnal arrays on string', function(done){
+    var _xml = '<xml> <t_row> {d[brand="Tesla"].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Toyota' , 'id':1},
+      {'brand' : 'Tesla'  , 'id':2},
+      {'brand' : 'Toyota' , 'id':3}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla </t_row></xml>');
+      done();
+    });
+  });
+  it('if two objects match with the filter, it should select the first occurence', function(done){
+    var _xml = '<xml> <t_row> {d[id=2].brand} </t_row><t_row> {d[id=1].brand} </t_row></xml>';
+    var _data = [
+      {'brand' : 'Lumeneo'     , 'id':1},
+      {'brand' : 'Tesla motors', 'id':2},
+      {'brand' : 'Toyota'      , 'id':2}
+    ];
+    builder.buildXML(_xml, _data, function(err, _xmlBuilt){
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row><t_row> Lumeneo </t_row></xml>');
+      done();
+    });
+  });
   it('should accept conditions on the main iterators "i"', function(done){
     var _xml = '<xml> <t_row> {d[i=2].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
     var _data = [

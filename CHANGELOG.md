@@ -1,6 +1,8 @@
 # CarboneJS
 
 ### v0.12.1
+  - Fixed crash when a document cannot be converted (ods -> doc for example). It returns an error instead of crashing
+  - Update documentation to install LibreOffice 5.1 on Ubuntu Server 
   - Fix: crashed when using a nested undefined object inside a template
 
 ### v0.12.0

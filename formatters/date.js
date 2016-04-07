@@ -10,7 +10,11 @@ module.exports = {
   convert : function(d, patternIn, patternOut){
     return moment(d + '', patternIn).format(patternOut);
   },
-  
+  /**
+   * Adds a number of days to the date
+   * @param  {Integer} nbDay: the number of days to add
+   * @return {String}
+   */
   addDays : function(d, nbDay){
     return moment(d).add('days', parseInt(nbDay));
   },

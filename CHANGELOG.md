@@ -1,5 +1,7 @@
 # CarboneJS
 
+### v0.12.2
+
 ### v0.12.1
   - Fixed crash when a document cannot be converted (ods -> doc for example). It returns an error instead of crashing
   - Update documentation to install LibreOffice 5.1 on Ubuntu Server 

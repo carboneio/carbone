@@ -41,12 +41,12 @@ def send(message):
     sys.stdout.flush()
 
 
-def sendErrorOrExit():
+def sendErrorOrExit(code):
     ### Tell to python that we want to modify the global variable
     global nbConsecutiveAttemptOpeningDocument 
     nbConsecutiveAttemptOpeningDocument += 1
     if nbConsecutiveAttemptOpeningDocument < nbConsecutiveAttemptOpeningDocumentMax:
-        send('400')  # The document could not be opened.
+        send(code)  # The document could not be opened.
     else:
         nbConsecutiveAttemptOpeningDocument = 0
         sys.exit(254) # Restart everything
@@ -81,11 +81,11 @@ def convert(message):
     try:
         document = desktop.loadComponentFromURL( inputurl , "_blank", 0, inputprops)
     except:
-        sendErrorOrExit()
+        sendErrorOrExit('400')
         return
 
     if not document:
-        sendErrorOrExit()
+        sendErrorOrExit('400')
         return
 
     ### Reset counter
@@ -114,7 +114,14 @@ def convert(message):
     if fileOption.formatOptions != '':
         outputprops += UnoProps(FilterOptions=fileOption.formatOptions)
     outputurl = unohelper.absolutize(cwd, unohelper.systemPathToFileUrl(fileOption.output) )
-    document.storeToURL(outputurl, tuple(outputprops) )
+
+    try:
+        document.storeToURL(outputurl, tuple(outputprops) )
+    except:
+        sendErrorOrExit('401') # could not convert document
+        document.dispose()
+        document.close(True)
+        return
 
     document.dispose()
     document.close(True)

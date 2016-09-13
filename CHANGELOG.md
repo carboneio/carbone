@@ -1,5 +1,7 @@
 # CarboneJS
 
+### v0.12.3
+
 ### v0.12.2
   - Fixed crash when a document cannot be parsed. It returns an error instead of crashing
 

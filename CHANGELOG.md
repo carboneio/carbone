@@ -1,6 +1,7 @@
 # CarboneJS
 
 ### v0.12.2
+  - Fixed crash when a document cannot be parsed. It returns an error instead of crashing
 
 ### v0.12.1
   - Fixed crash when a document cannot be converted (ods -> doc for example). It returns an error instead of crashing

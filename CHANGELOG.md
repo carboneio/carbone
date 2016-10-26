@@ -1,7 +1,7 @@
 # CarboneJS
 
 ### v0.12.3
-  - Fixed the path of libreOffice changed in version 5.2
+  - Fix: on OSX, the LibreOffice 5.2 path has changed
   - Possibility to add the source file extension when using convert() function. It is mandatory for CSV files otherwise LibreOffice does not understand the file type. 
     Example in `options` parameter = {
       fieldSeparator  : ',',

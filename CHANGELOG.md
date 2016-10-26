@@ -1,6 +1,13 @@
 # CarboneJS
 
 ### v0.12.3
+  - Possibility to add the source file extension when using convert() function. It is mandatory for CSV files otherwise LibreOffice does not understand the file type. 
+    Example in `options` parameter = {
+      fieldSeparator  : ',',
+      textDelimiter   : '"',
+      characterSet    : '76',
+      sourceExtension : '.csv'
+    }
 
 ### v0.12.2
   - Fixed crash when a document cannot be parsed. It returns an error instead of crashing

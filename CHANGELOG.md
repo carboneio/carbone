@@ -1,5 +1,7 @@
 # CarboneJS
 
+### v0.12.5
+
 ### v0.12.4
   - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions` 
 

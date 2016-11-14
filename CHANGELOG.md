@@ -1,5 +1,8 @@
 # CarboneJS
 
+### v0.12.4
+  - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions` 
+
 ### v0.12.3
   - Fix: on OSX, the LibreOffice 5.2 path has changed
   - Possibility to add the source file extension when using convert() function. It is mandatory for CSV files otherwise LibreOffice does not understand the file type. 

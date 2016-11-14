@@ -500,7 +500,26 @@ describe('Carbone', function(){
         fs.writeFileSync('test.csv', result);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
         fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(_expected, fileData);
+          helper.assert(fileData, _expected);
+          done();
+        });
+      });
+    });
+    it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function(done){
+      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
+        'convertTo' : {
+          'formatName' : 'csv'
+        }
+      };
+      carbone.render(_filePath, data, _options, function(err, result){
+        helper.assert(err, null);
+        fs.writeFileSync('test.csv', result);
+        var _expected = ',,\n,1,field_1\n,2,field_2\n';
+        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
+          helper.assert(fileData, _expected);
           done();
         });
       });
@@ -520,7 +539,7 @@ describe('Carbone', function(){
         fs.writeFileSync('test.csv', result);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
         fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(_expected, fileData);
+          helper.assert(fileData, _expected);
           done();
         });
       });
@@ -544,7 +563,7 @@ describe('Carbone', function(){
         fs.writeFileSync('test.csv', result);
         var _expected = '++\n+1+field_1\n+2+field_2\n';
         fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(_expected, fileData);
+          helper.assert(fileData, _expected);
           done();
         });
       });
@@ -567,7 +586,7 @@ describe('Carbone', function(){
         fs.writeFileSync('test.csv', result);
         var _expected = '**\n*1*field_1\n*2*field_2\n';
         fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(_expected, fileData);
+          helper.assert(fileData, _expected);
           done();
         });
       });

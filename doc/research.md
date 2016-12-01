@@ -207,6 +207,10 @@ http://www.opendope.org/opendope_conventions_v2.3.html
 -> comment gérer les répétitions et conditions
 
 
+Commande pour trouver toutes les occurences dans les rapport d'un formatteur dans les rapports (attention, n'est pas parfaite)
+
+for report in `ls`; do echo -e "`unzip -p $report content.xml | tidy -q -xml 2> /dev/null`" | grep ifNull && echo "$report"; done | less
+
 
 /*
 function binarySearch(value, arr) {

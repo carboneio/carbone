@@ -1,4 +1,3 @@
-
 module.exports = {
   /**
    * Converts a number to an INT

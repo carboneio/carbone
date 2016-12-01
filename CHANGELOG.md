@@ -1,6 +1,9 @@
 # CarboneJS
 
 ### v0.12.5
+  - Bump moment.js to 2.17.0
+  - Add some powerful and tested formatters: ifEmpty, arrayJoin, arrayMap, convDate, lowerCase, upperCase, ucFirst, ucWords
+  - Fix: in formatters convert, format, addDays, parse: if the date is null or undefined these formatters return null or undefined instead of "Invalid Date"
 
 ### v0.12.4
   - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions` 

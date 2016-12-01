@@ -3,15 +3,17 @@
   "description": "Simple and powerful reporting framework (docx, odt, pdf, xlsx, xml, ods, pptx, odp, ...)",
   "version": "0.12.5",
   "private": true,
-  "bin" : "bin/carbone",
+  "bin": "bin/carbone",
   "main": "./lib",
   "dependencies": {
-    "moment" : "=2.0.0",
-    "zipfile" : "=0.5.9",
-    "moxie-zip" : "=0.0.3"
+    "moment": "=2.17.0",
+    "moxie-zip": "=0.0.3",
+    "zipfile": "=0.5.9"
   },
   "devDependencies": {
     "mocha": ">=1.8.2"
   },
-  "engines": { "node": ">= 0.10.0" }
+  "engines": {
+    "node": ">= 0.10.0"
+  }
 }

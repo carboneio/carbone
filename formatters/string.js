@@ -49,9 +49,37 @@ function ucWords(d){
   return d;
 }
 
+/**
+ * Always return the same message if called (sort of "catch all" formatter)
+ * @param  {Mixed}   d           data
+ * @param  {String}  message     message to print
+ * @return {String} `message` is always printed
+ */
+function print(d, message){
+  return message;
+}
+
+/**
+ * Should convert enums to human readable values
+ * @param  {Integer|String} d    data
+ * @param  {String}         type enum type name 
+ * @return {String}         return human readable enum or original value if it cannot be converted
+ */
+function convEnum(d, type){
+  if(this.enum !== undefined){
+    var _type = this.enum[type];
+    if(_type !== undefined && _type[d] !== undefined){
+      return _type[d];
+    }
+  }
+  return d;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
   ucFirst   : ucFirst,
-  ucWords   : ucWords
+  ucWords   : ucWords,
+  convEnum  : convEnum,
+  print     : print
 };

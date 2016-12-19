@@ -3,6 +3,8 @@ var moment = require('moment');
 
 /**
  * Format dates
+ * Doc: http://momentjs.com/docs/#/parsing/string-format/
+ * 
  * @param  {String|Number} d    date to format
  * @param  {String} patternIn  input format 
  * @param  {String} patternOut output format
@@ -10,7 +12,7 @@ var moment = require('moment');
  */
 function convDate(d, patternIn, patternOut){
   if(d !== null && typeof d !== 'undefined'){
-    //moment.locale(this.lang);
+    moment.locale(this.lang);
     return moment(d + '', patternIn).format(patternOut);
   }
   return d;

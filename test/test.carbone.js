@@ -136,6 +136,161 @@ describe('Carbone', function(){
     });
   });
 
+  describe('renderXML', function(){
+    after(function(done){
+      carbone.reset();
+      done();
+    });
+    it('should render an XML string', function(done){
+      var data = {
+        param  : 'field_1'
+      };
+      carbone.renderXML('<xml>{d.param}</xml>', data, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>field_1</xml>');
+        done();
+      });
+    });
+    it('#1 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function(done){
+      var data = {
+        param  : 1
+      };
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>one</xml>');
+        done();
+      });
+    });
+    it('#3 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function(done){
+      var data = {
+        param  : 3
+      };
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>three</xml>');
+        done();
+      });
+    });
+    it('#2 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function(done){
+      var data = {
+        param  : 2
+      };
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>two</xml>');
+        done();
+      });
+    });
+    it('#4 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function(done){
+      var data = {
+        param  : 6
+      };
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>unknown</xml>');
+        done();
+      });
+    });
+    it('conditional formatter should call the next formatter even if the condition is true when continueOnSuccess=true', function(done){
+      var data = {
+        param  : 3
+      };
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\', true):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>unknown</xml>');
+        done();
+      });
+    });
+    it('formatters should be independant. The propagation of one set of cascaded formatters should not alter the propagation of another set of formatters', function(done){
+      var data = {
+        param : 3,
+        type  : 1,
+        other : 2,
+        empty : -1
+      };
+      carbone.renderXML(
+          '<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>'
+        + '<tr>{d.type:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</tr>'
+        + '<td>{d.other:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</td>'
+        + '<td>{d.empty:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</td>', data, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>three</xml><tr>one</tr><td>two</td><td>unknown</td>');
+        done();
+      });
+    });
+    it('conditional formatter should call the next formatter even if the condition is true when continueOnSuccess=true', function(done){
+      var data = {
+        param : 2
+      };
+      var options = {
+        enum : {
+          ORDER_STATUS : ['open', 'close', 'sent']
+        }
+      };
+      carbone.renderXML('<xml>{d.param:convEnum(\'ORDER_STATUS\')}</xml>', data, options, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>sent</xml>');
+        done();
+      });
+    });
+    it('options.lang = "fr" should force the lang of date formatter', function(done){
+      var data = {
+        param  : '20160131'
+      };
+      carbone.set({'lang':'en'}); //default lang
+      var options = {
+        lang : 'fr' //forced lang
+      };
+      carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>31/01/2016</xml>');
+        options.lang = 'en';
+        carbone.set({'lang':'fr'}); //default lang
+        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function(err, result){
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>01/31/2016</xml>');
+          done();
+        });
+      });
+    });
+    it('should set the default lang if not set in options.lang for date formatter', function(done){
+      var data = {
+        param  : '20160131'
+      };
+      carbone.set({'lang':'fr'});
+      carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>31/01/2016</xml>');
+        carbone.set({'lang':'en'});
+        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, function(err, result){
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>01/31/2016</xml>');
+          done();
+        });
+      });
+    });
+    it.skip('options.lang = "fr" should force the lang of translation markers {t()}', function(done){
+      var data = {
+        param  : '20160131'
+      };
+      carbone.set({'lang':'en'}); //default lang
+      var options = {
+        lang : 'fr' //forced lang
+      };
+      carbone.renderXML('<xml>{t(kitchen)}</xml>', data, options, function(err, result){
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>31/01/2016</xml>');
+        options.lang = 'en';
+        carbone.set({'lang':'fr'}); //default lang
+        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function(err, result){
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>01/31/2016</xml>');
+          done();
+        });
+      });
+    });
+  });
+
 
   describe('render', function(){
     before(function(){

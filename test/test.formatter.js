@@ -8,14 +8,18 @@ var fs = require('fs');
 var helper = require('../lib/helper');
 
 describe('formatter', function(){
-  describe('convert', function(){
-    it.skip('should accept use this.lang to set convert date', function(){
-      helper.assert(dateFormatter.convert.call({lang: 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
-      //helper.assert(dateFormatter.convert.call({lang: 'fr'}, '20101201', 'YYYYMMDD', 'L'), '01/12/2010');
+  describe('convDate', function(){
+    it('should accept use this.lang to set convert date', function(){
+      helper.assert(dateFormatter.convDate.call({lang: 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.convert.call({lang: 'fr'}, '20101201', 'YYYYMMDD', 'L'), '01/12/2010');
     });
     it('should return null or undefined if value is null or undefined', function(){
-      helper.assert(dateFormatter.convert.call({lang: 'en'}, undefined, 'YYYYMMDD', 'L'), undefined);
-      //helper.assert(dateFormatter.convert.call({lang: 'fr'}, null, 'YYYYMMDD', 'L'), null);
+      helper.assert(dateFormatter.convDate.call({lang: 'en'}, undefined, 'YYYYMMDD', 'L'), undefined);
+      helper.assert(dateFormatter.convert.call({lang: 'fr'}, null, 'YYYYMMDD', 'L'), null);
+    });
+    it('should convert unix timestamp', function(){
+      helper.assert(dateFormatter.convDate.call({lang: 'en'}, 1318781876, 'X', 'LLLL'), 'Sunday, October 16, 2011 6:17 PM');
+      helper.assert(dateFormatter.convert.call({lang: 'fr'}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
     });
   });
   describe('ifEmpty', function(){
@@ -320,7 +324,7 @@ describe('formatter', function(){
  * @return {Mixed}            [description]
  */
 function callWithContext(func, context){
-  context.stopPropagation = null; //reset propagation
+  context.stopPropagation = false; //reset propagation
   var _args = Array.prototype.slice.call(arguments);
   return func.apply(context, _args.slice(2));
 }

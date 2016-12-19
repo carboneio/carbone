@@ -13,10 +13,11 @@ function ifEmpty(d, message, continueOnSuccess){
     || d instanceof Array && d.length === 0
     || d.constructor === Object && Object.keys(d).length === 0
     || Number.isNaN(d) === true){
-    this.stopPropagation = (continueOnSuccess !== 'true') ? true : false;
+    if(continueOnSuccess !== 'true'){
+      this.stopPropagation = true;
+    }
     return message;
   }
-  this.stopPropagation = false;
   return d;
 }
 
@@ -31,10 +32,11 @@ function ifEmpty(d, message, continueOnSuccess){
 function ifEqual(d, value, messageIfTrue, continueOnSuccess){
   //Convert everything in string (not strict Equal)
   if(d == value){
-    this.stopPropagation = (continueOnSuccess !== 'true') ? true : false;
+    if(continueOnSuccess !== 'true'){
+      this.stopPropagation = true;
+    }
     return messageIfTrue;
   }
-  this.stopPropagation = false;
   return d;
 }
 
@@ -48,10 +50,11 @@ function ifEqual(d, value, messageIfTrue, continueOnSuccess){
  */
 function ifContain(d, value, messageIfTrue, continueOnSuccess) {
   if((typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) !== -1){
-    this.stopPropagation = (continueOnSuccess !== 'true') ? true : false;
+    if(continueOnSuccess !== 'true'){
+      this.stopPropagation = true;
+    }
     return messageIfTrue;
   }
-  this.stopPropagation = false;
   return d;
 }
 

@@ -1,5 +1,16 @@
 # CarboneJS
 
+### v0.13.0
+  - Built-in conditional formatters, which starts by `if`, stop propagation to next formatters if the condition is true
+  - New formatters:
+    - `convEnum(d, type)`: convert enums to human readable values
+    - `ifEqual(d, value, messageIfTrue, continueOnSuccess)`: show message if `d == value`, and stop propagation to next formatters unless `continueOnSuccess` is true
+    - `ifContain(d, value, messageIfTrue, continueOnSuccess)`: show message if `d contains value`, and stop propagation to next formatters unless `continueOnSuccess` is true
+    - `print(d, message)`: print message
+  - New function `carbone.renderXML(xmlString, data, options, callback)` to render XML directly
+  - Change the lang dynamically in `carbone.render` and `carbone.renderXML` with `options.lang = 'fr'`
+
+
 ### v0.12.5
   - Bump moment.js to 2.17.0
   - Add some powerful and tested formatters: ifEmpty, arrayJoin, arrayMap, convDate, lowerCase, upperCase, ucFirst, ucWords

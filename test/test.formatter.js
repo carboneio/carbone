@@ -39,6 +39,8 @@ describe('formatter', function(){
       helper.assert(_context.stopPropagation, true);
       helper.assert(callWithContext(conditionFormatter.ifEmpty, _context, {}       , 'msgIfEmpty', 'true'), 'msgIfEmpty');
       helper.assert(_context.stopPropagation, false);
+      helper.assert(callWithContext(conditionFormatter.ifEmpty, _context, {}       , 'msgIfEmpty', true), 'msgIfEmpty');
+      helper.assert(_context.stopPropagation, false);
     });
 
     it('should return data if the message is not empty... and keep on propagation to next formatter', function(){
@@ -88,6 +90,8 @@ describe('formatter', function(){
       helper.assert(_context.stopPropagation, false);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'titi', 'titi', 'msgIfTrue', 'true'), 'msgIfTrue');
       helper.assert(_context.stopPropagation, false);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'titi', 'titi', 'msgIfTrue', true), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, false);
     });
     it('should return data if data is not equal to a variable', function(){
       var _context = {};
@@ -125,6 +129,8 @@ describe('formatter', function(){
       helper.assert(callWithContext(conditionFormatter.ifContain, _context, [1, 2, 'toto'], 'toto', 'msgIfTrue', 'true'), 'msgIfTrue');
       helper.assert(_context.stopPropagation, false);
       helper.assert(callWithContext(conditionFormatter.ifContain, _context, [1, 2, 'toto'], 2, 'msgIfTrue', 'true'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, false);
+      helper.assert(callWithContext(conditionFormatter.ifContain, _context, [1, 2, 'toto'], 2, 'msgIfTrue', true), 'msgIfTrue');
       helper.assert(_context.stopPropagation, false);
     });
     it('should return data if data does not contain the variable', function(){

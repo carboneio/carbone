@@ -1,8 +1,20 @@
 
 /**
  * Flatten an array of String or Number
- * @param  {Array} d  array passed by carbone
- * @return {String}   computed result, or `d` if `d` is not an array
+ *
+ * @example [ ["homer", "bart", "lisa"]        ]
+ * @example [ ["homer", "bart", "lisa"] , " | "]
+ * @example [ ["homer", "bart", "lisa"] , ""   ]
+ * @example [ [10, 50]                         ]
+ * @example [ []                               ]
+ * @example [ null                             ]
+ * @example [ {}                               ]
+ * @example [ 20                               ]
+ * @example [                                  ]
+ * 
+ * @param  {Array}  d           array passed by carbone
+ * @param  {String} separator   [optional] item separator (`,` by default)
+ * @return {String}             computed result, or `d` if `d` is not an array
  */
 function arrayJoin(d, separator){
   if(separator === undefined){
@@ -15,11 +27,25 @@ function arrayJoin(d, separator){
 }
 
 /**
- * Flatten an array of objects.
- * @param  {Array} d                   array passed by carbone
- * @param  {String} objSeparator       object separator (`, ` by default)
- * @param  {String} attributeSeparator attribute separator (`:` by default)
- * @return {String}                    the computed result, or `d` if `d` is not an array
+ * Flatten an array of objects?
+ * It ignores nested objects and arrays
+ *
+ * @example [ [{"id":2, "name":"homer"}, {"id":3, "name":"bart"} ]              ]
+ * @example [ [{"id":2, "name":"homer"}, {"id":3, "name":"bart"} ] , " - "      ]
+ * @example [ [{"id":2, "name":"homer"}, {"id":3, "name":"bart"} ] , " ; ", "|" ]
+ * @example [ [{"id":2, "name":"homer", "obj":{"id":20}, "arr":[12,23] }]       ]
+ * @example [ ["homer", "bart", "lisa"]                                         ]
+ * @example [ [10, 50]                                                          ]
+ * @example [ []                                                                ]
+ * @example [ null                                                              ]
+ * @example [ {}                                                                ]
+ * @example [ 20                                                                ]
+ * @example [                                                                   ]
+ *
+ * @param  {Array} d                     array passed by carbone
+ * @param  {String} objSeparator         [optional] object separator (`, ` by default)
+ * @param  {String} attributeSeparator   [optional] attribute separator (`:` by default)
+ * @return {String}                      the computed result, or `d` if `d` is not an array
  */
 function arrayMap(d, objSeparator, attributeSeparator){
   if(objSeparator === undefined){

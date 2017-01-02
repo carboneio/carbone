@@ -1,4 +1,5 @@
 var assert = require('assert');
+var should = require('should');
 var file = require('../lib/file');
 var helper = require('../lib/helper');
 var carbone = require('../lib/index');
@@ -6,6 +7,7 @@ var path  = require('path');
 var fs = require('fs');
 var testPath = path.join(__dirname,'test_file');
 var spawn = require('child_process').spawn;
+var zipfile = require('zipfile');
 
 describe('file', function(){
   
@@ -81,6 +83,47 @@ describe('file', function(){
         assert.equal((_elapsed < 6), true);
         done(); 
       }
+    });
+    it('should be reliable', function(done){
+      var _testedZips = helper.walkDirSync(path.join(__dirname, 'datasets', 'zip'));
+      _testedZips.should.have.length(8);
+      testEachFile(_testedZips);
+      function testEachFile(testedZips){
+        if(testedZips.length === 0){
+          return done();
+        }
+        var _testedZip = testedZips.pop();
+        file.unzip(_testedZip, function(err, yauzlUnzippedFiles){
+          if(err) {
+            throw err;
+          }
+          unzipWithZipFile(_testedZip, function(err, zipfilelUnzippedFiles){
+            if(err) {
+              throw err;
+            }
+            yauzlUnzippedFiles.should.be.eql(zipfilelUnzippedFiles);
+            testEachFile(testedZips);
+          });
+        });
+      }
+    });
+    it('should return an error if the file is corrupted', function(done){
+      file.unzip(path.join(__dirname, 'datasets', 'zip-failure', 'too_many_length_or_distance_symbols.zip'), function(err, res){
+        err.should.be.instanceOf(Error);
+        err.toString().should.containEql('too many length');
+        done();
+      });
+    });
+    it('should accept a buffer', function(done){
+      fs.readFile(path.join(__dirname, 'datasets', 'test.simple_zip.zip'), function(err, buffer){
+        file.unzip(buffer, function(err, files){
+          assert.equal(err, null);
+          files.should.have.length(1);
+          files[0].name.should.be.eql('coucou.txt');
+          files[0].data.toString().should.be.eql('coucou');
+          done();
+        });
+      });
     });
   });
 
@@ -172,6 +215,7 @@ describe('file', function(){
       file.openTemplate('test_word_render_A.docx', function(err, template){
         helper.assert(err, null);
         helper.assert(template.isZipped, true);
+        helper.assert(template.filename, 'test_word_render_A.docx');
         helper.assert(template.files.length, 13);
         for (var i = 0; i < template.files.length; i++) {
           var _file = template.files[i];
@@ -212,6 +256,23 @@ describe('file', function(){
         done();
       });
     });
+    it('should open embedded xlsx file', function(done){
+      file.openTemplate('test_word_with_nested_excel.docx', function(err, template){
+        helper.assert(err, null);
+        helper.assert(template.isZipped, true);
+        helper.assert(template.files.length, 29);
+        helper.assert(template.types.length, 2);
+        helper.assert(template.types, ['.docx', '.xlsx']);
+        var _filesFromDocx = template.files.filter((file) => {return file.parent === ''});
+        helper.assert(_filesFromDocx.length, 16);
+        var _filesFromXslx = template.files.filter((file) => {return file.parent === 'word/embeddings/Feuille_de_calcul_Microsoft_Excel1.xlsx'});
+        helper.assert(_filesFromXslx.length, 13);
+        var _oneFileOfXlsx = _filesFromXslx.filter((file) => {return file.name === 'xl/tables/table1.xml'});
+        helper.assert(_oneFileOfXlsx.length, 1);
+        _oneFileOfXlsx[0].data.should.containEql('Tableau1');
+        done();
+      });
+    });
     /*it.skip('should detect files which contains markers (not all xml)');*/
   });
 
@@ -233,6 +294,7 @@ describe('file', function(){
           {'name': 'subdir/dir/my_file2.txt', 'data': new Buffer( 'content of the another file','utf8')}
         ]
       };
+      var _filesCopy = _report.files.slice(); //buildFile empties _report.files
       fs.mkdirSync(testPath, 0755);
       file.buildFile(_report, function(err, zipBuffer){
         helper.assert(err, null);
@@ -241,8 +303,9 @@ describe('file', function(){
         var _unzipFilePath = path.join(testPath, 'unzip');
         fs.writeFileSync(_zipFilePath, zipBuffer);
         unzipSystem(_zipFilePath, _unzipFilePath, function(err, result){
-          for (var i = 0; i < _report.files.length; i++) {
-            var _file = _report.files[i];
+          assert.equal(_filesCopy.length, 3);
+          for (var i = 0; i < _filesCopy.length; i++) {
+            var _file = _filesCopy[i];
             if(Buffer.isBuffer(_file.data)===false){
               _file.data = new Buffer(_file.data, 'utf8');
             }
@@ -252,7 +315,48 @@ describe('file', function(){
         });
       });
     });
-    it('should open works woth xml files', function(done){
+    it('should zip embedded files independantly', function(done){
+      var _report = {
+        'isZipped' : true,
+        'files' : [
+          {'name': 'my_file.xml'            , 'parent':'', 'data': 'some text'},
+          {'name': 'subdir/my_file.xml'     , 'parent':'', 'data': 'content of the file in the sub dir'},
+          {'name': 'subdir/dir/my_file2.txt', 'parent':'', 'data': new Buffer( 'content of the another file','utf8')},
+          {'name': 'other/table.xml'        , 'parent':'embedded/spreadsheet.xlsx' , 'data': 'array of data'},
+          {'name': 'other/other.xml'        , 'parent':'embedded/spreadsheet.xlsx' , 'data': 'second file'},
+          {'name': 'other/images/bin.png'   , 'parent':'embedded/spreadsheet.xlsx' , 'data': new Buffer( 'my favorite movies', 'utf8')},
+          {'name': 'other/table.zip'        , 'parent':'embedded/spreadsheet2.xlsx', 'data': new Buffer( 'other image', 'utf8')},
+          {'name': 'other/xml/doc.xml'      , 'parent':'embedded/spreadsheet2.xlsx', 'data': 'third file'},
+        ]
+      };
+      var _filesCopy = _report.files.slice(); //buildFile empties _report.files
+      var _spreadsheet1Only = _report.files.filter((file) => {return file.parent === 'embedded/spreadsheet.xlsx'});
+      fs.mkdirSync(testPath, 0755);
+      file.buildFile(_report, function(err, zipBuffer){
+        helper.assert(err, null);
+        assert.equal(Buffer.isBuffer(zipBuffer), true);
+        var _zipFilePath = path.join(testPath, 'file.zip');
+        fs.writeFileSync(_zipFilePath, zipBuffer);
+        unzipWithZipFile(_zipFilePath, function(err, files){
+          assert.equal(err, null);
+          helper.assert(files.length, 5);
+          var _spreadsheet = files.filter((file) => {return file.name === 'embedded/spreadsheet.xlsx'});
+          helper.assert(_spreadsheet.length, 1);
+          var _spreadsheet2 = files.filter((file) => {return file.name === 'embedded/spreadsheet2.xlsx'});
+          helper.assert(_spreadsheet2.length, 1);
+          var _spreadSheet1FilePath = path.join(testPath, 'spreadsheetFile1.zip');
+          fs.writeFileSync(_spreadSheet1FilePath, _spreadsheet[0].data);
+          unzipWithZipFile(_spreadSheet1FilePath, function(err, files){
+            assert.equal(files.length, 3);
+            var _image = files.filter((file) => {return file.name === 'other/images/bin.png'});
+            assert.equal(_image.length, 1);
+            assert.equal(JSON.stringify(_image[0].data), JSON.stringify(_spreadsheet1Only[2].data));
+            done();
+          });
+        });
+      });
+    });
+    it('should works with xml files', function(done){
       var _report = {
         'isZipped' : false,
         'files' : [
@@ -294,5 +398,27 @@ function generateRandomText(length)
     _text += _possible.charAt(Math.floor(Math.random() * (_possible.length-1)));
   }
   return _text;
+}
+
+/**
+ * Zipfile was used before yauzl.
+ * Zipfie uses the rock-solid C library libzip. I use it as a comparison tool. Should I use the system unzip?
+ * @param  {String}   filePath 
+ * @param  {Function} callback(err, template)
+ */
+function unzipWithZipFile(filePath, callback){
+  var _zipfile = new zipfile.ZipFile(filePath);
+  var _nbFiles = _zipfile.names.length;
+  var _unzippedFiles = [];
+  for (var i = 0; i < _nbFiles; i++) {
+    var _filename = _zipfile.names[i];
+    //I use the sync method because the async version reach the limit of open files of the OS (ulimit -n) in a performance test. It should change in the future
+    var _buffer = _zipfile.readFileSync(_filename);
+    _unzippedFiles.push({
+      'name' : _filename,
+      'data' : _buffer
+    });
+  }
+  callback(null, _unzippedFiles);
 }
 

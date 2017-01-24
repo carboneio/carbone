@@ -217,6 +217,7 @@ describe('file', function(){
         helper.assert(template.isZipped, true);
         helper.assert(template.filename, 'test_word_render_A.docx');
         helper.assert(template.files.length, 13);
+        helper.assert(template.embeddings, []);
         for (var i = 0; i < template.files.length; i++) {
           var _file = template.files[i];
           if(_file.name === 'word/document.xml'){
@@ -257,12 +258,12 @@ describe('file', function(){
       });
     });
     it('should open embedded xlsx file', function(done){
-      file.openTemplate('test_word_with_nested_excel.docx', function(err, template){
+      file.openTemplate('test_word_with_embedded_excel.docx', function(err, template){
         helper.assert(err, null);
         helper.assert(template.isZipped, true);
         helper.assert(template.files.length, 29);
-        helper.assert(template.types.length, 2);
-        helper.assert(template.types, ['.docx', '.xlsx']);
+        helper.assert(template.embeddings.length, 1);
+        helper.assert(template.embeddings, ['word/embeddings/Feuille_de_calcul_Microsoft_Excel1.xlsx']);
         var _filesFromDocx = template.files.filter((file) => {return file.parent === ''});
         helper.assert(_filesFromDocx.length, 16);
         var _filesFromXslx = template.files.filter((file) => {return file.parent === 'word/embeddings/Feuille_de_calcul_Microsoft_Excel1.xlsx'});

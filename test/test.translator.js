@@ -14,6 +14,10 @@ describe('translator', function(){
     var _dirLangPath = path.join(_templatePath,'lang');
     var _fileLangPath = _dirLangPath+'/'+_lang+'.json';
 
+    after(function(done){
+      fs.unlink(_fileLangPath, done);
+    });
+
 
     it('should return a message when the folder where are docs does not exist', function(done){
       helper.rmDirRecursive(_dirLangPath);

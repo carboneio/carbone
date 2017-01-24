@@ -9,6 +9,8 @@
     - `print(d, message)`: print message
   - New function `carbone.renderXML(xmlString, data, options, callback)` to render XML directly
   - Change the lang dynamically in `carbone.render` and `carbone.renderXML` with `options.lang = 'fr'`
+  - Replace module zipfile by yauzl
+  - Parse embedded XLSX and ODS documents
 
 
 ### v0.12.5

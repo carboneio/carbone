@@ -7,6 +7,8 @@ Toujours renvoyer l'objet Error avec la stack complete : https://www.joyent.com/
 
 
 Gérer Excel en convertissant les sharedString avant (pas obligatoire apparemen)
+LA SOLUTION : http://openxmldeveloper.org/blog/b/openxmldeveloper/archive/2013/12/16/advice-when-generating-spreadsheets-use-inline-strings-not-shared-strings.aspx
+
 https://social.msdn.microsoft.com/Forums/en-US/5dd1dd01-2117-41e2-8836-26252cf90c1a/how-fetch-numeric-and-non-numeric-data-in-excel-and-store-the-data-to-table-storage-in-azure?forum=oxmlsdk
 
 http://packageexplorer.codeplex.com/
@@ -175,6 +177,7 @@ May use these source :
 - ePub (pas gagné)
 - djvu (ox2a, djvutopdf)
 - abiworld
+- PANDOC : http://johnmacfarlane.net/pandoc/index.html (NON TESTE)
 
 XML Parser :
 

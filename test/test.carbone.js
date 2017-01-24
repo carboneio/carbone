@@ -5,10 +5,10 @@ var fs = require('fs');
 var helper = require('../lib/helper');
 var converter = require('../lib/converter');
 var dateFormatter = require('../formatters/date');
-var testPath = path.join(__dirname,'test_file');
+var testPath = path.join(__dirname, 'test_file');
 var params = require('../lib/params');
+var should = require('should');
 var spawn = require('child_process').spawn;
-
 
 describe('Carbone', function(){
 
@@ -522,6 +522,37 @@ describe('Carbone', function(){
         done();
       });
     });
+    it('should accept XLSX files (needs preprocessing)', function(done){
+      var _data = [{
+        name : 'Bouteille de sirop d’érable 25cl',
+        qty : 4
+      },{
+        name : 'Bouteille de cidre de glace 1L',
+        qty : 2
+      },{
+        name : 'Sachet de Cranberry 200g',
+        qty : 3
+      }];
+      carbone.render('test_xlsx_list.xlsx', _data, function(err, result){
+        assert.equal(err, null);
+        fs.mkdirSync(testPath, 0755);
+        var _document = path.join(testPath, 'file.xlsx');
+        var _unzipPath = path.join(testPath, 'unzip');
+        fs.writeFileSync(_document, result);
+        unzipSystem(_document, _unzipPath, function(err, files){
+          var _xmlExpectedContent = files['xl/worksheets/sheet1.xml'];
+          _xmlExpectedContent.should.containEql(''
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de sirop d’érable 25cl</t></is></c><c  t="inlineStr"><is><t>4</t></is></c></row>'
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de cidre de glace 1L</t></is></c><c  t="inlineStr"><is><t>2</t></is></c></row>'
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Sachet de Cranberry 200g</t></is></c><c  t="inlineStr"><is><t>3</t></is></c></row>'
+          );
+          done();
+        });
+      });
+    });
+    it.skip('should parse embedded documents (should be ok but not perfect)');
+    it.skip('should re-generate r=1, c=A1 in Excel documents');
+    it.skip('should not remove empty cells in XLSX files (needs pre-processing to add empty cells)');
   });
 
 
@@ -652,12 +683,9 @@ describe('Carbone', function(){
       };
       carbone.render(_filePath, data, _options, function(err, result){
         helper.assert(err, null);
-        fs.writeFileSync('test.csv', result);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
-        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(fileData, _expected);
-          done();
-        });
+        helper.assert(result.toString(), _expected);
+        done();
       });
     });
     it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function(done){
@@ -671,12 +699,9 @@ describe('Carbone', function(){
       };
       carbone.render(_filePath, data, _options, function(err, result){
         helper.assert(err, null);
-        fs.writeFileSync('test.csv', result);
         var _expected = ',,\n,1,field_1\n,2,field_2\n';
-        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(fileData, _expected);
-          done();
-        });
+        helper.assert(result.toString(), _expected);
+        done();
       });
     });
     it('should render spreadsheet with raw options (incomplete)', function(done){
@@ -691,12 +716,9 @@ describe('Carbone', function(){
       };
       carbone.render(_filePath, data, _options, function(err, result){
         helper.assert(err, null);
-        fs.writeFileSync('test.csv', result);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
-        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(fileData, _expected);
-          done();
-        });
+        helper.assert(result.toString(), _expected);
+        done();
       });
     });
     it('should render spreadsheet with options (complete)', function(done){
@@ -715,12 +737,9 @@ describe('Carbone', function(){
       };
       carbone.render(_filePath, data, _options, function(err, result){
         helper.assert(err, null);
-        fs.writeFileSync('test.csv', result);
         var _expected = '++\n+1+field_1\n+2+field_2\n';
-        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(fileData, _expected);
-          done();
-        });
+        helper.assert(result.toString(), _expected);
+        done();
       });
     });
     it('should render spreadsheet with options (incomplete)', function(done){
@@ -738,12 +757,9 @@ describe('Carbone', function(){
       };
       carbone.render(_filePath, data, _options, function(err, result){
         helper.assert(err, null);
-        fs.writeFileSync('test.csv', result);
         var _expected = '**\n*1*field_1\n*2*field_2\n';
-        fs.readFile('test.csv', 'utf-8', function(err, fileData) {
-          helper.assert(fileData, _expected);
-          done();
-        });
+        helper.assert(result.toString(), _expected);
+        done();
       });
     });
   });

@@ -32,6 +32,7 @@
     "no-unreachable"                :   "error",                // Disallow unreachable code
     "array-callback-return"         :   "error",                // Enforce return statements in array functions
     "dot-notation"                  :   "error",                // Enforce dot notation over square brackets
+    "block-scoped-var"              :   "error",                // Treat var as Block Scoped (block-scoped-var), why not using "let"? because "let" is 10 times slower than "var"
     "no-sparse-arrays"              :   "warn",                 // Enforce empty slots at the end of array declaration
     "no-irregular-whitespace"       :   "warn",                 // Enforce usage of whitespace
     "camelcase"                     :   "warn",                 // Enforce usage of CamelCase over snake_case

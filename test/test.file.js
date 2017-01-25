@@ -9,57 +9,57 @@ var testPath = path.join(__dirname,'test_file');
 var spawn = require('child_process').spawn;
 var zipfile = require('zipfile');
 
-describe('file', function(){
+describe('file', function () {
   
-  describe('isZipped', function(){
-    it('should return true if the file is zipped', function(done){
+  describe('isZipped', function () {
+    it('should return true if the file is zipped', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
-      file.isZipped(_filePath, function(err, isZipped){
+      file.isZipped(_filePath, function (err, isZipped) {
         helper.assert(isZipped, true);
         done();
       });
     });
-    it('should return false if the file is not zipped', function(done){
+    it('should return false if the file is not zipped', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
-      file.isZipped(_filePath, function(err, isZipped){
+      file.isZipped(_filePath, function (err, isZipped) {
         helper.assert(isZipped, false);
         done();
       });
     });
   });
 
-  describe('unzip', function(){
-    it('should unzip a file and return a array which contain its content', function(done){
+  describe('unzip', function () {
+    it('should unzip a file and return a array which contain its content', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var _expectedFiles = {
-        '[Content_Types].xml':1,
-        '_rels/.rels':1,
-        'word/_rels/document.xml.rels':1,
-        'word/document.xml':1,
-        'word/theme/theme1.xml':1,
-        'docProps/thumbnail.jpeg':1,
-        'word/settings.xml':1,
-        'word/webSettings.xml':1,
-        'word/stylesWithEffects.xml':1,
-        'docProps/core.xml':1,
-        'word/styles.xml':1,
-        'word/fontTable.xml':1,
-        'docProps/app.xml':'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Template>Normal.dotm</Template><TotalTime>2</TotalTime><Pages>1</Pages><Words>4</Words><Characters>42</Characters><Application>Microsoft Macintosh Word</Application><DocSecurity>0</DocSecurity><Lines>4</Lines><Paragraphs>4</Paragraphs><ScaleCrop>false</ScaleCrop><Company></Company><LinksUpToDate>false</LinksUpToDate><CharactersWithSpaces>42</CharactersWithSpaces><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>14.0000</AppVersion></Properties>'
+        '[Content_Types].xml'          : 1,
+        '_rels/.rels'                  : 1,
+        'word/_rels/document.xml.rels' : 1,
+        'word/document.xml'            : 1,
+        'word/theme/theme1.xml'        : 1,
+        'docProps/thumbnail.jpeg'      : 1,
+        'word/settings.xml'            : 1,
+        'word/webSettings.xml'         : 1,
+        'word/stylesWithEffects.xml'   : 1,
+        'docProps/core.xml'            : 1,
+        'word/styles.xml'              : 1,
+        'word/fontTable.xml'           : 1,
+        'docProps/app.xml'             : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\r\n<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Template>Normal.dotm</Template><TotalTime>2</TotalTime><Pages>1</Pages><Words>4</Words><Characters>42</Characters><Application>Microsoft Macintosh Word</Application><DocSecurity>0</DocSecurity><Lines>4</Lines><Paragraphs>4</Paragraphs><ScaleCrop>false</ScaleCrop><Company></Company><LinksUpToDate>false</LinksUpToDate><CharactersWithSpaces>42</CharactersWithSpaces><SharedDoc>false</SharedDoc><HyperlinksChanged>false</HyperlinksChanged><AppVersion>14.0000</AppVersion></Properties>'
       };
 
-      file.unzip(_filePath, function(err, files){
+      file.unzip(_filePath, function (err, files) {
         assert.equal(files.length, 13);
         for (var i = 0; i < files.length; i++) {
           var _file = files[i];
           assert.equal((_expectedFiles[_file.name]!==undefined), true);
-          if(_file.name==='docProps/app.xml'){
+          if (_file.name==='docProps/app.xml') {
             assert.equal(_expectedFiles[_file.name], _file.data.toString());
           }
-        };
+        }
         done();
       });
     });
-    it('should be fast to unzip', function(done){
+    it('should be fast to unzip', function (done) {
       var _filePath1 = path.resolve('./test/datasets/test_word_render_A.docx');
       var _filePath2 = path.resolve('./test/datasets/test_odt_render_static.odt');
       var _nbExecuted = 100;
@@ -68,15 +68,15 @@ describe('file', function(){
       var _start = new Date();
       for (var i = 0; i < _nbExecuted; i++) {
         var _filePath = (i % 3 === 0 ) ? _filePath1 : _filePath2;
-        file.unzip(_filePath, function(err, files){
+        file.unzip(_filePath, function (err, files) {
           _waitedResponse--;
           _results.push(files);
-          if(_waitedResponse === 0){
+          if (_waitedResponse === 0) {
             theEnd();
           }
         });
-      };
-      function theEnd(){
+      }
+      function theEnd () {
         var _end = new Date();
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Unzip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' unzip tasks\n\n\n');
@@ -84,21 +84,21 @@ describe('file', function(){
         done(); 
       }
     });
-    it('should be reliable', function(done){
+    it('should be reliable', function (done) {
       var _testedZips = helper.walkDirSync(path.join(__dirname, 'datasets', 'zip'));
       _testedZips.should.have.length(8);
       testEachFile(_testedZips);
-      function testEachFile(testedZips){
-        if(testedZips.length === 0){
+      function testEachFile (testedZips) {
+        if (testedZips.length === 0) {
           return done();
         }
         var _testedZip = testedZips.pop();
-        file.unzip(_testedZip, function(err, yauzlUnzippedFiles){
-          if(err) {
+        file.unzip(_testedZip, function (err, yauzlUnzippedFiles) {
+          if (err) {
             throw err;
           }
-          unzipWithZipFile(_testedZip, function(err, zipfilelUnzippedFiles){
-            if(err) {
+          unzipWithZipFile(_testedZip, function (err, zipfilelUnzippedFiles) {
+            if (err) {
               throw err;
             }
             yauzlUnzippedFiles.should.be.eql(zipfilelUnzippedFiles);
@@ -107,16 +107,16 @@ describe('file', function(){
         });
       }
     });
-    it('should return an error if the file is corrupted', function(done){
-      file.unzip(path.join(__dirname, 'datasets', 'zip-failure', 'too_many_length_or_distance_symbols.zip'), function(err, res){
+    it('should return an error if the file is corrupted', function (done) {
+      file.unzip(path.join(__dirname, 'datasets', 'zip-failure', 'too_many_length_or_distance_symbols.zip'), function (err, res) {
         err.should.be.instanceOf(Error);
         err.toString().should.containEql('too many length');
         done();
       });
     });
-    it('should accept a buffer', function(done){
-      fs.readFile(path.join(__dirname, 'datasets', 'test.simple_zip.zip'), function(err, buffer){
-        file.unzip(buffer, function(err, files){
+    it('should accept a buffer', function (done) {
+      fs.readFile(path.join(__dirname, 'datasets', 'test.simple_zip.zip'), function (err, buffer) {
+        file.unzip(buffer, function (err, files) {
           assert.equal(err, null);
           files.should.have.length(1);
           files[0].name.should.be.eql('coucou.txt');
@@ -127,75 +127,75 @@ describe('file', function(){
     });
   });
 
-  describe('zip', function(){
-    beforeEach(function(){
+  describe('zip', function () {
+    beforeEach(function () {
       helper.rmDirRecursive(testPath);
     });
-    after(function(){
+    after(function () {
       helper.rmDirRecursive(testPath);
     });
-    it('should zip an array of files into one buffer', function(done){
+    it('should zip an array of files into one buffer', function (done) {
       var _files = [
-        {'name': 'my_file.xml'            , 'data': new Buffer( 'some text','utf8')},
-        {'name': 'subdir/my_file.xml'     , 'data': new Buffer( 'content of the file in the sub dir','utf8')},
-        {'name': 'subdir/dir/my_file2.txt', 'data': new Buffer( 'content of the another file','utf8')}
+        {name : 'my_file.xml'            , data : new Buffer( 'some text','utf8')},
+        {name : 'subdir/my_file.xml'     , data : new Buffer( 'content of the file in the sub dir','utf8')},
+        {name : 'subdir/dir/my_file2.txt', data : new Buffer( 'content of the another file','utf8')}
       ];
       fs.mkdirSync(testPath, 0755);
-      file.zip(_files, function(err, zipBuffer){
+      file.zip(_files, function (err, zipBuffer) {
         assert.equal(err, null);
         var _zipFilePath = path.join(testPath, 'file.zip');
         var _unzipFilePath = path.join(testPath, 'unzip');
         fs.writeFileSync(_zipFilePath, zipBuffer);
-        unzipSystem(_zipFilePath, _unzipFilePath, function(err, result){
+        unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
           for (var i = 0; i < _files.length; i++) {
             var _file = _files[i];
             assert.equal(result[file.name], file.data);
-          };
+          }
           done();
         });
       });
     });
-    it('should be fast to zip', function(done){
+    it('should be fast to zip', function (done) {
       var _files = [
-        {'name': 'my_file.xml'            , 'data': new Buffer(generateRandomText(9000),'utf8')},
-        {'name': 'subdir/my_file.xml'     , 'data': new Buffer(generateRandomText(8500),'utf8')},
-        {'name': 'subdir/dir/my_file2.txt', 'data': new Buffer(generateRandomText(6250),'utf8')}
+        {name : 'my_file.xml'            , data : new Buffer(generateRandomText(9000),'utf8')},
+        {name : 'subdir/my_file.xml'     , data : new Buffer(generateRandomText(8500),'utf8')},
+        {name : 'subdir/dir/my_file2.txt', data : new Buffer(generateRandomText(6250),'utf8')}
       ];
       var _nbExecuted = 200;
       var _results = [];
       var _nbLeft = _nbExecuted;
       var _start = new Date();
       for (var i = 0; i < _nbExecuted; i++) {
-        file.zip(_files, function(err, zipBuffer){
+        file.zip(_files, function (err, zipBuffer) {
           _nbLeft--;
           _results.push(zipBuffer);
-          if(_nbLeft === 0){
+          if (_nbLeft === 0) {
             theEnd();
           }
         });
-      };
-      function theEnd(){
+      }
+      function theEnd () {
         var _end = new Date();
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Zip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' zip tasks\n\n\n');
         assert.equal((_elapsed < 5), true);
-        //****** check the first one and the 90th 
+        //* ***** check the first one and the 90th 
         fs.mkdirSync(testPath, 0755);
         var _zipFilePath = path.join(testPath, 'file.zip');
         var _unzipFilePath = path.join(testPath, 'unzip0');
         fs.writeFileSync(_zipFilePath, _results[0]);
-        unzipSystem(_zipFilePath, _unzipFilePath, function(err, result){
+        unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
           for (var i = 0; i < _files.length; i++) {
             var _file = _files[i];
             assert.equal(result[file.name], file.data);
-          };
+          }
           _unzipFilePath = path.join(testPath, 'unzip90');
           fs.writeFileSync(_zipFilePath, _results[90]);
-          unzipSystem(_zipFilePath, _unzipFilePath, function(err, result){
+          unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
             for (var i = 0; i < _files.length; i++) {
               var _file = _files[i];
               assert.equal(result[file.name], file.data);
-            };
+            }
             done();
           });
         });
@@ -203,16 +203,16 @@ describe('file', function(){
     });
   });
 
-  describe('openTemplate', function(){
-    before(function(){
+  describe('openTemplate', function () {
+    before(function () {
       var _templatePath = path.resolve('./test/datasets');
-      carbone.set({'templatePath': _templatePath});
+      carbone.set({templatePath : _templatePath});
     });
-    after(function(){
+    after(function () {
       carbone.reset();
     });
-    it('should open the template, convert xml files into String, ...', function(done){
-      file.openTemplate('test_word_render_A.docx', function(err, template){
+    it('should open the template, convert xml files into String, ...', function (done) {
+      file.openTemplate('test_word_render_A.docx', function (err, template) {
         helper.assert(err, null);
         helper.assert(template.isZipped, true);
         helper.assert(template.filename, 'test_word_render_A.docx');
@@ -220,20 +220,20 @@ describe('file', function(){
         helper.assert(template.embeddings, []);
         for (var i = 0; i < template.files.length; i++) {
           var _file = template.files[i];
-          if(_file.name === 'word/document.xml'){
+          if (_file.name === 'word/document.xml') {
             helper.assert(_file.isMarked, true);
             assert.equal(/author/.test(_file.data), true);
           }
-          if(_file.name === 'docProps/thumbnail.jpeg'){
+          if (_file.name === 'docProps/thumbnail.jpeg') {
             helper.assert(_file.isMarked, false);
             assert.equal(Buffer.isBuffer(_file.data), true);
           }
-        };
+        }
         done();
       });
     });
-    it('should open not zipped templates', function(done){
-      file.openTemplate('test_word_render_2003_XML.xml', function(err, template){
+    it('should open not zipped templates', function (done) {
+      file.openTemplate('test_word_render_2003_XML.xml', function (err, template) {
         helper.assert(err, null);
         helper.assert(template.isZipped, false);
         helper.assert(template.files.length, 1);
@@ -244,9 +244,9 @@ describe('file', function(){
         done();
       });
     });
-    it('should accept absolute path', function(done){
+    it('should accept absolute path', function (done) {
       var _filePath =  path.resolve('./test/datasets','test_word_render_2003_XML.xml');
-      file.openTemplate(_filePath, function(err, template){
+      file.openTemplate(_filePath, function (err, template) {
         helper.assert(err, null);
         helper.assert(template.isZipped, false);
         helper.assert(template.files.length, 1);
@@ -257,99 +257,113 @@ describe('file', function(){
         done();
       });
     });
-    it('should open embedded xlsx file', function(done){
-      file.openTemplate('test_word_with_embedded_excel.docx', function(err, template){
+    it('should open embedded xlsx file', function (done) {
+      file.openTemplate('test_word_with_embedded_excel.docx', function (err, template) {
         helper.assert(err, null);
         helper.assert(template.isZipped, true);
         helper.assert(template.files.length, 29);
         helper.assert(template.embeddings.length, 1);
         helper.assert(template.embeddings, ['word/embeddings/Feuille_de_calcul_Microsoft_Excel1.xlsx']);
-        var _filesFromDocx = template.files.filter((file) => {return file.parent === ''});
+        var _filesFromDocx = template.files.filter((file) => {
+          return file.parent === '';
+        });
         helper.assert(_filesFromDocx.length, 16);
-        var _filesFromXslx = template.files.filter((file) => {return file.parent === 'word/embeddings/Feuille_de_calcul_Microsoft_Excel1.xlsx'});
+        var _filesFromXslx = template.files.filter((file) => {
+          return file.parent === 'word/embeddings/Feuille_de_calcul_Microsoft_Excel1.xlsx';
+        });
         helper.assert(_filesFromXslx.length, 13);
-        var _oneFileOfXlsx = _filesFromXslx.filter((file) => {return file.name === 'xl/tables/table1.xml'});
+        var _oneFileOfXlsx = _filesFromXslx.filter((file) => {
+          return file.name === 'xl/tables/table1.xml';
+        });
         helper.assert(_oneFileOfXlsx.length, 1);
         _oneFileOfXlsx[0].data.should.containEql('Tableau1');
         done();
       });
     });
-    /*it.skip('should detect files which contains markers (not all xml)');*/
+    /* it.skip('should detect files which contains markers (not all xml)');*/
   });
 
 
-  describe('buildFile', function(){
-    beforeEach(function(){
+  describe('buildFile', function () {
+    beforeEach(function () {
       helper.rmDirRecursive(testPath);
     });
-    after(function(){
+    after(function () {
       helper.rmDirRecursive(testPath);
       carbone.reset();
     });
-    it('should zip and return a buffer if the report is a docx. It should convert string to buffer', function(done){
+    it('should zip and return a buffer if the report is a docx. It should convert string to buffer', function (done) {
       var _report = {
-        'isZipped' : true,
-        'files' : [
-          {'name': 'my_file.xml'            , 'data': 'some text'},
-          {'name': 'subdir/my_file.xml'     , 'data': 'content of the file in the sub dir'},
-          {'name': 'subdir/dir/my_file2.txt', 'data': new Buffer( 'content of the another file','utf8')}
+        isZipped : true,
+        files    : [
+          {name : 'my_file.xml'            , data : 'some text'},
+          {name : 'subdir/my_file.xml'     , data : 'content of the file in the sub dir'},
+          {name : 'subdir/dir/my_file2.txt', data : new Buffer( 'content of the another file','utf8')}
         ]
       };
-      var _filesCopy = _report.files.slice(); //buildFile empties _report.files
+      var _filesCopy = _report.files.slice(); // buildFile empties _report.files
       fs.mkdirSync(testPath, 0755);
-      file.buildFile(_report, function(err, zipBuffer){
+      file.buildFile(_report, function (err, zipBuffer) {
         helper.assert(err, null);
         assert.equal(Buffer.isBuffer(zipBuffer), true);
         var _zipFilePath = path.join(testPath, 'file.zip');
         var _unzipFilePath = path.join(testPath, 'unzip');
         fs.writeFileSync(_zipFilePath, zipBuffer);
-        unzipSystem(_zipFilePath, _unzipFilePath, function(err, result){
+        unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
           assert.equal(_filesCopy.length, 3);
           for (var i = 0; i < _filesCopy.length; i++) {
             var _file = _filesCopy[i];
-            if(Buffer.isBuffer(_file.data)===false){
+            if (Buffer.isBuffer(_file.data)===false) {
               _file.data = new Buffer(_file.data, 'utf8');
             }
             assert.equal(result[file.name], file.data);
-          };
+          }
           done();
         });
       });
     });
-    it('should zip embedded files independantly', function(done){
+    it('should zip embedded files independantly', function (done) {
       var _report = {
-        'isZipped' : true,
-        'files' : [
-          {'name': 'my_file.xml'            , 'parent':'', 'data': 'some text'},
-          {'name': 'subdir/my_file.xml'     , 'parent':'', 'data': 'content of the file in the sub dir'},
-          {'name': 'subdir/dir/my_file2.txt', 'parent':'', 'data': new Buffer( 'content of the another file','utf8')},
-          {'name': 'other/table.xml'        , 'parent':'embedded/spreadsheet.xlsx' , 'data': 'array of data'},
-          {'name': 'other/other.xml'        , 'parent':'embedded/spreadsheet.xlsx' , 'data': 'second file'},
-          {'name': 'other/images/bin.png'   , 'parent':'embedded/spreadsheet.xlsx' , 'data': new Buffer( 'my favorite movies', 'utf8')},
-          {'name': 'other/table.zip'        , 'parent':'embedded/spreadsheet2.xlsx', 'data': new Buffer( 'other image', 'utf8')},
-          {'name': 'other/xml/doc.xml'      , 'parent':'embedded/spreadsheet2.xlsx', 'data': 'third file'},
+        isZipped : true,
+        files    : [
+          {name : 'my_file.xml'            , parent : '', data : 'some text'},
+          {name : 'subdir/my_file.xml'     , parent : '', data : 'content of the file in the sub dir'},
+          {name : 'subdir/dir/my_file2.txt', parent : '', data : new Buffer( 'content of the another file','utf8')},
+          {name : 'other/table.xml'        , parent : 'embedded/spreadsheet.xlsx' , data : 'array of data'},
+          {name : 'other/other.xml'        , parent : 'embedded/spreadsheet.xlsx' , data : 'second file'},
+          {name : 'other/images/bin.png'   , parent : 'embedded/spreadsheet.xlsx' , data : new Buffer( 'my favorite movies', 'utf8')},
+          {name : 'other/table.zip'        , parent : 'embedded/spreadsheet2.xlsx', data : new Buffer( 'other image', 'utf8')},
+          {name : 'other/xml/doc.xml'      , parent : 'embedded/spreadsheet2.xlsx', data : 'third file'},
         ]
       };
-      var _filesCopy = _report.files.slice(); //buildFile empties _report.files
-      var _spreadsheet1Only = _report.files.filter((file) => {return file.parent === 'embedded/spreadsheet.xlsx'});
+      var _filesCopy = _report.files.slice(); // buildFile empties _report.files
+      var _spreadsheet1Only = _report.files.filter((file) => {
+        return file.parent === 'embedded/spreadsheet.xlsx';
+      });
       fs.mkdirSync(testPath, 0755);
-      file.buildFile(_report, function(err, zipBuffer){
+      file.buildFile(_report, function (err, zipBuffer) {
         helper.assert(err, null);
         assert.equal(Buffer.isBuffer(zipBuffer), true);
         var _zipFilePath = path.join(testPath, 'file.zip');
         fs.writeFileSync(_zipFilePath, zipBuffer);
-        unzipWithZipFile(_zipFilePath, function(err, files){
+        unzipWithZipFile(_zipFilePath, function (err, files) {
           assert.equal(err, null);
           helper.assert(files.length, 5);
-          var _spreadsheet = files.filter((file) => {return file.name === 'embedded/spreadsheet.xlsx'});
+          var _spreadsheet = files.filter((file) => {
+            return file.name === 'embedded/spreadsheet.xlsx';
+          });
           helper.assert(_spreadsheet.length, 1);
-          var _spreadsheet2 = files.filter((file) => {return file.name === 'embedded/spreadsheet2.xlsx'});
+          var _spreadsheet2 = files.filter((file) => {
+            return file.name === 'embedded/spreadsheet2.xlsx';
+          });
           helper.assert(_spreadsheet2.length, 1);
           var _spreadSheet1FilePath = path.join(testPath, 'spreadsheetFile1.zip');
           fs.writeFileSync(_spreadSheet1FilePath, _spreadsheet[0].data);
-          unzipWithZipFile(_spreadSheet1FilePath, function(err, files){
+          unzipWithZipFile(_spreadSheet1FilePath, function (err, files) {
             assert.equal(files.length, 3);
-            var _image = files.filter((file) => {return file.name === 'other/images/bin.png'});
+            var _image = files.filter((file) => {
+              return file.name === 'other/images/bin.png';
+            });
             assert.equal(_image.length, 1);
             assert.equal(JSON.stringify(_image[0].data), JSON.stringify(_spreadsheet1Only[2].data));
             done();
@@ -357,14 +371,14 @@ describe('file', function(){
         });
       });
     });
-    it('should works with xml files', function(done){
+    it('should works with xml files', function (done) {
       var _report = {
-        'isZipped' : false,
-        'files' : [
-          {'name': 'test_word_render_2003_XML.xml', 'data': 'some text'}
+        isZipped : false,
+        files    : [
+          {name : 'test_word_render_2003_XML.xml', data : 'some text'}
         ]
       };
-      file.buildFile(_report, function(err, template){
+      file.buildFile(_report, function (err, template) {
         helper.assert(err, null);
         helper.assert(template, _report.files[0].data);
         done();
@@ -374,7 +388,7 @@ describe('file', function(){
 });
 
 
-function unzipSystem(filePath, destPath, callback){
+function unzipSystem (filePath, destPath, callback) {
   var _unzippedFiles = {};
   var _unzip = spawn('unzip', ['-o', filePath, '-d', destPath]);
   _unzip.stderr.on('data', function (data) {
@@ -391,11 +405,10 @@ function unzipSystem(filePath, destPath, callback){
   });
 }
 
-function generateRandomText(length)
-{
-  var _text = "";
-  var _possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz0123456789";
-  for(var i=0; i < length; i++){
+function generateRandomText (length) {
+  var _text = '';
+  var _possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz0123456789';
+  for (var i=0; i < length; i++) {
     _text += _possible.charAt(Math.floor(Math.random() * (_possible.length-1)));
   }
   return _text;
@@ -407,17 +420,17 @@ function generateRandomText(length)
  * @param  {String}   filePath 
  * @param  {Function} callback(err, template)
  */
-function unzipWithZipFile(filePath, callback){
+function unzipWithZipFile (filePath, callback) {
   var _zipfile = new zipfile.ZipFile(filePath);
   var _nbFiles = _zipfile.names.length;
   var _unzippedFiles = [];
   for (var i = 0; i < _nbFiles; i++) {
     var _filename = _zipfile.names[i];
-    //I use the sync method because the async version reach the limit of open files of the OS (ulimit -n) in a performance test. It should change in the future
+    // I use the sync method because the async version reach the limit of open files of the OS (ulimit -n) in a performance test. It should change in the future
     var _buffer = _zipfile.readFileSync(_filename);
     _unzippedFiles.push({
-      'name' : _filename,
-      'data' : _buffer
+      name : _filename,
+      data : _buffer
     });
   }
   callback(null, _unzippedFiles);

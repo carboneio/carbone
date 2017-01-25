@@ -10,70 +10,70 @@ var params = require('../lib/params');
 var should = require('should');
 var spawn = require('child_process').spawn;
 
-describe('Carbone', function(){
+describe('Carbone', function () {
 
 
-  describe('set', function(){
+  describe('set', function () {
     var _templatePath = path.join(__dirname,'template1');
     var _tempPath = path.join(__dirname,'temp1');
-    after(function(done){
+    after(function (done) {
       helper.rmDirRecursive(_tempPath);
       helper.rmDirRecursive(_templatePath);
       carbone.reset();
       done();
     });
-    it('should create automatically the template directory if it does not exists', function(done){
+    it('should create automatically the template directory if it does not exists', function (done) {
       helper.rmDirRecursive(_templatePath);
-      carbone.set({'templatePath':_templatePath});
+      carbone.set({templatePath : _templatePath});
       helper.assert(fs.existsSync(_templatePath), true);
       done();
     });
-    it('should create automatically the temp directory if it does not exists', function(done){
+    it('should create automatically the temp directory if it does not exists', function (done) {
       helper.rmDirRecursive(_tempPath);
-      carbone.set({'tempPath':_tempPath});
+      carbone.set({tempPath : _tempPath});
       helper.assert(fs.existsSync(_tempPath), true);
       done();
     });
-    it('should change the lang of of date formatter', function(done){
-      carbone.set({'lang':'fr'});
+    it('should change the lang of of date formatter', function (done) {
+      carbone.set({lang : 'fr'});
       helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'vendredi');
-      carbone.set({'lang':'en'});
+      carbone.set({lang : 'en'});
       helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'Friday');
-      carbone.set({'lang':'fr'});
+      carbone.set({lang : 'fr'});
       helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'vendredi');
       done();
     });
   });
 
 
-  describe('addTemplate', function(){
+  describe('addTemplate', function () {
     var _templatePath = path.join(__dirname,'template');
-    before(function(){
+    before(function () {
       helper.rmDirRecursive(_templatePath);
       fs.mkdirSync(_templatePath, '0755');
-      carbone.set({'templatePath':_templatePath});
+      carbone.set({templatePath : _templatePath});
     });
-    after(function(){
+    after(function () {
       helper.rmDirRecursive(_templatePath);
       carbone.reset();
     });
-    it('should save the template in the folder "templatePath"', function(done){
+    it('should save the template in the folder "templatePath"', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
       var _fileContent = fs.readFileSync(_filePath, 'utf8');
       var _fileId = '1.xml';
-      carbone.addTemplate(_fileId, _fileContent, function(err){
+      carbone.addTemplate(_fileId, _fileContent, function (err) {
         helper.assert(err, null);
         var _result = fs.readFileSync(path.join(_templatePath,_fileId), 'utf8');
         helper.assert(_result, _fileContent);
         done();
       });
     });
-    it('should overwrite existing template and should work if data is a buffer', function(done){
+    it('should overwrite existing template and should work if data is a buffer', function (done) {
       var _fileId = '2.txt';
       fs.writeFileSync(path.join(_templatePath, _fileId), 'bla');
       var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
       var _fileContent = fs.readFileSync(_filePath);
-      carbone.addTemplate(_fileId, _fileContent, function(err){
+      carbone.addTemplate(_fileId, _fileContent, function (err) {
         helper.assert(err, null);
         var _result = fs.readFileSync(path.join(_templatePath,_fileId));
         helper.assert(_result, _fileContent);
@@ -83,44 +83,44 @@ describe('Carbone', function(){
   });
 
   
-  describe('addFormatters', function(){
-    it('should add a formatter to the list of custom formatters', function(){
+  describe('addFormatters', function () {
+    it('should add a formatter to the list of custom formatters', function () {
       carbone.addFormatters({
-        'yesOrNo' : function(d){
+        yesOrNo : function (d) {
           return d === true ? 'yes' : 'no';
         }
       });
-      assert.notEqual(typeof carbone.formatters['yesOrNo'], 'undefined');
-      assert.equal(carbone.formatters['yesOrNo'](true), 'yes');
+      assert.notEqual(typeof carbone.formatters.yesOrNo, 'undefined');
+      assert.equal(carbone.formatters.yesOrNo(true), 'yes');
     });
   });
 
 
 
-  describe('removeTemplate', function(){
+  describe('removeTemplate', function () {
     var _templatePath = path.join(__dirname,'template');
-    before(function(){
-      helper.rmDirRecursive(_templatePath)
+    before(function () {
+      helper.rmDirRecursive(_templatePath);
       fs.mkdirSync(_templatePath, '0755');
-      carbone.set({'templatePath':_templatePath});
+      carbone.set({templatePath : _templatePath});
     });
-    after(function(){
+    after(function () {
       helper.rmDirRecursive(_templatePath);
       carbone.reset();
     });
-    it('should remove the template from the Carbone datastore (templatePath)', function(done){
+    it('should remove the template from the Carbone datastore (templatePath)', function (done) {
       var _fileId = '2.txt';
       var _filePath = path.join(_templatePath, _fileId);
       fs.writeFileSync(_filePath, 'bla');
-      carbone.removeTemplate(_fileId, function(err){
+      carbone.removeTemplate(_fileId, function (err) {
         helper.assert(err, null);
         helper.assert(fs.existsSync(_filePath), false);
         done();
       });
     });
-    it('should not crash if the template does not exist', function(done){
+    it('should not crash if the template does not exist', function (done) {
       var _fileId = '5.txt';
-      carbone.removeTemplate(_fileId, function(err){
+      carbone.removeTemplate(_fileId, function (err) {
         helper.assert(/unlink/.test(err+''), true);
         done();
       });
@@ -128,80 +128,80 @@ describe('Carbone', function(){
   });
 
 
-  describe('listConversionFormats', function(){
-    it('should return the list of format for conversion', function(done){
+  describe('listConversionFormats', function () {
+    it('should return the list of format for conversion', function (done) {
       var _list = carbone.listConversionFormats('document');
       helper.assert(_list[0].id, 'bib');
       done();
     });
   });
 
-  describe('renderXML', function(){
-    after(function(done){
+  describe('renderXML', function () {
+    after(function (done) {
       carbone.reset();
       done();
     });
-    it('should render an XML string', function(done){
+    it('should render an XML string', function (done) {
       var data = {
-        param  : 'field_1'
+        param : 'field_1'
       };
-      carbone.renderXML('<xml>{d.param}</xml>', data, function(err, result){
+      carbone.renderXML('<xml>{d.param}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>field_1</xml>');
         done();
       });
     });
-    it('#1 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function(done){
+    it('#1 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function (done) {
       var data = {
-        param  : 1
+        param : 1
       };
-      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>one</xml>');
         done();
       });
     });
-    it('#3 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function(done){
+    it('#3 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function (done) {
       var data = {
-        param  : 3
+        param : 3
       };
-      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>three</xml>');
         done();
       });
     });
-    it('#2 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function(done){
+    it('#2 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function (done) {
       var data = {
-        param  : 2
+        param : 2
       };
-      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>two</xml>');
         done();
       });
     });
-    it('#4 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function(done){
+    it('#4 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function (done) {
       var data = {
-        param  : 6
+        param : 6
       };
-      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>unknown</xml>');
         done();
       });
     });
-    it('conditional formatter should call the next formatter even if the condition is true when continueOnSuccess=true', function(done){
+    it('conditional formatter should call the next formatter even if the condition is true when continueOnSuccess=true', function (done) {
       var data = {
-        param  : 3
+        param : 3
       };
-      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\', true):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function(err, result){
+      carbone.renderXML('<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\', true):ifEqual(1, \'one\'):print(\'unknown\')}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>unknown</xml>');
         done();
       });
     });
-    it('formatters should be independant. The propagation of one set of cascaded formatters should not alter the propagation of another set of formatters', function(done){
+    it('formatters should be independant. The propagation of one set of cascaded formatters should not alter the propagation of another set of formatters', function (done) {
       var data = {
         param : 3,
         type  : 1,
@@ -212,13 +212,13 @@ describe('Carbone', function(){
           '<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>'
         + '<tr>{d.type:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</tr>'
         + '<td>{d.other:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</td>'
-        + '<td>{d.empty:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</td>', data, function(err, result){
-        helper.assert(err+'', 'null');
-        helper.assert(result, '<xml>three</xml><tr>one</tr><td>two</td><td>unknown</td>');
-        done();
-      });
+        + '<td>{d.empty:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</td>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>three</xml><tr>one</tr><td>two</td><td>unknown</td>');
+          done();
+        });
     });
-    it('conditional formatter should call the next formatter even if the condition is true when continueOnSuccess=true', function(done){
+    it('conditional formatter should call the next formatter even if the condition is true when continueOnSuccess=true', function (done) {
       var data = {
         param : 2
       };
@@ -227,62 +227,62 @@ describe('Carbone', function(){
           ORDER_STATUS : ['open', 'close', 'sent']
         }
       };
-      carbone.renderXML('<xml>{d.param:convEnum(\'ORDER_STATUS\')}</xml>', data, options, function(err, result){
+      carbone.renderXML('<xml>{d.param:convEnum(\'ORDER_STATUS\')}</xml>', data, options, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>sent</xml>');
         done();
       });
     });
-    it('options.lang = "fr" should force the lang of date formatter', function(done){
+    it('options.lang = "fr" should force the lang of date formatter', function (done) {
       var data = {
-        param  : '20160131'
+        param : '20160131'
       };
-      carbone.set({'lang':'en'}); //default lang
+      carbone.set({lang : 'en'}); // default lang
       var options = {
-        lang : 'fr' //forced lang
+        lang : 'fr' // forced lang
       };
-      carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function(err, result){
+      carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>31/01/2016</xml>');
         options.lang = 'en';
-        carbone.set({'lang':'fr'}); //default lang
-        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function(err, result){
+        carbone.set({lang : 'fr'}); // default lang
+        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml>01/31/2016</xml>');
           done();
         });
       });
     });
-    it('should set the default lang if not set in options.lang for date formatter', function(done){
+    it('should set the default lang if not set in options.lang for date formatter', function (done) {
       var data = {
-        param  : '20160131'
+        param : '20160131'
       };
-      carbone.set({'lang':'fr'});
-      carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, function(err, result){
+      carbone.set({lang : 'fr'});
+      carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>31/01/2016</xml>');
-        carbone.set({'lang':'en'});
-        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, function(err, result){
+        carbone.set({lang : 'en'});
+        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml>01/31/2016</xml>');
           done();
         });
       });
     });
-    it.skip('options.lang = "fr" should force the lang of translation markers {t()}', function(done){
+    it.skip('options.lang = "fr" should force the lang of translation markers {t()}', function (done) {
       var data = {
-        param  : '20160131'
+        param : '20160131'
       };
-      carbone.set({'lang':'en'}); //default lang
+      carbone.set({lang : 'en'}); // default lang
       var options = {
-        lang : 'fr' //forced lang
+        lang : 'fr' // forced lang
       };
-      carbone.renderXML('<xml>{t(kitchen)}</xml>', data, options, function(err, result){
+      carbone.renderXML('<xml>{t(kitchen)}</xml>', data, options, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>31/01/2016</xml>');
         options.lang = 'en';
-        carbone.set({'lang':'fr'}); //default lang
-        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function(err, result){
+        carbone.set({lang : 'fr'}); // default lang
+        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml>01/31/2016</xml>');
           done();
@@ -292,31 +292,31 @@ describe('Carbone', function(){
   });
 
 
-  describe('render', function(){
-    before(function(){
+  describe('render', function () {
+    before(function () {
       var _templatePath = path.resolve('./test/datasets');
-      carbone.set({'templatePath':_templatePath});
+      carbone.set({templatePath : _templatePath});
       helper.rmDirRecursive(testPath);
     });
-    afterEach(function(){
+    afterEach(function () {
       helper.rmDirRecursive(testPath);
     });
-    after(function(){
+    after(function () {
       carbone.reset();
     });
-    it('should render a template (docx) and give result with replacements', function(done){
+    it('should render a template (docx) and give result with replacements', function (done) {
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
       var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.docx');
-      carbone.render('test_word_render_A.docx', data, function(err, result){
+      carbone.render('test_word_render_A.docx', data, function (err, result) {
         assert.equal(err, null);
         fs.mkdirSync(testPath, 0755);
         var _document = path.join(testPath, 'file.docx');
         var _unzipPath = path.join(testPath, 'unzip');
         fs.writeFileSync(_document, result);
-        unzipSystem(_document, _unzipPath, function(err, files){
+        unzipSystem(_document, _unzipPath, function (err, files) {
           var _xmlExpectedContent = files['word/document.xml'];
           assert.equal(_xmlExpectedContent.indexOf('field1'), -1);
           assert.equal(_xmlExpectedContent.indexOf('field2'), -1);
@@ -326,7 +326,7 @@ describe('Carbone', function(){
         });
       });
     });
-    it('should be fast to render a document without conversion', function(done){
+    it('should be fast to render a document without conversion', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var data = {
         field1 : 'field_1',
@@ -337,32 +337,32 @@ describe('Carbone', function(){
       var _waitedResponse = _nbExecuted;
       var _start = new Date();
       for (var i = 0; i < _nbExecuted; i++) {
-        carbone.render(_filePath, data, function(err, result){
+        carbone.render(_filePath, data, function (err, result) {
           _waitedResponse--;
           _results.push(result);
-          if(_waitedResponse === 0){
+          if (_waitedResponse === 0) {
             theEnd();
           }
         });
-      };
-      function theEnd(){
+      }
+      function theEnd () {
         var _end = new Date();
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Basic rendering: Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' attempts (usally around 10ms)\n\n\n');
         for (var i = 0; i < _results.length; i++) {
           var _buf = new Buffer(_results[i]);
           assert.equal((_buf.slice(0, 2).toString() === 'PK'), true);
-        };
+        }
         assert.equal((_elapsed < 200), true);
         done(); 
       }
     });
-    it('should render a template (doc XML 2003) and give result with replacements', function(done){
+    it('should render a template (doc XML 2003) and give result with replacements', function (done) {
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      carbone.render('test_word_render_2003_XML.xml', data, function(err, result){
+      carbone.render('test_word_render_2003_XML.xml', data, function (err, result) {
         assert.equal(result.indexOf('field1'), -1);
         assert.equal(result.indexOf('field2'), -1);
         assert.notEqual(result.indexOf('field_1'), -1);
@@ -370,7 +370,7 @@ describe('Carbone', function(){
         done();
       });
     });
-    it('should accept a second data object with the marker {c.}', function(done){
+    it('should accept a second data object with the marker {c.}', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
       var _data = {
         field1 : 'field_1',
@@ -381,7 +381,7 @@ describe('Carbone', function(){
         author2 : 'author_2'
       };
       var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.xml');
-      carbone.render('test_word_render_2003_XML.xml', _data, {'complement':_complement}, function(err, result){
+      carbone.render('test_word_render_2003_XML.xml', _data, {complement : _complement}, function (err, result) {
         assert.equal(err, null);
         assert.equal(result.indexOf('field1'), -1);
         assert.equal(result.indexOf('field2'), -1);
@@ -394,7 +394,7 @@ describe('Carbone', function(){
         done();
       });
     });
-    it('(zipped file) should accept a second data object with the marker {c.}', function(done){
+    it('(zipped file) should accept a second data object with the marker {c.}', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var _data = {
         field1 : 'field_1',
@@ -404,13 +404,13 @@ describe('Carbone', function(){
         author1 : 'author_1',
         author2 : 'author_2'
       };
-      carbone.render('test_word_render_A.docx', _data, {'complement':_complement}, function(err, result){
+      carbone.render('test_word_render_A.docx', _data, {complement : _complement}, function (err, result) {
         assert.equal(err, null);
         fs.mkdirSync(testPath, 0755);
         var _document = path.join(testPath, 'file.docx');
         var _unzipPath = path.join(testPath, 'unzip');
         fs.writeFileSync(_document, result);
-        unzipSystem(_document, _unzipPath, function(err, files){
+        unzipSystem(_document, _unzipPath, function (err, files) {
           var _xmlExpectedContent = files['word/document.xml'];
           assert.equal(_xmlExpectedContent.indexOf('field1'), -1);
           assert.equal(_xmlExpectedContent.indexOf('field2'), -1);
@@ -424,122 +424,122 @@ describe('Carbone', function(){
         });
       });
     });
-    it('should translate the file and insert three product rows', function(done){
+    it('should translate the file and insert three product rows', function (done) {
       var _filePath = path.resolve('./test/datasets/test_odt_render_translate.odt');
-      //var _fileLangPath = path.resolve('./test/datasets/lang/fr.json');
+      // var _fileLangPath = path.resolve('./test/datasets/lang/fr.json');
       var _data = [{
-        name : 'Bouteille de sirop d’érable 25cl',
-        qty : '4',
+        name  : 'Bouteille de sirop d’érable 25cl',
+        qty   : '4',
         price : '8',
         total : '32',
       },{
-        name : 'Bouteille de cidre de glace 1L',
-        qty : '2',
+        name  : 'Bouteille de cidre de glace 1L',
+        qty   : '2',
         price : '17.5',
         total : '35',
       },{
-        name : 'Sachet de Cranberry 200g',
-        qty : '3',
+        name  : 'Sachet de Cranberry 200g',
+        qty   : '3',
         price : '2',
         total : '6',
       }];
       var _objLang = {
-          'Canada Products' :   'Produits du Canada',
-          'productName' :       'Nom du produit',
-          'qty' :               'Quantité',
-          'unitPrice' :         'Prix unitaire',
-          'I\'ve an Idea : Revenues >= Sales' : 'J\'ai une idée : Chiffre d\'Affaire >= Ventes'
+        'Canada Products'                   : 'Produits du Canada',
+        productName                         : 'Nom du produit',
+        qty                                 : 'Quantité',
+        unitPrice                           : 'Prix unitaire',
+        'I\'ve an Idea : Revenues >= Sales' : 'J\'ai une idée : Chiffre d\'Affaire >= Ventes'
       };
-      //I commented these lines because it does not test the lang file... objLang is overwritted by the next line of code 
+      // I commented these lines because it does not test the lang file... objLang is overwritted by the next line of code 
       //  TODO: The solution would be to 
       //    - not overwrite objLang
       //    - reload the lang file (fileReadSync) if the method carbone.set is called for modifying the parameter 'lang'. 
-      //fs.writeFile(_fileLangPath, JSON.stringify(_objLang, null, 2), function(err){ 
-        carbone.set({'lang':'fr'});
-        carbone.set({'objLang': _objLang});
-        //helper.assert(err, null);
-        carbone.render('test_odt_render_translate.odt', _data, function(err, result){
-          assert.equal(err, null);
-          fs.mkdirSync(testPath, 0755);
-          var _document = path.join(testPath, 'file.odt');
-          var _unzipPath = path.join(testPath, 'unzip');
-          fs.writeFileSync(_document, result);
-          unzipSystem(_document, _unzipPath, function(err, files){
-            var _xmlExpectedContent = files['content.xml'];
-            //Have words been translated ?
-            assert.equal(_xmlExpectedContent.indexOf('Canada Products'), -1);
-            assert.equal(_xmlExpectedContent.indexOf('productName'), -1);
-            assert.equal(_xmlExpectedContent.indexOf('qty'), -1);
-            assert.equal(_xmlExpectedContent.indexOf('Unit price'), -1);
-            assert.notEqual(_xmlExpectedContent.indexOf('Produits du Canada'), -1);
-            assert.notEqual(_xmlExpectedContent.indexOf('Nom du produit'), -1);
-            assert.notEqual(_xmlExpectedContent.indexOf('Quantité'), -1);
-            assert.notEqual(_xmlExpectedContent.indexOf('Prix unitaire'), -1);
-            assert.notEqual(_xmlExpectedContent.indexOf('total'), -1); //total is not defined in this ObjLang. So it should be write with this word 'total'
-            //We have inserted three product rows 
-            assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de sirop d’érable 25cl'), -1);
-            assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de cidre de glace 1L'), -1);
-            assert.notEqual(_xmlExpectedContent.indexOf('Sachet de Cranberry 200g'), -1);
-            //var _dirLangPath = path.join("./test/datasets/lang",'lang');
-            //helper.rmDirRecursive(_fileLangPath);
-            done();
-          });
+      // fs.writeFile(_fileLangPath, JSON.stringify(_objLang, null, 2), function(err){ 
+      carbone.set({lang : 'fr'});
+      carbone.set({objLang : _objLang});
+        // helper.assert(err, null);
+      carbone.render('test_odt_render_translate.odt', _data, function (err, result) {
+        assert.equal(err, null);
+        fs.mkdirSync(testPath, 0755);
+        var _document = path.join(testPath, 'file.odt');
+        var _unzipPath = path.join(testPath, 'unzip');
+        fs.writeFileSync(_document, result);
+        unzipSystem(_document, _unzipPath, function (err, files) {
+          var _xmlExpectedContent = files['content.xml'];
+            // Have words been translated ?
+          assert.equal(_xmlExpectedContent.indexOf('Canada Products'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('productName'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('qty'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('Unit price'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Produits du Canada'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Nom du produit'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Quantité'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Prix unitaire'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('total'), -1); // total is not defined in this ObjLang. So it should be write with this word 'total'
+            // We have inserted three product rows 
+          assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de sirop d’érable 25cl'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de cidre de glace 1L'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('Sachet de Cranberry 200g'), -1);
+            // var _dirLangPath = path.join("./test/datasets/lang",'lang');
+            // helper.rmDirRecursive(_fileLangPath);
+          done();
         });
-      //});
+      });
+      // });
     });
     it('should accept pre-declared variables and variables declared directly in the document.\
-      it should remove declared variables from the template', function(done){
+      it should remove declared variables from the template', function (done) {
       var data = {
         field1 : 'field_1',
         field2 : 'field_2',
         field3 : 'field_3'
       };
       var options = {
-        'variableStr':'{#preVar1= d.field1 } {#preVar2= d.field2 }'
+        variableStr : '{#preVar1= d.field1 } {#preVar2= d.field2 }'
       };
-      carbone.render('test_variables.xml', data, options, function(err, result){
+      carbone.render('test_variables.xml', data, options, function (err, result) {
         assert.equal(result.indexOf('field1'), -1);
         assert.equal(result.indexOf('field2'), -1);
         assert.equal(result.indexOf('field3'), -1);
-        assert.equal(result.indexOf('myVar3'), -1); //should remove declared variables from the template
+        assert.equal(result.indexOf('myVar3'), -1); // should remove declared variables from the template
         assert.notEqual(result.indexOf('field_1'), -1);
         assert.notEqual(result.indexOf('field_2'), -1);
         assert.notEqual(result.indexOf('field_3'), -1);
         done();
       });
     });
-    it('should parse and return the report filename', function(done){
+    it('should parse and return the report filename', function (done) {
       var data = {
         field1 : 'field_1',
         field2 : '2013',
         field3 : 'field_3'
       };
       var options = {
-        'reportName':'report_{d.field2}'
+        reportName : 'report_{d.field2}'
       };
-      carbone.render('test_variables.xml', data, options, function(err, result, reportName){
+      carbone.render('test_variables.xml', data, options, function (err, result, reportName) {
         assert.equal(reportName, 'report_2013');
         done();
       });
     });
-    it('should accept XLSX files (needs preprocessing)', function(done){
+    it('should accept XLSX files (needs preprocessing)', function (done) {
       var _data = [{
         name : 'Bouteille de sirop d’érable 25cl',
-        qty : 4
+        qty  : 4
       },{
         name : 'Bouteille de cidre de glace 1L',
-        qty : 2
+        qty  : 2
       },{
         name : 'Sachet de Cranberry 200g',
-        qty : 3
+        qty  : 3
       }];
-      carbone.render('test_xlsx_list.xlsx', _data, function(err, result){
+      carbone.render('test_xlsx_list.xlsx', _data, function (err, result) {
         assert.equal(err, null);
         fs.mkdirSync(testPath, 0755);
         var _document = path.join(testPath, 'file.xlsx');
         var _unzipPath = path.join(testPath, 'unzip');
         fs.writeFileSync(_document, result);
-        unzipSystem(_document, _unzipPath, function(err, files){
+        unzipSystem(_document, _unzipPath, function (err, files) {
           var _xmlExpectedContent = files['xl/worksheets/sheet1.xml'];
           _xmlExpectedContent.should.containEql(''
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de sirop d’érable 25cl</t></is></c><c  t="inlineStr"><is><t>4</t></is></c></row>'
@@ -556,62 +556,62 @@ describe('Carbone', function(){
   });
 
 
-  describe('render and convert document', function(){
+  describe('render and convert document', function () {
     var defaultOptions = {
-      'pipeNamePrefix' : '_carbone',
-      'factories' : 1,
-      'startFactory' : false,
-      'attempts' : 2
+      pipeNamePrefix : '_carbone',
+      factories      : 1,
+      startFactory   : false,
+      attempts       : 2
     };
-    afterEach(function(done){
-      converter.exit(function(){
+    afterEach(function (done) {
+      converter.exit(function () {
         converter.init(defaultOptions, done);
         carbone.reset();
       });
     });
-    it('should render a template (docx), generate to PDF and give output', function(done){
+    it('should render a template (docx), generate to PDF and give output', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      carbone.render(_filePath, data, {'convertTo':'pdf'}, function(err, result){
+      carbone.render(_filePath, data, {convertTo : 'pdf'}, function (err, result) {
         assert.equal(err, null);
         var buf = new Buffer(result);
         assert.equal(buf.slice(0, 4).toString(), '%PDF');
         var bufPDF = new Buffer(buf.length);
-        fs.open(_pdfResultPath, 'r', function(status, fd){
-          fs.read(fd, bufPDF, 0, buf.length, 0, function(err, bytesRead, buffer){
+        fs.open(_pdfResultPath, 'r', function (status, fd) {
+          fs.read(fd, bufPDF, 0, buf.length, 0, function (err, bytesRead, buffer) {
             assert.equal(buf.slice(0, 90).toString(), buffer.slice(0, 90).toString());
             done();
           });
         });
       });
     });
-    it('should render spreadsheet and convert it to a xls', function(done){
+    it('should render spreadsheet and convert it to a xls', function (done) {
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{
-        id : 1,
+        id   : 1,
         name : 'field_1'
       },{
-        id : 2,
+        id   : 2,
         name : 'field_2'
       }];
-      carbone.render(_filePath, data, {'convertTo':'xls'}, function(err, result){
+      carbone.render(_filePath, data, {convertTo : 'xls'}, function (err, result) {
         helper.assert(err, null);
-        //fs.writeFileSync('test.xls', result);
-        //TODO TODO TODO TODO TODO TODO TODO TODO : test the content of the xls
+        // fs.writeFileSync('test.xls', result);
+        // TODO TODO TODO TODO TODO TODO TODO TODO : test the content of the xls
         done();
       });
     });
-    it('should be fast to render and convert to pdf', function(done){
+    it('should be fast to render and convert to pdf', function (done) {
       converter.init({
-          'pipeNamePrefix' : '_carbone',
-          'factories' : 3,
-          'startFactory' : true,
-          'attempts' : 2
-        }, function(){
+        pipeNamePrefix : '_carbone',
+        factories      : 3,
+        startFactory   : true,
+        attempts       : 2
+      }, function () {
 
         var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
         var data = {
@@ -623,139 +623,139 @@ describe('Carbone', function(){
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          carbone.render(_filePath, data, {'convertTo':'pdf'}, function(err, result){
+          carbone.render(_filePath, data, {convertTo : 'pdf'}, function (err, result) {
             _waitedResponse--;
             _results.push(result);
-            if(_waitedResponse === 0){
+            if (_waitedResponse === 0) {
               theEnd();
             }
           });
-        };
-        function theEnd(){
+        }
+        function theEnd () {
           var _end = new Date();
           var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
           console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions (usally around 65ms) \n\n\n');
           for (var i = 0; i < _results.length; i++) {
             var _buf = new Buffer(_results[i]);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-          };
-          //assert.equal((_elapsed < 200), true);
+          }
+          // assert.equal((_elapsed < 200), true);
           done(); 
         }
       });
     });
   });
 
-  describe('render and convert CSV with options', function (){
+  describe('render and convert CSV with options', function () {
     var defaultOptions = {
-      'pipeNamePrefix' : '_carbone',
-      'factories' : 1,
-      'startFactory' : false,
-      'attempts' : 2
+      pipeNamePrefix : '_carbone',
+      factories      : 1,
+      startFactory   : false,
+      attempts       : 2
     };
-    afterEach(function(done){
-      converter.exit(function(){
+    afterEach(function (done) {
+      converter.exit(function () {
         converter.init(defaultOptions, done);
         carbone.reset();
       });
     });
-    it('should render spreadsheet with raw options (complete)', function(done){
+    it('should render spreadsheet with raw options (complete)', function (done) {
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
-        'convertTo' : null
+        convertTo : null
       };
-      carbone.render(_filePath, data, _options, function(err, result){
+      carbone.render(_filePath, data, _options, function (err, result) {
         helper.assert(err, null);
         done();
       });
     });
-    it('should render spreadsheet with raw options (complete)', function(done){
+    it('should render spreadsheet with raw options (complete)', function (done) {
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
-        'convertTo' : {
-          'formatName' : 'csv',
-          'formatOptionsRaw' : '124,34,0'
+        convertTo : {
+          formatName       : 'csv',
+          formatOptionsRaw : '124,34,0'
         }
       };
-      carbone.render(_filePath, data, _options, function(err, result){
+      carbone.render(_filePath, data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
         helper.assert(result.toString(), _expected);
         done();
       });
     });
-    it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function(done){
+    it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function (done) {
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
-        'convertTo' : {
-          'formatName' : 'csv'
+        convertTo : {
+          formatName : 'csv'
         }
       };
-      carbone.render(_filePath, data, _options, function(err, result){
+      carbone.render(_filePath, data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = ',,\n,1,field_1\n,2,field_2\n';
         helper.assert(result.toString(), _expected);
         done();
       });
     });
-    it('should render spreadsheet with raw options (incomplete)', function(done){
+    it('should render spreadsheet with raw options (incomplete)', function (done) {
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
-        'convertTo' : {
-          'formatName' : 'csv',
-          'formatOptionsRaw' : '124'
+        convertTo : {
+          formatName       : 'csv',
+          formatOptionsRaw : '124'
         }
       };
-      carbone.render(_filePath, data, _options, function(err, result){
+      carbone.render(_filePath, data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
         helper.assert(result.toString(), _expected);
         done();
       });
     });
-    it('should render spreadsheet with options (complete)', function(done){
+    it('should render spreadsheet with options (complete)', function (done) {
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
-        'convertTo' : {
-          'formatName' : 'csv',
-          'formatOptions' : {
-            'fieldSeparator'    : '+',
-            'textDelimiter'     : '"',
-            'characterSet'      : '0'
+        convertTo : {
+          formatName    : 'csv',
+          formatOptions : {
+            fieldSeparator : '+',
+            textDelimiter  : '"',
+            characterSet   : '0'
           }
         }
       };
-      carbone.render(_filePath, data, _options, function(err, result){
+      carbone.render(_filePath, data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '++\n+1+field_1\n+2+field_2\n';
         helper.assert(result.toString(), _expected);
         done();
       });
     });
-    it('should render spreadsheet with options (incomplete)', function(done){
+    it('should render spreadsheet with options (incomplete)', function (done) {
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
-        'convertTo' : {
-          'formatName' : 'csv',
-          'formatOptions' : {
-            'fieldSeparator'  : '*',
-            'characterSet'    : '9'
+        convertTo : {
+          formatName    : 'csv',
+          formatOptions : {
+            fieldSeparator : '*',
+            characterSet   : '9'
           }
         }
       };
-      carbone.render(_filePath, data, _options, function(err, result){
+      carbone.render(_filePath, data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '**\n*1*field_1\n*2*field_2\n';
         helper.assert(result.toString(), _expected);
@@ -768,7 +768,7 @@ describe('Carbone', function(){
 
 
 
-function unzipSystem(filePath, destPath, callback){
+function unzipSystem (filePath, destPath, callback) {
   var _unzippedFiles = {};
   var _unzip = spawn('unzip', ['-o', filePath, '-d', destPath]);
   _unzip.stderr.on('data', function (data) {

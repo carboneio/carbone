@@ -7,23 +7,23 @@ var fs = require('fs');
 var testPath = path.join(__dirname,'test_file');
 var spawn = require('child_process').spawn;
 
-describe('preprocessor', function(){
-  describe('execute', function(){
-    it('should do nothing if the file is an empty object', function(done){
-      preprocessor.execute({}, function(err, tmpl){
+describe('preprocessor', function () {
+  describe('execute', function () {
+    it('should do nothing if the file is an empty object', function (done) {
+      preprocessor.execute({}, function (err, tmpl) {
         helper.assert(err+'', 'null');
         helper.assert(tmpl, {});
         done();
       });
     });
-    it('should do nothing if the file is null', function(done){
-      preprocessor.execute(null, function(err, tmpl){
+    it('should do nothing if the file is null', function (done) {
+      preprocessor.execute(null, function (err, tmpl) {
         helper.assert(err+'', 'null');
         helper.assert(tmpl, null);
         done();
       });
     });
-    describe('XSLX preprocessing', function(){
+    describe('XSLX preprocessing', function () {
       var _sharedStringBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
                               + '<t>{d.name}</t></si><si><t>{d.id}</t></si></sst>';
       var _sharedStringAfter  = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
@@ -43,78 +43,78 @@ describe('preprocessor', function(){
       var _sheetBefore2 = _sheetBefore.replace('{d.id}', '{d.type}');
       var _sheetAfter2 = _sheetAfter.replace('{d.id}', '{d.type}');
       helper.assert(_sheetAfter2 !== _sheetAfter, true);
-      describe('execute', function(){
-        it('should replace shared string by inline strings in a real xlsx file. The shared string should be removed', function(done){
+      describe('execute', function () {
+        it('should replace shared string by inline strings in a real xlsx file. The shared string should be removed', function (done) {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.xlsx',
-            'embeddings' : [],
-            'files' : [
-              {'name': 'xl/sharedStrings.xml'    , 'parent' : '', 'data': _sharedStringBefore},
-              {'name': 'xl/worksheets/sheet1.xml', 'parent' : '', 'data': _sheetBefore}
+            isZipped   : true,
+            filename   : 'template.xlsx',
+            embeddings : [],
+            files      : [
+              {name : 'xl/sharedStrings.xml'    , parent : '', data : _sharedStringBefore},
+              {name : 'xl/worksheets/sheet1.xml', parent : '', data : _sheetBefore}
             ]
           };
-          preprocessor.execute(_report, function(err, tmpl){
+          preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err+'', 'null');
-            //tmpl.files[0].name.should.be.eql('xl/sharedStrings.xml');
-            //tmpl.files[0].data.should.be.eql(_sharedStringAfter);
+            // tmpl.files[0].name.should.be.eql('xl/sharedStrings.xml');
+            // tmpl.files[0].data.should.be.eql(_sharedStringAfter);
             tmpl.files[0].name.should.be.eql('xl/worksheets/sheet1.xml');
             tmpl.files[0].data.should.be.eql(_sheetAfter);
             done();
           });
         });
-        it('should replace shared string by inline strings in embedded xlsx file', function(done){
+        it('should replace shared string by inline strings in embedded xlsx file', function (done) {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'embeddings' : ['embedded/spreadsheet.xlsx'],
-            'files' : [
-              {'name': 'my_file.xml'             , 'parent':''                         , 'data': 'some text'},
-              {'name': 'xl/sharedStrings.xml'    , 'parent':'embedded/spreadsheet.xlsx', 'data': _sharedStringBefore},
-              {'name': 'xl/worksheets/sheet1.xml', 'parent':'embedded/spreadsheet.xlsx', 'data': _sheetBefore}
+            isZipped   : true,
+            filename   : 'template.docx',
+            embeddings : ['embedded/spreadsheet.xlsx'],
+            files      : [
+              {name : 'my_file.xml'             , parent : ''                         , data : 'some text'},
+              {name : 'xl/sharedStrings.xml'    , parent : 'embedded/spreadsheet.xlsx', data : _sharedStringBefore},
+              {name : 'xl/worksheets/sheet1.xml', parent : 'embedded/spreadsheet.xlsx', data : _sheetBefore}
             ]
           };
-          preprocessor.execute(_report, function(err, tmpl){
+          preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err+'', 'null');
             tmpl.files[0].name.should.be.eql('my_file.xml');
             tmpl.files[0].data.should.be.eql('some text');
             tmpl.files[0].parent.should.be.eql('');
-            //tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
-            //tmpl.files[1].data.should.be.eql(_sharedStringAfter);
-            //tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
+            // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
+            // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
+            // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
             tmpl.files[1].name.should.be.eql('xl/worksheets/sheet1.xml');
             tmpl.files[1].data.should.be.eql(_sheetAfter);
             tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
             done();
           });
         });
-        it('should consider each embedded document separately', function(done){
+        it('should consider each embedded document separately', function (done) {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'embeddings' : ['embedded/spreadsheet.xlsx', 'embedded/spreadsheet2.xlsx'],
-            'files' : [
-              {'name': 'my_file.xml'             , 'parent':''                          , 'data': 'some text'},
-              {'name': 'xl/sharedStrings.xml'    , 'parent':'embedded/spreadsheet.xlsx' , 'data': _sharedStringBefore},
-              {'name': 'xl/worksheets/sheet1.xml', 'parent':'embedded/spreadsheet.xlsx' , 'data': _sheetBefore},
-              {'name': 'xl/sharedStrings.xml'    , 'parent':'embedded/spreadsheet2.xlsx', 'data': _sharedStringBefore2},
-              {'name': 'xl/worksheets/sheet1.xml', 'parent':'embedded/spreadsheet2.xlsx', 'data': _sheetBefore2}
+            isZipped   : true,
+            filename   : 'template.docx',
+            embeddings : ['embedded/spreadsheet.xlsx', 'embedded/spreadsheet2.xlsx'],
+            files      : [
+              {name : 'my_file.xml'             , parent : ''                          , data : 'some text'},
+              {name : 'xl/sharedStrings.xml'    , parent : 'embedded/spreadsheet.xlsx' , data : _sharedStringBefore},
+              {name : 'xl/worksheets/sheet1.xml', parent : 'embedded/spreadsheet.xlsx' , data : _sheetBefore},
+              {name : 'xl/sharedStrings.xml'    , parent : 'embedded/spreadsheet2.xlsx', data : _sharedStringBefore2},
+              {name : 'xl/worksheets/sheet1.xml', parent : 'embedded/spreadsheet2.xlsx', data : _sheetBefore2}
             ]
           };
-          preprocessor.execute(_report, function(err, tmpl){
+          preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err+'', 'null');
             tmpl.files[0].name.should.be.eql('my_file.xml');
             tmpl.files[0].data.should.be.eql('some text');
             tmpl.files[0].parent.should.be.eql('');
-            //tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
-            //tmpl.files[1].data.should.be.eql(_sharedStringAfter);
-            //tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
+            // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
+            // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
+            // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
             tmpl.files[1].name.should.be.eql('xl/worksheets/sheet1.xml');
             tmpl.files[1].data.should.be.eql(_sheetAfter);
             tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            //tmpl.files[2].name.should.be.eql('xl/sharedStrings.xml');
-            //tmpl.files[2].data.should.be.eql(_sharedStringAfter2);
-            //tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
+            // tmpl.files[2].name.should.be.eql('xl/sharedStrings.xml');
+            // tmpl.files[2].data.should.be.eql(_sharedStringAfter2);
+            // tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
             tmpl.files[2].name.should.be.eql('xl/worksheets/sheet1.xml');
             tmpl.files[2].data.should.be.eql(_sheetAfter2);
             tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
@@ -122,7 +122,7 @@ describe('preprocessor', function(){
           });
         });
       });
-      describe('removeOneFile', function(){
+      describe('removeOneFile', function () {
         var _relationFileBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
           +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
           +'  <Relationship Id="rId8" Target="worksheets/sheet8.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"/>'
@@ -135,36 +135,36 @@ describe('preprocessor', function(){
           +'  '
           +'  <Relationship Id="rId10" Target="styles.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"/>'
           +'</Relationships>';
-        it('should do nothing if template is empty', function(){
+        it('should do nothing if template is empty', function () {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'files' : []
+            isZipped : true,
+            filename : 'template.docx',
+            files    : []
           };
           preprocessor.removeOneFile(_report, 1);
           helper.assert(_report, {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'files' : []
+            isZipped : true,
+            filename : 'template.docx',
+            files    : []
           });
         });
-        it('should do nothing if index is negative', function(){
+        it('should do nothing if index is negative', function () {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'files' : [{'name': 'my_file.xml' , 'data': 'some text', 'parent':''}]
+            isZipped : true,
+            filename : 'template.docx',
+            files    : [{name : 'my_file.xml' , data : 'some text', parent : ''}]
           };
           preprocessor.removeOneFile(_report, -1);
           helper.assert(_report.files.length, 1);
         });
-        it('should remove this 2nd file', function(){
+        it('should remove this 2nd file', function () {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'files' : [
-              {'name': 'my_file.xml' , 'data': 'some text', 'parent':''},
-              {'name': 'my_file1.xml', 'data': 'some text', 'parent':''},
-              {'name': 'my_file2.xml', 'data': 'some text', 'parent':''}
+            isZipped : true,
+            filename : 'template.docx',
+            files    : [
+              {name : 'my_file.xml' , data : 'some text', parent : ''},
+              {name : 'my_file1.xml', data : 'some text', parent : ''},
+              {name : 'my_file2.xml', data : 'some text', parent : ''}
             ]
           };
           preprocessor.removeOneFile(_report, 1, '');
@@ -172,15 +172,15 @@ describe('preprocessor', function(){
           helper.assert(_report.files[0].name, 'my_file.xml');
           helper.assert(_report.files[1].name, 'my_file2.xml');
         });
-        it('should remove this 2nd file and the relation in workbook', function(){
+        it('should remove this 2nd file and the relation in workbook', function () {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'files' : [
-              {'name': 'xl/my_file.xml'            , 'data': 'some text'        , 'parent':''},
-              {'name': 'xl/my_file2.xml'           , 'data': 'some text'        , 'parent':''},
-              {'name': 'xl/sharedStrings.xml'      , 'data': 'some text'        , 'parent':''},
-              {'name': 'xl/_rels/workbook.xml.rels', 'data': _relationFileBefore, 'parent':''}
+            isZipped : true,
+            filename : 'template.docx',
+            files    : [
+              {name : 'xl/my_file.xml'            , data : 'some text'        , parent : ''},
+              {name : 'xl/my_file2.xml'           , data : 'some text'        , parent : ''},
+              {name : 'xl/sharedStrings.xml'      , data : 'some text'        , parent : ''},
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileBefore, parent : ''}
             ]
           };
           preprocessor.removeOneFile(_report, 2, '');
@@ -190,16 +190,16 @@ describe('preprocessor', function(){
           helper.assert(_report.files[2].name, 'xl/_rels/workbook.xml.rels');
           helper.assert(_report.files[2].data, _relationFileAfter);
         });
-        it('should change the workbook of the embedded document only', function(){
+        it('should change the workbook of the embedded document only', function () {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'files' : [
-              {'name': 'xl/my_file.xml'            , 'data': 'some text'        , 'parent':''},
-              {'name': 'xl/my_file2.xml'           , 'data': 'some text'        , 'parent':''},
-              {'name': 'xl/sharedStrings.xml'      , 'data': 'some text'        , 'parent':''},
-              {'name': 'xl/_rels/workbook.xml.rels', 'data': _relationFileBefore, 'parent':''},
-              {'name': 'xl/_rels/workbook.xml.rels', 'data': _relationFileBefore, 'parent':'subdoc.xlsx'}
+            isZipped : true,
+            filename : 'template.docx',
+            files    : [
+              {name : 'xl/my_file.xml'            , data : 'some text'        , parent : ''},
+              {name : 'xl/my_file2.xml'           , data : 'some text'        , parent : ''},
+              {name : 'xl/sharedStrings.xml'      , data : 'some text'        , parent : ''},
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileBefore, parent : ''},
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileBefore, parent : 'subdoc.xlsx'}
             ]
           };
           preprocessor.removeOneFile(_report, 2, 'subdoc.xlsx');
@@ -212,51 +212,51 @@ describe('preprocessor', function(){
           helper.assert(_report.files[3].data, _relationFileAfter);
         });
       });
-      describe('convertSharedStringToInlineString', function(){
-        it('should do not crash if the file is not an xlsx file (should not happen because execute filter)', function(){
+      describe('convertSharedStringToInlineString', function () {
+        it('should do not crash if the file is not an xlsx file (should not happen because execute filter)', function () {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.docx',
-            'files' : [
-              {'name': 'my_file.xml', 'data': 'some text'}
+            isZipped : true,
+            filename : 'template.docx',
+            files    : [
+              {name : 'my_file.xml', data : 'some text'}
             ]
           };
           var _fileConverted = preprocessor.convertSharedStringToInlineString(_report);
           helper.assert(_fileConverted, _report);
         });
-        it('should replace shared string by inline strings in a real xlsx file', function(){
+        it('should replace shared string by inline strings in a real xlsx file', function () {
           var _report = {
-            'isZipped' : true,
-            'filename' : 'template.xlsx',
-            'files' : [
-              {'name': 'xl/sharedStrings.xml'    , 'data': _sharedStringBefore},
-              {'name': 'xl/worksheets/sheet1.xml', 'data': _sheetBefore}
+            isZipped : true,
+            filename : 'template.xlsx',
+            files    : [
+              {name : 'xl/sharedStrings.xml'    , data : _sharedStringBefore},
+              {name : 'xl/worksheets/sheet1.xml', data : _sheetBefore}
             ]
           };
           var _fileConverted = preprocessor.convertSharedStringToInlineString(_report);
           helper.assert(_fileConverted, {
-            'isZipped' : true,
-            'filename' : 'template.xlsx',
-            'files' : [
-              //{'name': 'xl/sharedStrings.xml'    , 'data': _sharedStringAfter},
-              {'name': 'xl/worksheets/sheet1.xml', 'data': _sheetAfter}
+            isZipped : true,
+            filename : 'template.xlsx',
+            files    : [
+              // {'name': 'xl/sharedStrings.xml'    , 'data': _sharedStringAfter},
+              {name : 'xl/worksheets/sheet1.xml', data : _sheetAfter}
             ]
           });
         });
         it('should works with sheet2.xml');
       });
-      describe('readSharedString', function(){
-        it('should do nothing if the string is empty or null', function(){
+      describe('readSharedString', function () {
+        it('should do nothing if the string is empty or null', function () {
           helper.assert(preprocessor.readSharedString(null), []);
           helper.assert(preprocessor.readSharedString(''), []);
           helper.assert(preprocessor.readSharedString(undefined), []);
         });
-        it('should parse xml and return an array of shared strings', function(){
+        it('should parse xml and return an array of shared strings', function () {
           helper.assert(preprocessor.readSharedString('<si><t>Name</t></si>'), ['<t>Name</t>']);
           helper.assert(preprocessor.readSharedString('<xml><si><t>Name</t></si></xml>'), ['<t>Name</t>']);
           helper.assert(preprocessor.readSharedString('<xml> <si> <t> Name </t> </si>  </xml>'), [' <t> Name </t> ']);
         });
-        it('should be able to parse a real xlsx shared string file', function(){
+        it('should be able to parse a real xlsx shared string file', function () {
           helper.assert(preprocessor.readSharedString('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si><t>{d.name}</t></si><si><t>{d.id}</t></si></sst>'),
             [ '<t>Nom</t>',
               '<t xml:space="preserve">Id </t>',
@@ -267,21 +267,21 @@ describe('preprocessor', function(){
           );
         });
       });
-      describe('convertToInlineString', function(){
-        it('should do nothing if the string is empty or null', function(){
+      describe('convertToInlineString', function () {
+        it('should do nothing if the string is empty or null', function () {
           helper.assert(preprocessor.convertToInlineString(null), null);
           helper.assert(preprocessor.convertToInlineString(''), '');
           helper.assert(preprocessor.convertToInlineString(), undefined);
         });
-        it('should replace shared string index by inline string', function(){
+        it('should replace shared string index by inline string', function () {
           helper.assert(preprocessor.convertToInlineString('<c r="A34" s="117" t="s"><v>0</v></c>', ['<t>{d.name}</t>']), '<c r="A34" s="117" t="inlineStr"><is><t>{d.name}</t></is></c>');
         });
-        it('should not do bullshit if a text contain t="s"', function(){
+        it('should not do bullshit if a text contain t="s"', function () {
           helper.assert(preprocessor.convertToInlineString('<c r="A34" s="117"><t>t="s"</t></c>', []), '<c r="A34" s="117"><t>t="s"</t></c>');
         });
         it('should replace shared string even if there are multiple shared string in different order\
             it should work if the type (t="s") of the tag is not always at the same position\
-            it should work if index position is greater than 9 ', function(){
+            it should work if index position is greater than 9 ', function () {
           var _sharedStrings = [
             'matrix',
             '{d.id}',
@@ -295,28 +295,28 @@ describe('preprocessor', function(){
             '<row r="34" spans="1:4"><c r="A34"  t="inlineStr"  s="117" ><is>{d.isActive}}</is></c><c r="C34" s="118" t="inlineStr" ><is>h</is></c><c   t="inlineStr"   r="D34" s="33" ><is>{d.name}</is></c></row>'
           );
         });
-        it('should do nothing if the tag does not contain nested <v> </v> even if the type is t="s"', function(){
+        it('should do nothing if the tag does not contain nested <v> </v> even if the type is t="s"', function () {
           helper.assert(preprocessor.convertToInlineString('<c r="A34" s="117" t="s"><t>0</t></c>', ['<t>{d.name}</t>']), '<c r="A34" s="117" t="s"><t>0</t></c>');
         });
       });
-      describe('removeRowCounterInWorksheet', function(){
-        it('should do nothing if the string is empty or null', function(){
+      describe('removeRowCounterInWorksheet', function () {
+        it('should do nothing if the string is empty or null', function () {
           helper.assert(preprocessor.removeRowCounterInWorksheet(null), null);
           helper.assert(preprocessor.removeRowCounterInWorksheet(''), '');
           helper.assert(preprocessor.removeRowCounterInWorksheet(), undefined);
         });
-        it('should remove absolute position "r=" and spans in "row" tag', function(){
-          //spans are optional (XLSX optimization)
+        it('should remove absolute position "r=" and spans in "row" tag', function () {
+          // spans are optional (XLSX optimization)
           var _xml      = '<row r="1" spans="1:2" x14ac:dyDescent="0.2">';
           var _expected = '<row   x14ac:dyDescent="0.2">';
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
         });
-        it('should remove absolute position "r=" and spans in "c" tag', function(){
+        it('should remove absolute position "r=" and spans in "c" tag', function () {
           var _xml      = '<c r="B1" spans="1:2" x14ac:dyDescent="0.2">';
           var _expected = '<c   x14ac:dyDescent="0.2">';
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
         });
-        it('should remove absolute position "r=" in "c" tag even if the attribute is not the first one', function(){
+        it('should remove absolute position "r=" in "c" tag even if the attribute is not the first one', function () {
           var _xml      = '<c spans="1:2" r="A1" x14ac:dyDescent="0.2">';
           var _expected = '<c   x14ac:dyDescent="0.2">';
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
@@ -324,12 +324,12 @@ describe('preprocessor', function(){
           var _expected = '<row   x14ac:dyDescent="0.2">';
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
         });
-        it('should not remove absolute position "r=" in other tags than "c" or "row"', function(){
+        it('should not remove absolute position "r=" in other tags than "c" or "row"', function () {
           var _xml      = '<titi r="1" spans="1:2" x14ac:dyDescent="0.2">';
           var _expected = '<titi r="1" spans="1:2" x14ac:dyDescent="0.2">';
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
         });
-        it('should remove absolute row position in XML', function(){
+        it('should remove absolute row position in XML', function () {
           var _xml =''
             +'<sheetData>'
             +'  <row r="1" spans="1:2" x14ac:dyDescent="0.2">'

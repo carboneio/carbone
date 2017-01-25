@@ -1,10 +1,7 @@
-var assert = require('assert');
 var translator  = require('../lib/translator');
 var helper = require('../lib/helper');
 var path  = require('path');
 var fs  = require('fs');
-var rootPath = process.cwd(); // where "make test" is called 
-var testPath = rootPath+'/test/test/';
 
 describe('translator', function () {
 
@@ -22,7 +19,7 @@ describe('translator', function () {
     it('should return a message when the folder where are docs does not exist', function (done) {
       helper.rmDirRecursive(_dirLangPath);
       var _testedPathFalse = path.join(__dirname, '../test_docs_incorrect');
-      translator.generateLang(_testedPathFalse,_lang,function (err,result) {
+      translator.generateLang(_testedPathFalse,_lang,function (err) {
         helper.assert(err, 'docs folder does not exist');
       });
       done();
@@ -44,7 +41,7 @@ describe('translator', function () {
         helper.assert(_isLangDirectoryExist, false);
 
         // should create the lang directory and the test.json file
-        translator.generateLang(_templatePath,_lang,function (err,result,bodyMsg,keyTypeCountArray) {
+        translator.generateLang(_templatePath,_lang, function () {
           fs.exists(_dirLangPath, function (exists) {
             if (exists) {
               _isLangDirectoryExist = true;

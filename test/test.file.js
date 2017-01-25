@@ -108,7 +108,7 @@ describe('file', function () {
       }
     });
     it('should return an error if the file is corrupted', function (done) {
-      file.unzip(path.join(__dirname, 'datasets', 'zip-failure', 'too_many_length_or_distance_symbols.zip'), function (err, res) {
+      file.unzip(path.join(__dirname, 'datasets', 'zip-failure', 'too_many_length_or_distance_symbols.zip'), function (err) {
         err.should.be.instanceOf(Error);
         err.toString().should.containEql('too many length');
         done();
@@ -140,7 +140,7 @@ describe('file', function () {
         {name : 'subdir/my_file.xml'     , data : new Buffer( 'content of the file in the sub dir','utf8')},
         {name : 'subdir/dir/my_file2.txt', data : new Buffer( 'content of the another file','utf8')}
       ];
-      fs.mkdirSync(testPath, 0755);
+      fs.mkdirSync(testPath, parseInt('0755', 8));
       file.zip(_files, function (err, zipBuffer) {
         assert.equal(err, null);
         var _zipFilePath = path.join(testPath, 'file.zip');
@@ -149,7 +149,7 @@ describe('file', function () {
         unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
           for (var i = 0; i < _files.length; i++) {
             var _file = _files[i];
-            assert.equal(result[file.name], file.data);
+            assert.equal(result[_file.name], _file.data);
           }
           done();
         });
@@ -180,21 +180,21 @@ describe('file', function () {
         console.log('\n\n Zip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' zip tasks\n\n\n');
         assert.equal((_elapsed < 5), true);
         //* ***** check the first one and the 90th 
-        fs.mkdirSync(testPath, 0755);
+        fs.mkdirSync(testPath, parseInt('0755', 8));
         var _zipFilePath = path.join(testPath, 'file.zip');
         var _unzipFilePath = path.join(testPath, 'unzip0');
         fs.writeFileSync(_zipFilePath, _results[0]);
         unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
           for (var i = 0; i < _files.length; i++) {
             var _file = _files[i];
-            assert.equal(result[file.name], file.data);
+            assert.equal(result[_file.name], _file.data);
           }
           _unzipFilePath = path.join(testPath, 'unzip90');
           fs.writeFileSync(_zipFilePath, _results[90]);
           unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
             for (var i = 0; i < _files.length; i++) {
               var _file = _files[i];
-              assert.equal(result[file.name], file.data);
+              assert.equal(result[_file.name], _file.data);
             }
             done();
           });
@@ -302,7 +302,7 @@ describe('file', function () {
         ]
       };
       var _filesCopy = _report.files.slice(); // buildFile empties _report.files
-      fs.mkdirSync(testPath, 0755);
+      fs.mkdirSync(testPath, parseInt('0755', 8));
       file.buildFile(_report, function (err, zipBuffer) {
         helper.assert(err, null);
         assert.equal(Buffer.isBuffer(zipBuffer), true);
@@ -336,11 +336,11 @@ describe('file', function () {
           {name : 'other/xml/doc.xml'      , parent : 'embedded/spreadsheet2.xlsx', data : 'third file'},
         ]
       };
-      var _filesCopy = _report.files.slice(); // buildFile empties _report.files
+      _report.files.slice(); // buildFile empties _report.files
       var _spreadsheet1Only = _report.files.filter((file) => {
         return file.parent === 'embedded/spreadsheet.xlsx';
       });
-      fs.mkdirSync(testPath, 0755);
+      fs.mkdirSync(testPath, parseInt('0755', 8));
       file.buildFile(_report, function (err, zipBuffer) {
         helper.assert(err, null);
         assert.equal(Buffer.isBuffer(zipBuffer), true);
@@ -387,19 +387,18 @@ describe('file', function () {
   });
 });
 
-
 function unzipSystem (filePath, destPath, callback) {
   var _unzippedFiles = {};
   var _unzip = spawn('unzip', ['-o', filePath, '-d', destPath]);
   _unzip.stderr.on('data', function (data) {
     throw Error(data);
   });
-  _unzip.on('exit', function (code) {
+  _unzip.on('exit', function () {
     var _filesToParse = helper.walkDirSync(destPath);
     for (var i = 0; i < _filesToParse.length; i++) {
       var _file = _filesToParse[i];
-      var _content = fs.readFileSync(_file);
-      _unzippedFiles[_file] = _content;
+      var _content = fs.readFileSync(_file, 'utf8');
+      _unzippedFiles[path.relative(destPath, _file)] = _content;
     }
     callback(null, _unzippedFiles);
   });

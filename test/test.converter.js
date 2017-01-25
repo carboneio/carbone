@@ -3,11 +3,7 @@ var carbone = require('../lib/index');
 var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
-var assert = require('assert');
 var converter = require('../lib/converter');
-var path  = require('path');
-var fs = require('fs');
-var helper = require('../lib/helper');
 var exec = require('child_process').exec;
 var tempPath = path.join(__dirname, 'temp');
 
@@ -41,9 +37,7 @@ describe('Converter', function () {
       converter.init({factories : 1, startFactory : true, tempPath : tempPath}, function (factories) {
         var _nbFactories = 0;
         var _cachePathRegex = new RegExp(tempPath);
-        for (var i in factories) {
-          _nbFactories++;
-        }
+        _nbFactories = Object.keys(factories).length;
         helper.assert(_nbFactories, 1);
         helper.assert(factories[0].mode, 'pipe');
         helper.assert(/_carbone/g.test(factories[0].pipeName), true);
@@ -64,9 +58,7 @@ describe('Converter', function () {
       converter.init(_customOptions, function (factories) {
         var _nbFactories = 0;
         var _cachePathRegex = new RegExp(tempPath);
-        for (var i in factories) {
-          _nbFactories++;
-        }
+        _nbFactories = Object.keys(factories).length;
         helper.assert(_nbFactories, 3);
 
         helper.assert(factories[0].mode, 'pipe');
@@ -81,8 +73,8 @@ describe('Converter', function () {
         helper.assert(/[0-9]+/g.test(factories[2].pid), true);
         helper.assert(factories[2].isReady, true);
 
-        helper.assert((factories[2].pid           != factories[0].pid), true);
-        helper.assert((factories[2].userCachePath != factories[0].userCachePath), true);
+        helper.assert((factories[2].pid           !== factories[0].pid), true);
+        helper.assert((factories[2].userCachePath !== factories[0].userCachePath), true);
 
         done(); 
       });
@@ -112,7 +104,6 @@ describe('Converter', function () {
     });
     it('should restart automatically the conversion factory if it crashes', function (done) {
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
-      var _results = [];
       converter.init({factories : 1, startFactory : true, tempPath : tempPath}, function (factories) {
         converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
           helper.assert(err+'', 'null');
@@ -211,10 +202,9 @@ describe('Converter', function () {
     });
     it('should not restart the conversion factory if the document is corrupted. It should return an error message', function (done) {
       var _filePath = path.resolve('./test/datasets/test_odt_render_corrupted.odt');
-      var _results = [];
       converter.init({factories : 1, startFactory : true, tempPath : tempPath}, function (factories) {
         var _officePID = factories['0'].pid;
-        converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err) {
           assert.equal(err, 'Could not open document');
           assert.equal(factories['0'].pid, _officePID);
           done(); 
@@ -223,10 +213,9 @@ describe('Converter', function () {
     });
     it('should not restart the conversion factory if the document can be opened, but cannot be converted', function (done) {
       var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
-      var _results = [];
       converter.init({factories : 1, startFactory : true, tempPath : tempPath}, function (factories) {
         var _officePID = factories['0'].pid;
-        converter.convertFile(_filePath, 'MS Word 97', '', function (err, result) {
+        converter.convertFile(_filePath, 'MS Word 97', '', function (err) {
           assert.equal(err, 'Could not convert document');
           assert.equal(factories['0'].pid, _officePID);
           done(); 
@@ -240,13 +229,13 @@ describe('Converter', function () {
       converter.init({factories : 1, startFactory : true, tempPath : tempPath, attempts : 1}, function (factories) {
         var _officePID = factories['0'].pid;
         for (var i = 0; i < _nbAttemptMax; i++) {
-          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err) {
             _nbAttempt--;
             assert.equal(/Could/.test(err), true);
             assert.equal(factories['0'].pid, _officePID);
             // the 10th conversion will restart LibreOffice
             if (_nbAttempt === 0) {
-              converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+              converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err) {
                 assert.equal(/Could/.test(err), true);
                 assert.notEqual(factories['0'].pid, _officePID);
                 var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
@@ -278,7 +267,7 @@ describe('Converter', function () {
           else {
             _filePath = _filePathKO;
           }
-          converter.convertFile(_filePath, 'writer_pdf_Export', undefined, function (err, result) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', undefined, function () {
             _nbAttempt--;
             assert.equal(factories['0'].pid, _officePID);
             if (_nbAttempt === 0) {

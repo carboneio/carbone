@@ -25,7 +25,7 @@ describe('helper', function () {
     });
     it('should read a directory and return the content of each file in an object', function (done) {
       // create the directory
-      fs.mkdirSync(testPath, 0755);
+      fs.mkdirSync(testPath, parseInt('0755', 8));
       var _allFiles = [
         path.join(testPath, 'test.sql'),
         path.join(testPath, 'test1.sql'),
@@ -43,7 +43,7 @@ describe('helper', function () {
     });
     it('should only parse .sql files', function (done) {
       // create the directory
-      fs.mkdirSync(testPath, 0755);
+      fs.mkdirSync(testPath, parseInt('0755', 8));
       var _allFiles = [
         path.join(testPath, 'test.sql'),
         path.join(testPath, 'test1.js'),
@@ -65,13 +65,13 @@ describe('helper', function () {
       var _testedPath = path.join(__dirname, 'createdDir');
       // create the directory
       if (!fs.existsSync(_testedPath)) {
-        fs.mkdirSync(_testedPath, 0755);
+        fs.mkdirSync(_testedPath, parseInt('0755', 8));
       }
       fs.writeFileSync(path.join(_testedPath, 'test.js'), 'test');
       fs.writeFileSync(path.join(_testedPath, 'test2.sql'), 'test');
       var _subDir = path.join(_testedPath, 'otherDir');
       if (!fs.existsSync(_subDir)) {
-        fs.mkdirSync(_subDir, 0755);
+        fs.mkdirSync(_subDir, parseInt('0755', 8));
       }
       fs.writeFileSync(path.join(_subDir, 'testsub.sql'), 'test');
       
@@ -93,10 +93,8 @@ describe('helper', function () {
       helper.rmDirRecursive(_testedPath);
     });
     it('should return an empty array if the directory does not exist or if the directory is empty', function (done) {
-      var _expectedResult = [];
       var _testedPath = path.join(__dirname, 'walkDirTest');
       var _result = helper.walkDirSync(_testedPath);
-
       assert.equal(_result.length, 0);
       done();
     });
@@ -104,8 +102,8 @@ describe('helper', function () {
       var _testedPath = path.join(__dirname, 'walkDirTest');
       var _subDir = path.join(_testedPath, 'otherDir');
       // create the directory
-      fs.mkdirSync(_testedPath, 0755);          
-      fs.mkdirSync(_subDir, 0755);
+      fs.mkdirSync(_testedPath, parseInt('0755', 8));          
+      fs.mkdirSync(_subDir, parseInt('0755', 8));
       var _result = helper.walkDirSync(_testedPath);
       assert.equal(_result.length, 0);
       done();
@@ -114,8 +112,8 @@ describe('helper', function () {
       var _testedPath = path.join(__dirname, 'walkDirTest');
       var _subDir = path.join(_testedPath, 'otherDir');
       // create the directory
-      fs.mkdirSync(_testedPath, 0755);
-      fs.mkdirSync(_subDir, 0755);
+      fs.mkdirSync(_testedPath, parseInt('0755', 8));
+      fs.mkdirSync(_subDir, parseInt('0755', 8));
       var _expectedResult = [
         path.join(_subDir, 'testsub1.sql'),
         path.join(_subDir, 'testsub2.sql'),

@@ -1,8 +1,6 @@
 var assert = require('assert');
 var carbone = require('../lib/index');
 var builder = require('../lib/builder');
-var path  = require('path');
-var fs = require('fs');
 var helper = require('../lib/helper');
 
 describe('builder', function () {
@@ -278,21 +276,21 @@ describe('builder', function () {
       };
       var _nextAttrName = '';
       var _nbArrayExit = 0;
-      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function () {
         _nbArrayExit++;
       });
       helper.assert(_nbArrayExit, 0);
 
       _nextAttrName = '';
       _nbArrayExit = 0;
-      builder.forEachArrayExit(_currentlyVisitedArrays, {}, _nextAttrName, function (arrayLeft) {
+      builder.forEachArrayExit(_currentlyVisitedArrays, {}, _nextAttrName, function () {
         _nbArrayExit++;
       });
       helper.assert(_nbArrayExit, 0);
 
       _nextAttrName = 'cars';
       _nbArrayExit = 0;
-      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function () {
         _nbArrayExit++;
       });
       helper.assert(_nbArrayExit, 0);
@@ -364,7 +362,7 @@ describe('builder', function () {
       };
       var _nextAttrName = 'site';
       var _nbArrayExit = 0;
-      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function () {
         _nbArrayExit++;
       });
       helper.assert(_nbArrayExit, 0);

@@ -1,14 +1,10 @@
-var rootPath = process.cwd(); // where "make test" is called 
 var assert = require('assert');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
-var http = require('http');
 var Socket = require('../lib/socket');  
-var url = require('url');
 var helper  = require('../lib/helper');
 var path = require('path');
 var server;
-var tempPath = path.join(__dirname,'tempfile');
 
 describe('Socket', function () {
 
@@ -100,7 +96,7 @@ describe('Socket', function () {
         var _nbReceived = 0;
         _client = new Socket(4000, '127.0.0.1');
         _client.startClient(); 
-        _client.on('error', function (err) {
+        _client.on('error', function () {
           _nbError++;
         });
         _client.send('client1', function (err, response) {
@@ -125,6 +121,7 @@ describe('Socket', function () {
           }
         });
         function theEnd () {
+          helper.assert(_nbError, 0);
           _client.stop(function () {
             stopServer(done);
           });
@@ -137,7 +134,7 @@ describe('Socket', function () {
         var _nbError = 0;
         var _nbReceived = 0;
         _client = new Socket(4000, '127.0.0.1', {timeout : 50});
-        _client.on('error', function (err) {
+        _client.on('error', function () {
           _nbError++;
         });
         _client.startClient(function () {
@@ -165,6 +162,7 @@ describe('Socket', function () {
             }
           });
           function theEnd () {
+            helper.assert(_nbError, 0);
             _client.stop(function () {
               stopServer(done);
             });
@@ -182,7 +180,7 @@ describe('Socket', function () {
           for (var i = 0; i < _nbExecuted; i++) {
             _client.send('client'+i);
           }
-          _client.on('message',function (message) {
+          _client.on('message',function () {
             _waitedResponse--;
             if (_waitedResponse === 0) {
               theEnd();
@@ -208,9 +206,7 @@ describe('Socket', function () {
         var _nbTimeout = 0;
         var _nbReceivedInTime = 0;
         var _nbReceived = 0;
-        var _waitedResponse = _nbExecuted;
         _client.startClient();
-        var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
           var _clientId = i%2;
           if (i!==51) {
@@ -233,7 +229,7 @@ describe('Socket', function () {
             }
           };
         }
-        _client.on('message',function (message) {
+        _client.on('message',function () {
           _nbReceived++;
           if (_nbReceived === _nbExecuted) {
             theEnd();
@@ -251,9 +247,12 @@ describe('Socket', function () {
       });
     });
     it('should accept multiple clients and it should not mix messages between clients', function (done) {
-      var _client1timer = null; var _client1 = null;
-      var _client2timer = null; var _client2 = null;
-      var _client3timer = null; var _client3 = null;
+      var _client1timer = null;
+      var _client1 = null;
+      var _client2timer = null;
+      var _client2 = null;
+      var _client3timer = null;
+      var _client3 = null;
       var _nbMessageReceivedServerSide = {client1 : 0, client2 : 0, client3 : 0};
       var _nbMessageReceivedClientSide = {client1 : 0, client2 : 0, client3 : 0};
       var _server = new Socket(4000, '127.0.0.1');
@@ -324,23 +323,22 @@ describe('Socket', function () {
       var _nbClose = 0;
       var _nbConnect = 0;
       var _nbReceived = 0;
-      var _nbCallback = 0;
       _client = new Socket(4000, '127.0.0.1', {timeout : 5000, reconnectInterval : 50});
       _client.startClient();  
       _timer = setInterval(function () {
         _sent++;
         _client.send('message for a drunk server');
       }, 5);
-      _client.on('error', function (err) {
+      _client.on('error', function () {
         _nbError++;
       });
-      _client.on('connect', function (err) {
+      _client.on('connect', function () {
         _nbConnect++;
       });
-      _client.on('close', function (err) {
+      _client.on('close', function () {
         _nbClose++;
       });
-      _client.on('message', function (message) {
+      _client.on('message', function () {
         _nbReceived++;
       });
       executeServer('simple', function () {
@@ -356,6 +354,7 @@ describe('Socket', function () {
                     assert.equal(_nbReceived>100, true);
                     assert.equal(_nbClose>1, true);
                     assert.equal(_nbConnect>1, true);
+                    assert.equal(_nbError>1, true);
                     done();
                   });
                 });
@@ -544,7 +543,6 @@ describe('Socket', function () {
   });
 });
 
-var server;
 function executeServer (filename, callback) {
   server = spawn(path.join(__dirname,'socket', filename+'.js'), [], {cwd : __dirname});
   setTimeout(function () {

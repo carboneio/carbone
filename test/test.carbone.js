@@ -6,7 +6,6 @@ var helper = require('../lib/helper');
 var converter = require('../lib/converter');
 var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
-var params = require('../lib/params');
 var should = require('should');
 var spawn = require('child_process').spawn;
 
@@ -309,10 +308,10 @@ describe('Carbone', function () {
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.docx');
+      path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.docx');
       carbone.render('test_word_render_A.docx', data, function (err, result) {
         assert.equal(err, null);
-        fs.mkdirSync(testPath, 0755);
+        fs.mkdirSync(testPath, parseInt('0755',8));
         var _document = path.join(testPath, 'file.docx');
         var _unzipPath = path.join(testPath, 'unzip');
         fs.writeFileSync(_document, result);
@@ -371,7 +370,7 @@ describe('Carbone', function () {
       });
     });
     it('should accept a second data object with the marker {c.}', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
+      path.resolve('./test/datasets/test_word_render_2003_XML.xml');
       var _data = {
         field1 : 'field_1',
         field2 : 'field_2'
@@ -380,7 +379,7 @@ describe('Carbone', function () {
         author1 : 'author_1',
         author2 : 'author_2'
       };
-      var _resultFilePath = path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.xml');
+      path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.xml');
       carbone.render('test_word_render_2003_XML.xml', _data, {complement : _complement}, function (err, result) {
         assert.equal(err, null);
         assert.equal(result.indexOf('field1'), -1);
@@ -395,7 +394,7 @@ describe('Carbone', function () {
       });
     });
     it('(zipped file) should accept a second data object with the marker {c.}', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
+      path.resolve('./test/datasets/test_word_render_A.docx');
       var _data = {
         field1 : 'field_1',
         field2 : 'field_2'
@@ -406,7 +405,7 @@ describe('Carbone', function () {
       };
       carbone.render('test_word_render_A.docx', _data, {complement : _complement}, function (err, result) {
         assert.equal(err, null);
-        fs.mkdirSync(testPath, 0755);
+        fs.mkdirSync(testPath, parseInt('0755', 8));
         var _document = path.join(testPath, 'file.docx');
         var _unzipPath = path.join(testPath, 'unzip');
         fs.writeFileSync(_document, result);
@@ -425,7 +424,7 @@ describe('Carbone', function () {
       });
     });
     it('should translate the file and insert three product rows', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_odt_render_translate.odt');
+      path.resolve('./test/datasets/test_odt_render_translate.odt');
       // var _fileLangPath = path.resolve('./test/datasets/lang/fr.json');
       var _data = [{
         name  : 'Bouteille de sirop d’érable 25cl',
@@ -460,7 +459,7 @@ describe('Carbone', function () {
         // helper.assert(err, null);
       carbone.render('test_odt_render_translate.odt', _data, function (err, result) {
         assert.equal(err, null);
-        fs.mkdirSync(testPath, 0755);
+        fs.mkdirSync(testPath, parseInt('0755', 8));
         var _document = path.join(testPath, 'file.odt');
         var _unzipPath = path.join(testPath, 'unzip');
         fs.writeFileSync(_document, result);
@@ -535,7 +534,7 @@ describe('Carbone', function () {
       }];
       carbone.render('test_xlsx_list.xlsx', _data, function (err, result) {
         assert.equal(err, null);
-        fs.mkdirSync(testPath, 0755);
+        fs.mkdirSync(testPath, parseInt('0755', 8));
         var _document = path.join(testPath, 'file.xlsx');
         var _unzipPath = path.join(testPath, 'unzip');
         fs.writeFileSync(_document, result);
@@ -598,7 +597,7 @@ describe('Carbone', function () {
         id   : 2,
         name : 'field_2'
       }];
-      carbone.render(_filePath, data, {convertTo : 'xls'}, function (err, result) {
+      carbone.render(_filePath, data, {convertTo : 'xls'}, function (err) {
         helper.assert(err, null);
         // fs.writeFileSync('test.xls', result);
         // TODO TODO TODO TODO TODO TODO TODO TODO : test the content of the xls
@@ -774,7 +773,7 @@ function unzipSystem (filePath, destPath, callback) {
   _unzip.stderr.on('data', function (data) {
     throw Error(data);
   });
-  _unzip.on('exit', function (code) {
+  _unzip.on('exit', function () {
     var _filesToParse = helper.walkDirSync(destPath);
     for (var i = 0; i < _filesToParse.length; i++) {
       var _file = _filesToParse[i];

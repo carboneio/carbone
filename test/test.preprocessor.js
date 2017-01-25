@@ -1,11 +1,6 @@
-var assert = require('assert');
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
-var carbone = require('../lib/index');
 var path  = require('path');
-var fs = require('fs');
-var testPath = path.join(__dirname,'test_file');
-var spawn = require('child_process').spawn;
 
 describe('preprocessor', function () {
   describe('execute', function () {
@@ -26,8 +21,8 @@ describe('preprocessor', function () {
     describe('XSLX preprocessing', function () {
       var _sharedStringBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
                               + '<t>{d.name}</t></si><si><t>{d.id}</t></si></sst>';
-      var _sharedStringAfter  = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
-                              + '<t></t></si><si><t></t></si></sst>';
+      // var _sharedStringAfter  = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
+      //                        + '<t></t></si><si><t></t></si></sst>';
       var _sheetBefore  = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac"><dimension ref="A1:C3"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="C3" sqref="C3"/></sheetView></sheetViews><sheetFormatPr baseColWidth="10" defaultRowHeight="15" x14ac:dyDescent="0"/><sheetData>\n'
                         + '<row r="1" spans="1:3"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c><c r="C1" t="s"><v>2</v></c></row>\n'
                         + '<row r="2" spans="1:3"><c r="A2" t="s"><v>3</v></c><c r="B2"><v>100</v></c><c r="C2"><f>B2*100</f><v>10000</v></c></row>\n'
@@ -39,7 +34,7 @@ describe('preprocessor', function () {
                         + '<row  ><c  t="inlineStr"><is><t>{d.name}</t></is></c><c  t="inlineStr"><is><t>{d.id}</t></is></c><c  t="e"><f>B3*100</f><v>#VALUE!</v></c></row>\n'
                         + '</sheetData><pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/><extLst><ext uri="{64002731-A6B0-56B0-2670-7721B7C09600}" xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main"><mx:PLV Mode="0" OnePage="0" WScale="0"/></ext></extLst></worksheet>';
       var _sharedStringBefore2 = _sharedStringBefore.replace('{d.id}', '{d.type}');
-      var _sharedStringAfter2 = _sharedStringAfter.replace('{d.id}', '{d.type}');
+      //  var _sharedStringAfter2 = _sharedStringAfter.replace('{d.id}', '{d.type}');
       var _sheetBefore2 = _sheetBefore.replace('{d.id}', '{d.type}');
       var _sheetAfter2 = _sheetAfter.replace('{d.id}', '{d.type}');
       helper.assert(_sheetAfter2 !== _sheetAfter, true);
@@ -320,8 +315,8 @@ describe('preprocessor', function () {
           var _xml      = '<c spans="1:2" r="A1" x14ac:dyDescent="0.2">';
           var _expected = '<c   x14ac:dyDescent="0.2">';
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
-          var _xml      = '<row spans="1:2" r="1" x14ac:dyDescent="0.2">';
-          var _expected = '<row   x14ac:dyDescent="0.2">';
+          _xml      = '<row spans="1:2" r="1" x14ac:dyDescent="0.2">';
+          _expected = '<row   x14ac:dyDescent="0.2">';
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
         });
         it('should not remove absolute position "r=" in other tags than "c" or "row"', function () {

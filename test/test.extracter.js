@@ -1,8 +1,4 @@
-var assert = require('assert');
-var carbone = require('../lib/index');
 var extracter = require('../lib/extracter');
-var path  = require('path');
-var fs = require('fs');
 var helper = require('../lib/helper');
 
 describe('extracter', function () {

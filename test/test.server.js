@@ -2,16 +2,12 @@ var rootPath = process.cwd(); // where "make test" is called
 var assert = require('assert');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
-var http = require('http');
 var Socket = require('../lib/socket');  
-var url = require('url');
 var helper  = require('../lib/helper');
 var format  = require('../lib/format');
 var path = require('path');
 var carbone = require('../lib/index');
-var server;
 var tempPath = path.join(__dirname,'tempfile');
-var os = require('os');
 
 
 describe('Server', function () {
@@ -23,12 +19,12 @@ describe('Server', function () {
       helper.rmDirRecursive(tempPath);
     });
     it('should start the server on port 4000 and accept to receive conversion jobs via the socket (with binary data)', function (done) {
-      fs.mkdirSync(tempPath, 0755);
+      fs.mkdirSync(tempPath, parseInt('0755', 8));
       executeServer(['server', '--port', 4000], function () {
         var _inputFile = path.resolve('./test/datasets/test_odt_render_static.odt');
         var _outputFile = path.join(tempPath, 'my_converted_file.pdf');
         var _client = new Socket(4000, '127.0.0.1', 10000);
-        _client.on('error', function (err) {});
+        _client.on('error', function () {});
         _client.startClient();
         var _file = fs.readFileSync(_inputFile);
         var _job = {
@@ -50,12 +46,12 @@ describe('Server', function () {
       });
     });
     it('accept to receive conversion with a link to a local file instead of a buffer (for backward compatibility with v0.10)', function (done) {
-      fs.mkdirSync(tempPath, 0755);
+      fs.mkdirSync(tempPath, parseInt('0755', 8));
       executeServer(['server', '--port', 4000], function () {
         var _inputFile = path.resolve('./test/datasets/test_odt_render_static.odt');
         var _outputFile = path.join(tempPath, 'my_converted_file.pdf');
         var _client = new Socket(4000, '127.0.0.1', 10000);
-        _client.on('error', function (err) {});
+        _client.on('error', function () {});
         _client.startClient();
         var _job = {
           inputFile  : _inputFile,
@@ -77,7 +73,7 @@ describe('Server', function () {
       });
     });
     it('should convert the document using the server on port 4001', function (done) {
-      fs.mkdirSync(tempPath, 0755);
+      fs.mkdirSync(tempPath, parseInt('0755', 8));
       carbone.set({
         tempPath         : tempPath,
         port             : 4001,
@@ -87,7 +83,7 @@ describe('Server', function () {
       executeServer(['server', '--port', 4001], function () {
         var _client = new Socket(4001, '127.0.0.1', 10000);
         _client.startClient();
-        _client.on('error', function (err) {});
+        _client.on('error', function () {});
         var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
         var data = {
           field1 : 'field_1',
@@ -117,23 +113,13 @@ describe('Server', function () {
 
 function executeServer (params, callback) {
   var _commandToTest = rootPath+'/bin/carbone'; 
-  server = spawn(_commandToTest, params, {cwd : rootPath});
+  spawn(_commandToTest, params, {cwd : rootPath}); //stop by the client
   // server.stdout.on('data', function (data) {
   //  console.log('\n\nstdout: ' + data+'\n\n');
   // });
   // server.stderr.on('data', function (data) {
   //  console.log('\n\nstderr: ' + data+'\n\n');
   // });
-  setTimeout(function () {
-    callback();
-  }, 200);
-}
-
-// Unable to use a kill signal, I don't know why?
-function stopServer (callback) {
-  if (server) {
-    server.kill();
-  }
   setTimeout(function () {
     callback();
   }, 200);

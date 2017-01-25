@@ -1,8 +1,5 @@
 var assert = require('assert');
-var carbone = require('../lib/index');
 var builder = require('../lib/builder');
-var path  = require('path');
-var fs = require('fs');
 var helper = require('../lib/helper');
 
 describe('builder.buildXML', function () {
@@ -930,7 +927,7 @@ describe('builder.buildXML', function () {
                +'</xml>';
     var _start = new Date();
     for (var i = 0; i < _nbExecuted; i++) {
-      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      builder.buildXML(_xml, _data, function (err) {
         _waitedResponse--;
         if (_waitedResponse === 0) {
           theEnd();

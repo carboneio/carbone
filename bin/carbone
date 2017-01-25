@@ -5,21 +5,21 @@ var server = require('../lib/server');
 var translator = require('../lib/translator');
 var _action = process.argv[2];
 
-switch(_action){
+switch (_action) {
   case 'server':
     server(process.argv.slice(3));
     break;
-  case "generateLang":
+  case 'generateLang':
     translator.handleParams(process.argv.slice(3));
     break;
   default:
     usage(); 
 }
 
-function usage(){
+function usage () {
   console.log('*************************************');
   console.log('Carbone Usage:');
   console.log('   carbone server [--help]');
   console.log('   carbone generateLang [--help]');
   process.exit();
-};
+}

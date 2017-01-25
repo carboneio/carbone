@@ -16,11 +16,11 @@
  * @param  {String} separator   [optional] item separator (`,` by default)
  * @return {String}             computed result, or `d` if `d` is not an array
  */
-function arrayJoin(d, separator){
-  if(separator === undefined){
+function arrayJoin (d, separator) {
+  if (separator === undefined) {
     separator = ', ';
   }
-  if(d instanceof Array){
+  if (d instanceof Array) {
     return d.join(separator);
   }
   return d;
@@ -47,31 +47,31 @@ function arrayJoin(d, separator){
  * @param  {String} attributeSeparator   [optional] attribute separator (`:` by default)
  * @return {String}                      the computed result, or `d` if `d` is not an array
  */
-function arrayMap(d, objSeparator, attributeSeparator){
-  if(objSeparator === undefined){
+function arrayMap (d, objSeparator, attributeSeparator) {
+  if (objSeparator === undefined) {
     objSeparator = ', ' ;
   }
-  if(attributeSeparator === undefined){
+  if (attributeSeparator === undefined) {
     attributeSeparator = ':' ;
   }
   var _isAttributeFilterActive = arguments.length > 3;
   var _res = [];
-  if(d instanceof Array){
+  if (d instanceof Array) {
     for (var i = 0; i < d.length; i++) {
       var _obj = d[i];
       var _flatObj = [];
-      //if user want to print only some attributes, avoid looping on whole object
-      if(_isAttributeFilterActive === true){
+      // if user want to print only some attributes, avoid looping on whole object
+      if (_isAttributeFilterActive === true) {
         for (var j = 3; j < arguments.length; j++) {
           var _attr = arguments[j];
           _flatObj.push(_obj[_attr]);
         }
       }
-      //else, loop on all attributes and print each one it is not an object
-      else{
-        for(var _attr in _obj){
+      // else, loop on all attributes and print each one it is not an object
+      else {
+        for (var _attr in _obj) {
           var _val = _obj[_attr];
-          if(!(_val instanceof Object)){
+          if (!(_val instanceof Object)) {
             _flatObj.push(_val);
           }
         }

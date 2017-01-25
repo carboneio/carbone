@@ -16,14 +16,14 @@
  * @param  {Boolean} continueOnSuccess [optional], if true, next formatter will be called even if the condition is true
  * @return {Mixed}                     `message` if condition is true, `d` otherwise
  */
-function ifEmpty(d, message, continueOnSuccess){
-  if(  d === null
+function ifEmpty (d, message, continueOnSuccess) {
+  if (  d === null
     || typeof(d) === 'undefined'
     || d === ''
     || d instanceof Array && d.length === 0
     || d.constructor === Object && Object.keys(d).length === 0
-    || Number.isNaN(d) === true){
-    if(continueOnSuccess !== true && continueOnSuccess !== 'true'){
+    || Number.isNaN(d) === true) {
+    if (continueOnSuccess !== true && continueOnSuccess !== 'true') {
       this.stopPropagation = true;
     }
     return message;
@@ -49,10 +49,10 @@ function ifEmpty(d, message, continueOnSuccess){
  * @param  {Boolean}                  continueOnSuccess [optional], if true, next formatter will be called even if the condition is true
  * @return {Mixed}                    `message` if condition is true, `d` otherwise
  */
-function ifEqual(d, value, messageIfTrue, continueOnSuccess){
-  //Convert everything in string (not strict Equal)
-  if(d == value){
-    if(continueOnSuccess !== true && continueOnSuccess !== 'true'){
+function ifEqual (d, value, messageIfTrue, continueOnSuccess) {
+  // Convert everything in string (not strict Equal)
+  if (d == value) { // eslint-disable-line
+    if (continueOnSuccess !== true && continueOnSuccess !== 'true') {
       this.stopPropagation = true;
     }
     return messageIfTrue;
@@ -79,9 +79,9 @@ function ifEqual(d, value, messageIfTrue, continueOnSuccess){
  * @param  {Boolean}                  continueOnSuccess [optional], if true, next formatter will be called even if the condition is true
  * @return {Mixed}                    `message` if condition is true, `d` otherwise
  */
-function ifContain(d, value, messageIfTrue, continueOnSuccess) {
-  if((typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) !== -1){
-    if(continueOnSuccess !== true && continueOnSuccess !== 'true'){
+function ifContain (d, value, messageIfTrue, continueOnSuccess) {
+  if ((typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) !== -1) {
+    if (continueOnSuccess !== true && continueOnSuccess !== 'true') {
       this.stopPropagation = true;
     }
     return messageIfTrue;

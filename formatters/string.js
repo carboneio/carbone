@@ -9,8 +9,8 @@
  * @param  {String} d string to parse
  * @return {String}   lower case on all letters, or `d` is it not a string
  */
-function lowerCase(d){
-  if(typeof d === 'string'){
+function lowerCase (d) {
+  if (typeof d === 'string') {
     return d.toLowerCase();
   }
   return d;
@@ -27,8 +27,8 @@ function lowerCase(d){
  * @param  {String} d string to parse
  * @return {String}   upper case on all letters, or `d` is it not a string
  */
-function upperCase(d){
-  if(typeof d === 'string'){
+function upperCase (d) {
+  if (typeof d === 'string') {
     return d.toUpperCase();
   }
   return d;
@@ -46,8 +46,8 @@ function upperCase(d){
  * @param  {String} d string to parse
  * @return {String}   upper case on the first letter, or `d` is it not a string
  */
-function ucFirst(d){
-  if(typeof d === 'string'){
+function ucFirst (d) {
+  if (typeof d === 'string') {
     return d.charAt(0).toUpperCase() + d.slice(1);
   }
   return d;
@@ -65,10 +65,10 @@ function ucFirst(d){
  * @param  {String} d string to parse
  * @return {String}   upper case on all words, or `d` is it not a string
  */
-function ucWords(d){
-  if(typeof d === 'string'){
-    return d.replace(/(?:^|\s)\S/g, function(a) {
-        return a.toUpperCase();
+function ucWords (d) {
+  if (typeof d === 'string') {
+    return d.replace(/(?:^|\s)\S/g, function (a) {
+      return a.toUpperCase();
     });
   }
   return d;
@@ -86,7 +86,7 @@ function ucWords(d){
  * @param  {String}  message     text to print
  * @return {String} `message` is always printed
  */
-function print(d, message){
+function print (d, message) {
   return message;
 }
 
@@ -110,10 +110,10 @@ function print(d, message){
  * @param  {String}         type   enum name passed in `options` of `carbone.render(data, options)`
  * @return {String}         return human readable enum or original value if it cannot be converted
  */
-function convEnum(d, type){
-  if(this.enum !== undefined){
+function convEnum (d, type) {
+  if (this.enum !== undefined) {
     var _type = this.enum[type];
-    if(_type !== undefined && _type[d] !== undefined){
+    if (_type !== undefined && _type[d] !== undefined) {
       return _type[d];
     }
   }

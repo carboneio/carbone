@@ -927,7 +927,7 @@ describe('builder.buildXML', function () {
                +'</xml>';
     var _start = new Date();
     for (var i = 0; i < _nbExecuted; i++) {
-      builder.buildXML(_xml, _data, function (err) {
+      builder.buildXML(_xml, _data, function () {
         _waitedResponse--;
         if (_waitedResponse === 0) {
           theEnd();

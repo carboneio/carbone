@@ -1,10 +1,7 @@
-var assert = require('assert');
 var dateFormatter = require('../formatters/date');
 var conditionFormatter = require('../formatters/condition');
 var stringFormatter = require('../formatters/string');
 var arrayFormatter = require('../formatters/array');
-var path  = require('path');
-var fs = require('fs');
 var helper = require('../lib/helper');
 
 describe('formatter', function () {

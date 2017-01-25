@@ -1,7 +1,5 @@
 var assert = require('assert');
 var parser = require('../lib/parser');
-var path  = require('path');
-var fs = require('fs');
 var helper = require('../lib/helper');
 
 describe('parser', function () {
@@ -70,7 +68,7 @@ describe('parser', function () {
       });
     });
     it('should convert conflicting characters', function (done) {
-      parser.findMarkers("<div>{menu}<div> it's \n   {city}", function (err, cleanedXml, markers) {
+      parser.findMarkers("<div>{menu}<div> it's \n   {city}", function (err, cleanedXml) {
         helper.assert(err, null);
         helper.assert(cleanedXml, "<div><div> it\\\'s     ");
         done();

@@ -1,6 +1,5 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
-var path  = require('path');
 
 describe('preprocessor', function () {
   describe('execute', function () {

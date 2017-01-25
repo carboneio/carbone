@@ -63,11 +63,11 @@ function arrayMap (d, objSeparator, attributeSeparator) {
       // if user want to print only some attributes, avoid looping on whole object
       if (_isAttributeFilterActive === true) {
         for (var j = 3; j < arguments.length; j++) {
-          var _attr = arguments[j];
-          _flatObj.push(_obj[_attr]);
+          var _att = arguments[j];
+          _flatObj.push(_obj[_att]);
         }
       }
-      // else, loop on all attributes and print each one it is not an object
+      // else, loop on all attributes and print each one if it is not an object
       else {
         for (var _attr in _obj) {
           var _val = _obj[_attr];

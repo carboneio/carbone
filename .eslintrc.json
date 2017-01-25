@@ -8,6 +8,7 @@
   },
   "plugins" : [],
   "extends": "eslint:recommended",
+  "ignore-path" : ".gitignore",
   "rules": {
     "one-var"                       : [ "warn" , "never"     ], // Disallow declaration of multiple var in one line
     "space-before-blocks"           : [ "warn" , "always"    ], // Enforce space before {}

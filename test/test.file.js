@@ -1,5 +1,5 @@
 var assert = require('assert');
-var should = require('should');
+var should = require('should'); // eslint-disable-line
 var file = require('../lib/file');
 var helper = require('../lib/helper');
 var carbone = require('../lib/index');

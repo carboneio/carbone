@@ -113,7 +113,7 @@ describe('Server', function () {
 
 function executeServer (params, callback) {
   var _commandToTest = rootPath+'/bin/carbone'; 
-  spawn(_commandToTest, params, {cwd : rootPath}); //stop by the client
+  spawn(_commandToTest, params, {cwd : rootPath}); // stop by the client
   // server.stdout.on('data', function (data) {
   //  console.log('\n\nstdout: ' + data+'\n\n');
   // });

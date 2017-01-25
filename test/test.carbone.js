@@ -6,7 +6,7 @@ var helper = require('../lib/helper');
 var converter = require('../lib/converter');
 var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
-var should = require('should');
+var should = require('should'); // eslint-disable-line
 var spawn = require('child_process').spawn;
 
 describe('Carbone', function () {
@@ -665,7 +665,7 @@ describe('Carbone', function () {
       var _options = {
         convertTo : null
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render(_filePath, data, _options, function (err) {
         helper.assert(err, null);
         done();
       });

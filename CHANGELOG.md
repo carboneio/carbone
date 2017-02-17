@@ -1,6 +1,8 @@
 # CarboneJS
 
 ### v0.13.0
+  - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays: 
+    - `{d.cities[i, temp=20]..countryName}` prints `d.countryName` only when the temperature of cities equals 20
   - Built-in conditional formatters, which starts by `if`, stop propagation to next formatters if the condition is true
   - New formatters:
     - `convEnum(d, type)`: convert enums to human readable values
@@ -8,29 +10,31 @@
     - `ifContain(d, value, messageIfTrue, continueOnSuccess)`: show message if `d contains value`, and stop propagation to next formatters unless `continueOnSuccess` is true
     - `print(d, message)`: print message
   - New function `carbone.renderXML(xmlString, data, options, callback)` to render XML directly
-  - Change the lang dynamically in `carbone.render` and `carbone.renderXML` with `options.lang = 'fr'`
-  - Replace module zipfile by yauzl
+  - Change the lang dynamically in `carbone.render` and `carbone.renderXML` with `options.lang = 'fr'`. The date formatter is automatically propagated on formatters such as `convDate`
+  - Replace module zipfile by yauzl: faster, lighter, asynchrone 
   - XLSX templates are accepted (beta)
   - Parse embedded XLSX and DOCX documents
 
 
 ### v0.12.5
   - Bump moment.js to 2.17.0
-  - Add some powerful and tested formatters: ifEmpty, arrayJoin, arrayMap, convDate, lowerCase, upperCase, ucFirst, ucWords
-  - Fix: in formatters convert, format, addDays, parse: if the date is null or undefined these formatters return null or undefined instead of "Invalid Date"
+  - Add some powerful and tested formatters: `ifEmpty`, `arrayJoin`, `arrayMap`, `convDate`, `lowerCase`, `upperCase`, `ucFirst`, `ucWords`
+  - Fix: in formatters `convert`, `format`, `addDays`, `parse`: if the date is null or undefined these formatters return null or undefined instead of "Invalid Date"
 
 ### v0.12.4
   - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions` 
 
 ### v0.12.3
   - Fix: on OSX, the LibreOffice 5.2 path has changed
-  - Possibility to add the source file extension when using convert() function. It is mandatory for CSV files otherwise LibreOffice does not understand the file type. 
-    Example in `options` parameter = {
+  - Possibility to add the source file extension in `options` when using `convert(data, convertTo, options, callback)` function. It is mandatory for CSV files otherwise LibreOffice does not understand the file type.
+  ```
+    {
       fieldSeparator  : ',',
       textDelimiter   : '"',
       characterSet    : '76',
       sourceExtension : '.csv'
     }
+  ```
 
 ### v0.12.2
   - Fixed crash when a document cannot be parsed. It returns an error instead of crashing

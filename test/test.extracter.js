@@ -1,5 +1,6 @@
 var extracter = require('../lib/extracter');
 var helper = require('../lib/helper');
+var assert = require('assert');
 
 describe('extracter', function () {
 
@@ -65,6 +66,84 @@ describe('extracter', function () {
           ]
         }
       });
+    });
+    it('should go up to parent object if two points ".." are used', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site..name'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
+        dsite : { name : 'site' , type : 'object', parent : 'd', parents : ['d'],  xmlParts : [
+            {attr : 'name', formatters : [], obj : 'd', pos : 20},
+          ]
+        }
+      });
+    });
+    it('should go up to third parent if four points "...." are used', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site.car.wheel.tyre....name'}
+      ];
+      var _result = extracter.splitMarkers(_markers);
+      helper.assert(_result.d.xmlParts, []);
+      helper.assert(_result.dsite.xmlParts, []);
+      helper.assert(_result.dsitecar.xmlParts, []);
+      helper.assert(_result.dsitecarwheel.xmlParts, []);
+      helper.assert(_result.dsitecarwheeltyre.xmlParts, [
+        {attr : 'name', formatters : [], obj : 'dsite', pos : 20}
+      ]);
+    });
+    it('should go up in hierarchy even with an array', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site.car[i]..name'},
+        {pos : 24, name : 'd.site.car[i+1]..name'}
+      ];
+      var _result = extracter.splitMarkers(_markers);
+      helper.assert(_result.d.xmlParts, []);
+      helper.assert(_result.dsite.xmlParts, []);
+      helper.assert(_result.dsitecar.xmlParts, [
+        {attr : 'name', formatters : [], obj : 'dsite', pos : 20}
+      ]);
+    });
+    it('should go up in hierarchy even with two arrays', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site.car[i].wheel[i]..name'},
+        {pos : 24, name : 'd.site.car[i+1].wheel[i+1]..name'}
+      ];
+      var _result = extracter.splitMarkers(_markers);
+      helper.assert(_result.d.xmlParts, []);
+      helper.assert(_result.dsite.xmlParts, []);
+      helper.assert(_result.dsitecar.xmlParts, []);
+      helper.assert(_result.dsitecarwheel.xmlParts, [
+        {attr : 'name', formatters : [], obj : 'dsitecar', pos : 20}
+      ]);
+    });
+    it('should go up in hierarchy up to the root, even with two arrays', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site.car[i].wheel[i]....name'},
+        {pos : 24, name : 'd.site.car[i+1].wheel[i+1]....name'}
+      ];
+      var _result = extracter.splitMarkers(_markers);
+      helper.assert(_result.d.xmlParts, []);
+      helper.assert(_result.dsite.xmlParts, []);
+      helper.assert(_result.dsitecar.xmlParts, []);
+      helper.assert(_result.dsitecarwheel.xmlParts, [
+        {attr : 'name', formatters : [], obj : 'd', pos : 20}
+      ]);
+    });
+    it('should throw an error if we go up to high with ".."', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site...name'}
+      ];
+      assert.throws(
+        () => {
+          extracter.splitMarkers(_markers);
+        },
+        (err) => {
+          err.should.be.an.instanceOf(Error);
+          err.message.should.containEql('Cannot access parent object in "d.site...name" (too high)');
+          return true;
+        }
+      );
     });
     it('should accept two levels of object and many attributes', function () {
       var _markers = [

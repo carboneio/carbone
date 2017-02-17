@@ -1012,6 +1012,36 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('shoud go up in hierarchy using two points ".."', function (done) {
+    var _xml = '<xml><tr> {d.cars[i]..who} </tr><tr> {d.cars[i+1]..who} </tr></xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><tr> test </tr><tr> test </tr><tr> test </tr></xml>');
+      done();
+    });
+  });
+  it('shoud go up in hierarchy using two points ".." and accept filters', function (done) {
+    var _xml = '<xml><tr> {d.cars[i, brand="Lumeneo"]..who} </tr><tr> {d.cars[i+1]..who} </tr></xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><tr> test </tr></xml>');
+      done();
+    });
+  });
   /* it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [

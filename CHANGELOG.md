@@ -1,4 +1,6 @@
 
+### v0.13.1
+
 ### v0.13.0
   - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays: 
     - `{d.cities[i, temp=20]..countryName}` prints `d.countryName` only when the temperature of cities equals 20

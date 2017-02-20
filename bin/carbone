@@ -3,6 +3,7 @@
 
 var server = require('../lib/server');
 var translator = require('../lib/translator');
+var tool = require('../lib/tool');
 var _action = process.argv[2];
 
 switch (_action) {
@@ -11,6 +12,9 @@ switch (_action) {
     break;
   case 'generateLang':
     translator.handleParams(process.argv.slice(3));
+    break;
+  case 'find':
+    tool.findMarkers(process.argv.slice(3));
     break;
   default:
     usage(); 

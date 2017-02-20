@@ -14,6 +14,7 @@
   - Replace module zipfile by yauzl: faster, lighter, asynchrone 
   - XLSX templates are accepted (beta)
   - Parse embedded XLSX and DOCX documents
+  - Add a tool to search a text within a marker in all reports `carbone find :formatterName` 
 
 
 ### v0.12.5

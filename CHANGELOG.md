@@ -1,4 +1,3 @@
-# CarboneJS
 
 ### v0.13.0
   - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays: 

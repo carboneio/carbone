@@ -1027,6 +1027,25 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('shoud go up in hierarchy using two points ".." and go down', function (done) {
+    var _xml = '<xml><tr> {d.cars[i]..who.name.sex} </tr><tr> {d.cars[i+1]..who.name.sex} </tr></xml>';
+    var _data = {
+      who : {
+        name : {
+          sex : 'male'
+        }
+      },
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><tr> male </tr><tr> male </tr><tr> male </tr></xml>');
+      done();
+    });
+  });
   it('shoud go up in hierarchy using two points ".." and accept filters', function (done) {
     var _xml = '<xml><tr> {d.cars[i, brand="Lumeneo"]..who} </tr><tr> {d.cars[i+1]..who} </tr></xml>';
     var _data = {

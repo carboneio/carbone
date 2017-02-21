@@ -79,6 +79,20 @@ describe('extracter', function () {
         }
       });
     });
+    it('should go up to parent object and if two points ".." are used', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site..other.sub.name'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
+        dsite : { name : 'site' , type : 'object', parent : 'd', parents : ['d'],  xmlParts : [
+            {attr : 'name', formatters : [], obj : 'dothersub', pos : 20},
+        ]
+        },
+        dother    : { name : 'other', type : 'object', parent : 'd'      , parents : ['d']           ,  xmlParts : [] },
+        dothersub : { name : 'sub'  , type : 'object', parent : 'dother' , parents : ['d', 'dother'] ,  xmlParts : [] }
+      });
+    });
     it('should go up to third parent if four points "...." are used', function () {
       var _markers = [
         {pos : 20, name : 'd.site.car.wheel.tyre....name'}
@@ -103,6 +117,22 @@ describe('extracter', function () {
       helper.assert(_result.dsitecar.xmlParts, [
         {attr : 'name', formatters : [], obj : 'dsite', pos : 20}
       ]);
+    });
+    it('should go up in hierarchy, and set parents of rootdsub', function () {
+      // root.d.cars[i]..who.name
+      var _markers = [
+        {pos : 20, name : 'root.d.car[i]..sub.name'},
+        {pos : 24, name : 'root.d.car[i+1]..sub.name'}
+      ];
+      var _result = extracter.splitMarkers(_markers);
+      helper.assert(_result.root.xmlParts, []);
+      helper.assert(_result.rootd.xmlParts, []);
+      helper.assert(_result.rootdcar.xmlParts, [
+        {attr : 'name', formatters : [], obj : 'rootdsub', pos : 20}
+      ]);
+      helper.assert(_result.rootdsub.xmlParts, []);
+      helper.assert(_result.rootdsub.parent, 'rootd');
+      helper.assert(_result.rootdsub.parents, ['root', 'rootd']);
     });
     it('should go up in hierarchy even with two arrays', function () {
       var _markers = [
@@ -129,6 +159,23 @@ describe('extracter', function () {
       helper.assert(_result.dsitecarwheel.xmlParts, [
         {attr : 'name', formatters : [], obj : 'd', pos : 20}
       ]);
+    });
+    it('should go up in hierarchy up to the root, even with two arrays, and go down', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site.car[i].wheel[i]...name.sub.id'},
+        {pos : 24, name : 'd.site.car[i+1].wheel[i+1]...name.sub.id'}
+      ];
+      var _result = extracter.splitMarkers(_markers);
+      helper.assert(_result.d.xmlParts, []);
+      helper.assert(_result.dsite.xmlParts, []);
+      helper.assert(_result.dsitecar.xmlParts, []);
+      helper.assert(_result.dsitecarwheel.xmlParts, [
+        {attr : 'id', formatters : [], obj : 'dsitenamesub', pos : 20}
+      ]);
+      helper.assert(_result.dsitename.xmlParts, []);
+      helper.assert(_result.dsitename.parent, 'dsite');
+      helper.assert(_result.dsitenamesub.xmlParts, []);
+      helper.assert(_result.dsitenamesub.parent, 'dsitename');
     });
     it('should throw an error if we go up to high with ".."', function () {
       var _markers = [

@@ -1,6 +1,8 @@
 
 ### v0.13.1
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`
+  - Do not crash when there is a javascript error during building process
+  - Improve error outputs: detect when an unknown formatter is used, and propose a correction
 
 ### v0.13.0
   - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays: 

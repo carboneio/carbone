@@ -150,4 +150,32 @@ describe('helper', function () {
     });
   });
 
+  describe('distance(str, str)', function () {
+    it('should return 0 with empty string', function () {
+      assert.equal( helper.distance('', ''), 0 );
+    });
+    it('should return 2 if there is two different character', function () {
+      assert.equal( helper.distance('titi', 'toto'), 2);
+    });
+    it('should return 2 if there is two different character', function () {
+      assert.equal( helper.distance('azertyuiop12345', 'ytrezauiop02345'), 7);
+    });
+  });
+
+  describe('findClosest(str, choices)', function () {
+    it('should return an empty string', function () {
+      assert.equal( helper.findClosest(''   , [])       , '' );
+      assert.equal( helper.findClosest(''   , [''])     , '' );
+      assert.equal( helper.findClosest('bla', [])       , '' );
+      assert.equal( helper.findClosest(''   , ['bla'])  , '' );
+    });
+    it('should return toto', function () {
+      assert.equal( helper.findClosest('titi', ['blabla', 'croco', 'toto']), 'toto');
+    });
+    it('should accept an object of choices', function () {
+      assert.equal( helper.findClosest('titi', {blabla : 1, croco : 2, toto : 3}), 'toto');
+    });
+  });
+
+
 });

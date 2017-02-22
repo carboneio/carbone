@@ -150,6 +150,16 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should return an error if the formatter does not exist', function (done) {
+      var data = {
+        param : 1
+      };
+      carbone.renderXML('<xml>{d.param:ifEkual(2, \'two\')}</xml>', data, function (err, result) {
+        helper.assert(err+'', 'Error: Formatter \"ifEkual\" does not exist. Do you mean "ifEqual"?');
+        helper.assert(result, null);
+        done();
+      });
+    });
     it('#1 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function (done) {
       var data = {
         param : 1

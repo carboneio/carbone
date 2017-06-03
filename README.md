@@ -1,20 +1,39 @@
-CarboneJS
-=========
+Carbone.io
+==========
+**Fast, Simple and Powerful report generator** in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, ...
 
-- **Fast, Simple and Powerful report generator** in any XML-based formats : DOCX, XLSX, ODT, PPTX, ODS, ...
-- **Generate PDF** thanks to the integrated document converter (depends on LibreOffice)
+https://carbone.io
+
+![Carbone.io Icon](./doc/carbone_icon_small.png)
+
 
 Features
 --------
 
-- Report generator based on templates.
-- Efficient use of LibreOffice to convert documents 
-- Automatically restart LibreOffice if it crahes
-- Configurable number of LibreOffice servers
-- Retry conversion automatically
+- **Extremely simple** : Use only LibreOffice™, OpenOffice™ or Microsoft Office™ to draw your report
+- **Unlimited design** : The limit is your document editor: pagination, headers, footers, tables...
+- **Convert documents** : thanks to the integrated document converter (LibreOffice must be installed)
+- **Unique template engine** : Insert JSON-like markers `{d.companyName}` directly in your document
+- **Flexible** : Use any XML documents as a template: docx, odt, ods, xlsx, html, pptx, odp, custom xml files...
+- **Future-proof** : A powerful XML-agnostic algorithm understands what to do without knowing XML document specifications
+- **Multilanguage** : One template, multiple languages. Update translation files automatically
+- **Format data** : Use built-in date and number formatters or create your own in Javascript
+- **Fast** : Manage multiple LibreOffice threads for document conversion, optimized code generation for each report
 
-Dependencies
-------------
+
+How it works?
+-------------
+
+Carbone is a template engine.
+
+- The template can be any document coming from LibreOffice™, OpenOffice™ or Microsoft Office™  (ods, docx, odt, xslx...)
+- The injected data must be a JSON object or array, coming directly from your existing APIs for example
+
+Carbone analyze your template and inject data in the document. The generated document can be exported as is, or converted to another format (PDF, ...) using LibreOffice if it is installed on the system
+
+
+Getting Started
+---------------
 
 Minimal dependencies: 
 - moxie-zip 
@@ -51,171 +70,5 @@ Be careful, LibreOffice which is provided by the PPA libreoffice/libreoffice-4-0
 The ppa seams to be compiled with  --enable-python=system
 
 
-Other similar solutions
------------------------
-- http://templater.info/
-- http://docxpert.eu/
-- xdocreports : https://code.google.com/p/xdocreport
-- JODReport : http://jodreports.sourceforge.net/
-- https://www.docmosis.com
-- [Jandoc](https://github.com/jgnewman/jandoc)
-- [node-office](https://github.com/dkiyatkin/node-office)
-- [markdown-word](https://github.com/Trimeego/markdown-word)
-- [excel](https://github.com/trevordixon/excel.js)
-- [js-xlsx](https://github.com/Niggler/js-xlsx)
-- [node-json2officexml](https://github.com/pimetrai/node-json2officexml)
 
 
----
-
-# Getting started
-
-## Install
-First you have to install carbone in your project via `npm` :
-
-```bash
-npm install carbone
-```
-
-## Include in project
-Just like all other node modules you have to `require` carbone :
-
-```javascript
-var carbone = require('carbone');
-```
-
----
-
-## First example
-In this example we will generate a file with two variables inside it.
-
-### File structure
-For this example we will have following structure of files and folders :
-
-```bash
-|-- carbone-example/
-    |-- templates/
-        |-- my-file.docx
-    |-- app.js
-```
-
-Create and save **my-file.docx** in the **templates** folder with only the following line inside it :
-
-```text
-Hello {d.firstname} {d.lastname} !
-```
-
-Open a **Terminal** and go to the **carbone-example** folder :
-
-```bash
-cd carbone-example
-```
-
-Install carbone in this folder
-
-```javascript
-npm install carbone
-```
-
-Open **app.js** file and write :
-
-```javascript
-var fs = require('fs');
-var carbone = require('carbone');
-
-var data = {
-  firstname : 'John',
-  lastname : 'Doe'
-};
-
-carbone.set({
-  templatePath: 'templates'
-});
-
-carbone.render('my-file.docx', data, function(err, result){
-  if (err) {
-    console.error(err);
-    return;
-  }
-
-  fs.writeFileSync('result.docx', result);
-});
-```
-
-Now you just have to execute this file in terminal :
-
-```bash
-node app.js
-```
-
-Now go into **carbone-example** folder and look at the **result.docx** file !
-
----
-
-## Formatters usage example
-In this example we will generate a file with variables and formatters for a date and a number.
-
-### File structure
-For this example we will have following structure of files and folders :
-
-```bash
-|-- carbone-example-formatter/
-    |-- templates/
-        |-- my-file.docx
-    |-- app.js
-```
-
-Create and save **my-file.docx** in the **templates** folder with the following lines inside it :
-
-```text
-Hello {d.firstname} {d.lastname} !
-You are {d.age:int} years old.
-Today’s date is {d.date:format('YYYY/MM/DD')}.
-```
-
-Open a **Terminal** and go to the **carbone-example-formatter** folder :
-
-```bash
-cd carbone-example-formatter
-```
-
-Install carbone in this folder
-
-```javascript
-npm install carbone
-```
-
-Open **app.js** file and write :
-
-```javascript
-var fs = require('fs');
-var carbone = require('carbone');
-
-var data = {
-  firstname : 'John',
-  lastname : 'Doe',
-  age : 24.55,
-  date : new Date()
-};
-
-carbone.set({
-  templatePath: 'templates'
-});
-
-carbone.render('my-file.docx', data, function(err, result){
-  if (err) {
-    console.error(err);
-    return;
-  }
-
-  fs.writeFileSync('result.docx', result);
-});
-```
-
-Now you just have to execute this file in terminal :
-
-```bash
-node app.js
-```
-
-Now go into **carbone-example-formatter** folder and look at the **result.docx** file !

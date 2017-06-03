@@ -15,7 +15,7 @@ var defaultOptions = {
   tempPath       : tempPath
 };
 
-describe('Converter', function () {
+describe.skip('Converter', function () {
   before(function () {
     helper.rmDirRecursive(tempPath);
     fs.mkdirSync(tempPath, '0755');

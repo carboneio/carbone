@@ -48,6 +48,12 @@
   - Fix LO zombie process when node exits
   - Fix: improve detection of markers. And avoid removing non-marker {}
 
+### v0.13.2
+  - Get the last object of an array using negative values when filtering with `i` iterator
+    - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
+    - `{d.cities[i=-2].temperature}` shows the temperature of the city before the last
+    - ...
+
 ### v0.13.1
   - Release February 22, 2017
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`

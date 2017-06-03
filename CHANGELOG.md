@@ -1,4 +1,10 @@
 
+### v1.0.6-ideolys
+  - Get the last object of an array using negative values when filtering with `i` iterator
+    - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
+    - `{d.cities[i=-2].temperature}` shows the temperature of the city before the last
+    - ...
+
 ### v1.0.5-ideolys
   - Release January 12, 2018
   - Fix socket bug

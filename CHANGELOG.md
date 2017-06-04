@@ -1,4 +1,8 @@
 
+### Open Source
+  - Server removed
+  - generateLang -> translate. New UNUSED marker, only translated key are kept
+
 ### v0.13.1
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`
   - Do not crash when there is a javascript error during building process

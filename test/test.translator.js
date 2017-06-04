@@ -93,24 +93,24 @@ describe('translator', function () {
       });
     });
     it('should detect already translated keys, should accept duplicated in keys\
-        should put deleted keys at the top, should sort all keys, should keep old keys\
+        should put deleted keys at the top, should sort all keys, should keep old keys which were translated\
         should detect new keys', function (done) {
       var _currentLang = {
         'ab keys_@@@_UNUSED' : 'ab clés',
-        'these tables'        : '',
-        'my car'              : 'ma voiture',
-        'an apple'            : 'une pomme',
-        'a tower'             : ''
+        'these tables'       : '',
+        'my car'             : 'ma voiture',
+        'an apple'           : 'une pomme',
+        'a tower'            : ''
       };
       translator.createLangObj(_currentLang, ['ac be happy', 'my car', 'these tables'], function (err, newLangObj, meta) {
         helper.assert(err+'', 'null');
         helper.assert(newLangObj, {
-          'a tower_@@@_UNUSED'      : '',
-          'ab keys_@@@_UNUSED'      : 'ab clés',
-          'ac be happy'             : '',
-          'an apple_@@@_UNUSED'     : 'une pomme',
-          'these tables'            : '',
-          'my car'                  : 'ma voiture'
+          // 'a tower_@@@_UNUSED' : '', not kept because there was no translation
+          'ab keys_@@@_UNUSED'  : 'ab clés',
+          'ac be happy'         : '',
+          'an apple_@@@_UNUSED' : 'une pomme',
+          'these tables'        : '',
+          'my car'              : 'ma voiture'
         });
         helper.assert(meta.addedKeys, 1);
         helper.assert(meta.deletedKeys, 2);
@@ -250,7 +250,6 @@ describe('translator', function () {
       var _expectedObjLang = {
         'Canada Products'                   : '',
         'Delivery Date'                     : '',
-        'Error 404_@@@_UNUSED'              : '',
         'excl tax'                          : '',
         From                                : '',
         FromDate                            : '',
@@ -283,7 +282,7 @@ describe('translator', function () {
         'another translation is required' : 'une autre traduction est requise',
         currency                          : 'monnaie',
         'not found'                       : 'non trouve',
-        'Error 404'                       : '',
+        'Error 404'                       : '',  // will be removed because there is no translation
         Total                             : 'Total',
         'Total Amount'                    : 'Montant Total'
       };
@@ -305,7 +304,6 @@ describe('translator', function () {
       var _expectedObjLang = {
         'Canada Products'                   : '',
         'Delivery Date'                     : '',
-        'Error 404_@@@_UNUSED'              : '',
         'excl tax'                          : '',
         'False key_@@@_UNUSED'              : 'fausse clé',
         From                                : '',
@@ -342,7 +340,7 @@ describe('translator', function () {
         'another translation is required' : 'une autre traduction est requise',
         currency                          : 'monnaie',
         'not found'                       : 'non trouve',
-        'Error 404'                       : '',
+        'Error 404'                       : '', // will be removed because there is no translation
         Total                             : 'Total',
         'Total Amount'                    : 'Montant Total'
       };

@@ -6,7 +6,7 @@ var _action = process.argv[2];
 
 switch (_action) {
   case 'translate':
-    translator.handleParams(process.argv.slice(3));
+    translator.handleCLI(process.argv.slice(3));
     break;
   case 'find':
     tool.findMarkers(process.argv.slice(3));

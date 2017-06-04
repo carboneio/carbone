@@ -5,69 +5,155 @@ var fs  = require('fs');
 
 describe('translator', function () {
 
-  describe('generateLang(dir,lang)' ,function () {
-    var _lang = 'test';
-    var _templatePath = path.join(__dirname, 'datasets');
-    var _dirLangPath = path.join(_templatePath,'lang');
-    var _fileLangPath = _dirLangPath+'/'+_lang+'.json';
-
-    after(function (done) {
-      fs.unlink(_fileLangPath, done);
+  describe('findTranslationMarkers' ,function () {
+    it('should return an error when the file does not exist', function (done) {
+      var _templatePath = path.join(__dirname, '../test_docs_incorrect');
+      translator.findTranslationMarkers(_templatePath, [], function (err, keys) {
+        helper.assert(/no such file or directory/.test(err.message), true);
+        helper.assert(keys, []);
+        done();
+      });
     });
 
-
-    it('should return a message when the folder where are docs does not exist', function (done) {
-      helper.rmDirRecursive(_dirLangPath);
-      var _testedPathFalse = path.join(__dirname, '../test_docs_incorrect');
-      translator.generateLang(_testedPathFalse,_lang,function (err) {
-        helper.assert(err, 'docs folder does not exist');
+    it('should return the list of text keys to translate', function (done) {
+      var _templatePath = path.join(__dirname, 'datasets', 'test_odt_to_translate.odt');
+      translator.findTranslationMarkers(_templatePath, [], function (err, keys) {
+        helper.assert(err+'', 'null');
+        helper.assert(keys, [
+          'I need to be translate',
+          'another translation is required'
+        ]);
+        done();
       });
+    });
+  });
+
+  describe('parseFiles' ,function () {
+    it('should do nothing if files is empty', function (done) {
+      translator.parseFiles([], [], function (err, keys) {
+        helper.assert(err+'', 'null');
+        helper.assert(keys, []);
+        done();
+      });
+    });
+    it('should travel all file', function (done) {
+      var _files = [
+        path.join(__dirname, 'datasets', 'test_odt_render_translate.odt'),
+        path.join(__dirname, 'datasets', 'test_odt_to_translate.odt')
+      ];
+      translator.parseFiles(_files, [], function (err, keys) {
+        helper.assert(err+'', 'null');
+        helper.assert(keys, [
+          'another translation is required',
+          'Canada Products',
+          'I need to be translate',
+          "I've an Idea : Revenues >= Sales",
+          'productName',
+          'qty',
+          'total',
+          'unitPrice'
+        ]);
+        done();
+      });
+    });
+  });
+
+  describe('createLangObj' ,function () {
+    it('should do nothing if files is empty', function (done) {
+      translator.createLangObj({}, [], function (err, newLangObj, meta) {
+        helper.assert(err+'', 'null');
+        helper.assert(newLangObj, {});
+        helper.assert(meta.addedKeys, 0);
+        helper.assert(meta.deletedKeys, 0);
+        helper.assert(meta.unalteredKeys, 0);
+        helper.assert(meta.untranslatedKeys, 0); // = new added keys   + old untranslated keys
+        helper.assert(meta.unusedKeys, 0);       // = new deleted keys + old deleted keys
+        done();
+      });
+    });
+    it('should keep deleted keys and add _@@@_UNUSED if new key array is empty', function (done) {
+      var _currentLang = {
+        'an apple'     : 'une pomme',
+        'my car'       : 'ma voiture',
+        'these tables' : 'ces tableaux'
+      };
+      translator.createLangObj(_currentLang, [], function (err, newLangObj, meta) {
+        helper.assert(err+'', 'null');
+        helper.assert(newLangObj, {
+          'an apple_@@@_UNUSED'     : 'une pomme',
+          'my car_@@@_UNUSED'       : 'ma voiture',
+          'these tables_@@@_UNUSED' : 'ces tableaux'
+        });
+        helper.assert(meta.addedKeys, 0);
+        helper.assert(meta.deletedKeys, 3);
+        helper.assert(meta.unalteredKeys, 0);
+        helper.assert(meta.untranslatedKeys, 0);
+        helper.assert(meta.unusedKeys, 3);
+        done();
+      });
+    });
+    it('should detect already translated keys, should accept duplicated in keys\
+        should put deleted keys at the top, should sort all keys, should keep old keys\
+        should detect new keys', function (done) {
+      var _currentLang = {
+        'ab keys_@@@_UNUSED' : 'ab clés',
+        'these tables'        : '',
+        'my car'              : 'ma voiture',
+        'an apple'            : 'une pomme',
+        'a tower'             : ''
+      };
+      translator.createLangObj(_currentLang, ['ac be happy', 'my car', 'these tables'], function (err, newLangObj, meta) {
+        helper.assert(err+'', 'null');
+        helper.assert(newLangObj, {
+          'a tower_@@@_UNUSED'      : '',
+          'ab keys_@@@_UNUSED'      : 'ab clés',
+          'ac be happy'             : '',
+          'an apple_@@@_UNUSED'     : 'une pomme',
+          'these tables'            : '',
+          'my car'                  : 'ma voiture'
+        });
+        helper.assert(meta.addedKeys, 1);
+        helper.assert(meta.deletedKeys, 2);
+        helper.assert(meta.unalteredKeys, 2);
+        helper.assert(meta.untranslatedKeys, 2); // = new added keys + old untranslated keys
+        helper.assert(meta.unusedKeys, 3); // = new deleted keys + old deleted keys
+        done();
+      });
+    });
+  });
+
+
+  describe('generateLang' ,function () {
+    var _lang = 'test';
+    var _templatePath = path.join(__dirname, 'datasets');
+    var _dirLangPath  = path.join(_templatePath, 'lang');
+    var _fileLangPath = path.join(_dirLangPath, _lang + '.json');
+
+    afterEach(function (done) {
+      helper.rmDirRecursive(_dirLangPath);
       done();
     });
 
-    it('should create the lang directory and the lang file when it does not exist', function (done) {
-      // lang directory should not exist
-      helper.rmDirRecursive(_dirLangPath);
-      var _isLangDirectoryExist = true;
-      var _isLangFileExist = false;
-
-      fs.exists(_dirLangPath, function (exists) {
-        if (exists) {
-          _isLangDirectoryExist = true;
-        }
-        else {
-          _isLangDirectoryExist = false;
-        }
-        helper.assert(_isLangDirectoryExist, false);
-
-        // should create the lang directory and the test.json file
-        translator.generateLang(_templatePath,_lang, function () {
-          fs.exists(_dirLangPath, function (exists) {
-            if (exists) {
-              _isLangDirectoryExist = true;
-            }
-            else {
-              _isLangDirectoryExist = false;
-            }
-            helper.assert(_isLangDirectoryExist, true);
-            fs.exists(_fileLangPath, function (exists) {
-              if (exists) {
-                _isLangFileExist = true;
-              }
-              else {
-                _isLangFileExist = false;
-              }
-              helper.assert(_isLangFileExist, true);
-              done();
-            });
-          });
-        });
+    it('should return a message when the folder where are docs does not exist', function (done) {
+      var _testedPathFalse = path.join(__dirname, '../test_docs_incorrect');
+      translator.generateLang(_testedPathFalse, _lang, function (err) {
+        helper.assert(/Invalid path/.test(err), true);
+        done();
       });
     });
 
-    it('should add 26 tranlates keys in the test lang file.', function (done) {
-      helper.rmDirRecursive(_dirLangPath);
-      var expectedObjLang = {
+    it('should create the lang directory and the lang file when it does not exist', function (done) {
+      helper.assert(fs.existsSync(_dirLangPath), false);
+      // should create the lang directory and the test.json file
+      translator.generateLang(_templatePath, _lang, function () {
+        helper.assert(fs.existsSync(_dirLangPath), true);
+        helper.assert(fs.existsSync(_fileLangPath), true);
+        done();
+      });
+    });
+
+    it('should add 26 tranlates keys in the test lang file', function (done) {
+      var _expectedObjLang = {
         'another translation is required'   : '',
         'Canada Products'                   : '',
         currency                            : '',
@@ -95,33 +181,24 @@ describe('translator', function () {
         'Total Amount'                      : '',
         unitPrice                           : ''
       };
-
-      // should create the lang directory and the test.json file
-      translator.generateLang(_templatePath,_lang,function (err,result,bodyMsg,keyTypeCountObject) {
-        fs.readFile(_fileLangPath, 'utf8', function (err,langData) {
+      translator.generateLang(_templatePath, _lang, function (err, result, meta) {
+        fs.readFile(_fileLangPath, 'utf8', function (err, langData) {
           helper.assert(err, null);
-          var fixedResponse = langData.replace(/\\'/g, "'");
-          var objLang = '';
-          if (!err) {
-            objLang = JSON.parse(fixedResponse);
-          }
-          // Does the lang file content corresponding to the expectedData?
-          helper.assert(objLang, expectedObjLang);
-          // Does the generateLang result data correspondind to the file content ?
-          helper.assert(result, objLang);
-          helper.assert(keyTypeCountObject.newKeys, 26);
-          helper.assert(keyTypeCountObject.emptyExistingKeys, 0);
-          helper.assert(keyTypeCountObject.updatedKeys, 0);
-          helper.assert(keyTypeCountObject.deletedKeys, 0);
-          helper.assert(keyTypeCountObject.oldDeletedKeys, 0);
+          var _objLang = JSON.parse(langData);
+          helper.assert(_objLang, _expectedObjLang);
+          helper.assert(result, _objLang);
+          helper.assert(meta.addedKeys, 26);
+          helper.assert(meta.deletedKeys, 0);
+          helper.assert(meta.unalteredKeys, 0);
+          helper.assert(meta.untranslatedKeys, 26);
+          helper.assert(meta.unusedKeys, 0);
           done();
         });
       });
     });
 
-    it('4 translates are defined, 1 is present but without value. These translates must be at the bottom of the lang file \
-      and theirs values should not be updated', function (done) {
-      var expectedObjLang = {
+    it('4 lang keys are defined, 1 is present but without value. These lang keys must be at the bottom of the lang file and their values should not be updated', function (done) {
+      var _expectedObjLang = {
         'Canada Products'                   : '',
         'Delivery Date'                     : '',
         'excl tax'                          : '',
@@ -149,41 +226,38 @@ describe('translator', function () {
         Total                               : 'Total',
         'Total Amount'                      : 'Montant Total'
       };
-
-      var newObjLang = {
+      var _existingObjLang = {
         'excl tax'                        : '',
         'another translation is required' : 'une autre traduction est requise',
         currency                          : 'monnaie',
         Total                             : 'Total',
         'Total Amount'                    : 'Montant Total'
       };
-      fs.writeFile(_fileLangPath, JSON.stringify(newObjLang, null, 2), function (err) {
-        helper.assert(err, null);
-        translator.generateLang(_templatePath,_lang,function (err,result,bodyMsg,keyTypeCountObject) {
-          helper.assert(expectedObjLang, result);
-          helper.assert(keyTypeCountObject.newKeys, 21);
-          helper.assert(keyTypeCountObject.emptyExistingKeys, 1);
-          helper.assert(keyTypeCountObject.updatedKeys, 4);
-          helper.assert(keyTypeCountObject.deletedKeys, 0);
-          helper.assert(keyTypeCountObject.oldDeletedKeys, 0);
-          done();
-        });
+      fs.mkdirSync(_dirLangPath, parseInt('0766', 8));
+      fs.writeFileSync(_fileLangPath, JSON.stringify(_existingObjLang, null, 2));
+      translator.generateLang(_templatePath, _lang, function (err, result, meta) {
+        helper.assert(_expectedObjLang, result);
+        helper.assert(meta.addedKeys, 21);
+        helper.assert(meta.deletedKeys, 0);
+        helper.assert(meta.unalteredKeys, 5);
+        helper.assert(meta.untranslatedKeys, 22);
+        helper.assert(meta.unusedKeys, 0);
+        done();
       });
     });
 
-    it('6 translates are defined. 2 of them should be not found. Theses not found translates must be sorted and find at the \
-      top of the translate file with <!> below them', function (done) {
-      var expectedObjLang = {
-        '<!>Error 404'                      : '',
-        '<!>not found'                      : 'non trouve',
+    it('6 lang keys are defined. 2 of them should be not found. The latter must be sorted and be at the top of the lang file with _@@@_UNUSED marker', function (done) {
+      var _expectedObjLang = {
         'Canada Products'                   : '',
         'Delivery Date'                     : '',
+        'Error 404_@@@_UNUSED'              : '',
         'excl tax'                          : '',
         From                                : '',
         FromDate                            : '',
         'I need to be translate'            : '',
         "I've an Idea : Revenues >= Sales"  : '',
         'Internal Code'                     : '',
+        'not found_@@@_UNUSED'              : 'non trouve',
         'Order Date'                        : '',
         'Order number'                      : '',
         productName                         : '',
@@ -204,7 +278,7 @@ describe('translator', function () {
         'Total Amount'                      : 'Montant Total'
       };
 
-      var newObjLang = {
+      var _existingObjLang = {
         'excl tax'                        : '',
         'another translation is required' : 'une autre traduction est requise',
         currency                          : 'monnaie',
@@ -213,36 +287,34 @@ describe('translator', function () {
         Total                             : 'Total',
         'Total Amount'                    : 'Montant Total'
       };
-      fs.writeFile(_fileLangPath, JSON.stringify(newObjLang, null, 2), function (err) {
-        helper.assert(err, null);
-        translator.generateLang(_templatePath,_lang,function (err,result,bodyMsg,keyTypeCountObject) {
-          helper.assert(expectedObjLang, result);
-          helper.assert(keyTypeCountObject.newKeys, 21);
-          helper.assert(keyTypeCountObject.emptyExistingKeys, 1);
-          helper.assert(keyTypeCountObject.updatedKeys, 4);
-          helper.assert(keyTypeCountObject.deletedKeys, 2);
-          helper.assert(keyTypeCountObject.oldDeletedKeys, 0);
-          done();
-        });
+      fs.mkdirSync(_dirLangPath, parseInt('0766', 8));
+      fs.writeFileSync(_fileLangPath, JSON.stringify(_existingObjLang, null, 2));
+      translator.generateLang(_templatePath, _lang, function (err, result, meta) {
+        helper.assert(_expectedObjLang, result);
+        helper.assert(meta.addedKeys, 21);
+        helper.assert(meta.deletedKeys, 2);
+        helper.assert(meta.unalteredKeys, 5);
+        helper.assert(meta.untranslatedKeys, 22);
+        helper.assert(meta.unusedKeys, 2);
+        done();
       });
     });
 
-    it('8 translates are defined. 2 of them should be not found and 2 others are old removed keys (with <!>) \
-      Theses new and old not found translates  must be sorted and find at the \
-      top of the translate file with <!> below them', function (done) {
-      var expectedObjLang = {
-        '<!>Error 404'                      : '',
-        '<!>False key'                      : 'fausse clé',
-        '<!>not found'                      : 'non trouve',
-        '<!>Old translate'                  : 'vielle traduction',
+    it('8 lang keys are defined. 2 of them should be not found and 2 others are old removed keys (with @@@_UNUSED \
+      These new and old keys must be sorted and find at the top of the lang file with @@@_UNUSED marker', function (done) {
+      var _expectedObjLang = {
         'Canada Products'                   : '',
         'Delivery Date'                     : '',
+        'Error 404_@@@_UNUSED'              : '',
         'excl tax'                          : '',
+        'False key_@@@_UNUSED'              : 'fausse clé',
         From                                : '',
         FromDate                            : '',
         'I need to be translate'            : '',
         "I've an Idea : Revenues >= Sales"  : '',
         'Internal Code'                     : '',
+        'not found_@@@_UNUSED'              : 'non trouve',
+        'Old translate_@@@_UNUSED'          : 'vielle traduction',
         'Order Date'                        : '',
         'Order number'                      : '',
         productName                         : '',
@@ -263,9 +335,9 @@ describe('translator', function () {
         'Total Amount'                      : 'Montant Total'
       };
 
-      var newObjLang = {
-        '<!>False key'                    : 'fausse clé',
-        '<!>Old translate'                : 'vielle traduction',
+      var _existingObjLang = {
+        'False key_@@@_UNUSED'            : 'fausse clé',
+        'Old translate_@@@_UNUSED'        : 'vielle traduction',
         'excl tax'                        : '',
         'another translation is required' : 'une autre traduction est requise',
         currency                          : 'monnaie',
@@ -274,17 +346,16 @@ describe('translator', function () {
         Total                             : 'Total',
         'Total Amount'                    : 'Montant Total'
       };
-      fs.writeFile(_fileLangPath, JSON.stringify(newObjLang, null, 2), function (err) {
-        helper.assert(err, null);
-        translator.generateLang(_templatePath,_lang,function (err,result,bodyMsg,keyTypeCountObject) {
-          helper.assert(expectedObjLang, result);
-          helper.assert(keyTypeCountObject.newKeys, 21);
-          helper.assert(keyTypeCountObject.emptyExistingKeys, 1);
-          helper.assert(keyTypeCountObject.updatedKeys, 4);
-          helper.assert(keyTypeCountObject.deletedKeys, 2);
-          helper.assert(keyTypeCountObject.oldDeletedKeys, 2);
-          done();
-        });
+      fs.mkdirSync(_dirLangPath, parseInt('0766', 8));
+      fs.writeFileSync(_fileLangPath, JSON.stringify(_existingObjLang, null, 2));
+      translator.generateLang(_templatePath, _lang, function (err, result, meta) {
+        helper.assert(_expectedObjLang, result);
+        helper.assert(meta.addedKeys, 21);
+        helper.assert(meta.deletedKeys, 2);
+        helper.assert(meta.unalteredKeys, 5);
+        helper.assert(meta.untranslatedKeys, 22);
+        helper.assert(meta.unusedKeys, 4);
+        done();
       });
     });
   });

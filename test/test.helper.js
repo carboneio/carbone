@@ -15,6 +15,18 @@ describe('helper', function () {
     });
   });
 
+  describe('removeDuplicatedRows', function () {
+    it('should do nothing if the array is empty', function () {
+      helper.assert(helper.removeDuplicatedRows([]), []);
+    });
+    it('should do nothing with an array of length = 1', function () {
+      helper.assert(helper.removeDuplicatedRows(['aa']), ['aa']);
+    });
+    it('should remove duplicated rows', function () {
+      helper.assert(helper.removeDuplicatedRows(['aa', 'aa', 'aa', 'bb', 'cc', 'cc', 'yy']), ['aa', 'bb', 'cc', 'yy']);
+    });
+  });
+
   
   describe('readFileDirSync', function () {
     beforeEach(function () {

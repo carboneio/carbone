@@ -278,22 +278,56 @@ describe('Carbone', function () {
         });
       });
     });
-    it.skip('options.lang = "fr" should force the lang of translation markers {t()}', function (done) {
+    it('options.lang should dynamically force the lang of translation markers {t()} and accept provided translations', function (done) {
       var data = {
         param : '20160131'
       };
       carbone.set({lang : 'en'}); // default lang
       var options = {
-        lang : 'fr' // forced lang
+        lang         : 'fr', // forced lang
+        translations : {
+          fr : {
+            kitchen : 'cuisine'
+          },
+          es : {
+            kitchen : 'cocina'
+          }
+        }
       };
       carbone.renderXML('<xml>{t(kitchen)}</xml>', data, options, function (err, result) {
         helper.assert(err+'', 'null');
-        helper.assert(result, '<xml>31/01/2016</xml>');
-        options.lang = 'en';
+        helper.assert(result, '<xml>cuisine</xml>');
+        options.lang = 'es';
         carbone.set({lang : 'fr'}); // default lang
-        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function (err, result) {
+        carbone.renderXML('<xml>{t(kitchen)}</xml>', data, options, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>01/31/2016</xml>');
+          helper.assert(result, '<xml>cocina</xml>');
+          done();
+        });
+      });
+    });
+    it('options.lang should dynamically force the lang of translation markers {t()} and use translations of carbone', function (done) {
+      var data = {
+        param : '20160131'
+      };
+      carbone.set({lang : 'en'}); // default lang
+      carbone.set({
+        translations : {
+          fr : {
+            kitchen : 'cuisine'
+          },
+          es : {
+            kitchen : 'cocina'
+          }
+        }
+      });
+      carbone.renderXML('<xml>{t(kitchen)}</xml>', data, {lang : 'fr'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>cuisine</xml>');
+        carbone.set({lang : 'fr'}); // default lang
+        carbone.renderXML('<xml>{t(kitchen)}</xml>', data, {lang : 'es'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>cocina</xml>');
           done();
         });
       });
@@ -433,25 +467,29 @@ describe('Carbone', function () {
         });
       });
     });
-    it('should translate the file and insert three product rows', function (done) {
-      path.resolve('./test/datasets/test_odt_render_translate.odt');
-      // var _fileLangPath = path.resolve('./test/datasets/lang/fr.json');
-      var _data = [{
-        name  : 'Bouteille de sirop d’érable 25cl',
-        qty   : '4',
-        price : '8',
-        total : '32',
-      },{
-        name  : 'Bouteille de cidre de glace 1L',
-        qty   : '2',
-        price : '17.5',
-        total : '35',
-      },{
-        name  : 'Sachet de Cranberry 200g',
-        qty   : '3',
-        price : '2',
-        total : '6',
-      }];
+    it('should translate the file and insert three product rows.\
+      it should load translations files if the template path change', function (done) {
+      var _templatePath = path.join(__dirname, 'datasets');
+      var _dirLangPath  = path.join(_templatePath, 'lang');
+      var _fileLangPath = path.join(_dirLangPath, 'fr.json');
+      var _data = [
+        {
+          name  : 'Bouteille de sirop d’érable 25cl',
+          qty   : '4',
+          price : '8',
+          total : '32',
+        },{
+          name  : 'Bouteille de cidre de glace 1L',
+          qty   : '2',
+          price : '17.5',
+          total : '35',
+        },{
+          name  : 'Sachet de Cranberry 200g',
+          qty   : '3',
+          price : '2',
+          total : '6',
+        }
+      ];
       var _objLang = {
         'Canada Products'                   : 'Produits du Canada',
         productName                         : 'Nom du produit',
@@ -459,14 +497,11 @@ describe('Carbone', function () {
         unitPrice                           : 'Prix unitaire',
         'I\'ve an Idea : Revenues >= Sales' : 'J\'ai une idée : Chiffre d\'Affaire >= Ventes'
       };
-      // I commented these lines because it does not test the lang file... objLang is overwritted by the next line of code 
-      //  TODO: The solution would be to 
-      //    - not overwrite objLang
-      //    - reload the lang file (fileReadSync) if the method carbone.set is called for modifying the parameter 'lang'. 
-      // fs.writeFile(_fileLangPath, JSON.stringify(_objLang, null, 2), function(err){ 
+      helper.rmDirRecursive(_dirLangPath);
+      fs.mkdirSync(_dirLangPath);
+      fs.writeFileSync(_fileLangPath, JSON.stringify(_objLang, null, 2));
       carbone.set({lang : 'fr'});
-      carbone.set({objLang : _objLang});
-        // helper.assert(err, null);
+      carbone.set({templatePath : _templatePath});
       carbone.render('test_odt_render_translate.odt', _data, function (err, result) {
         assert.equal(err, null);
         fs.mkdirSync(testPath, parseInt('0755', 8));
@@ -475,7 +510,6 @@ describe('Carbone', function () {
         fs.writeFileSync(_document, result);
         unzipSystem(_document, _unzipPath, function (err, files) {
           var _xmlExpectedContent = files['content.xml'];
-            // Have words been translated ?
           assert.equal(_xmlExpectedContent.indexOf('Canada Products'), -1);
           assert.equal(_xmlExpectedContent.indexOf('productName'), -1);
           assert.equal(_xmlExpectedContent.indexOf('qty'), -1);
@@ -485,16 +519,13 @@ describe('Carbone', function () {
           assert.notEqual(_xmlExpectedContent.indexOf('Quantité'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Prix unitaire'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('total'), -1); // total is not defined in this ObjLang. So it should be write with this word 'total'
-            // We have inserted three product rows 
           assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de sirop d’érable 25cl'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de cidre de glace 1L'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Sachet de Cranberry 200g'), -1);
-            // var _dirLangPath = path.join("./test/datasets/lang",'lang');
-            // helper.rmDirRecursive(_fileLangPath);
+          helper.rmDirRecursive(_dirLangPath);
           done();
         });
       });
-      // });
     });
     it('should accept pre-declared variables and variables declared directly in the document.\
       it should remove declared variables from the template', function (done) {

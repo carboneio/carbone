@@ -165,37 +165,28 @@ describe('parser', function () {
 
   describe('translate', function () {
     it('should do nothing if the xml is null or undefined', function (done) {
-      var _objLang = {
-        Monday : 'Lundi'
-      };
-      parser.translate('', _objLang, function (err, xmlTranslated) {
+      parser.translate('', {}, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '');
         done();
       });
     });
-    it('should not crash if objLang is undefined, and it should replace translation markers by the "not translated" text', function (done) {
-      parser.translate('<xml> {t(yeah)} </xml>', undefined, function (err, xmlTranslated) {
+    it('should not crash if options is empty, and it should replace translation markers by the "not translated" text', function (done) {
+      parser.translate('<xml> {t(yeah)} </xml>', {}, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xml> yeah </xml>');
         done();
       });
     });
     it('should not consider marker which starts by "t" and which is not a translation marker', function (done) {
-      var _objLang = {
-        Monday : 'Lundi'
-      };
-      parser.translate('<xml>{table}</xml>', _objLang, function (err, xmlTranslated) {
+      parser.translate('<xml>{table}</xml>', {}, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xml>{table}</xml>');
         done();
       });
     });
     it('should not consider marker which starts by "t" and which is not a translation marker (variable marker)', function (done) {
-      var _objLang = {
-        Monday : 'Lundi'
-      };
-      parser.translate('<xml>{#t($a) = myvar=$a} </xml>', _objLang, function (err, xmlTranslated) {
+      parser.translate('<xml>{#t($a) = myvar=$a} </xml>', {}, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xml>{#t($a) = myvar=$a} </xml>');
         done();
@@ -212,63 +203,93 @@ describe('parser', function () {
       });
     });*/
     it('should extract t(Mond<interxml>ay) and t(Tuesday is <bullshit>the second day of the week!) in order to transform them to Lundi (_found in objLang) and Tuesday is the second day of the week! (not found in the _objLang)', function (done) {
-      var _objLang = {
-        Monday : 'Lundi'
+      var _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            Monday : 'Lundi'
+          }
+        }
       };
-      parser.translate('<xmlstart>{me<interxml>n<bullshit>u}<div>{t(Mond<interxml>ay)}</div><div>{#def = id=2  }</div><div>{t(Tuesday is <bullshit>the second day of the week!)}</div></xmlend>', _objLang, function (err, xmlTranslated) {
+      parser.translate('<xmlstart>{me<interxml>n<bullshit>u}<div>{t(Mond<interxml>ay)}</div><div>{#def = id=2  }</div><div>{t(Tuesday is <bullshit>the second day of the week!)}</div></xmlend>', _options, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xmlstart>{me<interxml>n<bullshit>u}<div>Lundi<interxml></div><div>{#def = id=2  }</div><div>Tuesday is the second day of the week!<bullshit></div></xmlend>');
         done();
       });
     });
     it('should extract t(I have a dog) and t(I\'ve a cat) and translate it to J\'ai un chien and J\'ai un chat', function (done) {
-      var _objLang = {
-        'I have a dog' : 'J\'ai un chien',
-        'I\'ve a cat'  : 'J\'ai un chat',
+      var _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'I have a dog' : 'J\'ai un chien',
+            'I\'ve a cat'  : 'J\'ai un chat',
+          }
+        }
       };
-      parser.translate('<xmlstart><div>{t(I have a dog)}</div><div>{t(I&apos;ve a cat)}</div></xmlend>', _objLang, function (err, xmlTranslated) {
+      parser.translate('<xmlstart><div>{t(I have a dog)}</div><div>{t(I&apos;ve a cat)}</div></xmlend>', _options, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xmlstart><div>J&apos;ai un chien</div><div>J&apos;ai un chat</div></xmlend>');
         done();
       });
     });
     it('should extract t(I saw a spirit(with green eyes and a transparent body) and I cried) and translate this', function (done) {
-      var _objLang = {
-        'I saw a spirit(with green eyes and a transparent body) and I cried' : 'J ai vu un esprit(avec des yeux verts et un corps transparent) et j ai crié'
+      var _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'I saw a spirit(with green eyes and a transparent body) and I cried' : 'J ai vu un esprit(avec des yeux verts et un corps transparent) et j ai crié'
+          }
+        }
       };
-      parser.translate('<xmlstart><div>{t(I saw a spi<interxml>rit(with green eyes and a trans<interxml>parent body) and I cried)}</div></xmlend>', _objLang, function (err, xmlTranslated) {
+      parser.translate('<xmlstart><div>{t(I saw a spi<interxml>rit(with green eyes and a trans<interxml>parent body) and I cried)}</div></xmlend>', _options, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xmlstart><div>J ai vu un esprit(avec des yeux verts et un corps transparent) et j ai crié<interxml><interxml></div></xmlend>');
         done();
       });
     });
     it('should translate this string and keep tags inside t(). The final result include <b> <i>', function (done) {
-      var _objLang = {
-        cat : 'chat',
-        dog : 'chien'
+      var _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            cat : 'chat',
+            dog : 'chien'
+          }
+        }
       };
-      parser.translate('<xmlstart><div><b>{</b>t(<i><b>cat</b></i>)}<b>thanks</b>{t(<i>do<interxml>g</i>)}</div></xmlend>', _objLang, function (err, xmlTranslated) {
+      parser.translate('<xmlstart><div><b>{</b>t(<i><b>cat</b></i>)}<b>thanks</b>{t(<i>do<interxml>g</i>)}</div></xmlend>', _options, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xmlstart><div><b>chat</b><i><b></b></i><b>thanks</b>chien<i><interxml></i></div></xmlend>');
         done();
       });
     });
     it('should translate the sentence and keep the smiley :)', function (done) {
-      var _objLang = {
-        'my smiley :) ' : 'mon emoticon :) '
+      var _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'my smiley :) ' : 'mon emoticon :) '
+          }
+        }
       };
-      parser.translate('<xmlstart>{t(my smiley :) )}<b>', _objLang, function (err, xmlTranslated) {
+      parser.translate('<xmlstart>{t(my smiley :) )}<b>', _options, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xmlstart>mon emoticon :) <b>');
         done();
       });
     });
     it('should translate this sentence with special characters', function (done) {
-      var _objLang = {
-        'price < 100'                                     : 'prix < 100',
-        'productPrice >= salePrice > mac\'doProductPrice' : 'prixProduit >= prixVente > prixProduitMac\'Do',
+      var _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'price < 100'                                     : 'prix < 100',
+            'productPrice >= salePrice > mac\'doProductPrice' : 'prixProduit >= prixVente > prixProduitMac\'Do',
+          }
+        }
       };
-      parser.translate('<xmlstart>{t(price &lt; 100)}<b>test</b><span>{t(productPrice &gt;= salePrice &gt; mac&apos;doProductPrice)}</span>', _objLang, function (err, xmlTranslated) {
+      parser.translate('<xmlstart>{t(price &lt; 100)}<b>test</b><span>{t(productPrice &gt;= salePrice &gt; mac&apos;doProductPrice)}</span>', _options, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xmlstart>prix &lt; 100<b>test</b><span>prixProduit &gt;= prixVente &gt; prixProduitMac&apos;Do</span>');
         done();

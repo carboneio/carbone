@@ -2,6 +2,11 @@
 ### Open Source
   - Server removed
   - generateLang -> translate. New UNUSED marker, only translated key are kept
+  - now, it load all lang, and is able to change lang dynamically
+  - avoid unacessary synchronuous code in carbone.set
+  - fix: a report without markers, except lang ones, is translated
+  - improve doc
+  - default template dir is carbone_reports
 
 ### v0.13.1
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`

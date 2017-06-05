@@ -1,7 +1,8 @@
-var translator  = require('../lib/translator');
+var translator = require('../lib/translator');
 var helper = require('../lib/helper');
-var path  = require('path');
-var fs  = require('fs');
+var path = require('path');
+var fs = require('fs');
+var params = require('../lib/params');
 
 describe('translator', function () {
 
@@ -119,6 +120,46 @@ describe('translator', function () {
         helper.assert(meta.unusedKeys, 3); // = new deleted keys + old deleted keys
         done();
       });
+    });
+  });
+
+  describe('loadTranslations' ,function () {
+    var _templatePath = path.join(__dirname, 'datasets');
+    var _dirLangPath  = path.join(_templatePath, 'lang');
+    var _langPathFr = path.join(_dirLangPath, 'fr.json');
+    var _LangPathEs = path.join(_dirLangPath, 'es.json');
+
+    afterEach(function (done) {
+      helper.rmDirRecursive(_dirLangPath);
+      done();
+    });
+
+    it('should load all lang in memory', function (done) {
+      var _fr = {
+        'a table' : 'un tableaux',
+        'a car'   : 'une voiture'
+      };
+      var _es = {
+        'a table' : 'uno mesa',
+        'a car'   : 'una coche'
+      };
+      if (fs.existsSync(_dirLangPath)===false) {
+        fs.mkdirSync(_dirLangPath);
+      }
+      fs.writeFileSync(_langPathFr, JSON.stringify(_fr, null, 2));
+      fs.writeFileSync(_LangPathEs, JSON.stringify(_es, null, 2));
+      translator.loadTranslations(_templatePath);
+      helper.assert(params.translations, {
+        es : {
+          'a table' : 'uno mesa',
+          'a car'   : 'una coche'
+        },
+        fr : {
+          'a table' : 'un tableaux',
+          'a car'   : 'une voiture'
+        }
+      });
+      done();
     });
   });
 

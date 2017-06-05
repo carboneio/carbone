@@ -370,7 +370,6 @@ describe('Carbone', function () {
       });
     });
     it('should be fast to render a document without conversion', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
@@ -380,7 +379,7 @@ describe('Carbone', function () {
       var _waitedResponse = _nbExecuted;
       var _start = new Date();
       for (var i = 0; i < _nbExecuted; i++) {
-        carbone.render(_filePath, data, function (err, result) {
+        carbone.render('test_word_render_A.docx', data, function (err, result) {
           _waitedResponse--;
           _results.push(result);
           if (_waitedResponse === 0) {
@@ -597,6 +596,7 @@ describe('Carbone', function () {
 
 
   describe('render and convert document', function () {
+    var _templatePath = path.join(__dirname, 'datasets');
     var defaultOptions = {
       pipeNamePrefix : '_carbone',
       factories      : 1,
@@ -609,14 +609,16 @@ describe('Carbone', function () {
         carbone.reset();
       });
     });
+    beforeEach(function () {
+      carbone.set({templatePath : _templatePath});
+    });
     it('should render a template (docx), generate to PDF and give output', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      carbone.render(_filePath, data, {convertTo : 'pdf'}, function (err, result) {
+      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
         assert.equal(err, null);
         var buf = new Buffer(result);
         assert.equal(buf.slice(0, 4).toString(), '%PDF');
@@ -630,7 +632,6 @@ describe('Carbone', function () {
       });
     });
     it('should render spreadsheet and convert it to a xls', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{
         id   : 1,
         name : 'field_1'
@@ -638,7 +639,7 @@ describe('Carbone', function () {
         id   : 2,
         name : 'field_2'
       }];
-      carbone.render(_filePath, data, {convertTo : 'xls'}, function (err) {
+      carbone.render('test_spreadsheet.ods', data, {convertTo : 'xls'}, function (err) {
         helper.assert(err, null);
         // fs.writeFileSync('test.xls', result);
         // TODO TODO TODO TODO TODO TODO TODO TODO : test the content of the xls
@@ -653,7 +654,6 @@ describe('Carbone', function () {
         attempts       : 2
       }, function () {
 
-        var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
         var data = {
           field1 : 'field_1',
           field2 : 'field_2'
@@ -663,7 +663,7 @@ describe('Carbone', function () {
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          carbone.render(_filePath, data, {convertTo : 'pdf'}, function (err, result) {
+          carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
             _waitedResponse--;
             _results.push(result);
             if (_waitedResponse === 0) {
@@ -687,6 +687,7 @@ describe('Carbone', function () {
   });
 
   describe('render and convert CSV with options', function () {
+    var _templatePath = path.join(__dirname, 'datasets');
     var defaultOptions = {
       pipeNamePrefix : '_carbone',
       factories      : 1,
@@ -699,20 +700,21 @@ describe('Carbone', function () {
         carbone.reset();
       });
     });
+    beforeEach(function () {
+      carbone.set({templatePath : _templatePath});
+    });
     it('should render spreadsheet with raw options (complete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : null
       };
-      carbone.render(_filePath, data, _options, function (err) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err) {
         helper.assert(err, null);
         done();
       });
     });
     it('should render spreadsheet with raw options (complete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -721,7 +723,7 @@ describe('Carbone', function () {
           formatOptionsRaw : '124,34,0'
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
         helper.assert(result.toString(), _expected);
@@ -729,7 +731,6 @@ describe('Carbone', function () {
       });
     });
     it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -737,7 +738,7 @@ describe('Carbone', function () {
           formatName : 'csv'
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = ',,\n,1,field_1\n,2,field_2\n';
         helper.assert(result.toString(), _expected);
@@ -745,7 +746,6 @@ describe('Carbone', function () {
       });
     });
     it('should render spreadsheet with raw options (incomplete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -754,7 +754,7 @@ describe('Carbone', function () {
           formatOptionsRaw : '124'
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
         helper.assert(result.toString(), _expected);
@@ -762,7 +762,6 @@ describe('Carbone', function () {
       });
     });
     it('should render spreadsheet with options (complete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -775,7 +774,7 @@ describe('Carbone', function () {
           }
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '++\n+1+field_1\n+2+field_2\n';
         helper.assert(result.toString(), _expected);
@@ -783,7 +782,6 @@ describe('Carbone', function () {
       });
     });
     it('should render spreadsheet with options (incomplete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -795,7 +793,7 @@ describe('Carbone', function () {
           }
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '**\n*1*field_1\n*2*field_2\n';
         helper.assert(result.toString(), _expected);

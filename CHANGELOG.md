@@ -7,6 +7,7 @@
   - fix: a report without markers, except lang ones, is translated
   - improve doc
   - default template dir is carbone_reports
+  - fix LO zombie process when node exits
 
 ### v0.13.1
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`

@@ -714,6 +714,30 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should not use the converter if the input file extension is the same as convertTo parameter', function (done) {
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
+        convertTo : 'ods'
+      };
+      var _start = process.hrtime();
+      carbone.render('test_spreadsheet.ods', data, _options, function (err) {
+        var _diff = process.hrtime(_start);
+        var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+        helper.assert(err, null);
+        helper.assert(_elapsed < 100, true);
+        done();
+      });
+    });
+    it('should return an error when the convertTo format is unknown', function (done) {
+      var _options = {
+        convertTo : 'ods_ede'
+      };
+      carbone.render('test_spreadsheet.ods', {}, _options, function (err) {
+        helper.assert(/Format "ods_ede" not accepted/.test(err), true);
+        done();
+      });
+    });
     it('should render spreadsheet with raw options (complete)', function (done) {
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];

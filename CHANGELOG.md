@@ -8,6 +8,10 @@
   - improve doc
   - default template dir is carbone_reports
   - fix LO zombie process when node exits
+  - fix security issue
+  - do not use LO if convertTo equals input file type
+  - return error if unknown convertTo
+  - accept more input type
 
 ### v0.13.1
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`

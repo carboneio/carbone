@@ -42,7 +42,7 @@ Carbone.io
   - **Unique template engine** : Insert JSON-like markers `{d.companyName}` directly in your document
   - **Flexible** : Use any XML documents as a template: docx, odt, ods, xlsx, html, pptx, odp, custom xml files...
   - **Future-proof** : A powerful XML-agnostic algorithm understands what to do without knowing XML document specifications
-  - **Multilanguage** : One template, multiple languages. Update translation files automatically
+  - **Multilingual** : One template, multiple languages. Update translation files automatically
   - **Format data** : Use built-in date and number formatters or create your own in Javascript
   - **Fast** : Manage multiple LibreOffice threads for document conversion, optimized code generation for each report
 
@@ -119,7 +119,7 @@ Carbone does a lot of thing for you behind the scene:
 
 ###### on Ubuntu Server & Ubuntu desktop
 
-> Be careful, LibreOffice which is provided by the PPA libreoffice/ppa does not bundled python (mandatory for Carbone). The best solution is to download the LibreOffice Package from the offical website and install it manually:
+> Be careful, LibreOffice which is provided by the PPA libreoffice/ppa does not bundled python (mandatory for Carbone). The best solution is to download the LibreOffice Package from the official website and install it manually:
 
 ```bash
   # remove all old version of LibreOffice
@@ -282,7 +282,7 @@ Example:
 
 #### set(options)
 
-> This function is not asynchrone (It may create the template or temp directory synchronously).
+> This function is not asynchronous (It may create the template or temp directory synchronously).
 
 Set general carbone parameters.
 

@@ -1,6 +1,7 @@
 
 ### v0.13.2
   - fix LO zombie process when node exits
+  - fix: improve detection of markers. And avoid removing non-marker {}
 
 ### v0.13.1
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`

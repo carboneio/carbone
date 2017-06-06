@@ -21,6 +21,15 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should not remove marker which do not contain {d. {d[ {c. {c[ {$ {# {t(', function (done) {
+    var _xml = '<ds:datastoreItem ds:itemID="{5C3EA648-9B80-B142-9BDE-D25C08381CE2}"></ds>'
+             + '{tssd}'
+             + '{m.}';
+    builder.buildXML(_xml, {}, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<ds:datastoreItem ds:itemID="{5C3EA648-9B80-B142-9BDE-D25C08381CE2}"></ds>{tssd}{m.}');
+      done();
+    });
+  });
   it('should accept a second object which is accessible with the marker {c.}, c as "complement"', function (done) {
     var _xml = '<xml> {d.title} {c.date} </xml>';
     var _data = {title : 'boo'};

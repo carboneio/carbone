@@ -1,7 +1,7 @@
 
 ### V1.0.0
-  - Release June 7, 2017
-  - It loads all lang at startup, and it is able to change lang at runtime
+  - Release June 7, 2017 - First Public Release, First Public Demo on the [Web2day](https://web2day.co) event!
+  - It loads all lang at startup, and it is able to change the lang at runtime
   - Avoid unnecessary synchronous code in `carbone.set`
   - Improve documentation
   - Default template path is working directory by default

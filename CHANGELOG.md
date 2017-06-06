@@ -50,6 +50,7 @@
 
 ### v0.13.2
   - fix LO zombie process when node exits
+  - fix: improve detection of markers. And avoid removing non-marker {}
 
 ### v0.13.2
   - Get the last object of an array using negative values when filtering with `i` iterator

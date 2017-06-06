@@ -7,98 +7,123 @@ describe('parser', function () {
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      parser.findMarkers('{menu}', function (err, cleanedXml, markers) {
+      parser.findMarkers('{d.menu}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 0, name : '_root.menu'}]);
+        helper.assert(markers, [{pos : 0, name : '_root.d.menu'}]);
         helper.assert(cleanedXml, '');
         done();
       });
     });
     it('2. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      parser.findMarkers('<div>{menu}<div>', function (err, cleanedXml, markers) {
+      parser.findMarkers('<div>{c.menu}<div>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.menu'}]);
+        helper.assert(markers, [{pos : 5, name : '_root.c.menu'}]);
         helper.assert(cleanedXml, '<div><div>');
         done();
       });
     });
     it('3. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend>', function (err, cleanedXml, markers) {
+      parser.findMarkers('<xmlstart>{d.me<interxml>n<bullshit>u}</xmlend>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 10, name : '_root.menu'}]);
+        helper.assert(markers, [{pos : 10, name : '_root.d.menu'}]);
         helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend>');
         done();
       });
     });
     it('4. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      parser.findMarkers('<div>{menu}<div>{city}', function (err, cleanedXml, markers) {
+      parser.findMarkers('<div>{d.menu}<div>{d.city}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.menu'},{pos : 10, name : '_root.city'}]);
+        helper.assert(markers, [{pos : 5, name : '_root.d.menu'},{pos : 10, name : '_root.d.city'}]);
         helper.assert(cleanedXml, '<div><div>');
         done();
       });
     });
     it('5. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars}</bla>', function (err, cleanedXml, markers) {
+      parser.findMarkers('<xmlstart>{d.me<interxml>n<bullshit>u}</xmlend><tga>{d.ci<td>ty</td>}<tga><bla>{d.cars}</bla>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 10, name : '_root.menu'},{pos : 44, name : '_root.city'},{pos : 63, name : '_root.cars'}]);
+        helper.assert(markers, [{pos : 10, name : '_root.d.menu'},{pos : 44, name : '_root.d.city'},{pos : 63, name : '_root.d.cars'}]);
         helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>');
         done();
       });
     });
     it('6. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      parser.findMarkers('<xmlstart>{me<interxml>n<bullshit>u[i].city}</xmlend><tga>{ci<td>ty</td>}<tga><bla>{cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
+      parser.findMarkers('<xmlstart>{d.me<interxml>n<bullshit>u[i].city}</xmlend><tga>{d.ci<td>ty</td>}<tga><bla>{c.cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 10, name : '_root.menu[i].city'},{pos : 44, name : '_root.city'},{pos : 63, name : '_root.cars[i].wheel'}]);
+        helper.assert(markers, [{pos : 10, name : '_root.d.menu[i].city'},{pos : 44, name : '_root.d.city'},{pos : 63, name : '_root.c.cars[i].wheel'}]);
         helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>');
         done();
       });
     });
     it('should remove unwanted characters', function (done) {
-      parser.findMarkers('<div>{menu}<div> \n   {city}', function (err, cleanedXml, markers) {
+      parser.findMarkers('<div>{d.menu}<div> \n   {d.city}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.menu'},{pos : 15, name : '_root.city'}]);
+        helper.assert(markers, [{pos : 5, name : '_root.d.menu'},{pos : 15, name : '_root.d.city'}]);
         helper.assert(cleanedXml, '<div><div>     ');
         done();
       });
     });
     it('should convert conflicting characters', function (done) {
-      parser.findMarkers("<div>{menu}<div> it's \n   {city}", function (err, cleanedXml) {
+      parser.findMarkers("<div>{d.menu}<div> it's \n   {d.city}", function (err, cleanedXml) {
         helper.assert(err, null);
         helper.assert(cleanedXml, "<div><div> it\\\'s     ");
         done();
       });
     });
     it('should keep whitespaces between simple quotes', function (done) {
-      parser.findMarkers("<div>{menu:test('hello, world is great')}<div>", function (err, cleanedXml, markers) {
+      parser.findMarkers("<div>{d.menu:test('hello, world is great')}<div>", function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.menu:test(\'hello, world is great\')'}]);
+        helper.assert(markers, [{pos : 5, name : '_root.d.menu:test(\'hello, world is great\')'}]);
         done();
       });
     });
     it('should keep whitespaces between encoded simple quotes, and it should convert encoded quotes', function (done) {
-      parser.findMarkers('<div>{menu:test(&apos;hello, world is great&apos;)}<div>', function (err, cleanedXml, markers) {
+      parser.findMarkers('<div>{d.menu:test(&apos;hello, world is great&apos;)}<div>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.menu:test(\'hello, world is great\')'}]);
+        helper.assert(markers, [{pos : 5, name : '_root.d.menu:test(\'hello, world is great\')'}]);
         done();
       });
     });
     it('should remove whitespaces which are inside {} and not inside <>. It should not count them for the position', function (done) {
-      parser.findMarkers(' <div>   {  menu  }   <div>   {   city  } ', function (err, cleanedXml, markers) {
+      parser.findMarkers(' <div>   {  d.menu  }   <div>   {   d.city  } ', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 9, name : '_root.menu'},{pos : 20, name : '_root.city'}]);
+        helper.assert(markers, [{pos : 9, name : '_root.d.menu'},{pos : 20, name : '_root.d.city'}]);
         helper.assert(cleanedXml, ' <div>      <div>    ');
-        parser.findMarkers(' <xmlstart> {  me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {ci  <td>  ty  </td>  } <tga><bla>{cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
+        parser.findMarkers(' <xmlstart> {  d.me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {d.ci  <td>  ty  </td>  } <tga><bla>{d.cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
           helper.assert(err, null);
-          helper.assert(markers, [{pos : 12, name : '_root.menu[i].city'},{pos : 52, name : '_root.city'},{pos : 72, name : '_root.cars[i].wheel'}]);
+          helper.assert(markers, [{pos : 12, name : '_root.d.menu[i].city'},{pos : 52, name : '_root.d.city'},{pos : 72, name : '_root.d.cars[i].wheel'}]);
           helper.assert(cleanedXml, ' <xmlstart> <interxml><bull  sh it> </xmlend> <tga> <td></td> <tga><bla></bla>');
           done();
         });
+      });
+    });
+    it('should not extract marker if it does not start by {d. {d[ {c. {c[ {$', function (done) {
+      var _xml = '<xml>{<td>d<td>.<td>menu</td></td></td>}</xml>'
+               + '{d.menu}'
+               + '{d[i].menu}'
+               + '{c.memu}'
+               + '{c[i].menu}'
+               + '{$menu}'
+               + '{D.menu}' // not parsed
+               + '{C.menu}' // not parsed
+               + '{C.menu}' // not parsed
+               + '{DZZDZD-DSDZD-1131}'; // not parsed
+      parser.findMarkers(_xml, function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [
+          { pos : 5,  name : '_root.d.menu' },
+          { pos : 38, name : '_root.d.menu' },
+          { pos : 38, name : '_root.d[i].menu' },
+          { pos : 38, name : '_root.c.memu' },
+          { pos : 38, name : '_root.c[i].menu' },
+          { pos : 38, name : '_root.$menu' }
+        ]);
+        helper.assert(cleanedXml, '<xml><td><td><td></td></td></td></xml>{D.menu}{C.menu}{C.menu}{DZZDZD-DSDZD-1131}');
+        done();
       });
     });
   });

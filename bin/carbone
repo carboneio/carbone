@@ -17,7 +17,7 @@ switch (_action) {
 
 function usage () {
   console.log('*************************************');
-  console.log('Carbone Usage:');
+  console.log('Carbone usage:');
   console.log('   carbone translate [--help]');
   console.log('   carbone find [--help]');
   process.exit();

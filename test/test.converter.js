@@ -292,7 +292,7 @@ describe('Converter', function () {
             var _tempContent = helper.walkDirSync(tempPath);
             assert.equal(_tempContent.length, 0);
             done(); 
-          }, 1000);
+          }, 1500);
         });
       });
     });
@@ -306,7 +306,7 @@ describe('Converter', function () {
             assert.equal(_tempContent.length, 1);
             assert.equal(_tempContent[0], _otherFile);
             exec('rm -rf '+_otherFile, done);
-          }, 1000);
+          }, 1500);
         });
       });
     });

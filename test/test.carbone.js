@@ -35,11 +35,11 @@ describe('Carbone', function () {
     });
     it('should change the lang of of date formatter', function (done) {
       carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'vendredi');
+      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
       carbone.set({lang : 'en'});
-      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'Friday');
+      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'Friday');
       carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'vendredi');
+      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
       done();
     });
   });

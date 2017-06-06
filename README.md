@@ -26,6 +26,7 @@ Carbone.io
 - [Command line tools](#command-line-tools)
     - [translate](#translate)
     - [find](#find)
+- [Performance](#performance)
 - [Licenses and editions](#licenses-and-editions)
 - [Philosophy](#philosophy)
 - [Roadmap](#roadmap)
@@ -372,6 +373,17 @@ carbone find needle
 
 It searches among all reports in the current working directory and its subdirectories
 
+
+## Performance
+
+Report generation speed, using a basic one-page DOCX template:
+
+  - ~ `10 ms / report` without document conversion (analyzing, injection, rendering)
+  - ~ `50 ms / report` with a PDF conversion (100 loops, 3 LibreOffice workers, without cold-start)
+
+On a MacBook Pro Mid-2015, 2,2 Ghz i7, 16Go.
+
+It could be even better when "code cache" will be activated. Coming soon...
 
 ## Licenses and editions
 

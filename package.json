@@ -2,7 +2,6 @@
   "name": "carbone",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
   "version": "1.0.0",
-  "private": true,
   "bin": "bin/carbone",
   "main": "./lib",
   "author": "David Grelaud",

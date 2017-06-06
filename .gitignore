@@ -1,0 +1,39 @@
+####### OS X
+.DS_Store*
+Icon?
+._*
+
+
+####### Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+
+####### Linux
+.directory
+*~
+
+
+####### npm
+node_modules
+npm-debug.log
+
+
+####### IDE 
+.emacs*
+*.flymake
+.#*
+.idea
+*.sublime-*
+
+
+####### LibreOffice & MS Office
+.~*
+~$*
+
+
+######## project-specific
+0perso/*
+0formation/*
+

@@ -1,0 +1,6 @@
+.git*
+.hg*
+doc/
+0perso/
+test/
+.DS_Store

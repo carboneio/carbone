@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+var translator = require('../lib/translator');
+var tool = require('../lib/tool');
+var _action = process.argv[2];
+
+switch (_action) {
+  case 'translate':
+    translator.handleCLI(process.argv.slice(3));
+    break;
+  case 'find':
+    tool.findMarkers(process.argv.slice(3));
+    break;
+  default:
+    usage(); 
+}
+
+function usage () {
+  console.log('*************************************');
+  console.log('Carbone usage:');
+  console.log('   carbone translate [--help]');
+  console.log('   carbone find [--help]');
+  process.exit();
+}

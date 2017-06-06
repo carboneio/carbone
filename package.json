@@ -1,0 +1,35 @@
+{
+  "name": "carbone",
+  "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
+  "version": "1.0.0",
+  "private": true,
+  "bin": "bin/carbone",
+  "main": "./lib",
+  "author": "David Grelaud",
+  "license": "Apache-2.0",
+  "homepage": "https://carbone.io",
+  "keywords": [
+    "report",
+    "document",
+    "pdf",
+    "xslx",
+    "docx",
+    "odt",
+    "ods",
+    "json"
+  ],
+  "dependencies": {
+    "debug": "=2.6.8",
+    "moment": "=2.18.1",
+    "moxie-zip": "=0.0.3",
+    "yauzl": "=2.8.0"
+  },
+  "devDependencies": {
+    "mocha": ">=1.8.2",
+    "should": "=11.1.2",
+    "zipfile": "=0.5.11"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  }
+}

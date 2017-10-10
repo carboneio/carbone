@@ -631,6 +631,25 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should render a template (docx) with wrong unicode in data, generate to PDF and give output', function (done) {
+      var str = 'field_1';
+      for (var i = 0 ; i < 160 ; i++) {
+        if ((i >= 127 && i <= 159)) {
+          str += String.fromCharCode(i);
+        }
+      }
+      var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+      var data = {
+        field1 : str,
+        field2 : 'field_2'
+      };
+      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
+        assert.equal(err, null);
+        var buf = new Buffer(result);
+        assert.equal(buf.slice(0, 4).toString(), '%PDF');
+        done();
+      });
+    });
     it('should render spreadsheet and convert it to a xls', function (done) {
       var data = [{
         id   : 1,

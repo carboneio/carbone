@@ -1,3 +1,5 @@
+### V1.0.1
+  - Remove control codes from U+0000 to U+0020 and U+007F to U+009F except U+0009, U+000D and U+0020
 
 ### V1.0.0
   - Release June 7, 2017 - First Public Release, First Public Demo on the [Web2day](https://web2day.co) event!

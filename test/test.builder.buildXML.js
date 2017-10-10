@@ -2,7 +2,7 @@ var assert = require('assert');
 var builder = require('../lib/builder');
 var helper = require('../lib/helper');
 
-describe.only('builder.buildXML', function () {
+describe('builder.buildXML', function () {
 
   it.skip('should work if the same array is repeated two times in the xml <tr>d[i].product</tr>    <tr>d[i].product</tr>');
   it.skip('should escape special characters > < & " \' even if a formatter is used (output of a formatter)');

@@ -24,7 +24,7 @@
     "yauzl": "=2.8.0"
   },
   "devDependencies": {
-    "mocha": ">=1.8.2",
+    "mocha": "=3.5.3",
     "should": "=11.1.2",
     "zipfile": "=0.5.11"
   },

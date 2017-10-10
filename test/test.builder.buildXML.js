@@ -25,9 +25,8 @@ describe('builder.buildXML', function () {
     var str = 'boo';
     for (var i = 0 ; i < 160 ; i++) {
       if ((i >= 0 && i <= 8) ||
-          (i >= 10 && i <= 12) ||
-          (i >= 14 && i <= 31) ||
-          (i >= 127 && i <= 159)) {
+          (i >= 11 && i <= 12) ||
+          (i >= 14 && i <= 31)) {
         str += String.fromCharCode(i);
       }
     }
@@ -40,13 +39,19 @@ describe('builder.buildXML', function () {
   });
   it('should not replace control codes like space, carriage return and tab', function (done) {
     var str = 'boo';
-    str += String.fromCharCode(9);
-    str += String.fromCharCode(13);
-    str += String.fromCharCode(32);
+    for (var i = 0 ; i < 160 ; i++) {
+      if ((i == 9) ||
+          (i == 10) ||
+          (i == 13) ||
+          (i == 32) ||
+          (i >= 127 && i <= 159)) {
+        str += String.fromCharCode(i);
+      }
+    }
     var _xml = '<xml> {d.title} </xml>';
     var _data = {title : str};
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      helper.assert(_xmlBuilt, '<xml> boo\u0009\u000D\u0020 </xml>');
+      helper.assert(_xmlBuilt, '<xml> ' + str + ' </xml>');
       done();
     });
   });

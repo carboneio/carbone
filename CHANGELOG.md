@@ -1,4 +1,6 @@
 
+### v0.13.4
+
 ### v0.13.3
   - Automatically remove XML-incompatible control codes (U+0000 to U+0008 and U+000B to U+000C and U+000E to U+001F) before inserting data in templates
   - Fix: ifEqual did not work correctly with boolean values

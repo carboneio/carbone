@@ -23,7 +23,7 @@ describe('builder.buildXML', function () {
   });
   it('should replace control codes that makes problem in LibreOffice', function (done) {
     var str = 'boo';
-    for (var i = 0 ; i < 160 ; i++) {
+    for (var i = 0 ; i < 32 ; i++) {
       if ((i >= 0 && i <= 8) ||
           (i >= 11 && i <= 12) ||
           (i >= 14 && i <= 31)) {

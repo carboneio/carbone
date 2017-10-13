@@ -21,6 +21,40 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should replace control codes that makes problem in LibreOffice', function (done) {
+    var str = 'boo';
+    for (var i = 0 ; i < 32 ; i++) {
+      if ((i >= 0 && i <= 8) ||
+          (i >= 11 && i <= 12) ||
+          (i >= 14 && i <= 31)) {
+        str += String.fromCharCode(i);
+      }
+    }
+    var _xml = '<xml> {d.title} </xml>';
+    var _data = {title : str};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> boo </xml>');
+      done();
+    });
+  });
+  it('should not replace control codes like space, carriage return and tab', function (done) {
+    var str = 'boo';
+    for (var i = 0 ; i < 160 ; i++) {
+      if ((i == 9) ||
+          (i == 10) ||
+          (i == 13) ||
+          (i == 32) ||
+          (i >= 127 && i <= 159)) {
+        str += String.fromCharCode(i);
+      }
+    }
+    var _xml = '<xml> {d.title} </xml>';
+    var _data = {title : str};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> ' + str + ' </xml>');
+      done();
+    });
+  });
   it('should not remove marker which do not contain {d. {d[ {c. {c[ {$ {# {t(', function (done) {
     var _xml = '<ds:datastoreItem ds:itemID="{5C3EA648-9B80-B142-9BDE-D25C08381CE2}"></ds>'
              + '{tssd}'

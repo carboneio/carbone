@@ -51,7 +51,7 @@ function ifEmpty (d, message, continueOnSuccess) {
  */
 function ifEqual (d, value, messageIfTrue, continueOnSuccess) {
   // Convert everything in string (not strict Equal)
-  if (d == value) { // eslint-disable-line
+  if (d + '' === value + '') { // eslint-disable-line
     if (continueOnSuccess !== true && continueOnSuccess !== 'true') {
       this.stopPropagation = true;
     }

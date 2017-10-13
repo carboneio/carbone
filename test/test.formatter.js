@@ -61,7 +61,7 @@ describe('formatter', function () {
     });
   });
 
-  describe('ifEquals', function () {
+  describe('ifEqual', function () {
     it('should show a message if data is equal to a variable', function () {
       var _context = {};
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 0, 0, 'msgIfTrue'), 'msgIfTrue');
@@ -70,7 +70,17 @@ describe('formatter', function () {
       helper.assert(_context.stopPropagation, true);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, true, true, 'msgIfTrue'), 'msgIfTrue');
       helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'true', 'true', 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, true, 'true', 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, false, 'false', 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'false', 'false', 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, false, false, 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, false, 'false', 'msgIfTrue'), 'msgIfTrue');
       helper.assert(_context.stopPropagation, true);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'titi', 'titi', 'msgIfTrue'), 'msgIfTrue');
       helper.assert(_context.stopPropagation, true);
@@ -97,6 +107,10 @@ describe('formatter', function () {
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 0, '1', 'msgIfTrue'), 0);
       helper.assert(_context.stopPropagation, false);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, true, false, 'msgIfTrue'), true);
+      helper.assert(_context.stopPropagation, false);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'true', false, 'msgIfTrue'), 'true');
+      helper.assert(_context.stopPropagation, false);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'false', 'true', 'msgIfTrue'), 'false');
       helper.assert(_context.stopPropagation, false);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, false, true, 'msgIfTrue'), false);
       helper.assert(_context.stopPropagation, false);

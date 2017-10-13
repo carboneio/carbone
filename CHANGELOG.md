@@ -1,3 +1,5 @@
+### V1.0.1
+  - Automatically remove XML-incompatible control codes (U+0000 to U+0008 and U+000B to U+000C and U+000E to U+001F) before inserting data in templates
 
 ### V1.0.0
   - Release June 7, 2017 - First Public Release, First Public Demo on the [Web2day](https://web2day.co) event!

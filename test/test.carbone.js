@@ -631,6 +631,19 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should not crash if datas contain XML-incompatible control code', function (done) {
+      var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+      var data = {
+        field1 : '\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u000b\u000c\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f',
+        field2 : 'field_2'
+      };
+      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
+        assert.equal(err, null);
+        var buf = new Buffer(result);
+        assert.equal(buf.slice(0, 4).toString(), '%PDF');
+        done();
+      });
+    });
     it('should render spreadsheet and convert it to a xls', function (done) {
       var data = [{
         id   : 1,

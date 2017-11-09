@@ -4,6 +4,15 @@ var helper = require('../lib/helper');
 
 describe('builder.buildXML', function () {
 
+  it('should return an error if one attribute of data is undefined', function (done) {
+    var _xml = '<xml> {d.firstname} is a {d.type.name} </xml>';
+    var _data = {};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err.message, 'Error: d.firstname doesn\'t exist');
+      helper.assert(_xmlBuilt, null);
+      done();
+    });
+  });
   it.skip('should work if the same array is repeated two times in the xml <tr>d[i].product</tr>    <tr>d[i].product</tr>');
   it.skip('should escape special characters > < & " \' even if a formatter is used (output of a formatter)');
   it('should return the xml if no data is passed', function (done) {

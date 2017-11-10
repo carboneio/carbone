@@ -248,7 +248,8 @@ And now, you can use the converter, by passing options to render method.
   translations : {  // Object, dynamically overwrite all loaded translations for this rendering
     fr : {'one':'un' },
     es : {'one':'uno'}
-  }
+  },
+  throwErrorOnUndefined : false // Boolean, if one of the data defined in the xml doesn't exist, throw an error
 }
 ```
 
@@ -303,6 +304,7 @@ Set general carbone parameters.
     },
     factories    : 1, // Number of LibreOffice worker 
     startFactory : false // If true, start LibreOffice worker immediately
+    throwErrorOnUndefined : false // Boolean, if one of the data defined in the xml doesn't exist, throw an error
   }
 ```
 

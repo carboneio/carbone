@@ -2,13 +2,14 @@ var assert = require('assert');
 var builder = require('../lib/builder');
 var helper = require('../lib/helper');
 
-describe('builder.buildXML', function () {
+describe.only('builder.buildXML', function () {
 
   it('should return an error if one attribute of data is undefined', function (done) {
     var _xml = '<xml> {d.firstname} is a {d.type.name} </xml>';
-    var _data = {};
-    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      helper.assert(err.message, 'Error: d.firstname doesn\'t exist');
+    var _data = { foo : "bar" };
+    var _options = { throwErrorOnUndefined : true };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      helper.assert(err.message, 'Error: d.firstname is undefined');
       helper.assert(_xmlBuilt, null);
       done();
     });

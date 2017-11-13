@@ -2,7 +2,7 @@ var assert = require('assert');
 var builder = require('../lib/builder');
 var helper = require('../lib/helper');
 
-describe.only('builder.buildXML', function () {
+describe('builder.buildXML', function () {
 
   it('should return an error if one attribute of data is undefined', function (done) {
     var _xml = '<xml> {d.firstname} is a {d.type.name} </xml>';
@@ -14,6 +14,50 @@ describe.only('builder.buildXML', function () {
       done();
     });
   });
+  it('should throw an Error cause of an array in the data', function (done) {
+    var _xml = '<xml> {d.movie[0].type} is the favorite genre of movie of {d.name.first} {d.name.last} </xml>';
+    var _data =
+    {
+      name :
+      {
+        first : "Léo",
+        last : "Labruyère"
+      },
+      movie :
+      [
+        { name : "Matrix" },
+        { name : "Avengers" }
+      ]
+    }
+    var _options = { throwErrorOnUndefined : true };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      helper.assert(err.message, "Error: d.movie[0].type is undefined");
+      helper.assert(_xmlBuilt, null);
+      done();
+    });
+  })
+  it('should replace all the tag by the data (throwErrorOnUndefined enabled)', function (done) {
+    var _xml = '<xml> {d.movie[0].name} is the favorite movie of {d.name.first} {d.name.last} </xml>';
+    var _data =
+    {
+      name :
+      {
+        first : "Léo",
+        last : "Labruyère"
+      },
+      movie :
+      [
+        { name : "Matrix" },
+        { name : "Avengers" }
+      ]
+    }
+    var _options = { throwErrorOnUndefined : true };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      helper.assert(err, null);
+      helper.assert(_xmlBuilt, "<xml> Matrix is the favorite movie of Léo Labruyère </xml>");
+      done();
+    });
+  })
   it.skip('should work if the same array is repeated two times in the xml <tr>d[i].product</tr>    <tr>d[i].product</tr>');
   it.skip('should escape special characters > < & " \' even if a formatter is used (output of a formatter)');
   it('should return the xml if no data is passed', function (done) {

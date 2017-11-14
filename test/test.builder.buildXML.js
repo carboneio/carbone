@@ -1088,6 +1088,128 @@ describe('builder.buildXML', function () {
       { "pos": 13723,  "name": "d[i+1].date" }
     ]
   */
+
+  describe('Dynamic pictures', function () {
+
+    it('should replace href value by the new one', function (done) {
+      var _xml = '<xml>' +
+                '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                '<draw:image xlink:href="oldHref" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                '<svg:title>{ d.href }</svg:title>' +
+                '</draw:frame>' +
+                '</xml>';
+      var _expectedResult = '<xml>' +
+                 '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                 '<draw:image xlink:href="newHref" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                 '<svg:title></svg:title>' +
+                 '</draw:frame>' +
+                 '</xml>';
+      var _data = { href : 'newHref' };
+
+      builder.buildXML(_xml, _data, function (err, xml) {
+        helper.assert(xml, _expectedResult);
+        done();
+      });
+    });
+
+    it('should not replace href value by the new one (no marker)', function (done) {
+      var _xml = '<xml>' +
+                '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                '<draw:image xlink:href="oldHref" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                '<svg:title>d.href</svg:title>' +
+                '</draw:frame>' +
+                '</xml>';
+      var _expectedResult = '<xml>' +
+                 '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                 '<draw:image xlink:href="oldHref" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                 '<svg:title>d.href</svg:title>' +
+                 '</draw:frame>' +
+                 '</xml>';
+      var _data = { href : 'newHref' };
+
+      builder.buildXML(_xml, _data, function (err, xml) {
+        helper.assert(xml, _expectedResult);
+        done();
+      });
+    });
+
+    it('should replace href value by the new one and apply offset to next markers', function (done) {
+      var _xml = '<xml>' +
+                '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                '<draw:image xlink:href="oldHref1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                '<svg:title>{ d.href1 }</svg:title>' +
+                '</draw:frame>' +
+                '<draw:frame draw:style-name="fr2" draw:name="Image2" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                '<draw:image xlink:href="oldHref2" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                '<svg:title>{ d.href2 }</svg:title>' +
+                '</draw:frame>' +
+                '<text:p text:style-name="P1">{ d.firstname }</text:p>' +
+                '<text:p text:style-name="P1">{ d.lastname }</text:p>' +
+                '</xml>';
+      var _expectedResult = '<xml>' +
+                            '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                            '<draw:image xlink:href="newHref1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                            '<svg:title></svg:title>' +
+                            '</draw:frame>' +
+                            '<draw:frame draw:style-name="fr2" draw:name="Image2" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                            '<draw:image xlink:href="newHref2" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                            '<svg:title></svg:title>' +
+                            '</draw:frame>' +
+                            '<text:p text:style-name="P1">John</text:p>' +
+                            '<text:p text:style-name="P1">Doe</text:p>' +
+                            '</xml>';
+      var _data = {
+        href1     : 'newHref1',
+        href2     : 'newHref2',
+        firstname : 'John',
+        lastname  : 'Doe'
+      };
+
+      builder.buildXML(_xml, _data, function (err, xml) {
+        helper.assert(xml, _expectedResult);
+        done();
+      });
+    });
+
+    it('should replace href value by the new one and not break arrays', function (done) {
+      var _xml = '<xml>' +
+                '<text:p text:style-name="P1">{d.cars[i].brand}</text:p>' +
+                '<text:p text:style-name="P1">{d.cars[i+1].brand}</text:p>' +
+                '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                '<draw:image xlink:href="oldHref" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                '<svg:title>{ d.href }</svg:title>' +
+                '</draw:frame>' +
+                '<text:p text:style-name="P1">{d.cars[i].brand}</text:p>' +
+                '<text:p text:style-name="P1">{d.cars[i+1].brand}</text:p>' +
+                '</xml>';
+      var _expectedResult = '<xml>' +
+                            '<text:p text:style-name="P1">Lumeneo</text:p>' +
+                            '<text:p text:style-name="P1">Tesla</text:p>' +
+                            '<text:p text:style-name="P1">Toyota</text:p>' +
+                            '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="17cm" svg:height="9.562cm" draw:z-index="0">' +
+                            '<draw:image xlink:href="newHref" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                            '<svg:title></svg:title>' +
+                            '</draw:frame>' +
+                            '<text:p text:style-name="P1">Lumeneo</text:p>' +
+                            '<text:p text:style-name="P1">Tesla</text:p>' +
+                            '<text:p text:style-name="P1">Toyota</text:p>' +
+                            '</xml>'
+      var _data = {
+        href : 'newHref',
+        cars : [
+          { brand : 'Lumeneo' },
+          { brand : 'Tesla'   },
+          { brand : 'Toyota'  }
+        ]
+      };
+
+      builder.buildXML(_xml, _data, function (err, xml) {
+        helper.assert(xml, _expectedResult);
+        done();
+      });
+    });
+
+  });
 });
 
 

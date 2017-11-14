@@ -31,7 +31,7 @@ describe('builder.buildXML', function () {
     }
     var _options = { throwErrorOnUndefined : true };
     builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
-      helper.assert(err.message, "Error: d.movie[0].type is undefined");
+      helper.assert(err.message, "Error: d.movie[].type is undefined");
       helper.assert(_xmlBuilt, null);
       done();
     });

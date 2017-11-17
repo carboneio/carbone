@@ -1089,7 +1089,7 @@ describe('builder.buildXML', function () {
     ]
   */
 
-  describe('Dynamic pictures', function () {
+  describe.skip('Dynamic pictures', function () {
 
     it('should replace href value by the new one', function (done) {
       var _xml = '<xml>' +

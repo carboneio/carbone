@@ -258,6 +258,37 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('Should work if there is a marker in a tag', function (done) {
+    var _xml = '<xml><t_row bla={d.cars[i].brand}>  </t_row><t_row bla={d.cars [i+1].brand}>  </t_row></xml>';
+    var _data = {
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err)
+      assert.equal(_xmlBuilt, '<xml><t_row bla=Lumeneo>  </t_row><t_row bla=Tesla motors>  </t_row><t_row bla=Toyota>  </t_row></xml>');
+      done();
+    });
+  });
+  it.skip('Should work if there is a marker in a tag', function (done) {
+    var _xml = '<xml>{d.cars[i].brand}<t_row>coucou</t_row>{d.cars[i+1].brand}</xml>';
+    var _data = {
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err)
+      assert.equal(_xmlBuilt, '<xml><t_row bla=Lumeneo>  </t_row><t_row bla=Tesla motors>  </t_row><t_row bla=Toyota>  </t_row></xml>');
+      done();
+    });
+  });
+  
   it('should detect repetition even if there is only one self-closing tag between the two parts (with whitespaces)', function (done) {
     var _xml = '<xml><p><p><br/></p></p>{d[i].brand}  <br/>{d[i+1].brand}  <br/></xml>';
     var _data = [

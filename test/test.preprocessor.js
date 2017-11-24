@@ -2,6 +2,163 @@ var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
 
 describe('preprocessor', function () {
+  describe('color', function () {
+    describe('simple replace', function () {
+      it('Should replace a color in style tag', function (done) {
+        var _template = {
+          files: [
+            {
+              name: 'content.xml',
+              data: '<xml><style:style style:name="P1"><toto color="#FF0000" background-color="#FAB091" /><tata color="#EEEEEE"></tata></style:style>{bindColor(FF0000, RRGGBB)=d.color}</xml>'
+            }
+          ]
+        };
+        var _result = preprocessor.replaceColorMarkers(_template);
+        helper.assert(_result.files[0].data, '<xml><style:style style:name="P1"><toto color="{d.color}" background-color="#FAB091" /><tata color="#EEEEEE"></tata></style:style></xml>')
+        done();
+      });
+      it('Should replace multiple time the same color', function (done) {
+        var _template = {
+          files: [
+            {
+              name: 'content.xml',
+              data: '<xml><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"/></style:style>{bindColor(000000, RRGGBB)=d.color}</xml>'
+            }
+          ]
+        };
+        var _result = preprocessor.replaceColorMarkers(_template);
+        helper.assert(_result.files[0].data, '<xml><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid {d.color}" fo:border-right="none" fo:border-top="0.05pt solid {d.color}" fo:border-bottom="0.05pt solid {d.color}"/></style:style></xml>')
+        done();
+      });
+      it('Should replace multiple time the same color and that with multiple colors', function (done) {
+        var _template = {
+          files: [
+            {
+              name: 'content.xml',
+              data: '<xml><style:style style:name="name"><text:p draw:fill-color="#ff0000" />' +
+              '<toto color="#00ff00" background-color="#0000ff" />' +
+              '<style:paragraph-properties style:page-number="auto" fo:background-color="#00ff00">' +
+              '<style:tab-stops/></style:paragraph-properties><style:text-properties fo:background-color="#ff0000"/>' +
+              '<tata color="#ff0000" background-color="#0000ff" />' +
+              '</style:style>{bindColor(ff0000, RRGGBB)=d.color}{bindColor(00FF00, RRGGBB)=d.color2}{bindColor(0000FF, RRGGBB)=d.color3}</xml>'
+            }
+          ]
+        };
+        var _result = preprocessor.replaceColorMarkers(_template);
+        helper.assert(_result.files[0].data,
+              '<xml><style:style style:name="name"><text:p draw:fill-color="{d.color}" />' +
+              '<toto color="{d.color2}" background-color="{d.color3}" />' +
+              '<style:paragraph-properties style:page-number="auto" fo:background-color="{d.color2}">' +
+              '<style:tab-stops/></style:paragraph-properties><style:text-properties fo:background-color="{d.color}"/>' +
+              '<tata color="{d.color}" background-color="{d.color3}" />' +
+              '</style:style></xml>')
+        done();
+      });
+      it('Should not replace color', function (done) {
+        var _template = {
+          files: [
+            {
+              name: 'content.xml',
+              data: '<xml><style:style style:name="P1"><toto color="#FF0000" background-color="#FAB091" /><tata color="#EEEEEE"></tata></style:style>{bindColor(FF0000, RRGGBB)=}</xml>'
+            }
+          ]
+        };
+        var _result = preprocessor.replaceColorMarkers(_template);
+        helper.assert(_result.files[0].data, _result.files[0].data)
+        done();
+      });
+      it('Should not replace color 2', function (done) {
+        var _template = {
+          files: [
+            {
+              name: 'content.xml',
+              data: '<xml><style:style style:name="P1"><toto color="#FF0000" background-color="#FAB091" /><tata color="#EEEEEE"></tata></style:style>{bindColor(, RRGGBB)=d.color}</xml>'
+            }
+          ]
+        };
+        var _result = preprocessor.replaceColorMarkers(_template);
+        helper.assert(_result.files[0].data, _result.files[0].data)
+        done();
+      });
+    });
+
+    describe('Loop', function () {
+      it('Should create a simple loop', function (done) {
+        var _template = {
+          files: [
+            {
+              name: 'content.xml',
+              data: '<xml>' +
+                      '<office:automatic-styles>' +
+                        '<style:style style:name="P{d.perso[i].color} {d.perso[i].color} {d.perso[i].color} "><toto color="{d.perso[i].color}" background-color="{d.perso[i].color}" /><tata color="{d.perso[i].color}"></tata></style:style>' +
+                        '<style:style style:name="P{d.perso[i+1].color} {d.perso[i+1].color} {d.perso[i+1].color} "><toto color="{d.perso[i+1].color}" background-color="{d.perso[i+1].color}" /><tata color="{d.perso[i+1].color}"></tata></style:style>' +
+                      '</office:automatic-styles>' +
+                      '<table>' +
+                        '<tr>' +
+                          '<td style-name="P{d.perso[i].color} {d.perso[i].color} {d.perso[i].color} ">{d.perso[i].prenom}</td><td style-name="P{d.perso[i].color} {d.perso[i].color} {d.perso[i].color} ">{d.perso[i].nom}</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                          '<td style-name="P{d.perso[i+1].color} {d.perso[i+1].color} {d.perso[i+1].color} ">{d.perso[i+1].prenom}</td><td style-name="P{d.perso[i+1].color} {d.perso[i+1].color} {d.perso[i+1].color} ">{d.perso[i+1].nom}</td>' +
+                        '</tr>' +
+                      '</table>' +
+                    '</xml>'
+            }
+          ]
+        };
+        var _result = preprocessor.replaceColorMarkers(_template);
+        helper.assert(_result.files[0].data, _result.files[0].data)
+        done();
+      });
+      it('Should create a complex loop', function (done) {
+        var _template = {
+          files: [
+            {
+              name: 'content.xml',
+              data: '<xml>' +
+                      '<office:automatic-styles>' +
+                        '<style:style style:name="P1"><toto color="#FF0000" /><trtr color="#F0F0F0" /><tarte color="#F0000F" /></style:style>' +
+                        '<style:style style:name="P2"><toto color="#00FF00" /><trtr color="#0F0F0F" /><tarte color="#0FFFF0" /></style:style>' +
+                        '<style:style style:name="P3"><toto color="#AAAAAA" /></style:style>' +
+                      '</office:automatic-styles>' +
+                      '<table>' +
+                        '<tr>' +
+                          '<td style-name="P1">{d.perso[i].prenom}</td><td style-name="P2">{d.perso[i].nom}</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                          '<td style-name="P1">{d.perso[i+1].prenom}</td><td style-name="P2">{d.perso[i+1].nom}</td>' +
+                        '</tr>' +
+                      '</table>{bindColor(FF0000, RRGGBB)=d.perso[i].color}{bindColor(00FF00, RRGGBB)=d.perso[i+1].color}' +
+                      '{bindColor(F0F0F0, RRGGBB)=d.perso[i].color2}{bindColor(0F0F0F, RRGGBB)=d.perso[i+1].color2}' +
+                      '{bindColor(F0000F, RRGGBB)=d.perso[i].color3}{bindColor(0FFFF0, RRGGBB)=d.perso[i+1].color3}' +
+                      '{bindColor(AAAAAA, RRGGBB)=d.color}' +
+                    '</xml>'
+            }
+          ]
+        };
+        var _result = preprocessor.replaceColorMarkers(_template);
+        helper.assert(_result.files[0].data, 
+                    '<xml>' +
+                      '<office:automatic-styles>' +
+                        '<style:style style:name="P{d.perso[i].color} {d.perso[i].color2} {d.perso[i].color3} "><toto color="{d.perso[i].color}" /><trtr color="{d.perso[i].color2}" /><tarte color="{d.perso[i].color3}" /></style:style>' +
+                        '<style:style style:name="P{d.perso[i+1].color} {d.perso[i+1].color2} {d.perso[i+1].color3} "><toto color="{d.perso[i+1].color}" /><trtr color="{d.perso[i+1].color2}" /><tarte color="{d.perso[i+1].color3}" /></style:style>' +
+                        '<style:style style:name="P1"><toto color="#FF0000" /><trtr color="#F0F0F0" /><tarte color="#F0000F" /></style:style>' +
+                        '<style:style style:name="P2"><toto color="#00FF00" /><trtr color="#0F0F0F" /><tarte color="#0FFFF0" /></style:style>' +
+                        '<style:style style:name="P3"><toto color="{d.color}" /></style:style>' +
+                      '</office:automatic-styles>' +
+                      '<table>' +
+                        '<tr>' +
+                          '<td style-name="P{d.perso[i].color} {d.perso[i].color2} {d.perso[i].color3} ">{d.perso[i].prenom}</td><td style-name="P{d.perso[i+1].color} {d.perso[i+1].color2} {d.perso[i+1].color3} ">{d.perso[i].nom}</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                          '<td style-name="P{d.perso[i].color} {d.perso[i].color2} {d.perso[i].color3} ">{d.perso[i+1].prenom}</td><td style-name="P{d.perso[i+1].color} {d.perso[i+1].color2} {d.perso[i+1].color3} ">{d.perso[i+1].nom}</td>' +
+                        '</tr>' +
+                      '</table>' +
+                    '</xml>');
+        done();
+      });
+    });
+    
+  });  
   describe('execute', function () {
     it('should do nothing if the file is an empty object', function (done) {
       preprocessor.execute({}, function (err, tmpl) {

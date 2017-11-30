@@ -268,7 +268,6 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      console.log(err)
       assert.equal(_xmlBuilt, '<xml><t_row bla=Lumeneo>  </t_row><t_row bla=Tesla motors>  </t_row><t_row bla=Toyota>  </t_row></xml>');
       done();
     });
@@ -283,7 +282,6 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      console.log(err)
       assert.equal(_xmlBuilt, '<xml><t_row bla=Lumeneo>  </t_row><t_row bla=Tesla motors>  </t_row><t_row bla=Toyota>  </t_row></xml>');
       done();
     });

@@ -1117,6 +1117,7 @@ describe('builder.buildXML', function () {
       { "pos": 13723,  "name": "d[i+1].date" }
     ]
   */
+
 });
 
 

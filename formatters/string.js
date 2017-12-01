@@ -1,3 +1,5 @@
+var toMd5 = require('./md5');
+
 /**
  * Lower case all letters
  * 
@@ -120,11 +122,21 @@ function convEnum (d, type) {
   return d;
 }
 
+function md5 (d) {
+  return toMd5(d);
+}
+
+function prepend (d, toPrepend) {
+  return toPrepend + d;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
   ucFirst   : ucFirst,
   ucWords   : ucWords,
   convEnum  : convEnum,
-  print     : print
+  print     : print,
+  md5       : md5,
+  prepend   : prepend
 };

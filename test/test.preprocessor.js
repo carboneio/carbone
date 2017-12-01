@@ -1,5 +1,6 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
+var dynpics = require('../lib/dynpics');
 
 describe('preprocessor', function() {
   describe('color', function() {
@@ -612,6 +613,141 @@ describe('preprocessor', function() {
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
         });
       });
+    });
+    describe('Dynamic pictures preprocessing ODT ONLY', function () {
+
+      describe('Without loops', function () {
+
+        it('should replace pictures link by alt text marker', function () {
+          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
+          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var report = {
+            files      : [
+              { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report);
+          helper.assert(report.files[0].data, expected);
+        });
+
+        it('should replace pictures link by alt text marker (two pictures)', function () {
+          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.cat}</svg:title></draw:frame></text:p></xml>';
+          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.cat}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var report = {
+            files      : [
+              { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report);
+          helper.assert(report.files[0].data, expected);
+        });
+
+        it('should replace pictures link by alt text marker (with captions)', function () {
+          var xml = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
+          var expected = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
+          var report = {
+            files      : [
+              { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report);
+          helper.assert(report.files[0].data, expected);
+        });
+
+      });
+
+      describe('With loops', function () {
+
+        it('should replace pictures link by alt text marker and wrap in loop', function () {
+          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.dog}{d.loop[i+1]}</svg:title></draw:frame></text:p></xml>';
+          var expected = '<xml><text:p text:style-name="P1">{d.loop[i]}</text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1">{d.loop[i+1]}</text:p></xml>';
+          var report = {
+            files      : [
+              { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report);
+          helper.assert(report.files[0].data, expected);
+        });
+
+        it('should replace pictures link by alt text marker and wrap in loop (two pictures)', function () {
+          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.dog}{d.loop[i+1]}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.cat}{d.loop[i+1]}</svg:title></draw:frame></text:p></xml>';
+          var expected = '<xml><text:p text:style-name="P1">{d.loop[i]}</text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1">{d.loop[i+1]}</text:p><text:p text:style-name="P1">{d.loop[i]}</text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.cat}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1">{d.loop[i+1]}</text:p></xml>';
+          var report = {
+            files      : [
+              { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report);
+          helper.assert(report.files[0].data, expected);
+        });
+
+        it('should replace pictures link by alt text marker and wrap in loop (with captions)', function () {
+          var xml = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.dog}{d.loop[i+1]}</svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
+          var expected = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1">{d.loop[i]}</text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p><text:p text:style-name="P1">{d.loop[i+1]}</text:p>';
+          var report = {
+            files      : [
+              { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report);
+          helper.assert(report.files[0].data, expected);
+        });
+
+      });
+
+    });
+
+    describe('Dynamic pictures preprocessing DOCX ONLY', function () {
+
+      describe('Without loops', function () {
+
+        it('should add a relation and link to it (basic)', function () {
+          var xml = '<xml><w:p w14:paraId="7DEA1F7F" w14:textId="77777777" w:rsidR="00E67D1A" w:rsidRDefault="006F0085"><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="19C73DC8" wp14:editId="0B99D1D7"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="1" name="Image 1" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="1E31A505" w14:textId="66AFCDB5" w:rsidR="006959F6" w:rsidRDefault="006959F6"><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="017380FC" wp14:editId="1C0957DB"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="2" name="Image 2"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:bookmarkEnd w:id="0"/></w:p></xml>';
+          var expectedXml = '<xml><w:p w14:paraId="7DEA1F7F" w14:textId="77777777" w:rsidR="00E67D1A" w:rsidRDefault="006F0085"><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="19C73DC8" wp14:editId="0B99D1D7"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="1" name="Image 1" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:link="{d.dog:md5:prepend(id)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="1E31A505" w14:textId="66AFCDB5" w:rsidR="006959F6" w:rsidRDefault="006959F6"><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="017380FC" wp14:editId="1C0957DB"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="2" name="Image 2"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:bookmarkEnd w:id="0"/></w:p></xml>';
+          var xmlRels = '<Relationships></Relationships>';
+          var expectedXmlRels = '<Relationships><Relationship Id="{d.dog:md5:prepend(id)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="{d.dog}" TargetMode="External"/></Relationships>';
+          var report = {
+            files      : [
+              { name : 'word/document.xml'    , parent : '', data : xml },
+              { name : 'word/_rels/document.xml.rels' , parent : '' , data : xmlRels }
+            ]
+          };
+          var expectedReport = {
+            files      : [
+              { name : 'word/document.xml'    , parent : '', data : expectedXml },
+              { name : 'word/_rels/document.xml.rels' , parent : '' , data : expectedXmlRels }
+            ]
+          };
+          dynpics.manageDocx(report, function (error, result) {
+            helper.assert(result, expectedReport);
+          });
+        });
+
+        it('should add a relation and link to it (two pictures)', function () {
+          var xml = '<xml><w:p w14:paraId="7DEA1F7F" w14:textId="77777777" w:rsidR="00E67D1A" w:rsidRDefault="006F0085"><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="19C73DC8" wp14:editId="0B99D1D7"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="1" name="Image 1" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="1E31A505" w14:textId="66AFCDB5" w:rsidR="006959F6" w:rsidRDefault="006959F6"><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="017380FC" wp14:editId="1C0957DB"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="2" name="Image 2" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:bookmarkEnd w:id="0"/></w:p></xml>';
+          var expectedXml = '<xml><w:p w14:paraId="7DEA1F7F" w14:textId="77777777" w:rsidR="00E67D1A" w:rsidRDefault="006F0085"><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="19C73DC8" wp14:editId="0B99D1D7"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="1" name="Image 1" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:link="{d.dog:md5:prepend(id)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="1E31A505" w14:textId="66AFCDB5" w:rsidR="006959F6" w:rsidRDefault="006959F6"><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="017380FC" wp14:editId="1C0957DB"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="2" name="Image 2" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:link="{d.dog:md5:prepend(id)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:bookmarkEnd w:id="0"/></w:p></xml>';
+          var xmlRels = '<Relationships></Relationships>';
+          var expectedXmlRels = '<Relationships><Relationship Id="{d.dog:md5:prepend(id)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="{d.dog}" TargetMode="External"/><Relationship Id="{d.dog:md5:prepend(id)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="{d.dog}" TargetMode="External"/></Relationships>';
+          var report = {
+            files      : [
+              { name : 'word/document.xml'    , parent : '', data : xml },
+              { name : 'word/_rels/document.xml.rels' , parent : '' , data : xmlRels }
+            ]
+          };
+          var expectedReport = {
+            files      : [
+              { name : 'word/document.xml'    , parent : '', data : expectedXml },
+              { name : 'word/_rels/document.xml.rels' , parent : '' , data : expectedXmlRels }
+            ]
+          };
+          dynpics.manageDocx(report, function (error, result) {
+            helper.assert(result, expectedReport);
+          });
+        });
+
+      });
+
     });
   });
 });

@@ -618,6 +618,19 @@ describe('preprocessor', function() {
 
       describe('Without loops', function () {
 
+        it('should do nothing', function () {
+          var xml = '<xml><text:p></text:p></xml>';
+          var expected = '<xml><text:p></text:p></xml>';
+          var report = {
+            files      : [
+              { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report, function (err, report) {
+            helper.assert(report.files[0].data, expected);
+          });
+        });
+
         it('should replace pictures link by alt text marker', function () {
           var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
           var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
@@ -626,8 +639,9 @@ describe('preprocessor', function() {
               { name : 'content.xml'    , parent : '', data : xml }
             ]
           };
-          dynpics.manageOdt(report);
-          helper.assert(report.files[0].data, expected);
+          dynpics.manageOdt(report, function (err, report) {
+            helper.assert(report.files[0].data, expected);
+          });
         });
 
         it('should replace pictures link by alt text marker (two pictures)', function () {
@@ -638,8 +652,9 @@ describe('preprocessor', function() {
               { name : 'content.xml'    , parent : '', data : xml }
             ]
           };
-          dynpics.manageOdt(report);
-          helper.assert(report.files[0].data, expected);
+          dynpics.manageOdt(report, function (err, report) {
+            helper.assert(report.files[0].data, expected);
+          });
         });
 
         it('should replace pictures link by alt text marker (with captions)', function () {
@@ -650,8 +665,9 @@ describe('preprocessor', function() {
               { name : 'content.xml'    , parent : '', data : xml }
             ]
           };
-          dynpics.manageOdt(report);
-          helper.assert(report.files[0].data, expected);
+          dynpics.manageOdt(report, function (err, report) {
+            helper.assert(report.files[0].data, expected);
+          });
         });
 
       });
@@ -666,8 +682,9 @@ describe('preprocessor', function() {
               { name : 'content.xml'    , parent : '', data : xml }
             ]
           };
-          dynpics.manageOdt(report);
-          helper.assert(report.files[0].data, expected);
+          dynpics.manageOdt(report, function (err, report) {
+            helper.assert(report.files[0].data, expected);
+          });
         });
 
         it('should replace pictures link by alt text marker and wrap in loop (two pictures)', function () {
@@ -678,8 +695,9 @@ describe('preprocessor', function() {
               { name : 'content.xml'    , parent : '', data : xml }
             ]
           };
-          dynpics.manageOdt(report);
-          helper.assert(report.files[0].data, expected);
+          dynpics.manageOdt(report, function (err, report) {
+            helper.assert(report.files[0].data, expected);
+          });
         });
 
         it('should replace pictures link by alt text marker and wrap in loop (with captions)', function () {
@@ -690,8 +708,9 @@ describe('preprocessor', function() {
               { name : 'content.xml'    , parent : '', data : xml }
             ]
           };
-          dynpics.manageOdt(report);
-          helper.assert(report.files[0].data, expected);
+          dynpics.manageOdt(report, function (err, report) {
+            helper.assert(report.files[0].data, expected);
+          });
         });
 
       });
@@ -701,6 +720,18 @@ describe('preprocessor', function() {
     describe('Dynamic pictures preprocessing DOCX ONLY', function () {
 
       describe('Without loops', function () {
+
+        it('should do nothing', function () {
+          var xml = '<xml><w:p></w:p></xml>';
+          var expected = '<xml><w:p></w:p></xml>';
+          var report = {
+            files      : [
+              { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report);
+          helper.assert(report.files[0].data, expected);
+        });
 
         it('should add a relation and link to it (basic)', function () {
           var xml = '<xml><w:p w14:paraId="7DEA1F7F" w14:textId="77777777" w:rsidR="00E67D1A" w:rsidRDefault="006F0085"><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="19C73DC8" wp14:editId="0B99D1D7"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="1" name="Image 1" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="1E31A505" w14:textId="66AFCDB5" w:rsidR="006959F6" w:rsidRDefault="006959F6"><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="017380FC" wp14:editId="1C0957DB"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="2" name="Image 2"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:bookmarkEnd w:id="0"/></w:p></xml>';

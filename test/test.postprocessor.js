@@ -97,6 +97,16 @@ describe('postprocessor', function () {
 			});
 		});
 
+		it('should do nothing (pictures does not exist)', function (done) {
+			report.files[1].data = '<Relationships><Relationship Id="id72db2d937dba0c211598e89afb814679" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="http://thissitedoesnot.exist" TargetMode="External"/></Relationships>';
+
+			postprocessor.embedDocxPictures(report, function (err, result) {
+				var gotRels = dynpics.getTemplate(result, 'word/_rels/document.xml.rels').data;
+				helper.assert(gotRels, report.files[1].data);
+				done();
+			});
+		});
+
 	});
 
 });

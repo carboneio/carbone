@@ -62,7 +62,7 @@ describe('postprocessor', function () {
 
 	});
 
-	describe('Dynpics DOCX (can takes time to request pictures)', function () {
+	describe.only('Dynpics DOCX (can takes time to request pictures)', function () {
 
 		var rels = '<Relationships><Relationship Id="id72db2d937dba0c211598e89afb814679" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="https://www.wanimo.com/veterinaire/images/articles/chien/chien-boiterie.jpg" TargetMode="External"/></Relationships>';
 		var expectedRels = '<Relationships><Relationship Id="id72db2d937dba0c211598e89afb814679" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarbonePicture0.jpg"/></Relationships>';

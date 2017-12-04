@@ -457,7 +457,7 @@ describe('preprocessor', function () {
 
     });
 
-    describe('Dynamic pictures preprocessing DOCX ONLY', function () {
+    describe.only('Dynamic pictures preprocessing DOCX ONLY', function () {
 
       describe('Without loops', function () {
 

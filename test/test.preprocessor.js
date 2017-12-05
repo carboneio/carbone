@@ -616,6 +616,23 @@ describe('preprocessor', function() {
     });
     describe('Dynamic pictures preprocessing ODT ONLY', function () {
 
+      it('should do nothing (no picture)', function () {
+        var xml = '<xml></xml>';
+        var report = {
+          files      : [
+            { name : 'content.xml'    , parent : '', data : xml }
+          ]
+        };
+        var expectedReport = {
+          files      : [
+            { name : 'content.xml'    , parent : '', data : xml }
+          ]
+        };
+        dynpics.manageDocx(report, function (error, result) {
+          helper.assert(result, expectedReport);
+        });
+      });
+
       describe('Without loops', function () {
 
         it('should do nothing', function () {
@@ -718,6 +735,23 @@ describe('preprocessor', function() {
     });
 
     describe('Dynamic pictures preprocessing DOCX ONLY', function () {
+
+      it('should do nothing (no picture)', function () {
+        var xml = '<xml></xml>';
+        var report = {
+          files      : [
+            { name : 'word/document.xml'    , parent : '', data : xml }
+          ]
+        };
+        var expectedReport = {
+          files      : [
+            { name : 'word/document.xml'    , parent : '', data : xml }
+          ]
+        };
+        dynpics.manageDocx(report, function (error, result) {
+          helper.assert(result, expectedReport);
+        });
+      });
 
       describe('Without loops', function () {
 

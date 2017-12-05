@@ -12,10 +12,16 @@ describe('postprocessor', function () {
 		var expectedXmlContent = '<xml><draw:image xlink:href="Pictures/CarbonePicture0.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
 						'<draw:image xlink:href="Pictures/CarbonePicture1.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
 						'<draw:image xlink:href="Pictures/CarbonePicture2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/></xml>';
+		var contentTypeXml = '<Types></Types>';
+		var expectedContentTypeXml = '<Types><Default Extension="jpg" ContentType="image/jpeg"/></Types>';
 		var manifest = '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"></manifest:manifest>';
 		var expectedManifest = '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/CarbonePicture2.jpg" manifest:media-type="image/jpeg"/><manifest:file-entry manifest:full-path="Pictures/CarbonePicture0.jpg" manifest:media-type="image/jpeg"/><manifest:file-entry manifest:full-path="Pictures/CarbonePicture1.jpg" manifest:media-type="image/jpeg"/></manifest:manifest>';
 		var report = {
 			files : [
+				{
+					name : '[Content_Types].xml',
+					data : contentTypeXml
+				},
 				{
 					name : 'content.xml',
 					data : xmlContent
@@ -28,6 +34,10 @@ describe('postprocessor', function () {
 		}
 		var expectedReport = {
 			files : [
+				{
+					name : '[Content_Types].xml',
+					data : expectedContentTypeXml
+				},
 				{
 					name : 'content.xml',
 					data : expectedXmlContent
@@ -69,6 +79,10 @@ describe('postprocessor', function () {
 		var report = {
 			files : [
 				{
+					name : '[Content_Types].xml',
+					data : '<Types></Types>'
+				},
+				{
 					name : 'word/_rels/document.xml.rels',
 					data : rels
 				}
@@ -79,6 +93,16 @@ describe('postprocessor', function () {
 			postprocessor.embedDocxPictures(report, function (err, result) {
 				var gotRels = dynpics.getTemplate(result, 'word/_rels/document.xml.rels').data;
 				helper.assert(gotRels, expectedRels);
+				done();
+			});
+		});
+
+		it('should do nothing (pictures does not exist)', function (done) {
+			report.files[1].data = '<Relationships><Relationship Id="id72db2d937dba0c211598e89afb814679" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="http://thissitedoesnot.exist" TargetMode="External"/></Relationships>';
+
+			postprocessor.embedDocxPictures(report, function (err, result) {
+				var gotRels = dynpics.getTemplate(result, 'word/_rels/document.xml.rels').data;
+				helper.assert(gotRels, report.files[1].data);
 				done();
 			});
 		});

@@ -1,5 +1,6 @@
 
 ### v0.14.0
+  - Fix: should find markers even if there is a opening bracket `{` before the markers
 
 ### v0.13.3
   - Automatically remove XML-incompatible control codes (U+0000 to U+0008 and U+000B to U+000C and U+000E to U+001F) before inserting data in templates

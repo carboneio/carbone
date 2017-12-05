@@ -1099,7 +1099,7 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it.only('should replace rId by md5 hash with id prepend', function (done) {
+  it('should replace rId by md5 hash with id prepend', function (done) {
     var formatters = require('../formatters/string.js');
     var _xml = '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="{d.dog:md5:prepend(id)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="{d.dog}" TargetMode="External"/></Relationships><';
     var _expect = '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="id319f27934db5dd8f03070e75989ca667" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg" TargetMode="External"/></Relationships><';

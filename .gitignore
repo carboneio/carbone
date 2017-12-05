@@ -33,11 +33,6 @@ npm-debug.log
 ~$*
 
 
-####### VCS
-.hgignore
-.hg
-
-
 ######## project-specific
 0perso/*
 0formation/*

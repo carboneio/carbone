@@ -35,11 +35,11 @@ describe('Carbone', function () {
     });
     it('should change the lang of of date formatter', function (done) {
       carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'vendredi');
+      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
       carbone.set({lang : 'en'});
-      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'Friday');
+      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'Friday');
       carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convert('20140131','YYYYMMDD','dddd'), 'vendredi');
+      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
       done();
     });
   });
@@ -278,22 +278,56 @@ describe('Carbone', function () {
         });
       });
     });
-    it.skip('options.lang = "fr" should force the lang of translation markers {t()}', function (done) {
+    it('options.lang should dynamically force the lang of translation markers {t()} and accept provided translations', function (done) {
       var data = {
         param : '20160131'
       };
       carbone.set({lang : 'en'}); // default lang
       var options = {
-        lang : 'fr' // forced lang
+        lang         : 'fr', // forced lang
+        translations : {
+          fr : {
+            kitchen : 'cuisine'
+          },
+          es : {
+            kitchen : 'cocina'
+          }
+        }
       };
       carbone.renderXML('<xml>{t(kitchen)}</xml>', data, options, function (err, result) {
         helper.assert(err+'', 'null');
-        helper.assert(result, '<xml>31/01/2016</xml>');
-        options.lang = 'en';
+        helper.assert(result, '<xml>cuisine</xml>');
+        options.lang = 'es';
         carbone.set({lang : 'fr'}); // default lang
-        carbone.renderXML('<xml>{d.param:convDate(YYYYMMDD, L)}</xml>', data, options, function (err, result) {
+        carbone.renderXML('<xml>{t(kitchen)}</xml>', data, options, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>01/31/2016</xml>');
+          helper.assert(result, '<xml>cocina</xml>');
+          done();
+        });
+      });
+    });
+    it('options.lang should dynamically force the lang of translation markers {t()} and use translations of carbone', function (done) {
+      var data = {
+        param : '20160131'
+      };
+      carbone.set({lang : 'en'}); // default lang
+      carbone.set({
+        translations : {
+          fr : {
+            kitchen : 'cuisine'
+          },
+          es : {
+            kitchen : 'cocina'
+          }
+        }
+      });
+      carbone.renderXML('<xml>{t(kitchen)}</xml>', data, {lang : 'fr'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>cuisine</xml>');
+        carbone.set({lang : 'fr'}); // default lang
+        carbone.renderXML('<xml>{t(kitchen)}</xml>', data, {lang : 'es'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>cocina</xml>');
           done();
         });
       });
@@ -336,7 +370,6 @@ describe('Carbone', function () {
       });
     });
     it('should be fast to render a document without conversion', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
@@ -346,7 +379,7 @@ describe('Carbone', function () {
       var _waitedResponse = _nbExecuted;
       var _start = new Date();
       for (var i = 0; i < _nbExecuted; i++) {
-        carbone.render(_filePath, data, function (err, result) {
+        carbone.render('test_word_render_A.docx', data, function (err, result) {
           _waitedResponse--;
           _results.push(result);
           if (_waitedResponse === 0) {
@@ -433,25 +466,29 @@ describe('Carbone', function () {
         });
       });
     });
-    it('should translate the file and insert three product rows', function (done) {
-      path.resolve('./test/datasets/test_odt_render_translate.odt');
-      // var _fileLangPath = path.resolve('./test/datasets/lang/fr.json');
-      var _data = [{
-        name  : 'Bouteille de sirop d’érable 25cl',
-        qty   : '4',
-        price : '8',
-        total : '32',
-      },{
-        name  : 'Bouteille de cidre de glace 1L',
-        qty   : '2',
-        price : '17.5',
-        total : '35',
-      },{
-        name  : 'Sachet de Cranberry 200g',
-        qty   : '3',
-        price : '2',
-        total : '6',
-      }];
+    it('should translate the file and insert three product rows.\
+      it should load translations files if the template path change', function (done) {
+      var _templatePath = path.join(__dirname, 'datasets');
+      var _dirLangPath  = path.join(_templatePath, 'lang');
+      var _fileLangPath = path.join(_dirLangPath, 'fr.json');
+      var _data = [
+        {
+          name  : 'Bouteille de sirop d’érable 25cl',
+          qty   : '4',
+          price : '8',
+          total : '32',
+        },{
+          name  : 'Bouteille de cidre de glace 1L',
+          qty   : '2',
+          price : '17.5',
+          total : '35',
+        },{
+          name  : 'Sachet de Cranberry 200g',
+          qty   : '3',
+          price : '2',
+          total : '6',
+        }
+      ];
       var _objLang = {
         'Canada Products'                   : 'Produits du Canada',
         productName                         : 'Nom du produit',
@@ -459,14 +496,11 @@ describe('Carbone', function () {
         unitPrice                           : 'Prix unitaire',
         'I\'ve an Idea : Revenues >= Sales' : 'J\'ai une idée : Chiffre d\'Affaire >= Ventes'
       };
-      // I commented these lines because it does not test the lang file... objLang is overwritted by the next line of code 
-      //  TODO: The solution would be to 
-      //    - not overwrite objLang
-      //    - reload the lang file (fileReadSync) if the method carbone.set is called for modifying the parameter 'lang'. 
-      // fs.writeFile(_fileLangPath, JSON.stringify(_objLang, null, 2), function(err){ 
+      helper.rmDirRecursive(_dirLangPath);
+      fs.mkdirSync(_dirLangPath);
+      fs.writeFileSync(_fileLangPath, JSON.stringify(_objLang, null, 2));
       carbone.set({lang : 'fr'});
-      carbone.set({objLang : _objLang});
-        // helper.assert(err, null);
+      carbone.set({templatePath : _templatePath});
       carbone.render('test_odt_render_translate.odt', _data, function (err, result) {
         assert.equal(err, null);
         fs.mkdirSync(testPath, parseInt('0755', 8));
@@ -475,7 +509,6 @@ describe('Carbone', function () {
         fs.writeFileSync(_document, result);
         unzipSystem(_document, _unzipPath, function (err, files) {
           var _xmlExpectedContent = files['content.xml'];
-            // Have words been translated ?
           assert.equal(_xmlExpectedContent.indexOf('Canada Products'), -1);
           assert.equal(_xmlExpectedContent.indexOf('productName'), -1);
           assert.equal(_xmlExpectedContent.indexOf('qty'), -1);
@@ -485,16 +518,13 @@ describe('Carbone', function () {
           assert.notEqual(_xmlExpectedContent.indexOf('Quantité'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Prix unitaire'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('total'), -1); // total is not defined in this ObjLang. So it should be write with this word 'total'
-            // We have inserted three product rows 
           assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de sirop d’érable 25cl'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Bouteille de cidre de glace 1L'), -1);
           assert.notEqual(_xmlExpectedContent.indexOf('Sachet de Cranberry 200g'), -1);
-            // var _dirLangPath = path.join("./test/datasets/lang",'lang');
-            // helper.rmDirRecursive(_fileLangPath);
+          helper.rmDirRecursive(_dirLangPath);
           done();
         });
       });
-      // });
     });
     it('should accept pre-declared variables and variables declared directly in the document.\
       it should remove declared variables from the template', function (done) {
@@ -566,6 +596,7 @@ describe('Carbone', function () {
 
 
   describe('render and convert document', function () {
+    var _templatePath = path.join(__dirname, 'datasets');
     var defaultOptions = {
       pipeNamePrefix : '_carbone',
       factories      : 1,
@@ -578,14 +609,16 @@ describe('Carbone', function () {
         carbone.reset();
       });
     });
+    beforeEach(function () {
+      carbone.set({templatePath : _templatePath});
+    });
     it('should render a template (docx), generate to PDF and give output', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
       var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
-      carbone.render(_filePath, data, {convertTo : 'pdf'}, function (err, result) {
+      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
         assert.equal(err, null);
         var buf = new Buffer(result);
         assert.equal(buf.slice(0, 4).toString(), '%PDF');
@@ -612,7 +645,6 @@ describe('Carbone', function () {
       });
     });
     it('should render spreadsheet and convert it to a xls', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{
         id   : 1,
         name : 'field_1'
@@ -620,7 +652,7 @@ describe('Carbone', function () {
         id   : 2,
         name : 'field_2'
       }];
-      carbone.render(_filePath, data, {convertTo : 'xls'}, function (err) {
+      carbone.render('test_spreadsheet.ods', data, {convertTo : 'xls'}, function (err) {
         helper.assert(err, null);
         // fs.writeFileSync('test.xls', result);
         // TODO TODO TODO TODO TODO TODO TODO TODO : test the content of the xls
@@ -635,7 +667,6 @@ describe('Carbone', function () {
         attempts       : 2
       }, function () {
 
-        var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
         var data = {
           field1 : 'field_1',
           field2 : 'field_2'
@@ -645,7 +676,7 @@ describe('Carbone', function () {
         var _waitedResponse = _nbExecuted;
         var _start = new Date();
         for (var i = 0; i < _nbExecuted; i++) {
-          carbone.render(_filePath, data, {convertTo : 'pdf'}, function (err, result) {
+          carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
             _waitedResponse--;
             _results.push(result);
             if (_waitedResponse === 0) {
@@ -669,6 +700,7 @@ describe('Carbone', function () {
   });
 
   describe('render and convert CSV with options', function () {
+    var _templatePath = path.join(__dirname, 'datasets');
     var defaultOptions = {
       pipeNamePrefix : '_carbone',
       factories      : 1,
@@ -681,20 +713,45 @@ describe('Carbone', function () {
         carbone.reset();
       });
     });
+    beforeEach(function () {
+      carbone.set({templatePath : _templatePath});
+    });
     it('should render spreadsheet with raw options (complete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : null
       };
-      carbone.render(_filePath, data, _options, function (err) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err) {
         helper.assert(err, null);
         done();
       });
     });
+    it('should not use the converter if the input file extension is the same as convertTo parameter', function (done) {
+      var data = [{ id : 1, name : 'field_1' },
+                  { id : 2, name : 'field_2' }];
+      var _options = {
+        convertTo : 'ods'
+      };
+      var _start = process.hrtime();
+      carbone.render('test_spreadsheet.ods', data, _options, function (err) {
+        var _diff = process.hrtime(_start);
+        var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+        helper.assert(err, null);
+        helper.assert(_elapsed < 100, true);
+        done();
+      });
+    });
+    it('should return an error when the convertTo format is unknown', function (done) {
+      var _options = {
+        convertTo : 'ods_ede'
+      };
+      carbone.render('test_spreadsheet.ods', {}, _options, function (err) {
+        helper.assert(/Format "ods_ede" not accepted/.test(err), true);
+        done();
+      });
+    });
     it('should render spreadsheet with raw options (complete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -703,7 +760,7 @@ describe('Carbone', function () {
           formatOptionsRaw : '124,34,0'
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
         helper.assert(result.toString(), _expected);
@@ -711,7 +768,6 @@ describe('Carbone', function () {
       });
     });
     it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -719,7 +775,7 @@ describe('Carbone', function () {
           formatName : 'csv'
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = ',,\n,1,field_1\n,2,field_2\n';
         helper.assert(result.toString(), _expected);
@@ -727,7 +783,6 @@ describe('Carbone', function () {
       });
     });
     it('should render spreadsheet with raw options (incomplete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -736,7 +791,7 @@ describe('Carbone', function () {
           formatOptionsRaw : '124'
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '||\n|1|field_1\n|2|field_2\n';
         helper.assert(result.toString(), _expected);
@@ -744,7 +799,6 @@ describe('Carbone', function () {
       });
     });
     it('should render spreadsheet with options (complete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -757,7 +811,7 @@ describe('Carbone', function () {
           }
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '++\n+1+field_1\n+2+field_2\n';
         helper.assert(result.toString(), _expected);
@@ -765,7 +819,6 @@ describe('Carbone', function () {
       });
     });
     it('should render spreadsheet with options (incomplete)', function (done) {
-      var _filePath = path.resolve('./test/datasets/test_spreadsheet.ods');
       var data = [{ id : 1, name : 'field_1' },
                   { id : 2, name : 'field_2' }];
       var _options = {
@@ -777,7 +830,7 @@ describe('Carbone', function () {
           }
         }
       };
-      carbone.render(_filePath, data, _options, function (err, result) {
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = '**\n*1*field_1\n*2*field_2\n';
         helper.assert(result.toString(), _expected);

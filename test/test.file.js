@@ -211,6 +211,12 @@ describe('file', function () {
     after(function () {
       carbone.reset();
     });
+    it.skip('should not accept template name with /../ to avoid security issues (access to parent directory)', function (done) {
+      file.openTemplate('../test_word_render_A.docx', function (err) {
+        helper.assert(err, 'access forbidden');
+        done();
+      });
+    });
     it('should open the template, convert xml files into String, ...', function (done) {
       file.openTemplate('test_word_render_A.docx', function (err, template) {
         helper.assert(err, null);

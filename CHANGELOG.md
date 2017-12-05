@@ -1,4 +1,16 @@
 
+### v1.0.3-ideolys
+  - It loads all lang at startup, and it is able to change lang at runtime
+  - Avoid unnecessary synchronous code in `carbone.set
+  - Improve documentation
+  - Default template path is working directory by default
+  - Return the list of supported format when an unknown `options.convertTo` is used
+  - Accept more input type
+  - carbone.set` takes into account changes on `factories` and `startFactory` parameters
+  - Fix: a report without markers, except lang ones, is translated
+  - Fix: avoid using LibreOffice if `options.convertTo` equals input file extension
+  - Fix: now compatible with node v4.5.0+, v6+, v8+
+
 ### v0.14.0
   - Fix: should find markers even if there is a opening bracket `{` before the markers
 
@@ -11,11 +23,13 @@
   - Fix: improve detection of markers. And avoid removing non-marker {}
 
 ### v0.13.1
+  - Release February 22, 2017
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`
   - Do not crash when there is a javascript error during building process
   - Improve error outputs: detect when an unknown formatter is used, and propose a correction
 
 ### v0.13.0
+  - Release February 20, 2017
   - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays: 
     - `{d.cities[i, temp=20]..countryName}` prints `d.countryName` only when the temperature of cities equals 20
   - Built-in conditional formatters, which starts by `if`, stop propagation to next formatters if the condition is true
@@ -33,6 +47,7 @@
 
 
 ### v0.12.5
+  - Release December 1, 2016
   - Bump moment.js to 2.17.0
   - Add some powerful and tested formatters: `ifEmpty`, `arrayJoin`, `arrayMap`, `convDate`, `lowerCase`, `upperCase`, `ucFirst`, `ucWords`
   - Fix: in formatters `convert`, `format`, `addDays`, `parse`: if the date is null or undefined these formatters return null or undefined instead of "Invalid Date"

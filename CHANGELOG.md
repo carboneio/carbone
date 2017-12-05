@@ -1,4 +1,14 @@
 
+### v0.13.4
+
+### v0.13.3
+  - Automatically remove XML-incompatible control codes (U+0000 to U+0008 and U+000B to U+000C and U+000E to U+001F) before inserting data in templates
+  - Fix: ifEqual did not work correctly with boolean values
+
+### v0.13.2
+  - Fix LO zombie process when node exits
+  - Fix: improve detection of markers. And avoid removing non-marker {}
+
 ### v0.13.1
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`
   - Do not crash when there is a javascript error during building process

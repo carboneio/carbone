@@ -14,6 +14,22 @@ describe('parser', function () {
         done();
       });
     });
+    it('should find marker even if there is a bracket before the markers', function (done) {
+      parser.findMarkers('<xml>{toto {d.toto}</xml>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [{pos : 11, name : '_root.d.toto'}]);
+        helper.assert(cleanedXml, '<xml>{toto </xml>');
+        done();
+      })
+    });
+    it('should find multiple markers even if there are brackets before the markers', function (done) {
+      parser.findMarkers('<xml>{d.tata} {to{c.menu} {to {d.toto}</xml>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [{pos : 5, name : '_root.d.tata'}, {pos : 9, name : '_root.c.menu'}, {pos : 14, name : '_root.d.toto'}]);
+        helper.assert(cleanedXml, '<xml> {to {to </xml>');
+        done();
+      })
+    });
     it('2. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
       parser.findMarkers('<div>{c.menu}<div>', function (err, cleanedXml, markers) {

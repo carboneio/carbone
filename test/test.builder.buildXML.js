@@ -1099,6 +1099,17 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it.only('should replace', function (done) {
+    var _xml = '<xml><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="{d.dog:md5:prepend(id)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg" TargetMode="External"/></Relationships></xml>';
+    var _expect = '<xml><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="id319f27934db5dd8f03070e75989ca667" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg" TargetMode="External"/></Relationships></xml>';
+    var _data = {
+      dog : "https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg"
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert(_xmlBuilt, _expect)
+      done();
+    });
+  });
   /* it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [

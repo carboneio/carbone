@@ -2,7 +2,7 @@ var assert = require('assert');
 var parser = require('../lib/parser');
 var helper = require('../lib/helper');
 
-describe('parser', function () {
+describe.only('parser', function () {
   
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
@@ -72,6 +72,29 @@ describe('parser', function () {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 21, name : '_root.d.perso[i].nom'},{pos : 55, name : '_root.d.perso[i].color'},{pos : 94, name : '_root.d.perso[i].test'}]);
         helper.assert(cleanedXml, '<w:r><w:color /><w:t></w:t></w:r><w:r ><w:color w:val="" /><w:t></w:t></w:r><w:r><w:rPr test=""><w:color /></w:rPr><w:t></w:t></w:r>');
+        done();
+      });
+    });
+    it('It should find multiple markers inside tag which are themselves in other markers', function (done) {
+      parser.findMarkers('<xml><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i]</ha>.na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i+</ha>1].na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr></xml>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [
+          {pos : 9, name  : '_root.d.toto[i].name'},
+          {pos : 16, name : '_root.d.toto'},
+          {pos : 21, name : '_root.d.tata'},
+          {pos : 26, name : '_root.d.titi'},
+          {pos : 40, name : '_root.d.toto'},
+          {pos : 45, name : '_root.d.tata'},
+          {pos : 50, name : '_root.d.titi'},
+          {pos : 66, name : '_root.d.toto[i+1].name'},
+          {pos : 73, name : '_root.d.toto'},
+          {pos : 78, name : '_root.d.tata'},
+          {pos : 83, name : '_root.d.titi'},
+          {pos : 97, name : '_root.d.toto'},
+          {pos : 102, name : '_root.d.tata'},
+          {pos : 107, name : '_root.d.titi'},
+        ]);
+        helper.assert(cleanedXml, '<xml><tr><ha a="" b="" c=""></ha><he a="" b="" c=""></he></tr><tr><ha a="" b="" c=""></ha><he a="" b="" c=""></he></tr></xml>');
         done();
       });
     });

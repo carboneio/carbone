@@ -4,7 +4,7 @@ var builder = require('../lib/builder');
 var parser = require('../lib/parser');
 var helper = require('../lib/helper');
 
-describe('builder', function () {
+describe.only('builder', function () {
   describe('getFormatterString', function () {
     it('should return an empty string if there is no formatter', function () {
       var _actual = builder.getFormatterString('_str', 'context', []);

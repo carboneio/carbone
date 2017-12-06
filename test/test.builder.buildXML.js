@@ -2,7 +2,7 @@ var assert = require('assert');
 var builder = require('../lib/builder');
 var helper = require('../lib/helper');
 
-describe('builder.buildXML', function () {
+describe.only('builder.buildXML', function () {
 
   it.skip('should work if the same array is repeated two times in the xml <tr>d[i].product</tr>    <tr>d[i].product</tr>');
   it.skip('should escape special characters > < & " \' even if a formatter is used (output of a formatter)');
@@ -1101,8 +1101,8 @@ describe('builder.buildXML', function () {
   });
   it('should replace rId by md5 hash with id prepend', function (done) {
     var formatters = require('../formatters/string.js');
-    var _xml = '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="{d.dog:md5:prepend(id)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="{d.dog}" TargetMode="External"/></Relationships><';
-    var _expect = '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="id319f27934db5dd8f03070e75989ca667" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg" TargetMode="External"/></Relationships><';
+    var _xml = '<Relationships>{d.<Relationship Id="{d.dog:md5:prepend(id)}" Target="{d.dog}"/>toto}</Relationships>';
+    var _expect = '<Relationships>toto<Relationship Id="id319f27934db5dd8f03070e75989ca667" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg"/></Relationships>';
     var _options = {
       formatters : {
         md5 : formatters.md5,
@@ -1110,9 +1110,11 @@ describe('builder.buildXML', function () {
       }
     }
     var _data = {
-      dog : "https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg"
+      dog : "https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg",
+      toto: "toto"
     };
     builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      console.log(_xmlBuilt)
       assert.equal(_xmlBuilt, _expect)
       done();
     });

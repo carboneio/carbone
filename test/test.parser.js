@@ -1,6 +1,7 @@
-var assert = require('assert');
-var parser = require('../lib/parser');
-var helper = require('../lib/helper');
+var assert      = require('assert');
+var parser      = require('../lib/parser');
+var helper      = require('../lib/helper');
+var rowNumber   = require('../formatters/array').rowNumber;
 
 describe('parser', function () {
   
@@ -936,6 +937,93 @@ describe('parser', function () {
     });
   });
 
+  describe('rowNumber formatter', function () {
+
+    describe('Preprocess', function () {
+
+      it('should assign loop id (without parenthesis)', function (done) {
+        var _xml = '<xml><p>{d.cars[i].brand:rowNumber}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _data = {
+          "cars" : [
+            {"brand" : "Lumeneo"},
+            {"brand" : "Tesla"  },
+            {"brand" : "Toyota" }
+          ]
+        };
+
+        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+          parser.preprocessMarkers(markers, [], function (err, markers) {
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:rowNumber(08)')
+            done();
+          });
+        });
+      });
+
+      it('should assign loop id (with parenthesis)', function (done) {
+        var _xml = '<xml><p>{d.cars[i].brand:rowNumber()}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _data = {
+          "cars" : [
+            {"brand" : "Lumeneo"},
+            {"brand" : "Tesla"  },
+            {"brand" : "Toyota" }
+          ]
+        };
+
+        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+          parser.preprocessMarkers(markers, [], function (err, markers) {
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:rowNumber(08)')
+            done();
+          });
+        });
+      });
+
+      it('should assign loop id (with start given)', function (done) {
+        var _xml = '<xml><p>{d.cars[i].brand:rowNumber(42)}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _data = {
+          "cars" : [
+            {"brand" : "Lumeneo"},
+            {"brand" : "Tesla"  },
+            {"brand" : "Toyota" }
+          ]
+        };
+
+        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+          parser.preprocessMarkers(markers, [], function (err, markers) {
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:rowNumber(08, 42)')
+            done();
+          });
+        });
+      });
+
+    });
+
+    describe('Exec', function () {
+
+      it('should return 0, 1, 2', function () {
+        helper.assert(rowNumber('', 0), 0);
+        helper.assert(rowNumber('', 0), 1);
+        helper.assert(rowNumber('', 0), 2);
+      });
+
+      it('should return 42, 43, 44', function () {
+        helper.assert(rowNumber('', 1, 42), 42);
+        helper.assert(rowNumber('', 1, 42), 43);
+        helper.assert(rowNumber('', 1, 42), 44);
+      });
+
+      it('should return 0, 1, 2 and 0, 1, 2', function () {
+        helper.assert(rowNumber('', 2), 0);
+        helper.assert(rowNumber('', 2), 1);
+        helper.assert(rowNumber('', 2), 2);
+        helper.assert(rowNumber('', 3), 0);
+        helper.assert(rowNumber('', 3), 1);
+        helper.assert(rowNumber('', 3), 2);
+      });
+
+    });
+
+
+  });
 
 });
 

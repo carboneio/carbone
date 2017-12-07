@@ -976,7 +976,6 @@ describe('parser', function () {
           });
         });
       });
-
       it('should assign loop id (with start given)', function (done) {
         var _xml = '<xml><p>{d.cars[i].brand:rowNumber(42)}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
         var _data = {
@@ -995,29 +994,47 @@ describe('parser', function () {
         });
       });
 
+      it('should assign loop id (with start given)', function (done) {
+        var _xml = '<xml> <t_row> {d[speed=100,i].brand:rowNumber} </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
+        var _data = [
+          {brand : 'Lumeneo'     , speed : 100},
+          {brand : 'Tesla motors', speed : 200},
+          {brand : 'Toyota'      , speed : 100}
+        ];
+
+        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+          parser.preprocessMarkers(markers, [], function (err, markers) {
+            //helper.assert(markers[0].name, '_root.d.cars[i].brand:rowNumber(08, 42)')
+            done();
+          });
+        });
+      });
+
     });
+
 
     describe('Exec', function () {
 
-      it('should return 0, 1, 2', function () {
-        helper.assert(rowNumber('', 0), 0);
-        helper.assert(rowNumber('', 0), 1);
-        helper.assert(rowNumber('', 0), 2);
+      it('should return __ROW_NUMBER_0_0__ each time', function () {
+        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_0__');
+        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_0__');
+        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_0__');
       });
 
-      it('should return 42, 43, 44', function () {
-        helper.assert(rowNumber('', 1, 42), 42);
-        helper.assert(rowNumber('', 1, 42), 43);
-        helper.assert(rowNumber('', 1, 42), 44);
+      it('should return __ROW_NUMBER_1337_42__ each time', function () {
+        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
+        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
+        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
       });
 
-      it('should return 0, 1, 2 and 0, 1, 2', function () {
-        helper.assert(rowNumber('', 2), 0);
-        helper.assert(rowNumber('', 2), 1);
-        helper.assert(rowNumber('', 2), 2);
-        helper.assert(rowNumber('', 3), 0);
-        helper.assert(rowNumber('', 3), 1);
-        helper.assert(rowNumber('', 3), 2);
+      it('should return __ROW_NUMBER_1337_42__ then __ROW_NUMBER_42_1337__', function () {
+        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
+        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
+        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
+
+        helper.assert(rowNumber('', 42, 1337), '__ROW_NUMBER_42_1337__');
+        helper.assert(rowNumber('', 42, 1337), '__ROW_NUMBER_42_1337__');
+        helper.assert(rowNumber('', 42, 1337), '__ROW_NUMBER_42_1337__');        
       });
 
     });

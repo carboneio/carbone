@@ -27,6 +27,17 @@ describe('preprocessor', function() {
         helper.assert(_result.files[0].data, '<xml><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:padding="0.097cm" fo:border-left="0.05pt solid {d.color}" fo:border-right="none" fo:border-top="0.05pt solid {d.color}" fo:border-bottom="0.05pt solid {d.color}"/></style:style></xml>')
         done();
       });
+      it('Should replace a color even if there is space in the bindColor', function(done) {
+        var _template = {
+          files: [{
+            name: 'content.xml',
+            data: '<xml><style:style style:name="P1"><color color="#FF0000" /></style:style>coucou {   bindColor  (    FF0000   ,    RRGGBB   )    =    d.color    }</xml>'
+          }]
+        };
+        var _result = preprocessor.replaceColorMarkersOdt(_template);
+        helper.assert(_result.files[0].data, '<xml><style:style style:name="P1"><color color="{d.color}" /></style:style>coucou </xml>')
+        done();
+      });
       it('Should replace multiple time the same color and that with multiple colors', function(done) {
         var _template = {
           files: [{

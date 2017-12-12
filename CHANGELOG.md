@@ -2,6 +2,7 @@
 ### v1.0.3-ideolys
   - accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}` 
   - carbone.set do not overwrite user-defined translations
+  - some optimization
   - It loads all lang at startup, and it is able to change lang at runtime
   - Avoid unnecessary synchronous code in `carbone.set
   - Improve documentation

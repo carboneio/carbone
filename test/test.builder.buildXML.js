@@ -1070,6 +1070,110 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept to use markers as the start or the end of a loop.\
+      should accept flat XML between repetition sections', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} <i></i> {d.cars[i].wheels[i].nuts[i].type} <b></b> {d.cars[i].wheels[i].nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        { 
+          wheels : [
+            {
+              size : 10,
+              nuts : [{ type : 'M5'}, { type : 'M6'}]
+            },
+            {
+              size : 11,
+              nuts : [{ type : 'M8'}, { type : 'M9'}]
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err);
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
+  it('should accept to nest arrays in XML whereas these arrays are not nested in JSON. Moreover, the XML structure is flat', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i].keys[i]} <i></i> {d.cars[i].wheels[i].nuts[i].type} <b></b> {d.cars[i].wheels[i].nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1].keys[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        { 
+          wheels : [
+            {
+              size : 10,
+              nuts : [{ type : 'M5'}, { type : 'M6'}],
+              keys : [{ type : '8'}, { type : '10'}, { type : '17'}]
+            },
+            {
+              size : 11,
+              nuts : [{ type : 'M8'}, { type : 'M9'}],
+              keys : [{ type : '12'}, { type : '14'}]
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err);
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M5 <b></b> M6 <b></b>   <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
+  it('should work if XML is flat (no hierarchy), and JSON is flattened, using two "empty" markers to define the start and end of the loop', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i].keys[i]}<tr></tr>'
+            +  '{d.cars[i].wheels[i].keys[i]..size}<b></b>'
+            +  '{d.cars[i].wheels[i].keys[i]...name}<i></i>'
+            +  '{d.cars[i].wheels[i].keys[i].type}<tr></tr>'
+            +  '{d.cars[i+1].wheels[i+1].keys[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        { 
+          name   : 'toy',
+          wheels : [
+            {
+              size : 100,
+              keys : [{ type : '8'}, { type : '10'}]
+            },
+            {
+              size : 111,
+              keys : [{ type : '12'}, { type : '14'}, { type : '19'}]
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, 
+          '<xml>'
+        + '<tr></tr>'
+        +   '100<b></b>'
+        +   'toy<i></i>'
+        +   '8<tr></tr>'
+        + '<tr></tr>'
+        +   '100<b></b>'
+        +   'toy<i></i>'
+        +   '10<tr></tr>'
+        + '<tr></tr>'
+        +   '111<b></b>'
+        +   'toy<i></i>'
+        +   '12<tr></tr>'
+        + '<tr></tr>'
+        +   '111<b></b>'
+        +   'toy<i></i>'
+        +   '14<tr></tr>'
+        + '<tr></tr>'
+        +   '111<b></b>'
+        +   'toy<i></i>'
+        +   '19<tr></tr>'
+        + '</xml>');
+      done();
+    });
+  });
   it('shoud go up in hierarchy using two points ".." and go down', function (done) {
     var _xml = '<xml><tr> {d.cars[i]..who.name.sex} </tr><tr> {d.cars[i+1]..who.name.sex} </tr></xml>';
     var _data = {

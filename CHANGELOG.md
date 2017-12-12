@@ -8,6 +8,7 @@
   - Return the list of supported format when an unknown `options.convertTo` is used
   - Accept more input type
   - carbone.set` takes into account changes on `factories` and `startFactory` parameters
+  - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
   - Fix: a report without markers, except lang ones, is translated
   - Fix: avoid using LibreOffice if `options.convertTo` equals input file extension
   - Fix: now compatible with node v4.5.0+, v6+, v8+

@@ -2019,7 +2019,7 @@ describe('extracter', function () {
       });
     });
 
-    it('7 should extract xml parts even if the two nested arrays are in inverse order', function () {
+    it.skip('7 should extract xml parts even if the two nested arrays are in inverse order', function () {
       var _xml = '<div><tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> <h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr></div>';
       var _descriptor = {
         d0 : {

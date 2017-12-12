@@ -152,6 +152,31 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept non-XML structure', function (done) {
+    var _xml = '{d[i].brand} , {d[i+1].brand}';
+    var _data = [
+      {brand : 'Lumeneo'},
+      {brand : 'Tesla motors'},
+      {brand : 'Toyota'}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, 'Lumeneo , Tesla motors , Toyota , ');
+      done();
+    });
+  });
+  it.skip('should keep \n for non-XML file', function (done) {
+    var _xml = '{d[i].brand} , {d[i].power}\n'
+             + '{d[i+1].brand} , {d[i+1].power}';
+    var _data = [
+      {brand : 'Lumeneo'     , power : 1},
+      {brand : 'Tesla motors', power : 2},
+      {brand : 'Toyota'      , power : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, 'Lumeneo , 1\n  Tesla motors , 2\n   Toyota , 3\n    , ');
+      done();
+    });
+  });
   it('should works even if there are some empty rows between the two repetition markers', function (done) {
     var _xml = '<xml> <t_row> {d[i].brand} </t_row> <t_row></t_row> <t_row> {d[i+1].brand} </t_row></xml>';
     var _data = [

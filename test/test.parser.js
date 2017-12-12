@@ -572,11 +572,11 @@ describe('parser', function () {
       assert.equal(parser.findOpeningTagPosition('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>'), 14);
       assert.equal(parser.findOpeningTagPosition('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>'), 17);
     });
-    it('should return -1 when the opening tag is not found', function () {
-      assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>'), -1);
-      assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>'), -1);
-      assert.equal(parser.findOpeningTagPosition('<p></p></p><p></p></p><br/>',22), -1);
-      assert.equal(parser.findOpeningTagPosition('</p><p><p><br/></p></p><br/>',4), -1);
+    it('should return 0 when the opening tag is not found', function () {
+      assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>'), 0);
+      assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>'), 0);
+      assert.equal(parser.findOpeningTagPosition('<p></p></p><p></p></p><br/>',22), 0);
+      assert.equal(parser.findOpeningTagPosition('</p><p><p><br/></p></p><br/>',4), 0);
     });
     it('should accept a third parameter which indicates that the opening tag is before it.\
         It forces the algorithm to find the opening tag before this position', function () {
@@ -807,13 +807,18 @@ describe('parser', function () {
         part2Start : {tag : 'w:tbl', pos : 593 }
       });
     });
-    /* it.skip('should accept non-XML structure', function(){
-      var _str = ' ';
+    it('should accept non-XML structure', function(){
+      var _str = '';
       helper.assert(parser.findPivot(_str), {
-        'part1End'  :{'tag':'', 'pos': 1 },
-        'part2Start':{'tag':'', 'pos': 1 }
+        part1End   : {tag : '', pos : 0, selfClosing : true},
+        part2Start : {tag : '', pos : 0, selfClosing : true}
       });
-    });*/
+      var _str = '  ,  ';
+      helper.assert(parser.findPivot(_str), {
+        part1End   : {tag : '', pos : 5, selfClosing : true},
+        part2Start : {tag : '', pos : 5, selfClosing : true}
+      });
+    });
   });
 
   describe('findRepetitionPosition', function () {
@@ -866,13 +871,13 @@ describe('parser', function () {
       var _expectedRange = {startEven : 7,  endEven : 53, startOdd : 53, endOdd : 105};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
-    it('should return -1 if the start tag is not found', function () {
+    it('should return 0 if the start tag is not found', function () {
       var _xml = 'qsjh k  qsd:blue color=test   menu <r/><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p>    balle </tr> dqd';
       var _pivot = {
         part1End   : {tag : 'tr', pos : 70 },
         part2Start : {tag : 'tr', pos : 70 }
       };
-      var _expectedRange = {startEven : -1,  endEven : 70, startOdd : 70, endOdd : 120};
+      var _expectedRange = {startEven : 0,  endEven : 70, startOdd : 70, endOdd : 120};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should accept a third parameter which indicates that the beginning of the repetition is before it', function () {
@@ -940,6 +945,16 @@ describe('parser', function () {
       };
       var _expectedRange = {startEven : 24,  endEven : 29, startOdd : 29, endOdd : 34};
       var _roughStart = 24;
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
+    });
+    it('should accept non-XML structure', function () {
+      var _xml = '  ,  ';
+      var _pivot = {
+        part1End   : {tag : '', pos : 5, selfClosing : true},
+        part2Start : {tag : '', pos : 5, selfClosing : true}
+      };
+      var _expectedRange = {startEven : 0,  endEven : 5, startOdd : 5, endOdd : 5};
+      var _roughStart = 0;
       helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
     });
   });

@@ -1139,6 +1139,31 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept to use markers as the start or the end of a loop, even if the second loop is nested in an object', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} <i></i> {d.cars[i].wheels[i].obj.nuts[i].type} <b></b> {d.cars[i].wheels[i].obj.nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        { 
+          wheels : [
+            {
+              size : 10,
+              obj : { nuts : [{ type : 'M5'}, { type : 'M6'}] }
+            },
+            {
+              size : 11,
+              obj : { nuts : [{ type : 'M8'}, { type : 'M9'}] }
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err);
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
   it('should accept to nest arrays in XML whereas these arrays are not nested in JSON. Moreover, the XML structure is flat', function (done) {
     var _xml = '<xml>{d.cars[i].wheels[i].keys[i]} <i></i> {d.cars[i].wheels[i].nuts[i].type} <b></b> {d.cars[i].wheels[i].nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1].keys[i+1]}</xml>';
     var _data = {

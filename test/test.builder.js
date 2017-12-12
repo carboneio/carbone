@@ -378,6 +378,23 @@ describe('builder', function () {
       helper.assert(_nbArrayExit, 2);
       helper.assert(_currentlyVisitedArrays, ['d']);
     });
+    it('should not leave the array "wheels" if the array "tyres" is nested in "wheels" in XML (depth >)', function () {
+      var _currentlyVisitedArrays = ['d', 'cars', 'wheels'];
+      var _objDependencyDescriptor = {
+        d      : {type : 'array' , parent : ''     , depth : 1 },
+        cars   : {type : 'array' , parent : 'd'    , depth : 2 },
+        wheels : {type : 'array' , parent : 'cars' , depth : 3 },
+        tyres  : {type : 'array' , parent : 'cars' , depth : 4 },
+        site   : {type : 'object', parent : 'cars'                                     }
+      };
+      var _nextAttrName = 'tyres';
+      var _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 0);
+      helper.assert(_currentlyVisitedArrays, ['d', 'cars', 'wheels']);
+    });
   });
 
   describe('assembleXmlParts', function () {

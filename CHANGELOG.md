@@ -1,4 +1,7 @@
 
+### v0.14.1
+  - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
+
 ### v0.14.0
   - Fix: should find markers even if there is a opening bracket `{` before the markers
 

@@ -652,17 +652,13 @@ describe('parser', function () {
 
   describe('findPivot', function () {
     it('should return null if the pivot cannot be found', function () {
-      var _str = '';
-      helper.assert(parser.findPivot(_str), null);
-      _str = '</tr></tr></tr></tr>';
+      var _str = '</tr></tr></tr></tr>';
       helper.assert(parser.findPivot(_str), null);
       _str = '</tr>';
       helper.assert(parser.findPivot(_str), null);
       _str = '<tr><tr><tr>';
       helper.assert(parser.findPivot(_str), null);
       _str = '<tr><tr><tr></tr>';
-      helper.assert(parser.findPivot(_str), null);
-      _str = '<tr><tr><tr></tr></tr></tr>';
       helper.assert(parser.findPivot(_str), null);
       _str = '<tr><tr><tr></tr></tr></tr></tr>';
       helper.assert(parser.findPivot(_str), null);
@@ -747,13 +743,13 @@ describe('parser', function () {
       });
       _str = '<br/><br/><br/>';
       helper.assert(parser.findPivot(_str), {
-        part1End   : {tag : 'br', pos : 5, selfClosing : true},
-        part2Start : {tag : 'br', pos : 10, selfClosing : true}
+        part1End   : {tag : 'br', pos : 15, selfClosing : true},
+        part2Start : {tag : 'br', pos : 15, selfClosing : true}
       });
       _str = '<br/><br/><br/><br/>';
       helper.assert(parser.findPivot(_str), {
-        part1End   : {tag : 'br', pos : 5, selfClosing : true},
-        part2Start : {tag : 'br', pos : 15, selfClosing : true}
+        part1End   : {tag : 'br', pos : 20, selfClosing : true},
+        part2Start : {tag : 'br', pos : 20, selfClosing : true}
       });
       _str = '<br/>';
       helper.assert(parser.findPivot(_str), {
@@ -769,6 +765,18 @@ describe('parser', function () {
       helper.assert(parser.findPivot(_str), {
         part1End   : {tag : 'tr', pos : 10 },
         part2Start : {tag : 'br', pos : 10, selfClosing : true}
+      });
+    });
+    it('should accept flat XML structure and return the last tag as the pivot', function () {
+      var _str = ' <tr></tr>';
+      helper.assert(parser.findPivot(_str), {
+        part1End   : {tag : 'tr', pos : 10, selfClosing : true},
+        part2Start : {tag : 'tr', pos : 10, selfClosing : true}
+      });
+      var _str = '<tr></tr> <i></i>';
+      helper.assert(parser.findPivot(_str), {
+        part1End   : {tag : 'i', pos : 17, selfClosing : true},
+        part2Start : {tag : 'i', pos : 17, selfClosing : true}
       });
     });
     it('should accept very complex case', function () {

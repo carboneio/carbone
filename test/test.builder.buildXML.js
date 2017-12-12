@@ -356,6 +356,24 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it.skip('should bi-directionnal loop', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row><td>{d.cars[i].wheels[i].size  }</td><td>{d.cars[i+1].wheels[i].size  }</td></t_row>'
+      +  '<t_row><td>{d.cars[i].wheels[i+1].size}</td><td>{d.cars[i+1].wheels[i+1].size}</td></t_row>'
+      +'</xml>';
+    var _data = {
+      cars : [
+        {wheels : [ {size : 'A'}, {size : 'B'}               ]},
+        {wheels : [ {size : 'C'}, {size : 'D'},{size : 'E'} ]}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err.stack);
+      assert.equal(_xmlBuilt, 'TODO');
+      done();
+    });
+  });
   it('should manage two adjacents arrays within an array. It should accept partial repetitions (only {d[i+1].site.label} is set)', function (done) {
     var _xml =
        '<xml>'

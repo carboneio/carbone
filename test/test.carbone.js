@@ -3,6 +3,7 @@ var carbone = require('../lib/index');
 var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
+var params = require('../lib/params');
 var converter = require('../lib/converter');
 var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
@@ -31,6 +32,22 @@ describe('Carbone', function () {
       helper.rmDirRecursive(_tempPath);
       carbone.set({tempPath : _tempPath});
       helper.assert(fs.existsSync(_tempPath), true);
+      done();
+    });
+    it('should not overwrite lang object if provided', function (done) {
+      carbone.set({
+        templatePath : _templatePath,
+        translations : {
+          fr : {
+            test : 'trad'
+          }
+        }
+      });
+      helper.assert(params.translations, {
+        fr : {
+          test : 'trad'
+        }
+      });
       done();
     });
     it('should change the lang of of date formatter', function (done) {

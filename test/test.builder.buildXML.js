@@ -152,6 +152,31 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept non-XML structure', function (done) {
+    var _xml = '{d[i].brand} , {d[i+1].brand}';
+    var _data = [
+      {brand : 'Lumeneo'},
+      {brand : 'Tesla motors'},
+      {brand : 'Toyota'}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, 'Lumeneo , Tesla motors , Toyota , ');
+      done();
+    });
+  });
+  it.skip('should keep \n for non-XML file', function (done) {
+    var _xml = '{d[i].brand} , {d[i].power}\n'
+             + '{d[i+1].brand} , {d[i+1].power}';
+    var _data = [
+      {brand : 'Lumeneo'     , power : 1},
+      {brand : 'Tesla motors', power : 2},
+      {brand : 'Toyota'      , power : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, 'Lumeneo , 1\n  Tesla motors , 2\n   Toyota , 3\n    , ');
+      done();
+    });
+  });
   it('should works even if there are some empty rows between the two repetition markers', function (done) {
     var _xml = '<xml> <t_row> {d[i].brand} </t_row> <t_row></t_row> <t_row> {d[i+1].brand} </t_row></xml>';
     var _data = [
@@ -328,6 +353,24 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
+      done();
+    });
+  });
+  it.skip('should bi-directionnal loop', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row><td>{d.cars[i].wheels[i].size  }</td><td>{d.cars[i+1].wheels[i].size  }</td></t_row>'
+      +  '<t_row><td>{d.cars[i].wheels[i+1].size}</td><td>{d.cars[i+1].wheels[i+1].size}</td></t_row>'
+      +'</xml>';
+    var _data = {
+      cars : [
+        {wheels : [ {size : 'A'}, {size : 'B'}               ]},
+        {wheels : [ {size : 'C'}, {size : 'D'},{size : 'E'} ]}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err.stack);
+      assert.equal(_xmlBuilt, 'TODO');
       done();
     });
   });
@@ -1067,6 +1110,135 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(_xmlBuilt, '<xml><tr> test </tr><tr> test </tr><tr> test </tr></xml>');
+      done();
+    });
+  });
+  it('should accept to use markers as the start or the end of a loop.\
+      should accept flat XML between repetition sections', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} <i></i> {d.cars[i].wheels[i].nuts[i].type} <b></b> {d.cars[i].wheels[i].nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        { 
+          wheels : [
+            {
+              size : 10,
+              nuts : [{ type : 'M5'}, { type : 'M6'}]
+            },
+            {
+              size : 11,
+              nuts : [{ type : 'M8'}, { type : 'M9'}]
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err);
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
+  it('should accept to use markers as the start or the end of a loop, even if the second loop is nested in an object', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} <i></i> {d.cars[i].wheels[i].obj.nuts[i].type} <b></b> {d.cars[i].wheels[i].obj.nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        { 
+          wheels : [
+            {
+              size : 10,
+              obj : { nuts : [{ type : 'M5'}, { type : 'M6'}] }
+            },
+            {
+              size : 11,
+              obj : { nuts : [{ type : 'M8'}, { type : 'M9'}] }
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err);
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
+  it('should accept to nest arrays in XML whereas these arrays are not nested in JSON. Moreover, the XML structure is flat', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i].keys[i]} <i></i> {d.cars[i].wheels[i].nuts[i].type} <b></b> {d.cars[i].wheels[i].nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1].keys[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        { 
+          wheels : [
+            {
+              size : 10,
+              nuts : [{ type : 'M5'}, { type : 'M6'}],
+              keys : [{ type : '8'}, { type : '10'}, { type : '17'}]
+            },
+            {
+              size : 11,
+              nuts : [{ type : 'M8'}, { type : 'M9'}],
+              keys : [{ type : '12'}, { type : '14'}]
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      console.log(err);
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M5 <b></b> M6 <b></b>   <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
+  it('should work if XML is flat (no hierarchy), and JSON is flattened, using two "empty" markers to define the start and end of the loop', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i].keys[i]}<tr></tr>'
+            +  '{d.cars[i].wheels[i].keys[i]..size}<b></b>'
+            +  '{d.cars[i].wheels[i].keys[i]...name}<i></i>'
+            +  '{d.cars[i].wheels[i].keys[i].type}<tr></tr>'
+            +  '{d.cars[i+1].wheels[i+1].keys[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        { 
+          name   : 'toy',
+          wheels : [
+            {
+              size : 100,
+              keys : [{ type : '8'}, { type : '10'}]
+            },
+            {
+              size : 111,
+              keys : [{ type : '12'}, { type : '14'}, { type : '19'}]
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, 
+          '<xml>'
+        + '<tr></tr>'
+        +   '100<b></b>'
+        +   'toy<i></i>'
+        +   '8<tr></tr>'
+        + '<tr></tr>'
+        +   '100<b></b>'
+        +   'toy<i></i>'
+        +   '10<tr></tr>'
+        + '<tr></tr>'
+        +   '111<b></b>'
+        +   'toy<i></i>'
+        +   '12<tr></tr>'
+        + '<tr></tr>'
+        +   '111<b></b>'
+        +   'toy<i></i>'
+        +   '14<tr></tr>'
+        + '<tr></tr>'
+        +   '111<b></b>'
+        +   'toy<i></i>'
+        +   '19<tr></tr>'
+        + '</xml>');
       done();
     });
   });

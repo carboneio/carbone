@@ -1039,9 +1039,9 @@ describe('parser', function () {
     describe('Exec', function () {
 
       it('should return __ROW_NUMBER_0_0__ each time', function () {
-        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_0__');
-        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_0__');
-        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_0__');
+        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_1__');
+        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_1__');
+        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_1__');
       });
 
       it('should return __ROW_NUMBER_1337_42__ each time', function () {

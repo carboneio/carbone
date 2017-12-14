@@ -349,6 +349,92 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should print a counter', function (done) {
+      var _xml = '<xml><t_row> {d.cars[sort,i].brand:rowNumber()} {d.cars[sort,i].brand} </t_row><t_row> {d.cars[sort+1,i+1].brand} </t_row></xml>';
+      var _data = {
+        cars : [
+          {brand : 'Lumeneo'     , sort : 1},
+          {brand : 'Tesla motors', sort : 2},
+          {brand : 'Toyota'      , sort : 1}
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml><t_row> 1 Lumeneo </t_row><t_row> 2 Toyota </t_row><t_row> 3 Tesla motors </t_row></xml>');
+        done();
+      });
+    });
+    it('should print a counter which start by 1 and 0', function (done) {
+      var _xml =
+         '<xml>'
+        +  '<tr>'
+        +    '<td>{d[i].cars[i].wheels[i].tire.brand:rowNumber()} {d[i].cars[i].wheels[i].tire.brand}</td>'
+        +    '<td>{d[i].cars[i].wheels[i].tire.brand:rowNumber(0)} {d[i].site.label}</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>{d[i+1].cars[i+1].wheels[i+1].tire.brand}</td>'
+        +    '<td>{d[i+1].site.label}</td>'
+        +  '</tr>'
+        +'</xml>';
+      var _data = [
+        {
+          site : {label : 'site_A'},
+          cars : [
+            {
+              wheels : [
+                {tire : {brand : 'mich'}},
+                {tire : {brand : 'cont'}}
+              ]
+            },
+            {
+              wheels : [
+                {tire : {brand : 'mich'}}
+              ]
+            },
+          ],
+        },{
+          site : {label : 'site_B'},
+          cars : [{
+            wheels : [
+                {tire : {brand : 'mich'}},
+                {tire : {brand : 'uni' }},
+                {tire : {brand : 'cont'}}
+            ]
+          }
+          ],
+        }
+      ];
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        var _expectedResult =
+           '<xml>'
+          +  '<tr>'
+          +    '<td>1 mich</td>'
+          +    '<td>0 site_A</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>2 cont</td>'
+          +    '<td>1 site_A</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>3 mich</td>'
+          +    '<td>2 site_A</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>4 mich</td>'
+          +    '<td>3 site_B</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>5 uni</td>'
+          +    '<td>4 site_B</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>6 cont</td>'
+          +    '<td>5 site_B</td>'
+          +  '</tr>'
+          +'</xml>';
+        assert.equal(_xmlBuilt, _expectedResult);
+        done();
+      });
+    });
   });
 
 

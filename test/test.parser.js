@@ -1,7 +1,7 @@
-var assert      = require('assert');
-var parser      = require('../lib/parser');
-var helper      = require('../lib/helper');
-var rowNumber   = require('../formatters/array').rowNumber;
+var assert  = require('assert');
+var parser  = require('../lib/parser');
+var helper  = require('../lib/helper');
+var count   = require('../formatters/array').count;
 
 describe('parser', function () {
   
@@ -960,12 +960,12 @@ describe('parser', function () {
     });
   });
 
-  describe('rowNumber formatter', function () {
+  describe('count formatter', function () {
 
     describe('Preprocess', function () {
 
       it('should assign loop id (without parenthesis)', function (done) {
-        var _xml = '<xml><p>{d.cars[i].brand:rowNumber}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _xml = '<xml><p>{d.cars[i].brand:count}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
         var _data = {
           "cars" : [
             {"brand" : "Lumeneo"},
@@ -976,14 +976,14 @@ describe('parser', function () {
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:rowNumber(08)')
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)')
             done();
           });
         });
       });
 
       it('should assign loop id (with parenthesis)', function (done) {
-        var _xml = '<xml><p>{d.cars[i].brand:rowNumber()}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _xml = '<xml><p>{d.cars[i].brand:count()}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
         var _data = {
           "cars" : [
             {"brand" : "Lumeneo"},
@@ -994,13 +994,13 @@ describe('parser', function () {
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:rowNumber(08)')
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)')
             done();
           });
         });
       });
       it('should assign loop id (with start given)', function (done) {
-        var _xml = '<xml><p>{d.cars[i].brand:rowNumber(42)}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _xml = '<xml><p>{d.cars[i].brand:count(42)}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
         var _data = {
           "cars" : [
             {"brand" : "Lumeneo"},
@@ -1011,14 +1011,14 @@ describe('parser', function () {
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:rowNumber(08, 42)')
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)')
             done();
           });
         });
       });
 
       it('should assign loop id (with start given)', function (done) {
-        var _xml = '<xml> <t_row> {d[speed=100,i].brand:rowNumber} </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
+        var _xml = '<xml> <t_row> {d[speed=100,i].brand:count} </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
         var _data = [
           {brand : 'Lumeneo'     , speed : 100},
           {brand : 'Tesla motors', speed : 200},
@@ -1027,7 +1027,7 @@ describe('parser', function () {
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            //helper.assert(markers[0].name, '_root.d.cars[i].brand:rowNumber(08, 42)')
+            //helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)')
             done();
           });
         });
@@ -1038,26 +1038,26 @@ describe('parser', function () {
 
     describe('Exec', function () {
 
-      it('should return __ROW_NUMBER_0_0__ each time', function () {
-        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_1__');
-        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_1__');
-        helper.assert(rowNumber('', 0), '__ROW_NUMBER_0_1__');
+      it('should return __COUNT_0_0__ each time', function () {
+        helper.assert(count('', 0), '__COUNT_0_1__');
+        helper.assert(count('', 0), '__COUNT_0_1__');
+        helper.assert(count('', 0), '__COUNT_0_1__');
       });
 
-      it('should return __ROW_NUMBER_1337_42__ each time', function () {
-        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
-        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
-        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
+      it('should return __COUNT_1337_42__ each time', function () {
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
       });
 
-      it('should return __ROW_NUMBER_1337_42__ then __ROW_NUMBER_42_1337__', function () {
-        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
-        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
-        helper.assert(rowNumber('', 1337, 42), '__ROW_NUMBER_1337_42__');
+      it('should return __COUNT_1337_42__ then __COUNT_42_1337__', function () {
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
 
-        helper.assert(rowNumber('', 42, 1337), '__ROW_NUMBER_42_1337__');
-        helper.assert(rowNumber('', 42, 1337), '__ROW_NUMBER_42_1337__');
-        helper.assert(rowNumber('', 42, 1337), '__ROW_NUMBER_42_1337__');        
+        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
+        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
+        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');        
       });
 
     });

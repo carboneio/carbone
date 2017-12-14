@@ -350,7 +350,7 @@ describe('Carbone', function () {
       });
     });
     it('should print a counter', function (done) {
-      var _xml = '<xml><t_row> {d.cars[sort,i].brand:rowNumber()} {d.cars[sort,i].brand} </t_row><t_row> {d.cars[sort+1,i+1].brand} </t_row></xml>';
+      var _xml = '<xml><t_row> {d.cars[sort,i].brand:count()} {d.cars[sort,i].brand} </t_row><t_row> {d.cars[sort+1,i+1].brand} </t_row></xml>';
       var _data = {
         cars : [
           {brand : 'Lumeneo'     , sort : 1},
@@ -367,8 +367,8 @@ describe('Carbone', function () {
       var _xml =
          '<xml>'
         +  '<tr>'
-        +    '<td>{d[i].cars[i].wheels[i].tire.brand:rowNumber()} {d[i].cars[i].wheels[i].tire.brand}</td>'
-        +    '<td>{d[i].cars[i].wheels[i].tire.brand:rowNumber(0)} {d[i].site.label}</td>'
+        +    '<td>{d[i].cars[i].wheels[i].tire.brand:count()} {d[i].cars[i].wheels[i].tire.brand}</td>'
+        +    '<td>{d[i].cars[i].wheels[i].tire.brand:count(0)} {d[i].site.label}</td>'
         +  '</tr>'
         +  '<tr>'
         +    '<td>{d[i+1].cars[i+1].wheels[i+1].tire.brand}</td>'

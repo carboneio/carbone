@@ -1299,15 +1299,15 @@ describe('builder.buildXML', function () {
     it('should return 0, 1, 2 (rowShow: true)', function () {
       var _loopIds = {};
       var _part1 = {
-        str : '__ROW_NUMBER_0_0__',
+        str : '__COUNT_0_0__',
         rowShow : true
       };
       var _part2 = {
-        str : '__ROW_NUMBER_0_0__',
+        str : '__COUNT_0_0__',
         rowShow : true
       };
       var _part3 = {
-        str : '__ROW_NUMBER_0_0__',
+        str : '__COUNT_0_0__',
         rowShow : true
       };
       builder.getLoopIteration(_loopIds, _part1);
@@ -1321,15 +1321,15 @@ describe('builder.buildXML', function () {
     it('should return 1, 2 (rowShow: true, false, true)', function () {
       var _loopIds = {};
       var _part1 = {
-        str : '__ROW_NUMBER_0_1__',
+        str : '__COUNT_0_1__',
         rowShow : true
       };
       var _part2 = {
-        str : '__ROW_NUMBER_0_1__',
+        str : '__COUNT_0_1__',
         rowShow : false
       };
       var _part3 = {
-        str : '__ROW_NUMBER_0_1__',
+        str : '__COUNT_0_1__',
         rowShow : true
       };
       builder.getLoopIteration(_loopIds, _part1);
@@ -1343,15 +1343,15 @@ describe('builder.buildXML', function () {
     it('should return 1337, 1338 (rowShow: true, false, true) (with xml outside)', function () {
       var _loopIds = {};
       var _part1 = {
-        str : '<tag>__ROW_NUMBER_42_1337__</tag>',
+        str : '<tag>__COUNT_42_1337__</tag>',
         rowShow : true
       };
       var _part2 = {
-        str : '<tag>__ROW_NUMBER_42_1337__</tag>',
+        str : '<tag>__COUNT_42_1337__</tag>',
         rowShow : false
       };
       var _part3 = {
-        str : '<tag>__ROW_NUMBER_42_1337__</tag>',
+        str : '<tag>__COUNT_42_1337__</tag>',
         rowShow : true
       };
       var _part4 = {

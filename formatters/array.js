@@ -93,15 +93,15 @@ function arrayMap (d, objSeparator, attributeSeparator) {
  * @param   {String}  start   Number to start with (default: 1)
  * @return  {String}          Marker with loop ID and number to start with -> will be recognized by Carbone in builder.assembleXmlParts
  */
-function rowNumber (d, loopId, start) {
+function count (d, loopId, start) {
   if (start === undefined) {
     start = 1;
   }
-  return '__ROW_NUMBER_' + loopId + '_' + start + '__';
+  return '__COUNT_' + loopId + '_' + start + '__';
 }
 
 module.exports = {
   arrayJoin : arrayJoin,
   arrayMap  : arrayMap,
-  rowNumber : rowNumber
+  count : count
 };

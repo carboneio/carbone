@@ -167,19 +167,19 @@ describe('builder', function () {
     it('should sort the array with a depth of 2', function () {
       var _data     = [{pos : [40, 4]}, {pos : [40, 3]}, {pos : [51, 100]}, {pos : [29, 8  ]}];
       var _expected = [{pos : [29, 8]}, {pos : [40, 3]}, {pos : [40, 4  ]}, {pos : [51, 100]}];
-      builder.sortXmlParts(_data, 2);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
     });
     it('should sort the array with a depth of 3', function () {
       var _data     = [{pos : [4, 4, 2]}, {pos : [4, 4, 1]}, {pos : [4, 3, 2]}, {pos : [1, 9, 1]}, {pos : [2, 5, 6]}, {pos : [1, 8, 9]}];
       var _expected = [{pos : [1, 8, 9]}, {pos : [1, 9, 1]}, {pos : [2, 5, 6]}, {pos : [4, 3, 2]}, {pos : [4, 4, 1]}, {pos : [4, 4, 2]}];
-      builder.sortXmlParts(_data, 3);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
     });
     it('should sort the array even if some arrays are incomplete, undefined values appears first', function () {
       var _data     = [{pos : [4, 4, 2]}, {pos : [4, 4, 1]}, {pos : [2, 4   ]}, {pos : [1, 9, 1]}, {pos : [2, 3   ]}, {pos : [1      ]}];
       var _expected = [{pos : [1      ]}, {pos : [1, 9, 1]}, {pos : [2, 3   ]}, {pos : [2, 4   ]}, {pos : [4, 4, 1]}, {pos : [4, 4, 2]}];
-      builder.sortXmlParts(_data, 3);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
     });
     it('should sort a complex array (sort depth of 3) of xml parts', function () {
@@ -209,13 +209,28 @@ describe('builder', function () {
         { pos : [ 6, 2, 23 ], str : '</tr>'        },
         { pos : [ 24       ], str : '</xml>'       }
       ];
-      builder.sortXmlParts(_data, 10);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
+    });
+    it('should be fast to sort 1 Millons of rows', function () {
+      var _nbRows = 1000000;
+      var _data = [];
+      for (var i = 0; i < _nbRows; i++) {
+        _data.push({ 
+          pos : [i % 100, i % 50, i % 1000, i % 60]
+        });
+      }
+      var _start = process.hrtime();
+      builder.sortXmlParts(_data, 10);
+      var _diff = process.hrtime(_start);
+      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n sortXmlParts speed : ' + _elapsed + ' ms (usually around 800 ms)\n');
+      helper.assert(_elapsed < 2000, true);
     });
     it('should sort by rowShow first if "pos" are the same', function () {
       var _data     = [{pos : [4], rowShow : false}, {pos : [4], rowShow : false}, {pos : [4], rowShow : true }, {pos : [1], rowShow : false}];
       var _expected = [{pos : [1], rowShow : false}, {pos : [4], rowShow : true }, {pos : [4], rowShow : false}, {pos : [4], rowShow : false}];
-      builder.sortXmlParts(_data, 3);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
     });
     /*

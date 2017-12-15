@@ -231,7 +231,7 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it('should use keep the first element of the array if the custom iterator is constant (always equals 1)', function (done) {
+  it('should keep the first element of the array if the custom iterator is constant (always equals 1)', function (done) {
     var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
     var _data = {
       cars : [
@@ -241,7 +241,7 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      assert.equal(_xmlBuilt, '<xml><t_row> Tesla motors </t_row></xml>');
+      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row></xml>');
       done();
     });
   });
@@ -275,7 +275,7 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it('should select only one element if the iterator is always null ???', function (done) {
+  it('should select only the first element if the iterator is always null ???', function (done) {
     var _xml = '<xml><t_row> {d.cars[sort].brand} </t_row><t_row> {d.cars[sort+1].brand} </t_row></xml>';
     var _data = {
       cars : [
@@ -285,7 +285,7 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      assert.equal(_xmlBuilt, '<xml><t_row> Tesla motors </t_row></xml>');
+      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo </t_row></xml>');
       done();
     });
   });

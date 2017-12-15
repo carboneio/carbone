@@ -2,7 +2,7 @@
 ### v1.0.3-ideolys
   - accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}` 
   - carbone.set do not overwrite user-defined translations
-  - some optimization
+  - some optimization : gain x10 when sorting 1 Million of rows
   - It loads all lang at startup, and it is able to change lang at runtime
   - Avoid unnecessary synchronous code in `carbone.set
   - Improve documentation
@@ -11,6 +11,7 @@
   - Accept more input type
   - carbone.set` takes into account changes on `factories` and `startFactory` parameters
   - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
+  - Fix: keep the first element of the array if the custom iterator is constant
   - Fix: a report without markers, except lang ones, is translated
   - Fix: avoid using LibreOffice if `options.convertTo` equals input file extension
   - Fix: now compatible with node v4.5.0+, v6+, v8+

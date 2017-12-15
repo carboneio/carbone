@@ -1,5 +1,6 @@
 
 ### v1.0.3-ideolys
+  - Release December 15, 2017
   - Add new formatters
     - `unaccent()` to remove accent from string
     - `count()` to print a counter in loops. Usage: `{d[i].name:count()}`

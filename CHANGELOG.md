@@ -1,7 +1,8 @@
 
 ### v1.0.3-ideolys
-  - Add formatter `unaccent` to remove accent from string
-  - add new formatter `count()` to print a counter in loops
+  - Add new formatters
+    - `unaccent()` to remove accent from string
+    - `count()` to print a counter in loops. Usage: `{d[i].name:count()}`
   - accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}` 
   - carbone.set do not overwrite user-defined translations
   - some optimization : gain x10 when sorting 1 Million of rows

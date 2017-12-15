@@ -1,4 +1,6 @@
 
+### v1.0.4-ideolys
+
 ### v1.0.3-ideolys
   - Release December 15, 2017
   - Add new formatters

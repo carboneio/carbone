@@ -14,6 +14,7 @@ Carbone.io
 - [Features](#features)
 - [How it works?](#how-it-works)
 - [Minimum Requirements](#minimum-requirements)
+    - [Optional](#optional)
 - [Getting started](#getting-started)
   - [Basic sample](#basic-sample)
   - [PDF generation, document conversion](#pdf-generation-document-conversion)
@@ -38,7 +39,7 @@ Carbone.io
 
   - **Extremely simple** : Use only LibreOffice™, OpenOffice™ or Microsoft Office™ to draw your report
   - **Unlimited design** : The limit is your document editor: pagination, headers, footers, tables...
-  - **Convert documents** : thanks to the integrated document converter (LibreOffice must be installed)
+  - **Convert documents** : thanks to the integrated document converter
   - **Unique template engine** : Insert JSON-like markers `{d.companyName}` directly in your document
   - **Flexible** : Use any XML documents as a template: docx, odt, ods, xlsx, html, pptx, odp, custom xml files...
   - **Future-proof** : A powerful XML-agnostic algorithm understands what to do without knowing XML document specifications
@@ -61,8 +62,11 @@ Carbone analyzes your template and inject data in the document. The generated do
 ## Minimum Requirements
 
 - NodeJS 4.x+
-- LibreOffice, if you want to use the document converter and generate PDF
 - Runs on OSX, Linux (servers and desktop), and coming soon on Windows
+
+#### Optional
+
+- LibreOffice server if you want to use the document converter and generate PDF. Without LibreOffice, you can still generate docx, xlsx, pptx, odt, ods, odp, html as long as your template is in the same format.
 
 
 ## Getting started

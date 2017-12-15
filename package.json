@@ -1,7 +1,7 @@
 {
   "name": "carbone",
   "description": "Simple and powerful reporting framework (docx, odt, pdf, xlsx, xml, ods, pptx, odp, ...)",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "private": true,
   "bin": "bin/carbone",
   "main": "./lib",

@@ -1,4 +1,7 @@
 
+### v0.14.2
+  - Add formatter `unaccent` to remove accent from string
+
 ### v0.14.1
   - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
 

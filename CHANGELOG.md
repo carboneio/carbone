@@ -1,5 +1,6 @@
 
 ### v1.0.3-ideolys
+  - add new formatter `count()` to print a counter in loops
   - accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}` 
   - carbone.set do not overwrite user-defined translations
   - some optimization : gain x10 when sorting 1 Million of rows

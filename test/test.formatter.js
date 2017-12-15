@@ -275,6 +275,20 @@ describe('formatter', function () {
     });
   });
 
+  describe('unaccent', function () {
+    it('should remove accent from string', function () {
+      helper.assert(stringFormatter.unaccent('crème brulée'), 'creme brulee');
+      helper.assert(stringFormatter.unaccent('CRÈME BRULÉE'), 'CREME BRULEE');
+      helper.assert(stringFormatter.unaccent('être'), 'etre');
+      helper.assert(stringFormatter.unaccent('éùïêèà'), 'euieea');
+    });
+    it('should not crash if datas is null or undefined', function () {
+      helper.assert(stringFormatter.unaccent(null), null);
+      helper.assert(stringFormatter.unaccent(undefined), undefined);
+      helper.assert(stringFormatter.unaccent(120), 120);
+    });
+  });
+
   describe('arrayMap', function () {
     it('should flatten the each object of the array (only the first level, ignoring sub arrays, sub objects,...)', function () {
       var _datas = [

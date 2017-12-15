@@ -120,11 +120,31 @@ function convEnum (d, type) {
   return d;
 }
 
+
+/**
+ * Removes accents from text
+ *
+ * @example [ "crème brulée" ]
+ * @example [ "CRÈME BRULÉE" ]
+ * @example [ "être"         ]
+ * @example [ "éùïêèà"       ]
+ *  
+ * @param  {String} d string to parse
+ * @return {String}   string without accent
+ */
+function unaccent (d) {
+  if (typeof d === 'string') {
+    return d.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  return d;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
   ucFirst   : ucFirst,
   ucWords   : ucWords,
   convEnum  : convEnum,
+  unaccent  : unaccent,
   print     : print
 };

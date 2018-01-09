@@ -24,6 +24,15 @@
   - Fix: avoid using LibreOffice if `options.convertTo` equals input file extension
   - Fix: now compatible with node v4.5.0+, v6+, v8+
 
+### v0.14.3
+  - Fix: markers were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...
+
+### v0.14.2
+  - Add formatter `unaccent` to remove accent from string
+
+### v0.14.1
+  - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
+
 ### v0.14.0
   - Fix: should find markers even if there is a opening bracket `{` before the markers
 

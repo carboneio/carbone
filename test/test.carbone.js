@@ -167,6 +167,22 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should execute formatter if the data object is empty with the formatter ifEmpty', function (done) {
+      var data = {};
+      carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : {}}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>yeah oops</xml>');
+        done();
+      });
+    });
+    it('should execute formatter if the data array is empty with the formatter ifEmpty', function (done) {
+      var data = [];
+      carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : []}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>yeah oops</xml>');
+        done();
+      });
+    });
     it('should return an error if the formatter does not exist', function (done) {
       var data = {
         param : 1

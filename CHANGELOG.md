@@ -1,3 +1,5 @@
+### v0.14.3
+  - Fix: markers were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...
 
 ### v0.14.2
   - Add formatter `unaccent` to remove accent from string

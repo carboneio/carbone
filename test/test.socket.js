@@ -1,4 +1,5 @@
 var assert = require('assert');
+var net = require('net');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
 var Socket = require('../lib/socket');  
@@ -364,6 +365,76 @@ describe('Socket', function () {
         },400);
       });
     });
+
+    it.skip('should not concatenate the socket buffer forever', function (done) {
+      const _server = new Socket(4000, '127.0.0.1');
+      const _client = new Socket(4000, '127.0.0.1');
+      var _otherSocket;
+
+      _server.startServer(function () {
+        _otherSocket = net.connect(4000, '127.0.0.1', function () {
+          _otherSocket.write(Buffer.from('AAAA'));
+
+          _client.on('message', function (packet) {
+            should(packet.data.type).ok();
+            should(packet.data.type).eql('REGISTERED');
+
+            _otherSocket.end();
+            _client.stop(function () {
+              _server.stop(done);
+            });
+          });
+
+          _client.startClient();
+        });
+      });
+    });
+
+    it.skip('should register the client if the buffer content length is not correct', function (done) {
+      const _uid     = helper.getUID();
+      const _server  = new Socket(4000, '127.0.0.1');
+      const _client  = new Socket(4000, '127.0.0.1', { uid : _uid });
+      var _nbPackets = 0; 
+
+      _server.on('message', function (packet) {
+        packet.send(packet.data);
+      });
+
+      _server.startServer(function () {
+        _client.on('message', function (packet) {
+          _nbPackets++;
+          if (_nbPackets === 1) {
+            should(packet.data.type).ok();
+            should(packet.data.type).eql('REGISTER');
+            return;
+          }
+
+          if (_nbPackets === 2) {
+            should(packet.data.type).ok();
+            should(packet.data.type).eql('REGISTERED');
+            _client.getClient().write('AAA9#{"key":1}', 'utf-8', function () {
+              _client.send({ key : 2});
+            });
+            return;
+          }
+
+          if (_nbPackets === 3) {
+            should(packet.data.key).ok();
+            should(packet.data.key).eql(2);
+          }
+        });
+
+        _client.startClient();
+
+        setTimeout(function () {
+          should(_nbPackets).eql(3);
+          _client.stop(function () {
+            stopServer(done);
+          });
+        }, 600);
+      });
+    });
+
   });
 
   describe('client / server secure TLS connection', function () {

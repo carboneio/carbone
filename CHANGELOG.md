@@ -1,4 +1,8 @@
 
+### v1.0.5-ideolys
+  - Release January 12, 2018
+  - Fix socket bug
+
 ### v1.0.4-ideolys
   - Release January 10, 2018
   - Fix: markers were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...

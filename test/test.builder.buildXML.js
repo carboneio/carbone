@@ -21,6 +21,46 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should replace a LF (unix) in an odt file', function (done) {
+    var _xml = '<xml> {d.text} </xml>';
+    var _data = {text : 'boo\nbeep'};
+    var _options = { extension : 'odt' };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      helper.assert(err + '', 'null');
+      helper.assert(_xmlBuilt, '<xml> boo<text:line-break/>beep </xml>');
+      done();
+    });
+  });
+  it('should replace a CRLF (windows) in an odt file', function (done) {
+    var _xml = '<xml> {d.text} </xml>';
+    var _data = {text : 'boo\r\nbeep'};
+    var _options = { extension : 'odt' };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      helper.assert(err + '', 'null');
+      helper.assert(_xmlBuilt, '<xml> boo<text:line-break/>beep </xml>');
+      done();
+    });
+  });
+  it('should replace a LF (unix) in a docx file', function (done) {
+    var _xml = '<xml> <w:t>{d.text}</w:t> </xml>';
+    var _data = {text : 'boo\nbeep'};
+    var _options = { extension : 'docx' };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      helper.assert(err + '', 'null');
+      helper.assert(_xmlBuilt, '<xml> <w:t>boo</w:t><w:br/><w:t>beep</w:t> </xml>');
+      done();
+    });
+  });
+  it('should replace a CRLF (windows) in a docx file', function (done) {
+    var _xml = '<xml> <w:t>{d.text}</w:t> </xml>';
+    var _data = {text : 'boo\r\nbeep'};
+    var _options = { extension : 'docx' };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      helper.assert(err + '', 'null');
+      helper.assert(_xmlBuilt, '<xml> <w:t>boo</w:t><w:br/><w:t>beep</w:t> </xml>');
+      done();
+    });
+  });
   it('should replace control codes that makes problem in LibreOffice', function (done) {
     var str = 'boo';
     for (var i = 0 ; i < 32 ; i++) {

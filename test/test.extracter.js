@@ -385,7 +385,7 @@ describe('extracter', function () {
           parents  : [],
           xmlParts : []
         },
-        dsite : {
+        dsite       : {
           name      : 'site',
           type      : 'array',
           parent    : 'd',
@@ -395,6 +395,43 @@ describe('extracter', function () {
           xmlParts  : [
             {attr : 'id', formatters : [], obj : 'dsite', pos : 20, conditions : [{left : {parent : 'dsite', attr : 'i'}, operator : '==', right : '1'}]},
             {attr : 'id', formatters : [], obj : 'dsite', pos : 30, conditions : [{left : {parent : 'dsite', attr : 'i'}, operator : '==', right : '0'}]}
+          ]
+        }
+      });
+    });
+    it('should manage arrays with conditions. It should transform = to ==', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site[i=1].id'},
+        {pos : 30, name : 'd.site[i=0].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        d : {
+          name     : 'd',
+          type     : 'object',
+          parent   : '',
+          parents  : [],
+          xmlParts : []
+        },
+        dsitei__1 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [
+            {attr : 'id', formatters : [], obj : 'dsitei__1', pos : 20, conditions : [{left : {parent : 'dsitei__1', attr : 'i'}, operator : '==', right : '1'}]},
+          ]
+        },
+        dsitei__0 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [
+            {attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, conditions : [{left : {parent : 'dsitei__0', attr : 'i'}, operator : '==', right : '0'}]}
           ]
         }
       });

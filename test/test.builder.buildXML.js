@@ -910,7 +910,7 @@ describe.only('builder.buildXML', function () {
       done();
     });
   });
-  it('should accept conditionnal arrays without iterators', function (done) {
+  it.skip('should accept conditionnal arrays without iterators', function (done) {
     var _xml = '<xml> <t_row> {d[id=2].brand} </t_row><t_row> {d[id=1].brand} </t_row></xml>';
     var _data = [
       {brand : 'Lumeneo'     , id : 1},
@@ -922,7 +922,7 @@ describe.only('builder.buildXML', function () {
       done();
     });
   });
-  it('should accept conditionnal arrays on string', function (done) {
+  it.skip('should accept conditionnal arrays on string', function (done) {
     var _xml = '<xml> <t_row> {d[brand="Tesla"].brand} </t_row></xml>';
     var _data = [
       {brand : 'Toyota' , id : 1},
@@ -934,7 +934,7 @@ describe.only('builder.buildXML', function () {
       done();
     });
   });
-  it('if two objects match with the filter, it should select the first occurence', function (done) {
+  it.skip('if two objects match with the filter, it should select the first occurence', function (done) {
     var _xml = '<xml> <t_row> {d[id=2].brand} </t_row><t_row> {d[id=1].brand} </t_row></xml>';
     var _data = [
       {brand : 'Lumeneo'     , id : 1},
@@ -998,16 +998,46 @@ describe.only('builder.buildXML', function () {
       done();
     });
   });
-  it.skip('fix it BBhould manage conditions with nested arrays', function (done) {
+  it('AA', function (done) {
     var _xml =
        '<xml>'
-      +  '<t_row><td>{d.cars[i].speed  }<i/>{d.cars[i].wheels[i=1].other}</td> <td>{d.cars[i]  .wheels[size].size}              </td> <td>{d.cars[i]  .wheels[size++].size}           </td></t_row>'
-      +  '<t_row><td>{d.cars[i+1].speed}                              </td> <td>{d.cars[i+1].wheels[size].size}              </td> <td>{d.cars[i+1].wheels[size++].size}           </td></t_row>'
+      +  '<div>{d.wheels[i=0].size } </div>'
+      +  '<div>{d.cars[i=0].speed } </div>'
+      +  '<div> {d.cars[i].speed  } </div>'
+      +  '<div> {d.cars[i+1].speed} </div>'
       +'</xml>';
     var _res = 
         '<xml>'
-      +  '<t_row><td>fast<i/>b</td> <td>5              </td> <td>10              </td> <td>              </td> </t_row>'
-      +  '<t_row><td>slow<i/>b</td> <td>5              </td> <td>10              </td> <td>20              </td> </t_row>'
+      +  '<div>10 </div>'
+      +  '<div>fast </div>'
+      +  '<div> fast </div>'
+      +  '<div> slow </div>'
+      + '</xml>';
+    var _data = {
+      cars : [
+        { speed : 'fast'},
+        { speed : 'slow'}
+      ],
+      wheels : [
+        { size : 10 },
+        { size : 20 }
+      ]
+    };
+    builder.buildXML(_xml, _data, {formatters: require('../formatters/string.js')}, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, _res);
+      done();
+    });
+  });
+  it.skip('fix it BBhould manage conditions with nested arrays', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row><td>{d.cars[i].speed  } {d.cars[i].wheels[i=2].other}</td> <td>{d.cars[i]  .wheels[i].size}              </td> <td>{d.cars[i]  .wheels[i+1].size}           </td></t_row>'
+      +  '<t_row><td>{d.cars[i+1].speed}                              </td> <td>{d.cars[i+1].wheels[i].size}              </td> <td>{d.cars[i+1].wheels[i+1].size}           </td></t_row>'
+      +'</xml>';
+    var _res = 
+        '<xml>'
+      +  '<t_row><td>fastb</td> <td>5              </td> <td>10              </td> <td>              </td> </t_row>'
+      +  '<t_row><td>slowc</td> <td>5              </td> <td>10              </td> <td>20              </td> </t_row>'
       + '</xml>';
     // 
     //  plusieurs bugs : 
@@ -1036,7 +1066,7 @@ describe.only('builder.buildXML', function () {
     var _data = {
       cars : [
         { wheels : [ {size : 5, other:'a'}, {size : 10, other:'b'}                         ], speed : 'fast'},
-        { wheels : [ {size : 5, other:'a'}, {size : 10, other:'b'}, {size : 20, other:'c'} ], speed : 'slow'}
+        { wheels : [ {size : 5, other:'a'}, {size : 10, other:'c'}, {size : 20, other:'c'} ], speed : 'slow'}
       ]
     };
     builder.buildXML(_xml, _data, {formatters: require('../formatters/string.js')}, function (err, _xmlBuilt) {
@@ -1056,11 +1086,12 @@ describe.only('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo <tr> </tr> </t_row><t_row> Tesla motors <tr>Tesla motors </tr> </t_row><t_row> Toyota <tr> </tr> </t_row></xml>');
+      //assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo <tr> </tr> </t_row><t_row> Tesla motors <tr> </tr> </t_row><t_row> Toyota <tr> </tr> </t_row></xml>');
       done();
     });
   });
   it('SSshould not crash if the array is empty when using negative values', function (done) {
-    var _xml = '<xml> <t_row> {d.site.tabs[i=0].brand} </t_row> <t_row> {d.site.tabs[i=1].brand} </t_row><t_row> {d.site.tabs[i=1].brand} </t_row></xml>';
+    var _xml = '<xml> <t_row> {d.site.tabs[i=0].brand} </t_row> <t_row> {d.site.tabs[i=1].brand} </t_row> <t_row> {d.site.tabs[i=1].brand} </t_row></xml>';
     var _data = {
       site  : {
         tabs : []
@@ -1069,6 +1100,7 @@ describe.only('builder.buildXML', function () {
     //TODO les conditions qui sont présente dans les tableau avec itérator doivent agir sur rowShow
     //les condition qui sont présente dans les tableau SANS itérator ne doivent pas agir sur rowShow (donc = true), mais agir sur l'affichage du texte ou non
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err + '', 'null');
       helper.assert(_xmlBuilt, '<xml> <t_row>  </t_row> <t_row>  </t_row> <t_row>  </t_row></xml>');
       done();
     });

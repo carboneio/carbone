@@ -1,5 +1,6 @@
 
 ### v1.0.6-ideolys
+  - Fix a lot of bugs when using a filter without iterators in arrays `{d.cities[i=0].temperature}`
   - Get the last object of an array using negative values when filtering with `i` iterator
     - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
     - `{d.cities[i=-2].temperature}` shows the temperature of the city before the last
@@ -57,12 +58,6 @@
 ### v0.13.2
   - fix LO zombie process when node exits
   - fix: improve detection of markers. And avoid removing non-marker {}
-
-### v0.13.2
-  - Get the last object of an array using negative values when filtering with `i` iterator
-    - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
-    - `{d.cities[i=-2].temperature}` shows the temperature of the city before the last
-    - ...
 
 ### v0.13.1
   - Release February 22, 2017

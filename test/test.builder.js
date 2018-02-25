@@ -120,6 +120,13 @@ describe('builder', function () {
       var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
       assert.equal(_actual, 'if((myObj_i >10)){\n code;\n }');
     });
+    it('should handle the reserved index iterator "i" and negative values', function () {
+      var _conditions = [
+        {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : '-10'},
+      ];
+      var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((myObj_i =myObj_array_length -10)){\n code;\n }');
+    });
     it('should not declare the same variable twice if there are two conditions on the same variable', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},

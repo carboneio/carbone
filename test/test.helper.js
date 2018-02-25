@@ -15,6 +15,27 @@ describe('helper', function () {
     });
   });
 
+  describe('cleanJavascriptVariable', function () {
+    it('should return the same attribute name if there is no forbidden character in it', function () {
+      helper.assert(helper.cleanJavascriptVariable('aa'), 'aa');
+      helper.assert(helper.cleanJavascriptVariable('aa$'), 'aa$');
+      helper.assert(helper.cleanJavascriptVariable('aa_'), 'aa_');
+    });
+    it('should replace forbidden character in attribute', function () {
+      helper.assert(helper.cleanJavascriptVariable('aa-2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa+2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa/2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa*2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa>2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa<2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa!2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa=2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa\'2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa\"2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('ab-+-/*!=.f'), 'ab________f');
+    });
+  });
+
   describe('removeDuplicatedRows', function () {
     it('should do nothing if the array is empty', function () {
       helper.assert(helper.removeDuplicatedRows([]), []);

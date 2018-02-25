@@ -1192,17 +1192,26 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it.skip('should manage "holes" if we use the operatior "++" instead of "+1"', function (done) {
+  it.skip('should be able to create a title on the table...', function (done) {
     var _xml =
        '<xml>'
-      +  '<t_row><td span=2>  {d.cars[i].history[date].date }                     </td> <td span=2>     {d.cars[i+1].history[date++].date }                            </td></t_row>'
+      +  '<t_row><td span=2>  {d.cars[i].history[date].date }                     </td> <td span=2>     {d.cars[i+1].history[date+1].date }                            </td></t_row>'
       +  '<t_row><td>{d.cars[i].history[date].size}</td><td>{d.history[date].name}</td> <td>{d.cars[i].history[date++].size}</td><td>{d.cars[i].history[date++].name}</td></t_row>'
-      +  '<t_row><td>{d.cars[i].history[date].size}</td><td>{d.history[date].name}</td> <td>{d.cars[i].history[date++].size}</td><td>{d.cars[i].history[date++].name}</td></t_row>'
+      +  '<t_row><td>{d.cars[i+1].history[date].size}</td><td>{d.history[date].name}</td> <td>{d.cars[i+1].history[date++].size}</td><td>{d.cars[i+1].history[date++].name}</td></t_row>'
       +'</xml>';
     var _data = {
-      history : [
-        { date : '20120101'},
-        { date : '20120102'},
+      cars : [
+        {
+          history : [
+            { date : '20120101', size : 'A', name : 'toyota'},
+            { date : '20120102', size : 'B', name : 'tesla'}
+          ]
+        },
+        {
+          history : [
+            { date : '20120201', size : 'C', name : 'lumeneo'},
+          ]
+        }
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {

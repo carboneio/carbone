@@ -1,5 +1,5 @@
 
-### v1.0.6-ideolys
+### v1.1.0-ideolys
   - add formatter `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
   - Formatters which have the property `canInjectXML = true` can inject XML in documents
   - Return an error in render callback when LibreOffice is not detected 

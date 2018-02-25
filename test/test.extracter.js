@@ -73,9 +73,9 @@ describe('extracter', function () {
       ];
       helper.assert(extracter.splitMarkers(_markers), {
         d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
-        dsite : { name : 'site' , type : 'object', parent : 'd', parents : ['d'],  xmlParts : [
+        dsite : { name     : 'site' , type     : 'object', parent   : 'd', parents  : ['d'],  xmlParts : [
             {attr : 'name', formatters : [], obj : 'd', pos : 20},
-          ]
+        ]
         }
       });
     });
@@ -85,7 +85,7 @@ describe('extracter', function () {
       ];
       helper.assert(extracter.splitMarkers(_markers), {
         d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
-        dsite : { name : 'site' , type : 'object', parent : 'd', parents : ['d'],  xmlParts : [
+        dsite : { name     : 'site' , type     : 'object', parent   : 'd', parents  : ['d'],  xmlParts : [
             {attr : 'name', formatters : [], obj : 'dothersub', pos : 20},
         ]
         },
@@ -385,33 +385,6 @@ describe('extracter', function () {
           parents  : [],
           xmlParts : []
         },
-        dsite       : {
-          name      : 'site',
-          type      : 'array',
-          parent    : 'd',
-          parents   : ['d'],
-          position  : { start : 20/* , 'end': 30*/ },
-          iterators : [],
-          xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, conditions : [{left : {parent : 'dsite', attr : 'i'}, operator : '==', right : '1'}]},
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 30, conditions : [{left : {parent : 'dsite', attr : 'i'}, operator : '==', right : '0'}]}
-          ]
-        }
-      });
-    });
-    it('should manage arrays with conditions. It should transform = to ==', function () {
-      var _markers = [
-        {pos : 20, name : 'd.site[i=1].id'},
-        {pos : 30, name : 'd.site[i=0].id'}
-      ];
-      helper.assert(extracter.splitMarkers(_markers), {
-        d : {
-          name     : 'd',
-          type     : 'object',
-          parent   : '',
-          parents  : [],
-          xmlParts : []
-        },
         dsitei__1 : {
           name      : 'site',
           type      : 'objectInArray',
@@ -420,7 +393,10 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsitei__1', pos : 20, conditions : [{left : {parent : 'dsitei__1', attr : 'i'}, operator : '==', right : '1'}]},
+            { attr : 'id', formatters : [], obj : 'dsitei__1', pos : 20 }
+          ],
+          conditions : [
+            { left : { parent : 'dsitei__1',  attr : 'i' }, operator : '==', right : '1' }
           ]
         },
         dsitei__0 : {
@@ -431,7 +407,10 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, conditions : [{left : {parent : 'dsitei__0', attr : 'i'}, operator : '==', right : '0'}]}
+            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30 }
+          ],
+          conditions : [
+            { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
           ]
         }
       });
@@ -441,7 +420,7 @@ describe('extracter', function () {
         {pos : 20, name : 'd.site[ i = 1, sort >  310].id'},
         {pos : 30, name : 'd.site[ i = 0,   bank < 54,  lang = en].id'}
       ];
-      helper.assert(extracter.splitMarkers(_markers), {
+      helper.assert(extracter.splitMarkers(_markers),  {
         d : {
           name     : 'd',
           type     : 'object',
@@ -449,24 +428,70 @@ describe('extracter', function () {
           parents  : [],
           xmlParts : []
         },
-        dsite : {
+        dsitesort__310i__1 : {
           name      : 'site',
-          type      : 'array',
+          type      : 'objectInArray',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20/* , 'end': 30 */},
+          position  : {},
           iterators : [],
-          xmlParts  : [
-            {attr       : 'id', formatters : [], obj        : 'dsite', pos        : 20, conditions : [
-              {left : {parent : 'dsite', attr : 'i'}, operator : '==', right : '1'},
-              {left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '310'}
-            ]},
-            {attr       : 'id', formatters : [], obj        : 'dsite', pos        : 30, conditions : [
-              {left : {parent : 'dsite', attr : 'i'}, operator : '==', right : '0'},
-              {left : {parent : 'dsite', attr : 'bank'}, operator : '<', right : '54'},
-              {left : {parent : 'dsite', attr : 'lang'}, operator : '==', right : 'en'}
-            ]}
-          ]
+          xmlParts  : [{
+            attr       : 'id',
+            formatters : [],
+            obj        : 'dsitesort__310i__1',
+            pos        : 20
+          }],
+          conditions : [{
+            left : {
+              parent : 'dsitesort__310i__1',
+              attr   : 'i'
+            },
+            operator : '==',
+            right    : '1'
+          }, {
+            left : {
+              parent : 'dsitesort__310i__1',
+              attr   : 'sort'
+            },
+            operator : '>',
+            right    : '310'
+          }]
+        },
+        dsitelang__enbank__54i__0 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [{
+            attr       : 'id',
+            formatters : [],
+            obj        : 'dsitelang__enbank__54i__0',
+            pos        : 30
+          }],
+          conditions : [{
+            left : {
+              parent : 'dsitelang__enbank__54i__0',
+              attr   : 'i'
+            },
+            operator : '==',
+            right    : '0'
+          }, {
+            left : {
+              parent : 'dsitelang__enbank__54i__0',
+              attr   : 'bank'
+            },
+            operator : '<',
+            right    : '54'
+          }, {
+            left : {
+              parent : 'dsitelang__enbank__54i__0',
+              attr   : 'lang'
+            },
+            operator : '==',
+            right    : 'en'
+          }]
         }
       });
     });
@@ -1052,15 +1077,21 @@ describe('extracter', function () {
             {attr : 'id', formatters : [], obj : 'dproduct', pos : 30}
           ]
         },
-        dmenumenuElement : {
+        dmenumenuElementi__0 : {
           name      : 'menuElement',
-          type      : 'array',
+          type      : 'objectInArray',
           parent    : 'dmenu',
           parents   : ['d', 'dmenu'],
-          position  : { start : 40/* , 'end': 50*/ },
+          position  : {},
           iterators : [],
-          xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dmenumenuElement', pos : 40, conditions : [{left : { parent : 'dmenumenuElement', attr : 'i' }, operator : '==', right : '0' }] } 
+          xmlParts  : [{
+            attr       : 'id',
+            formatters : [],
+            obj        : 'dmenumenuElementi__0',
+            pos        : 40
+          }],
+          conditions : [
+            { left : { parent : 'dmenumenuElementi__0', attr : 'i' }, operator : '==', right : '0' }
           ]
         }
       });

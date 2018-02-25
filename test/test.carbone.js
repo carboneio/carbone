@@ -365,6 +365,46 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should replace a LF (unix) in an odt file', function (done) {
+      var _xml = '<xml> {d.text:convCRLF()} </xml>';
+      var _data = {text : 'boo\nbeep'};
+      var _options = { extension : 'odt' };
+      carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
+        helper.assert(err + '', 'null');
+        helper.assert(_xmlBuilt, '<xml> boo<text:line-break/>beep </xml>');
+        done();
+      });
+    });
+    it('should replace a CRLF (windows) in an odt file', function (done) {
+      var _xml = '<xml> {d.text:convCRLF()} </xml>';
+      var _data = {text : 'boo\r\nbeep'};
+      var _options = { extension : 'odt' };
+      carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
+        helper.assert(err + '', 'null');
+        helper.assert(_xmlBuilt, '<xml> boo<text:line-break/>beep </xml>');
+        done();
+      });
+    });
+    it('should replace a LF (unix) in a docx file', function (done) {
+      var _xml = '<xml> <w:t>{d.text:convCRLF()}</w:t> </xml>';
+      var _data = {text : 'boo\nbeep'};
+      var _options = { extension : 'docx' };
+      carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
+        helper.assert(err + '', 'null');
+        helper.assert(_xmlBuilt, '<xml> <w:t>boo</w:t><w:br/><w:t>beep</w:t> </xml>');
+        done();
+      });
+    });
+    it('should replace a CRLF (windows) in a docx file', function (done) {
+      var _xml = '<xml> <w:t>{d.text:convCRLF()}</w:t> </xml>';
+      var _data = {text : 'boo\r\nbeep'};
+      var _options = { extension : 'docx' };
+      carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
+        helper.assert(err + '', 'null');
+        helper.assert(_xmlBuilt, '<xml> <w:t>boo</w:t><w:br/><w:t>beep</w:t> </xml>');
+        done();
+      });
+    });
     it('should print a counter', function (done) {
       var _xml = '<xml><t_row> {d.cars[sort,i].brand:count()} {d.cars[sort,i].brand} </t_row><t_row> {d.cars[sort+1,i+1].brand} </t_row></xml>';
       var _data = {

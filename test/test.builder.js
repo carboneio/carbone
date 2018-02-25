@@ -6,48 +6,58 @@ var helper = require('../lib/helper');
 describe('builder', function () {
 
   describe('getFormatterString', function () {
+    var _testedFormatters = {
+      int        : function () {},
+      toFixed    : function () {},
+      format     : function () {},
+      formatter  : function () {},
+      formatter1 : function () {},
+      formatter2 : function () {},
+      print      : function () {},
+      convCRLF   : function () {}
+    };
     it('should return an empty string if there is no formatter', function () {
       var _actual = builder.getFormatterString('_str', 'context', []);
       helper.assert(_actual, '');
     });
     it('should return a simple call of a function for a formatter without arguments', function () {
-      var _actual = builder.getFormatterString('_str', 'context', [ 'int' ]);
+      var _actual = builder.getFormatterString('_str', 'context', [ 'int' ], _testedFormatters);
       helper.assert(_actual, '_str = formatters.int.call(context, _str);\n');
     });
     it('should return a simple call of a function for a formatter without arguments but called with parenthesis', function () {
-      var _actual = builder.getFormatterString('_otherString', '_meta', [ 'int()' ]);
+      var _actual = builder.getFormatterString('_otherString', '_meta', [ 'int()' ], _testedFormatters);
       helper.assert(_actual, '_otherString = formatters.int.call(_meta, _otherString);\n');
     });
     it('should return a call of a function for a formatter with one argument', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'toFixed(2)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'toFixed(2)' ], _testedFormatters);
       helper.assert(_actual, '_str = formatters.toFixed.call(_options, _str, \'2\');\n');
     });
     it('should return a call of a function for a formatter with one argument which is a string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'format(YYYYMMDD)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'format(YYYYMMDD)' ], _testedFormatters);
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYYMMDD');\n");
     });
     it('should keep whitespaces if it is a string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY MM DD')" ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY MM DD')" ], _testedFormatters);
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY MM DD');\n");
     });
     it('should keep anti-slash quotes', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY \' MM DD')" ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY \' MM DD')" ], _testedFormatters);
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY \' MM DD');\n");
     });
     it('should keep parenthesis in the string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('(YYYY) \' (MM) DD')" ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ "format('(YYYY) \' (MM) DD')" ], _testedFormatters);
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, '(YYYY) \' (MM) DD');\n");
     });
     it('should return a call of a function for a formatter with two arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(2, 3)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(2, 3)' ], _testedFormatters);
       helper.assert(_actual, '_str = formatters.formatter.call(_options, _str, \'2\', \'3\');\n');
     });
     it('should remove extra whitespaces between arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(   2   ,   3   )' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(   2   ,   3   )' ], _testedFormatters);
       helper.assert(_actual, '_str = formatters.formatter.call(_options, _str, \'2\', \'3\');\n');
     });
     it('should return two calls of functions for two chained formatters', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'int', 'toFixed(2)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'int', 'toFixed(2)' ], _testedFormatters);
       // helper.assert(_actual, '_str = formatters.toFixed.call(_options, formatters.int(d.number), \'2\');');
       helper.assert(_actual, '_str = formatters.int.call(_options, _str);\n'
                            +'if(_options.stopPropagation === false){\n'
@@ -55,14 +65,14 @@ describe('builder', function () {
                            +'}');
     });
     it('should return two calls of functions for two chained formatters each with arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ], _testedFormatters);
       assert.equal(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\', \'5\');\n'
                            +'if(_options.stopPropagation === false){\n'
                            +  '_str = formatters.formatter2.call(_options, _str, \'2\', \'3\');\n'
                            +'}');
     });
     it('should return three calls of functions for three chained formatters each with arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)', 'print(\'ok\')' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)', 'print(\'ok\')' ], _testedFormatters);
       assert.equal(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\', \'5\');\n'
                            +'if(_options.stopPropagation === false){\n'
                            +  '_str = formatters.formatter2.call(_options, _str, \'2\', \'3\');\n'
@@ -70,6 +80,14 @@ describe('builder', function () {
                            +    '_str = formatters.print.call(_options, _str, \'ok\');\n'
                            +  '}'
                            +'}');
+    });
+    it('should return formatter code according to the filter "canInjectXML"', function () {
+      _testedFormatters.convCRLF.canInjectXML = true;
+      var _actual = builder.getFormatterString('_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters);
+      helper.assert(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\');\n');
+
+      _actual = builder.getFormatterString('_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters, true);
+      helper.assert(_actual, '_str = formatters.convCRLF.call(_options, _str);\n');
     });
   });
 
@@ -120,6 +138,13 @@ describe('builder', function () {
       var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
       assert.equal(_actual, 'if((myObj_i >10)){\n code;\n }');
     });
+    it('should handle the reserved index iterator "i" and negative values', function () {
+      var _conditions = [
+        {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : '-10'},
+      ];
+      var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((myObj_i =myObj_array_length -10)){\n code;\n }');
+    });
     it('should not declare the same variable twice if there are two conditions on the same variable', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
@@ -167,19 +192,19 @@ describe('builder', function () {
     it('should sort the array with a depth of 2', function () {
       var _data     = [{pos : [40, 4]}, {pos : [40, 3]}, {pos : [51, 100]}, {pos : [29, 8  ]}];
       var _expected = [{pos : [29, 8]}, {pos : [40, 3]}, {pos : [40, 4  ]}, {pos : [51, 100]}];
-      builder.sortXmlParts(_data, 2);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
     });
     it('should sort the array with a depth of 3', function () {
       var _data     = [{pos : [4, 4, 2]}, {pos : [4, 4, 1]}, {pos : [4, 3, 2]}, {pos : [1, 9, 1]}, {pos : [2, 5, 6]}, {pos : [1, 8, 9]}];
       var _expected = [{pos : [1, 8, 9]}, {pos : [1, 9, 1]}, {pos : [2, 5, 6]}, {pos : [4, 3, 2]}, {pos : [4, 4, 1]}, {pos : [4, 4, 2]}];
-      builder.sortXmlParts(_data, 3);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
     });
     it('should sort the array even if some arrays are incomplete, undefined values appears first', function () {
       var _data     = [{pos : [4, 4, 2]}, {pos : [4, 4, 1]}, {pos : [2, 4   ]}, {pos : [1, 9, 1]}, {pos : [2, 3   ]}, {pos : [1      ]}];
       var _expected = [{pos : [1      ]}, {pos : [1, 9, 1]}, {pos : [2, 3   ]}, {pos : [2, 4   ]}, {pos : [4, 4, 1]}, {pos : [4, 4, 2]}];
-      builder.sortXmlParts(_data, 3);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
     });
     it('should sort a complex array (sort depth of 3) of xml parts', function () {
@@ -209,13 +234,28 @@ describe('builder', function () {
         { pos : [ 6, 2, 23 ], str : '</tr>'        },
         { pos : [ 24       ], str : '</xml>'       }
       ];
-      builder.sortXmlParts(_data, 10);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
+    });
+    it('should be fast to sort 1 Millons of rows', function () {
+      var _nbRows = 1000000;
+      var _data = [];
+      for (var i = 0; i < _nbRows; i++) {
+        _data.push({ 
+          pos : [i % 100, i % 50, i % 1000, i % 60]
+        });
+      }
+      var _start = process.hrtime();
+      builder.sortXmlParts(_data, 10);
+      var _diff = process.hrtime(_start);
+      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n sortXmlParts speed : ' + _elapsed + ' ms (usually around 800 ms)\n');
+      helper.assert(_elapsed < 2000, true);
     });
     it('should sort by rowShow first if "pos" are the same', function () {
       var _data     = [{pos : [4], rowShow : false}, {pos : [4], rowShow : false}, {pos : [4], rowShow : true }, {pos : [1], rowShow : false}];
       var _expected = [{pos : [1], rowShow : false}, {pos : [4], rowShow : true }, {pos : [4], rowShow : false}, {pos : [4], rowShow : false}];
-      builder.sortXmlParts(_data, 3);
+      builder.sortXmlParts(_data);
       helper.assert(_data, _expected);
     });
     /*
@@ -378,6 +418,23 @@ describe('builder', function () {
       helper.assert(_nbArrayExit, 2);
       helper.assert(_currentlyVisitedArrays, ['d']);
     });
+    it('should not leave the array "wheels" if the array "tyres" is nested in "wheels" in XML (depth >)', function () {
+      var _currentlyVisitedArrays = ['d', 'cars', 'wheels'];
+      var _objDependencyDescriptor = {
+        d      : {type : 'array' , parent : ''     , depth : 1 },
+        cars   : {type : 'array' , parent : 'd'    , depth : 2 },
+        wheels : {type : 'array' , parent : 'cars' , depth : 3 },
+        tyres  : {type : 'array' , parent : 'cars' , depth : 4 },
+        site   : {type : 'object', parent : 'cars'                                     }
+      };
+      var _nextAttrName = 'tyres';
+      var _nbArrayExit = 0;
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 0);
+      helper.assert(_currentlyVisitedArrays, ['d', 'cars', 'wheels']);
+    });
   });
 
   describe('assembleXmlParts', function () {
@@ -520,7 +577,7 @@ describe('builder', function () {
       var _data = {
         number : 24.55
       };
-      var _fn = builder.getBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc, carbone.formatters);
       helper.assert(_fn(_data, {formatters : carbone.formatters}), [
         {pos : [5 ],str : '<xml>24', rowShow : true},
         {pos : [6 ],str : '</xml>'}

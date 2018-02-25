@@ -1,3 +1,9 @@
+
+const LINEBREAK = {
+  odt  : '<text:line-break/>',
+  docx : '</w:t><w:br/><w:t>'
+};
+
 /**
  * Lower case all letters
  * 
@@ -120,11 +126,61 @@ function convEnum (d, type) {
   return d;
 }
 
+
+/**
+ * Removes accents from text
+ *
+ * @example [ "crème brulée" ]
+ * @example [ "CRÈME BRULÉE" ]
+ * @example [ "être"         ]
+ * @example [ "éùïêèà"       ]
+ *  
+ * @param  {String} d string to parse
+ * @return {String}   string without accent
+ */
+function unaccent (d) {
+  if (typeof d === 'string') {
+    return d.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  return d;
+}
+
+
+/**
+ * Convert carriage return `\r\n` and line feed `\n` to XML-specific code in rendered document
+ *
+ * Compatible with odt, and docx (beta)
+ *
+ * @exampleContext { "extension" : "odt" }
+ * @example [ "my text \n contains Line Feed"         , "my text <text:line-break/> contains Line Feed" ]
+ * @example [ "my text \r\n contains Carriage Return" , "my text <text:line-break/> contains Line Feed" ]
+ *
+ * @exampleContext { "extension" : "docx" }
+ * @example [ "my text \n contains Line Feed"         , "my text </w:t><w:br/><w:t> contains Line Feed" ]
+ * @example [ "my text \r\n contains Carriage Return" , "my text </w:t><w:br/><w:t> contains Line Feed" ]
+ * 
+ * @param  {Integer|String} d
+ * @return {String}         return "XML carriage return" for odt and docx
+ */
+function convCRLF (d) {
+  if (typeof d === 'string') {
+    var _lineBreak = LINEBREAK[this.extension];
+    if (_lineBreak) {
+      return d.replace(/\r?\n/g, _lineBreak);
+    }
+  }
+  return d;
+}
+// this formatter is separately to inject code
+convCRLF.canInjectXML = true;
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
   ucFirst   : ucFirst,
   ucWords   : ucWords,
   convEnum  : convEnum,
+  convCRLF  : convCRLF,
+  unaccent  : unaccent,
   print     : print
 };

@@ -1,5 +1,25 @@
-### V1.0.2
-  - Next release
+### v1.1.0
+  - Release February 26, 2018
+  - Fix: should find markers even if there is a opening bracket `{` before the markers
+  - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
+  - Fix: markers were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...
+  - Fix: keep the first element of the array if the custom iterator is constant
+  - Fix a lot of strange bugs when using a filter without iterators in arrays (ex. `{d.cities[i=0].temperature}`)
+  - Optimization: gain x10 when sorting 1 Million of rows
+  - Add formatter `unaccent` to remove accent from string
+  - `carbone.set` does not overwrite user-defined translations
+  - Accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}` 
+  - Add new formatters
+    - `unaccent()` to remove accent from string
+    - `count()` to print a counter in loops. Usage: `{d[i].name:count()}`
+    - `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
+  - Formatters which have the property `canInjectXML = true` can inject XML in documents
+  - Return an error in render callback when LibreOffice is not detected 
+  - Get the last object of an array using negative values when filtering with `i` iterator
+    - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
+    - `{d.cities[i=-2].temperature}` shows the temperature of the city before the last
+    - ...
+
 
 ### V1.0.1
   - Release October 13, 2017

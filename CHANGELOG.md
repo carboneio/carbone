@@ -1,5 +1,6 @@
 
 ### v1.0.6-ideolys
+  - Return an error in render callback when LibreOffice is not detected 
   - Fix a lot of bugs when using a filter without iterators in arrays `{d.cities[i=0].temperature}`
   - Get the last object of an array using negative values when filtering with `i` iterator
     - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city

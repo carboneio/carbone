@@ -152,12 +152,12 @@ function unaccent (d) {
  * Compatible with odt, and docx (beta)
  *
  * @exampleContext { "extension" : "odt" }
- * @example [ "my text \n contains Line Feed"         , "my text <text:line-break/> contains Line Feed" ]
- * @example [ "my text \r\n contains Carriage Return" , "my text <text:line-break/> contains Line Feed" ]
+ * @example [ "my blue \\n car"   ]
+ * @example [ "my blue \\r\\n car" ]
  *
  * @exampleContext { "extension" : "docx" }
- * @example [ "my text \n contains Line Feed"         , "my text </w:t><w:br/><w:t> contains Line Feed" ]
- * @example [ "my text \r\n contains Carriage Return" , "my text </w:t><w:br/><w:t> contains Line Feed" ]
+ * @example [ "my blue \\n car"   ]
+ * @example [ "my blue \\r\\n car" ]
  * 
  * @param  {Integer|String} d
  * @return {String}         return "XML carriage return" for odt and docx

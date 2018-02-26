@@ -127,8 +127,8 @@ Carbone does a lot of thing for you behind the scene:
 
 ```bash
   # remove all old version of LibreOffice
-  sudo apt-get remove --purge libreoffice*
-  sudo apt-get autoremove --purge
+  sudo apt remove --purge libreoffice*
+  sudo apt autoremove --purge
 
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable 
@@ -136,7 +136,7 @@ Carbone does a lot of thing for you behind the scene:
   wget https://downloadarchive.documentfoundation.org/libreoffice/old/5.3.2.2/deb/x86_64/LibreOffice_5.3.2.2_Linux_x86-64_deb.tar.gz
   
   # Install required dependencies on ubuntu server for LibreOffice 5.0+
-  sudo apt-get install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
+  sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
   tar -zxvf LibreOffice_5.3.2.2_Linux_x86-64_deb.tar.gz
@@ -148,7 +148,11 @@ Carbone does a lot of thing for you behind the scene:
   # If you want to use Microsoft fonts in reports, you must install the fonts 
   # Andale Mono, Arial Black, Arial, Comic Sans MS, Courier New, Georgia, Impact,
   # Times New Roman, Trebuchet, Verdana,Webdings)
-  sudo apt-get install ttf-mscorefonts-installer
+  sudo apt install ttf-mscorefonts-installer
+
+  # If you want to use special characters, such as chinese ideograms, you must install a font that support them
+  # For example:
+  sudo apt install fonts-wqy-zenhei
 ```
 
 ##### 2 - generate PDF
@@ -436,6 +440,10 @@ Thanks to all Ideolys's direct contributors (random order)
   - Etienne Rouillard
   - Guillaume Chevaux
   - Fabien Bigant
+  - Maxime Magne
+  - Vincent Bertin
+  - Léo Labruyère
+  - Aurélien Kermabon
 
 Thanks to all French citizens (Crédit Impôt Recherche, Jeune Entreprise Innovante, BPI)!
 

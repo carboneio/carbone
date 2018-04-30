@@ -1,3 +1,5 @@
+### xxx
+  - Add fallback to basic sorting when timsort crashes.
 
 ### v1.1.0-ideolys
   - Release January 25, 2018

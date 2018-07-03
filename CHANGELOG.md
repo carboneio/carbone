@@ -1,3 +1,8 @@
+### v1.0.6-ideolys
+  - Use same engine as v1.0.5 but includes features of `v1.1.0-ideolys` and `v1.1.1-ideolys`:
+    - Add fallback to basic sorting when timsort crashes
+    - add formatter `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
+    - Formatters which have the property `canInjectXML = true` can inject XML in documents
 
 ### v1.0.5-ideolys
   - Release January 12, 2018

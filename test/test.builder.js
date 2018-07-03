@@ -6,48 +6,58 @@ var helper = require('../lib/helper');
 describe('builder', function () {
 
   describe('getFormatterString', function () {
+    var _testedFormatters = {
+      int        : function () {},
+      toFixed    : function () {},
+      format     : function () {},
+      formatter  : function () {},
+      formatter1 : function () {},
+      formatter2 : function () {},
+      print      : function () {},
+      convCRLF   : function () {}
+    };
     it('should return an empty string if there is no formatter', function () {
       var _actual = builder.getFormatterString('_str', 'context', []);
       helper.assert(_actual, '');
     });
     it('should return a simple call of a function for a formatter without arguments', function () {
-      var _actual = builder.getFormatterString('_str', 'context', [ 'int' ]);
+      var _actual = builder.getFormatterString('_str', 'context', [ 'int' ], _testedFormatters);
       helper.assert(_actual, '_str = formatters.int.call(context, _str);\n');
     });
     it('should return a simple call of a function for a formatter without arguments but called with parenthesis', function () {
-      var _actual = builder.getFormatterString('_otherString', '_meta', [ 'int()' ]);
+      var _actual = builder.getFormatterString('_otherString', '_meta', [ 'int()' ], _testedFormatters);
       helper.assert(_actual, '_otherString = formatters.int.call(_meta, _otherString);\n');
     });
     it('should return a call of a function for a formatter with one argument', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'toFixed(2)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'toFixed(2)' ], _testedFormatters);
       helper.assert(_actual, '_str = formatters.toFixed.call(_options, _str, \'2\');\n');
     });
     it('should return a call of a function for a formatter with one argument which is a string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'format(YYYYMMDD)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'format(YYYYMMDD)' ], _testedFormatters);
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYYMMDD');\n");
     });
     it('should keep whitespaces if it is a string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY MM DD')" ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY MM DD')" ], _testedFormatters);
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY MM DD');\n");
     });
     it('should keep anti-slash quotes', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY \' MM DD')" ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY \' MM DD')" ], _testedFormatters);
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY \' MM DD');\n");
     });
     it('should keep parenthesis in the string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('(YYYY) \' (MM) DD')" ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ "format('(YYYY) \' (MM) DD')" ], _testedFormatters);
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, '(YYYY) \' (MM) DD');\n");
     });
     it('should return a call of a function for a formatter with two arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(2, 3)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(2, 3)' ], _testedFormatters);
       helper.assert(_actual, '_str = formatters.formatter.call(_options, _str, \'2\', \'3\');\n');
     });
     it('should remove extra whitespaces between arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(   2   ,   3   )' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(   2   ,   3   )' ], _testedFormatters);
       helper.assert(_actual, '_str = formatters.formatter.call(_options, _str, \'2\', \'3\');\n');
     });
     it('should return two calls of functions for two chained formatters', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'int', 'toFixed(2)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'int', 'toFixed(2)' ], _testedFormatters);
       // helper.assert(_actual, '_str = formatters.toFixed.call(_options, formatters.int(d.number), \'2\');');
       helper.assert(_actual, '_str = formatters.int.call(_options, _str);\n'
                            +'if(_options.stopPropagation === false){\n'
@@ -55,14 +65,14 @@ describe('builder', function () {
                            +'}');
     });
     it('should return two calls of functions for two chained formatters each with arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ], _testedFormatters);
       assert.equal(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\', \'5\');\n'
                            +'if(_options.stopPropagation === false){\n'
                            +  '_str = formatters.formatter2.call(_options, _str, \'2\', \'3\');\n'
                            +'}');
     });
     it('should return three calls of functions for three chained formatters each with arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)', 'print(\'ok\')' ]);
+      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)', 'print(\'ok\')' ], _testedFormatters);
       assert.equal(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\', \'5\');\n'
                            +'if(_options.stopPropagation === false){\n'
                            +  '_str = formatters.formatter2.call(_options, _str, \'2\', \'3\');\n'
@@ -70,6 +80,14 @@ describe('builder', function () {
                            +    '_str = formatters.print.call(_options, _str, \'ok\');\n'
                            +  '}'
                            +'}');
+    });
+    it('should return formatter code according to the filter "canInjectXML"', function () {
+      _testedFormatters.convCRLF.canInjectXML = true;
+      var _actual = builder.getFormatterString('_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters);
+      helper.assert(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\');\n');
+
+      _actual = builder.getFormatterString('_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters, true);
+      helper.assert(_actual, '_str = formatters.convCRLF.call(_options, _str);\n');
     });
   });
 
@@ -552,7 +570,7 @@ describe('builder', function () {
       var _data = {
         number : 24.55
       };
-      var _fn = builder.getBuilderFunction(_desc);
+      var _fn = builder.getBuilderFunction(_desc, carbone.formatters);
       helper.assert(_fn(_data, {formatters : carbone.formatters}), [
         {pos : [5 ],str : '<xml>24', rowShow : true},
         {pos : [6 ],str : '</xml>'}

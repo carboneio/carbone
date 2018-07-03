@@ -19,6 +19,14 @@ describe('formatter', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'fr'}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
     });
   });
+  describe('convCRLF', function () {
+    it('should convert LF and CR in odt', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'odt'}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <text:line-break/> sd <text:line-break/> qsd <text:line-break/> sq');
+    });
+    it('should convert LF and CR in docx', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'docx'}, 'qsdqsd \n'), 'qsdqsd </w:t><w:br/><w:t>');
+    });
+  });
   describe('ifEmpty', function () {
     it('should show a message if data is empty. It should stop propagation to next formatter', function () {
       var _context = {};

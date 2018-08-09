@@ -297,6 +297,18 @@ describe('formatter', function () {
     });
   });
 
+  describe('slice', function () {
+    it('should keep only the selection', function () {
+      helper.assert(stringFormatter.slice("coucou", 0, 3), "cou");
+      helper.assert(stringFormatter.slice("coucou", 0, 0), "");
+      helper.assert(stringFormatter.slice("coucou", 3, 4), "c");
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.slice(null, 0, 3), null);
+      helper.assert(stringFormatter.slice(undefined, 0, 3), undefined);
+    });
+  });
+
   describe('arrayMap', function () {
     it('should flatten the each object of the array (only the first level, ignoring sub arrays, sub objects,...)', function () {
       var _datas = [

@@ -3,6 +3,7 @@ var carbone = require('../lib/index');
 var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
+var params = require('../lib/params');
 var converter = require('../lib/converter');
 var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
@@ -31,6 +32,22 @@ describe('Carbone', function () {
       helper.rmDirRecursive(_tempPath);
       carbone.set({tempPath : _tempPath});
       helper.assert(fs.existsSync(_tempPath), true);
+      done();
+    });
+    it('should not overwrite lang object if provided', function (done) {
+      carbone.set({
+        templatePath : _templatePath,
+        translations : {
+          fr : {
+            test : 'trad'
+          }
+        }
+      });
+      helper.assert(params.translations, {
+        fr : {
+          test : 'trad'
+        }
+      });
       done();
     });
     it('should change the lang of of date formatter', function (done) {
@@ -147,6 +164,22 @@ describe('Carbone', function () {
       carbone.renderXML('<xml>{d.param}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>field_1</xml>');
+        done();
+      });
+    });
+    it('should execute formatter if the data object is empty with the formatter ifEmpty', function (done) {
+      var data = {};
+      carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : {}}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>yeah oops</xml>');
+        done();
+      });
+    });
+    it('should execute formatter if the data array is empty with the formatter ifEmpty', function (done) {
+      var data = [];
+      carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : []}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>yeah oops</xml>');
         done();
       });
     });
@@ -330,6 +363,132 @@ describe('Carbone', function () {
           helper.assert(result, '<xml>cocina</xml>');
           done();
         });
+      });
+    });
+    it('should replace a LF (unix) in an odt file', function (done) {
+      var _xml = '<xml> {d.text:convCRLF()} </xml>';
+      var _data = {text : 'boo\nbeep'};
+      var _options = { extension : 'odt' };
+      carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
+        helper.assert(err + '', 'null');
+        helper.assert(_xmlBuilt, '<xml> boo<text:line-break/>beep </xml>');
+        done();
+      });
+    });
+    it('should replace a CRLF (windows) in an odt file', function (done) {
+      var _xml = '<xml> {d.text:convCRLF()} </xml>';
+      var _data = {text : 'boo\r\nbeep'};
+      var _options = { extension : 'odt' };
+      carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
+        helper.assert(err + '', 'null');
+        helper.assert(_xmlBuilt, '<xml> boo<text:line-break/>beep </xml>');
+        done();
+      });
+    });
+    it('should replace a LF (unix) in a docx file', function (done) {
+      var _xml = '<xml> <w:t>{d.text:convCRLF()}</w:t> </xml>';
+      var _data = {text : 'boo\nbeep'};
+      var _options = { extension : 'docx' };
+      carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
+        helper.assert(err + '', 'null');
+        helper.assert(_xmlBuilt, '<xml> <w:t>boo</w:t><w:br/><w:t>beep</w:t> </xml>');
+        done();
+      });
+    });
+    it('should replace a CRLF (windows) in a docx file', function (done) {
+      var _xml = '<xml> <w:t>{d.text:convCRLF()}</w:t> </xml>';
+      var _data = {text : 'boo\r\nbeep'};
+      var _options = { extension : 'docx' };
+      carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
+        helper.assert(err + '', 'null');
+        helper.assert(_xmlBuilt, '<xml> <w:t>boo</w:t><w:br/><w:t>beep</w:t> </xml>');
+        done();
+      });
+    });
+    it('should print a counter', function (done) {
+      var _xml = '<xml><t_row> {d.cars[sort,i].brand:count()} {d.cars[sort,i].brand} </t_row><t_row> {d.cars[sort+1,i+1].brand} </t_row></xml>';
+      var _data = {
+        cars : [
+          {brand : 'Lumeneo'     , sort : 1},
+          {brand : 'Tesla motors', sort : 2},
+          {brand : 'Toyota'      , sort : 1}
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml><t_row> 1 Lumeneo </t_row><t_row> 2 Toyota </t_row><t_row> 3 Tesla motors </t_row></xml>');
+        done();
+      });
+    });
+    it('should print a counter which start by 1 and 0', function (done) {
+      var _xml =
+         '<xml>'
+        +  '<tr>'
+        +    '<td>{d[i].cars[i].wheels[i].tire.brand:count()} {d[i].cars[i].wheels[i].tire.brand}</td>'
+        +    '<td>{d[i].cars[i].wheels[i].tire.brand:count(0)} {d[i].site.label}</td>'
+        +  '</tr>'
+        +  '<tr>'
+        +    '<td>{d[i+1].cars[i+1].wheels[i+1].tire.brand}</td>'
+        +    '<td>{d[i+1].site.label}</td>'
+        +  '</tr>'
+        +'</xml>';
+      var _data = [
+        {
+          site : {label : 'site_A'},
+          cars : [
+            {
+              wheels : [
+                {tire : {brand : 'mich'}},
+                {tire : {brand : 'cont'}}
+              ]
+            },
+            {
+              wheels : [
+                {tire : {brand : 'mich'}}
+              ]
+            },
+          ],
+        },{
+          site : {label : 'site_B'},
+          cars : [{
+            wheels : [
+                {tire : {brand : 'mich'}},
+                {tire : {brand : 'uni' }},
+                {tire : {brand : 'cont'}}
+            ]
+          }
+          ],
+        }
+      ];
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        var _expectedResult =
+           '<xml>'
+          +  '<tr>'
+          +    '<td>1 mich</td>'
+          +    '<td>0 site_A</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>2 cont</td>'
+          +    '<td>1 site_A</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>3 mich</td>'
+          +    '<td>2 site_A</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>4 mich</td>'
+          +    '<td>3 site_B</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>5 uni</td>'
+          +    '<td>4 site_B</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>6 cont</td>'
+          +    '<td>5 site_B</td>'
+          +  '</tr>'
+          +'</xml>';
+        assert.equal(_xmlBuilt, _expectedResult);
+        done();
       });
     });
   });
@@ -629,6 +788,19 @@ describe('Carbone', function () {
             done();
           });
         });
+      });
+    });
+    it('should not crash if datas contain XML-incompatible control code', function (done) {
+      var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+      var data = {
+        field1 : '\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\u000b\u000c\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f',
+        field2 : 'field_2'
+      };
+      carbone.render(path.resolve('./test/datasets/test_word_render_A.docx'), data, {convertTo : 'pdf'}, function (err, result) {
+        assert.equal(err, null);
+        var buf = new Buffer(result);
+        assert.equal(buf.slice(0, 4).toString(), '%PDF');
+        done();
       });
     });
     it('should render spreadsheet and convert it to a xls', function (done) {

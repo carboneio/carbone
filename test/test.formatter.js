@@ -19,6 +19,14 @@ describe('formatter', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'fr'}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
     });
   });
+  describe('convCRLF', function () {
+    it('should convert LF and CR in odt', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'odt'}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <text:line-break/> sd <text:line-break/> qsd <text:line-break/> sq');
+    });
+    it('should convert LF and CR in docx', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'docx'}, 'qsdqsd \n'), 'qsdqsd </w:t><w:br/><w:t>');
+    });
+  });
   describe('ifEmpty', function () {
     it('should show a message if data is empty. It should stop propagation to next formatter', function () {
       var _context = {};
@@ -61,7 +69,7 @@ describe('formatter', function () {
     });
   });
 
-  describe('ifEquals', function () {
+  describe('ifEqual', function () {
     it('should show a message if data is equal to a variable', function () {
       var _context = {};
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 0, 0, 'msgIfTrue'), 'msgIfTrue');
@@ -70,7 +78,17 @@ describe('formatter', function () {
       helper.assert(_context.stopPropagation, true);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, true, true, 'msgIfTrue'), 'msgIfTrue');
       helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'true', 'true', 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, true, 'true', 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, false, 'false', 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'false', 'false', 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, false, false, 'msgIfTrue'), 'msgIfTrue');
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, false, 'false', 'msgIfTrue'), 'msgIfTrue');
       helper.assert(_context.stopPropagation, true);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'titi', 'titi', 'msgIfTrue'), 'msgIfTrue');
       helper.assert(_context.stopPropagation, true);
@@ -97,6 +115,10 @@ describe('formatter', function () {
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 0, '1', 'msgIfTrue'), 0);
       helper.assert(_context.stopPropagation, false);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, true, false, 'msgIfTrue'), true);
+      helper.assert(_context.stopPropagation, false);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'true', false, 'msgIfTrue'), 'true');
+      helper.assert(_context.stopPropagation, false);
+      helper.assert(callWithContext(conditionFormatter.ifEqual, _context, 'false', 'true', 'msgIfTrue'), 'false');
       helper.assert(_context.stopPropagation, false);
       helper.assert(callWithContext(conditionFormatter.ifEqual, _context, false, true, 'msgIfTrue'), false);
       helper.assert(_context.stopPropagation, false);
@@ -258,6 +280,32 @@ describe('formatter', function () {
       helper.assert(stringFormatter.ucWords(undefined), undefined);
       helper.assert(stringFormatter.ucWords(120), 120);
       helper.assert(stringFormatter.ucWords([]), []);
+    });
+  });
+
+  describe('unaccent', function () {
+    it('should remove accent from string', function () {
+      helper.assert(stringFormatter.unaccent('crème brulée'), 'creme brulee');
+      helper.assert(stringFormatter.unaccent('CRÈME BRULÉE'), 'CREME BRULEE');
+      helper.assert(stringFormatter.unaccent('être'), 'etre');
+      helper.assert(stringFormatter.unaccent('éùïêèà'), 'euieea');
+    });
+    it('should not crash if datas is null or undefined', function () {
+      helper.assert(stringFormatter.unaccent(null), null);
+      helper.assert(stringFormatter.unaccent(undefined), undefined);
+      helper.assert(stringFormatter.unaccent(120), 120);
+    });
+  });
+
+  describe('slice', function () {
+    it('should keep only the selection', function () {
+      helper.assert(stringFormatter.slice("coucou", 0, 3), "cou");
+      helper.assert(stringFormatter.slice("coucou", 0, 0), "");
+      helper.assert(stringFormatter.slice("coucou", 3, 4), "c");
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.slice(null, 0, 3), null);
+      helper.assert(stringFormatter.slice(undefined, 0, 3), undefined);
     });
   });
 

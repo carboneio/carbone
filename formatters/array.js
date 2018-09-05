@@ -46,7 +46,7 @@ function arrayJoin (d, separator) {
  * @param  {Array} d                     array passed by carbone
  * @param  {String} objSeparator         [optional] object separator (`, ` by default)
  * @param  {String} attributeSeparator   [optional] attribute separator (`:` by default)
- * @param  {String [, ...]} attributes   [optional] list of object's attributes to print
+ * @param  {String} attributes           [optional] list of object's attributes to print
  * @return {String}                      the computed result, or `d` if `d` is not an array
  */
 function arrayMap (d, objSeparator, attributeSeparator) {
@@ -85,7 +85,24 @@ function arrayMap (d, objSeparator, attributeSeparator) {
   return d;
 }
 
+/**
+ * Count and print row number of any array
+ *
+ * Usage example: `d[i].id:count()` will print a counter of the current row no matter the value of `id` 
+ *
+ * @param   {String}  d       Array passed by carbone
+ * @param   {String}  start   Number to start with (default: 1)
+ * @return  {String}          Counter value
+ */
+function count (d, loopId, start) {
+  if (start === undefined) {
+    start = 1;
+  }
+  return '__COUNT_' + loopId + '_' + start + '__';
+}
+
 module.exports = {
   arrayJoin : arrayJoin,
-  arrayMap  : arrayMap
+  arrayMap  : arrayMap,
+  count     : count
 };

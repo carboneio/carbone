@@ -1,19 +1,66 @@
 
-### V1.0.0
-  - Release June 7, 2017
+### v1.1.1-ideolys
+  - Add fallback to basic sorting when timsort crashes
+
+### v1.1.0-ideolys
+  - Release January 25, 2018
+  - add formatter `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
+  - Formatters which have the property `canInjectXML = true` can inject XML in documents
+  - Return an error in render callback when LibreOffice is not detected 
+  - Fix a lot of bugs when using a filter without iterators in arrays `{d.cities[i=0].temperature}`
+  - Get the last object of an array using negative values when filtering with `i` iterator
+    - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
+    - `{d.cities[i=-2].temperature}` shows the temperature of the city before the last
+    - ...
+
+### v1.0.5-ideolys
+  - Release January 12, 2018
+  - Fix socket bug
+
+### v1.0.4-ideolys
+  - Release January 10, 2018
+  - Fix: markers were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...
+  
+### v1.0.3-ideolys
+  - Release December 15, 2017
+  - Add new formatters
+    - `unaccent()` to remove accent from string
+    - `count()` to print a counter in loops. Usage: `{d[i].name:count()}`
+  - accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}` 
+  - carbone.set do not overwrite user-defined translations
+  - some optimization : gain x10 when sorting 1 Million of rows
   - It loads all lang at startup, and it is able to change lang at runtime
-  - Avoid unnecessary synchronous code in `carbone.set`
+  - Avoid unnecessary synchronous code in `carbone.set
   - Improve documentation
   - Default template path is working directory by default
   - Return the list of supported format when an unknown `options.convertTo` is used
   - Accept more input type
-  - Remove deprecated formatters
-  - `carbone.set` takes into account changes on `factories` and `startFactory` parameters
+  - carbone.set` takes into account changes on `factories` and `startFactory` parameters
+  - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
+  - Fix: keep the first element of the array if the custom iterator is constant
   - Fix: a report without markers, except lang ones, is translated
-  - Fix: avoid creating LibreOffice zombies when node crashes
   - Fix: avoid using LibreOffice if `options.convertTo` equals input file extension
-  - Fix: improve markers detection to avoid removing some XML variable like `{DSDSD-232D}` used in DOCX
   - Fix: now compatible with node v4.5.0+, v6+, v8+
+
+### v0.14.3
+  - Fix: markers were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...
+
+### v0.14.2
+  - Add formatter `unaccent` to remove accent from string
+
+### v0.14.1
+  - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
+
+### v0.14.0
+  - Fix: should find markers even if there is a opening bracket `{` before the markers
+
+### v0.13.3
+  - Automatically remove XML-incompatible control codes (U+0000 to U+0008 and U+000B to U+000C and U+000E to U+001F) before inserting data in templates
+  - Fix: ifEqual did not work correctly with boolean values
+
+### v0.13.2
+  - Fix LO zombie process when node exits
+  - Fix: improve detection of markers. And avoid removing non-marker {}
 
 ### v0.13.1
   - Release February 22, 2017

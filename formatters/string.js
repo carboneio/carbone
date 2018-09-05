@@ -1,5 +1,11 @@
 var toMd5 = require('./md5');
 
+
+const LINEBREAK = {
+  odt  : '<text:line-break/>',
+  docx : '</w:t><w:br/><w:t>'
+};
+
 /**
  * Lower case all letters
  * 
@@ -122,6 +128,72 @@ function convEnum (d, type) {
   return d;
 }
 
+
+/**
+ * Removes accents from text
+ *
+ * @example [ "crème brulée" ]
+ * @example [ "CRÈME BRULÉE" ]
+ * @example [ "être"         ]
+ * @example [ "éùïêèà"       ]
+ *  
+ * @param  {String} d string to parse
+ * @return {String}   string without accent
+ */
+function unaccent (d) {
+  if (typeof d === 'string') {
+    return d.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  return d;
+}
+
+
+/**
+ * Convert carriage return `\r\n` and line feed `\n` to XML-specific code in rendered document
+ *
+ * Compatible with odt, and docx (beta)
+ *
+ * @exampleContext { "extension" : "odt" }
+ * @example [ "my blue \\n car"   ]
+ * @example [ "my blue \\r\\n car" ]
+ *
+ * @exampleContext { "extension" : "docx" }
+ * @example [ "my blue \\n car"   ]
+ * @example [ "my blue \\r\\n car" ]
+ * 
+ * @param  {Integer|String} d
+ * @return {String}         return "XML carriage return" for odt and docx
+ */
+function convCRLF (d) {
+  if (typeof d === 'string') {
+    var _lineBreak = LINEBREAK[this.extension];
+    if (_lineBreak) {
+      return d.replace(/\r?\n/g, _lineBreak);
+    }
+  }
+  return d;
+}
+// this formatter is separately to inject code
+convCRLF.canInjectXML = true;
+
+/**
+ * Slice a string with a begin and an end
+ * 
+ * @example ["foorbar".slice(0, 3)]
+ * @example ["foo"]
+ * 
+ * @param {String} d
+ * @param {Integer} begin
+ * @param {Integer} end
+ * @return {String} return the formatted string
+ */
+function slice(d, begin, end) {
+  if (typeof d === 'string') {
+    return d.slice(begin, end);
+  }
+  return d;
+}
+
 function md5 (d) {
   return toMd5(d);
 }
@@ -136,7 +208,10 @@ module.exports = {
   ucFirst   : ucFirst,
   ucWords   : ucWords,
   convEnum  : convEnum,
+  convCRLF  : convCRLF,
+  unaccent  : unaccent,
   print     : print,
+  slice     : slice,
   md5       : md5,
   prepend   : prepend
 };

@@ -1,6 +1,7 @@
-var assert = require('assert');
-var parser = require('../lib/parser');
-var helper = require('../lib/helper');
+var assert  = require('assert');
+var parser  = require('../lib/parser');
+var helper  = require('../lib/helper');
+var count   = require('../formatters/array').count;
 
 describe('parser', function () {
   
@@ -13,6 +14,22 @@ describe('parser', function () {
         helper.assert(cleanedXml, '');
         done();
       });
+    });
+    it('should find marker even if there is a bracket before the markers', function (done) {
+      parser.findMarkers('<xml>{toto {d.toto}</xml>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [{pos : 11, name : '_root.d.toto'}]);
+        helper.assert(cleanedXml, '<xml>{toto </xml>');
+        done();
+      })
+    });
+    it('should find multiple markers even if there are brackets before the markers', function (done) {
+      parser.findMarkers('<xml>{d.tata} {to{c.menu} {to {d.toto}</xml>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [{pos : 5, name : '_root.d.tata'}, {pos : 9, name : '_root.c.menu'}, {pos : 14, name : '_root.d.toto'}]);
+        helper.assert(cleanedXml, '<xml> {to {to </xml>');
+        done();
+      })
     });
     it('2. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
@@ -672,11 +689,11 @@ describe('parser', function () {
       assert.equal(parser.findOpeningTagPosition('a<tr></tr>asas<tr>sqd<tr></tr>s<tr>s</tr>sqd</tr>'), 14);
       assert.equal(parser.findOpeningTagPosition('<tr> qsjh k </tr><tr>start<tr> <tr> menu </tr><tr> bla </tr><tr> foot </tr></tr>   </tr>'), 17);
     });
-    it('should return -1 when the opening tag is not found', function () {
-      assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>'), -1);
-      assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>'), -1);
-      assert.equal(parser.findOpeningTagPosition('<p></p></p><p></p></p><br/>',22), -1);
-      assert.equal(parser.findOpeningTagPosition('</p><p><p><br/></p></p><br/>',4), -1);
+    it('should return 0 when the opening tag is not found', function () {
+      assert.equal(parser.findOpeningTagPosition('aasqdsqd</tr>'), 0);
+      assert.equal(parser.findOpeningTagPosition('aasas<tr></tr>sqdsqd</tr>'), 0);
+      assert.equal(parser.findOpeningTagPosition('<p></p></p><p></p></p><br/>',22), 0);
+      assert.equal(parser.findOpeningTagPosition('</p><p><p><br/></p></p><br/>',4), 0);
     });
     it('should accept a third parameter which indicates that the opening tag is before it.\
         It forces the algorithm to find the opening tag before this position', function () {
@@ -773,17 +790,13 @@ describe('parser', function () {
 
   describe('findPivot', function () {
     it('should return null if the pivot cannot be found', function () {
-      var _str = '';
-      helper.assert(parser.findPivot(_str), null);
-      _str = '</tr></tr></tr></tr>';
+      var _str = '</tr></tr></tr></tr>';
       helper.assert(parser.findPivot(_str), null);
       _str = '</tr>';
       helper.assert(parser.findPivot(_str), null);
       _str = '<tr><tr><tr>';
       helper.assert(parser.findPivot(_str), null);
       _str = '<tr><tr><tr></tr>';
-      helper.assert(parser.findPivot(_str), null);
-      _str = '<tr><tr><tr></tr></tr></tr>';
       helper.assert(parser.findPivot(_str), null);
       _str = '<tr><tr><tr></tr></tr></tr></tr>';
       helper.assert(parser.findPivot(_str), null);
@@ -868,13 +881,13 @@ describe('parser', function () {
       });
       _str = '<br/><br/><br/>';
       helper.assert(parser.findPivot(_str), {
-        part1End   : {tag : 'br', pos : 5, selfClosing : true},
-        part2Start : {tag : 'br', pos : 10, selfClosing : true}
+        part1End   : {tag : 'br', pos : 15, selfClosing : true},
+        part2Start : {tag : 'br', pos : 15, selfClosing : true}
       });
       _str = '<br/><br/><br/><br/>';
       helper.assert(parser.findPivot(_str), {
-        part1End   : {tag : 'br', pos : 5, selfClosing : true},
-        part2Start : {tag : 'br', pos : 15, selfClosing : true}
+        part1End   : {tag : 'br', pos : 20, selfClosing : true},
+        part2Start : {tag : 'br', pos : 20, selfClosing : true}
       });
       _str = '<br/>';
       helper.assert(parser.findPivot(_str), {
@@ -892,6 +905,18 @@ describe('parser', function () {
         part2Start : {tag : 'br', pos : 10, selfClosing : true}
       });
     });
+    it('should accept flat XML structure and return the last tag as the pivot', function () {
+      var _str = ' <tr></tr>';
+      helper.assert(parser.findPivot(_str), {
+        part1End   : {tag : 'tr', pos : 10, selfClosing : true},
+        part2Start : {tag : 'tr', pos : 10, selfClosing : true}
+      });
+      var _str = '<tr></tr> <i></i>';
+      helper.assert(parser.findPivot(_str), {
+        part1End   : {tag : 'i', pos : 17, selfClosing : true},
+        part2Start : {tag : 'i', pos : 17, selfClosing : true}
+      });
+    });
     it('should accept very complex case', function () {
       var _str = '<w:rPr><w:b/><w:b-cs/><w:color w:val="FFFFFF"/></w:rPr><w:t></w:t></w:r></w:p></w:tc></w:tr><w:tr wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidTr="00137A31"><w:trPr><w:trHeight w:val="1760"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="10012" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="auto"/></w:tcPr><w:p wsp:rsidR="00137A31" wsp:rsidRPr="00F62BCC" wsp:rsidRDefault="00137A31" wsp:rsidP="007057CC"><w:pPr><w:rPr><w:b/><w:b-cs/></w:rPr></w:pPr></w:p></w:tc></w:tr></w:tbl><w:p wsp:rsidR="00F62BCC" wsp:rsidRDefault="00F62BCC"><w:pPr><w:rPr><w:sz w:val="32"/></w:rPr></w:pPr></w:p><w:tbl><w:tblPr><w:tblpPr w:leftFromText="180" w:rightFromText="180" w:horzAnchor="page" w:tblpX="1009"/><w:tblW w:w="10081" w:type="dxa"/><w:tblBorders><w:top w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/><w:left w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/><w:bottom w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/><w:right w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/></w:tblBorders><w:tblLook w:val="04A0"/></w:tblPr><w:tblGrid><w:gridCol w:w="10081"/></w:tblGrid><w:tr wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidTr="00F62BCC"><w:trPr><w:trHeight w:val="98"/></w:trPr><w:tc><w:tcPr><w:tcW w:w="10081" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="4F81BD"/></w:tcPr><w:p wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidRDefault="00F62BCC" wsp:rsidP="007E678B"><w:pPr><w:rPr><w:b/><w:b-cs/><w:color w:val="FFFFFF"/></w:rPr></w:pPr><w:r wsp:rsidRPr="00F62BCC"><w:rPr><w:b/><w:b-cs/><w:color w:val="FFFFFF"/></w:rPr>';
       helper.assert(parser.findPivot(_str), {
@@ -899,13 +924,18 @@ describe('parser', function () {
         part2Start : {tag : 'w:tbl', pos : 593 }
       });
     });
-    /* it.skip('should accept non-XML structure', function(){
-      var _str = ' ';
+    it('should accept non-XML structure', function(){
+      var _str = '';
       helper.assert(parser.findPivot(_str), {
-        'part1End'  :{'tag':'', 'pos': 1 },
-        'part2Start':{'tag':'', 'pos': 1 }
+        part1End   : {tag : '', pos : 0, selfClosing : true},
+        part2Start : {tag : '', pos : 0, selfClosing : true}
       });
-    });*/
+      var _str = '  ,  ';
+      helper.assert(parser.findPivot(_str), {
+        part1End   : {tag : '', pos : 5, selfClosing : true},
+        part2Start : {tag : '', pos : 5, selfClosing : true}
+      });
+    });
   });
 
   describe('findRepetitionPosition', function () {
@@ -958,13 +988,13 @@ describe('parser', function () {
       var _expectedRange = {startEven : 7,  endEven : 53, startOdd : 53, endOdd : 105};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
-    it('should return -1 if the start tag is not found', function () {
+    it('should return 0 if the start tag is not found', function () {
       var _xml = 'qsjh k  qsd:blue color=test   menu <r/><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p>    balle </tr> dqd';
       var _pivot = {
         part1End   : {tag : 'tr', pos : 70 },
         part2Start : {tag : 'tr', pos : 70 }
       };
-      var _expectedRange = {startEven : -1,  endEven : 70, startOdd : 70, endOdd : 120};
+      var _expectedRange = {startEven : 0,  endEven : 70, startOdd : 70, endOdd : 120};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should accept a third parameter which indicates that the beginning of the repetition is before it', function () {
@@ -1034,6 +1064,16 @@ describe('parser', function () {
       var _roughStart = 24;
       helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
     });
+    it('should accept non-XML structure', function () {
+      var _xml = '  ,  ';
+      var _pivot = {
+        part1End   : {tag : '', pos : 5, selfClosing : true},
+        part2Start : {tag : '', pos : 5, selfClosing : true}
+      };
+      var _expectedRange = {startEven : 0,  endEven : 5, startOdd : 5, endOdd : 5};
+      var _roughStart = 0;
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
+    });
   });
   describe('Count char not in XML', function () {
     it('should find 0 (not between {})', function () {
@@ -1066,6 +1106,111 @@ describe('parser', function () {
       var _count = parser.countCharNotInXml(_xml, 0, _xml.length);
       helper.assert(_count, 8);
     });
+  });
+
+  describe('count formatter', function () {
+
+    describe('Preprocess', function () {
+
+      it('should assign loop id (without parenthesis)', function (done) {
+        var _xml = '<xml><p>{d.cars[i].brand:count}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _data = {
+          "cars" : [
+            {"brand" : "Lumeneo"},
+            {"brand" : "Tesla"  },
+            {"brand" : "Toyota" }
+          ]
+        };
+
+        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+          parser.preprocessMarkers(markers, [], function (err, markers) {
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)')
+            done();
+          });
+        });
+      });
+
+      it('should assign loop id (with parenthesis)', function (done) {
+        var _xml = '<xml><p>{d.cars[i].brand:count()}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _data = {
+          "cars" : [
+            {"brand" : "Lumeneo"},
+            {"brand" : "Tesla"  },
+            {"brand" : "Toyota" }
+          ]
+        };
+
+        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+          parser.preprocessMarkers(markers, [], function (err, markers) {
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)')
+            done();
+          });
+        });
+      });
+      it('should assign loop id (with start given)', function (done) {
+        var _xml = '<xml><p>{d.cars[i].brand:count(42)}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        var _data = {
+          "cars" : [
+            {"brand" : "Lumeneo"},
+            {"brand" : "Tesla"  },
+            {"brand" : "Toyota" }
+          ]
+        };
+
+        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+          parser.preprocessMarkers(markers, [], function (err, markers) {
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)')
+            done();
+          });
+        });
+      });
+
+      it('should assign loop id (with start given)', function (done) {
+        var _xml = '<xml> <t_row> {d[speed=100,i].brand:count} </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
+        var _data = [
+          {brand : 'Lumeneo'     , speed : 100},
+          {brand : 'Tesla motors', speed : 200},
+          {brand : 'Toyota'      , speed : 100}
+        ];
+
+        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+          parser.preprocessMarkers(markers, [], function (err, markers) {
+            //helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)')
+            done();
+          });
+        });
+      });
+
+    });
+
+
+    describe('Exec', function () {
+
+      it('should return __COUNT_0_0__ each time', function () {
+        helper.assert(count('', 0), '__COUNT_0_1__');
+        helper.assert(count('', 0), '__COUNT_0_1__');
+        helper.assert(count('', 0), '__COUNT_0_1__');
+      });
+
+      it('should return __COUNT_1337_42__ each time', function () {
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+      });
+
+      it('should return __COUNT_1337_42__ then __COUNT_42_1337__', function () {
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
+
+        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
+        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
+        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');        
+      });
+
+    });
+
+
   });
 
 });

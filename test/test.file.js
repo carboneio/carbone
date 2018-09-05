@@ -80,7 +80,7 @@ describe('file', function () {
         var _end = new Date();
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Unzip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' unzip tasks\n\n\n');
-        assert.equal((_elapsed < 6), true);
+        assert.equal((_elapsed < 7), true);
         done(); 
       }
     });

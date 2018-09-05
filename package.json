@@ -1,12 +1,12 @@
 {
   "name": "carbone",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "1.0.0",
+  "version": "1.1.1-ideolys",
   "private": true,
   "bin": "bin/carbone",
   "main": "./lib",
   "author": "David Grelaud",
-  "license": "Apache-2.0",
+  "license": "Ideolys",
   "homepage": "https://carbone.io",
   "keywords": [
     "report",
@@ -22,11 +22,12 @@
     "debug": "=2.6.8",
     "moment": "=2.18.1",
     "moxie-zip": "=0.0.3",
+    "timsort": "=0.3.0",
     "request": "^2.83.0",
     "yauzl": "=2.8.0"
   },
   "devDependencies": {
-    "mocha": ">=1.8.2",
+    "mocha": "=3.5.3",
     "should": "=11.1.2",
     "zipfile": "=0.5.11"
   },

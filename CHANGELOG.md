@@ -1,3 +1,7 @@
+### v1.1.1
+  - Release October 11, 2018
+  - Better Windows support by improving path detection for `soffice` and `python` across all operating platforms. Done by Robert Kawecki (@rkaw92).
+
 ### v1.1.0
   - Release February 26, 2018
   - Fix: should find markers even if there is a opening bracket `{` before the markers

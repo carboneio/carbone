@@ -1,4 +1,7 @@
 
+### v1.1.2-ideolys
+  - Fix crash when template is not correct
+
 ### v1.1.1-ideolys
   - Add fallback to basic sorting when timsort crashes
 

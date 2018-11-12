@@ -444,7 +444,7 @@ describe('Socket', function () {
       Socket.generateKeys(_publicFilename, _privateFilename, function (err) {
         helper.assert(err+'', 'null');
         helper.assert(/-----BEGIN CERTIFICATE-----/.test(fs.readFileSync(_publicFilename, 'utf8')), true); 
-        helper.assert(/-----BEGIN RSA PRIVATE KEY-----/.test(fs.readFileSync(_privateFilename, 'utf8')), true); 
+        helper.assert(/PRIVATE KEY/.test(fs.readFileSync(_privateFilename, 'utf8')), true); 
         fs.unlinkSync(_publicFilename); // remove key
         fs.unlinkSync(_privateFilename); // remove key
         done();

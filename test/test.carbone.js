@@ -784,7 +784,7 @@ describe('Carbone', function () {
         var bufPDF = new Buffer(buf.length);
         fs.open(_pdfResultPath, 'r', function (status, fd) {
           fs.read(fd, bufPDF, 0, buf.length, 0, function (err, bytesRead, buffer) {
-            assert.equal(buf.slice(0, 90).toString(), buffer.slice(0, 90).toString());
+            assert.equal(buf.slice(0, 50).toString(), buffer.slice(0, 50).toString());
             done();
           });
         });

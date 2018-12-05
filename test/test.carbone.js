@@ -9,6 +9,7 @@ var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
 var should = require('should'); // eslint-disable-line
 var spawn = require('child_process').spawn;
+var execSync = require('child_process').execSync;
 
 describe('Carbone', function () {
 
@@ -526,6 +527,20 @@ describe('Carbone', function () {
           assert.notEqual(_xmlExpectedContent.indexOf('field_2'), -1);
           done();
         });
+      });
+    });
+    it('should not leaks (leave file descriptor open) when rendering a report', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.docx');
+      carbone.render('test_word_render_A.docx', data, function (err, result) {
+        assert.equal(err, null);
+        // check memory leaks. On Windows, we should use replace lsof by 'handle -p pid' and 'listdlls -p pid' ?
+        var _result = execSync('lsof -p '+process.pid).toString();
+        assert.equal(/test_word_render_A\.docx/.test(_result), false);
+        done();
       });
     });
     it('should be fast to render a document without conversion', function (done) {

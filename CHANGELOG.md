@@ -1,3 +1,7 @@
+### v1.0.7-ideolys
+  - Fix memory leaks: one file descriptor remains opened
+  - Fix crash when template is not correct
+
 ### v1.0.6-ideolys
   - Use same engine as v1.0.5 but includes features of `v1.1.0-ideolys` and `v1.1.1-ideolys`:
     - Add fallback to basic sorting when timsort crashes

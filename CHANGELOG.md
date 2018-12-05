@@ -1,4 +1,7 @@
 
+### v1.1.3-ideolys
+  - Fix memory leaks: one file descriptor remains opened
+
 ### v1.1.2-ideolys
   - Fix crash when template is not correct
 

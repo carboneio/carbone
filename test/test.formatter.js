@@ -2,6 +2,7 @@ var dateFormatter = require('../formatters/date');
 var conditionFormatter = require('../formatters/condition');
 var stringFormatter = require('../formatters/string');
 var arrayFormatter = require('../formatters/array');
+var numberFormatter = require('../formatters/number');
 var helper = require('../lib/helper');
 
 describe('formatter', function () {
@@ -364,6 +365,32 @@ describe('formatter', function () {
       helper.assert(arrayFormatter.arrayMap(120), 120);
       helper.assert(arrayFormatter.arrayMap([]), '');
       helper.assert(arrayFormatter.arrayMap({}), {});
+    });
+  });
+
+  describe('numberFormatter', function () {
+    it('should format number with numeral', function () {
+      helper.assert(numberFormatter.format('1,000'), 1000);
+    });
+
+    it('should format number with numeral string formatter', function () {
+      helper.assert(numberFormatter.format('-104000', '0a'), '-104k');
+    });
+
+    it('should add number', function () {
+      helper.assert(numberFormatter.add('120', '67'), 187);
+    });
+
+    it('should substract number', function () {
+      helper.assert(numberFormatter.substract('120', '67'), 53);
+    });
+
+    it('should multiply number', function () {
+      helper.assert(numberFormatter.multiply('120', '67'), 8040);
+    });
+
+    it('should divide number', function () {
+      helper.assert(numberFormatter.divide('120', '80'), 1.5);
     });
   });
 });

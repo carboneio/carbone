@@ -1,3 +1,5 @@
+const numeral = require('numeral');
+
 module.exports = {
   /**
    * Converts a number to an INT
@@ -27,5 +29,47 @@ module.exports = {
    */
   toFR : function (d) {
     return (d + '').replace(/\./g, ',');
+  },
+  /**
+   * Binds number formatting system to Numeral
+   * @param {String} format String formatter
+   * @return {String} Formatted string
+   */
+  format : function (d, format) {
+    if (format)
+      return numeral(d).format(format);
+    return numeral(d).value();
+  },
+  /**
+   * Add two numbers
+   * @param {Number} value Value to add
+   * @return {Number} Result
+   */
+  add : function(d, value) {
+    return numeral(d).add(value).value();
+  },
+  /**
+   * Substract two numbers
+   * @param {Number} value Value to substract
+   * @return {Number} Result
+   */
+  substract : function (d, value) {
+    return numeral(d).subtract(value).value();
+  },
+  /**
+   * Multiply two numbers
+   * @param {Number} value Value to multiply
+   * @return {Number} Result
+   */
+  multiply : function (d, value) {
+    return numeral(d).multiply(value).value();
+  },
+  /**
+   * Divide two numbers
+   * @param {Number} value Value to divide
+   * @return {Number} Result
+   */
+  divide : function (d, value) {
+    return numeral(d).divide(value).value();
   }
 };

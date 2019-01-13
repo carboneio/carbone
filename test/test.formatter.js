@@ -2,6 +2,7 @@ var dateFormatter = require('../formatters/date');
 var conditionFormatter = require('../formatters/condition');
 var stringFormatter = require('../formatters/string');
 var arrayFormatter = require('../formatters/array');
+var numberFormatter = require('../formatters/number');
 var helper = require('../lib/helper');
 
 describe('formatter', function () {
@@ -17,6 +18,34 @@ describe('formatter', function () {
     it('should convert unix timestamp', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'en'}, 1318781876, 'X', 'LLLL'), 'Sunday, October 16, 2011 6:17 PM');
       helper.assert(dateFormatter.convDate.call({lang : 'fr'}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
+    });
+  });
+  describe('formatD', function () {
+    it('should accept use this.lang to set convert date', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '20101201', 'L', 'YYYYMMDD'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, '20101201', 'L', 'YYYYMMDD'), '01/12/2010');
+    });
+    it('should return null or undefined if value is null or undefined', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, undefined, 'L', 'YYYYMMDD'), undefined);
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, null, 'L',  'YYYYMMDD'), null);
+    });
+    it('should convert unix timestamp', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, 1318781876, 'LLLL', 'X'), 'Sunday, October 16, 2011 6:17 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, 1318781876, 'LLLL', 'X'), 'dimanche 16 octobre 2011 18:17');
+    });
+    it('should consider input format is ISO 8601 by default if not provided', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '2017-05-10T15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '1997-12-17 07:37:16-08', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
+    });
+    it('should accepts real locales', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en-GB'}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en-gb'}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en-US'}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr-CA'}, '20101201', 'L'), '2010-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr-FR'}, '20101201', 'L'), '01/12/2010');
     });
   });
   describe('convCRLF', function () {
@@ -299,9 +328,9 @@ describe('formatter', function () {
 
   describe('slice', function () {
     it('should keep only the selection', function () {
-      helper.assert(stringFormatter.slice("coucou", 0, 3), "cou");
-      helper.assert(stringFormatter.slice("coucou", 0, 0), "");
-      helper.assert(stringFormatter.slice("coucou", 3, 4), "c");
+      helper.assert(stringFormatter.slice('coucou', 0, 3), 'cou');
+      helper.assert(stringFormatter.slice('coucou', 0, 0), '');
+      helper.assert(stringFormatter.slice('coucou', 3, 4), 'c');
     });
     it('should not crash if data is null or undefined', function () {
       helper.assert(stringFormatter.slice(null, 0, 3), null);
@@ -364,6 +393,187 @@ describe('formatter', function () {
       helper.assert(arrayFormatter.arrayMap(120), 120);
       helper.assert(arrayFormatter.arrayMap([]), '');
       helper.assert(arrayFormatter.arrayMap({}), {});
+    });
+  });
+
+  describe('convCurr', function () {
+    it('should return the same value if the currency source is the same as the currency target', function () {
+      var _this = {currency : { source : 'EUR', target : 'EUR', rates : {EUR : 1, USD : 1.14, GBP : 0.89} }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10.1), 10.1);
+    });
+
+    it('should not crash if value or rate is null or undefined', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, null), 0);
+
+      _this = {currency : { source : null, target : null, rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10), 10);
+    });
+
+    it('should convert currency', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10.1), 11.514);
+
+      _this = {currency : { source : 'USD', target : 'EUR', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 11.514), 10.1);
+
+      _this = {currency : { source : 'GBP', target : 'EUR', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 100.4), 125.5);
+
+      _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 125.5), 143.07);
+
+      _this = {currency : { source : 'GBP', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 100.4), 143.07);
+    });
+
+    it('should accept to change target in the formatter', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10.1, 'GBP'), 8.08);
+    });
+
+    it('should accept to change source in the formatter', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 100.4, 'EUR', 'GBP'), 125.5);
+    });
+  });
+
+  describe('formatN', function () {
+    it('should format number according to the locale a percentage', function () {
+      var _this = {lang : 'fr'};
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1, 1), '10 000,1');
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1, '1'), '10 000,1');
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1), '10 000,100');
+      helper.assert(numberFormatter.formatN.call(_this, null, 1), null);
+      helper.assert(numberFormatter.formatN.call(_this, undefined, 1), undefined);
+      helper.assert(numberFormatter.formatN.call(_this, 10000.30202, 5), '10 000,30202');
+      helper.assert(numberFormatter.formatN.call(_this, -10000.30202, 5), '-10 000,30202');
+      helper.assert(numberFormatter.formatN.call(_this, -10000.30202, '5'), '-10 000,30202');
+      helper.assert(numberFormatter.formatN.call(_this, '-10000.30202', '5'), '-10 000,30202');
+
+      _this = {lang : 'en-gb'};
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1, 1), '10,000.1');
+      helper.assert(numberFormatter.formatN.call(_this, '10000000.1', 1), '10,000,000.1');
+    });
+
+    it.skip('should keep maximal precision if precision is not defined', function () {
+      var _this = {lang : 'fr'};    
+      helper.assert(numberFormatter.formatN.call(_this, 10000.12345566789), '10 000,12345566789');
+    });
+
+    it('should round number', function () {
+      var _this = {lang : 'fr'};
+      helper.assert(numberFormatter.formatN.call(_this, 222.1512, 2), '222,15');
+      helper.assert(numberFormatter.formatN.call(_this, 222.1552, 2), '222,16');
+
+      helper.assert(numberFormatter.formatN.call(_this, 1.005, 2), '1,01');
+      helper.assert(numberFormatter.formatN.call(_this, 1.005, 3), '1,005');
+
+      helper.assert(numberFormatter.formatN.call(_this, -1.005, 3), '-1,005');
+      helper.assert(numberFormatter.formatN.call(_this, -1.006, 2), '-1,01');
+    });
+  });
+
+  describe('round', function () {
+
+    it('should round number', function () {
+      var _this = {lang : 'fr'};
+      helper.assert(numberFormatter.round.call(_this, 222.1512, 2), 222.15);
+      helper.assert(numberFormatter.round.call(_this, 222.1552, 2), 222.16);
+
+      helper.assert(numberFormatter.round.call(_this, 1.005, 2), 1.01);
+      helper.assert(numberFormatter.round.call(_this, 1.005, 3), 1.005);
+
+      helper.assert(numberFormatter.round.call(_this, -1.005, 3), -1.005);
+      helper.assert(numberFormatter.round.call(_this, -1.006, 2), -1.01);
+      helper.assert(numberFormatter.round.call(_this, -1.005, 2), -1);
+    });
+  });
+
+  describe('formatC', function () {
+    it('should format number according to the locale, currencyTarget, and set automatically the precision', function () {
+      var _rates = {EUR : 1, USD : 1, GBP : 1};
+      var _this = {lang : 'en-us', currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1), '$10,000.10');
+
+      _this.currency.target = 'EUR';
+      helper.assert(numberFormatter.formatC.call(_this, 10000.155), '€10,000.16');
+
+      _this.lang = 'fr-fr';
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1), '10 000,10 €');
+      helper.assert(numberFormatter.formatC.call(_this, -10000.1), '-10 000,10 €');
+
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'M'), 'euros');
+
+      helper.assert(numberFormatter.formatC.call(_this, null, 1), null);
+      helper.assert(numberFormatter.formatC.call(_this, undefined, 1), undefined);
+    });
+
+    it('should change currency output format', function () {
+      var _rates = {EUR : 1, USD : 1, GBP : 1};
+      var _this = {lang : 'en-us', currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'M'), 'dollars');
+      helper.assert(numberFormatter.formatC.call(_this, 1, 'M'), 'dollar');
+      helper.assert(numberFormatter.formatC.call(_this, 10.15678, 5), '$10.15678');
+      helper.assert(numberFormatter.formatC.call(_this, 10.15678, 'LL'), '10.16 dollars');
+      _this.currency.target = 'EUR';
+      _this.lang = 'fr-fr';
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'M'), 'euros');
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'L'), '10 000,10 €');
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'LL'), '10 000,10 euros');
+      helper.assert(numberFormatter.formatC.call(_this, 1, 'LL'), '1,00 euro');
+    });
+
+    it('should convert currency automatically if target != source using rates', function () {
+      var _rates = {EUR : 1, USD : 2, GBP : 10};
+      var _this = {lang : 'en-us', currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1), '$20,000.20');
+      _this.currency.target = 'GBP';
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1), '£100,001.00');
+    });
+
+    it('should accept custom format', function () {
+      var _rates = {EUR : 1, USD : 1, GBP : 1};
+      var _this = {lang : 'fr-fr', currency : { source : 'EUR', target : 'EUR', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'M'), 'euros');
+      helper.assert(numberFormatter.formatC.call(_this, 1, 'M'), 'euro');
+    });
+
+    it('should be fast', function () {
+      var _rates = {EUR : 1, USD : 2, GBP : 10};
+      var _this = {lang : 'en-us', currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      var _loops = 10000;
+      var _res = [];
+      var _start = process.hrtime();
+      for (var i = 0; i < _loops; i++) {
+        _res.push(numberFormatter.formatC.call(_this, 10000.1));
+      }
+      var _diff = process.hrtime(_start);
+      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n formatC number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
+      helper.assert(_elapsed > 50, false, 'formatC is too slow');
+    });
+  });
+
+  describe('Number operations', function () {
+    it('should add number', function () {
+      helper.assert(numberFormatter.add('120', '67'), 187);
+    });
+
+    it('should substract number', function () {
+      helper.assert(numberFormatter.sub('120', '67'), 53);
+    });
+
+    it('should multiply number', function () {
+      helper.assert(numberFormatter.mul('120', '67'), 8040);
+    });
+
+    it('should divide number', function () {
+      helper.assert(numberFormatter.div('120', '80'), 1.5);
     });
   });
 });

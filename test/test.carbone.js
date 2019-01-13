@@ -492,6 +492,124 @@ describe('Carbone', function () {
         done();
       });
     });
+    describe('number formatters', function(done){
+      afterEach(function (done) {
+        carbone.reset();
+        done();
+      });
+      it('convCurr() and formatC() should convert from one currency to another according to rates passed in options', function (done) {
+        var data = {
+          value : 10
+        };
+        var options = {
+          currencyRates : { EUR : 1, USD : 2, GBP: 10 },
+          lang : 'en-GB'
+        };
+        carbone.renderXML('<xml>{d.value:convCurr(EUR, USD)}</xml>', data, options, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>5</xml>');
+          done();
+        });
+      });
+      it('convCurr() and formatC() should convert automatically to the currency of the locale (lang) if currencyTarget is empty', function (done) {
+        var data = {
+          value : 10
+        };
+        var options = {
+          currencySource : 'GBP',
+          currencyTarget : null, // depends on locale
+          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
+          lang : 'en-US'
+        };
+        carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>2</xml>');
+          options.currencyTarget = ''; // same thing with an empty string 
+          carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml>2</xml>');
+            options.lang = 'fr-FR';
+            carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>1</xml>');
+              done();
+            });
+          });
+        });
+      });
+      it('convCurr() and formatC() should take into account the locale (lang) if currencySource is not defined', function (done) {
+        var data = {
+          value : 10
+        };
+        var options = {
+          currencySource : null,
+          currencyTarget : null, // depends on locale
+          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
+          lang : 'en-GB'
+        };
+        // nothing happen if both are not defined
+        carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>10</xml>');
+          options.currencyTarget = 'USD';
+          carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml>2</xml>');
+            // We should still be able to force to another currency with the formatter
+            carbone.renderXML('<xml>{d.value:convCurr(EUR)}</xml>', data, options, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>1</xml>');
+              carbone.renderXML('<xml>{d.value:convCurr(EUR, USD)}</xml>', data, options, function (err, result) {
+                helper.assert(err+'', 'null');
+                helper.assert(result, '<xml>5</xml>');
+                done();
+              });
+            });
+          });
+        });
+      });
+      it('convCurr() and formatC() should takes into account global parameters first, then options in carbone.render', function (done) {
+        var data = {
+          value : 10
+        };
+        var customOptions = {};
+        var options = {
+          currencySource : 'GBP',
+          currencyTarget : null, // USD from locale
+          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
+          lang : 'en-US'
+        };
+        carbone.set(options);
+        carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>2</xml>');
+          options.currencyTarget = 'GBP';
+          carbone.set(options);
+          carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml>10</xml>');
+            options.currencyTarget = '';
+            carbone.set(options);
+            customOptions.currencyRates = { EUR : 1, USD : 3, GBP: 10 };
+            carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, customOptions, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>3</xml>');
+              customOptions.currencyTarget = 'EUR';
+              carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, customOptions, function (err, result) {
+                helper.assert(err+'', 'null');
+                helper.assert(result, '<xml>1</xml>');
+                customOptions.currencySource = 'EUR';
+                carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, customOptions, function (err, result) {
+                  helper.assert(err+'', 'null');
+                  helper.assert(result, '<xml>10</xml>');
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    })
   });
 
 

@@ -385,6 +385,27 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should not crash if the template is not correct', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row><td>{d[i].others[i].wheels[i].size } </td></t_row>'
+      +  '<t_row><td>{d[i].others[i].wheels[i].size }  {d[i].others[i+1].wheels[i].size }</td></t_row>'
+      +  '<t_row><td>{d[i].cars[i].wheels[i].size }  {d[i].cars[i+1].wheels[i+1].size }</td></t_row>'
+      +  '<t_row><td>{d[i+1].others[i+1].wheels[i].size } </td> </t_row>'
+      +'</xml>';
+    var _data = [{
+        cars : [
+          {wheels : [ {size : 'A'}, {size : 'B'}]}
+        ],
+        others : [
+          {wheels : [ {size : 'A'}, {size : 'B'}]}
+        ]
+      }
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      done();
+    });
+  });
   it.skip('should bi-directionnal loop', function (done) {
     var _xml =
        '<xml>'

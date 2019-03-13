@@ -174,6 +174,24 @@ function convCRLF (d) {
 // this formatter is separately to inject code
 convCRLF.canInjectXML = true;
 
+/**
+ * Slice a string with a begin and an end
+ * 
+ * @example ["foorbar", 0, 2]
+ * @example ["foo"]
+ * 
+ * @param {String} d
+ * @param {Integer} begin
+ * @param {Integer} end
+ * @return {String} return the formatted string
+ */
+function substr (d, begin, end) {
+  if (typeof d === 'string') {
+    return d.slice(begin, end);
+  }
+  return d;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -182,5 +200,6 @@ module.exports = {
   convEnum  : convEnum,
   convCRLF  : convCRLF,
   unaccent  : unaccent,
-  print     : print
+  print     : print,
+  substr    : substr
 };

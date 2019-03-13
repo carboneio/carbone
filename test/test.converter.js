@@ -150,7 +150,7 @@ describe('Converter', function () {
             var _buf = new Buffer(_results[i]);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           }
-          assert.equal((_elapsed < 200), true);
+          assert.equal((_elapsed < 350), true);
           done(); 
         }
       });
@@ -195,7 +195,7 @@ describe('Converter', function () {
             var _buf = new Buffer(_results[i]);
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           }
-          assert.equal((_elapsed < 200), true);
+          assert.equal((_elapsed < 400), true);
           done(); 
         }
       });

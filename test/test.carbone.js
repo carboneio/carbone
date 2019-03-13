@@ -9,6 +9,7 @@ var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
 var should = require('should'); // eslint-disable-line
 var spawn = require('child_process').spawn;
+var execSync = require('child_process').execSync;
 
 describe('Carbone', function () {
 
@@ -491,6 +492,124 @@ describe('Carbone', function () {
         done();
       });
     });
+    describe('number formatters', function(done){
+      afterEach(function (done) {
+        carbone.reset();
+        done();
+      });
+      it('convCurr() and formatC() should convert from one currency to another according to rates passed in options', function (done) {
+        var data = {
+          value : 10
+        };
+        var options = {
+          currencyRates : { EUR : 1, USD : 2, GBP: 10 },
+          lang : 'en-GB'
+        };
+        carbone.renderXML('<xml>{d.value:convCurr(EUR, USD)}</xml>', data, options, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>5</xml>');
+          done();
+        });
+      });
+      it('convCurr() and formatC() should convert automatically to the currency of the locale (lang) if currencyTarget is empty', function (done) {
+        var data = {
+          value : 10
+        };
+        var options = {
+          currencySource : 'GBP',
+          currencyTarget : null, // depends on locale
+          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
+          lang : 'en-US'
+        };
+        carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>2</xml>');
+          options.currencyTarget = ''; // same thing with an empty string 
+          carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml>2</xml>');
+            options.lang = 'fr-FR';
+            carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>1</xml>');
+              done();
+            });
+          });
+        });
+      });
+      it('convCurr() and formatC() should take into account the locale (lang) if currencySource is not defined', function (done) {
+        var data = {
+          value : 10
+        };
+        var options = {
+          currencySource : null,
+          currencyTarget : null, // depends on locale
+          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
+          lang : 'en-GB'
+        };
+        // nothing happen if both are not defined
+        carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>10</xml>');
+          options.currencyTarget = 'USD';
+          carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml>2</xml>');
+            // We should still be able to force to another currency with the formatter
+            carbone.renderXML('<xml>{d.value:convCurr(EUR)}</xml>', data, options, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>1</xml>');
+              carbone.renderXML('<xml>{d.value:convCurr(EUR, USD)}</xml>', data, options, function (err, result) {
+                helper.assert(err+'', 'null');
+                helper.assert(result, '<xml>5</xml>');
+                done();
+              });
+            });
+          });
+        });
+      });
+      it('convCurr() and formatC() should takes into account global parameters first, then options in carbone.render', function (done) {
+        var data = {
+          value : 10
+        };
+        var customOptions = {};
+        var options = {
+          currencySource : 'GBP',
+          currencyTarget : null, // USD from locale
+          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
+          lang : 'en-US'
+        };
+        carbone.set(options);
+        carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>2</xml>');
+          options.currencyTarget = 'GBP';
+          carbone.set(options);
+          carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml>10</xml>');
+            options.currencyTarget = '';
+            carbone.set(options);
+            customOptions.currencyRates = { EUR : 1, USD : 3, GBP: 10 };
+            carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, customOptions, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>3</xml>');
+              customOptions.currencyTarget = 'EUR';
+              carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, customOptions, function (err, result) {
+                helper.assert(err+'', 'null');
+                helper.assert(result, '<xml>1</xml>');
+                customOptions.currencySource = 'EUR';
+                carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, customOptions, function (err, result) {
+                  helper.assert(err+'', 'null');
+                  helper.assert(result, '<xml>10</xml>');
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+    })
   });
 
 
@@ -526,6 +645,20 @@ describe('Carbone', function () {
           assert.notEqual(_xmlExpectedContent.indexOf('field_2'), -1);
           done();
         });
+      });
+    });
+    it('should not leaks (leave file descriptor open) when rendering a report', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      path.resolve('temp', (new Date()).valueOf().toString() + (Math.floor((Math.random()*100)+1)) + '.docx');
+      carbone.render('test_word_render_A.docx', data, function (err, result) {
+        assert.equal(err, null);
+        // check memory leaks. On Windows, we should use replace lsof by 'handle -p pid' and 'listdlls -p pid' ?
+        var _result = execSync('lsof -p '+process.pid).toString();
+        assert.equal(/test_word_render_A\.docx/.test(_result), false);
+        done();
       });
     });
     it('should be fast to render a document without conversion', function (done) {
@@ -784,7 +917,7 @@ describe('Carbone', function () {
         var bufPDF = new Buffer(buf.length);
         fs.open(_pdfResultPath, 'r', function (status, fd) {
           fs.read(fd, bufPDF, 0, buf.length, 0, function (err, bytesRead, buffer) {
-            assert.equal(buf.slice(0, 90).toString(), buffer.slice(0, 90).toString());
+            assert.equal(buf.slice(0, 50).toString(), buffer.slice(0, 50).toString());
             done();
           });
         });

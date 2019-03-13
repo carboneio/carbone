@@ -1,3 +1,26 @@
+### v1.2.0
+  - Release March 13, 2019
+  - Add new formatters
+    - `convCurr(targetCurrency, sourceCurrency)` to convert from one currency to another
+    - `formatN()` format number according to the locale (lang). Examples:
+      - old `toFixed(2):toFR` can be replaced by `formatN(2)`
+    - `formatC()` format currency according to the locale and the currency
+      - old `toFixed(2)} {t(currency)}` can be replaced by `formatC(2)`
+    - `formatD()` format date according to the locale. Same as `convDate`, but consider parameters are swapped 
+      for consistency with formatN. Moreover, `patternIn` is ISO8601 by default.
+    - `convDate()` is deprecated
+    - `add(valueToAdd)`, `mul(valueToMultiply)`, `sub(valueToSubstract)`,`div(value)` : mathematical operations
+    - `substr(start, end)` : slice strings
+  - `carbone.set` and `carbone.render` have new options
+    - `currencySource` : default currency of source data. Ex 'EUR' 
+    - `currencyTarget` : default target currency when the formatter `convCurr` is used without target
+    - `currencyRates`  : rates, based on EUR { EUR : 1, USD : 1.14 }
+  - Fix memory leaks: one file descriptor remains opened
+  - Fix crash when template is not correct
+  - Add fallback to basic sorting when timsort crashes
+  - Bump debug and moment to fix vulnerabilities
+  - Remove Support of NodeJS 4
+
 ### v1.1.1
   - Release October 11, 2018
   - Better Windows support by improving path detection for `soffice` and `python` across all operating platforms. Done by Robert Kawecki (@rkaw92).

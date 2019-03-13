@@ -61,7 +61,7 @@ Carbone analyzes your template and inject data in the document. The generated do
 
 ## Minimum Requirements
 
-- NodeJS 4.x+
+- NodeJS 8.x+
 - Runs on OSX, Linux (servers and desktop), and coming soon on Windows
 
 #### Optional

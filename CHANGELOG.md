@@ -17,6 +17,7 @@
     - `currencyRates`  : rates, based on EUR { EUR : 1, USD : 1.14 }
   - Fix memory leaks: one file descriptor remains opened
   - Fix crash when template is not correct
+  - Now `option.lang` must use the i18n format 'fr-fr' instead of just 'fr'
   - Add fallback to basic sorting when timsort crashes
   - Bump debug and moment to fix vulnerabilities
   - Remove Support of NodeJS 4

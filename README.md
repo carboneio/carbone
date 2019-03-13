@@ -238,7 +238,7 @@ And now, you can use the converter, by passing options to render method.
 ```javascript
 {
   convertTo    : 'pdf', // String|Object, to convert the document (pdf, xlsx, docx, ods, csv, txt, ...)
-  lang         : 'en',  // String, output lang of the report
+  lang         : 'en-us', // String, output lang of the report
   complement   : {},  // Object|Array, extra data accessible in the template with {c.} instead of {d.}
   variableStr  : '{#def = d.id}', // String, predefined alias string, see designer's documentation
   reportName   : '{d.date}.odt', // String, dynamic file name, output in third argument of the callback
@@ -250,8 +250,8 @@ And now, you can use the converter, by passing options to render method.
     }
   },    
   translations : {  // Object, dynamically overwrite all loaded translations for this rendering
-    fr : {'one':'un' },
-    es : {'one':'uno'}
+    'fr-fr' : {'one':'un' },
+    'es-es' : {'one':'uno'}
   }
 }
 ```
@@ -300,10 +300,10 @@ Set general carbone parameters.
   {
     tempPath     : os.tmpdir(),  // String, system temp directory by default
     templatePath : process.cwd(), // String, default template path, and lang path
-    lang         : 'fr', // String, set default lang of carbone, can be overwrite by carbone.render options
+    lang         : 'fr-fr', // String, set default lang of carbone, can be overwrite by carbone.render options
     translations : {    // Object, in-memory loaded translations at startup. Can be overwritten here
-      fr : {'one':'un' },
-      es : {'one':'uno'}
+      'fr-fr' : {'one':'un' },
+      'es-es' : {'one':'uno'}
     },
     factories    : 1, // Number of LibreOffice worker 
     startFactory : false // If true, start LibreOffice worker immediately
@@ -314,7 +314,7 @@ Example:
 
 ```javascript
   carbone.set({
-    lang : 'en'
+    lang : 'en-us'
   });
 ```
 
@@ -331,7 +331,7 @@ You can add your own formatters, and overwrite default ones.
   carbone.addFormatters({
     // this formatter can be used in a template with {d.myBoolean:yesOrNo()}
     yesOrNo : function (data) { // data = d.myBoolean
-      if (this.lang === 'fr') {
+      if (this.lang === 'fr-fr') {
         return data === true ? 'oui' : 'non';
       }
       return data === true ? 'yes' : 'no';
@@ -368,7 +368,7 @@ Carbone loads translation files at startup if it finds a `lang` directory in the
 carbone translate --help
 
 # example: 
-carbone translate -l fr -p path/to/template_default_path
+carbone translate -l fr-fr -p path/to/template_default_path
 ```
 
 #### find

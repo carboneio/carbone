@@ -9,7 +9,7 @@ const currency = require('./_currency.js');
  *
  * `convCurr()`  without parameters converts automatically from `options.currencySource` to `options.currencyTarget`.
  *
- * @exampleContext {"currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } }}
+ * @exampleContext {"currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } } }
  * @example [10                  ]
  * @example [1000                ]
  * @example [1000, "EUR"         ]
@@ -124,17 +124,14 @@ function formatN (d, precision) {
  *  - L  : prints number with currency symbol (by default)
  *  - LL : prints number with Major currency name
  *
- * @exampleContext {"lang":"en-us"}
+ * @exampleContext {"lang":"en-us", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } } }
  * @example ["1000.456"        ]
  * @example ["1000.456", "M"   ]
  * @example ["1"       , "M"   ]
  * @example ["1000"    , "L"   ]
  * @example ["1000"    , "LL"  ]
  *
- * @exampleContext {"lang":"fr-fr"}
- * @example ["1000.456"    ]
- *
- * @exampleContext {"lang":"fr-fr", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } }}
+ * @exampleContext {"lang":"fr-fr", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } } }
  * @example ["1000.456"    ]
  *
  * @param  {Number} d                 Number to format
@@ -173,7 +170,7 @@ function formatC (d, precisionOrFormat) {
  * Add two numbers
  * 
  * @example [1000.4  , 2 ]
- * @example ['1000.4', '2' ]
+ * @example ["1000.4", "2" ]
  * 
  * @param {Number} value Value to add
  * @return {Number} Result
@@ -189,7 +186,7 @@ function add (d, value) {
  * Substract two numbers
  *
  * @example [1000.4  , 2 ]
- * @example ['1000.4', '2' ]
+ * @example ["1000.4", "2" ]
  * 
  * @param {Number} value Value to substract
  * @return {Number} Result
@@ -205,7 +202,7 @@ function sub (d, value) {
  * Multiply two numbers
  *
  * @example [1000.4  , 2 ]
- * @example ['1000.4', '2' ]
+ * @example ["1000.4", "2" ]
  * 
  * @param {Number} value Value to multiply
  * @return {Number} Result
@@ -221,7 +218,7 @@ function mul (d, value) {
  * Divide two numbers
  * 
  * @example [1000.4  , 2 ]
- * @example ['1000.4', '2' ]
+ * @example ["1000.4", "2" ]
  * 
  * @param {Number} value Value to divide
  * @return {Number} Result

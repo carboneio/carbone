@@ -46,7 +46,7 @@ function convDate (d, patternIn, patternOut) {
  *
  * @exampleContext {"lang":"fr"}
  * @example ["20160131", "dddd", "YYYYMMDD"]
- * @example [1410715640, "LLLL", "X", ]
+ * @example [1410715640, "LLLL", "X" ]
  * 
  * @param  {String|Number} d   date to format
  * @param  {String} patternOut output format

@@ -1,10 +1,10 @@
 var assert = require('assert');
 var carbone = require('../lib/index');
 var builder = require('../lib/builder');
+var parser = require('../lib/parser');
 var helper = require('../lib/helper');
 
 describe('builder', function () {
-
   describe('getFormatterString', function () {
     var _testedFormatters = {
       int        : function () {},

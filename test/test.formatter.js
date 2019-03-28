@@ -346,6 +346,10 @@ describe('formatter', function () {
       ];
       helper.assert(arrayFormatter.arrayMap(_datas), '2:car:toy, 3:plane:concept');
     });
+    it('should flatten each value of the array (only the first level, ignoring sub arrays, sub objects,...)', function () {
+      var _datas = ['car', 'plane', 'toy', 42];
+      helper.assert(arrayFormatter.arrayMap(_datas), 'car, plane, toy, 42');
+    });
     it('should change object and attribute separators', function () {
       var _datas = [
         {id : 2, name : 'car'  , type : 'toy'    , sub : {id : 3}},

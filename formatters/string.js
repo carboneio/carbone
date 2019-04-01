@@ -177,7 +177,7 @@ convCRLF.canInjectXML = true;
 /**
  * Slice a string with a begin and an end
  * 
- * @example ["foorbar", 0, 2]
+ * @example ["foorbar", 0, 3]
  * @example ["foo"]
  * 
  * @param {String} d

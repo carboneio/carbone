@@ -1,3 +1,5 @@
+var toMd5 = require('./md5');
+
 
 const LINEBREAK = {
   odt  : '<text:line-break/>',
@@ -192,6 +194,14 @@ function slice(d, begin, end) {
   return d;
 }
 
+function md5 (d) {
+  return toMd5(d);
+}
+
+function prepend (d, toPrepend) {
+  return toPrepend + d;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -201,5 +211,7 @@ module.exports = {
   convCRLF  : convCRLF,
   unaccent  : unaccent,
   print     : print,
-  slice     : slice
+  slice     : slice,
+  md5       : md5,
+  prepend   : prepend
 };

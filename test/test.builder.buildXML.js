@@ -317,6 +317,35 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('Should work if there is a marker in a tag', function (done) {
+    var _xml = '<xml><t_row bla={d.cars[i].brand}>  </t_row><t_row bla={d.cars [i+1].brand}>  </t_row></xml>';
+    var _data = {
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><t_row bla=Lumeneo>  </t_row><t_row bla=Tesla motors>  </t_row><t_row bla=Toyota>  </t_row></xml>');
+      done();
+    });
+  });
+  it.skip('Should work if there is a marker in a tag', function (done) {
+    var _xml = '<xml>{d.cars[i].brand}<t_row>coucou</t_row>{d.cars[i+1].brand}</xml>';
+    var _data = {
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><t_row bla=Lumeneo>  </t_row><t_row bla=Tesla motors>  </t_row><t_row bla=Toyota>  </t_row></xml>');
+      done();
+    });
+  });
+  
   it('should detect repetition even if there is only one self-closing tag between the two parts (with whitespaces)', function (done) {
     var _xml = '<xml><p><p><br/></p></p>{d[i].brand}  <br/>{d[i+1].brand}  <br/></xml>';
     var _data = [
@@ -1451,6 +1480,26 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(_xmlBuilt, '<xml><tr> test </tr></xml>');
+      done();
+    });
+  });
+  it('should replace rId by md5 hash with id prepend', function (done) {
+    var formatters = require('../formatters/string.js');
+    var _xml = '<Relationships>{d.<Relationship Id="{d.dog:md5:prepend(id)}" Target="{d.dog}"/>toto}</Relationships>';
+    var _expect = '<Relationships>toto<Relationship Id="id319f27934db5dd8f03070e75989ca667" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg"/></Relationships>';
+    var _options = {
+      formatters : {
+        md5 : formatters.md5,
+        prepend : formatters.prepend
+      }
+    }
+    var _data = {
+      dog : "https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg",
+      toto: "toto"
+    };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      console.log(_xmlBuilt)
+      assert.equal(_xmlBuilt, _expect)
       done();
     });
   });

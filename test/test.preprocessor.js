@@ -2,7 +2,7 @@ var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
 var dynpics = require('../lib/dynpics');
 
-describe('preprocessor', function() {
+describe.only('preprocessor', function() {
   describe('color', function() {
     describe('simple replace', function() {
       it('Should replace a color in style tag', function(done) {
@@ -330,7 +330,7 @@ describe('preprocessor', function() {
             done();
           });
         });
-        it('should consider each embedded document separately', function(done) {
+        it.only('should consider each embedded document separately', function(done) {
           var _report = {
             isZipped: true,
             filename: 'template.docx',

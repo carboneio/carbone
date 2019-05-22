@@ -2,7 +2,7 @@ var postprocessor = require('../lib/postprocessor');
 var helper = require('../lib/helper');
 var dynpics = require('../lib/dynpics');
 
-describe.skip('postprocessor', function () {
+describe.only('postprocessor', function () {
 	describe('Dynamic pictures', function () {
 		describe('ODT', function () {
 			describe('Public links (can takes time to request pictures)', function () {

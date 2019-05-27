@@ -20,10 +20,11 @@
   ],
   "dependencies": {
     "debug": "=2.6.8",
+    "image-size": "^0.7.4",
     "moment": "=2.18.1",
     "moxie-zip": "=0.0.3",
-    "timsort": "=0.3.0",
     "request": "^2.83.0",
+    "timsort": "=0.3.0",
     "yauzl": "=2.8.0"
   },
   "devDependencies": {

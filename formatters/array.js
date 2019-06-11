@@ -27,7 +27,8 @@ function arrayJoin (d, separator) {
 }
 
 /**
- * Flatten an array of objects?
+ * Flatten an array of objects
+ * 
  * It ignores nested objects and arrays
  *
  * @example [ [{"id":2, "name":"homer"}, {"id":3, "name":"bart"} ]                    ]
@@ -68,6 +69,9 @@ function arrayMap (d, objSeparator, attributeSeparator) {
           var _att = arguments[j];
           _flatObj.push(_obj[_att]);
         }
+      }
+      else if (_obj instanceof Object === false) {
+        _flatObj.push(_obj)
       }
       // else, loop on all attributes and print each one if it is not an object
       else {

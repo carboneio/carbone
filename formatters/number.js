@@ -9,7 +9,7 @@ const currency = require('./_currency.js');
  *
  * `convCurr()`  without parameters converts automatically from `options.currencySource` to `options.currencyTarget`.
  *
- * @exampleContext {"currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } } }
+ * @exampleContext {"currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 }} }
  * @example [10                  ]
  * @example [1000                ]
  * @example [1000, "EUR"         ]
@@ -38,10 +38,11 @@ function convCurr (d, target, source) {
  *
  * Same as toFixed(2) but it rounds number correclty `round(1.05, 1) = 1.1` 
  *
- * Source: https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
+ * @example [10.05123  , 2  ]
+ * @example [1.05      , 1  ]
  * 
- * @param  {Number} num   number
- * @param  {Number} precision precision
+ * @param  {Number} num       number
+ * @param  {Number} precision number of decimal
  * @return {Number}   
  */
 function round (num, precision) {
@@ -73,8 +74,9 @@ function round (num, precision) {
  *   - https://jsperf.com/number-formatting-with-commas/5
  *   - https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
  * 
+ * @private
  * @param  {Number} value      
- * @param  {Object} format  
+ * @param  {Number} value      
  * @param  {Number} precision  
  * @return {String} 
  */
@@ -114,29 +116,31 @@ function formatN (d, precision) {
  *
  * When `options.lang === 'fr-FR'` the `currencySource` and `currencyTarget` equals by default `EUR`.
  *
- * If the formatter `convCurr() is used before, formatC prints the corresponding target currency used in `convCurr()`.
+ * If the formatter `convCurr()` is used before, formatC prints the corresponding target currency used in `convCurr()`.
  *
  * By default, it prints with the currency symbol only, but you can use other output formats:
  * 
- * `precisionOrFormat` can be
- *  - Integer : change default precision of the currency 
- *  - M  : print Major currency name without the number
- *  - L  : prints number with currency symbol (by default)
- *  - LL : prints number with Major currency name
- *
- * @exampleContext {"lang":"en-us", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } } }
+ * @exampleContext {"lang":"en-us", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 }} }
  * @example ["1000.456"        ]
  * @example ["1000.456", "M"   ]
  * @example ["1"       , "M"   ]
  * @example ["1000"    , "L"   ]
  * @example ["1000"    , "LL"  ]
  *
- * @exampleContext {"lang":"fr-fr", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } } }
+ * @exampleContext {"lang":"fr-fr", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 }} }
+ * @example ["1000.456"    ]
+ *
+ * @exampleContext {"lang":"fr-fr", "currency": { "source":"EUR", "target":"EUR", "rates": { "EUR":1, "USD":2 }} }
  * @example ["1000.456"    ]
  *
  * @param  {Number} d                 Number to format
- * @param  {Number} precisionOrFormat [optional] Number of decimal, or specific format
+ * @param  {Number} precisionOrFormat [optional] Number of decimal, or specific format <br>
+ *                                      - Integer : change default precision of the currency
+ *                                      - M  : print Major currency name without the number
+ *                                      - L  : prints number with currency symbol (by default)
+ *                                      - LL : prints number with Major currency name
  * @return {String}                   return converted values
+ *
  */
 function formatC (d, precisionOrFormat) {
   if (d !== null && typeof d !== 'undefined') {
@@ -169,7 +173,7 @@ function formatC (d, precisionOrFormat) {
 /**
  * Add two numbers
  * 
- * @example [1000.4  , 2 ]
+ * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
  * 
  * @param {Number} value Value to add
@@ -185,7 +189,7 @@ function add (d, value) {
 /**
  * Substract two numbers
  *
- * @example [1000.4  , 2 ]
+ * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
  * 
  * @param {Number} value Value to substract
@@ -201,7 +205,7 @@ function sub (d, value) {
 /**
  * Multiply two numbers
  *
- * @example [1000.4  , 2 ]
+ * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
  * 
  * @param {Number} value Value to multiply
@@ -217,8 +221,8 @@ function mul (d, value) {
 /**
  * Divide two numbers
  * 
- * @example [1000.4  , 2 ]
- * @example ["1000.4", "2" ]
+ * @example [1000.4   ,  2  ]
+ * @example ["1000.4" , "2" ]
  * 
  * @param {Number} value Value to divide
  * @return {Number} Result
@@ -242,7 +246,7 @@ module.exports = {
 
   /**
    * Converts a number to an INT
-   * DEPRECTAED 
+   * @deprecated
    * 
    * @return {Number}
    */
@@ -252,7 +256,7 @@ module.exports = {
   
   /**
    * Converts a number with English specifications (decimal separator is '.')
-   * DEPRECTAED
+   * @deprecated
    * 
    * @return {String}
    */
@@ -262,7 +266,7 @@ module.exports = {
 
   /**
    * Converts a number into string, keeping only <nb> decimals
-   * DEPRECTAED
+   * @deprecated
    * 
    * @param  {Number} nb
    * @return {String}
@@ -273,7 +277,7 @@ module.exports = {
 
   /**
    * Converts a number with French specifications (decimal separator is ',')
-   * DEPRECTAED
+   * @deprecated
    * 
    * @return {String}
    */

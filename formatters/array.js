@@ -27,7 +27,8 @@ function arrayJoin (d, separator) {
 }
 
 /**
- * Flatten an array of objects?
+ * Flatten an array of objects
+ * 
  * It ignores nested objects and arrays
  *
  * @example [ [{"id":2, "name":"homer"}, {"id":3, "name":"bart"} ]                    ]

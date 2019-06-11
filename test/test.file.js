@@ -155,6 +155,37 @@ describe('file', function () {
         });
       });
     });
+    it('should catch exception when file data is not bufferable and keep valid files', function (done) {
+      file.buildFile({
+        isZipped : true,
+        files    : [
+          {
+            name : 'test',
+            data : null
+          },
+          {
+            name : 'test2',
+            data : 'bonjour'
+          }
+        ]
+      }, (err, data) => {
+        assert.equal(err, null);
+        assert.equal(data.constructor, Buffer);
+
+        fs.mkdirSync(testPath, parseInt('0755', 8));
+        var _zipFilePath = path.join(testPath, 'file.zip');
+        var _unzipFilePath = path.join(testPath, 'unzip0');
+        fs.writeFileSync(_zipFilePath, data);
+        unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
+          var _expected = {
+            test2 : 'bonjour'
+          };
+
+          assert.equal(JSON.stringify(result), JSON.stringify(_expected));
+          done();
+        });
+      });
+    });
     it('should be fast to zip', function (done) {
       var _files = [
         {name : 'my_file.xml'            , data : new Buffer(generateRandomText(9000),'utf8')},

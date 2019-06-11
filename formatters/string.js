@@ -177,12 +177,14 @@ convCRLF.canInjectXML = true;
 /**
  * Slice a string with a begin and an end
  * 
- * @example ["foorbar", 0, 2]
- * @example ["foo"]
+ * @example ["foobar" , 0  , 3 ]
+ * @example ["foobar" , 1      ]
+ * @example ["foobar" , -2     ]
+ * @example ["foobar" , 2  , -1]
  * 
  * @param {String} d
- * @param {Integer} begin
- * @param {Integer} end
+ * @param {Integer} begin Zero-based index at which to begin extraction.
+ * @param {Integer} end Zero-based index before which to end extraction
  * @return {String} return the formatted string
  */
 function substr (d, begin, end) {

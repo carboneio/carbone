@@ -421,8 +421,8 @@ We already know that beneficiaries will be, at least :heart:
 
 Help is welcome!
 
-  - manage dynamic images
-  - manage dynamic colors
+  - manage dynamic images : Beta available only on SaaS version
+  - manage dynamic colors : Available only on SaaS version
   - manage dynamic charts
   - improve error output
   - improve xslx support

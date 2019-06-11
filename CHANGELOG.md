@@ -1,3 +1,7 @@
+### v1.2.1
+  - Release June 11, 2019
+  - Fix `arrayMap()` if used with an array of strings or integer
+
 ### v1.2.0
   - Release March 13, 2019
   - Add new formatters

@@ -96,7 +96,8 @@ describe('Converter', function () {
         var bufPDF = new Buffer(_buf.length);
         fs.open(_pdfResultPath, 'r', function (status, fd) {
           fs.read(fd, bufPDF, 0, _buf.length, 0, function (err, bytesRead, buffer) {
-            assert.equal(_buf.slice(0, 70).toString(), buffer.slice(0, 70).toString());
+            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            assert.equal(_buf.slice(8, 70).toString(), buffer.slice(8, 70).toString());
             done();
           });
         });

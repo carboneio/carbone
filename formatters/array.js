@@ -70,6 +70,9 @@ function arrayMap (d, objSeparator, attributeSeparator) {
           _flatObj.push(_obj[_att]);
         }
       }
+      else if (_obj instanceof Object === false) {
+        _flatObj.push(_obj)
+      }
       // else, loop on all attributes and print each one if it is not an object
       else {
         for (var _attr in _obj) {

@@ -1,4 +1,7 @@
 
+### v1.2.1-ideolys
+  - Fix `arrayMap()` if used with an array of strings or integer
+
 ### v1.2.0-ideolys
   - Add new formatters
     - `convCurr(targetCurrency, sourceCurrency)` to convert from one currency to another

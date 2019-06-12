@@ -189,7 +189,7 @@ convCRLF.canInjectXML = true;
  * @param {Integer} end Zero-based index before which to end extraction
  * @return {String} return the formatted string
  */
-function slice(d, begin, end) {
+function substr(d, begin, end) {
   if (typeof d === 'string') {
     return d.slice(begin, end);
   }
@@ -213,7 +213,8 @@ module.exports = {
   convCRLF  : convCRLF,
   unaccent  : unaccent,
   print     : print,
-  slice     : slice,
+  substr    : substr,
+  slice     : substr,
   md5       : md5,
   prepend   : prepend
 };

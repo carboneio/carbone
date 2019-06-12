@@ -326,15 +326,15 @@ describe('formatter', function () {
     });
   });
 
-  describe('slice', function () {
+  describe('substr', function () {
     it('should keep only the selection', function () {
-      helper.assert(stringFormatter.slice('coucou', 0, 3), 'cou');
-      helper.assert(stringFormatter.slice('coucou', 0, 0), '');
-      helper.assert(stringFormatter.slice('coucou', 3, 4), 'c');
+      helper.assert(stringFormatter.substr('coucou', 0, 3), 'cou');
+      helper.assert(stringFormatter.substr('coucou', 0, 0), '');
+      helper.assert(stringFormatter.substr('coucou', 3, 4), 'c');
     });
     it('should not crash if data is null or undefined', function () {
-      helper.assert(stringFormatter.slice(null, 0, 3), null);
-      helper.assert(stringFormatter.slice(undefined, 0, 3), undefined);
+      helper.assert(stringFormatter.substr(null, 0, 3), null);
+      helper.assert(stringFormatter.substr(undefined, 0, 3), undefined);
     });
   });
 

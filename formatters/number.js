@@ -73,6 +73,7 @@ function round (num, precision) {
  *   - https://jsperf.com/number-formatting-with-commas/5
  *   - https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
  * 
+ * @private
  * @param  {Number} value      
  * @param  {Object} format  
  * @param  {Number} precision  
@@ -116,13 +117,13 @@ function formatN (d, precision) {
  *
  * If the formatter `convCurr() is used before, formatC prints the corresponding target currency used in `convCurr()`.
  *
- * By default, it prints with the currency symbol only, but you can use other output formats:
- * 
  * `precisionOrFormat` can be
  *  - Integer : change default precision of the currency 
  *  - M  : print Major currency name without the number
  *  - L  : prints number with currency symbol (by default)
  *  - LL : prints number with Major currency name
+ * 
+ * By default, it prints with the currency symbol only.
  *
  * @exampleContext {"lang":"en-us", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 } } }
  * @example ["1000.456"        ]
@@ -242,7 +243,7 @@ module.exports = {
 
   /**
    * Converts a number to an INT
-   * DEPRECTAED 
+   * @deprecated 
    * 
    * @return {Number}
    */
@@ -252,7 +253,7 @@ module.exports = {
   
   /**
    * Converts a number with English specifications (decimal separator is '.')
-   * DEPRECTAED
+   * @deprecated
    * 
    * @return {String}
    */
@@ -262,7 +263,7 @@ module.exports = {
 
   /**
    * Converts a number into string, keeping only <nb> decimals
-   * DEPRECTAED
+   * @deprecated
    * 
    * @param  {Number} nb
    * @return {String}
@@ -273,7 +274,7 @@ module.exports = {
 
   /**
    * Converts a number with French specifications (decimal separator is ',')
-   * DEPRECTAED
+   * @deprecated
    * 
    * @return {String}
    */

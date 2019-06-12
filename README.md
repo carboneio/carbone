@@ -262,6 +262,12 @@ And now, you can use the converter, by passing options to render method.
   translations : {  // Object, dynamically overwrite all loaded translations for this rendering
     fr : {'one':'un' },
     es : {'one':'uno'}
+  },
+  currencySource : 'EUR', // String, currency of your JSON data, used by the formatter formatC
+  currencyTarget : 'USD', // String, target currency for conversions direclty in your report
+  currencyRates  : {      // Object, currency exchange rates for conversions from currencySource to currencyTarget
+    EUR : 1,
+    USD : 1.1403
   }
 }
 ```
@@ -314,6 +320,12 @@ Set general carbone parameters.
     translations : {    // Object, in-memory loaded translations at startup. Can be overwritten here
       fr : {'one':'un' },
       es : {'one':'uno'}
+    },
+    currencySource : 'EUR', // String, default currency of your JSON data, used by the formatter formatC
+    currencyTarget : 'USD', // String, default target currency for conversions direclty in your report
+    currencyRates  : {      // Object, default currency exchange rates for conversions from currencySource to currencyTarget
+      EUR : 1,
+      USD : 1.1403
     },
     factories    : 1, // Number of LibreOffice worker 
     startFactory : false // If true, start LibreOffice worker immediately

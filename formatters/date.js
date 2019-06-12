@@ -4,6 +4,7 @@ var moment = require('moment');
 /**
  * Format dates
  * 
+ * @deprecated
  * @exampleContext {"lang":"en"}
  * @example ["20160131", "YYYYMMDD", "L"]
  * @example ["20160131", "YYYYMMDD", "LL"]

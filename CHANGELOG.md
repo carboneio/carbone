@@ -1,3 +1,6 @@
+### v1.2.1-ideolys
+  - Fix `arrayMap()` if used with an array of strings or integer
+  - Fix: Do not crash when file to zip cannot be buffered with `Buffer`, just skip the file instead.
 
 ### v1.2.0-ideolys
   - Add new formatters

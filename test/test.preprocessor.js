@@ -272,7 +272,7 @@ describe('preprocessor', function() {
       var _sheetBefore2 = _sheetBefore.replace('{d.id}', '{d.type}');
       var _sheetAfter2 = _sheetAfter.replace('{d.id}', '{d.type}');
       helper.assert(_sheetAfter2 !== _sheetAfter, true);
-      describe.skip('execute', function() {
+      describe('execute', function() {
         it('should replace shared string by inline strings in a real xlsx file. The shared string should be removed', function(done) {
           var _report = {
             isZipped: true,

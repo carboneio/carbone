@@ -2,7 +2,7 @@ var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
 var dynpics = require('../lib/dynpics');
 
-describe.only('preprocessor', function() {
+describe('preprocessor', function() {
   describe('color', function() {
     describe('simple replace', function() {
       it('Should replace a color in style tag', function(done) {
@@ -625,7 +625,7 @@ describe.only('preprocessor', function() {
         });
       });
     });
-    describe.only('Dynamic pictures preprocessing ODT ONLY', function () {
+    describe('Dynamic pictures preprocessing ODT ONLY', function () {
 
       it('should do nothing (no picture)', function () {
         var xml = '<xml></xml>';

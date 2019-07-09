@@ -4,7 +4,7 @@ var dynpics = require('../lib/dynpics');
 var fs = require('fs');
 var path = require('path');
 
-describe.only('postprocessor', function () {
+describe('postprocessor', function () {
   describe('Dynamic pictures', function () {
     describe('ODT', function () {
       describe('Public links (can takes time to request pictures)', function () {

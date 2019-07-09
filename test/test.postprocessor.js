@@ -4,7 +4,7 @@ var dynpics = require('../lib/dynpics');
 var fs = require('fs');
 var path = require('path');
 
-describe('postprocessor', function () {
+describe.only('postprocessor', function () {
   describe('Dynamic pictures', function () {
     describe('ODT', function () {
       describe('Public links (can takes time to request pictures)', function () {
@@ -29,6 +29,10 @@ describe('postprocessor', function () {
               data: xmlContent
             },
             {
+              name: 'styles.xml',
+              data: xmlContent
+            },
+            {
               name: 'META-INF/manifest.xml',
               data: manifest
             }
@@ -45,6 +49,10 @@ describe('postprocessor', function () {
               data: expectedXmlContent
             },
             {
+              name: 'styles.xml',
+              data: expectedXmlContent
+            },
+            {
               name: 'META-INF/manifest.xml',
               data: expectedManifest
             }
@@ -54,6 +62,13 @@ describe('postprocessor', function () {
         it('should replace dynpics links by embedded pictures', function (done) {
           postprocessor.embedOdtPictures(report, {}, {}, function (err, result) {
             helper.assert(dynpics.getTemplate(result, 'content.xml'), dynpics.getTemplate(expectedReport, 'content.xml'));
+            done();
+          });
+        });
+
+        it('should replace dynpics links by embedded pictures (in styles.xml)', function (done) {
+          postprocessor.embedOdtPictures(report, {}, {}, function (err, result) {
+            helper.assert(dynpics.getTemplate(result, 'styles.xml'), dynpics.getTemplate(expectedReport, 'styles.xml'));
             done();
           });
         });

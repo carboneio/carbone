@@ -2,7 +2,7 @@ var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
 var dynpics = require('../lib/dynpics');
 
-describe('preprocessor', function() {
+describe.only('preprocessor', function() {
   describe('color', function() {
     describe('simple replace', function() {
       it('Should replace a color in style tag', function(done) {
@@ -272,7 +272,7 @@ describe('preprocessor', function() {
       var _sheetBefore2 = _sheetBefore.replace('{d.id}', '{d.type}');
       var _sheetAfter2 = _sheetAfter.replace('{d.id}', '{d.type}');
       helper.assert(_sheetAfter2 !== _sheetAfter, true);
-      describe('execute', function() {
+      describe.skip('execute', function() {
         it('should replace shared string by inline strings in a real xlsx file. The shared string should be removed', function(done) {
           var _report = {
             isZipped: true,
@@ -625,7 +625,7 @@ describe('preprocessor', function() {
         });
       });
     });
-    describe('Dynamic pictures preprocessing ODT ONLY', function () {
+    describe.only('Dynamic pictures preprocessing ODT ONLY', function () {
 
       it('should do nothing (no picture)', function () {
         var xml = '<xml></xml>';
@@ -639,7 +639,7 @@ describe('preprocessor', function() {
             { name : 'content.xml'    , parent : '', data : xml }
           ]
         };
-        dynpics.manageDocx(report, function (error, result) {
+        dynpics.manageOdt(report, function (error, result) {
           helper.assert(result, expectedReport);
         });
       });
@@ -666,6 +666,21 @@ describe('preprocessor', function() {
           var report = {
             files      : [
               { name : 'content.xml'    , parent : '', data : xml }
+            ]
+          };
+          dynpics.manageOdt(report, function (err, report) {
+            helper.assert(report.files[0].data, expected);
+            done();
+          });
+        });
+
+        it('should replace pictures link by alt text marker (in styles file)', function (done) {
+          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
+          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var report = {
+            files      : [
+              { name : 'styles.xml' , parent : '', data : xml },
+              { name : 'content.xml', parent : '', data : ''  }
             ]
           };
           dynpics.manageOdt(report, function (err, report) {

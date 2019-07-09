@@ -1454,6 +1454,72 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should resolve dynamic keys in leaf using variables', function (done) {
+    var _xml = '<xml> {#style = d.style}{d.company.names.$$style} </xml>';
+    var _data = {
+      style: 'short',
+      company: {
+        names: { short: 'Snakeoil', full: 'Snakeoil Systems GmbH' }
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml> Snakeoil </xml>');
+      done();
+    });
+  });
+  it('should resolve dynamic keys in node using variables', function (done) {
+    var _xml = '<xml> Payer name: {#payerParty = d.payer}{d.companies.$$payerParty.name} </xml>';
+    var _data = {
+      payer: 'seller',
+      companies: {
+        buyer: { name: 'General Store' },
+        seller: { name: 'ACME' }
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml> Payer name: ACME </xml>');
+      done();
+    });
+  });
+  it('should resolve values of empty dynamic keys as if the key name was undefined', function (done) {
+    var _xml = '<xml> {#style = d.style}{d.company.names.$$style} </xml>';
+    var _data = {
+      // NOTE: we don't provide "style"
+      company: {
+        names: { short: 'Snakeoil', full: 'Snakeoil Systems GmbH' }
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml>  </xml>');
+      done();
+    });
+  });
+  it('should follow normal value resolution rules when object is undefined', function (done) {
+    var _xml = '<xml> Payer name: {#payerParty = d.payer}{d.companies.$$payerParty.name} </xml>';
+    var _data = {
+      payer: 'nobody-today-is-tax-free-day',
+      companies: {
+        buyer: { name: 'General Store' },
+        seller: { name: 'ACME' }
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml> Payer name:  </xml>');
+      done();
+    });
+  });
+  it('should only resolve known variables to allow using verbatim keys with two dollar signs', function (done) {
+    var _xml = '<xml> {d.products.$$saver} </xml>';
+    var _data = {
+      products: {
+        $$saver: 'save 10% today'
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml> save 10% today </xml>');
+      done();
+    });
+  });
   /* it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [

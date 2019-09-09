@@ -10,9 +10,9 @@
 const ean13 = (arg) =>{
   var _first; // first number used to defined the type of numbers from A or B
   var _barcode = ''; // final result
-  var _checksum = 0; // result calcul pour la clef de controle
   var _tableA; // Boolean used to define the table A or B
-  var _controlKey; // last digit computed
+  // var _checksum = 0; // result calcul pour la clef de controle
+  // var _controlKey; // last digit computed
 
   /**
    * Allow only a string of numbers
@@ -30,26 +30,28 @@ const ean13 = (arg) =>{
     return '';
   }
 
+  // DISABLED => SOME BARCODE ARE BEGINING WITH 000000
   /**
    * Check if the barcode control key is valid
    * Calcul of the control key
    */
-  _checksum = 0;
-  for (let j = 1; j <= 12 ; j += 2) {
-    _checksum += parseInt(arg[j]);
-  }
-  _checksum *= 3;
-  for (let i = 0; i < 12 ; i += 2) {
-    _checksum +=  parseInt(arg[i]);
-  }
-  _controlKey = 10 - _checksum % 10;
+  // _checksum = 0;
+  // for (let j = 1; j <= 12 ; j += 2) {
+  //   _checksum += parseInt(arg[j]);
+  // }
+  // _checksum *= 3;
+  // for (let i = 0; i < 12 ; i += 2) {
+  //   _checksum +=  parseInt(arg[i]);
+  // }
+  // _controlKey = 10 - _checksum % 10;
+
   /**
    * Check result of the control key
    */
-  if (parseInt(arg[arg.length - 1]) !== _controlKey) {
-    // console.error('Barcode ean13 not valid!', 'Actual last digit = ' + arg[arg.length - 1], 'expected = ' + _controlKey);
-    return '';
-  }
+  // if (parseInt(arg[arg.length - 1]) !== _controlKey) {
+  //   console.error('Barcode ean13 not valid!', 'Actual last digit = ' + arg[arg.length - 1], 'expected = ' + _controlKey);
+  //   return '';
+  // }
 
   /**
    * If everything ok, start translate the ean13code to ean13.tff string.

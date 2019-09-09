@@ -10,8 +10,8 @@
 const ean8 = (arg) => {
 
   let _barcode = '';
-  let _checksum = 0;
-  let _controlKey = 0;
+  // let _checksum = 0;
+  // let _controlKey = 0;
 
   /**
    * Allow only a string of numbers
@@ -29,26 +29,27 @@ const ean8 = (arg) => {
     return '';
   }
 
+  // DISABLED => SOME BARCODE ARE BEGINING WITH 000000
   /**
    * Check if the barcode control key is valid
    * Calcul of the control key
    */
-  _checksum = 0;
-  for (let i = 0; i < 7 ; i += 2) {
-    _checksum +=  parseInt(arg[i]);
-  }
-  _checksum *= 3;
-  for (let j = 1; j < 6 ; j += 2) {
-    _checksum += parseInt(arg[j]);
-  }
-  _controlKey = 10 - _checksum % 10;
+  // _checksum = 0;
+  // for (let i = 0; i < 7 ; i += 2) {
+  //   _checksum +=  parseInt(arg[i]);
+  // }
+  // _checksum *= 3;
+  // for (let j = 1; j < 6 ; j += 2) {
+  //   _checksum += parseInt(arg[j]);
+  // }
+  // _controlKey = 10 - _checksum % 10;
   /**
    * Check result of the control key
    */
-  if (parseInt(arg[arg.length - 1]) !== _controlKey) {
-    // console.error('Barcode ean8 not valid!', 'Actual last digit = ' + arg[arg.length - 1], 'expected = ' + _controlKey);
-    return '';
-  }
+  // if (parseInt(arg[arg.length - 1]) !== _controlKey) {
+  //   console.error('Barcode ean8 not valid!', 'Actual last digit = ' + arg[arg.length - 1], 'expected = ' + _controlKey);
+  //   return '';
+  // }
 
   /**
    * Define the first digits

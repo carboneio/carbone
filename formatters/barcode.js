@@ -2,16 +2,18 @@ const ean13 = require('./barcode_ean13.js');
 const ean8 = require('./barcode_ean8.js');
 
 /**
- * @description Translate an ean barcode to EAN13.TTF font code.
+ * Translate a ean13/ean8 barcode to EAN13.TTF font code.
  *
- * @example ("8056459824973", "ean13")
- * @example ("9780201134476", "ean13")
- * @example ("35967101", "ean8")
- * @example ("96385074", "ean8")
+ * You have to apply the font `EAN13.ttf` to your text in order to display the barcode.
  *
- * @param {string} data codebar numbers
- * @param {string} args codebar format
- * @returns {string} translated to EAN13.TTF font code or empty string
+ * @example ["8056459824973", "ean13"]
+ * @example ["9780201134476", "ean13"]
+ * @example ["35967101", "ean8"      ]
+ * @example ["96385074", "ean8"      ]
+ *
+ * @param   {String} data Barcode numbers
+ * @param   {String} args Barcode format: ean13 or ean8
+ * @returns {S tring} translated  to EAN13.TTF font code or empty string
  */
 const barcode = (data, args) => {
   var _fc;

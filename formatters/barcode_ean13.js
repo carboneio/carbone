@@ -7,7 +7,7 @@
  * @param {string} arg 13 numbers ean13 codebar
  * @returns {string} translated code for EAN13.TTF font
  */
-const ean13 = (arg) =>{
+const _ean13 = (arg) =>{
   var _first; // first number used to defined the type of numbers from A or B
   var _barcode = ''; // final result
   var _tableA; // Boolean used to define the table A or B
@@ -123,4 +123,4 @@ const ean13 = (arg) =>{
   return _barcode;
 };
 
-module.exports = ean13;
+module.exports = _ean13;

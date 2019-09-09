@@ -7,7 +7,7 @@
  * @param {string} arg 8 numbers ean8 codebar
  * @returns {string} translated to EAN13.TTF font code
  */
-const ean8 = (arg) => {
+const _ean8 = (arg) => {
 
   let _barcode = '';
   // let _checksum = 0;
@@ -83,4 +83,4 @@ const ean8 = (arg) => {
   return _barcode;
 };
 
-module.exports = ean8;
+module.exports = _ean8;

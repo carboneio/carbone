@@ -3,6 +3,7 @@ var conditionFormatter = require('../formatters/condition');
 var stringFormatter = require('../formatters/string');
 var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
+const barcodeFormatter = require('../formatters/barcode');
 var helper = require('../lib/helper');
 
 describe('formatter', function () {
@@ -81,7 +82,7 @@ describe('formatter', function () {
       var _context = {};
       helper.assert(callWithContext(conditionFormatter.ifEmpty, _context, 0           , 'msgIfEmpty'), 0);
       helper.assert(_context.stopPropagation, false);
-       
+
       var _date = new Date();
       helper.assert(callWithContext(conditionFormatter.ifEmpty, _context, _date       , 'msgIfEmpty'), _date);
       helper.assert(_context.stopPropagation, false);
@@ -465,7 +466,7 @@ describe('formatter', function () {
     });
 
     it.skip('should keep maximal precision if precision is not defined', function () {
-      var _this = {lang : 'fr'};    
+      var _this = {lang : 'fr'};
       helper.assert(numberFormatter.formatN.call(_this, 10000.12345566789), '10 000,12345566789');
     });
 
@@ -580,12 +581,53 @@ describe('formatter', function () {
       helper.assert(numberFormatter.div('120', '80'), 1.5);
     });
   });
+
+  describe('EAN Barcodes', function () {
+
+    it('should return an empty string with a undefined barcode format', () => {
+      helper.assert(barcodeFormatter.barcode('fweffewfweq'), '');
+    });
+
+    it('should format the ean13 barcode to EAN13.TTF code (ean13 format)', () => {
+      helper.assert(barcodeFormatter.barcode('9780201134476', 'ean13'), '9HSKCKB*bdeehg+');
+      helper.assert(barcodeFormatter.barcode('8056459824973', 'ean13'), '8APGOPJ*icejhd+');
+    });
+
+    it('should return an empty string with a string of letters (ean13 format)', () => {
+      helper.assert(barcodeFormatter.barcode('fweffewfweq', 'ean13'), '');
+    });
+
+    it('should return an empty string with less than 13 numbers (ean13 format)', () => {
+      helper.assert(barcodeFormatter.barcode('805645982497', 'ean13'), '');
+    });
+
+    it('should return an empty string with a false barecode control key (ean13 format)', () => {
+      helper.assert(barcodeFormatter.barcode('8056459824972', 'ean13'), '');
+    });
+
+    it('should format the ean8 barcode to EAN13.TTF code (ean8 format)',  () => {
+      helper.assert(barcodeFormatter.barcode('96385074', 'ean8'), ':JGDI*fahe+');
+      helper.assert(barcodeFormatter.barcode('35967101', 'ean8'), ':DFJG*hbab+');
+    });
+
+    it('should return an empty string with a string of letters (ean8 format)', () => {
+      helper.assert(barcodeFormatter.barcode('fweffewfweq', 'ean8'), '');
+    });
+
+    it('should return an empty string with less than 8 numbers (ean8 format)', () => {
+      helper.assert(barcodeFormatter.barcode('8056', 'ean8'), '');
+    });
+
+    it('should return an empty string with a false barecode control key (ean8 format)', () => {
+      helper.assert(barcodeFormatter.barcode('35967100', 'ean8'), '');
+    });
+  });
 });
 
 /**
- * Call a formatter, passing `context` object as `this` 
+ * Call a formatter, passing `context` object as `this`
  * @param  {Function} func    formatter to call
- * @param  {Object} context   object 
+ * @param  {Object} context   object
  * @return {Mixed}            [description]
  */
 function callWithContext (func, context) {

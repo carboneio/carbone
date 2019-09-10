@@ -1,13 +1,15 @@
+
 /**
- * @description Translate an ean13 barcode to EAN13.TTF font code.
- *
- * @example "8056459824973"
- * @example "9780201134476"
- *
- * @param {string} arg 13 numbers ean13 codebar
- * @returns {string} translated code for EAN13.TTF font
+  * Translate an ean13 barcode to EAN13.TTF font code. Called only from the barcode formatter.
+  *
+  * @example [ "8056459824973" ,  "ean13" ]
+  * @example [ "9780201134476" ,  "ean13" ]
+  *
+  * @param {string} arg 13 numbers ean13 codebar
+  * @returns {string} translated code for EAN13.TTF font
  */
 const _ean13 = (arg) =>{
+
   var _first; // first number used to defined the type of numbers from A or B
   var _barcode = ''; // final result
   var _tableA; // Boolean used to define the table A or B

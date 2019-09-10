@@ -1,14 +1,13 @@
 /**
- * @description Translate an ean8 barcode to EAN13.TTF font code.
+ * Translate an ean8 barcode to EAN13.TTF font code. Called only from the barcode formatter.
  *
- * @example "35967101"
- * @example "96385074"
+ * @example [ "35967101"      ,  "ean8"  ]
+ * @example [ "96385074"      ,  "ean8"  ]
  *
  * @param {string} arg 8 numbers ean8 codebar
  * @returns {string} translated to EAN13.TTF font code
  */
 const _ean8 = (arg) => {
-
   let _barcode = '';
   // let _checksum = 0;
   // let _controlKey = 0;

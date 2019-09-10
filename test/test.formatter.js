@@ -582,7 +582,7 @@ describe('formatter', function () {
     });
   });
 
-  describe('EAN Barcodes', function () {
+  describe('Barcodes', function () {
 
     it('should return an empty string with a undefined barcode format', () => {
       helper.assert(barcodeFormatter.barcode('fweffewfweq'), '');
@@ -621,6 +621,20 @@ describe('formatter', function () {
     // it('should return an empty string with a false barecode control key (ean8 format)', () => {
     //   helper.assert(barcodeFormatter.barcode('35967100', 'ean8'), '');
     // });
+
+    it('should format the code39 barcode to CODE39.TTF code (code39 format)',  () => {
+      helper.assert(barcodeFormatter.barcode('GSJ-220097', 'code39'), '*GSJ-220097*');
+      helper.assert(barcodeFormatter.barcode('96385074', 'code39'), '*96385074*');
+      helper.assert(barcodeFormatter.barcode('ASDFGHJKLZXCVBNQWERTYUIOP-.$/+% ', 'code39'), '*ASDFGHJKLZXCVBNQWERTYUIOP-.$/+% *');
+    });
+
+    it('should return an empty string with a wrong character (code39 format)', () => {
+      helper.assert(barcodeFormatter.barcode('80a56', 'code39'), '');
+      helper.assert(barcodeFormatter.barcode('w8056', 'code39'), '');
+      helper.assert(barcodeFormatter.barcode('8056,', 'code39'), '');
+      helper.assert(barcodeFormatter.barcode('', 'code39'), '');
+      helper.assert(barcodeFormatter.barcode(null, 'code39'), '');
+    });
   });
 });
 

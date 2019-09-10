@@ -5,7 +5,7 @@ const code39 = require('./barcode_code39.js');
 /**
  * Translate a barcode to specific font code.
  *
- * You have to apply the font `EAN13.ttf` to your text in order to display the barcode.
+ * You have to apply the barecode font to your text in order to display the barcode.
  *
  * @example [ "8056459824973" ,  "ean13"   ]
  * @example [ "9780201134476" ,  "ean13"   ]

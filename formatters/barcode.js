@@ -15,7 +15,7 @@ const code39 = require('./barcode_code39.js');
  * @example [ "ASDFGH-.$/+% " ,  "code39"  ]
  *
  * @param   {String} data Barcode numbers
- * @param   {String} type Barcode type: `ean13` or `ean8`
+ * @param   {String} type Barcode type: `ean13`, `ean8` or `code39`
  * @returns {String}      translated  to EAN13.TTF font code or empty string
  */
 const barcode = (data, type) => {

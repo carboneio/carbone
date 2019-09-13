@@ -51,7 +51,7 @@ Carbone.io
 
 Carbone is a mustache-like template engine `{d.companyName}`.
 
-Template language documentation : https://carbone.io/designer-documentation.html
+Template language documentation : https://carbone.io/documentation.html
 
 - The template can be any XML-document coming from LibreOffice™ or Microsoft Office™  (ods, docx, odt, xslx...)
 - The injected data must be a JSON object or array, coming directly from your existing APIs for example
@@ -321,7 +321,7 @@ Example:
 
 #### addFormatters(customFormatters)
 
-Carbone comes with [embedded formatters](https://carbone.io/designer-documentation.html#formatters)
+Carbone comes with [embedded formatters](https://carbone.io/documentation.html#formatters)
 
 You can add your own formatters, and overwrite default ones.
 
@@ -358,7 +358,7 @@ For convenience, install carbone globally
 
 #### translate
 
-With this command, Carbone parses all your templates, find [translation markers](https://carbone.io/designer-documentation.html#translations) like `{t(movie)}`, and updates JSON translation files accordingly.
+With this command, Carbone parses all your templates, find [translation markers](https://carbone.io/documentation.html#translations) like `{t(movie)}`, and updates JSON translation files accordingly.
 
 It creates automatically a `lang` directory with all translation files, one per lang. It never loses already translated sentences.
 
@@ -384,7 +384,7 @@ It searches among all reports in the current working directory and its subdirect
 
 ## Performance
 
-Report generation speed, using a basic one-page DOCX template:
+Report generation speed (without network latency), using a basic one-page DOCX template:
 
   - ~ `10 ms / report` without document conversion (analyzing, injection, rendering)
   - ~ `50 ms / report` with a PDF conversion (100 loops, 3 LibreOffice workers, without cold-start)
@@ -407,9 +407,7 @@ We want to follow the model of Gitlab. **The free version must be and must stay 
 
 > Our ultimate goal
 
-We will give 3% percent of our hosted solution revenues to charity in three domains: technology, people and resources.
-
-Stay tuned, best contributors could choose where a part of these 3% goes!
+2% percent of our hosted solution revenues will go to charity in three domains: open source software we love, education and environment.
 
 We already know that beneficiaries will be, at least :heart:
 - LibreOffice foundation
@@ -421,8 +419,8 @@ We already know that beneficiaries will be, at least :heart:
 
 Help is welcome!
 
-  - manage dynamic images : Beta available only on SaaS version
-  - manage dynamic colors : Available only on SaaS version
+  - manage dynamic images : Available only on Hosted version Carbone Render
+  - manage dynamic colors : Available only on Hosted version Carbone Render
   - manage dynamic charts
   - improve error output
   - improve xslx support

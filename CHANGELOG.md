@@ -1,4 +1,10 @@
 
+### v1.3.0-ideolys
+  - Add new formatters to manage barcode:
+    - `barcode(ean8)` : translate an ean8 barcode to EAN13.TTF font code
+    - `barcode(ean13)` : translate an ean13 barcode to EAN13.TTF font code
+    - `barcode(code39)` : translate a code39 barcode to CODE39.TTF font code
+
 ### v1.2.1-ideolys
   - Fix `arrayMap()` if used with an array of strings or integer
 

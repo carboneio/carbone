@@ -99,7 +99,7 @@ describe('Carbone', function () {
     });
   });
 
-  
+
   describe('addFormatters', function () {
     it('should add a formatter to the list of custom formatters', function () {
       carbone.addFormatters({
@@ -109,6 +109,59 @@ describe('Carbone', function () {
       });
       assert.notEqual(typeof carbone.formatters.yesOrNo, 'undefined');
       assert.equal(carbone.formatters.yesOrNo(true), 'yes');
+    });
+  });
+
+  describe('barcode Formatter', function () {
+
+    it('should return an empty string with a wrong parameter', function (done) {
+      var _xml = '<xml> {d.ean13code:barcode(\'ean1\')} </xml>';
+      var _data = { ean13code : '9780201134476' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should return an empty string with a false ean13 barcode', function (done) {
+      var _xml = '<xml> {d.ean13code:barcode(\'ean13\')} </xml>';
+      var _data = { ean13code : '978020113447' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should return an empty string with a false ean8 barcode', function (done) {
+      var _xml = '<xml> {d.ean8code:barcode(\'ean8\')} </xml>';
+      var _data = { ean8code : '978020' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should format the ean13 barcode to EAN13.ttf code font', function (done) {
+      var _xml = '<xml> {d.ean13code1:barcode(\'ean13\')} {d.ean13code2:barcode(\'ean13\')} </xml>';
+      var _data = { ean13code1 : '9780201134476', ean13code2 : '2001000076727' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> 9HSKCKB*bdeehg+ 2AALKAK*ahghch+ </xml>');
+        done();
+      });
+    });
+
+    it('should format the ean8 barcode to EAN13.ttf code font', function (done) {
+      var _xml = '<xml> {d.ean8code1:barcode(\'ean8\')} {d.ean8code2:barcode(\'ean8\')} </xml>';
+      var _data = { ean8code1 : '35967101', ean8code2 : '96385074'};
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> :DFJG*hbab+ :JGDI*fahe+ </xml>');
+        done();
+      });
     });
   });
 
@@ -524,7 +577,7 @@ describe('Carbone', function () {
         carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml>2</xml>');
-          options.currencyTarget = ''; // same thing with an empty string 
+          options.currencyTarget = ''; // same thing with an empty string
           carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
             helper.assert(err+'', 'null');
             helper.assert(result, '<xml>2</xml>');
@@ -688,7 +741,7 @@ describe('Carbone', function () {
           assert.equal((_buf.slice(0, 2).toString() === 'PK'), true);
         }
         assert.equal((_elapsed < 200), true);
-        done(); 
+        done();
       }
     });
     it('should render a template (doc XML 2003) and give result with replacements', function (done) {
@@ -986,7 +1039,7 @@ describe('Carbone', function () {
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           }
           // assert.equal((_elapsed < 200), true);
-          done(); 
+          done();
         }
       });
     });

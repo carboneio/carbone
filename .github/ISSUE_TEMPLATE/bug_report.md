@@ -3,7 +3,7 @@ name: Bug report
 about: Create a report to help us improve Carbone. Any issues not created using this
   form will be closed immediately. Search the repo and ensure your issue doesn't already
   exist.
-title: "[BUG REPORT] - "
+title: "[Bug Report]: "
 labels: ''
 assignees: ''
 

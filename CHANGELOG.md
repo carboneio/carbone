@@ -1,4 +1,6 @@
 
+### v1.4.0-ideolys
+
 ### v1.3.0-ideolys
   - Add new formatters to manage barcode:
     - `barcode(ean8)` : translate an ean8 barcode to EAN13.TTF font code

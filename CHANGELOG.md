@@ -1,6 +1,17 @@
+
+  - Fix: Do not crash when file to zip cannot be buffered with `Buffer`, just skip the file instead.
+
+### v1.4.0-ideolys
+  - Fix file conversion errors by checking the input and output file type
+
+### v1.3.0-ideolys
+  - Add new formatters to manage barcode:
+    - `barcode(ean8)` : translate an ean8 barcode to EAN13.TTF font code
+    - `barcode(ean13)` : translate an ean13 barcode to EAN13.TTF font code
+    - `barcode(code39)` : translate a code39 barcode to CODE39.TTF font code
+
 ### v1.2.1-ideolys
   - Fix `arrayMap()` if used with an array of strings or integer
-  - Fix: Do not crash when file to zip cannot be buffered with `Buffer`, just skip the file instead.
 
 ### v1.2.0-ideolys
   - Add new formatters
@@ -9,11 +20,11 @@
       - old `toFixed(2):toFR` can be replaced by `formatN(2)`
     - `formatC()` format currency according to the locale and the currency
       - old `toFixed(2)} {t(currency)}` can be replaced by `formatC(2)`
-    - `formatD()` format date according to the locale. Same as `convDate`, but consider parameters are swapped 
+    - `formatD()` format date according to the locale. Same as `convDate`, but consider parameters are swapped
       for consistency with formatN. Moreover, `patternIn` is ISO8601 by default.
     - `convDate()` is deprecated
   - `carbone.set` and `carbone.render` have new options
-    - `currencySource` : default currency of source data. Ex 'EUR' 
+    - `currencySource` : default currency of source data. Ex 'EUR'
     - `currencyTarget` : default target currency when the formatter `convCurr` is used without target
     - `currencyRates`  : rates, based on EUR { EUR : 1, USD : 1.14 }
 
@@ -30,7 +41,7 @@
   - Release January 25, 2018
   - add formatter `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
   - Formatters which have the property `canInjectXML = true` can inject XML in documents
-  - Return an error in render callback when LibreOffice is not detected 
+  - Return an error in render callback when LibreOffice is not detected
   - Fix a lot of bugs when using a filter without iterators in arrays `{d.cities[i=0].temperature}`
   - Get the last object of an array using negative values when filtering with `i` iterator
     - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
@@ -44,13 +55,13 @@
 ### v1.0.4-ideolys
   - Release January 10, 2018
   - Fix: markers were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...
-  
+
 ### v1.0.3-ideolys
   - Release December 15, 2017
   - Add new formatters
     - `unaccent()` to remove accent from string
     - `count()` to print a counter in loops. Usage: `{d[i].name:count()}`
-  - accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}` 
+  - accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}`
   - carbone.set do not overwrite user-defined translations
   - some optimization : gain x10 when sorting 1 Million of rows
   - It loads all lang at startup, and it is able to change lang at runtime
@@ -94,7 +105,7 @@
 
 ### v0.13.0
   - Release February 20, 2017
-  - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays: 
+  - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays:
     - `{d.cities[i, temp=20]..countryName}` prints `d.countryName` only when the temperature of cities equals 20
   - Built-in conditional formatters, which starts by `if`, stop propagation to next formatters if the condition is true
   - New formatters:
@@ -104,10 +115,10 @@
     - `print(d, message)`: print message
   - New function `carbone.renderXML(xmlString, data, options, callback)` to render XML directly
   - Change the lang dynamically in `carbone.render` and `carbone.renderXML` with `options.lang = 'fr'`. The date formatter is automatically propagated on formatters such as `convDate`
-  - Replace module zipfile by yauzl: faster, lighter, asynchrone 
+  - Replace module zipfile by yauzl: faster, lighter, asynchrone
   - XLSX templates are accepted (beta)
   - Parse embedded XLSX and DOCX documents
-  - Add a tool to search a text within a marker in all reports `carbone find :formatterName` 
+  - Add a tool to search a text within a marker in all reports `carbone find :formatterName`
 
 
 ### v0.12.5
@@ -117,7 +128,7 @@
   - Fix: in formatters `convert`, `format`, `addDays`, `parse`: if the date is null or undefined these formatters return null or undefined instead of "Invalid Date"
 
 ### v0.12.4
-  - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions` 
+  - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions`
 
 ### v0.12.3
   - Fix: on OSX, the LibreOffice 5.2 path has changed

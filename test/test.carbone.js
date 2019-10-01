@@ -99,7 +99,7 @@ describe('Carbone', function () {
     });
   });
 
-  
+
   describe('addFormatters', function () {
     it('should add a formatter to the list of custom formatters', function () {
       carbone.addFormatters({
@@ -109,6 +109,59 @@ describe('Carbone', function () {
       });
       assert.notEqual(typeof carbone.formatters.yesOrNo, 'undefined');
       assert.equal(carbone.formatters.yesOrNo(true), 'yes');
+    });
+  });
+
+  describe('barcode Formatter', function () {
+
+    it('should return an empty string with a wrong parameter', function (done) {
+      var _xml = '<xml> {d.ean13code:barcode(\'ean1\')} </xml>';
+      var _data = { ean13code : '9780201134476' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should return an empty string with a false ean13 barcode', function (done) {
+      var _xml = '<xml> {d.ean13code:barcode(\'ean13\')} </xml>';
+      var _data = { ean13code : '978020113447' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should return an empty string with a false ean8 barcode', function (done) {
+      var _xml = '<xml> {d.ean8code:barcode(\'ean8\')} </xml>';
+      var _data = { ean8code : '978020' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should format the ean13 barcode to EAN13.ttf code font', function (done) {
+      var _xml = '<xml> {d.ean13code1:barcode(\'ean13\')} {d.ean13code2:barcode(\'ean13\')} </xml>';
+      var _data = { ean13code1 : '9780201134476', ean13code2 : '2001000076727' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> 9HSKCKB*bdeehg+ 2AALKAK*ahghch+ </xml>');
+        done();
+      });
+    });
+
+    it('should format the ean8 barcode to EAN13.ttf code font', function (done) {
+      var _xml = '<xml> {d.ean8code1:barcode(\'ean8\')} {d.ean8code2:barcode(\'ean8\')} </xml>';
+      var _data = { ean8code1 : '35967101', ean8code2 : '96385074'};
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> :DFJG*hbab+ :JGDI*fahe+ </xml>');
+        done();
+      });
     });
   });
 
@@ -252,7 +305,7 @@ describe('Carbone', function () {
         empty : -1
       };
       carbone.renderXML(
-          '<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>'
+        '<xml>{d.param:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</xml>'
         + '<tr>{d.type:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</tr>'
         + '<td>{d.other:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</td>'
         + '<td>{d.empty:ifEqual(2, \'two\'):ifEqual(3, \'three\'):ifEqual(1, \'one\'):print(\'unknown\')}</td>', data, function (err, result) {
@@ -452,9 +505,9 @@ describe('Carbone', function () {
           site : {label : 'site_B'},
           cars : [{
             wheels : [
-                {tire : {brand : 'mich'}},
-                {tire : {brand : 'uni' }},
-                {tire : {brand : 'cont'}}
+              {tire : {brand : 'mich'}},
+              {tire : {brand : 'uni' }},
+              {tire : {brand : 'cont'}}
             ]
           }
           ],
@@ -492,7 +545,7 @@ describe('Carbone', function () {
         done();
       });
     });
-    describe('number formatters', function(done){
+    describe('number formatters', function (done) {
       afterEach(function (done) {
         carbone.reset();
         done();
@@ -502,8 +555,8 @@ describe('Carbone', function () {
           value : 10
         };
         var options = {
-          currencyRates : { EUR : 1, USD : 2, GBP: 10 },
-          lang : 'en-GB'
+          currencyRates : { EUR : 1, USD : 2, GBP : 10 },
+          lang          : 'en-GB'
         };
         carbone.renderXML('<xml>{d.value:convCurr(EUR, USD)}</xml>', data, options, function (err, result) {
           helper.assert(err+'', 'null');
@@ -518,13 +571,13 @@ describe('Carbone', function () {
         var options = {
           currencySource : 'GBP',
           currencyTarget : null, // depends on locale
-          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
-          lang : 'en-US'
+          currencyRates  : { EUR : 1, USD : 2, GBP : 10 },
+          lang           : 'en-US'
         };
         carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml>2</xml>');
-          options.currencyTarget = ''; // same thing with an empty string 
+          options.currencyTarget = ''; // same thing with an empty string
           carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
             helper.assert(err+'', 'null');
             helper.assert(result, '<xml>2</xml>');
@@ -544,8 +597,8 @@ describe('Carbone', function () {
         var options = {
           currencySource : null,
           currencyTarget : null, // depends on locale
-          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
-          lang : 'en-GB'
+          currencyRates  : { EUR : 1, USD : 2, GBP : 10 },
+          lang           : 'en-GB'
         };
         // nothing happen if both are not defined
         carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, options, function (err, result) {
@@ -576,8 +629,8 @@ describe('Carbone', function () {
         var options = {
           currencySource : 'GBP',
           currencyTarget : null, // USD from locale
-          currencyRates  : { EUR : 1, USD : 2, GBP: 10 },
-          lang : 'en-US'
+          currencyRates  : { EUR : 1, USD : 2, GBP : 10 },
+          lang           : 'en-US'
         };
         carbone.set(options);
         carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, function (err, result) {
@@ -590,7 +643,7 @@ describe('Carbone', function () {
             helper.assert(result, '<xml>10</xml>');
             options.currencyTarget = '';
             carbone.set(options);
-            customOptions.currencyRates = { EUR : 1, USD : 3, GBP: 10 };
+            customOptions.currencyRates = { EUR : 1, USD : 3, GBP : 10 };
             carbone.renderXML('<xml>{d.value:convCurr()}</xml>', data, customOptions, function (err, result) {
               helper.assert(err+'', 'null');
               helper.assert(result, '<xml>3</xml>');
@@ -609,7 +662,7 @@ describe('Carbone', function () {
           });
         });
       });
-    })
+    });
   });
 
 
@@ -688,7 +741,7 @@ describe('Carbone', function () {
           assert.equal((_buf.slice(0, 2).toString() === 'PK'), true);
         }
         assert.equal((_elapsed < 200), true);
-        done(); 
+        done();
       }
     });
     it('should render a template (doc XML 2003) and give result with replacements', function (done) {
@@ -932,11 +985,57 @@ describe('Carbone', function () {
     beforeEach(function () {
       carbone.set({templatePath : _templatePath});
     });
+
+    it('should return error by converting a template ODS to BMP (non compatible files types)', (done) => {
+      var data = [{ id : 1, name : 'field_1' }, { id : 2, name : 'field_2' }];
+      var _options = {
+        convertTo : {
+          formatName : 'bmp'
+        }
+      };
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
+        helper.assert(typeof err, 'string');
+        helper.assert(/can't be converted to "bmp"*/.test(err), true);
+        helper.assert(result, undefined);
+        done();
+      });
+    });
+
+    it('should return error by converting a template ODS to text10 (non compatible files types)', (done) => {
+      var data = [{ id : 1, name : 'field_1' }, { id : 2, name : 'field_2' }];
+      var _options = {
+        convertTo : {
+          formatName : 'text10'
+        }
+      };
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
+        helper.assert(typeof err, 'string');
+        helper.assert(/can't be converted to "text10"*/.test(err), true);
+        helper.assert(result, undefined);
+        done();
+      });
+    });
+
+    it('should return error by converting a template ODS to PGM (non compatible files types)', (done) => {
+      var data = [{ id : 1, name : 'field_1' }, { id : 2, name : 'field_2' }];
+      var _options = {
+        convertTo : {
+          formatName : 'pgm'
+        }
+      };
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
+        helper.assert(typeof err, 'string');
+        helper.assert(/can't be converted to "pgm"*/.test(err), true);
+        helper.assert(result, undefined);
+        done();
+      });
+    });
+
     it('should render a template (docx), generate to PDF and give output', function (done) {
       var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
       var data = {
         field1 : 'field_1',
-        field2 : 'field_2'
+        field2 : 'field_2',
       };
       carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
         assert.equal(err, null);
@@ -1014,7 +1113,7 @@ describe('Carbone', function () {
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           }
           // assert.equal((_elapsed < 200), true);
-          done(); 
+          done();
         }
       });
     });
@@ -1039,7 +1138,7 @@ describe('Carbone', function () {
     });
     it('should render spreadsheet with raw options (complete)', function (done) {
       var data = [{ id : 1, name : 'field_1' },
-                  { id : 2, name : 'field_2' }];
+        { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : null
       };
@@ -1050,7 +1149,7 @@ describe('Carbone', function () {
     });
     it('should not use the converter if the input file extension is the same as convertTo parameter', function (done) {
       var data = [{ id : 1, name : 'field_1' },
-                  { id : 2, name : 'field_2' }];
+        { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : 'ods'
       };
@@ -1068,13 +1167,13 @@ describe('Carbone', function () {
         convertTo : 'ods_ede'
       };
       carbone.render('test_spreadsheet.ods', {}, _options, function (err) {
-        helper.assert(/Format "ods_ede" not accepted/.test(err), true);
+        helper.assert(/can't be converted to "ods_ede"*/.test(err), true);
         done();
       });
     });
     it('should render spreadsheet with raw options (complete)', function (done) {
       var data = [{ id : 1, name : 'field_1' },
-                  { id : 2, name : 'field_2' }];
+        { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : {
           formatName       : 'csv',
@@ -1090,7 +1189,7 @@ describe('Carbone', function () {
     });
     it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function (done) {
       var data = [{ id : 1, name : 'field_1' },
-                  { id : 2, name : 'field_2' }];
+        { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : {
           formatName : 'csv'
@@ -1105,7 +1204,7 @@ describe('Carbone', function () {
     });
     it('should render spreadsheet with raw options (incomplete)', function (done) {
       var data = [{ id : 1, name : 'field_1' },
-                  { id : 2, name : 'field_2' }];
+        { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : {
           formatName       : 'csv',
@@ -1121,7 +1220,7 @@ describe('Carbone', function () {
     });
     it('should render spreadsheet with options (complete)', function (done) {
       var data = [{ id : 1, name : 'field_1' },
-                  { id : 2, name : 'field_2' }];
+        { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : {
           formatName    : 'csv',
@@ -1141,7 +1240,7 @@ describe('Carbone', function () {
     });
     it('should render spreadsheet with options (incomplete)', function (done) {
       var data = [{ id : 1, name : 'field_1' },
-                  { id : 2, name : 'field_2' }];
+        { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : {
           formatName    : 'csv',

@@ -3,6 +3,140 @@ let barcodesMethods = new Map();
 barcodesMethods.set('ean13', _ean13);
 barcodesMethods.set('ean8', _ean8);
 barcodesMethods.set('code39', _code39);
+barcodesMethods.set('code128', _ean128);
+
+const _ean128TestNum = (mini, chaine, i) => {
+  mini--;
+  if (i + mini <= chaine.length) {
+    let y = 0;
+    while (mini >= 0 && y === 0) {
+      const c = chaine.charCodeAt(i + mini -1);
+      if (c < 48 || c > 57) {
+        y = 1;
+        mini++;
+      }
+      mini--;
+    }
+  }
+  return mini;
+};
+
+const _ean128IsNumeric = (str) => {
+  return /^\d+$/.test(str);
+};
+
+const _ean128GetDoubleNumber = (chaine) => {
+  let j = 1;
+  let chaine2 = '';
+  while (j <= chaine.length) {
+    if (_ean128IsNumeric(chaine.substr(j - 1, 1))) {
+      chaine2 += chaine.substr(j - 1, 1);
+      j++;
+    }
+    else {
+      break;
+    }
+  }
+  return chaine2;
+};
+
+/**
+ * Translate an ean128 barcode to EAN128.TTF font code. Called only from the barcode formatter.
+ *
+ * @param {string} arg ean128 codebar
+ * @returns {string} translated to EAN13.TTF font code
+ */
+const _ean128 = (chaine) => {
+
+  let code128 = '';
+  let dummy; // traitement de 2 caractères à la fois
+
+  if (!chaine || chaine === '') {
+    return '';
+  }
+
+  for (let i = 0; i < chaine.length; i++) {
+    const c = chaine.charCodeAt(i);
+    if (!(c >= 32 && c <= 126) && !(c === 203)) {
+      return '';
+    }
+  }
+
+  let i = 1;
+  let tableB = true;
+  // nb de caractères numériques suivants
+  let mini;
+  while (i <= chaine.length) {
+    if (tableB) {
+      // passer en table C pour 4 chiffres au début ou a la fin ou pour 6 chiffres
+      mini = ((i === 1) || (i + 3 === chaine.length)) ? 4 : 6;
+
+      // si les mini caractères à partir de index sont numériques, alors mini = 0
+      mini = _ean128TestNum(mini, chaine, i);
+      if (mini < 0) {
+        // débuter sur la table C ou commuter sur la table C
+        (i === 1 ? code128 = String.fromCharCode(210) : code128 += String.fromCharCode(204));
+        tableB = false;
+      }
+      else if (i === 1) {
+        // débuter sur la table B
+        code128 = String.fromCharCode(209);
+      }
+    }
+
+    if (!tableB) {
+      // on est sur la table C, on va essayer de traiter 2 chiffres
+      mini = 2;
+      mini = _ean128TestNum(mini, chaine, i);
+      if (mini < 0) {
+        dummy = parseInt(_ean128GetDoubleNumber(chaine.substr(i - 1, 2)));
+        if (dummy < 95) {
+          dummy += 32;
+        }
+        else {
+          dummy += 105;
+        }
+        code128 += String.fromCharCode(dummy);
+        i += 2;
+      }
+      else {
+        code128 += String.fromCharCode(205);
+        tableB = true;
+      }
+    }
+
+    if (tableB) {
+      code128 += chaine.substr(i - 1, 1);
+      i++;
+    }
+  }
+
+  let checksum = 0;
+  for (i = 1; i <= code128.length; i++) {
+    dummy = code128.charCodeAt(i - 1);
+    if (dummy < 127) {
+      dummy -= 32;
+    }
+    else {
+      dummy -= 105;
+    }
+    if (i === 1) {
+      checksum = dummy;
+    }
+    checksum = (checksum + (i - 1) * dummy ) % 103;
+  }
+
+  if (checksum < 95) {
+    checksum += 32;
+  }
+  else {
+    checksum += 100;
+  }
+
+  code128 += String.fromCharCode(checksum) + String.fromCharCode(211);
+
+  return code128;
+};
 
 /**
  * Translate an ean8 barcode to EAN13.TTF font code. Called only from the barcode formatter.
@@ -177,13 +311,15 @@ function _code39 (data) {
  *
  * @example [ "8056459824973" ,  "ean13"   ]
  * @example [ "9780201134476" ,  "ean13"   ]
+ * @example [ "3754 KC 75"    ,  "ean128"  ]
+ * @example [ "DR39"          ,  "ean128"  ]
  * @example [ "35967101"      ,  "ean8"    ]
  * @example [ "96385074"      ,  "ean8"    ]
  * @example [ "GSJ-220097"    ,  "code39"  ]
  * @example [ "ASDFGH-.$/+% " ,  "code39"  ]
  *
  * @param   {String} data Barcode numbers
- * @param   {String} type Barcode type: `ean13`, `ean8` or `code39`
+ * @param   {String} type Barcode type: `ean13`, `ean8`, `ean128` or `code39`
  * @returns {String}      translated  to EAN13.TTF font code or empty string
  */
 function barcode (data, type) {
@@ -207,7 +343,7 @@ module.exports = {
 // function _checksumEan8 (arg) {
 //   let _checksum = 0;
 //   let _controlKey = 0;
-// 
+//
 //   _checksum = 0;
 //   for (let i = 0; i < 7 ; i += 2) {
 //     _checksum +=  parseInt(arg[i]);
@@ -223,7 +359,7 @@ module.exports = {
 //     return '';
 //   }
 // }
-// 
+//
 // /**
 //  * Check if the barcode control key is valid
 //  * @return {String} always return ''  (NOT USED FOR THE MOMENT)
@@ -231,7 +367,7 @@ module.exports = {
 // function _checksumEan13 (arg) {
 //   let _checksum = 0;
 //   let _controlKey = 0;
-// 
+//
 //   _checksum = 0;
 //   for (let j = 1; j <= 12 ; j += 2) {
 //     _checksum += parseInt(arg[j]);
@@ -241,7 +377,7 @@ module.exports = {
 //     _checksum +=  parseInt(arg[i]);
 //   }
 //   _controlKey = 10 - _checksum % 10;
-// 
+//
 //   // Check result of the control key
 //   if (parseInt(arg[arg.length - 1]) !== _controlKey) {
 //     console.error('Barcode ean13 not valid!', 'Actual last digit = ' + arg[arg.length - 1], 'expected = ' + _controlKey);

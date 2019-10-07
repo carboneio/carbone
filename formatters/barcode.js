@@ -41,7 +41,7 @@ function _ean128GetDoubleNumber (chaine) {
 }
 
 /**
- * Translate an ean128 barcode to EAN128.TTF font code. Called only from the barcode formatter.
+ * @description Translate an ean128 barcode to EAN128.TTF font code. Called only from the barcode formatter.
  *
  * @param {string} arg ean128 codebar
  * @returns {string} translated to EAN13.TTF font code
@@ -139,7 +139,7 @@ function _ean128 (chaine) {
 }
 
 /**
- * Translate an ean8 barcode to EAN13.TTF font code. Called only from the barcode formatter.
+ * @description Translate an ean8 barcode to EAN13.TTF font code. Called only from the barcode formatter.
  *
  * @param {string} arg 8 numbers ean8 codebar
  * @returns {string} translated to EAN13.TTF font code
@@ -184,7 +184,7 @@ function _ean8 (arg) {
 }
 
 /**
-  * Translate an ean13 barcode to EAN13.TTF font code. Called only from the barcode formatter.
+  * @description Translate an ean13 barcode to EAN13.TTF font code. Called only from the barcode formatter.
   *
   * @param {string} arg 13 numbers ean13 codebar
   * @returns {string} translated code for EAN13.TTF font
@@ -270,7 +270,7 @@ function _ean13 (arg) {
 }
 
 /**
- * Translate an code39 barcode to CODE39.TTF font code. Called only from the barcode formatter.
+ * @description Translate an code39 barcode to CODE39.TTF font code. Called only from the barcode formatter.
  *
  * @param {string} data uppercase letters (A through Z), numeric digits (0 through 9) and a number of special characters (-.$/+% )
  * @returns {string} translated code for CODE39.TTF font

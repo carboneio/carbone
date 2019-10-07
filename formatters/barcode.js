@@ -3,9 +3,9 @@ let barcodesMethods = new Map();
 barcodesMethods.set('ean13', _ean13);
 barcodesMethods.set('ean8', _ean8);
 barcodesMethods.set('code39', _code39);
-barcodesMethods.set('code128', _ean128);
+barcodesMethods.set('ean128', _ean128);
 
-const _ean128TestNum = (mini, chaine, i) => {
+function _ean128TestNum (mini, chaine, i) {
   mini--;
   if (i + mini <= chaine.length) {
     let y = 0;
@@ -19,13 +19,13 @@ const _ean128TestNum = (mini, chaine, i) => {
     }
   }
   return mini;
-};
+}
 
-const _ean128IsNumeric = (str) => {
+function _ean128IsNumeric (str) {
   return /^\d+$/.test(str);
-};
+}
 
-const _ean128GetDoubleNumber = (chaine) => {
+function _ean128GetDoubleNumber (chaine) {
   let j = 1;
   let chaine2 = '';
   while (j <= chaine.length) {
@@ -38,7 +38,7 @@ const _ean128GetDoubleNumber = (chaine) => {
     }
   }
   return chaine2;
-};
+}
 
 /**
  * Translate an ean128 barcode to EAN128.TTF font code. Called only from the barcode formatter.
@@ -46,7 +46,7 @@ const _ean128GetDoubleNumber = (chaine) => {
  * @param {string} arg ean128 codebar
  * @returns {string} translated to EAN13.TTF font code
  */
-const _ean128 = (chaine) => {
+function _ean128 (chaine) {
 
   let code128 = '';
   let dummy; // traitement de 2 caractères à la fois
@@ -136,7 +136,7 @@ const _ean128 = (chaine) => {
   code128 += String.fromCharCode(checksum) + String.fromCharCode(211);
 
   return code128;
-};
+}
 
 /**
  * Translate an ean8 barcode to EAN13.TTF font code. Called only from the barcode formatter.
@@ -292,7 +292,6 @@ function _code39 (data) {
       c !== 43 &&
       !(c >= 45 && c <= 57) &&
       !(c >= 65 && c <= 90)) {
-      console.error('Input error', data[i], data.charCodeAt(i));
       _err = true;
     }
   }

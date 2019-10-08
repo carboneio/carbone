@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Create a report to help us improve Carbone. Search the repo and ensure your
-  issue doesn't already exist. Any issues not created using this form will be closed
-  immediately.
+  issue doesn't already exist.
 title: "[Bug Report]: "
-labels: ''
+labels: 'T: bug'
 assignees: ''
 
 ---
@@ -15,10 +14,10 @@ Node Version: [e.g. chrome 22]
 Browsers: [e.g. chrome 22]
 Desktop OS: [e.g. Ubuntu 18, Mac Os, ...]
 
-**Expected Behavior**
+**Expected Behaviour**
 A clear and concise description of what you expected to happen.
 
-**Actual Behavior**
+**Actual Behaviour**
 A clear and concise description of what the bug is.
 
 **Steps to reproduce**
@@ -26,7 +25,6 @@ Steps to reproduce the bug:
 1. Go to '...'
 2. Click on '....'
 4. See error
-
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.

@@ -49,7 +49,8 @@ function _ean128GetDoubleNumber (chaine) {
 function _ean128 (chaine) {
 
   let code128 = '';
-  let dummy; // traitement de 2 caractères à la fois
+  // For optimisation purpose, `dummy` is used to handle 2 characters
+  let dummy;
 
   if (!chaine || chaine === '') {
     return '';
@@ -64,28 +65,27 @@ function _ean128 (chaine) {
 
   let i = 1;
   let tableB = true;
-  // nb de caractères numériques suivants
+  // Number of digital characters
   let mini;
   while (i <= chaine.length) {
     if (tableB) {
-      // passer en table C pour 4 chiffres au début ou a la fin ou pour 6 chiffres
+      // Change to table C if `i` is the first iterator or 4 digits following
       mini = ((i === 1) || (i + 3 === chaine.length)) ? 4 : 6;
 
-      // si les mini caractères à partir de index sont numériques, alors mini = 0
+      // Check if `mini` is a number
       mini = _ean128TestNum(mini, chaine, i);
       if (mini < 0) {
-        // débuter sur la table C ou commuter sur la table C
+        // Table C
         (i === 1 ? code128 = String.fromCharCode(210) : code128 += String.fromCharCode(204));
         tableB = false;
       }
       else if (i === 1) {
-        // débuter sur la table B
+        // Table B
         code128 = String.fromCharCode(209);
       }
     }
 
     if (!tableB) {
-      // on est sur la table C, on va essayer de traiter 2 chiffres
       mini = 2;
       mini = _ean128TestNum(mini, chaine, i);
       if (mini < 0) {

@@ -654,6 +654,20 @@ describe('formatter', function () {
       helper.assert(barcodeFormatter.barcode(undefined, 'ean128'), '');
       helper.assert(barcodeFormatter.barcode('', 'ean128'), '');
     });
+
+    it('should be fast to format ean128 barcode',  () => {
+      let _loops = 10000;
+      let _res = [];
+      let _start = process.hrtime();
+      let _barcodes  = ['00 12345678 0000000001', '(15)071231(10)LOTA', 'DR39'];
+      for (let i = 0; i < _loops; i++) {
+        _res.push(barcodeFormatter.barcode(_barcodes[i%3], 'ean128'));
+      }
+      let _diff = process.hrtime(_start);
+      let _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n barcode e128 number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
+      helper.assert(_elapsed > 50, false, 'barcode(ean128) is too slow');
+    });
   });
 });
 

@@ -5,39 +5,19 @@ barcodesMethods.set('ean8', _ean8);
 barcodesMethods.set('code39', _code39);
 barcodesMethods.set('ean128', _ean128);
 
-function _ean128TestNum (mini, chaine, i) {
-  mini--;
-  if (i + mini <= chaine.length) {
-    let y = 0;
-    while (mini >= 0 && y === 0) {
-      const c = chaine.charCodeAt(i + mini -1);
-      if (c < 48 || c > 57) {
-        y = 1;
-        mini++;
-      }
-      mini--;
-    }
+/**
+ * Return true if letters from `fromIndex` to (`fromIndex` + `length`) are numbers 
+ * 
+ * @param  {String}  str       string to test
+ * @param  {Integer} fromIndex the index of the first character
+ * @param  {Integer} length    the number of characters to analyze
+ * @return {Boolean}            
+ */
+function _isNumber (str, fromIndex, length) {
+  if ((fromIndex + length - 1) > str.length) {
+    return false;
   }
-  return mini;
-}
-
-function _ean128IsNumeric (str) {
-  return /^\d+$/.test(str);
-}
-
-function _ean128GetDoubleNumber (chaine) {
-  let j = 1;
-  let chaine2 = '';
-  while (j <= chaine.length) {
-    if (_ean128IsNumeric(chaine.substr(j - 1, 1))) {
-      chaine2 += chaine.substr(j - 1, 1);
-      j++;
-    }
-    else {
-      break;
-    }
-  }
-  return chaine2;
+  return /^\d+$/.test(str.substr(fromIndex-1, length));
 }
 
 /**
@@ -72,9 +52,7 @@ function _ean128 (chaine) {
       // Change to table C if `i` is the first iterator or 4 digits following
       mini = ((i === 1) || (i + 3 === chaine.length)) ? 4 : 6;
 
-      // Check if `mini` is a number
-      mini = _ean128TestNum(mini, chaine, i);
-      if (mini < 0) {
+      if (_isNumber(chaine, i, mini) === true) {
         // Table C
         (i === 1 ? code128 = String.fromCharCode(210) : code128 += String.fromCharCode(204));
         tableB = false;
@@ -87,9 +65,8 @@ function _ean128 (chaine) {
 
     if (!tableB) {
       mini = 2;
-      mini = _ean128TestNum(mini, chaine, i);
-      if (mini < 0) {
-        dummy = parseInt(_ean128GetDoubleNumber(chaine.substr(i - 1, 2)));
+      if ( _isNumber(chaine, i, mini) === true) {
+        dummy = parseInt(chaine.substr(i - 1, 2));
         if (dummy < 95) {
           dummy += 32;
         }

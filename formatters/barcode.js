@@ -23,17 +23,16 @@ function _isNumber (str, fromIndex, length) {
 /**
  * @description Translate an ean128 barcode to EAN128.TTF font code. Called only from the barcode formatter.
  *
- * @param {string} arg ean128 codebar
- * @returns {string} translated to EAN13.TTF font code
+ * @param {string}   arg ean128 barcode
+ * @returns {string}     string translated to EAN128.TTF font code
  */
-function _ean128 (chaine) {
-
+function _ean128 (arg) {
   let code128 = '';
   // For optimisation purpose, `dummy` is used to handle 2 characters
   let dummy;
 
   // u0020 hex = 32 decimal | u007E hex = 126 decimal | u00CB hex = 203 decimal
-  if (!chaine || !/^(?:[\u0020-\u007E]|\u00CB)+$/.test(chaine)) {
+  if (!arg || !/^(?:[\u0020-\u007E]|\u00CB)+$/.test(arg)) {
     return '';
   }
 
@@ -41,12 +40,12 @@ function _ean128 (chaine) {
   let tableB = true;
   // Number of digital characters
   let mini;
-  while (i <= chaine.length) {
+  while (i <= arg.length) {
     if (tableB) {
       // Change to table C if `i` is the first iterator or 4 digits following
-      mini = ((i === 1) || (i + 3 === chaine.length)) ? 4 : 6;
+      mini = ((i === 1) || (i + 3 === arg.length)) ? 4 : 6;
 
-      if (_isNumber(chaine, i, mini) === true) {
+      if (_isNumber(arg, i, mini) === true) {
         // Table C
         (i === 1 ? code128 = String.fromCharCode(210) : code128 += String.fromCharCode(204));
         tableB = false;
@@ -59,8 +58,8 @@ function _ean128 (chaine) {
 
     if (!tableB) {
       mini = 2;
-      if ( _isNumber(chaine, i, mini) === true) {
-        dummy = parseInt(chaine.substr(i - 1, 2));
+      if ( _isNumber(arg, i, mini) === true) {
+        dummy = parseInt(arg.substr(i - 1, 2));
         if (dummy < 95) {
           dummy += 32;
         }
@@ -77,7 +76,7 @@ function _ean128 (chaine) {
     }
 
     if (tableB) {
-      code128 += chaine.substr(i - 1, 1);
+      code128 += arg.substr(i - 1, 1);
       i++;
     }
   }
@@ -112,7 +111,7 @@ function _ean128 (chaine) {
 /**
  * @description Translate an ean8 barcode to EAN13.TTF font code. Called only from the barcode formatter.
  *
- * @param {string} arg 8 numbers ean8 codebar
+ * @param {string} arg 8 numbers ean8 barcode
  * @returns {string} translated to EAN13.TTF font code
  */
 function _ean8 (arg) {
@@ -157,7 +156,7 @@ function _ean8 (arg) {
 /**
   * @description Translate an ean13 barcode to EAN13.TTF font code. Called only from the barcode formatter.
   *
-  * @param {string} arg 13 numbers ean13 codebar
+  * @param {string} arg 13 numbers ean13 barcode
   * @returns {string} translated code for EAN13.TTF font
  */
 function _ean13 (arg) {

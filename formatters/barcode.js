@@ -32,15 +32,9 @@ function _ean128 (chaine) {
   // For optimisation purpose, `dummy` is used to handle 2 characters
   let dummy;
 
-  if (!chaine || chaine === '') {
+  // u0020 hex = 32 decimal | u007E hex = 126 decimal | u00CB hex = 203 decimal
+  if (!chaine || !/^(?:[\u0020-\u007E]|\u00CB)+$/.test(chaine)) {
     return '';
-  }
-
-  for (let i = 0; i < chaine.length; i++) {
-    const c = chaine.charCodeAt(i);
-    if (!(c >= 32 && c <= 126) && !(c === 203)) {
-      return '';
-    }
   }
 
   let i = 1;

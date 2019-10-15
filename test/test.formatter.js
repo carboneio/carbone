@@ -635,6 +635,39 @@ describe('formatter', function () {
       helper.assert(barcodeFormatter.barcode('', 'code39'), '');
       helper.assert(barcodeFormatter.barcode(null, 'code39'), '');
     });
+
+    it('should format the ean128 barcode to EAN128.TTF code (ean128 format)',  () => {
+      helper.assert(barcodeFormatter.barcode('3754 KC 75', 'ean128'), 'ÒEVÍ KC 75)Ó');
+      helper.assert(barcodeFormatter.barcode('3754KC75', 'ean128'), 'ÒEVÍKC75QÓ');
+      helper.assert(barcodeFormatter.barcode('0312345600001', 'ean128'), 'Ò#,BX  Í1ZÓ');
+      helper.assert(barcodeFormatter.barcode('(15)071231(10)LOTA', 'ean128'), "Ñ(15)Ì',?Í(10)LOTASÓ");
+      helper.assert(barcodeFormatter.barcode('DR39', 'ean128'), 'ÑDR39xÓ');
+      helper.assert(barcodeFormatter.barcode('ZB65', 'ean128'), 'ÑZB65gÓ');
+      helper.assert(barcodeFormatter.barcode('~2020112345678901231', 'ean128'), 'Ñ~Ì44+7Mcy!7Í1PÓ');
+      helper.assert(barcodeFormatter.barcode('(01)12345678901231', 'ean128'), 'Ñ(01)Ì,BXnz,?xÓ');
+      helper.assert(barcodeFormatter.barcode('00 12345678 0000000001', 'ean128'), 'Ñ00 Ì,BXnÍ Ì    !6Ó');
+      helper.assert(barcodeFormatter.barcode('[FNC1] 21 12345 [FNC1] 11 (01)123', 'ean128'), 'Ñ[FNC1] 21 12345 [FNC1] 11 (01)123;Ó');
+    });
+
+    it('should return an empty string with a wrong arguments (ean128 format)', () => {
+      helper.assert(barcodeFormatter.barcode(null, 'ean128'), '');
+      helper.assert(barcodeFormatter.barcode(undefined, 'ean128'), '');
+      helper.assert(barcodeFormatter.barcode('', 'ean128'), '');
+    });
+
+    it('should be fast to format ean128 barcode',  () => {
+      let _loops = 10000;
+      let _res = [];
+      let _start = process.hrtime();
+      let _barcodes  = ['00 12345678 0000000001', '(15)071231(10)LOTA', 'DR39'];
+      for (let i = 0; i < _loops; i++) {
+        _res.push(barcodeFormatter.barcode(_barcodes[i%3], 'ean128'));
+      }
+      let _diff = process.hrtime(_start);
+      let _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n barcode e128 number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
+      helper.assert(_elapsed > 50, false, 'barcode(ean128) is too slow');
+    });
   });
 });
 

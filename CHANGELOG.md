@@ -3,6 +3,7 @@
 
 ### v1.4.0-ideolys
   - Fix file conversion errors by checking the input and output file type
+  - Add support for ean128 barcode
 
 ### v1.3.0-ideolys
   - Add new formatters to manage barcode:

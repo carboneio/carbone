@@ -20,7 +20,7 @@ describe('postprocessor', function () {
         reportName : undefined,
         extension  : ''
       };
-      const data = { firstname : 'Steeve', lastname : 'PAYRAUDEAU' };
+      const data = { firstname : 'John' };
       const options = {
         lang         : 'en',
         translations : {},
@@ -54,7 +54,7 @@ describe('postprocessor', function () {
         reportName : undefined,
         extension  : ''
       };
-      const data = { firstname : 'Steeve', lastname : 'PAYRAUDEAU' };
+      const data = { firstname : 'John' };
       const options = {
         lang         : 'en',
         translations : {},
@@ -88,7 +88,7 @@ describe('postprocessor', function () {
         reportName : undefined,
         extension  : ''
       };
-      const data = { firstname : 'Steeve', lastname : 'PAYRAUDEAU' };
+      const data = { firstname : 'John' };
       const options = {
         lang         : 'en',
         translations : {},

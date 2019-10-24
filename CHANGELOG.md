@@ -1,4 +1,4 @@
-
+  - Fix: use extensions coming from `options` in post-processing
   - Fix: Do not crash when file to zip cannot be buffered with `Buffer`, just skip the file instead.
 
 ### v1.4.0-ideolys

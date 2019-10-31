@@ -10,7 +10,104 @@ var spawn = require('child_process').spawn;
 var zipfile = require('zipfile');
 
 describe('file', function () {
-  
+  describe('Detect types', function () {
+    before(function () {
+      var _templatePath = path.resolve('./test/datasets');
+      carbone.set({templatePath : _templatePath});
+    });
+    after(function () {
+      carbone.reset();
+    });
+    it('should detect a docx type', function (done) {
+      file.openTemplate('test_word_render_A.docx', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'docx');
+        done();
+      });
+    });
+    it('should detect a xlsx type', function (done) {
+      file.openTemplate('test_xlsx_list.xlsx', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'xlsx');
+        done();
+      });
+    });
+    it('should detect a pptx type', function (done) {
+      file.openTemplate('test_simple_ppt.pptx', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'pptx');
+        done();
+      });
+    });
+    it('should detect an odt type', function (done) {
+      file.openTemplate('test_odt_to_translate.odt', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'odt');
+        done();
+      });
+    });
+    it('should detect an ods type', function (done) {
+      file.openTemplate('test_spreadsheet.ods', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'ods');
+        done();
+      });
+    });
+    it('should detect an odp type', function (done) {
+      file.openTemplate('test_odp.odp', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'odp');
+        done();
+      });
+    });
+    it('should detect a docx type without extension', function (done) {
+      file.openTemplate('test_word_render_A_without_ext', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'docx');
+        done();
+      });
+    });
+    it('should detect a html type', function (done) {
+      file.openTemplate('test_html.html', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'html');
+        done();
+      });
+    });
+    it('should detect a xhtml type', function (done) {
+      file.openTemplate('test_xhtml.xhtml', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'xhtml');
+        done();
+      });
+    });
+    it('should detect a xml type', function (done) {
+      file.openTemplate('test_xml.xml', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, 'xml');
+        done();
+      });
+    });
+    it('should not detect type if nothing has been matched', function (done) {
+      file.openTemplate('test_txt.txt', function (err, template) {
+        helper.assert(err, null);
+        var ext = file.detectType(template);
+        assert.strictEqual(ext, null);
+        done();
+      });
+    });
+  });
+
   describe('isZipped', function () {
     it('should return true if the file is zipped', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
@@ -440,4 +537,3 @@ function unzipWithZipFile (filePath, callback) {
   }
   callback(null, _unzippedFiles);
 }
-

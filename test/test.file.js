@@ -10,7 +10,92 @@ var spawn = require('child_process').spawn;
 var zipfile = require('zipfile');
 
 describe('file', function () {
-  
+  describe('Detect types', function () {
+    before(function () {
+      var _templatePath = path.resolve('./test/datasets');
+      carbone.set({templatePath : _templatePath});
+    });
+    after(function () {
+      carbone.reset();
+    });
+    it('should detect a docx type', function (done) {
+      carbone.getFileExtension('test_word_render_A.docx', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'docx');
+        done();
+      });
+    });
+    it('should detect a xlsx type', function (done) {
+      carbone.getFileExtension('test_xlsx_list.xlsx', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'xlsx');
+        done();
+      });
+    });
+    it('should detect a pptx type', function (done) {
+      carbone.getFileExtension('test_simple_ppt.pptx', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'pptx');
+        done();
+      });
+    });
+    it('should detect an odt type', function (done) {
+      carbone.getFileExtension('test_odt_to_translate.odt', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'odt');
+        done();
+      });
+    });
+    it('should detect an ods type', function (done) {
+      carbone.getFileExtension('test_spreadsheet.ods', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'ods');
+        done();
+      });
+    });
+    it('should detect an odp type', function (done) {
+      carbone.getFileExtension('test_odp.odp', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'odp');
+        done();
+      });
+    });
+    it('should detect a docx type without extension', function (done) {
+      carbone.getFileExtension('test_word_render_A_without_ext', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'docx');
+        done();
+      });
+    });
+    it('should detect a html type', function (done) {
+      carbone.getFileExtension('test_html.html', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'html');
+        done();
+      });
+    });
+    it('should detect a xhtml type', function (done) {
+      carbone.getFileExtension('test_xhtml.xhtml', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'xhtml');
+        done();
+      });
+    });
+    it('should detect a xml type', function (done) {
+      carbone.getFileExtension('test_xml.xml', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'xml');
+        done();
+      });
+    });
+    it('should not detect type if nothing has been matched', function (done) {
+      carbone.getFileExtension('test_txt.txt', function (err) {
+        helper.assert(err, 'Cannot detect file extension');
+        done();
+      });
+    });
+  });
+
   describe('isZipped', function () {
     it('should return true if the file is zipped', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
@@ -471,4 +556,3 @@ function unzipWithZipFile (filePath, callback) {
   }
   callback(null, _unzippedFiles);
 }
-

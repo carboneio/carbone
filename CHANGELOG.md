@@ -1,5 +1,6 @@
   - Fix: use extensions coming from `options` in post-processing
   - Fix: Do not crash when file to zip cannot be buffered with `Buffer`, just skip the file instead.
+  - Detect input file type without reading file extension (docx, xlsx, pptx, odt, ods, odp, xhtml, html, xml)
 
 ### v1.4.0-ideolys
   - Fix file conversion errors by checking the input and output file type

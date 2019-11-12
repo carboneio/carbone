@@ -305,6 +305,91 @@ describe('preprocessor', function () {
         it('should do nothing if the tag does not contain nested <v> </v> even if the type is t="s"', function () {
           helper.assert(preprocessor.convertToInlineString('<c r="A34" s="117" t="s"><t>0</t></c>', ['<t>{d.name}</t>']), '<c r="A34" s="117" t="s"><t>0</t></c>');
         });
+        it('should makes a number marker (:formatN applied) recognised as number type by changing the type t="s" to t="n", removing xml markups and formatter ":formatN() [One marker test]" ', function () {
+          const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
+          const _sharedString = ['<t xml:space="preserve">{d.nbr2:formatN()}</t>'];
+          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d.nbr2}</v></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="s"/.exec(_result), false);
+          helper.assert(!!/t="n"/.exec(_result), true);
+        });
+
+        it('should makes a number marker (:formatN applied) recognised as number type by changing the type t="n", removing xml markups and formatter ":formatN()" [Multiple markers test]', function () {
+          const _xml = '<c r="A1" s="1" t="s"><v>0</v></c><c r="A2" s="0" t="s"><v>1</v></c><c r="A3" s="0" t="s"><v>2</v></c>';
+          const _sharedString = ['<t xml:space="preserve">1</t>', '<t xml:space="preserve">{d.nbr2:formatN()}</t>', '<t xml:space="preserve">{d.nbr3:formatN()}</t>'];
+          const _expectedResult = '<c r="A1" s="1" t="inlineStr"><is><t xml:space="preserve">1</t></is></c><c r="A2" s="0" t="n"><v>{d.nbr2}</v></c><c r="A3" s="0" t="n"><v>{d.nbr3}</v></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="s"/.exec(_result), false);
+          helper.assert(!!/t="n"/.exec(_result), true);
+        });
+
+        it('should not makes a number marker recognised as number type because of wrong formatN typing [testing regex]', function () {
+          const _xml = '<c r="A1" s="1" t="s"><v>0</v></c><c r="A2" s="0" t="s"><v>1</v></c><c r="A3" s="0" t="s"><v>2</v></c>';
+          const _sharedString = ['<t xml:space="preserve">{d.nbr1:formatN(}</t>', '<t xml:space="preserve">{d.nbr2formatN()}</t>', '<t xml:space="preserve">{d.nbr3:formatN)}</t>'];
+          const _expectedResult = '<c r="A1" s="1" t="inlineStr"><is><t xml:space="preserve">{d.nbr1:formatN(}</t></is></c><c r="A2" s="0" t="inlineStr"><is><t xml:space="preserve">{d.nbr2formatN()}</t></is></c><c r="A3" s="0" t="inlineStr"><is><t xml:space="preserve">{d.nbr3:formatN)}</t></is></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="inlineStr"/.exec(_result), true);
+        });
+      });
+      describe('convertNumberMarkersIntoNumericFormat', function () {
+        it ('should makes a number marker (:formatN) recognised as number cell for ODS files [1 marker]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{d.nbr:formatN()}</text:p></table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d.nbr}" calcext:value-type="float"><text:p>{d.nbr}</text:p></table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template, function (err, resTemplate) {
+            helper.assert(!!err, false);
+            helper.assert(resTemplate.files[0].data, _expectedResult);
+          });
+        });
+
+        it ('should makes a number marker (:formatN) recognised as number cell for ODS files [2 markers]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{d.nbr:formatN()}</text:p></table:table-cell><table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{d.nbr6:formatN()}</text:p></table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d.nbr}" calcext:value-type="float"><text:p>{d.nbr}</text:p></table:table-cell><table:table-cell office:value-type="float" office:value="{d.nbr6}" calcext:value-type="float"><text:p>{d.nbr6}</text:p></table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template, function (err, resTemplate) {
+            helper.assert(!!err, false);
+            helper.assert(resTemplate.files[0].data, _expectedResult);
+          });
+        });
+
+        it ('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + style attributes]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell table:style-name="ce7" office:value-type="string" calcext:value-type="string"><text:p>{d.nbr7:formatN()}</text:p></table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell table:style-name="ce7" office:value-type="float" office:value="{d.nbr7}" calcext:value-type="float"><text:p>{d.nbr7}</text:p></table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template, function (err, resTemplate) {
+            helper.assert(!!err, false);
+            helper.assert(resTemplate.files[0].data, _expectedResult);
+          });
+        });
+
+        it ('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + 2 style attributes and spaces]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell table:style-name="ce7" office:value-type="string" table:style-name="ce7" calcext:value-type="string">  <text:p>   {d.nbr7:formatN()}  </text:p>   </table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell table:style-name="ce7" office:value-type="float" office:value="{d.nbr7}" table:style-name="ce7" calcext:value-type="float">  <text:p>   {d.nbr7}  </text:p>   </table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template, function (err, resTemplate) {
+            helper.assert(!!err, false);
+            helper.assert(resTemplate.files[0].data, _expectedResult);
+          });
+        });
       });
       describe('removeRowCounterInWorksheet', function () {
         it('should do nothing if the string is empty or null', function () {

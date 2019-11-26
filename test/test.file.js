@@ -166,7 +166,7 @@ describe('file', function () {
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Unzip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' unzip tasks\n\n\n');
         assert.equal((_elapsed < 7), true);
-        done(); 
+        done();
       }
     });
     it('should be reliable', function (done) {
@@ -264,7 +264,7 @@ describe('file', function () {
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Zip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' zip tasks\n\n\n');
         assert.equal((_elapsed < 5), true);
-        //* ***** check the first one and the 90th 
+        //* ***** check the first one and the 90th
         fs.mkdirSync(testPath, parseInt('0755', 8));
         var _zipFilePath = path.join(testPath, 'file.zip');
         var _unzipFilePath = path.join(testPath, 'unzip0');
@@ -507,7 +507,7 @@ function generateRandomText (length) {
 /**
  * Zipfile was used before yauzl.
  * Zipfie uses the rock-solid C library libzip. I use it as a comparison tool. Should I use the system unzip?
- * @param  {String}   filePath 
+ * @param  {String}   filePath
  * @param  {Function} callback(err, template)
  */
 function unzipWithZipFile (filePath, callback) {

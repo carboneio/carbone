@@ -1,10 +1,11 @@
+/* eslint-disable eqeqeq */
 const locale   = require('./_locale.js');
 const currency = require('./_currency.js');
 
 /**
  * Convert from one currency to another
  *
- * Exchange rates are included by default in Carbone but you can provide a new echange rate 
+ * Exchange rates are included by default in Carbone but you can provide a new echange rate
  * for one report in `options.currencyRates` of `Carbone.render` or globally with `Carbone.set`
  *
  * `convCurr()`  without parameters converts automatically from `options.currencySource` to `options.currencyTarget`.
@@ -34,16 +35,16 @@ function convCurr (d, target, source) {
 }
 
 /**
- * Round a number 
+ * Round a number
  *
- * Same as toFixed(2) but it rounds number correclty `round(1.05, 1) = 1.1` 
+ * Same as toFixed(2) but it rounds number correclty `round(1.05, 1) = 1.1`
  *
  * @example [10.05123  , 2  ]
  * @example [1.05      , 1  ]
- * 
+ *
  * @param  {Number} num       number
  * @param  {Number} precision number of decimal
- * @return {Number}   
+ * @return {Number}
  */
 function round (num, precision) {
   if (!('' + num).includes('e')) {
@@ -73,12 +74,12 @@ function round (num, precision) {
  * Other method to test and analyze
  *   - https://jsperf.com/number-formatting-with-commas/5
  *   - https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
- * 
+ *
  * @private
- * @param  {Number} value      
- * @param  {Number} value      
- * @param  {Number} precision  
- * @return {String} 
+ * @param  {Number} value
+ * @param  {Number} value
+ * @param  {Number} precision
+ * @return {String}
  */
 function _format (value, format, precision = 3) {
   var _re    = '\\d(?=(\\d{' + (format.group) + '})+' + (precision > 0 ? '\\D' : '$') + ')';
@@ -110,7 +111,7 @@ function formatN (d, precision) {
 /**
  * Format currency numbers
  *
- * Currencies are defined by the locale (`options.lang`). It can be overwritten by 
+ * Currencies are defined by the locale (`options.lang`). It can be overwritten by
  * `options.currencySource` and `options.currencyTarget` for one report  in `Carbone.render`
  * or globally with `Carbone.set`
  *
@@ -119,7 +120,7 @@ function formatN (d, precision) {
  * If the formatter `convCurr()` is used before, formatC prints the corresponding target currency used in `convCurr()`.
  *
  * By default, it prints with the currency symbol only, but you can use other output formats:
- * 
+ *
  * @exampleContext {"lang":"en-us", "currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 }} }
  * @example ["1000.456"        ]
  * @example ["1000.456", "M"   ]
@@ -157,9 +158,9 @@ function formatC (d, precisionOrFormat) {
       _formatFn = _locale.currency[precisionOrFormat];
     }
     var _valueRaw  = _format(convCurr.call(this, d), _locale.number, _precision);
-    // reset modifiedCurrencyTarget for next use 
-    this.modifiedCurrencyTarget = null; 
-    return _formatFn(_valueRaw, 
+    // reset modifiedCurrencyTarget for next use
+    this.modifiedCurrencyTarget = null;
+    return _formatFn(_valueRaw,
       _currencyInfo.symbol,
       _currencyInfo.minSymbol,
       (d != 1 ? _currencyInfo.major + 's' : _currencyInfo.major),
@@ -172,10 +173,10 @@ function formatC (d, precisionOrFormat) {
 
 /**
  * Add two numbers
- * 
+ *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
- * 
+ *
  * @param {Number} value Value to add
  * @return {Number} Result
  */
@@ -191,7 +192,7 @@ function add (d, value) {
  *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
- * 
+ *
  * @param {Number} value Value to substract
  * @return {Number} Result
  */
@@ -207,7 +208,7 @@ function sub (d, value) {
  *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
- * 
+ *
  * @param {Number} value Value to multiply
  * @return {Number} Result
  */
@@ -220,10 +221,10 @@ function mul (d, value) {
 
 /**
  * Divide two numbers
- * 
+ *
  * @example [1000.4   ,  2  ]
  * @example ["1000.4" , "2" ]
- * 
+ *
  * @param {Number} value Value to divide
  * @return {Number} Result
  */
@@ -247,17 +248,17 @@ module.exports = {
   /**
    * Converts a number to an INT
    * @deprecated
-   * 
+   *
    * @return {Number}
    */
   int : function (d) {
     return parseInt(d, 10);
   },
-  
+
   /**
    * Converts a number with English specifications (decimal separator is '.')
    * @deprecated
-   * 
+   *
    * @return {String}
    */
   toEN : function (d) {
@@ -267,7 +268,7 @@ module.exports = {
   /**
    * Converts a number into string, keeping only <nb> decimals
    * @deprecated
-   * 
+   *
    * @param  {Number} nb
    * @return {String}
    */
@@ -278,7 +279,7 @@ module.exports = {
   /**
    * Converts a number with French specifications (decimal separator is ',')
    * @deprecated
-   * 
+   *
    * @return {String}
    */
   toFR : function (d) {

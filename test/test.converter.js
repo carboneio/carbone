@@ -45,7 +45,7 @@ describe('Converter', function () {
         helper.assert(/[0-9]+/g.test(factories[0].pid), true);
         helper.assert(factories[0].isReady, true);
         helper.assert(factories[0].isConverting, false);
-        done(); 
+        done();
       });
     });
     it('should start 3 conversion factory and take into account the options object.\
@@ -76,7 +76,7 @@ describe('Converter', function () {
         helper.assert((factories[2].pid           !== factories[0].pid), true);
         helper.assert((factories[2].userCachePath !== factories[0].userCachePath), true);
 
-        done(); 
+        done();
       });
     });
   });
@@ -119,7 +119,7 @@ describe('Converter', function () {
               helper.assert(err+'', 'null');
               var _buf = new Buffer(result);
               assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-              done(); 
+              done();
             });
           }, 200);
         });
@@ -152,7 +152,7 @@ describe('Converter', function () {
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           }
           assert.equal((_elapsed < 350), true);
-          done(); 
+          done();
         }
       });
     });
@@ -172,10 +172,10 @@ describe('Converter', function () {
               var _factory = factories[_factoryId];
               if (_factory) {
                 if (_threadChoice > 0.5 && _factory.officeThread) {
-                  _factory.officeThread.kill(); 
+                  _factory.officeThread.kill();
                 }
                 else if (_factory.pythonThread) {
-                  _factory.pythonThread.kill(); 
+                  _factory.pythonThread.kill();
                 }
               }
             }
@@ -197,7 +197,7 @@ describe('Converter', function () {
             assert.equal(_buf.slice(0, 4).toString(), '%PDF');
           }
           assert.equal((_elapsed < 400), true);
-          done(); 
+          done();
         }
       });
     });
@@ -208,7 +208,7 @@ describe('Converter', function () {
         converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err) {
           assert.equal(err, 'Could not open document');
           assert.equal(factories['0'].pid, _officePID);
-          done(); 
+          done();
         });
       });
     });
@@ -219,7 +219,7 @@ describe('Converter', function () {
         converter.convertFile(_filePath, 'MS Word 97', '', function (err) {
           assert.equal(err, 'Could not convert document');
           assert.equal(factories['0'].pid, _officePID);
-          done(); 
+          done();
         });
       });
     });
@@ -244,7 +244,7 @@ describe('Converter', function () {
                   assert.equal(err, null);
                   var _buf = new Buffer(result);
                   assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-                  done(); 
+                  done();
                 });
               });
             }
@@ -272,7 +272,7 @@ describe('Converter', function () {
             _nbAttempt--;
             assert.equal(factories['0'].pid, _officePID);
             if (_nbAttempt === 0) {
-              done(); 
+              done();
             }
           });
         }
@@ -292,7 +292,7 @@ describe('Converter', function () {
           setTimeout(function () {
             var _tempContent = helper.walkDirSync(tempPath);
             assert.equal(_tempContent.length, 0);
-            done(); 
+            done();
           }, 1500);
         });
       });

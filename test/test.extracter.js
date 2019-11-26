@@ -74,7 +74,7 @@ describe('extracter', function () {
       helper.assert(extracter.splitMarkers(_markers), {
         d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
         dsite : { name     : 'site' , type     : 'object', parent   : 'd', parents  : ['d'],  xmlParts : [
-            {attr : 'name', formatters : [], obj : 'd', pos : 20},
+          {attr : 'name', formatters : [], obj : 'd', pos : 20},
         ]
         }
       });
@@ -86,7 +86,7 @@ describe('extracter', function () {
       helper.assert(extracter.splitMarkers(_markers), {
         d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
         dsite : { name     : 'site' , type     : 'object', parent   : 'd', parents  : ['d'],  xmlParts : [
-            {attr : 'name', formatters : [], obj : 'dothersub', pos : 20},
+          {attr : 'name', formatters : [], obj : 'dothersub', pos : 20},
         ]
         },
         dother    : { name : 'other', type : 'object', parent : 'd'      , parents : ['d']           ,  xmlParts : [] },
@@ -628,7 +628,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr       : 'id', formatters : [], obj        : 'dsite', pos        : 20, 
+            {attr       : 'id', formatters : [], obj        : 'dsite', pos        : 20,
               conditions : [
                 {
                   left     : {parent : 'dsite', attr : 'sort', formatters : ['int']},
@@ -1391,7 +1391,7 @@ describe('extracter', function () {
       });
     });
     it('should not generate duplicated iterators if they are incremented in the same time', function () {
-      var _markers = [   
+      var _markers = [
         {pos : 13, name : '_root.d[i].site.label'},
         {pos : 22, name : '_root.d[i].cars[i].name'},
         {pos : 23, name : '_root.d[i].cars[i].autonomy'},
@@ -1405,69 +1405,69 @@ describe('extracter', function () {
         {pos : 88, name : '_root.d[i+1].cars[i+1].wheels[i+1].strengh'},
         {pos : 89, name : '_root.d[i+1].cars[i+1].wheels[i+1].tire.brand'}
       ];
-      helper.assert(extracter.splitMarkers(_markers), 
-        { 
-          _root : { 
+      helper.assert(extracter.splitMarkers(_markers),
+        {
+          _root : {
             name     : '_root',
             type     : 'object',
             parent   : '',
             parents  : [],
             xmlParts : []
           },
-          _rootd : { 
+          _rootd : {
             name      : 'd',
             type      : 'array',
             parent    : '_root',
             parents   : [ '_root' ],
             position  : { start : 13, end : 60 },
             iterators : [ { attr : 'i' } ],
-            xmlParts  : [] 
+            xmlParts  : []
           },
-          _rootdsite : { 
+          _rootdsite : {
             name     : 'site',
             type     : 'object',
             parent   : '_rootd',
             parents  : [ '_root', '_rootd' ],
-            xmlParts : [ { attr : 'label', formatters : [], obj : '_rootdsite', pos : 13 } ] 
+            xmlParts : [ { attr : 'label', formatters : [], obj : '_rootdsite', pos : 13 } ]
           },
-          _rootdcars : { 
+          _rootdcars : {
             name      : 'cars',
             type      : 'array',
             parent    : '_rootd',
             parents   : [ '_root', '_rootd' ],
             position  : { start : 22, end : 69 },
             iterators : [ { attr : 'i' } ],
-            xmlParts  : [ 
+            xmlParts  : [
               { attr : 'name', formatters : [], obj : '_rootdcars', pos : 22 },
-              { attr : 'autonomy', formatters : [], obj : '_rootdcars', pos : 23 } 
-            ] 
+              { attr : 'autonomy', formatters : [], obj : '_rootdcars', pos : 23 }
+            ]
           },
-          _rootdcarsspec : { 
+          _rootdcarsspec : {
             name     : 'spec',
             type     : 'object',
             parent   : '_rootdcars',
             parents  : [ '_root', '_rootd', '_rootdcars' ],
             xmlParts : [
               { attr : 'weight', formatters : [], obj : '_rootdcarsspec', pos : 32 }
-            ] 
+            ]
           },
-          _rootdcarswheels : { 
+          _rootdcarswheels : {
             name      : 'wheels',
             type      : 'array',
             parent    : '_rootdcars',
             parents   : [ '_root', '_rootd', '_rootdcars' ],
             position  : { start : 41, end : 88 },
             iterators : [ { attr : 'i' } ],
-            xmlParts  : [ 
+            xmlParts  : [
               { attr : 'strengh', formatters : [], obj : '_rootdcarswheels', pos : 41 }
-            ] 
+            ]
           },
-          _rootdcarswheelstire : { 
+          _rootdcarswheelstire : {
             name     : 'tire',
             type     : 'object',
             parent   : '_rootdcarswheels',
             parents  : [ '_root', '_rootd', '_rootdcars', '_rootdcarswheels' ],
-            xmlParts : [ 
+            xmlParts : [
               { attr : 'brand', formatters : [], obj : '_rootdcarswheelstire', pos : 42 }
             ]
           }
@@ -1500,7 +1500,7 @@ describe('extracter', function () {
             parent   : '',
             parents  : [],
             xmlParts : [],
-            /*'depth' : 0*/
+            /* 'depth' : 0*/
           }
         }
       });
@@ -1715,7 +1715,7 @@ describe('extracter', function () {
         }
       });
     });
-    
+
     it('4 should extract xml parts even if there is a nested object in an array', function () {
       var _xml = '<div><tr> <h1> </h1> <p></p> </tr><tr> <h1> </h1> <p></p> </tr></div>';
       var _descriptor = {
@@ -1836,7 +1836,7 @@ describe('extracter', function () {
             xmlParts  : [
               {obj : 'movies1',  attr : 'title', pos : 11, depth : 1 },
               {obj : 'movies1', array : 'start', pos : 5 , depth : 1,after : '<tr1> ' },
-              {obj : 'movies1', array : 'end'  , pos : 17, depth : 1,before : '</tr1>' } 
+              {obj : 'movies1', array : 'end'  , pos : 17, depth : 1,before : '</tr1>' }
             ]
           },
           cars2 : {
@@ -1850,7 +1850,7 @@ describe('extracter', function () {
             xmlParts  : [
               {obj : 'cars2',  attr : 'brand', pos : 36,depth : 1 },
               {obj : 'cars2', array : 'start', pos : 30,depth : 1,after : '<tr2> ' },
-              {obj : 'cars2', array : 'end'  , pos : 42,depth : 1,before : '</tr2>' } 
+              {obj : 'cars2', array : 'end'  , pos : 42,depth : 1,before : '</tr2>' }
             ],
             before : ' '
           }
@@ -1917,7 +1917,7 @@ describe('extracter', function () {
             xmlParts  : [
               {obj : 'movies1',  attr : 'title', pos : 11, depth : 1 },
               {obj : 'movies1', array : 'start', pos : 5 , depth : 1,after : '<tr1> ' },
-              {obj : 'movies1', array : 'end'  , pos : 17, depth : 1,before : '</tr1>' } 
+              {obj : 'movies1', array : 'end'  , pos : 17, depth : 1,before : '</tr1>' }
             ]
           },
           cars2 : {
@@ -1931,7 +1931,7 @@ describe('extracter', function () {
             xmlParts  : [
               {obj : 'cars2',  attr : 'brand', pos : 40,depth : 1 },
               {obj : 'cars2', array : 'start', pos : 34,depth : 1,after : '<tr2> ' },
-              {obj : 'cars2', array : 'end'  , pos : 46,depth : 1,before : '</tr2>' } 
+              {obj : 'cars2', array : 'end'  , pos : 46,depth : 1,before : '</tr2>' }
             ],
             before : ' <b> '
           }
@@ -2098,7 +2098,7 @@ describe('extracter', function () {
           position  : {start : 26, end : 46}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : []
-        },  
+        },
         element1 : {
           name      : 'element',
           type      : 'array',
@@ -2147,7 +2147,7 @@ describe('extracter', function () {
         }
       });
     });
-    
+
     it('should add two attribute "moveTo" and "toDelete" to each xml part which are not in the right place (in the odd zone of the array, or inside an array)', function () {
       var _xml = '<xml><t_row>  </t_row><t_row>   </t_row></xml>';
       var _descriptor = {
@@ -2558,7 +2558,7 @@ describe('extracter', function () {
     });
     it('should sort correctly nested arrays which start at the same position in xml.\
       This happens when two arrays are incremented in the same time (d.tab[i+1].subtab[i+1])', function () {
-      // This test is sensible. 
+      // This test is sensible.
       var _data = [
         { obj : '_rootdother'           , pos : 90                  },
         { obj : '_rootdfamiliesproducts', pos : 50, array : 'start' }, // sub array

@@ -40,10 +40,10 @@ describe('builder.buildXML', function () {
   it('should not replace control codes like space, carriage return and tab', function (done) {
     var str = 'boo';
     for (var i = 0 ; i < 160 ; i++) {
-      if ((i == 9) ||
-          (i == 10) ||
-          (i == 13) ||
-          (i == 32) ||
+      if ((i === 9) ||
+          (i === 10) ||
+          (i === 13) ||
+          (i === 32) ||
           (i >= 127 && i <= 159)) {
         str += String.fromCharCode(i);
       }
@@ -365,14 +365,15 @@ describe('builder.buildXML', function () {
       +  '<t_row><td>{d[i+1].others[i+1].wheels[i].size } </td> </t_row>'
       +'</xml>';
     var _data = [{
-        cars : [
-          {wheels : [ {size : 'A'}, {size : 'B'}]}
-        ],
-        others : [
-          {wheels : [ {size : 'A'}, {size : 'B'}]}
-        ]
-      }
+      cars : [
+        {wheels : [ {size : 'A'}, {size : 'B'}]}
+      ],
+      others : [
+        {wheels : [ {size : 'A'}, {size : 'B'}]}
+      ]
+    }
     ];
+    // eslint-disable-next-line no-unused-vars
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       done();
     });
@@ -567,9 +568,9 @@ describe('builder.buildXML', function () {
           autonomy : 4,
           spec     : {weight : 1},
           wheels   : [
-              {strengh : 's1', tire : {brand : 'mich'}},
-              {strengh : 's2', tire : {brand : 'uni' }},
-              {strengh : 's3', tire : {brand : 'cont'}}
+            {strengh : 's1', tire : {brand : 'mich'}},
+            {strengh : 's2', tire : {brand : 'uni' }},
+            {strengh : 's3', tire : {brand : 'cont'}}
           ]
         }
         ],
@@ -652,9 +653,9 @@ describe('builder.buildXML', function () {
         site : {label : 'site_B'},
         cars : [{
           wheels : [
-              {tire : {brand : 'mich'}},
-              {tire : {brand : 'uni' }},
-              {tire : {brand : 'cont'}}
+            {tire : {brand : 'mich'}},
+            {tire : {brand : 'uni' }},
+            {tire : {brand : 'cont'}}
           ]
         }
         ],
@@ -1038,7 +1039,7 @@ describe('builder.buildXML', function () {
       +  '<div> {d.cars[i].speed  } </div>'
       +  '<div> {d.cars[i+1].speed} </div>'
       +'</xml>';
-    var _res = 
+    var _res =
         '<xml>'
       +  '<div> 10 </div>'
       +  '<div> fast </div>'
@@ -1066,7 +1067,7 @@ describe('builder.buildXML', function () {
       +  '<t_row><td>{d.cars[i].speed  } {d.cars[i].wheels[i=1].other}</td> <td>{d.cars[i]  .wheels[i].size}              </td> <td>{d.cars[i]  .wheels[i+1].size}           </td></t_row>'
       +  '<t_row><td>{d.cars[i+1].speed}                              </td> <td>{d.cars[i+1].wheels[i].size}              </td> <td>{d.cars[i+1].wheels[i+1].size}           </td></t_row>'
       +'</xml>';
-    var _res = 
+    var _res =
         '<xml>'
       +  '<t_row><td>fast b</td> <td>5              </td> <td>10              </td> </t_row>'
       +  '<t_row><td>slow c</td> <td>6              </td> <td>11              </td> <td>21              </td> </t_row>'
@@ -1297,7 +1298,7 @@ describe('builder.buildXML', function () {
     var _data = {
       who  : 'test',
       cars : [
-        { 
+        {
           wheels : [
             {
               size : 10,
@@ -1322,7 +1323,7 @@ describe('builder.buildXML', function () {
     var _data = {
       who  : 'test',
       cars : [
-        { 
+        {
           wheels : [
             {
               size : 10,
@@ -1347,7 +1348,7 @@ describe('builder.buildXML', function () {
     var _data = {
       who  : 'test',
       cars : [
-        { 
+        {
           wheels : [
             {
               size : 10,
@@ -1378,7 +1379,7 @@ describe('builder.buildXML', function () {
     var _data = {
       who  : 'test',
       cars : [
-        { 
+        {
           name   : 'toy',
           wheels : [
             {
@@ -1394,8 +1395,8 @@ describe('builder.buildXML', function () {
       ],
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      assert.equal(_xmlBuilt, 
-          '<xml>'
+      assert.equal(_xmlBuilt,
+        '<xml>'
         + '<tr></tr>'
         +   '100<b></b>'
         +   'toy<i></i>'

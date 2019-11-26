@@ -12,7 +12,7 @@ describe('preprocessor', function () {
     });
     it('should do nothing if the file is null', function (done) {
       preprocessor.execute(null, function (err, tmpl) {
-        helper.assert(err+'', 'null');
+        helper.assert(err + '', 'null');
         helper.assert(tmpl, null);
         done();
       });
@@ -49,7 +49,7 @@ describe('preprocessor', function () {
             ]
           };
           preprocessor.execute(_report, function (err, tmpl) {
-            helper.assert(err+'', 'null');
+            helper.assert(err + '', 'null');
             // tmpl.files[0].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[0].data.should.be.eql(_sharedStringAfter);
             tmpl.files[0].name.should.be.eql('xl/worksheets/sheet1.xml');
@@ -69,7 +69,7 @@ describe('preprocessor', function () {
             ]
           };
           preprocessor.execute(_report, function (err, tmpl) {
-            helper.assert(err+'', 'null');
+            helper.assert(err + '', 'null');
             tmpl.files[0].name.should.be.eql('my_file.xml');
             tmpl.files[0].data.should.be.eql('some text');
             tmpl.files[0].parent.should.be.eql('');
@@ -96,7 +96,7 @@ describe('preprocessor', function () {
             ]
           };
           preprocessor.execute(_report, function (err, tmpl) {
-            helper.assert(err+'', 'null');
+            helper.assert(err + '', 'null');
             tmpl.files[0].name.should.be.eql('my_file.xml');
             tmpl.files[0].data.should.be.eql('some text');
             tmpl.files[0].parent.should.be.eql('');

@@ -84,7 +84,9 @@ describe('Converter', function () {
   describe('convertFile', function () {
     afterEach(function (done) {
       converter.exit(function () {
-        converter.init(defaultOptions, done);
+        setTimeout(function () {
+          converter.init(defaultOptions, done);
+        }, 1000);
       });
     });
     it('should render a pdf and start an conversion factory automatically if no factories exist', function (done) {
@@ -281,6 +283,14 @@ describe('Converter', function () {
   });
 
   describe('exit', function () {
+    before(function () {
+      var _tempContent = helper.walkDirSync(tempPath);
+      if (_tempContent.length > 0) {
+        console.error(`Warning - ${_tempContent.length} files hasn't been deleted at the end of the previous tests.`);
+        helper.rmDirRecursive(tempPath);
+      }
+    });
+
     afterEach(function (done) {
       converter.exit(function () {
         converter.init(defaultOptions, done);
@@ -293,7 +303,7 @@ describe('Converter', function () {
             var _tempContent = helper.walkDirSync(tempPath);
             assert.equal(_tempContent.length, 0);
             done();
-          }, 1500);
+          }, 4000);
         });
       });
     });
@@ -307,7 +317,7 @@ describe('Converter', function () {
             assert.equal(_tempContent.length, 1);
             assert.equal(_tempContent[0], _otherFile);
             exec('rm -rf '+_otherFile, done);
-          }, 1500);
+          }, 4000);
         });
       });
     });

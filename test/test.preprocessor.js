@@ -1,5 +1,6 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
+const should = require('should');
 
 describe('preprocessor', function () {
   describe('execute', function () {
@@ -52,8 +53,8 @@ describe('preprocessor', function () {
             helper.assert(err + '', 'null');
             // tmpl.files[0].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[0].data.should.be.eql(_sharedStringAfter);
-            tmpl.files[0].name.should.be.eql('xl/worksheets/sheet1.xml');
-            tmpl.files[0].data.should.be.eql(_sheetAfter);
+            should(tmpl.files[0].name).be.eql('xl/worksheets/sheet1.xml');
+            should(tmpl.files[0].data).be.eql(_sheetAfter);
             done();
           });
         });
@@ -70,15 +71,15 @@ describe('preprocessor', function () {
           };
           preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err + '', 'null');
-            tmpl.files[0].name.should.be.eql('my_file.xml');
-            tmpl.files[0].data.should.be.eql('some text');
-            tmpl.files[0].parent.should.be.eql('');
+            should(tmpl.files[0].name).be.eql('my_file.xml');
+            should(tmpl.files[0].data).be.eql('some text');
+            should(tmpl.files[0].parent).be.eql('');
             // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
             // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            tmpl.files[1].name.should.be.eql('xl/worksheets/sheet1.xml');
-            tmpl.files[1].data.should.be.eql(_sheetAfter);
-            tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
+            should(tmpl.files[1].name).be.eql('xl/worksheets/sheet1.xml');
+            should(tmpl.files[1].data).be.eql(_sheetAfter);
+            should(tmpl.files[1].parent).be.eql('embedded/spreadsheet.xlsx');
             done();
           });
         });
@@ -97,21 +98,21 @@ describe('preprocessor', function () {
           };
           preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err + '', 'null');
-            tmpl.files[0].name.should.be.eql('my_file.xml');
-            tmpl.files[0].data.should.be.eql('some text');
-            tmpl.files[0].parent.should.be.eql('');
+            should(tmpl.files[0].name).be.eql('my_file.xml');
+            should(tmpl.files[0].data).be.eql('some text');
+            should(tmpl.files[0].parent).be.eql('');
             // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
             // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            tmpl.files[1].name.should.be.eql('xl/worksheets/sheet1.xml');
-            tmpl.files[1].data.should.be.eql(_sheetAfter);
-            tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
+            should(tmpl.files[1].name).be.eql('xl/worksheets/sheet1.xml');
+            should(tmpl.files[1].data).be.eql(_sheetAfter);
+            should(tmpl.files[1].parent).be.eql('embedded/spreadsheet.xlsx');
             // tmpl.files[2].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[2].data.should.be.eql(_sharedStringAfter2);
             // tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
-            tmpl.files[2].name.should.be.eql('xl/worksheets/sheet1.xml');
-            tmpl.files[2].data.should.be.eql(_sheetAfter2);
-            tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
+            should(tmpl.files[2].name).be.eql('xl/worksheets/sheet1.xml');
+            should(tmpl.files[2].data).be.eql(_sheetAfter2);
+            should(tmpl.files[2].parent).be.eql('embedded/spreadsheet2.xlsx');
             done();
           });
         });

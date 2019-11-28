@@ -41,12 +41,12 @@ describe('builder', function () {
       helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY MM DD');\n");
     });
     it('should keep anti-slash quotes', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY \' MM DD')" ], _testedFormatters);
-      helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY \' MM DD');\n");
+      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY ' MM DD')" ], _testedFormatters);
+      helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY ' MM DD');\n");
     });
     it('should keep parenthesis in the string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('(YYYY) \' (MM) DD')" ], _testedFormatters);
-      helper.assert(_actual, "_str = formatters.format.call(_options, _str, '(YYYY) \' (MM) DD');\n");
+      var _actual = builder.getFormatterString('_str', '_options', [ "format('(YYYY) ' (MM) DD')" ], _testedFormatters);
+      helper.assert(_actual, "_str = formatters.format.call(_options, _str, '(YYYY) ' (MM) DD');\n");
     });
     it('should return a call of a function for a formatter with two arguments', function () {
       var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(2, 3)' ], _testedFormatters);
@@ -241,7 +241,7 @@ describe('builder', function () {
       var _nbRows = 1000000;
       var _data = [];
       for (var i = 0; i < _nbRows; i++) {
-        _data.push({ 
+        _data.push({
           pos : [i % 100, i % 50, i % 1000, i % 60]
         });
       }
@@ -429,6 +429,7 @@ describe('builder', function () {
       };
       var _nextAttrName = 'tyres';
       var _nbArrayExit = 0;
+      // eslint-disable-next-line no-unused-vars
       builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
         _nbArrayExit++;
       });
@@ -1360,14 +1361,14 @@ describe('builder', function () {
         firstname : 'Thomas',
         lastname  : 'A. Anderson',
         skills    : [
-            {name : 'survive'},
-            {name : 'walk on the walls'}
+          {name : 'survive'},
+          {name : 'walk on the walls'}
         ]
       },{
         firstname : 'Trinity',
         lastname  : 'Unknown',
         skills    : [
-            {name : 'hack'}
+          {name : 'hack'}
         ]
       }
       ];
@@ -1456,18 +1457,18 @@ describe('builder', function () {
           {
             name : 'survive',
             when : [
-                {day : 'monday'},
-                {day : 'thursday'},
-                {day : 'friday'}
+              {day : 'monday'},
+              {day : 'thursday'},
+              {day : 'friday'}
             ]
           },
-            {name : 'walk on the walls'}
+          {name : 'walk on the walls'}
         ]
       },{
         firstname : 'Trinity',
         lastname  : 'Unknown',
         skills    : [
-            {name : 'hack'}
+          {name : 'hack'}
         ]
       }
       ];
@@ -1625,17 +1626,17 @@ describe('builder', function () {
         firstname : 'Thomas',
         lastname  : 'A. Anderson',
         skills    : [
-            {name : 'skill1_1'},
-            {name : 'skill1_2'},
-            {name : 'skill1_3'}
+          {name : 'skill1_1'},
+          {name : 'skill1_2'},
+          {name : 'skill1_3'}
         ]
       },{
         firstname : 'Trinity',
         lastname  : 'Unknown',
         skills    : [
-            {name : 'skill2_1'},
-            {name : 'skill2_2'},
-            {name : 'skill2_3'}
+          {name : 'skill2_1'},
+          {name : 'skill2_2'},
+          {name : 'skill2_3'}
         ]
       }
       ];

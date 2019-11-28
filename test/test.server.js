@@ -1,8 +1,8 @@
-var rootPath = process.cwd(); // where "make test" is called 
+var rootPath = process.cwd(); // where "make test" is called
 var assert = require('assert');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
-var Socket = require('../lib/socket');  
+var Socket = require('../lib/socket');
 var helper  = require('../lib/helper');
 var format  = require('../lib/format');
 var path = require('path');
@@ -112,7 +112,7 @@ describe('Server', function () {
 
 
 function executeServer (params, callback) {
-  var _commandToTest = rootPath+'/bin/carbone'; 
+  var _commandToTest = rootPath+'/bin/carbone';
   spawn(_commandToTest, params, {cwd : rootPath}); // stop by the client
   // server.stdout.on('data', function (data) {
   //  console.log('\n\nstdout: ' + data+'\n\n');

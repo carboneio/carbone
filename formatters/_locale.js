@@ -1,16 +1,18 @@
+/* eslint-disable camelcase */
+/* eslint-disable no-unused-vars */
 
 const commonFormatFn = {
   Sv : (v, S, s, M, m, n) => {
-    return `${S}${v}`; 
+    return `${S}${v}`;
   },
   v_S : (v, S, s, M, m, n) => {
-    return `${v} ${S}`; 
+    return `${v} ${S}`;
   },
   v_M : (v, S, s, M, m, n) => {
-    return `${v} ${M}`; 
+    return `${v} ${M}`;
   },
   M : (v, S, s, M, m, n) => {
-    return M; 
+    return M;
   }
 };
 
@@ -80,7 +82,7 @@ const locales = {
       code : 'EUR'
     }
   },
-  'af' : {
+  af : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -93,7 +95,7 @@ const locales = {
       code : 'ZAR'
     }
   },
-  'sq' : {
+  sq : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -106,7 +108,7 @@ const locales = {
       code : 'ALL'
     }
   },
-  'am' : {
+  am : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -327,7 +329,7 @@ const locales = {
       code : 'YER'
     }
   },
-  'hy' : {
+  hy : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -353,7 +355,7 @@ const locales = {
       code : 'RUB'
     }
   },
-  'be' : {
+  be : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -366,7 +368,7 @@ const locales = {
       code : 'BYN'
     }
   },
-  'bn' : {
+  bn : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -379,7 +381,7 @@ const locales = {
       code : 'BDT'
     }
   },
-  'bs' : {
+  bs : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -392,7 +394,7 @@ const locales = {
       code : 'BAM'
     }
   },
-  'bg' : {
+  bg : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -405,7 +407,7 @@ const locales = {
       code : 'BGN'
     }
   },
-  'my' : {
+  my : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -483,7 +485,7 @@ const locales = {
       code : 'TWD'
     }
   },
-  'hr' : {
+  hr : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -496,7 +498,7 @@ const locales = {
       code : 'HRK'
     }
   },
-  'cs' : {
+  cs : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -509,7 +511,7 @@ const locales = {
       code : 'CZK'
     }
   },
-  'da' : {
+  da : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -665,7 +667,7 @@ const locales = {
       code : 'TTD'
     }
   },
-  'et' : {
+  et : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -678,7 +680,7 @@ const locales = {
       code : 'EUR'
     }
   },
-  'mk' : {
+  mk : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -691,7 +693,7 @@ const locales = {
       code : 'MKD'
     }
   },
-  'fo' : {
+  fo : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -704,7 +706,7 @@ const locales = {
       code : 'FOK'
     }
   },
-  'fa' : {
+  fa : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -717,7 +719,7 @@ const locales = {
       code : 'IRR'
     }
   },
-  'fi' : {
+  fi : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -860,7 +862,7 @@ const locales = {
       code : 'CHF'
     }
   },
-  'el' : {
+  el : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -873,7 +875,7 @@ const locales = {
       code : 'EUR'
     }
   },
-  'gn' : {
+  gn : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -886,7 +888,7 @@ const locales = {
       code : 'PYG'
     }
   },
-  'he' : {
+  he : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -899,7 +901,7 @@ const locales = {
       code : 'ILS'
     }
   },
-  'hi' : {
+  hi : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -912,7 +914,7 @@ const locales = {
       code : 'INR'
     }
   },
-  'hu' : {
+  hu : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -925,7 +927,7 @@ const locales = {
       code : 'HUF'
     }
   },
-  'is' : {
+  is : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -938,7 +940,7 @@ const locales = {
       code : 'ISK'
     }
   },
-  'id' : {
+  id : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -977,7 +979,7 @@ const locales = {
       code : 'CHF'
     }
   },
-  'ja' : {
+  ja : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -990,7 +992,7 @@ const locales = {
       code : 'JPY'
     }
   },
-  'kn' : {
+  kn : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1003,7 +1005,7 @@ const locales = {
       code : 'INR'
     }
   },
-  'kk' : {
+  kk : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1016,7 +1018,7 @@ const locales = {
       code : 'KZT'
     }
   },
-  'km' : {
+  km : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1029,7 +1031,7 @@ const locales = {
       code : 'KHR'
     }
   },
-  'ko' : {
+  ko : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1042,7 +1044,7 @@ const locales = {
       code : 'KRW'
     }
   },
-  'lo' : {
+  lo : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1055,7 +1057,7 @@ const locales = {
       code : 'LAK'
     }
   },
-  'lv' : {
+  lv : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1068,7 +1070,7 @@ const locales = {
       code : 'EUR'
     }
   },
-  'lt' : {
+  lt : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1107,7 +1109,7 @@ const locales = {
       code : 'MYR'
     }
   },
-  'ml' : {
+  ml : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1120,7 +1122,7 @@ const locales = {
       code : 'MYR'
     }
   },
-  'mt' : {
+  mt : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1133,7 +1135,7 @@ const locales = {
       code : 'EUR'
     }
   },
-  'mi' : {
+  mi : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1146,7 +1148,7 @@ const locales = {
       code : 'NZD'
     }
   },
-  'mr' : {
+  mr : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1159,7 +1161,7 @@ const locales = {
       code : 'BDT'
     }
   },
-  'mn' : {
+  mn : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1172,7 +1174,7 @@ const locales = {
       code : 'MNT'
     }
   },
-  'ne' : {
+  ne : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1198,7 +1200,7 @@ const locales = {
       code : 'NOK'
     }
   },
-  'or' : {
+  or : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1211,7 +1213,7 @@ const locales = {
       code : 'INR'
     }
   },
-  'pl' : {
+  pl : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1263,7 +1265,7 @@ const locales = {
       code : 'MDL'
     }
   },
-  'ro' : {
+  ro : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1276,7 +1278,7 @@ const locales = {
       code : 'RON'
     }
   },
-  'ru' : {
+  ru : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1302,7 +1304,7 @@ const locales = {
       code : 'MDL'
     }
   },
-  'sa' : {
+  sa : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1328,7 +1330,7 @@ const locales = {
       code : 'RUB'
     }
   },
-  'si' : {
+  si : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1341,7 +1343,7 @@ const locales = {
       code : 'LKR'
     }
   },
-  'sk' : {
+  sk : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1354,7 +1356,7 @@ const locales = {
       code : 'EUR'
     }
   },
-  'sl' : {
+  sl : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1367,7 +1369,7 @@ const locales = {
       code : 'EUR'
     }
   },
-  'so' : {
+  so : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1627,7 +1629,7 @@ const locales = {
       code : 'VES'
     }
   },
-  'sw' : {
+  sw : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1666,7 +1668,7 @@ const locales = {
       code : 'SEK'
     }
   },
-  'tg' : {
+  tg : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1679,7 +1681,7 @@ const locales = {
       code : 'TJS'
     }
   },
-  'ta' : {
+  ta : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1692,7 +1694,7 @@ const locales = {
       code : 'LKR'
     }
   },
-  'te' : {
+  te : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1705,7 +1707,7 @@ const locales = {
       code : 'INR'
     }
   },
-  'th' : {
+  th : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1718,7 +1720,7 @@ const locales = {
       code : 'THB'
     }
   },
-  'bo' : {
+  bo : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1731,7 +1733,7 @@ const locales = {
       code : 'CNY'
     }
   },
-  'ts' : {
+  ts : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1744,7 +1746,7 @@ const locales = {
       code : 'ZAR'
     }
   },
-  'tr' : {
+  tr : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1757,7 +1759,7 @@ const locales = {
       code : 'TRY'
     }
   },
-  'tk' : {
+  tk : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1770,7 +1772,7 @@ const locales = {
       code : 'TMT'
     }
   },
-  'uk' : {
+  uk : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1783,7 +1785,7 @@ const locales = {
       code : 'UAH'
     }
   },
-  'ur' : {
+  ur : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1809,7 +1811,7 @@ const locales = {
       code : 'UZS'
     }
   },
-  'vi' : {
+  vi : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1822,7 +1824,7 @@ const locales = {
       code : 'VND'
     }
   },
-  'cy' : {
+  cy : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1835,7 +1837,7 @@ const locales = {
       code : 'GBP'
     }
   },
-  'xh' : {
+  xh : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1848,7 +1850,7 @@ const locales = {
       code : 'ZAR'
     }
   },
-  'yi' : {
+  yi : {
     number : {
       separator : ' ',
       decimal   : ',',
@@ -1861,7 +1863,7 @@ const locales = {
       code : 'ILS'
     }
   },
-  'zu' : {
+  zu : {
     number : {
       separator : ' ',
       decimal   : ',',

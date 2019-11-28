@@ -6,12 +6,12 @@ barcodesMethods.set('code39', _code39);
 barcodesMethods.set('ean128', _ean128);
 
 /**
- * Return true if letters from `fromIndex` to (`fromIndex` + `length`) are numbers 
- * 
+ * Return true if letters from `fromIndex` to (`fromIndex` + `length`) are numbers
+ *
  * @param  {String}  str       string to test
  * @param  {Integer} fromIndex the index of the first character
  * @param  {Integer} length    the number of characters to analyze
- * @return {Boolean}            
+ * @return {Boolean}
  */
 function _isNumber (str, fromIndex, length) {
   if ((fromIndex + length - 1) > str.length) {

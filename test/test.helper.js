@@ -2,7 +2,7 @@ var assert = require('assert');
 var helper  = require('../lib/helper');
 var path  = require('path');
 var fs  = require('fs');
-var rootPath = process.cwd(); // where "make test" is called 
+var rootPath = process.cwd(); // where "make test" is called
 var testPath = rootPath+'/test/test/';
 
 describe('helper', function () {
@@ -31,7 +31,7 @@ describe('helper', function () {
       helper.assert(helper.cleanJavascriptVariable('aa!2'), 'aa_2');
       helper.assert(helper.cleanJavascriptVariable('aa=2'), 'aa_2');
       helper.assert(helper.cleanJavascriptVariable('aa\'2'), 'aa_2');
-      helper.assert(helper.cleanJavascriptVariable('aa\"2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa"2'), 'aa_2');
       helper.assert(helper.cleanJavascriptVariable('ab-+-/*!=.f'), 'ab________f');
     });
   });
@@ -48,7 +48,7 @@ describe('helper', function () {
     });
   });
 
-  
+
   describe('readFileDirSync', function () {
     beforeEach(function () {
       helper.rmDirRecursive(testPath);
@@ -107,7 +107,7 @@ describe('helper', function () {
         fs.mkdirSync(_subDir, parseInt('0755', 8));
       }
       fs.writeFileSync(path.join(_subDir, 'testsub.sql'), 'test');
-      
+
       helper.rmDirRecursive(_testedPath);
 
       assert.equal(fs.existsSync(_testedPath), false);
@@ -135,7 +135,7 @@ describe('helper', function () {
       var _testedPath = path.join(__dirname, 'walkDirTest');
       var _subDir = path.join(_testedPath, 'otherDir');
       // create the directory
-      fs.mkdirSync(_testedPath, parseInt('0755', 8));          
+      fs.mkdirSync(_testedPath, parseInt('0755', 8));
       fs.mkdirSync(_subDir, parseInt('0755', 8));
       var _result = helper.walkDirSync(_testedPath);
       assert.equal(_result.length, 0);

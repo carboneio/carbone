@@ -343,10 +343,8 @@ describe('preprocessor', function () {
             }]
           };
           const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d.nbr}" calcext:value-type="float"><text:p>{d.nbr}</text:p></table:table-cell>';
-          preprocessor.convertNumberMarkersIntoNumericFormat(_template, function (err, resTemplate) {
-            helper.assert(!!err, false);
-            helper.assert(resTemplate.files[0].data, _expectedResult);
-          });
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
         });
 
         it('should makes a number marker (:formatN) recognised as number cell for ODS files [2 markers]', function () {
@@ -357,10 +355,8 @@ describe('preprocessor', function () {
             }]
           };
           const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d.nbr}" calcext:value-type="float"><text:p>{d.nbr}</text:p></table:table-cell><table:table-cell office:value-type="float" office:value="{d.nbr6}" calcext:value-type="float"><text:p>{d.nbr6}</text:p></table:table-cell>';
-          preprocessor.convertNumberMarkersIntoNumericFormat(_template, function (err, resTemplate) {
-            helper.assert(!!err, false);
-            helper.assert(resTemplate.files[0].data, _expectedResult);
-          });
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
         });
 
         it('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + style attributes]', function () {
@@ -371,10 +367,8 @@ describe('preprocessor', function () {
             }]
           };
           const _expectedResult = '<table:table-cell table:style-name="ce7" office:value-type="float" office:value="{d.nbr7}" calcext:value-type="float"><text:p>{d.nbr7}</text:p></table:table-cell>';
-          preprocessor.convertNumberMarkersIntoNumericFormat(_template, function (err, resTemplate) {
-            helper.assert(!!err, false);
-            helper.assert(resTemplate.files[0].data, _expectedResult);
-          });
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
         });
 
         it('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + 2 style attributes and spaces]', function () {
@@ -385,10 +379,8 @@ describe('preprocessor', function () {
             }]
           };
           const _expectedResult = '<table:table-cell table:style-name="ce7" office:value-type="float" office:value="{d.nbr7}" table:style-name="ce7" calcext:value-type="float">  <text:p>   {d.nbr7}  </text:p>   </table:table-cell>';
-          preprocessor.convertNumberMarkersIntoNumericFormat(_template, function (err, resTemplate) {
-            helper.assert(!!err, false);
-            helper.assert(resTemplate.files[0].data, _expectedResult);
-          });
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
         });
       });
       describe('removeRowCounterInWorksheet', function () {

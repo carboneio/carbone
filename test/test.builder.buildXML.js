@@ -317,6 +317,57 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should work if there is a marker in a tag', function (done) {
+    var _xml = '<xml><t_row bla={d.cars[i].brand}>  </t_row><t_row bla={d.cars [i+1].brand}>  </t_row></xml>';
+    var _data = {
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><t_row bla=Lumeneo>  </t_row><t_row bla=Tesla motors>  </t_row><t_row bla=Toyota>  </t_row></xml>');
+      done();
+    });
+  });
+  it('should work if there are marker in tag, with nested markers', function (done) {
+    var _xml = '<xml> <tr>{<t_row bla={d.cars[i].brand}> d <i attr={d.id}>.</i> <b> type </b> </t_row>}</tr><tr>  { <b></b>  <t_row bla={d.cars [i+1].brand}> d <i> . </i> type}  </t_row></tr></xml>';
+    var _data = {
+      id   : 20,
+      type : 'car',
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt,''
+        + '<xml> '
+        +   '<tr>car'
+        +     '<t_row bla=Lumeneo>'
+        +       '<i attr=20></i>'
+        +       '<b></b>'
+        +     '</t_row>'
+        +   '</tr>'
+        +   '<tr>car'
+        +     '<t_row bla=Tesla motors>'
+        +       '<i attr=20></i>'
+        +       '<b></b>'
+        +     '</t_row>'
+        +   '</tr>'
+        +   '<tr>car'
+        +     '<t_row bla=Toyota>'
+        +       '<i attr=20></i>'
+        +       '<b></b>'
+        +     '</t_row>'
+        +   '</tr>'
+        + '</xml>'
+      );
+      done();
+    });
+  });
   it('should detect repetition even if there is only one self-closing tag between the two parts (with whitespaces)', function (done) {
     var _xml = '<xml><p><p><br/></p></p>{d[i].brand}  <br/>{d[i+1].brand}  <br/></xml>';
     var _data = [

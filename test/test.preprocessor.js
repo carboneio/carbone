@@ -335,7 +335,7 @@ describe('preprocessor', function () {
         });
       });
       describe('convertNumberMarkersIntoNumericFormat', function () {
-        it ('should makes a number marker (:formatN) recognised as number cell for ODS files [1 marker]', function () {
+        it('should makes a number marker (:formatN) recognised as number cell for ODS files [1 marker]', function () {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -349,7 +349,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it ('should makes a number marker (:formatN) recognised as number cell for ODS files [2 markers]', function () {
+        it('should makes a number marker (:formatN) recognised as number cell for ODS files [2 markers]', function () {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -363,7 +363,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it ('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + style attributes]', function () {
+        it('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + style attributes]', function () {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -377,7 +377,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it ('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + 2 style attributes and spaces]', function () {
+        it('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + 2 style attributes and spaces]', function () {
           const _template = {
             files : [{
               name : 'content.xml',

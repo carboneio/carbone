@@ -44,6 +44,7 @@ describe('preprocessor', function () {
             isZipped   : true,
             filename   : 'template.xlsx',
             embeddings : [],
+            extension  : 'xlsx',
             files      : [
               {name : 'xl/sharedStrings.xml'    , parent : '', data : _sharedStringBefore},
               {name : 'xl/worksheets/sheet1.xml', parent : '', data : _sheetBefore}
@@ -63,6 +64,7 @@ describe('preprocessor', function () {
             isZipped   : true,
             filename   : 'template.docx',
             embeddings : ['embedded/spreadsheet.xlsx'],
+            extension  : 'docx',
             files      : [
               {name : 'my_file.xml'             , parent : ''                         , data : 'some text'},
               {name : 'xl/sharedStrings.xml'    , parent : 'embedded/spreadsheet.xlsx', data : _sharedStringBefore},
@@ -88,6 +90,7 @@ describe('preprocessor', function () {
             isZipped   : true,
             filename   : 'template.docx',
             embeddings : ['embedded/spreadsheet.xlsx', 'embedded/spreadsheet2.xlsx'],
+            extension  : 'docx',
             files      : [
               {name : 'my_file.xml'             , parent : ''                          , data : 'some text'},
               {name : 'xl/sharedStrings.xml'    , parent : 'embedded/spreadsheet.xlsx' , data : _sharedStringBefore},
@@ -132,31 +135,35 @@ describe('preprocessor', function () {
           +'</Relationships>';
         it('should do nothing if template is empty', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : []
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : []
           };
           preprocessor.removeOneFile(_report, 1);
           helper.assert(_report, {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : []
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : []
           });
         });
         it('should do nothing if index is negative', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [{name : 'my_file.xml' , data : 'some text', parent : ''}]
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [{name : 'my_file.xml' , data : 'some text', parent : ''}]
           };
           preprocessor.removeOneFile(_report, -1);
           helper.assert(_report.files.length, 1);
         });
         it('should remove this 2nd file', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
               {name : 'my_file.xml' , data : 'some text', parent : ''},
               {name : 'my_file1.xml', data : 'some text', parent : ''},
               {name : 'my_file2.xml', data : 'some text', parent : ''}
@@ -169,9 +176,10 @@ describe('preprocessor', function () {
         });
         it('should remove this 2nd file and the relation in workbook', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
               {name : 'xl/my_file.xml'            , data : 'some text'        , parent : ''},
               {name : 'xl/my_file2.xml'           , data : 'some text'        , parent : ''},
               {name : 'xl/sharedStrings.xml'      , data : 'some text'        , parent : ''},
@@ -187,9 +195,10 @@ describe('preprocessor', function () {
         });
         it('should change the workbook of the embedded document only', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
               {name : 'xl/my_file.xml'            , data : 'some text'        , parent : ''},
               {name : 'xl/my_file2.xml'           , data : 'some text'        , parent : ''},
               {name : 'xl/sharedStrings.xml'      , data : 'some text'        , parent : ''},
@@ -210,9 +219,10 @@ describe('preprocessor', function () {
       describe('convertSharedStringToInlineString', function () {
         it('should do not crash if the file is not an xlsx file (should not happen because execute filter)', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
               {name : 'my_file.xml', data : 'some text'}
             ]
           };
@@ -221,18 +231,20 @@ describe('preprocessor', function () {
         });
         it('should replace shared string by inline strings in a real xlsx file', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.xlsx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.xlsx',
+            extension : 'xlsx',
+            files     : [
               {name : 'xl/sharedStrings.xml'    , data : _sharedStringBefore},
               {name : 'xl/worksheets/sheet1.xml', data : _sheetBefore}
             ]
           };
           var _fileConverted = preprocessor.convertSharedStringToInlineString(_report);
           helper.assert(_fileConverted, {
-            isZipped : true,
-            filename : 'template.xlsx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.xlsx',
+            extension : 'xlsx',
+            files     : [
               // {'name': 'xl/sharedStrings.xml'    , 'data': _sharedStringAfter},
               {name : 'xl/worksheets/sheet1.xml', data : _sheetAfter}
             ]

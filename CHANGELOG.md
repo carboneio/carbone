@@ -4,6 +4,7 @@
 
 ### v1.5.0-ideolys
   - Detect input file type without reading file extension (docx, xlsx, pptx, odt, ods, odp, xhtml, html, xml)
+  - Convert number markers using the `:formatN()` formatter into a cell of type number for XLSX and ODS files.
 
 ### v1.4.0-ideolys
   - Fix file conversion errors by checking the input and output file type

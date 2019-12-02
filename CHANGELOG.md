@@ -1,3 +1,7 @@
+### v1.6.0-ideolys
+  - add the possibility to force input file extension with `options.extension`
+  - fix crash when a file is empty (null) in template
+
 ### v1.5.0-ideolys
   - Detect input file type without reading file extension (docx, xlsx, pptx, odt, ods, odp, xhtml, html, xml)
 

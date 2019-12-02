@@ -935,6 +935,62 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should accept XLSX files with the extension given in options (needs preprocessing)', function (done) {
+      var _data = [{
+        name : 'Bouteille de sirop d’érable 25cl',
+        qty  : 4
+      },{
+        name : 'Bouteille de cidre de glace 1L',
+        qty  : 2
+      },{
+        name : 'Sachet de Cranberry 200g',
+        qty  : 3
+      }];
+      carbone.render('test_xlsx_list', _data, { extension : 'xlsx' }, function (err, result) {
+        assert.equal(err, null);
+        fs.mkdirSync(testPath, parseInt('0755', 8));
+        var _document = path.join(testPath, 'file.xlsx');
+        var _unzipPath = path.join(testPath, 'unzip');
+        fs.writeFileSync(_document, result);
+        unzipSystem(_document, _unzipPath, function (err, files) {
+          var _xmlExpectedContent = files['xl/worksheets/sheet1.xml'];
+          _xmlExpectedContent.should.containEql(''
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de sirop d’érable 25cl</t></is></c><c  t="inlineStr"><is><t>4</t></is></c></row>'
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de cidre de glace 1L</t></is></c><c  t="inlineStr"><is><t>2</t></is></c></row>'
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Sachet de Cranberry 200g</t></is></c><c  t="inlineStr"><is><t>3</t></is></c></row>'
+          );
+          done();
+        });
+      });
+    });
+    it('should force extension to XLSX even if the file extension is another', function (done) {
+      var _data = [{
+        name : 'Bouteille de sirop d’érable 25cl',
+        qty  : 4
+      },{
+        name : 'Bouteille de cidre de glace 1L',
+        qty  : 2
+      },{
+        name : 'Sachet de Cranberry 200g',
+        qty  : 3
+      }];
+      carbone.render('test_xlsx_list.docx', _data, { extension : 'xlsx' }, function (err, result) {
+        assert.equal(err, null);
+        fs.mkdirSync(testPath, parseInt('0755', 8));
+        var _document = path.join(testPath, 'file.xlsx');
+        var _unzipPath = path.join(testPath, 'unzip');
+        fs.writeFileSync(_document, result);
+        unzipSystem(_document, _unzipPath, function (err, files) {
+          var _xmlExpectedContent = files['xl/worksheets/sheet1.xml'];
+          _xmlExpectedContent.should.containEql(''
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de sirop d’érable 25cl</t></is></c><c  t="inlineStr"><is><t>4</t></is></c></row>'
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de cidre de glace 1L</t></is></c><c  t="inlineStr"><is><t>2</t></is></c></row>'
+            +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Sachet de Cranberry 200g</t></is></c><c  t="inlineStr"><is><t>3</t></is></c></row>'
+          );
+          done();
+        });
+      });
+    });
     it.skip('should parse embedded documents (should be ok but not perfect)');
     it.skip('should re-generate r=1, c=A1 in Excel documents');
     it.skip('should not remove empty cells in XLSX files (needs pre-processing to add empty cells)');

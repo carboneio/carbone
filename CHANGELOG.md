@@ -1,9 +1,15 @@
 
+### v1.5.2-ideolys
+  - formatOptions to convert to CSV are by default `44,34,0`
+
 ### v1.5.1-ideolys
   - Fix: in ODS files:
     - numbers are converted to "spreadsheet number format" if the cell contains ONLY one Carbone marker
     - convert to "spreadsheet number format" is supported in more ODS files
-  - Breaking change: `carbone.convert` accepts `options.extension` (without dot) instead of `options.sourceExtension`
+  - Breaking changes: 
+    - `carbone.convert` accepts 
+      - `options.extension` (without dot) instead of `options.sourceExtension`
+      - all previous options (fieldSeparator, textDelimiter, characterSet) are in `options.formatOptions`
 
 ### v1.5.0-ideolys
   - add the possibility to force input file extension with `options.extension` without the dot

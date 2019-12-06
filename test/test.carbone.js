@@ -1314,6 +1314,19 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should by default render with options 44,34,0 for csv', function (done) {
+      var data = [{ id : 1, name : 'field_1' },
+        { id : 2, name : 'référence' }];
+      var _options = {
+        convertTo : 'csv'
+      };
+      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
+        helper.assert(err, null);
+        var _expected = ',,\n,1,field_1\n,2,référence\n';
+        helper.assert(result.toString(), _expected);
+        done();
+      });
+    });
     it('should render spreadsheet with options (incomplete)', function (done) {
       var data = [{ id : 1, name : 'field_1' },
         { id : 2, name : 'field_2' }];

@@ -382,6 +382,53 @@ describe('preprocessor', function () {
           preprocessor.convertNumberMarkersIntoNumericFormat(_template);
           helper.assert(_template.files[0].data, _expectedResult);
         });
+        it('should not convert to number if the cell contains multiple markers', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell table:style-name="ce7" office:value-type="string" table:style-name="ce7" calcext:value-type="string">  <text:p>   {d.nbr7:formatN()} {d.nbr6:formatN()}  </text:p>   </table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell table:style-name="ce7" office:value-type="string" table:style-name="ce7" calcext:value-type="string">  <text:p>   {d.nbr7:formatN()} {d.nbr6:formatN()}  </text:p>   </table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+        it('should accept unknown attributes in XML and other order of calcext:value-type and office:value-type', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : ''
+                + '<table:table-row table:style-name="ro5">'
+                + '  <table:table-cell calcext:value-type="string" office:value-type="string">'
+                + '    <text:p>{d.analyticalGroup[id=8].label:ifEmpty(\'-\')}</text:p>'
+                + '  </table:table-cell>'
+                + '  <table:table-cell calcext:value-type="string" office:value-type="string">'
+                + '    <text:p>{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\'):formatN()}</text:p>'
+                + '  </table:table-cell>'
+                + '  <table:table-cell office:value-type="string" other:unknown="bla" calcext:value-type="string">'
+                + '    <text:p>{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\'):formatN()}</text:p>'
+                + '  </table:table-cell>'
+                + '  <table:table-cell table:number-columns-repeated="59"/>'
+                + '</table:table-row>'
+            }]
+          };
+          const _expectedResult = ''
+            + '<table:table-row table:style-name="ro5">'
+            + '  <table:table-cell calcext:value-type="string" office:value-type="string">'
+            + '    <text:p>{d.analyticalGroup[id=8].label:ifEmpty(\'-\')}</text:p>'
+            + '  </table:table-cell>'
+            + '  <table:table-cell calcext:value-type="float" office:value-type="float" office:value="{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\')}">'
+            + '    <text:p>{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\')}</text:p>'
+            + '  </table:table-cell>'
+            + '  <table:table-cell office:value-type="float" office:value="{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\')}" other:unknown="bla" calcext:value-type="float">'
+            + '    <text:p>{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\')}</text:p>'
+            + '  </table:table-cell>'
+            + '  <table:table-cell table:number-columns-repeated="59"/>'
+            + '</table:table-row>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+        
       });
       describe('removeRowCounterInWorksheet', function () {
         it('should do nothing if the string is empty or null', function () {

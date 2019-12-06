@@ -1149,6 +1149,52 @@ describe('Carbone', function () {
     });
   });
 
+  describe('convert', function () {
+    var _templatePath = path.join(__dirname, 'datasets');
+    var defaultOptions = {
+      pipeNamePrefix : '_carbone',
+      factories      : 1,
+      startFactory   : false,
+      attempts       : 2
+    };
+    afterEach(function (done) {
+      converter.exit(function () {
+        converter.init(defaultOptions, done);
+        carbone.reset();
+      });
+    });
+    beforeEach(function () {
+      carbone.set({templatePath : _templatePath});
+    });
+    it('should convert a file to another format', function (done) {
+      var _options = {
+        fieldSeparator : ',',
+        textDelimiter  : '"',
+        characterSet   : '76',
+        extension      : 'ods'
+      };
+      var _fileData = fs.readFileSync(path.join(__dirname, 'datasets', 'test_spreadsheet.ods'));
+      carbone.convert(_fileData, 'csv', _options, function (err, data) {
+        helper.assert(err, null);
+        helper.assert(data.toString(), ',,\n,{d[i].id},{d[i].name}\n,{d[i+1].id},{d[i+1].name}\n');
+        done();
+      });
+    });
+    it('should return an error if the file input type is not defined', function (done) {
+      var _options = {
+        fieldSeparator : ',',
+        textDelimiter  : '"',
+        characterSet   : '76'
+      };
+      var _fileData = fs.readFileSync(path.join(__dirname, 'datasets', 'test_spreadsheet.ods'));
+      carbone.convert(_fileData, 'csv', _options, function (err, data) {
+        helper.assert(err, 'options.extension must be set to detect input file type');
+        helper.assert(data, null);
+        done();
+      });
+    });
+  });
+
   describe('render and convert CSV with options', function () {
     var _templatePath = path.join(__dirname, 'datasets');
     var defaultOptions = {

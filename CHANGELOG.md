@@ -1,6 +1,12 @@
 
+### v1.5.1-ideolys
+  - Fix: in ODS files:
+    - numbers are converted to "spreadsheet number format" if the cell contains ONLY one Carbone marker
+    - convert to "spreadsheet number format" is supported in more ODS files
+  - Breaking change: `carbone.convert` accepts `options.extension` (without dot) instead of `options.sourceExtension`
+
 ### v1.5.0-ideolys
-  - add the possibility to force input file extension with `options.extension`
+  - add the possibility to force input file extension with `options.extension` without the dot
   - fix crash when a file is empty (null) in template
   - detect input file type without reading file extension (docx, xlsx, pptx, odt, ods, odp, xhtml, html, xml)
   - convert number markers using the `:formatN()` formatter into a cell of type number for XLSX and ODS files.

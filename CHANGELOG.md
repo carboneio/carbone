@@ -1,3 +1,6 @@
+### v1.x.x
+  - Fix LibreOffice detection on Windows
+
 ### v1.2.1
   - Release June 11, 2019
   - Fix `arrayMap()` if used with an array of strings or integer

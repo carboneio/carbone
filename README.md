@@ -248,7 +248,7 @@ And now, you can use the converter, by passing options to render method.
 
 ## API Reference
 
-To check out the **[api reference](https://carbone.io/api-reference)** and the **[documentation](https://carbone.io/documentation)**, visit [carbone.io](http://carbone.io).
+To check out the **[api reference](https://carbone.io/api-reference.html#carbone-js-api)** and the **[documentation](https://carbone.io/documentation)**, visit [carbone.io](http://carbone.io).
 
 
 ## Command line tools

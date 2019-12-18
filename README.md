@@ -23,7 +23,7 @@
   <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
     <img src="https://badgen.net/docker/pulls/ideolys/carbone-env-docker?icon=docker" alt="docker badge">
   </a>
-  <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
+  <a href="https://github.com/Ideolys/carbone">
     <img src="https://badgen.net/github/forks/ideolys/carbone?icon=github" alt="github fork badge">
   </a>
 </p>
@@ -312,6 +312,6 @@ Thanks to all Ideolys's direct contributors (random order)
   - Vincent Bertin
   - Léo Labruyère
   - Aurélien Kermabon
-  - Steeve Payraudeau
+  - [Steeve Payraudeau](https://github.com/steevepay)
 
 Thanks to all French citizens (Crédit Impôt Recherche, Jeune Entreprise Innovante, BPI)!

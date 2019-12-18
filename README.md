@@ -1,11 +1,38 @@
-Carbone.io
-==========
+<p align="center">
+  <a href="https://carbone.io/" target="_blank">
+    <img alt="CarboneJS" width="100" src="https://carbone.io/img/favicon.png">
+  </a>
+</p>
 
-**Fast, Simple and Powerful report generator** in any format PDF, DOCX, XLSX, ODT, PPTX, ODS [, ...]
+<p align="center">
+<a href="https://www.npmjs.com/package/carbone">
+    <img src="https://badgen.net/npm/dt/carbone" alt="npm badge">
+  </a>
+  <a href="https://www.npmjs.com/package/carbone">
+    <img src="https://badgen.net/npm/dm/carbone" alt="npm badge">
+  </a>
+  <a href="https://www.npmjs.com/package/carbone">
+    <img src="https://badgen.net/npm/v/carbone" alt="carbone version badge">
+  </a><br/>
+  <a href="https://carbone.io/documentation.html">
+    <img src="https://readthedocs.org/projects/ansicolortags/badge/?version=latest" alt="documentation badge">
+  </a>
+  <a href="https://bundlephobia.com/result?p=carbone">
+    <img src="https://badgen.net/bundlephobia/minzip/carbone" alt="minizip badge">
+  </a>
+  <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
+    <img src="https://badgen.net/docker/pulls/ideolys/carbone-env-docker?icon=docker" alt="docker badge">
+  </a>
+  <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
+    <img src="https://badgen.net/github/forks/ideolys/carbone?icon=github" alt="github fork badge">
+  </a>
+</p>
 
-... using your JSON data as input.
 
-![Carbone.io Icon](./doc/carbone_icon_small.png)
+
+<p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...
+
+... using your JSON data as input !</p>
 
 ## Table of content
 
@@ -20,13 +47,7 @@ Carbone.io
   - [PDF generation, document conversion](#pdf-generation-document-conversion)
 - [More examples](#more-examples)
 - [API Reference](#api-reference)
-    - [render\(templatePath, data, options, callback\)](#rendertemplatepath-data-options-callback)
-    - [renderXML\(xml, data, options, callback\)](#renderxmlxml-data-options-callback)
-    - [set\(options\)](#setoptions)
-    - [addFormatters\(customFormatters\)](#addformatterscustomformatters)
 - [Command line tools](#command-line-tools)
-    - [translate](#translate)
-    - [find](#find)
 - [Performance](#performance)
 - [Licenses and editions](#licenses-and-editions)
 - [Philosophy](#philosophy)
@@ -57,6 +78,7 @@ Template language documentation : https://carbone.io/documentation.html
 - The injected data must be a JSON object or array, coming directly from your existing APIs for example
 
 Carbone analyzes your template and inject data in the document. The generated document can be exported as is, or converted to another format (PDF, ...) using LibreOffice if it is installed on the system.
+Carbone is working only on the server-side.
 
 
 ## Minimum Requirements
@@ -131,10 +153,10 @@ Carbone does a lot of thing for you behind the scene:
   sudo apt autoremove --purge
 
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
-  # Get the latest from http://download.documentfoundation.org/libreoffice/stable 
+  # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
   wget https://downloadarchive.documentfoundation.org/libreoffice/old/5.3.2.2/deb/x86_64/LibreOffice_5.3.2.2_Linux_x86-64_deb.tar.gz
-  
+
   # Install required dependencies on ubuntu server for LibreOffice 5.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
@@ -145,7 +167,7 @@ Carbone does a lot of thing for you behind the scene:
   # Install LibreOffice
   sudo dpkg -i *.deb
 
-  # If you want to use Microsoft fonts in reports, you must install the fonts 
+  # If you want to use Microsoft fonts in reports, you must install the fonts
   # Andale Mono, Arial Black, Arial, Comic Sans MS, Courier New, Georgia, Impact,
   # Times New Roman, Trebuchet, Verdana,Webdings)
   sudo apt install ttf-mscorefonts-installer
@@ -173,7 +195,7 @@ And now, you can use the converter, by passing options to render method.
   };
 
   carbone.render('./node_modules/carbone/examples/simple.odt', data, options, function(err, result){
-    if (err) return console.log(err); 
+    if (err) return console.log(err);
     fs.writeFileSync('result.pdf', result);
     process.exit(); // to kill automatically LibreOffice workers
   });
@@ -226,161 +248,20 @@ And now, you can use the converter, by passing options to render method.
 
 ## API Reference
 
-#### render(templatePath, data, options, callback)
-
-- templatePath `<string>`: path to the template relative to `defaultTemplatePath`, which is `process.cwd()` by default
-- data         `<object|array>` : data to inject in the template
-- options      `<object>` : options, details below
-- callback     `<Function>` : three parameters, `err`, `result` (Binary), `reportName` (String)
-
-`options` can one of these parameters:
-
-```javascript
-{
-  convertTo    : 'pdf', // String|Object, to convert the document (pdf, xlsx, docx, ods, csv, txt, ...)
-  lang         : 'en-us', // String, output lang of the report
-  complement   : {},  // Object|Array, extra data accessible in the template with {c.} instead of {d.}
-  variableStr  : '{#def = d.id}', // String, predefined alias string, see designer's documentation
-  reportName   : '{d.date}.odt', // String, dynamic file name, output in third argument of the callback
-  enums        : { // Object, list of enumerations, use it in reports with `convEnum` formatters
-    'ORDER_STATUS' : ['open', 'close']
-    'SPEED' : {
-      10 : 'slow' 
-      20 : 'fast' 
-    }
-  },    
-  translations : {  // Object, dynamically overwrite all loaded translations for this rendering
-    'fr-fr' : {'one':'un' },
-    'es-es' : {'one':'uno'}
-  }
-}
-```
-
-`convertTo` can be an object for CSV export
-
-```javascript
-{
-  formatName    : 'csv',
-  formatOptions : {
-    fieldSeparator : '+',
-    textDelimiter  : '"',
-    characterSet   : '76' // utf-8
-  }
-}
-```
-
-`characterSet` can be one these options : https://wiki.openoffice.org/wiki/Documentation/DevGuide/Spreadsheets/Filter_Options
-
-
-#### renderXML(xml, data, options, callback)
-
-Same as `render` function, except that it accepts pure XML string instead of a template path
-
-Example: 
-
-```javascript
-  var data = {
-    param : 'field_1'
-  };
-  carbone.renderXML('<xml>{d.param}</xml>', data, function (err, result) {
-    console.log(result); //output <xml>field_1</xml>
-  });
-```
-
-
-#### set(options)
-
-> This function is not asynchronous (It may create the template or temp directory synchronously).
-
-Set general carbone parameters.
-
-- `options` can contains 
-
-```javascript
-  {
-    tempPath     : os.tmpdir(),  // String, system temp directory by default
-    templatePath : process.cwd(), // String, default template path, and lang path
-    lang         : 'fr-fr', // String, set default lang of carbone, can be overwrite by carbone.render options
-    translations : {    // Object, in-memory loaded translations at startup. Can be overwritten here
-      'fr-fr' : {'one':'un' },
-      'es-es' : {'one':'uno'}
-    },
-    factories    : 1, // Number of LibreOffice worker 
-    startFactory : false // If true, start LibreOffice worker immediately
-  }
-```
-
-Example: 
-
-```javascript
-  carbone.set({
-    lang : 'en-us'
-  });
-```
-
-
-#### addFormatters(customFormatters)
-
-Carbone comes with [embedded formatters](https://carbone.io/documentation.html#formatters)
-
-You can add your own formatters, and overwrite default ones.
-
-- `customFormatters` must be an object containing one or many functions. Example:
-
-```javascript
-  carbone.addFormatters({
-    // this formatter can be used in a template with {d.myBoolean:yesOrNo()}
-    yesOrNo : function (data) { // data = d.myBoolean
-      if (this.lang === 'fr-fr') {
-        return data === true ? 'oui' : 'non';
-      }
-      return data === true ? 'yes' : 'no';
-    }
-  });
-```
-
-The function signature must be like this:
-
-```javascript
-function(data, firstParam, secondParam, ...) {
-  return '' // value printed in a rendered report
-}
-```
+To check out the **[api reference](https://carbone.io/api-reference)** and the **[documentation](https://carbone.io/documentation)**, visit [carbone.io](http://carbone.io).
 
 
 ## Command line tools
 
-For convenience, install carbone globally
+To checkout out the Carbone CLI documentation, visit [carbone.io](https://carbone.io/api-reference.html#cli)
 
-```bash
-  npm install carbone -g
-```
+## Issues
 
-#### translate
+If you're facing any issues, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/Ideolys/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/Ideolys/carbone/issues/new/choose).
 
-With this command, Carbone parses all your templates, find [translation markers](https://carbone.io/documentation.html#translations) like `{t(movie)}`, and updates JSON translation files accordingly.
+## Roadmap
 
-It creates automatically a `lang` directory with all translation files, one per lang. It never loses already translated sentences.
-
-Carbone loads translation files at startup if it finds a `lang` directory in the default template path.
-
-```bash
-carbone translate --help
-
-# example: 
-carbone translate -l fr-fr -p path/to/template_default_path
-```
-
-#### find
-
-If you want to find where a deprecated formatter is used among all your templates, carbone provides a search tool
-
-```bash
-carbone find needle
-```
-
-It searches among all reports in the current working directory and its subdirectories
-
+The roadmap is pinned on on the github issues list.
 
 ## Performance
 
@@ -398,7 +279,7 @@ It could be even better when "code cache" will be activated. Coming soon...
 There are two editions of Carbone:
 
 - Carbone Community Edition is available freely under the **Apache v2 license**
-- Carbone Enterprise Edition (hosted and on-premise) includes extra features like a user interface (coming soon)
+- Carbone Enterprise Edition (hosted and on-premise) includes extra features like a user interface.
 
 We want to follow the model of Gitlab. **The free version must be and must stay generous.**
 
@@ -413,17 +294,6 @@ We already know that beneficiaries will be, at least :heart:
 - LibreOffice foundation
 - PostgreSQL foundation
 - An innovative child school in France
-
-
-## Roadmap
-
-Help is welcome!
-
-  - manage dynamic images : Available only on Hosted version Carbone Render
-  - manage dynamic colors : Available only on Hosted version Carbone Render
-  - manage dynamic charts
-  - improve error output
-  - improve xslx support
 
 ## Contributors
 
@@ -442,8 +312,6 @@ Thanks to all Ideolys's direct contributors (random order)
   - Vincent Bertin
   - Léo Labruyère
   - Aurélien Kermabon
+  - Steeve Payraudeau
 
 Thanks to all French citizens (Crédit Impôt Recherche, Jeune Entreprise Innovante, BPI)!
-
-
-

@@ -1030,6 +1030,15 @@ describe('Carbone', function () {
       });
     });
 
+    it('should accept txt files as template', (done) => {
+      var data = [{ id : 1, name : 'field_1' }, { id : 2, name : 'field_2' }];
+      carbone.render('template_txt.txt', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '1 field_1 2 field_2 ');
+        done();
+      });
+    });
+
     it('should return error by converting a template ODS to text10 (non compatible files types)', (done) => {
       var data = [{ id : 1, name : 'field_1' }, { id : 2, name : 'field_2' }];
       var _options = {

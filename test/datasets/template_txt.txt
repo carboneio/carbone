@@ -1,0 +1,2 @@
+{d[i].id} {d[i].name}
+{d[i+1].id}

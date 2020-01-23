@@ -1,4 +1,7 @@
 
+### v1.5.3-ideolys
+  - Accepts `*.txt` templates
+
 ### v1.5.2-ideolys
   - formatOptions to convert to CSV are by default `44,34,0`
 

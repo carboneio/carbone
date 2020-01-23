@@ -88,8 +88,15 @@ describe('file', function () {
         done();
       });
     });
+    it('should accept txt files', function (done) {
+      carbone.getFileExtension('test_txt.txt', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'txt');
+        done();
+      });
+    });
     it('should not detect type if nothing has been matched', function (done) {
-      carbone.getFileExtension('test_txt.txt', function (err) {
+      carbone.getFileExtension('test_unknown_file_type', function (err) {
         helper.assert(err, 'Cannot detect file extension');
         done();
       });

@@ -1,4 +1,7 @@
 
+### v1.5.x-ideolys
+  - Add the possibility to export translatons keys
+
 ### v1.5.3-ideolys
   - Accepts `*.txt` templates
 

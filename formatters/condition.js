@@ -1,7 +1,7 @@
 
 /**
  * Test if data is empty (null, undefined, [], {}, ...)
- * 
+ *
  * @example [ null     ,  "D'oh!" ]
  * @example [ []       ,  "D'oh!" ]
  * @example [ {}       ,  "D'oh!" ]
@@ -10,7 +10,7 @@
  * @example [ "homer"  ,  "D'oh!" ]
  * @example [ [23]     ,  "D'oh!" ]
  * @example [ {"id":3} ,  "D'oh!" ]
- * 
+ *
  * @param  {Mixed} d                   data
  * @param  {String} message            message to print if JSON data is empty
  * @param  {Boolean} continueOnSuccess [optional], if true, next formatter will be called even if the condition is true
@@ -42,7 +42,7 @@ function ifEmpty (d, message, continueOnSuccess) {
  * @example [ null     , 100     ,  "bingo" ]
  * @example [ null     , null    ,  "bingo" ]
  * @example [ 0        , 100     ,  "bingo" ]
- * 
+ *
  * @param  {String|Integer|Boolean}   d                 data
  * @param  {String|Integer|Boolean}   value             value to test
  * @param  {String}                   messageIfTrue     message to print if the value equals JSON data
@@ -51,7 +51,7 @@ function ifEmpty (d, message, continueOnSuccess) {
  */
 function ifEqual (d, value, messageIfTrue, continueOnSuccess) {
   // Convert everything in string (not strict Equal)
-  if (d + '' === value + '') { // eslint-disable-line
+  if (d + '' === value + '') {
     if (continueOnSuccess !== true && continueOnSuccess !== 'true') {
       this.stopPropagation = true;
     }
@@ -72,7 +72,7 @@ function ifEqual (d, value, messageIfTrue, continueOnSuccess) {
  * @example [ [100, 120, 20]       , 99      ,  "bingo" ]
  * @example [ ["your", "eyes"]     , "eyes"  ,  "bingo" ]
  * @example [ []                   , "eyes"  ,  "bingo" ]
- * 
+ *
  * @param  {String|Array}             d                 data
  * @param  {String|Integer|Boolean}   value             value to search
  * @param  {String}                   messageIfTrue     message to print if JSON data contains the value

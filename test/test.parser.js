@@ -4,7 +4,7 @@ var helper  = require('../lib/helper');
 var count   = require('../formatters/array').count;
 
 describe('parser', function () {
-  
+
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
@@ -21,7 +21,7 @@ describe('parser', function () {
         helper.assert(markers, [{pos : 11, name : '_root.d.toto'}]);
         helper.assert(cleanedXml, '<xml>{toto </xml>');
         done();
-      })
+      });
     });
     it('should find multiple markers even if there are brackets before the markers', function (done) {
       parser.findMarkers('<xml>{d.tata} {to{c.menu} {to {d.toto}</xml>', function (err, cleanedXml, markers) {
@@ -29,7 +29,7 @@ describe('parser', function () {
         helper.assert(markers, [{pos : 5, name : '_root.d.tata'}, {pos : 9, name : '_root.c.menu'}, {pos : 14, name : '_root.d.toto'}]);
         helper.assert(cleanedXml, '<xml> {to {to </xml>');
         done();
-      })
+      });
     });
     it('2. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
@@ -76,6 +76,122 @@ describe('parser', function () {
         done();
       });
     });
+    it('It should find marker which is in another marker', function (done) {
+      parser.findMarkers('<w:r><w:rPr><w:color /></w:rPr><w:t>{</w:t></w:r><w:r ><w:rPr><w:color w:val="{d.perso[i].color}" /></w:rPr><w:t>d.perso</w:t></w:r><w:r><w:rPr><w:color /></w:rPr><w:t>[i].nom}</w:t></w:r>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [{pos : 36, name : '_root.d.perso[i].nom'},{pos : 77, name : '_root.d.perso[i].color'}]);
+        helper.assert(cleanedXml, '<w:r><w:rPr><w:color /></w:rPr><w:t></w:t></w:r><w:r ><w:rPr><w:color w:val="" /></w:rPr><w:t></w:t></w:r><w:r><w:rPr><w:color /></w:rPr><w:t></w:t></w:r>');
+        done();
+      });
+    });
+    it('It should find multiple markers which are in another marker', function (done) {
+      parser.findMarkers('<w:r><w:color /><w:t>{</w:t></w:r><w:r ><w:color w:val="{d.perso[i].color}" /><w:t>d.perso</w:t></w:r><w:r><w:rPr test="{d.perso[i].test}"><w:color /></w:rPr><w:t>[i].nom}</w:t></w:r>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [{pos : 21, name : '_root.d.perso[i].nom'},{pos : 55, name : '_root.d.perso[i].color'},{pos : 94, name : '_root.d.perso[i].test'}]);
+        helper.assert(cleanedXml, '<w:r><w:color /><w:t></w:t></w:r><w:r ><w:color w:val="" /><w:t></w:t></w:r><w:r><w:rPr test=""><w:color /></w:rPr><w:t></w:t></w:r>');
+        done();
+      });
+    });
+    it('It should find multiple markers inside tag which are themselves in other markers', function (done) {
+      parser.findMarkers('<xml><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i]</ha>.na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i+</ha>1].na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr></xml>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [
+          {pos : 9, name : '_root.d.toto[i].name'},
+          {pos : 16, name : '_root.d.toto'},
+          {pos : 21, name : '_root.d.tata'},
+          {pos : 26, name : '_root.d.titi'},
+          {pos : 40, name : '_root.d.toto'},
+          {pos : 45, name : '_root.d.tata'},
+          {pos : 50, name : '_root.d.titi'},
+          {pos : 66, name : '_root.d.toto[i+1].name'},
+          {pos : 73, name : '_root.d.toto'},
+          {pos : 78, name : '_root.d.tata'},
+          {pos : 83, name : '_root.d.titi'},
+          {pos : 97, name : '_root.d.toto'},
+          {pos : 102, name : '_root.d.tata'},
+          {pos : 107, name : '_root.d.titi'},
+        ]);
+        helper.assert(cleanedXml, '<xml><tr><ha a="" b="" c=""></ha><he a="" b="" c=""></he></tr><tr><ha a="" b="" c=""></ha><he a="" b="" c=""></he></tr></xml>');
+        done();
+      });
+    });
+    it('It should find multiple markers which are in another marker with others markers', function (done) {
+      parser.findMarkers('<w:r test="{d.lolo}">{d.color}<w:color /><w:t>{</w:t></w:r><w:r ><w:color w:val="{d.perso[i].color}" /><w:t>d.perso</w:t></w:r><w:r><w:rPr test="{d.perso[i].test}"><w:color /></w:rPr><w:t>[i].nom}</w:t class="{d.lala}">{d.test}</w:r>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [
+          {pos : 11, name : '_root.d.lolo'},
+          {pos : 13, name : '_root.d.color'},
+          {pos : 29, name : '_root.d.perso[i].nom'},
+          {pos : 63, name : '_root.d.perso[i].color'},
+          {pos : 102, name : '_root.d.perso[i].test'},
+          {pos : 141, name : '_root.d.lala'},
+          {pos : 143, name : '_root.d.test'}
+        ]);
+        helper.assert(cleanedXml, '<w:r test=""><w:color /><w:t></w:t></w:r><w:r ><w:color w:val="" /><w:t></w:t></w:r><w:r><w:rPr test=""><w:color /></w:rPr><w:t></w:t class=""></w:r>');
+        done();
+      });
+    });
+    it('It should find markers with loop and splited marker, it should order list of markers', function (done) {
+      var str =
+      '<xml>' +
+        '<tr>' +
+          '<td>' +
+            '<span class="{d.perso[i].color}">{</span>' +
+            '<span class="{d.perso[i].color}">d.perso[i]</span>' +
+            '<span class="{d.perso[i].color}">.nom</span>' +
+            '<span class="{d.perso[i].color}">}</span>' +
+          '</td>' +
+          '<td>' +
+            '<span class="{d.perso[i].color}">{</span>' +
+            '<span class="{d.perso[i].color}">d.perso[i]</span>' +
+            '<span class="{d.perso[i].color}">.prenom</span>' +
+            '<span class="{d.perso[i].color}">}</span>' +
+          '</td>' +
+        '</tr>' +
+        '<tr>' +
+          '<td>' +
+            '<span class="{d.perso[i+1].color}">{</span>' +
+            '<span class="{d.perso[i+1].color}">d.perso[i+1]</span>' +
+            '<span class="{d.perso[i+1].color}">.nom</span>' +
+            '<span class="{d.perso[i+1].color}">}</span>' +
+          '</td>' +
+          '<td>' +
+            '<span class="{d.perso[i+1].color}">{</span>' +
+            '<span class="{d.perso[i+1].color}">d.perso[i+1]</span>' +
+            '<span class="{d.perso[i+1].color}">.prenom</span>' +
+            '<span class="{d.perso[i+1].color}">}</span>' +
+          '</td>' +
+        '</tr>' +
+      '</xml>';
+      parser.findMarkers(str, function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [ { pos : 26, name : '_root.d.perso[i].color' },
+          { pos : 28, name : '_root.d.perso[i].nom' },
+          { pos : 48, name : '_root.d.perso[i].color' },
+          { pos : 70, name : '_root.d.perso[i].color' },
+          { pos : 92, name : '_root.d.perso[i].color' },
+          { pos : 123, name : '_root.d.perso[i].color' },
+          { pos : 125, name : '_root.d.perso[i].prenom' },
+          { pos : 145, name : '_root.d.perso[i].color' },
+          { pos : 167, name : '_root.d.perso[i].color' },
+          { pos : 189, name : '_root.d.perso[i].color' },
+          { pos : 229, name : '_root.d.perso[i+1].color' },
+          { pos : 231, name : '_root.d.perso[i+1].nom' },
+          { pos : 251, name : '_root.d.perso[i+1].color' },
+          { pos : 273, name : '_root.d.perso[i+1].color' },
+          { pos : 295, name : '_root.d.perso[i+1].color' },
+          { pos : 326, name : '_root.d.perso[i+1].color' },
+          { pos : 328, name : '_root.d.perso[i+1].prenom' },
+          { pos : 348, name : '_root.d.perso[i+1].color' },
+          { pos : 370, name : '_root.d.perso[i+1].color' },
+          { pos : 392, name : '_root.d.perso[i+1].color' }  ]);
+        helper.assert(cleanedXml, '<xml><tr><td><span class=""></span><span class=""></span><span class=""></span><span class=""></span></td><td><span class=""></span><span class=""></span>' +
+          '<span class=""></span><span class=""></span></td></tr><tr><td><span class=""></span><span class=""></span><span class=""></span><span class=""></span></td><td>' +
+          '<span class=""></span><span class=""></span><span class=""></span><span class=""></span></td></tr></xml>');
+        done();
+      });
+    });
+
     it('should remove unwanted characters', function (done) {
       parser.findMarkers('<div>{d.menu}<div> \n   {d.city}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
@@ -87,7 +203,7 @@ describe('parser', function () {
     it('should convert conflicting characters', function (done) {
       parser.findMarkers("<div>{d.menu}<div> it's \n   {d.city}", function (err, cleanedXml) {
         helper.assert(err, null);
-        helper.assert(cleanedXml, "<div><div> it\\\'s     ");
+        helper.assert(cleanedXml, "<div><div> it\\'s     ");
         done();
       });
     });
@@ -144,7 +260,7 @@ describe('parser', function () {
       });
     });
   });
-  
+
   describe('extractMarker', function () {
     it('should extract the marker from the xml and keep whitespaces and special characters (-> very important)', function () {
       assert.equal(parser.extractMarker('menu<xmla>why[1].test'), 'menuwhy[1].test');
@@ -155,7 +271,7 @@ describe('parser', function () {
       assert.equal(parser.extractMarker('menu<some xml data>why<sqs>[1<sas  >\n<qqs>].test'), 'menuwhy[1\n].test');
       assert.equal(parser.extractMarker('menu<some xml data>why<sqs>[1<sas  >\t<qqs>].test'), 'menuwhy[1\t].test');
       assert.equal(parser.extractMarker('menu</w:t></w:r><w:r w:rsidR="00013394"><w:t>why</w:t></w:r><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:bookmarkEnd w:id="0"/><w:r w:rsidR="00013394"><w:t>[1].</w:t></w:r><w:r w:rsidR="00013394"><w:t>test</w:t></w:r><w:r w:rsidR="00013394"><w:t xml:space="preserve">'),
-      'menuwhy[1].test');
+        'menuwhy[1].test');
     });
   });
 
@@ -663,7 +779,7 @@ describe('parser', function () {
       assert.equal(parser.findClosingTagPosition('<tar/><tar/><br/><file/>', 0), 6);
       assert.equal(parser.findClosingTagPosition('<br/>'), 5);
 
-      assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>'), 14); 
+      assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>'), 14);
       assert.equal(parser.findClosingTagPosition('<p><p></p></p></p>',13), 14);
       assert.equal(parser.findClosingTagPosition('<br/><p><p></p></p></p><br/>', 6), 19);
     });
@@ -795,7 +911,7 @@ describe('parser', function () {
         part1End   : {tag : 'tr', pos : 10, selfClosing : true},
         part2Start : {tag : 'tr', pos : 10, selfClosing : true}
       });
-      var _str = '<tr></tr> <i></i>';
+      _str = '<tr></tr> <i></i>';
       helper.assert(parser.findPivot(_str), {
         part1End   : {tag : 'i', pos : 17, selfClosing : true},
         part2Start : {tag : 'i', pos : 17, selfClosing : true}
@@ -808,13 +924,13 @@ describe('parser', function () {
         part2Start : {tag : 'w:tbl', pos : 593 }
       });
     });
-    it('should accept non-XML structure', function(){
+    it('should accept non-XML structure', function () {
       var _str = '';
       helper.assert(parser.findPivot(_str), {
         part1End   : {tag : '', pos : 0, selfClosing : true},
         part2Start : {tag : '', pos : 0, selfClosing : true}
       });
-      var _str = '  ,  ';
+      _str = '  ,  ';
       helper.assert(parser.findPivot(_str), {
         part1End   : {tag : '', pos : 5, selfClosing : true},
         part2Start : {tag : '', pos : 5, selfClosing : true}
@@ -966,17 +1082,18 @@ describe('parser', function () {
 
       it('should assign loop id (without parenthesis)', function (done) {
         var _xml = '<xml><p>{d.cars[i].brand:count}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        // eslint-disable-next-line no-unused-vars
         var _data = {
-          "cars" : [
-            {"brand" : "Lumeneo"},
-            {"brand" : "Tesla"  },
-            {"brand" : "Toyota" }
+          cars : [
+            {brand : 'Lumeneo'},
+            {brand : 'Tesla'  },
+            {brand : 'Toyota' }
           ]
         };
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)')
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)');
             done();
           });
         });
@@ -984,34 +1101,36 @@ describe('parser', function () {
 
       it('should assign loop id (with parenthesis)', function (done) {
         var _xml = '<xml><p>{d.cars[i].brand:count()}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        // eslint-disable-next-line no-unused-vars
         var _data = {
-          "cars" : [
-            {"brand" : "Lumeneo"},
-            {"brand" : "Tesla"  },
-            {"brand" : "Toyota" }
+          cars : [
+            {brand : 'Lumeneo'},
+            {brand : 'Tesla'  },
+            {brand : 'Toyota' }
           ]
         };
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)')
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)');
             done();
           });
         });
       });
       it('should assign loop id (with start given)', function (done) {
         var _xml = '<xml><p>{d.cars[i].brand:count(42)}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+        // eslint-disable-next-line no-unused-vars
         var _data = {
-          "cars" : [
-            {"brand" : "Lumeneo"},
-            {"brand" : "Tesla"  },
-            {"brand" : "Toyota" }
+          cars : [
+            {brand : 'Lumeneo'},
+            {brand : 'Tesla'  },
+            {brand : 'Toyota' }
           ]
         };
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)')
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)');
             done();
           });
         });
@@ -1019,6 +1138,7 @@ describe('parser', function () {
 
       it('should assign loop id (with start given)', function (done) {
         var _xml = '<xml> <t_row> {d[speed=100,i].brand:count} </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
+        // eslint-disable-next-line no-unused-vars
         var _data = [
           {brand : 'Lumeneo'     , speed : 100},
           {brand : 'Tesla motors', speed : 200},
@@ -1026,8 +1146,8 @@ describe('parser', function () {
         ];
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
-          parser.preprocessMarkers(markers, [], function (err, markers) {
-            //helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)')
+          parser.preprocessMarkers(markers, [], function () {
+            // helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)')
             done();
           });
         });
@@ -1057,7 +1177,7 @@ describe('parser', function () {
 
         helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
         helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
-        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');        
+        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
       });
 
     });

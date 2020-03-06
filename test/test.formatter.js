@@ -2,6 +2,8 @@ var dateFormatter = require('../formatters/date');
 var conditionFormatter = require('../formatters/condition');
 var stringFormatter = require('../formatters/string');
 var arrayFormatter = require('../formatters/array');
+var numberFormatter = require('../formatters/number');
+const barcodeFormatter = require('../formatters/barcode');
 var helper = require('../lib/helper');
 
 describe('formatter', function () {
@@ -17,6 +19,34 @@ describe('formatter', function () {
     it('should convert unix timestamp', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'en'}, 1318781876, 'X', 'LLLL'), 'Sunday, October 16, 2011 6:17 PM');
       helper.assert(dateFormatter.convDate.call({lang : 'fr'}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
+    });
+  });
+  describe('formatD', function () {
+    it('should accept use this.lang to set convert date', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '20101201', 'L', 'YYYYMMDD'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, '20101201', 'L', 'YYYYMMDD'), '01/12/2010');
+    });
+    it('should return null or undefined if value is null or undefined', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, undefined, 'L', 'YYYYMMDD'), undefined);
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, null, 'L',  'YYYYMMDD'), null);
+    });
+    it('should convert unix timestamp', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, 1318781876, 'LLLL', 'X'), 'Sunday, October 16, 2011 6:17 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, 1318781876, 'LLLL', 'X'), 'dimanche 16 octobre 2011 18:17');
+    });
+    it('should consider input format is ISO 8601 by default if not provided', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '2017-05-10T15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '1997-12-17 07:37:16-08', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
+    });
+    it('should accepts real locales', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en-GB'}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en-gb'}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en-US'}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr-CA'}, '20101201', 'L'), '2010-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr-FR'}, '20101201', 'L'), '01/12/2010');
     });
   });
   describe('convCRLF', function () {
@@ -52,7 +82,7 @@ describe('formatter', function () {
       var _context = {};
       helper.assert(callWithContext(conditionFormatter.ifEmpty, _context, 0           , 'msgIfEmpty'), 0);
       helper.assert(_context.stopPropagation, false);
-       
+
       var _date = new Date();
       helper.assert(callWithContext(conditionFormatter.ifEmpty, _context, _date       , 'msgIfEmpty'), _date);
       helper.assert(_context.stopPropagation, false);
@@ -297,6 +327,18 @@ describe('formatter', function () {
     });
   });
 
+  describe('substr', function () {
+    it('should keep only the selection', function () {
+      helper.assert(stringFormatter.substr('coucou', 0, 3), 'cou');
+      helper.assert(stringFormatter.substr('coucou', 0, 0), '');
+      helper.assert(stringFormatter.substr('coucou', 3, 4), 'c');
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.substr(null, 0, 3), null);
+      helper.assert(stringFormatter.substr(undefined, 0, 3), undefined);
+    });
+  });
+
   describe('arrayMap', function () {
     it('should flatten the each object of the array (only the first level, ignoring sub arrays, sub objects,...)', function () {
       var _datas = [
@@ -304,6 +346,10 @@ describe('formatter', function () {
         {id : 3, name : 'plane', type : 'concept', sub : {id : 3}, arr : [12, 23]}
       ];
       helper.assert(arrayFormatter.arrayMap(_datas), '2:car:toy, 3:plane:concept');
+    });
+    it('should accept array of strings', function () {
+      var _datas = ['car', 'plane', 'toy', 42];
+      helper.assert(arrayFormatter.arrayMap(_datas), 'car, plane, toy, 42');
     });
     it('should change object and attribute separators', function () {
       var _datas = [
@@ -354,12 +400,281 @@ describe('formatter', function () {
       helper.assert(arrayFormatter.arrayMap({}), {});
     });
   });
+
+  describe('convCurr', function () {
+    it('should return the same value if the currency source is the same as the currency target', function () {
+      var _this = {currency : { source : 'EUR', target : 'EUR', rates : {EUR : 1, USD : 1.14, GBP : 0.89} }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10.1), 10.1);
+    });
+
+    it('should not crash if value or rate is null or undefined', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, null), 0);
+
+      _this = {currency : { source : null, target : null, rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10), 10);
+    });
+
+    it('should convert currency', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10.1), 11.514);
+
+      _this = {currency : { source : 'USD', target : 'EUR', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 11.514), 10.1);
+
+      _this = {currency : { source : 'GBP', target : 'EUR', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 100.4), 125.5);
+
+      _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 125.5), 143.07);
+
+      _this = {currency : { source : 'GBP', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 100.4), 143.07);
+    });
+
+    it('should accept to change target in the formatter', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10.1, 'GBP'), 8.08);
+    });
+
+    it('should accept to change source in the formatter', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 100.4, 'EUR', 'GBP'), 125.5);
+    });
+  });
+
+  describe('formatN', function () {
+    it('should format number according to the locale a percentage', function () {
+      var _this = {lang : 'fr'};
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1, 1), '10 000,1');
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1, '1'), '10 000,1');
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1), '10 000,100');
+      helper.assert(numberFormatter.formatN.call(_this, null, 1), null);
+      helper.assert(numberFormatter.formatN.call(_this, undefined, 1), undefined);
+      helper.assert(numberFormatter.formatN.call(_this, 10000.30202, 5), '10 000,30202');
+      helper.assert(numberFormatter.formatN.call(_this, -10000.30202, 5), '-10 000,30202');
+      helper.assert(numberFormatter.formatN.call(_this, -10000.30202, '5'), '-10 000,30202');
+      helper.assert(numberFormatter.formatN.call(_this, '-10000.30202', '5'), '-10 000,30202');
+
+      _this = {lang : 'en-gb'};
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1, 1), '10,000.1');
+      helper.assert(numberFormatter.formatN.call(_this, '10000000.1', 1), '10,000,000.1');
+    });
+
+    it.skip('should keep maximal precision if precision is not defined', function () {
+      var _this = {lang : 'fr'};
+      helper.assert(numberFormatter.formatN.call(_this, 10000.12345566789), '10 000,12345566789');
+    });
+
+    it('should round number', function () {
+      var _this = {lang : 'fr'};
+      helper.assert(numberFormatter.formatN.call(_this, 222.1512, 2), '222,15');
+      helper.assert(numberFormatter.formatN.call(_this, 222.1552, 2), '222,16');
+
+      helper.assert(numberFormatter.formatN.call(_this, 1.005, 2), '1,01');
+      helper.assert(numberFormatter.formatN.call(_this, 1.005, 3), '1,005');
+
+      helper.assert(numberFormatter.formatN.call(_this, -1.005, 3), '-1,005');
+      helper.assert(numberFormatter.formatN.call(_this, -1.006, 2), '-1,01');
+    });
+  });
+
+  describe('round', function () {
+
+    it('should round number', function () {
+      var _this = {lang : 'fr'};
+      helper.assert(numberFormatter.round.call(_this, 222.1512, 2), 222.15);
+      helper.assert(numberFormatter.round.call(_this, 222.1552, 2), 222.16);
+
+      helper.assert(numberFormatter.round.call(_this, 1.005, 2), 1.01);
+      helper.assert(numberFormatter.round.call(_this, 1.005, 3), 1.005);
+
+      helper.assert(numberFormatter.round.call(_this, -1.005, 3), -1.005);
+      helper.assert(numberFormatter.round.call(_this, -1.006, 2), -1.01);
+      helper.assert(numberFormatter.round.call(_this, -1.005, 2), -1);
+    });
+  });
+
+  describe('formatC', function () {
+    it('should format number according to the locale, currencyTarget, and set automatically the precision', function () {
+      var _rates = {EUR : 1, USD : 1, GBP : 1};
+      var _this = {lang : 'en-us', currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1), '$10,000.10');
+
+      _this.currency.target = 'EUR';
+      helper.assert(numberFormatter.formatC.call(_this, 10000.155), '€10,000.16');
+
+      _this.lang = 'fr-fr';
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1), '10 000,10 €');
+      helper.assert(numberFormatter.formatC.call(_this, -10000.1), '-10 000,10 €');
+
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'M'), 'euros');
+
+      helper.assert(numberFormatter.formatC.call(_this, null, 1), null);
+      helper.assert(numberFormatter.formatC.call(_this, undefined, 1), undefined);
+    });
+
+    it('should change currency output format', function () {
+      var _rates = {EUR : 1, USD : 1, GBP : 1};
+      var _this = {lang : 'en-us', currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'M'), 'dollars');
+      helper.assert(numberFormatter.formatC.call(_this, 1, 'M'), 'dollar');
+      helper.assert(numberFormatter.formatC.call(_this, 10.15678, 5), '$10.15678');
+      helper.assert(numberFormatter.formatC.call(_this, 10.15678, 'LL'), '10.16 dollars');
+      _this.currency.target = 'EUR';
+      _this.lang = 'fr-fr';
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'M'), 'euros');
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'L'), '10 000,10 €');
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'LL'), '10 000,10 euros');
+      helper.assert(numberFormatter.formatC.call(_this, 1, 'LL'), '1,00 euro');
+    });
+
+    it('should convert currency automatically if target != source using rates', function () {
+      var _rates = {EUR : 1, USD : 2, GBP : 10};
+      var _this = {lang : 'en-us', currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1), '$20,000.20');
+      _this.currency.target = 'GBP';
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1), '£100,001.00');
+    });
+
+    it('should accept custom format', function () {
+      var _rates = {EUR : 1, USD : 1, GBP : 1};
+      var _this = {lang : 'fr-fr', currency : { source : 'EUR', target : 'EUR', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 10000.1, 'M'), 'euros');
+      helper.assert(numberFormatter.formatC.call(_this, 1, 'M'), 'euro');
+    });
+
+    it('should be fast', function () {
+      var _rates = {EUR : 1, USD : 2, GBP : 10};
+      var _this = {lang : 'en-us', currency : { source : 'EUR', target : 'USD', rates : _rates }};
+      var _loops = 10000;
+      var _res = [];
+      var _start = process.hrtime();
+      for (var i = 0; i < _loops; i++) {
+        _res.push(numberFormatter.formatC.call(_this, 10000.1));
+      }
+      var _diff = process.hrtime(_start);
+      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n formatC number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
+      helper.assert(_elapsed > 50, false, 'formatC is too slow');
+    });
+  });
+
+  describe('Number operations', function () {
+    it('should add number', function () {
+      helper.assert(numberFormatter.add('120', '67'), 187);
+    });
+
+    it('should substract number', function () {
+      helper.assert(numberFormatter.sub('120', '67'), 53);
+    });
+
+    it('should multiply number', function () {
+      helper.assert(numberFormatter.mul('120', '67'), 8040);
+    });
+
+    it('should divide number', function () {
+      helper.assert(numberFormatter.div('120', '80'), 1.5);
+    });
+  });
+
+  describe('Barcodes', function () {
+
+    it('should return an empty string with a undefined barcode format', () => {
+      helper.assert(barcodeFormatter.barcode('fweffewfweq'), '');
+    });
+
+    it('should format the ean13 barcode to EAN13.TTF code (ean13 format)', () => {
+      helper.assert(barcodeFormatter.barcode('9780201134476', 'ean13'), '9HSKCKB*bdeehg+');
+      helper.assert(barcodeFormatter.barcode('8056459824973', 'ean13'), '8APGOPJ*icejhd+');
+    });
+
+    it('should return an empty string with a string of letters (ean13 format)', () => {
+      helper.assert(barcodeFormatter.barcode('fweffewfweq', 'ean13'), '');
+    });
+
+    it('should return an empty string with less than 13 numbers (ean13 format)', () => {
+      helper.assert(barcodeFormatter.barcode('805645982497', 'ean13'), '');
+    });
+
+    // it('should return an empty string with a false barecode control key (ean13 format)', () => {
+    //   helper.assert(barcodeFormatter.barcode('8056459824972', 'ean13'), '');
+    // });
+
+    it('should format the ean8 barcode to EAN13.TTF code (ean8 format)',  () => {
+      helper.assert(barcodeFormatter.barcode('96385074', 'ean8'), ':JGDI*fahe+');
+      helper.assert(barcodeFormatter.barcode('35967101', 'ean8'), ':DFJG*hbab+');
+    });
+
+    it('should return an empty string with a string of letters (ean8 format)', () => {
+      helper.assert(barcodeFormatter.barcode('fweffewfweq', 'ean8'), '');
+    });
+
+    it('should return an empty string with less than 8 numbers (ean8 format)', () => {
+      helper.assert(barcodeFormatter.barcode('8056', 'ean8'), '');
+    });
+
+    // it('should return an empty string with a false barecode control key (ean8 format)', () => {
+    //   helper.assert(barcodeFormatter.barcode('35967100', 'ean8'), '');
+    // });
+
+    it('should format the code39 barcode to CODE39.TTF code (code39 format)',  () => {
+      helper.assert(barcodeFormatter.barcode('GSJ-220097', 'code39'), '*GSJ-220097*');
+      helper.assert(barcodeFormatter.barcode('96385074', 'code39'), '*96385074*');
+      helper.assert(barcodeFormatter.barcode('ASDFGHJKLZXCVBNQWERTYUIOP-.$/+% ', 'code39'), '*ASDFGHJKLZXCVBNQWERTYUIOP-.$/+% *');
+    });
+
+    it('should return an empty string with a wrong character (code39 format)', () => {
+      helper.assert(barcodeFormatter.barcode('80a56', 'code39'), '');
+      helper.assert(barcodeFormatter.barcode('w8056', 'code39'), '');
+      helper.assert(barcodeFormatter.barcode('8056,', 'code39'), '');
+      helper.assert(barcodeFormatter.barcode('', 'code39'), '');
+      helper.assert(barcodeFormatter.barcode(null, 'code39'), '');
+    });
+
+    it('should format the ean128 barcode to EAN128.TTF code (ean128 format)',  () => {
+      helper.assert(barcodeFormatter.barcode('3754 KC 75', 'ean128'), 'ÒEVÍ KC 75)Ó');
+      helper.assert(barcodeFormatter.barcode('3754KC75', 'ean128'), 'ÒEVÍKC75QÓ');
+      helper.assert(barcodeFormatter.barcode('0312345600001', 'ean128'), 'Ò#,BX  Í1ZÓ');
+      helper.assert(barcodeFormatter.barcode('(15)071231(10)LOTA', 'ean128'), "Ñ(15)Ì',?Í(10)LOTASÓ");
+      helper.assert(barcodeFormatter.barcode('DR39', 'ean128'), 'ÑDR39xÓ');
+      helper.assert(barcodeFormatter.barcode('ZB65', 'ean128'), 'ÑZB65gÓ');
+      helper.assert(barcodeFormatter.barcode('~2020112345678901231', 'ean128'), 'Ñ~Ì44+7Mcy!7Í1PÓ');
+      helper.assert(barcodeFormatter.barcode('(01)12345678901231', 'ean128'), 'Ñ(01)Ì,BXnz,?xÓ');
+      helper.assert(barcodeFormatter.barcode('00 12345678 0000000001', 'ean128'), 'Ñ00 Ì,BXnÍ Ì    !6Ó');
+      helper.assert(barcodeFormatter.barcode('[FNC1] 21 12345 [FNC1] 11 (01)123', 'ean128'), 'Ñ[FNC1] 21 12345 [FNC1] 11 (01)123;Ó');
+    });
+
+    it('should return an empty string with a wrong arguments (ean128 format)', () => {
+      helper.assert(barcodeFormatter.barcode(null, 'ean128'), '');
+      helper.assert(barcodeFormatter.barcode(undefined, 'ean128'), '');
+      helper.assert(barcodeFormatter.barcode('', 'ean128'), '');
+    });
+
+    it('should be fast to format ean128 barcode',  () => {
+      let _loops = 10000;
+      let _res = [];
+      let _start = process.hrtime();
+      let _barcodes  = ['00 12345678 0000000001', '(15)071231(10)LOTA', 'DR39'];
+      for (let i = 0; i < _loops; i++) {
+        _res.push(barcodeFormatter.barcode(_barcodes[i%3], 'ean128'));
+      }
+      let _diff = process.hrtime(_start);
+      let _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n barcode e128 number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
+      helper.assert(_elapsed > 50, false, 'barcode(ean128) is too slow');
+    });
+  });
 });
 
 /**
- * Call a formatter, passing `context` object as `this` 
+ * Call a formatter, passing `context` object as `this`
  * @param  {Function} func    formatter to call
- * @param  {Object} context   object 
+ * @param  {Object} context   object
  * @return {Mixed}            [description]
  */
 function callWithContext (func, context) {

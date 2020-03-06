@@ -1,23 +1,7 @@
-### v1.0.7-ideolys
-  - Fix memory leaks: one file descriptor remains opened
-  - Fix crash when template is not correct
-
-### v1.0.6-ideolys
-  - Use same engine as v1.0.5 but includes features of `v1.1.0-ideolys` and `v1.1.1-ideolys`:
-    - Add fallback to basic sorting when timsort crashes
-    - add formatter `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
-    - Formatters which have the property `canInjectXML = true` can inject XML in documents
-
-### v1.5.x-ideolys
+### v1.0.8-ideolys
   - Add the possibility to export translatons keys
-
-### v1.5.3-ideolys
   - Accepts `*.txt` templates
-
-### v1.5.2-ideolys
   - formatOptions to convert to CSV are by default `44,34,0`
-
-### v1.5.1-ideolys
   - Fix: in ODS files:
     - numbers are converted to "spreadsheet number format" if the cell contains ONLY one Carbone marker
     - convert to "spreadsheet number format" is supported in more ODS files
@@ -25,27 +9,17 @@
     - `carbone.convert` accepts 
       - `options.extension` (without dot) instead of `options.sourceExtension`
       - all previous options (fieldSeparator, textDelimiter, characterSet) are in `options.formatOptions`
-
-### v1.5.0-ideolys
   - add the possibility to force input file extension with `options.extension` without the dot
   - fix crash when a file is empty (null) in template
   - detect input file type without reading file extension (docx, xlsx, pptx, odt, ods, odp, xhtml, html, xml)
   - convert number markers using the `:formatN()` formatter into a cell of type number for XLSX and ODS files.
-
-### v1.4.0-ideolys
   - Fix file conversion errors by checking the input and output file type
   - Add support for ean128 barcode
-
-### v1.3.0-ideolys
   - Add new formatters to manage barcode:
     - `barcode(ean8)` : translate an ean8 barcode to EAN13.TTF font code
     - `barcode(ean13)` : translate an ean13 barcode to EAN13.TTF font code
     - `barcode(code39)` : translate a code39 barcode to CODE39.TTF font code
-
-### v1.2.1-ideolys
   - Fix `arrayMap()` if used with an array of strings or integer
-
-### v1.2.0-ideolys
   - Add new formatters
     - `convCurr(targetCurrency, sourceCurrency)` to convert from one currency to another
     - `formatN()` format number according to the locale (lang). Examples:
@@ -60,25 +34,15 @@
     - `currencyTarget` : default target currency when the formatter `convCurr` is used without target
     - `currencyRates`  : rates, based on EUR { EUR : 1, USD : 1.14 }
 
-### v1.1.3-ideolys
+### v1.0.7-ideolys
   - Fix memory leaks: one file descriptor remains opened
-
-### v1.1.2-ideolys
   - Fix crash when template is not correct
 
-### v1.1.1-ideolys
-  - Add fallback to basic sorting when timsort crashes
-
-### v1.1.0-ideolys
-  - Release January 25, 2018
-  - add formatter `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
-  - Formatters which have the property `canInjectXML = true` can inject XML in documents
-  - Return an error in render callback when LibreOffice is not detected
-  - Fix a lot of bugs when using a filter without iterators in arrays `{d.cities[i=0].temperature}`
-  - Get the last object of an array using negative values when filtering with `i` iterator
-    - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
-    - `{d.cities[i=-2].temperature}` shows the temperature of the city before the last
-    - ...
+### v1.0.6-ideolys
+  - Use same engine as v1.0.5 but includes features of `v1.1.0-ideolys` and `v1.1.1-ideolys`:
+    - Add fallback to basic sorting when timsort crashes
+    - add formatter `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
+    - Formatters which have the property `canInjectXML = true` can inject XML in documents
 
 ### v1.0.5-ideolys
   - Release January 12, 2018

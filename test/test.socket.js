@@ -9,7 +9,7 @@ const should = require('should');
 
 var server;
 
-describe.skip('Socket', function () {
+describe('Socket', function () {
 
   // after(function(done) {
   //  require("child_process").exec("kill -9 `lsof -t -i:4000`", function() {

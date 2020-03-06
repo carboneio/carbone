@@ -10,7 +10,7 @@ var carbone = require('../lib/index');
 var tempPath = path.join(__dirname,'tempfile');
 
 
-describe.skip('Server', function () {
+describe('Server', function () {
   describe('carbone server', function () {
     beforeEach(function () {
       helper.rmDirRecursive(tempPath);

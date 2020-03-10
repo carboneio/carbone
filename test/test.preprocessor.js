@@ -769,113 +769,137 @@ describe('preprocessor', function () {
     });
     describe('Dynamic pictures preprocessing ODT ONLY', function () {
 
-      it('should do nothing (no picture)', function () {
-        var xml = '<xml></xml>';
-        var report = {
-          files : [
-            { name : 'content.xml'    , parent : '', data : xml }
-          ]
-        };
-        var expectedReport = {
-          files : [
-            { name : 'content.xml'    , parent : '', data : xml }
-          ]
-        };
-        dynpics.manageOdt(report, function (error, result) {
-          helper.assert(result, expectedReport);
-        });
-      });
 
-      describe('Without loops', function () {
+      describe('prepareOpenDocumentImage', function () {
 
         it('should do nothing', function (done) {
-          var xml = '<xml><text:p></text:p></xml>';
-          var expected = '<xml><text:p></text:p></xml>';
-          var report = {
+          var _xml = '<xml><text:p></text:p></xml>';
+          var _expected = '<xml><text:p></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
             files : [
-              { name : 'content.xml'    , parent : '', data : xml }
+              { name : 'content.xml'    , parent : '', data : _xml }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
-        it('should replace pictures link by alt text marker', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
+        it('should replace pictures link by alt text marker and add special formatter generateOpenDocumentImageHref', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0">'
+                   + '<draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0">'
+                   + '<draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml' , parent : '', data : _xml }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
-        it('should replace pictures link by alt text marker (in styles file)', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
-          var report = {
-            files : [
-              { name : 'styles.xml' , parent : '', data : xml },
+        it('should replace pictures link by alt text marker and add special formatter generateOpenDocumentImageHref', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0">'
+                   + '<draw:image loext:mime-type="image/jpeg" xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0">'
+                   + '<draw:image loext:mime-type="{d.dog:generateOpenDocumentImageMimeType()}" xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml' , parent : '', data : _xml }
+            ]
+          };
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
+            done();
+          });
+        });
+
+
+        it('should leave other markers in alternative text and take into account only the first marker for image', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}  {d.altText}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>  {d.altText}</svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml' , parent : '', data : _xml }
+            ]
+          };
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
+            done();
+          });
+        });
+
+        it('should replace pictures alt text marker in styles file also', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'styles.xml' , parent : '', data : _xml },
               { name : 'content.xml', parent : '', data : ''  }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
-        it('should replace the dynamic picture (text before picture bug)', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.cat}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.cat}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
-          var report = {
+        it('should replace pictures alt text marker on all images and it should not modify other markers', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.cat}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.cat:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
             files : [
-              { name : 'content.xml', parent : '', data : xml }
+              { name : 'content.xml', parent : '', data : _xml }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
-            done();
-          });
-        });
-
-        it('should replace pictures link by alt text marker (two pictures)', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.cat}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.cat}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
-            ]
-          };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
         it('should replace pictures link by alt text marker (with captions)', function (done) {
-          var xml = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
-          var expected = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
-          var report = {
+          var _xml = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
+          var _expected = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
             files : [
-              { name : 'content.xml'    , parent : '', data : xml }
+              { name : 'content.xml'    , parent : '', data : _xml }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
       });
 
-      describe('With loops', function () {
+      describe.skip('With loops', function () {
 
         it('should replace pictures link by alt text marker and wrap in loop', function (done) {
           var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.dog}{d.loop[i+1]}</svg:title></draw:frame></text:p></xml>';

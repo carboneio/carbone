@@ -44,6 +44,9 @@
 
     You can even access nested objects and nested arrays inside `val`: `{d.myObject[i].val.myArray[i].id}`
 
+  - Image processing completely rewritten:
+    - Consider only the first marker occurences in alternative Text of ODT (enables oyther marker)
+
   - Accepts dynamic variables in all formatters! 
     Carbone passes data to formatters if parameters start with a dot `.` and is not surrounded by quotes. Here is an example:
 

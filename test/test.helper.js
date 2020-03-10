@@ -256,5 +256,147 @@ describe('helper', function () {
     });
   });
 
+  describe('genericQueue', () => {
+
+    it('should process one element', () => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }]
+        , item => {
+          _nb.push(item.id);
+        }
+      );
+
+      _queue.start();
+      helper.assert(_nb, [1]);
+    });
+
+    it('should process multiple elements', () => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }, { id : 2 }, { id : 3 }]
+        , (item, next) => {
+          _nb.push(item.id);
+          next();
+        }
+      );
+
+      _queue.start();
+      helper.assert(_nb, [1, 2, 3]);
+    });
+
+    it('should return error', () => {
+      let _nb    = [];
+      let _error = null;
+      let _queue = helper.genericQueue(
+        [{ id : 1 , error : 'error' }, { id : 2 }, { id : 3 }]
+        , (item, next) => {
+          if (item.error) {
+            return next(item.error);
+          }
+
+          _nb.push(item.id);
+          next();
+        }
+        , err => {
+          _error = err;
+        }
+      );
+
+      _queue.start();
+      helper.assert(_nb,[2, 3]);
+      helper.assert(_error, 'error');
+    });
+
+    it('should stop the queue on error when option is set', () => {
+
+      let _nb    = [];
+      let _error = null;
+      let _success = false;
+      let _items = [{ id : 1 }, { id : 2, error : 'error' }, { id : 3 }];
+      let _options = { stopOnError : true };
+
+      function handlerItem (item, next) {
+        if (item.error) {
+          return next(item.error);
+        }
+
+        _nb.push(item.id);
+        next();
+      }
+
+      function handlerSuccess () {
+        _success = true;
+      }
+
+      function handlerError (err) {
+        _error = err;
+      }
+
+      helper.genericQueue(_items, handlerItem, handlerError, handlerSuccess, _options).start();
+
+      helper.assert(_nb, [1]);
+      helper.assert(_error, 'error');
+      helper.assert(_success, false);
+    });
+
+    it('should process multiple elements and call callback end function when it is finished', (done) => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }, { id : 2 }, { id : 3 }]
+        , (item, next) => {
+          setTimeout(() => {
+            _nb.push(item.id);
+            next();
+          }, 100);
+        }
+        , null
+        , () => {
+          helper.assert(_nb, [1, 2, 3]);
+          done();
+        }
+      );
+
+      _queue.start();
+    });
+
+    it('should not start the queue twice if .start is called twice', (done) => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }, { id : 2 }, { id : 3 }]
+        , (item, next) => {
+          setTimeout(() => {
+            _nb.push(item.id);
+            next();
+          }, 100 / item.id);
+        }
+        , null
+        , () => {
+          helper.assert(_nb, [1, 2, 3]);
+          done();
+        }
+      );
+      _queue.start();
+      _queue.start();
+    });
+
+    it('should restart even after a first run', () => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }]
+        , (item, next) => {
+          _nb.push(item.id);
+          next();
+        }
+      );
+      _queue.start();
+      helper.assert(_nb, [1]);
+      _queue.items.push({ id : 2 });
+      _queue.start();
+      helper.assert(_nb, [1, 2]);
+    });
+
+  });
+
 
 });

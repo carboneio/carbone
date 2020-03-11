@@ -3,6 +3,9 @@ const commonFormatFn = {
   Sv : (v, S, s, M, m, n) => {
     return `${S}${v}`; 
   },
+  S_v : (v, S, s, M, m, n) => {
+    return `${S} ${v}`; 
+  },
   v_S : (v, S, s, M, m, n) => {
     return `${v} ${S}`; 
   },
@@ -78,6 +81,19 @@ const locales = {
       LL   : commonFormatFn.v_M,
       M    : commonFormatFn.M,
       code : 'EUR'
+    }
+  },
+  'de-ch' : {
+    number : {
+      separator : '\'',
+      decimal   : '.',
+      group     : 3
+    },
+    currency : {
+      L    : commonFormatFn.S_v,
+      LL   : commonFormatFn.v_M,
+      M    : commonFormatFn.M,
+      code : 'CHF'
     }
   }
 };

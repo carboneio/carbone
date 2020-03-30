@@ -1,5 +1,5 @@
 
-### v1.5.x-ideolys
+### v1.5.4-ideolys
   - Add the possibility to export translatons keys
 
 ### v1.5.3-ideolys

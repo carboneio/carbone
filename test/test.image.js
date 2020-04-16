@@ -245,12 +245,12 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       });
     });
   });
-  describe.only('Test downloadImage function', function () {
+  describe('Test downloadImage function', function () {
     it('should download a JPEG image from an url', function (done) {
       nock('https://google.com')
         .get('/image-flag-fr.jpg')
         .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
-          'Content-Type' : 'application/json',
+          'Content-Type' : 'image/jpeg',
         });
       image.downloadImage('https://google.com/image-flag-fr.jpg', {}, function (err, imageInfo) {
         helper.assert(err+'', 'null');
@@ -264,12 +264,8 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       nock('https://google.com')
         .get('/image-flag-it.png')
         .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
-          'Content-Type' : 'application/json',
+          'Content-Type' : 'image/png',
         });
-      // .replyWithError({
-      //   message: 'something awful happened',
-      //   code: 'AWFUL_ERROR',
-      // }
       image.downloadImage('https://google.com/image-flag-it.png', {}, function (err, imageInfo) {
         helper.assert(err+'', 'null');
         assert(imageInfo.data.length > 0);
@@ -278,9 +274,49 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         done();
       });
     });
+    it('should download a PNG image from an url even if the header.content-type is incorrect (application/json)', function (done) {
+      nock('https://google.com')
+        .get('/image-flag-it.png')
+        .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
+          'Content-Type' : 'application/json',
+        });
+      image.downloadImage('https://google.com/image-flag-it.png', {}, function (err, imageInfo) {
+        helper.assert(err+'', 'null');
+        assert(imageInfo.data.length > 0);
+        helper.assert(imageInfo.mimetype, 'image/png');
+        helper.assert(imageInfo.extension, 'png');
+        done();
+      });
+    });
+    it('should download a JPEG image from an url even if the header.content-type is incorrect (text/plain)', function (done) {
+      nock('https://google.com')
+        .get('/image-flag-fr.jpg')
+        .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+          'Content-Type' : 'text/plain',
+        });
+      image.downloadImage('https://google.com/image-flag-fr.jpg', {}, function (err, imageInfo) {
+        helper.assert(err+'', 'null');
+        assert(imageInfo.data.length > 0);
+        helper.assert(imageInfo.mimetype, 'image/jpeg');
+        helper.assert(imageInfo.extension, 'jpg');
+        done();
+      });
+    });
+
+    it('should return an error if the file is not an image with undefined Content-Type', function (done) {
+      nock('https://google.com')
+        .get('/image-flag-fr.txt')
+        .replyWithFile(200, __dirname + '/datasets/image/imageFR_base64_jpg.txt');
+      image.downloadImage('https://google.com/image-flag-fr.txt', {}, function (err, imageInfo) {
+        assert(err.includes('Error Carbone: the file is not an image'));
+        assert(imageInfo+'' === 'undefined');
+        done();
+      });
+    });
+
     it ('should return an error when the location url does not exist', function (done) {
       image.downloadImage('https://carbone.io/fowjfioewj', {}, function (err, imageInfo) {
-        assert(err.includes("can't download the image from the url"));
+        assert(err.includes('can not download the image from the url'));
         helper.assert(imageInfo+'', 'undefined');
         done();
       });
@@ -305,10 +341,6 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         assert(imageInfo+'', 'undefined');
         done();
       });
-    });
-
-    it('should return an error if the file is not an image', function () {
-
     });
   });
 });

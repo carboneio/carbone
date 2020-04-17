@@ -274,6 +274,20 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         done();
       });
     });
+    it('should download a PNG image from an url with query parameters', function (done) {
+      nock('https://google.com')
+        .get('/image-flag-it.png?size=10&color=blue')
+        .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
+          'Content-Type' : 'image/png',
+        });
+      image.downloadImage('https://google.com/image-flag-it.png?size=10&color=blue', {}, function (err, imageInfo) {
+        helper.assert(err+'', 'null');
+        assert(imageInfo.data.length > 0);
+        helper.assert(imageInfo.mimetype, 'image/png');
+        helper.assert(imageInfo.extension, 'png');
+        done();
+      });
+    });
     it('should download a PNG image from an url even if the header.content-type is incorrect (application/json)', function (done) {
       nock('https://google.com')
         .get('/image-flag-it.png')
@@ -339,6 +353,66 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       image.downloadImage('https://google.com/random-image.jpeg', {}, function (err, imageInfo) {
         helper.assert(err.code, errorCode);
         assert(imageInfo+'', 'undefined');
+        done();
+      });
+    });
+
+    it('[depreciated base64 img] should return an image descriptor from JPEG base64', function (done) {
+      const data = {
+        $base64dog : {
+          data      : '/9j/4AAQSkZJRgABAQEASABIAAD/7QA4UGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAAA4QklNBCUAAAAAABDUHYzZjwCyBOmACZjs+EJ+/+EAjEV4aWYAAE1NACoAAAAIAAUBEgADAAAAAQABAAABGgAFAAAAAQAAAEoBGwAFAAAAAQAAAFIBKAADAAAAAQACAACHaQAEAAAAAQAAAFoAAAAAAAAASAAAAAEAAABIAAAAAQADoAEAAwAAAAEAAQAAoAIABAAAAAEAAAANoAMABAAAAAEAAAAMAAAAAP/bAEMABQMEBAQDBQQEBAUFBQYHDAgHBwcHDwsLCQwRDxISEQ8RERMWHBcTFBoVEREYIRgaHR0fHx8TFyIkIh4kHB4fHv/bAEMBBQUFBwYHDggIDh4UERQeHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHv/AABEIAAwADQMBIgACEQEDEQH/xAAWAAEBAQAAAAAAAAAAAAAAAAAHBAj/xAAkEAACAgEDBAMBAQAAAAAAAAABAgMEBQYREgAHCBQTISIxof/EABQBAQAAAAAAAAAAAAAAAAAAAAX/xAAaEQABBQEAAAAAAAAAAAAAAAADAAECESEj/9oADAMBAAIRAxEAPwCnutPmNc+Qt/Sdm4fXr2fRx8T2fghib1kkD/YILbuxOw5MPyOPS1496Q1ZpnS93FX9QVSfZEyLA/sxoGUDiqsqmP7Xcj+EtuOs497MLWwPc3O4+tPbsxwWYWR7c5llPJEI5Of0xXcAMSW2Ubk9JHjXhMRlaedsZSibk6zRJ8r2pgxUc9h+XA/zosU7O9JAkebbmL//2Q==',
+          extension : 'jpeg'
+        }
+      };
+      image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        helper.assert(err+'', 'null');
+        assert(imageInfo.mimetype === 'image/jpeg');
+        assert(imageInfo.extension === 'jpeg');
+        assert(imageInfo.data.length > 0);
+        done();
+      });
+    });
+
+    it('[depreciated base64 img] should return an image descriptor from BMP base64', function (done) {
+      const data = {
+        $base64cat : {
+          data      : 'Qk2aAAAAAAAAADYAAAAoAAAABQAAAPv///8BACAAAAAAAAAAAAATCwAAEwsAAAAAAAAAAAAASTny/0Rp9f9Vq+H/nruq/66zqf9IefL/Sz3z/0R18P+OssH/t6qo/0KJ9P8/ePD/QgD5/z6l4/+otKj/Zara/4+6uP9EpuH/n6S8/8pxpP9kv8j/lrir/5DBr//FlKX/xUSr/w==',
+          extension : 'bmp'
+        }
+      };
+      image.downloadImage('$base64cat', data, function (err, imageInfo) {
+        helper.assert(err+'', 'null');
+        assert(imageInfo.mimetype === 'image/bmp');
+        assert(imageInfo.extension === 'bmp');
+        assert(imageInfo.data.length > 0);
+        done();
+      });
+    });
+
+    it('[depreciated base64 img] should return an error because the base64 is TXT file', function (done) {
+      const data = {
+        $base64dog : {
+          data      : '/9j/4AAQSkZJRgABAQEASABIAAD/7QA4UGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAAA4QklNBCUAAAAAABDUHYzZjwCyBOmACZjs+EJ+/+EAjEV4aWYAAE1NACoAAAAIAAUBEgADAAAAAQABAAABGgAFAAAAAQAAAEoBGwAFAAAAAQAAAFIBKAADAAAAAQACAACHaQAEAAAAAQAAAFoAAAAAAAAASAAAAAEAAABIAAAAAQADoAEAAwAAAAEAAQAAoAIABAAAAAEAAAANoAMABAAAAAEAAAAMAAAAAP/bAEMABQMEBAQDBQQEBAUFBQYHDAgHBwcHDwsLCQwRDxISEQ8RERMWHBcTFBoVEREYIRgaHR0fHx8TFyIkIh4kHB4fHv/bAEMBBQUFBwYHDggIDh4UERQeHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHv/AABEIAAwADQMBIgACEQEDEQH/xAAWAAEBAQAAAAAAAAAAAAAAAAAHBAj/xAAkEAACAgEDBAMBAQAAAAAAAAABAgMEBQYREgAHCBQTISIxof/EABQBAQAAAAAAAAAAAAAAAAAAAAX/xAAaEQABBQEAAAAAAAAAAAAAAAADAAECESEj/9oADAMBAAIRAxEAPwCnutPmNc+Qt/Sdm4fXr2fRx8T2fghib1kkD/YILbuxOw5MPyOPS1496Q1ZpnS93FX9QVSfZEyLA/sxoGUDiqsqmP7Xcj+EtuOs497MLWwPc3O4+tPbsxwWYWR7c5llPJEI5Of0xXcAMSW2Ubk9JHjXhMRlaedsZSibk6zRJ8r2pgxUc9h+XA/zosU7O9JAkebbmL//2Q==',
+          extension : 'txt'
+        }
+      };
+      image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        assert(err.includes('the base64 provided is not an image'));
+        assert(imageInfo + '' === 'undefined');
+        done();
+      });
+    });
+
+    it('[depreciated base64 img] should return an error because the base64 data is empty', function (done) {
+      const data = {
+        $base64dog : {
+          data      : '',
+          extension : 'jpeg'
+        }
+      };
+      image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        assert(err.includes('the base64 provided is empty'));
+        assert(imageInfo + '' === 'undefined');
         done();
       });
     });

@@ -328,6 +328,24 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       });
     });
 
+    it('should return an error when the imageLinkOrBase64 is either undefined, null or empty', function (done) {
+      image.downloadImage(undefined, {}, function (err, imageInfo) {
+        assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
+        helper.assert(imageInfo+'', 'undefined');
+
+        image.downloadImage(null, {}, function (err, imageInfo) {
+          assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
+          helper.assert(imageInfo+'', 'undefined');
+
+          image.downloadImage('', {}, function (err, imageInfo) {
+            assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
+            helper.assert(imageInfo+'', 'undefined');
+            done();
+          });
+        });
+      });
+    });
+
     it ('should return an error when the location url does not exist', function (done) {
       image.downloadImage('https://carbone.io/fowjfioewj', {}, function (err, imageInfo) {
         assert(err.includes('can not download the image from the url'));
@@ -336,7 +354,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       });
     });
 
-    it('should return an error when imageLinkOrBase64 argument is invalid', function (done) {
+    it('should return an error when imageLinkOrBase64 argument is invalid (the error is returned by image.parseBase64Picture)', function (done) {
       image.downloadImage('this_is_random_text', {}, function (err, imageInfo) {
         assert(err.includes('Error'));
         helper.assert(imageInfo+'', 'undefined');

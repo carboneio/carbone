@@ -1,14 +1,14 @@
 var image = require('../lib/image');
 
 /**
- * Update image database
+ * Add the image url or base64 to the imageDatabase Map
  *
  * @private
  *
  * @param  {Object} options
  * @param  {String} urlOrBase64
  */
-function updateImageDatabase (options, urlOrBase64) {
+function addImageDatabase (options, urlOrBase64) {
   if (!options.imageDatabase.has(urlOrBase64)) {
     // set an id for each image (used to generate unique names)
     var _nbImage = options.imageDatabase.size;
@@ -40,13 +40,15 @@ function generateOpenDocumentImageHrefPostProcessing (urlOrBase64) {
  * So we ask to the builder to call the function generateOpenDocumentImageHrefPostProcessing
  * at the end
  *
+ * `this` is the options
+ *
  * @private
  *
  * @param   {String} urlOrBase64 image data (link or base64)
  * @returns {String}             generated link for OpenDocument
  */
 function generateOpenDocumentImageHref (urlOrBase64) {
-  updateImageDatabase(this, urlOrBase64);
+  addImageDatabase(this, urlOrBase64);
   // return a function to call at the end of the building process
   return {
     fn   : generateOpenDocumentImageHrefPostProcessing,
@@ -77,13 +79,15 @@ function generateOpenDocumentImageMimeTypePostProcessing (urlOrBase64) {
  * So we ask to the builder to call the function generateOpenDocumentImageHrefPostProcessing
  * at the end
  *
+ * `this` is the options
+ *
  * @private
  *
  * @param   {String} urlOrBase64 image data (link or base64)
  * @returns {String}             generated link for OpenDocument
  */
 function generateOpenDocumentImageMimeType (urlOrBase64) {
-  updateImageDatabase(this, urlOrBase64);
+  addImageDatabase(this, urlOrBase64);
   // return a function to call at the end of the building process
   return {
     fn   : generateOpenDocumentImageMimeTypePostProcessing,

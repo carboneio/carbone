@@ -91,6 +91,42 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
     });
   });
 
+  describe('OpenDocument ODS', function () {
+    it('should replace one image (base64 jpg)', function (done) {
+      const _testedReport = 'ods-simple';
+      const _data = {
+        image : _imageFRBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should replace multiple images (base64 jpg png)', function (done) {
+      const _testedReport = 'ods-complex';
+      const _data = {
+        imageFR      : _imageFRBase64jpg,
+        imageFRold   : '$base64image',
+        $base64image : {
+          data      : _imageFRBase64jpgWithoutType,
+          extension : 'jpeg'
+        },
+        imageDE   : _imageDEBase64jpg,
+        imageIT   : _imageITBase64png,
+        imageLogo : _imageLogoBase64jpg,
+        text      : "0+rR_r+f|U*aG!^[;sEAN[y|x'TCe}|?20D_E,[Z",
+        text2     : 'K$-QXILVAB#j:XnR$*m"$9Rk76B@ARy2_qBdp2Xu',
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+  });
+
   describe('parseBase64Picture - Parse a base64 data-uri into an object descriptor', function () {
     // png, jpeg, GIF, BMP, non picture format (html), strange base64, différent mimetypes
     it('should parse base64 PNG (1)', function () {

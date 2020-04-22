@@ -29,7 +29,7 @@ function addImageDatabase (options, urlOrBase64) {
  */
 function generateOpenDocumentImageHrefPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
-  return image.buildOdtImageLink(_imageData.id, _imageData.extension);
+  return image.buildLoImageLink(_imageData.id, _imageData.extension);
 }
 
 /**

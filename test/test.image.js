@@ -127,6 +127,20 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
     });
   });
 
+  describe('DOCX MS document', function () {
+    it('should replace one image (base64 jpg)', function (done) {
+      const _testedReport = 'docx-simple';
+      const _data = {
+        image : _imageFRBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+  });
+
   describe('parseBase64Picture - Parse a base64 data-uri into an object descriptor', function () {
     // png, jpeg, GIF, BMP, non picture format (html), strange base64, différent mimetypes
     it('should parse base64 PNG (1)', function () {

@@ -95,8 +95,91 @@ function generateOpenDocumentImageMimeType (urlOrBase64) {
   };
 }
 
+/**
+ * Generate image reference ID for MS DOCX documents
+ *
+ * Called by the builder. At this time, we do not know if this image
+ * will be kept in final render. We do not know the image type (asynchronuous process)
+ * So we ask to the builder to call the function generateImageDocxIdPostProcessing
+ * at the end
+ *
+ * `this` is the options
+ *
+ * @private
+ *
+ * @param   {String} urlOrBase64 image data (link or base64)
+ * @returns {String}             generated link for OpenDocument
+ */
+function generateImageDocxReference (urlOrBase64) {
+  addImageDatabase(this, urlOrBase64);
+  // return a function to call at the end of the building process
+  return {
+    fn   : generateImageDocxReferencePostProcessing,
+    args : [urlOrBase64]
+  };
+}
+
+/**
+ * Post processing function called at the end of the building process
+ *
+ * this.imageDatabase as been updated by the post-processor and contains image info
+ *
+ * @private
+ *
+ * @param  {Object} urlOrBase64 image data (link or base64)
+ * @param  {[type]} urlOrBase64 image data (link or base64)
+ * @return {[type]}             [description]
+ */
+function generateImageDocxReferencePostProcessing (urlOrBase64) {
+  var _imageData = this.imageDatabase.get(urlOrBase64);
+  return `rIdCarbone${_imageData.id}`;
+}
+
+
+/**
+ * Generate image id for MS DOCX documents
+ *
+ * Called by the builder. At this time, we do not know if this image
+ * will be kept in final render. We do not know the image type (asynchronuous process)
+ * So we ask to the builder to call the function generateImageDocxIdPostProcessing
+ * at the end
+ *
+ * `this` is the options
+ *
+ * @private
+ *
+ * @param   {String} urlOrBase64 image data (link or base64)
+ * @returns {String}             generated link for OpenDocument
+ */
+function generateImageDocxId (urlOrBase64) {
+  addImageDatabase(this, urlOrBase64);
+  // return a function to call at the end of the building process
+  return {
+    fn   : generateImageDocxIdPostProcessing,
+    args : [urlOrBase64]
+  };
+}
+
+/**
+ * Post processing function called at the end of the building process
+ *
+ * this.imageDatabase as been updated by the post-processor and contains image info
+ *
+ * @private
+ *
+ * @param  {Object} urlOrBase64 image data (link or base64)
+ * @param  {[type]} urlOrBase64 image data (link or base64)
+ * @return {[type]}             [description]
+ */
+function generateImageDocxIdPostProcessing (urlOrBase64) {
+  var _imageData = this.imageDatabase.get(urlOrBase64);
+  return _imageData.id + '';
+}
+
 module.exports = {
   generateOpenDocumentImageHref     : generateOpenDocumentImageHref,
-  generateOpenDocumentImageMimeType : generateOpenDocumentImageMimeType
+  generateOpenDocumentImageMimeType : generateOpenDocumentImageMimeType,
+  generateImageDocxId               : generateImageDocxId,
+  generateImageDocxReference        : generateImageDocxReference
 };
 

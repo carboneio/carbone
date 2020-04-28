@@ -139,6 +139,33 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         done();
       });
     });
+
+    it.only('should replace multiple images with a complexe data object (child of child) (base64 jpg)', function (done) {
+      const _testedReport = 'docx-complex';
+      const _data = {
+        tests : {
+          image : _imageFRBase64jpg,
+          child : {
+            imageIT : _imageITBase64png,
+            child   : {
+              imageDE : _imageDEBase64jpg,
+            }
+          },
+          imageLogo  : _imageLogoBase64jpg,
+          imageError : 'This is some random text',
+        },
+        imageFRold   : '$base64image',
+        $base64image : {
+          data      : _imageFRBase64jpgWithoutType,
+          extension : 'jpeg'
+        }
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
   describe('parseBase64Picture - Parse a base64 data-uri into an object descriptor', function () {

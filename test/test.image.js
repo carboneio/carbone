@@ -140,7 +140,23 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       });
     });
 
-    it.only('should replace multiple images with a complexe data object (child of child) (base64 jpg)', function (done) {
+    it('should replace 4 images to invalid image', function (done) {
+      const _testedReport = 'docx-errors';
+      const _data = {
+        tests : {
+          imageError : 'This is some random text',
+        },
+        error2 : 'https://media.giphy.com/media/yXBqba0Zx8',
+        error3 : 'data:image/jpeg;base64,',
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should replace multiple images with a complexe data object (child of child) (base64 jpg)', function (done) {
       const _testedReport = 'docx-complex';
       const _data = {
         tests : {
@@ -157,7 +173,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         imageFRold   : '$base64image',
         $base64image : {
           data      : _imageFRBase64jpgWithoutType,
-          extension : 'jpeg'
+          extension : 'jpg'
         }
       };
       carbone.render(openTemplate(_testedReport), _data, (err, res) => {
@@ -288,9 +304,9 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         image.parseBase64Picture(img, function (err, imgDescriptor) {
           helper.assert(err, 'Error base64 picture: it is not a base64 picture.');
           helper.assert(imgDescriptor+'', 'undefined');
-          done();
         });
       });
+      done();
     });
     it('[ERROR test] should return an empty descriptor with an error because the data-uri are invalid', function (done) {
       const _base64Pictures = [
@@ -299,11 +315,11 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       ];
       _base64Pictures.forEach(img => {
         image.parseBase64Picture(img, function (err, imgDescriptor) {
-          assert(err === 'Error base64 picture: the  picture regex has failled. The data-uri is not valid.');
+          assert(err === 'Error base64 picture: the picture regex has failled. The data-uri is not valid.');
           helper.assert(imgDescriptor+'', 'undefined');
-          done();
         });
       });
+      done();
     });
     it('[ERROR test] should return an empty descriptor with an error because the data-uri content is empty', function (done) {
       const _base64Picture = 'data:image/jpeg;base64,';

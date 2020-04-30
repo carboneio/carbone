@@ -127,15 +127,45 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
     });
   });
 
-  describe('DOCX MS document', function () {
-    it('should replace one image (base64 jpg)', function (done) {
+  describe.only('DOCX MS document', function () {
+    it('should replace an image (Created from LO)(base64 jpg)', function (done) {
       const _testedReport = 'docx-simple';
       const _data = {
-        image : _imageFRBase64jpg
+        image : _imageDEBase64jpg
       };
       carbone.render(openTemplate(_testedReport), _data, (err, res) => {
         helper.assert(err+'', 'null');
         assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should replace an image (Created from MS Word Windows)(base64 jpg)', function (done) {
+      const _testedReport = 'docx-windows-word';
+      const _data = {
+        image : _imageDEBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it.skip('should replace an image (Created from MS Word Online)(base64 jpg)', function (done) {
+      const _testedReport = 'docx-word-online';
+      const _data = {
+        tests : {
+          child : {
+            child : {
+              imageDE : _imageDEBase64jpg
+            }
+          }
+        }
+      };
+      carbone.render(openTemplate(_testedReport, true), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport, true);
         done();
       });
     });
@@ -530,12 +560,12 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
   });
 });
 
-function openTemplate (template) {
-  return openUnzippedDocument(template, 'template');
+function openTemplate (template, getHiddenFiles = false) {
+  return openUnzippedDocument(template, 'template', getHiddenFiles);
 }
 
-function assertFullReport (carboneResult, expectedDirname) {
-  var _expected = openUnzippedDocument(expectedDirname, 'expected');
+function assertFullReport (carboneResult, expectedDirname, getHiddenFiles = false) {
+  var _expected = openUnzippedDocument(expectedDirname, 'expected', getHiddenFiles);
   var _max = Math.max(carboneResult.files.length, _expected.files.length);
   for (var i = 0; i < _max; i++) {
     var _resultFile   = carboneResult.files[i];
@@ -568,9 +598,9 @@ function assertFullReport (carboneResult, expectedDirname) {
   }
 }
 
-function openUnzippedDocument (dirname, type) {
+function openUnzippedDocument (dirname, type, getHiddenFiles = false) {
   var _dirname = path.join(__dirname, 'datasets', 'image', dirname, type);
-  var _files = helper.walkDirSync(_dirname);
+  var _files = helper.walkDirSync(_dirname, getHiddenFiles === true ? /.*/ : undefined);
   var _report = {
     isZipped   : false,
     filename   : dirname,

@@ -152,7 +152,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       });
     });
 
-    it.skip('should replace an image (Created from MS Word Online)(base64 jpg)', function (done) {
+    it('should replace an image (Created from MS Word Online)(base64 jpg)', function (done) {
       const _testedReport = 'docx-word-online';
       const _data = {
         tests : {

@@ -249,11 +249,6 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         done();
       });
     });
-
-    describe('DOCX postprocess XML', function () {
-      // basic XML
-      // XML from MS WORD
-    });
   });
 
   describe('parseBase64Picture - Parse a base64 data-uri into an object descriptor', function () {

@@ -132,7 +132,7 @@ function generateImageDocxReference (urlOrBase64) {
  */
 function generateImageDocxReferencePostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
-  return `rIdCarbone${_imageData.id}`;
+  return image.getDocxImageReference(_imageData.id);
 }
 
 

@@ -8,11 +8,33 @@ var image = require('../lib/image');
  * @param  {Object} options
  * @param  {String} urlOrBase64
  */
-function addImageDatabase (options, urlOrBase64) {
+function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) {
   if (!options.imageDatabase.has(urlOrBase64)) {
     // set an id for each image (used to generate unique names)
     var _nbImage = options.imageDatabase.size;
-    options.imageDatabase.set(urlOrBase64, {id : _nbImage});
+    var _imageDatabaseProperties = {
+      id : _nbImage
+    };
+    // console.log(typeof imageSourceParams.width);
+    if (!!imageSourceParams === true && typeof imageSourceParams.width === 'number') {
+      _imageDatabaseProperties.imageSourceWidth = imageSourceParams.width;
+    }
+    if (!!imageSourceParams === true && typeof imageSourceParams.height === 'number') {
+      _imageDatabaseProperties.imageSourceHeight = imageSourceParams.height;
+    }
+    // console.log(_imageDatabaseProperties);
+    options.imageDatabase.set(urlOrBase64, _imageDatabaseProperties);
+  }
+  else if (!!imageSourceParams === true) {
+    let _imageProperties = options.imageDatabase.get(urlOrBase64);
+    if (typeof imageSourceParams.width === 'number') {
+      _imageProperties.imageSourceWidth = imageSourceParams.width;
+    }
+    if (typeof imageSourceParams.height === 'number') {
+      _imageProperties.imageSourceHeight = imageSourceParams.height;
+    }
+    // console.log(imageSourceParams, _imageProperties);
+    options.imageDatabase.set(urlOrBase64, _imageProperties);
   }
 }
 
@@ -176,10 +198,74 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
   return _imageData.id + '';
 }
 
+function scaleImageDocxWidth (urlOrBase64, imageWidth) {
+  console.log('Formatter Width:', imageWidth);
+  let _imageSourceParams = {};
+  if (imageWidth) {
+    _imageSourceParams.width = parseInt(imageWidth);
+  }
+  addImageDatabase(this, urlOrBase64, _imageSourceParams);
+  // return a function to call at the end of the building process
+  return {
+    fn   : setImageDocxWidthPostProcessing,
+    args : [urlOrBase64]
+  };
+}
+
+/**
+ * Post processing function called at the end of the building process
+ *
+ * this.imageDatabase as been updated by the post-processor and contains image info
+ *
+ * @private
+ *
+ * @param  {Object} urlOrBase64 image data (link or base64)
+ * @param  {[type]} urlOrBase64 image data (link or base64)
+ * @return {[type]}             [description]
+ */
+function setImageDocxWidthPostProcessing (urlOrBase64) {
+  var _imageData = this.imageDatabase.get(urlOrBase64);
+  console.log(_imageData.imageSourceWidth);
+  return _imageData.imageSourceWidth + '';
+}
+
+function scaleImageDocxHeight (urlOrBase64, imageHeight) {
+  console.log('Formatter Height:', imageHeight);
+  let _imageSourceParams = {};
+  if (imageHeight) {
+    _imageSourceParams.height = parseInt(imageHeight);
+  }
+  addImageDatabase(this, urlOrBase64, _imageSourceParams);
+  // return a function to call at the end of the building process
+  return {
+    fn   : setImageDocxHeightPostProcessing,
+    args : [urlOrBase64]
+  };
+}
+
+/**
+ * Post processing function called at the end of the building process
+ *
+ * this.imageDatabase as been updated by the post-processor and contains image info
+ *
+ * @private
+ *
+ * @param  {Object} urlOrBase64 image data (link or base64)
+ * @param  {[type]} urlOrBase64 image data (link or base64)
+ * @return {[type]}             [description]
+ */
+function setImageDocxHeightPostProcessing (urlOrBase64) {
+  var _imageData = this.imageDatabase.get(urlOrBase64);
+  console.log(_imageData.imageSourceHeight);
+  return _imageData.imageSourceHeight + '';
+}
+
 module.exports = {
   generateOpenDocumentImageHref     : generateOpenDocumentImageHref,
   generateOpenDocumentImageMimeType : generateOpenDocumentImageMimeType,
   generateImageDocxId               : generateImageDocxId,
-  generateImageDocxReference        : generateImageDocxReference
+  generateImageDocxReference        : generateImageDocxReference,
+  scaleImageDocxWidth               : scaleImageDocxWidth,
+  scaleImageDocxHeight              : scaleImageDocxHeight
 };
 

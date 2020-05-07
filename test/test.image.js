@@ -282,26 +282,26 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
     describe('DOCX scaling', function () {
       it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
         let _imageInfo = {
-          data        : new Buffer.from(''),
-          imageWidth  : -1,
-          imageHeight : -1
+          data           : new Buffer.from(''),
+          newImageWidth  : -1,
+          newImageHeight : -1
         };
         image._getImageSize(_imageInfo);
-        helper.assert(_imageInfo.imageWidth, -1);
-        helper.assert(_imageInfo.imageHeight, -1);
+        helper.assert(_imageInfo.newImageWidth, -1);
+        helper.assert(_imageInfo.newImageHeight, -1);
         done();
       });
 
       it('_getImageSize: should return the EMU size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            data        : imageData.data,
-            imageWidth  : -1,
-            imageHeight : -1
+            data           : imageData.data,
+            newImageWidth  : -1,
+            newImageHeight : -1
           };
           image._getImageSize(_imageInfo);
-          helper.assert(_imageInfo.imageWidth, 952500);
-          helper.assert(_imageInfo.imageHeight, 590550);
+          helper.assert(_imageInfo.newImageWidth, 952500);
+          helper.assert(_imageInfo.newImageHeight, 590550);
           done();
         });
       });
@@ -310,53 +310,40 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
       it('_getImageSize: should return the EMU size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            data        : imageData.data,
-            imageWidth  : -1,
-            imageHeight : -1
+            data           : imageData.data,
+            newImageWidth  : -1,
+            newImageHeight : -1
           };
           image._getImageSize(_imageInfo);
-          helper.assert(_imageInfo.imageWidth, 2857500);
-          helper.assert(_imageInfo.imageHeight, 1905000);
+          helper.assert(_imageInfo.newImageWidth, 2857500);
+          helper.assert(_imageInfo.newImageHeight, 1905000);
           done();
         });
       });
 
-      it("_computeImageSize: should compute the imageFit size as 'contain'", function (done) {
-        let _imageInfo = {
-          imageWidth        : 220,
-          imageHeight       : 100,
-          imageSourceWidth  : 100,
-          imageSourceHeight : 80
-        };
-        image._computeImageSize(_imageInfo);
-        helper.assert(_imageInfo.imageSourceWidth, 100);
-        helper.assert(_imageInfo.imageSourceHeight, 46);
-        done();
-      });
-
       it("_computeImageSize 1: should compute the imageFit size as 'contain'", function (done) {
         let _imageInfo = {
-          imageWidth        : 220,
-          imageHeight       : 100,
-          imageSourceWidth  : 100,
-          imageSourceHeight : 80
+          newImageWidth  : 220,
+          newImageHeight : 100,
+          imageWidth     : 100,
+          imageHeight    : 80
         };
         image._computeImageSize(_imageInfo);
-        helper.assert(_imageInfo.imageSourceWidth, 100);
-        helper.assert(_imageInfo.imageSourceHeight, 46);
+        helper.assert(_imageInfo.imageWidth, 100);
+        helper.assert(_imageInfo.imageHeight, 46);
         done();
       });
 
       it("_computeImageSize 2: should compute the imageFit size as 'contain'", function (done) {
         let _imageInfo = {
-          imageWidth        : 2857500,
-          imageHeight       : 1905000,
-          imageSourceWidth  : 952500,
-          imageSourceHeight : 590550
+          newImageWidth  : 2857500,
+          newImageHeight : 1905000,
+          imageWidth     : 952500,
+          imageHeight    : 590550
         };
         image._computeImageSize(_imageInfo);
-        helper.assert(_imageInfo.imageSourceWidth, 952500);
-        helper.assert(_imageInfo.imageSourceHeight, 635000);
+        helper.assert(_imageInfo.imageWidth, 952500);
+        helper.assert(_imageInfo.imageHeight, 635000);
         done();
       });
     });

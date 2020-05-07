@@ -1,12 +1,13 @@
 var image = require('../lib/image');
 
 /**
- * Add the image url or base64 to the imageDatabase Map
+ * Add the image url or base64 to the imageDatabase Map.
  *
  * @private
  *
  * @param  {Object} options
  * @param  {String} urlOrBase64
+ * @param  {Object} imageSourceParams New properties to add to the image "urlOrBase64" properties
  */
 function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) {
   var _imageDatabaseProperties = null;

@@ -320,6 +320,45 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
           done();
         });
       });
+
+      it("_computeImageSize: should compute the imageFit size as 'contain'", function (done) {
+        let _imageInfo = {
+          imageWidth        : 220,
+          imageHeight       : 100,
+          imageSourceWidth  : 100,
+          imageSourceHeight : 80
+        };
+        image._computeImageSize(_imageInfo);
+        helper.assert(_imageInfo.imageSourceWidth, 100);
+        helper.assert(_imageInfo.imageSourceHeight, 46);
+        done();
+      });
+
+      it("_computeImageSize 1: should compute the imageFit size as 'contain'", function (done) {
+        let _imageInfo = {
+          imageWidth        : 220,
+          imageHeight       : 100,
+          imageSourceWidth  : 100,
+          imageSourceHeight : 80
+        };
+        image._computeImageSize(_imageInfo);
+        helper.assert(_imageInfo.imageSourceWidth, 100);
+        helper.assert(_imageInfo.imageSourceHeight, 46);
+        done();
+      });
+
+      it("_computeImageSize 2: should compute the imageFit size as 'contain'", function (done) {
+        let _imageInfo = {
+          imageWidth        : 2857500,
+          imageHeight       : 1905000,
+          imageSourceWidth  : 952500,
+          imageSourceHeight : 590550
+        };
+        image._computeImageSize(_imageInfo);
+        helper.assert(_imageInfo.imageSourceWidth, 952500);
+        helper.assert(_imageInfo.imageSourceHeight, 635000);
+        done();
+      });
     });
   });
 

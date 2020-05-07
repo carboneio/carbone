@@ -39,8 +39,7 @@ function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) 
  * @private
  *
  * @param  {Object} urlOrBase64 image data (link or base64)
- * @param  {[type]} urlOrBase64 image data (link or base64)
- * @return {[type]}             [description]
+ * @return {String} It returns the path to the image
  */
 function generateOpenDocumentImageHrefPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
@@ -79,7 +78,7 @@ function generateOpenDocumentImageHref (urlOrBase64) {
  * @private
  *
  * @param  {String} urlOrBase64 image data (link or base64)
- * @return {[type]}             [description]
+ * @return {String}             It returns the image mimetype
  */
 function generateOpenDocumentImageMimeTypePostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
@@ -142,8 +141,7 @@ function generateImageDocxReference (urlOrBase64) {
  * @private
  *
  * @param  {Object} urlOrBase64 image data (link or base64)
- * @param  {[type]} urlOrBase64 image data (link or base64)
- * @return {[type]}             [description]
+ * @return {String}             It returns the image reference defined on the `_rels/document.rels.xml` file
  */
 function generateImageDocxReferencePostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
@@ -152,7 +150,7 @@ function generateImageDocxReferencePostProcessing (urlOrBase64) {
 
 
 /**
- * Generate image id for MS DOCX documents
+ * Generate an image id for MS DOCX documents
  *
  * Called by the builder. At this time, we do not know if this image
  * will be kept in final render. We do not know the image type (asynchronuous process)
@@ -176,21 +174,37 @@ function generateImageDocxId (urlOrBase64) {
 }
 
 /**
- * Post processing function called at the end of the building process
+ * Post processing function called at the end of the building process.
+ * It is called only for Docx document to create an unique ID.
  *
- * this.imageDatabase as been updated by the post-processor and contains image info
+ * this.imageDatabase as been updated by the post-processor and contains image informations.
  *
  * @private
  *
  * @param  {Object} urlOrBase64 image data (link or base64)
- * @param  {[type]} urlOrBase64 image data (link or base64)
- * @return {[type]}             [description]
+ * @return {String}             the image ID
  */
 function generateImageDocxIdPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
   return _imageData.id + '';
 }
 
+/**
+ * It gets the EMU width of the initial image to being computed with the correct new scale.
+ *
+ * Called by the builder. At this time, we do not know if this image
+ * will be kept in final render. We do not know the image type (asynchronuous process)
+ * So we ask to the builder to call the function setImageDocxWidthPostProcessing
+ * at the end
+ *
+ * `this` is the options
+ *
+ * @private
+ *
+ * @param   {String} urlOrBase64 image data (link or base64)
+ * @param   {String} imageWidth image width as EMU unit
+ * @returns {Object}            a post process object
+ */
 function scaleImageDocxWidth (urlOrBase64, imageWidth) {
   let _imageSourceParams = {};
   if (imageWidth) {
@@ -205,21 +219,36 @@ function scaleImageDocxWidth (urlOrBase64, imageWidth) {
 }
 
 /**
- * Post processing function called at the end of the building process
+ * Post processing function called at the end of the building process. It return the EMU width of the new image.
  *
  * this.imageDatabase as been updated by the post-processor and contains image info
  *
  * @private
  *
  * @param  {Object} urlOrBase64 image data (link or base64)
- * @param  {[type]} urlOrBase64 image data (link or base64)
- * @return {[type]}             [description]
+ * @return {String}             image EMU witdh
  */
 function setImageDocxWidthPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
   return _imageData.imageSourceWidth + '';
 }
 
+/**
+ * It gets the EMU Height of the initial image to being computed with the correct new scale.
+ *
+ * Called by the builder. At this time, we do not know if this image
+ * will be kept in final render. We do not know the image type (asynchronuous process)
+ * So we ask to the builder to call the function setImageDocxWidthPostProcessing
+ * at the end
+ *
+ * `this` is the options
+ *
+ * @private
+ *
+ * @param   {String} urlOrBase64 image data (link or base64)
+ * @param   {String} imageHeight image height as EMU unit
+ * @returns {Object}             a post process object
+ */
 function scaleImageDocxHeight (urlOrBase64, imageHeight) {
   let _imageSourceParams = {};
   if (imageHeight) {
@@ -234,15 +263,14 @@ function scaleImageDocxHeight (urlOrBase64, imageHeight) {
 }
 
 /**
- * Post processing function called at the end of the building process
+ * Post processing function called at the end of the building process. It return the EMU height of the new image.
  *
  * this.imageDatabase as been updated by the post-processor and contains image info
  *
  * @private
  *
  * @param  {Object} urlOrBase64 image data (link or base64)
- * @param  {[type]} urlOrBase64 image data (link or base64)
- * @return {[type]}             [description]
+ * @return {String}             image EMU height
  */
 function setImageDocxHeightPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);

@@ -282,7 +282,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
     describe('DOCX scaling', function () {
       it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
         let _imageInfo = {
-          data        : new Buffer(''),
+          data        : new Buffer.from(''),
           imageWidth  : -1,
           imageHeight : -1
         };

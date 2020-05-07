@@ -208,7 +208,7 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
 function scaleImageDocxWidth (urlOrBase64, imageWidth) {
   let _imageSourceParams = {};
   if (imageWidth) {
-    _imageSourceParams.imageSourceWidth = parseInt(imageWidth);
+    _imageSourceParams.imageWidth = parseInt(imageWidth);
   }
   addImageDatabase(this, urlOrBase64, _imageSourceParams);
   // return a function to call at the end of the building process
@@ -230,7 +230,7 @@ function scaleImageDocxWidth (urlOrBase64, imageWidth) {
  */
 function setImageDocxWidthPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
-  return _imageData.imageSourceWidth + '';
+  return _imageData.imageWidth + '';
 }
 
 /**
@@ -252,7 +252,7 @@ function setImageDocxWidthPostProcessing (urlOrBase64) {
 function scaleImageDocxHeight (urlOrBase64, imageHeight) {
   let _imageSourceParams = {};
   if (imageHeight) {
-    _imageSourceParams.imageSourceHeight = parseInt(imageHeight);
+    _imageSourceParams.imageHeight = parseInt(imageHeight);
   }
   addImageDatabase(this, urlOrBase64, _imageSourceParams);
   // return a function to call at the end of the building process
@@ -274,7 +274,7 @@ function scaleImageDocxHeight (urlOrBase64, imageHeight) {
  */
 function setImageDocxHeightPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
-  return _imageData.imageSourceHeight + '';
+  return _imageData.imageHeight + '';
 }
 
 module.exports = {

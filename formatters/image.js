@@ -15,14 +15,12 @@ function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) 
     var _imageDatabaseProperties = {
       id : _nbImage
     };
-    // console.log(typeof imageSourceParams.width);
     if (!!imageSourceParams === true && typeof imageSourceParams.width === 'number') {
       _imageDatabaseProperties.imageSourceWidth = imageSourceParams.width;
     }
     if (!!imageSourceParams === true && typeof imageSourceParams.height === 'number') {
       _imageDatabaseProperties.imageSourceHeight = imageSourceParams.height;
     }
-    // console.log(_imageDatabaseProperties);
     options.imageDatabase.set(urlOrBase64, _imageDatabaseProperties);
   }
   else if (!!imageSourceParams === true) {
@@ -33,7 +31,6 @@ function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) 
     if (typeof imageSourceParams.height === 'number') {
       _imageProperties.imageSourceHeight = imageSourceParams.height;
     }
-    // console.log(imageSourceParams, _imageProperties);
     options.imageDatabase.set(urlOrBase64, _imageProperties);
   }
 }
@@ -199,7 +196,6 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
 }
 
 function scaleImageDocxWidth (urlOrBase64, imageWidth) {
-  console.log('Formatter Width:', imageWidth);
   let _imageSourceParams = {};
   if (imageWidth) {
     _imageSourceParams.width = parseInt(imageWidth);
@@ -225,12 +221,10 @@ function scaleImageDocxWidth (urlOrBase64, imageWidth) {
  */
 function setImageDocxWidthPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
-  console.log(_imageData.imageSourceWidth);
   return _imageData.imageSourceWidth + '';
 }
 
 function scaleImageDocxHeight (urlOrBase64, imageHeight) {
-  console.log('Formatter Height:', imageHeight);
   let _imageSourceParams = {};
   if (imageHeight) {
     _imageSourceParams.height = parseInt(imageHeight);
@@ -256,7 +250,6 @@ function scaleImageDocxHeight (urlOrBase64, imageHeight) {
  */
 function setImageDocxHeightPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
-  console.log(_imageData.imageSourceHeight);
   return _imageData.imageSourceHeight + '';
 }
 

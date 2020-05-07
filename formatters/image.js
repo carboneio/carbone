@@ -9,30 +9,25 @@ var image = require('../lib/image');
  * @param  {String} urlOrBase64
  */
 function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) {
+  var _imageDatabaseProperties = null;
   if (!options.imageDatabase.has(urlOrBase64)) {
-    // set an id for each image (used to generate unique names)
-    var _nbImage = options.imageDatabase.size;
-    var _imageDatabaseProperties = {
-      id : _nbImage
+    // If the image doesn't exist, it create a new ID
+    _imageDatabaseProperties = {
+      id : options.imageDatabase.size
     };
-    if (!!imageSourceParams === true && typeof imageSourceParams.width === 'number') {
-      _imageDatabaseProperties.imageSourceWidth = imageSourceParams.width;
-    }
-    if (!!imageSourceParams === true && typeof imageSourceParams.height === 'number') {
-      _imageDatabaseProperties.imageSourceHeight = imageSourceParams.height;
-    }
-    options.imageDatabase.set(urlOrBase64, _imageDatabaseProperties);
   }
-  else if (!!imageSourceParams === true) {
-    let _imageProperties = options.imageDatabase.get(urlOrBase64);
-    if (typeof imageSourceParams.width === 'number') {
-      _imageProperties.imageSourceWidth = imageSourceParams.width;
-    }
-    if (typeof imageSourceParams.height === 'number') {
-      _imageProperties.imageSourceHeight = imageSourceParams.height;
-    }
-    options.imageDatabase.set(urlOrBase64, _imageProperties);
+  else if (imageSourceParams) {
+    // If the image already exists, the image is retreived to set new properties
+    _imageDatabaseProperties = options.imageDatabase.get(urlOrBase64);
   }
+  else {
+    return;
+  }
+  if (imageSourceParams) {
+    // Set all properties coming from imageSourceParams
+    _imageDatabaseProperties = Object.assign(_imageDatabaseProperties, imageSourceParams);
+  }
+  options.imageDatabase.set(urlOrBase64, _imageDatabaseProperties);
 }
 
 /**
@@ -198,7 +193,7 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
 function scaleImageDocxWidth (urlOrBase64, imageWidth) {
   let _imageSourceParams = {};
   if (imageWidth) {
-    _imageSourceParams.width = parseInt(imageWidth);
+    _imageSourceParams.imageSourceWidth = parseInt(imageWidth);
   }
   addImageDatabase(this, urlOrBase64, _imageSourceParams);
   // return a function to call at the end of the building process
@@ -227,7 +222,7 @@ function setImageDocxWidthPostProcessing (urlOrBase64) {
 function scaleImageDocxHeight (urlOrBase64, imageHeight) {
   let _imageSourceParams = {};
   if (imageHeight) {
-    _imageSourceParams.height = parseInt(imageHeight);
+    _imageSourceParams.imageSourceHeight = parseInt(imageHeight);
   }
   addImageDatabase(this, urlOrBase64, _imageSourceParams);
   // return a function to call at the end of the building process

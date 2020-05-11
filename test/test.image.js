@@ -89,6 +89,38 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         done();
       });
     });
+
+    describe('ODT preprocess XML', function () {
+      it('should replace the main document tag attributes with markers and formaters (ODT XML from LO)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'content.xml',
+              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image}</svg:desc></draw:frame>'
+            }
+          ]
+        };
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        image.preProcessLo(template);
+        helper.assert(template.files[0].data, expectedXML);
+        done();
+      });
+
+      it('should replace the main document tag attributes with markers and formaters (ODT XML from WORD)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'content.xml',
+              data : '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="0.3375in" svg:height="0.20903in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="media/image1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc>{d.image}</svg:desc></draw:frame>'
+            }
+          ]
+        };
+        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="0.3375in" svg:height="0.20903in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
+        image.preProcessLo(template);
+        helper.assert(template.files[0].data, expectedXML);
+        done();
+      });
+    });
   });
 
   describe('OpenDocument ODS', function () {

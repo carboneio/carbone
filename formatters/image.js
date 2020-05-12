@@ -277,12 +277,28 @@ function setImageDocxHeightPostProcessing (urlOrBase64) {
   return _imageData.imageHeight + '';
 }
 
+function generateImageXlsxReference (urlOrBase64) {
+  addImageDatabase(this, urlOrBase64);
+  // return a function to call at the end of the building process
+  return {
+    fn   : generateImageXlsxReferencePostProcessing,
+    args : [urlOrBase64]
+  };
+}
+
+function generateImageXlsxReferencePostProcessing  (urlOrBase64) {
+  var _imageData = this.imageDatabase.get(urlOrBase64);
+  return image.getDocxImageReference(_imageData.id);
+}
+
+
 module.exports = {
   generateOpenDocumentImageHref     : generateOpenDocumentImageHref,
   generateOpenDocumentImageMimeType : generateOpenDocumentImageMimeType,
   generateImageDocxId               : generateImageDocxId,
   generateImageDocxReference        : generateImageDocxReference,
   scaleImageDocxWidth               : scaleImageDocxWidth,
-  scaleImageDocxHeight              : scaleImageDocxHeight
+  scaleImageDocxHeight              : scaleImageDocxHeight,
+  generateImageXlsxReference        : generateImageXlsxReference
 };
 

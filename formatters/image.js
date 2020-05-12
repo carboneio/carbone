@@ -25,8 +25,12 @@ function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) 
     return;
   }
   if (imageSourceParams) {
+    if (imageSourceParams.sheetIds && _imageDatabaseProperties.sheetIds) {
+      imageSourceParams.sheetIds.push(..._imageDatabaseProperties.sheetIds);
+    }
     // Set all properties coming from imageSourceParams
     _imageDatabaseProperties = Object.assign(_imageDatabaseProperties, imageSourceParams);
+    console.log(_imageDatabaseProperties);
   }
   options.imageDatabase.set(urlOrBase64, _imageDatabaseProperties);
 }
@@ -277,8 +281,12 @@ function setImageDocxHeightPostProcessing (urlOrBase64) {
   return _imageData.imageHeight + '';
 }
 
-function generateImageXlsxReference (urlOrBase64) {
-  addImageDatabase(this, urlOrBase64);
+function generateImageXlsxReference (urlOrBase64, sheetId) {
+  let _imageSourceParams = {};
+  if (sheetId) {
+    _imageSourceParams.sheetIds = [parseInt(sheetId)];
+  }
+  addImageDatabase(this, urlOrBase64, _imageSourceParams);
   // return a function to call at the end of the building process
   return {
     fn   : generateImageXlsxReferencePostProcessing,

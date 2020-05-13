@@ -1,4 +1,4 @@
-var image = require('../lib/image');
+const image = require('../lib/image');
 
 /**
  * Add the image url or base64 to the imageDatabase Map.
@@ -9,7 +9,7 @@ var image = require('../lib/image');
  * @param  {String} urlOrBase64
  * @param  {Object} imageSourceParams New properties to add to the image "urlOrBase64" properties
  */
-function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) {
+function addImageDatabase (options, urlOrBase64, imageSourceProperties = undefined) {
   var _imageDatabaseProperties = null;
   if (!options.imageDatabase.has(urlOrBase64)) {
     // If the image doesn't exist, it create a new ID
@@ -17,20 +17,25 @@ function addImageDatabase (options, urlOrBase64, imageSourceParams = undefined) 
       id : options.imageDatabase.size
     };
   }
-  else if (imageSourceParams) {
+  else if (imageSourceProperties) {
     // If the image already exists, the image is retreived to set new properties
     _imageDatabaseProperties = options.imageDatabase.get(urlOrBase64);
   }
   else {
     return;
   }
-  if (imageSourceParams) {
-    if (imageSourceParams.sheetIds && _imageDatabaseProperties.sheetIds) {
-      imageSourceParams.sheetIds.push(..._imageDatabaseProperties.sheetIds);
-    }
-    // Set all properties coming from imageSourceParams
-    _imageDatabaseProperties = Object.assign(_imageDatabaseProperties, imageSourceParams);
-    console.log(_imageDatabaseProperties);
+  if (imageSourceProperties) {
+    // Merge array properties before the mergeObject.
+    // It is used to merge the `sheetIds` property
+    Object.keys(imageSourceProperties).forEach(key => {
+      // Check if an element is an array. The method "typeof" can't be used because it returns "object" for Objects and Arrays.
+      if (Object.prototype.toString.call(imageSourceProperties[key]) === '[object Array]' &&
+          Object.prototype.toString.call(_imageDatabaseProperties[key]) === '[object Array]') {
+        imageSourceProperties[key].push(..._imageDatabaseProperties[key]);
+      }
+    });
+    // Merge all properties coming from imageSourceProperties into _imageDatabaseProperties
+    _imageDatabaseProperties = Object.assign(_imageDatabaseProperties, imageSourceProperties);
   }
   options.imageDatabase.set(urlOrBase64, _imageDatabaseProperties);
 }

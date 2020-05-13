@@ -1,5 +1,128 @@
-### v1.x.x
-  - Fix LibreOffice detection on Windows
+### v2.0.x
+
+  - Fix: avoid crashing when a static image was inserted in a loop in MS Word templates
+  - Update totals in ODS and XSLX files
+  - `formatC` supports many crypto currencies
+  - Fix: Accepts comma in formatter parameters such as `{d.sentenceExist:ifEqual(1, 'Some sentence, some more sentences.')}` 
+  - Fix: nested array in XML (but not in JSON) was not printed correctly
+    ```
+      {d.countries[i].name}
+        {d.movies[i].subObject.name}
+        {d.movies[i+1].subObject.name}
+      {d.countries[i+1].name}
+    ``` 
+  - Fix: avoid crashing when a sub-object is null or undefined in data
+  - Fix: avoid crashing when the parent object of an array is null or undefined in data
+  - Eslint code + add eslint tools
+  - Fix: accepts dashes characters in JSON data. Before, Carbones crashes when using `{d.my-att-with-dash}`
+  - Fix: avoid crashing when a XLSX template contains charts
+  - Beta: supports dynamic charts rendering in XLSX if these conditions are met:
+    - first, draw a chart in MS Excel and replace your data with Carbone markers
+    - datas of the chart should be placed at the top-left corner of the spreadsheet
+    - all numbers are formatted with formatN() formatter
+  - Fix: accepts whitespace in array filters with simple quote and double quotes 
+    Example: `{d.cars[i, type='Tesla car'].name}`
+             `{d.cars[i, type="Tesla car"].name}`
+  - Accepts to iterate on attributes of objects as is if it was an array:
+    ```js
+    {
+      myObject : {
+        paul : '10',
+        jack : '20',
+        bob  : '30'
+      }
+    }
+    ```
+
+    In the report: 
+    ```
+      {d.myObject[i].att} {d.myObject[i].val}
+      {d.myObject[i+1].att} {d.myObject[i+1].val}
+    ```
+    - use .att to print the attribue
+    - use .val to print the value
+
+    You can even access nested objects and nested arrays inside `val`: `{d.myObject[i].val.myArray[i].id}`
+
+  - Accepts dynamic variables in all formatters! 
+    Carbone passes data to formatters if parameters start with a dot `.` and is not surrounded by quotes. Here is an example:
+
+    **Examples:**
+    
+    *Data*
+      ```js
+        {
+          id : 10,
+          qtyA : 20,
+          subObject : {
+            qtyB : 5,
+            qtyC : 3
+          },
+          subArray : [{
+            id : 1000,
+            qtyE : 3
+          }]
+        }
+      ```
+
+    *Template => Result*
+
+    do mathematical operations:<br>
+    `{d.subObject.qtyB:add(.qtyC)}` => 8 (5+3)
+
+    read parent attributes if you use two dots, grandparents if you use three dots, etc...<br>
+    `{d.subObject.qtyB:add(.qtyC):add(..qtyA)}` => 28  (5+3+20)
+
+    read parent objects and their children attributes (no limit in depth)<br>
+    `{d.subArray[i].qtyE:add(..subObject.qtyC)` => 6 (3+3)
+
+    It returns an error if the attribute does not exist<br>
+    `{d.subArray[i].qtyE:add(..badAttr)` => [[C_ERROR]] badAttr not defined
+
+    You cannot access arrays<br>
+    `{d.subObject.qtyB:add(..subArray[0].qtyE)}` => [[C_ERROR]] subArray[0] not defined
+
+  - New conditional formatters, and a new IF-block
+    - `ifEQ  (value)` : Matches values that are equal to a specified value
+    - `ifNE  (value)` : Matches all values that are not equal to a specified value
+    - `ifGT  (value)` : Matches values, string.length, array.length or object.length that are greater than a specified value
+    - `ifGTE (value)` : Matches values, string.length, array.length or object.length that are greater than or equal to a specified value
+    - `ifLT  (value)` : Matches values, string.length, array.length or object.length that are less than a specified value
+    - `ifLTE (value)` : Matches values, string.length, array.length or object.length that are less than or equal to a specified value
+    - `ifIN  (value)` : Matches any of the values specified in an array or string
+    - `ifNIN (value)` : Matches none of the values specified in an array or string
+    - `ifEM  (value)` : Matches empty values, string, arrays or objects
+    - `ifNEM (value)` : Matches not empty values, string, arrays or objects
+    - `and   (value)` : AND operator between two consecutives conditional formatters 
+    - `or    (value)` : (default) OR operator between two consecutives conditional formatters 
+    - `hideBegin` and `hideEnd` : hide text block between hideBegin and hideEnd if condition is true
+    - `showBegin` and `showEnd` : show a text block between showBegin and showEnd if condition is true
+    - `show (message)`          : print a message if condition is true
+    - `elseShow (message)`      : print a message if condition is false
+
+    **Examples:**
+
+    *Data*
+      ```js
+        {
+          id : 10,
+          qtyA : 20
+        }
+      ```
+    *Template => Result*
+
+    print simple message according to the result of a condition<br>
+    `{d.id:ifEQ(10):showMessage('hey')}` => hey
+
+    print simple message according to the result of multiple conditions<br>
+    `{d.id:ifEQ(10):and(.qtyA):ifEQ(20):show('hey'):elseShow('hide')}` => hey
+
+    hide or show a block of text in the document<br>
+    `{d.id:ifEQ(10):showBegin}` block of text  `{d.id:showEnd}` => block of text<br>
+    `{d.id:ifEQ(12):showBegin}`  block of text  `{d.id:showEnd}` => 
+
+  - (Fix LibreOffice detection on Windows)
+
 
 ### v1.2.1
   - Release June 11, 2019

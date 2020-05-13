@@ -2,7 +2,7 @@ var assert = require('assert');
 var helper  = require('../lib/helper');
 var path  = require('path');
 var fs  = require('fs');
-var rootPath = process.cwd(); // where "make test" is called 
+var rootPath = process.cwd(); // where "make test" is called
 var testPath = rootPath+'/test/test/';
 
 describe('helper', function () {
@@ -31,8 +31,55 @@ describe('helper', function () {
       helper.assert(helper.cleanJavascriptVariable('aa!2'), 'aa_2');
       helper.assert(helper.cleanJavascriptVariable('aa=2'), 'aa_2');
       helper.assert(helper.cleanJavascriptVariable('aa\'2'), 'aa_2');
-      helper.assert(helper.cleanJavascriptVariable('aa\"2'), 'aa_2');
+      helper.assert(helper.cleanJavascriptVariable('aa"2'), 'aa_2');
       helper.assert(helper.cleanJavascriptVariable('ab-+-/*!=.f'), 'ab________f');
+    });
+  });
+
+  describe('getValueOfPath', function () {
+    it('should do nothing if object is undefined', function () {
+      helper.assert(helper.getValueOfPath(), undefined);
+    });
+    it('should get value of attribute if (first level)', function () {
+      var _obj = {
+        id : 1
+      };
+      helper.assert(helper.getValueOfPath(_obj, 'id'), 1);
+    });
+    it('should do nothing if object is undefined', function () {
+      var _obj = {
+        subObj : {
+          subObj : {
+            end : {
+              label : 'bla'
+            }
+          }
+        }
+      };
+      helper.assert(helper.getValueOfPath(_obj, 'subObj.subObj.end.label'), 'bla');
+    });
+    it('should be fast to sort 1 Millons of rows', function () {
+      var _nbRows = 100000;
+      var _res = 0;
+      var _obj = {
+        subObj : {
+          subObj : {
+            end : {
+              val : 10
+            },
+            val : 1
+          }
+        }
+      };
+      var _start = process.hrtime();
+      var _random = ['subObj.subObj.end.val', 'subObj.subObj.val'];
+      for (var i = 0; i < _nbRows; i++) {
+        _res += helper.getValueOfPath(_obj, _random[Math.round(Math.random())]);
+      }
+      var _diff = process.hrtime(_start);
+      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n getValueOfPath speed : ' + _elapsed  + ' ms (usually around 30 ms) '+_res+'\n');
+      helper.assert(_elapsed < 100, true);
     });
   });
 
@@ -48,7 +95,6 @@ describe('helper', function () {
     });
   });
 
-  
   describe('readFileDirSync', function () {
     beforeEach(function () {
       helper.rmDirRecursive(testPath);
@@ -107,7 +153,7 @@ describe('helper', function () {
         fs.mkdirSync(_subDir, parseInt('0755', 8));
       }
       fs.writeFileSync(path.join(_subDir, 'testsub.sql'), 'test');
-      
+
       helper.rmDirRecursive(_testedPath);
 
       assert.equal(fs.existsSync(_testedPath), false);
@@ -135,7 +181,7 @@ describe('helper', function () {
       var _testedPath = path.join(__dirname, 'walkDirTest');
       var _subDir = path.join(_testedPath, 'otherDir');
       // create the directory
-      fs.mkdirSync(_testedPath, parseInt('0755', 8));          
+      fs.mkdirSync(_testedPath, parseInt('0755', 8));
       fs.mkdirSync(_subDir, parseInt('0755', 8));
       var _result = helper.walkDirSync(_testedPath);
       assert.equal(_result.length, 0);

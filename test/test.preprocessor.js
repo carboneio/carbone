@@ -1,5 +1,6 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
+const should = require('should');
 
 describe('preprocessor', function () {
   describe('execute', function () {
@@ -12,7 +13,7 @@ describe('preprocessor', function () {
     });
     it('should do nothing if the file is null', function (done) {
       preprocessor.execute(null, function (err, tmpl) {
-        helper.assert(err+'', 'null');
+        helper.assert(err + '', 'null');
         helper.assert(tmpl, null);
         done();
       });
@@ -43,17 +44,18 @@ describe('preprocessor', function () {
             isZipped   : true,
             filename   : 'template.xlsx',
             embeddings : [],
+            extension  : 'xlsx',
             files      : [
               {name : 'xl/sharedStrings.xml'    , parent : '', data : _sharedStringBefore},
               {name : 'xl/worksheets/sheet1.xml', parent : '', data : _sheetBefore}
             ]
           };
           preprocessor.execute(_report, function (err, tmpl) {
-            helper.assert(err+'', 'null');
+            helper.assert(err + '', 'null');
             // tmpl.files[0].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[0].data.should.be.eql(_sharedStringAfter);
-            tmpl.files[0].name.should.be.eql('xl/worksheets/sheet1.xml');
-            tmpl.files[0].data.should.be.eql(_sheetAfter);
+            should(tmpl.files[0].name).be.eql('xl/worksheets/sheet1.xml');
+            should(tmpl.files[0].data).be.eql(_sheetAfter);
             done();
           });
         });
@@ -62,6 +64,7 @@ describe('preprocessor', function () {
             isZipped   : true,
             filename   : 'template.docx',
             embeddings : ['embedded/spreadsheet.xlsx'],
+            extension  : 'docx',
             files      : [
               {name : 'my_file.xml'             , parent : ''                         , data : 'some text'},
               {name : 'xl/sharedStrings.xml'    , parent : 'embedded/spreadsheet.xlsx', data : _sharedStringBefore},
@@ -69,16 +72,16 @@ describe('preprocessor', function () {
             ]
           };
           preprocessor.execute(_report, function (err, tmpl) {
-            helper.assert(err+'', 'null');
-            tmpl.files[0].name.should.be.eql('my_file.xml');
-            tmpl.files[0].data.should.be.eql('some text');
-            tmpl.files[0].parent.should.be.eql('');
+            helper.assert(err + '', 'null');
+            should(tmpl.files[0].name).be.eql('my_file.xml');
+            should(tmpl.files[0].data).be.eql('some text');
+            should(tmpl.files[0].parent).be.eql('');
             // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
             // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            tmpl.files[1].name.should.be.eql('xl/worksheets/sheet1.xml');
-            tmpl.files[1].data.should.be.eql(_sheetAfter);
-            tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
+            should(tmpl.files[1].name).be.eql('xl/worksheets/sheet1.xml');
+            should(tmpl.files[1].data).be.eql(_sheetAfter);
+            should(tmpl.files[1].parent).be.eql('embedded/spreadsheet.xlsx');
             done();
           });
         });
@@ -87,6 +90,7 @@ describe('preprocessor', function () {
             isZipped   : true,
             filename   : 'template.docx',
             embeddings : ['embedded/spreadsheet.xlsx', 'embedded/spreadsheet2.xlsx'],
+            extension  : 'docx',
             files      : [
               {name : 'my_file.xml'             , parent : ''                          , data : 'some text'},
               {name : 'xl/sharedStrings.xml'    , parent : 'embedded/spreadsheet.xlsx' , data : _sharedStringBefore},
@@ -96,22 +100,22 @@ describe('preprocessor', function () {
             ]
           };
           preprocessor.execute(_report, function (err, tmpl) {
-            helper.assert(err+'', 'null');
-            tmpl.files[0].name.should.be.eql('my_file.xml');
-            tmpl.files[0].data.should.be.eql('some text');
-            tmpl.files[0].parent.should.be.eql('');
+            helper.assert(err + '', 'null');
+            should(tmpl.files[0].name).be.eql('my_file.xml');
+            should(tmpl.files[0].data).be.eql('some text');
+            should(tmpl.files[0].parent).be.eql('');
             // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
             // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            tmpl.files[1].name.should.be.eql('xl/worksheets/sheet1.xml');
-            tmpl.files[1].data.should.be.eql(_sheetAfter);
-            tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
+            should(tmpl.files[1].name).be.eql('xl/worksheets/sheet1.xml');
+            should(tmpl.files[1].data).be.eql(_sheetAfter);
+            should(tmpl.files[1].parent).be.eql('embedded/spreadsheet.xlsx');
             // tmpl.files[2].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[2].data.should.be.eql(_sharedStringAfter2);
             // tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
-            tmpl.files[2].name.should.be.eql('xl/worksheets/sheet1.xml');
-            tmpl.files[2].data.should.be.eql(_sheetAfter2);
-            tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
+            should(tmpl.files[2].name).be.eql('xl/worksheets/sheet1.xml');
+            should(tmpl.files[2].data).be.eql(_sheetAfter2);
+            should(tmpl.files[2].parent).be.eql('embedded/spreadsheet2.xlsx');
             done();
           });
         });
@@ -131,31 +135,35 @@ describe('preprocessor', function () {
           +'</Relationships>';
         it('should do nothing if template is empty', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : []
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : []
           };
           preprocessor.removeOneFile(_report, 1);
           helper.assert(_report, {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : []
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : []
           });
         });
         it('should do nothing if index is negative', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [{name : 'my_file.xml' , data : 'some text', parent : ''}]
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [{name : 'my_file.xml' , data : 'some text', parent : ''}]
           };
           preprocessor.removeOneFile(_report, -1);
           helper.assert(_report.files.length, 1);
         });
         it('should remove this 2nd file', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
               {name : 'my_file.xml' , data : 'some text', parent : ''},
               {name : 'my_file1.xml', data : 'some text', parent : ''},
               {name : 'my_file2.xml', data : 'some text', parent : ''}
@@ -168,9 +176,10 @@ describe('preprocessor', function () {
         });
         it('should remove this 2nd file and the relation in workbook', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
               {name : 'xl/my_file.xml'            , data : 'some text'        , parent : ''},
               {name : 'xl/my_file2.xml'           , data : 'some text'        , parent : ''},
               {name : 'xl/sharedStrings.xml'      , data : 'some text'        , parent : ''},
@@ -186,9 +195,10 @@ describe('preprocessor', function () {
         });
         it('should change the workbook of the embedded document only', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
               {name : 'xl/my_file.xml'            , data : 'some text'        , parent : ''},
               {name : 'xl/my_file2.xml'           , data : 'some text'        , parent : ''},
               {name : 'xl/sharedStrings.xml'      , data : 'some text'        , parent : ''},
@@ -209,9 +219,10 @@ describe('preprocessor', function () {
       describe('convertSharedStringToInlineString', function () {
         it('should do not crash if the file is not an xlsx file (should not happen because execute filter)', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.docx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
               {name : 'my_file.xml', data : 'some text'}
             ]
           };
@@ -220,18 +231,20 @@ describe('preprocessor', function () {
         });
         it('should replace shared string by inline strings in a real xlsx file', function () {
           var _report = {
-            isZipped : true,
-            filename : 'template.xlsx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.xlsx',
+            extension : 'xlsx',
+            files     : [
               {name : 'xl/sharedStrings.xml'    , data : _sharedStringBefore},
               {name : 'xl/worksheets/sheet1.xml', data : _sheetBefore}
             ]
           };
           var _fileConverted = preprocessor.convertSharedStringToInlineString(_report);
           helper.assert(_fileConverted, {
-            isZipped : true,
-            filename : 'template.xlsx',
-            files    : [
+            isZipped  : true,
+            filename  : 'template.xlsx',
+            extension : 'xlsx',
+            files     : [
               // {'name': 'xl/sharedStrings.xml'    , 'data': _sharedStringAfter},
               {name : 'xl/worksheets/sheet1.xml', data : _sheetAfter}
             ]
@@ -283,15 +296,139 @@ describe('preprocessor', function () {
             '{d.isActive}}',
             'a','b','c','d','e','f','g','h',
           ];
-          helper.assert(preprocessor.convertToInlineString('<row r="34" spans="1:4"><c r="A34"  t="s"  s="117" ><v>3</v></c><c r="C34" s="118" t="s" ><v>11</v></c><c   t="s"   r="D34" s="33" ><v>2</v></c></row>', 
-              _sharedStrings
-            ),
-            '<row r="34" spans="1:4"><c r="A34"  t="inlineStr"  s="117" ><is>{d.isActive}}</is></c><c r="C34" s="118" t="inlineStr" ><is>h</is></c><c   t="inlineStr"   r="D34" s="33" ><is>{d.name}</is></c></row>'
+          helper.assert(preprocessor.convertToInlineString('<row r="34" spans="1:4"><c r="A34"  t="s"  s="117" ><v>3</v></c><c r="C34" s="118" t="s" ><v>11</v></c><c   t="s"   r="D34" s="33" ><v>2</v></c></row>',
+            _sharedStrings
+          ),
+          '<row r="34" spans="1:4"><c r="A34"  t="inlineStr"  s="117" ><is>{d.isActive}}</is></c><c r="C34" s="118" t="inlineStr" ><is>h</is></c><c   t="inlineStr"   r="D34" s="33" ><is>{d.name}</is></c></row>'
           );
         });
         it('should do nothing if the tag does not contain nested <v> </v> even if the type is t="s"', function () {
           helper.assert(preprocessor.convertToInlineString('<c r="A34" s="117" t="s"><t>0</t></c>', ['<t>{d.name}</t>']), '<c r="A34" s="117" t="s"><t>0</t></c>');
         });
+        it('should makes a number marker (:formatN applied) recognised as number type by changing the type t="s" to t="n", removing xml markups and formatter ":formatN() [One marker test]" ', function () {
+          const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
+          const _sharedString = ['<t xml:space="preserve">{d.nbr2:formatN()}</t>'];
+          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d.nbr2}</v></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="s"/.exec(_result), false);
+          helper.assert(!!/t="n"/.exec(_result), true);
+        });
+
+        it('should makes a number marker (:formatN applied) recognised as number type by changing the type t="n", removing xml markups and formatter ":formatN()" [Multiple markers test]', function () {
+          const _xml = '<c r="A1" s="1" t="s"><v>0</v></c><c r="A2" s="0" t="s"><v>1</v></c><c r="A3" s="0" t="s"><v>2</v></c>';
+          const _sharedString = ['<t xml:space="preserve">1</t>', '<t xml:space="preserve">{d.nbr2:formatN()}</t>', '<t xml:space="preserve">{d.nbr3:formatN()}</t>'];
+          const _expectedResult = '<c r="A1" s="1" t="inlineStr"><is><t xml:space="preserve">1</t></is></c><c r="A2" s="0" t="n"><v>{d.nbr2}</v></c><c r="A3" s="0" t="n"><v>{d.nbr3}</v></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="s"/.exec(_result), false);
+          helper.assert(!!/t="n"/.exec(_result), true);
+        });
+
+        it('should not makes a number marker recognised as number type because of wrong formatN typing [testing regex]', function () {
+          const _xml = '<c r="A1" s="1" t="s"><v>0</v></c><c r="A2" s="0" t="s"><v>1</v></c><c r="A3" s="0" t="s"><v>2</v></c>';
+          const _sharedString = ['<t xml:space="preserve">{d.nbr1:formatN(}</t>', '<t xml:space="preserve">{d.nbr2formatN()}</t>', '<t xml:space="preserve">{d.nbr3:formatN)}</t>'];
+          const _expectedResult = '<c r="A1" s="1" t="inlineStr"><is><t xml:space="preserve">{d.nbr1:formatN(}</t></is></c><c r="A2" s="0" t="inlineStr"><is><t xml:space="preserve">{d.nbr2formatN()}</t></is></c><c r="A3" s="0" t="inlineStr"><is><t xml:space="preserve">{d.nbr3:formatN)}</t></is></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="inlineStr"/.exec(_result), true);
+        });
+      });
+      describe('convertNumberMarkersIntoNumericFormat', function () {
+        it('should makes a number marker (:formatN) recognised as number cell for ODS files [1 marker]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{d.nbr:formatN()}</text:p></table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d.nbr}" calcext:value-type="float"><text:p>{d.nbr}</text:p></table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+
+        it('should makes a number marker (:formatN) recognised as number cell for ODS files [2 markers]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{d.nbr:formatN()}</text:p></table:table-cell><table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{d.nbr6:formatN()}</text:p></table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d.nbr}" calcext:value-type="float"><text:p>{d.nbr}</text:p></table:table-cell><table:table-cell office:value-type="float" office:value="{d.nbr6}" calcext:value-type="float"><text:p>{d.nbr6}</text:p></table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+
+        it('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + style attributes]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell table:style-name="ce7" office:value-type="string" calcext:value-type="string"><text:p>{d.nbr7:formatN()}</text:p></table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell table:style-name="ce7" office:value-type="float" office:value="{d.nbr7}" calcext:value-type="float"><text:p>{d.nbr7}</text:p></table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+
+        it('should makes a number marker (:formatN) recognised as number cell for ODS files [1 markers + 2 style attributes and spaces]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell table:style-name="ce7" office:value-type="string" table:style-name="ce7" calcext:value-type="string">  <text:p>   {d.nbr7:formatN()}  </text:p>   </table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell table:style-name="ce7" office:value-type="float" office:value="{d.nbr7}" table:style-name="ce7" calcext:value-type="float">  <text:p>   {d.nbr7}  </text:p>   </table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+        it('should not convert to number if the cell contains multiple markers', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell table:style-name="ce7" office:value-type="string" table:style-name="ce7" calcext:value-type="string">  <text:p>   {d.nbr7:formatN()} {d.nbr6:formatN()}  </text:p>   </table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell table:style-name="ce7" office:value-type="string" table:style-name="ce7" calcext:value-type="string">  <text:p>   {d.nbr7:formatN()} {d.nbr6:formatN()}  </text:p>   </table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+        it('should accept unknown attributes in XML and other order of calcext:value-type and office:value-type', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : ''
+                + '<table:table-row table:style-name="ro5">'
+                + '  <table:table-cell calcext:value-type="string" office:value-type="string">'
+                + '    <text:p>{d.analyticalGroup[id=8].label:ifEmpty(\'-\')}</text:p>'
+                + '  </table:table-cell>'
+                + '  <table:table-cell calcext:value-type="string" office:value-type="string">'
+                + '    <text:p>{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\'):formatN()}</text:p>'
+                + '  </table:table-cell>'
+                + '  <table:table-cell office:value-type="string" other:unknown="bla" calcext:value-type="string">'
+                + '    <text:p>{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\'):formatN()}</text:p>'
+                + '  </table:table-cell>'
+                + '  <table:table-cell table:number-columns-repeated="59"/>'
+                + '</table:table-row>'
+            }]
+          };
+          const _expectedResult = ''
+            + '<table:table-row table:style-name="ro5">'
+            + '  <table:table-cell calcext:value-type="string" office:value-type="string">'
+            + '    <text:p>{d.analyticalGroup[id=8].label:ifEmpty(\'-\')}</text:p>'
+            + '  </table:table-cell>'
+            + '  <table:table-cell calcext:value-type="float" office:value-type="float" office:value="{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\')}">'
+            + '    <text:p>{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\')}</text:p>'
+            + '  </table:table-cell>'
+            + '  <table:table-cell office:value-type="float" office:value="{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\')}" other:unknown="bla" calcext:value-type="float">'
+            + '    <text:p>{d.analyticalGroup[id=8].consumption:ifEmpty(\'-\')}</text:p>'
+            + '  </table:table-cell>'
+            + '  <table:table-cell table:number-columns-repeated="59"/>'
+            + '</table:table-row>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+
       });
       describe('removeRowCounterInWorksheet', function () {
         it('should do nothing if the string is empty or null', function () {
@@ -369,6 +506,20 @@ describe('preprocessor', function () {
             +'  </row>'
             +'</sheetData>';
           helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _expected);
+        });
+        it('should not cut, alter or remove the attributes "operator=", it is used for XLSX chart rendering', function () {
+          var _xml = '<conditionalFormatting sqref="A7">'
+            + '<cfRule type="cellIs" priority="2" operator="greaterThan" aboveAverage="0" equalAverage="0" bottom="0" percent="0" rank="0" text="" dxfId="0">'
+            + '<formula>500</formula>'
+            + '</cfRule>'
+            + '<cfRule type="cellIs" priority="3" operator="equal" aboveAverage="0" equalAverage="0" bottom="0" percent="0" rank="0" text="" dxfId="1">'
+            +'<formula>500</formula>'
+            + '</cfRule>'
+            + '<cfRule type="cellIs" priority="4" operator="lessThan" aboveAverage="0" equalAverage="0" bottom="0" percent="0" rank="0" text="" dxfId="2">'
+            + '<formula>500</formula>'
+            + '</cfRule>'
+            + '</conditionalFormatting>';
+          helper.assert(preprocessor.removeRowCounterInWorksheet(_xml), _xml);
         });
       });
     });

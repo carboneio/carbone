@@ -395,6 +395,49 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         done();
       });
     });
+
+    it('should replace one image on multiple sheets (Created from LO)(base64 jpg)', function (done) {
+      const _testedReport = 'xlsx-image-shared';
+      const _data = {
+        tests : {
+          image : _imageFRBase64jpg
+        }
+      };
+      carbone.render(openTemplate(_testedReport, true), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport, true);
+        done();
+      });
+    });
+
+    it('should replace multiple images on multiple sheets (Created from LO)(base64 jpg)', function (done) {
+      const _testedReport = 'xlsx-multi-sheets';
+      const _data = {
+        tests : {
+          image : _imageFRBase64jpg,
+          child : {
+            imageIT : _imageITBase64png,
+            child   : {
+              imageDE : _imageDEBase64jpg,
+            }
+          },
+          imageLogo  : _imageLogoBase64jpg,
+          imageError : 'Thisissomerandomtext',
+        },
+        imageFRold   : '$base64image',
+        $base64image : {
+          data      : _imageFRBase64jpgWithoutType,
+          extension : 'jpg'
+        },
+        imageError : 'This is some random text',
+        error3     : 'data:image/jpeg;base64,',
+      };
+      carbone.render(openTemplate(_testedReport, true), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport, true);
+        done();
+      });
+    });
   });
 
   describe('parseBase64Picture - Parse a base64 data-uri into an object descriptor', function () {

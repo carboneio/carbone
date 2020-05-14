@@ -135,7 +135,7 @@ function generateImageDocxReference (urlOrBase64) {
   addImageDatabase(this, urlOrBase64);
   // return a function to call at the end of the building process
   return {
-    fn   : generateImageDocxReferencePostProcessing,
+    fn   : generateImageReferencePostProcessing,
     args : [urlOrBase64]
   };
 }
@@ -150,9 +150,9 @@ function generateImageDocxReference (urlOrBase64) {
  * @param  {Object} urlOrBase64 image data (link or base64)
  * @return {String}             It returns the image reference defined on the `_rels/document.rels.xml` file
  */
-function generateImageDocxReferencePostProcessing (urlOrBase64) {
+function generateImageReferencePostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
-  return image.getDocxImageReference(_imageData.id);
+  return image.getImageReference(_imageData.id);
 }
 
 
@@ -292,14 +292,9 @@ function generateImageXlsxReference (urlOrBase64, sheetId) {
   addImageDatabase(this, urlOrBase64, _imageSourceParams);
   // return a function to call at the end of the building process
   return {
-    fn   : generateImageXlsxReferencePostProcessing,
+    fn   : generateImageReferencePostProcessing,
     args : [urlOrBase64]
   };
-}
-
-function generateImageXlsxReferencePostProcessing  (urlOrBase64) {
-  var _imageData = this.imageDatabase.get(urlOrBase64);
-  return image.getDocxImageReference(_imageData.id);
 }
 
 

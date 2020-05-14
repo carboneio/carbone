@@ -398,5 +398,32 @@ describe('helper', function () {
 
   });
 
+  describe('mergeObjects', () => {
+    it('should merge obj2 into obj1 with a simple property', function () {
+      let obj1 = { firstname : 'John' };
+      let obj2 = { lastname : 'Wick' };
+      obj1 = helper.mergeObjects(obj1, obj2);
+      helper.assert(obj1, {firstname : 'John', lastname : 'Wick' });
+    });
+    it('should merge obj2 into obj1 with multiple properties 1', function () {
+      let obj1 = { firstname : 'John', lastname : 'Wick', age : 55, city : 'Toronto', postalcode : 32123 };
+      let obj2 = { lastname : 'Cena', age : 43, city : 'West Newbury' };
+      obj1 = helper.mergeObjects(obj1, obj2);
+      helper.assert(obj1, { firstname : 'John', lastname : 'Cena', age : 43, city : 'West Newbury', postalcode : 32123 });
+    });
+    it('should merge obj2 into obj1 with multiple properties 2', function () {
+      let obj1 = { fruit : 'apple', id : 2, validate : false, limit : 5, name : 'foo' };
+      let obj2 = { firstname : 'John', lastname : 'Wick', id : 9, validate : true, name : 'bar' };
+      obj1 = helper.mergeObjects(obj1, obj2);
+      helper.assert(obj1, { fruit : 'apple', id : 9,  validate : true, limit : 5, name : 'bar', firstname : 'John', lastname : 'Wick' });
+    });
+    it('should merge obj2 into obj1 with multiple properties 3', function () {
+      let obj1 = { validate : false, limit : 5, name : 'foo', fruitsList : ['banana'], properties : { child : { id : 1}} };
+      let obj2 = { validate : true, name : 'bar', fruitsList : ['tomatoes', 'apples', 'pineapples'], properties : { child : { id : 2}} };
+      obj1 = helper.mergeObjects(obj1, obj2);
+      helper.assert(obj1, { validate : true, limit : 5, name : 'bar', fruitsList : ['tomatoes', 'apples', 'pineapples'], properties : { child : { id : 2 } }  });
+    });
+  });
+
 
 });

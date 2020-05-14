@@ -1643,6 +1643,26 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should replace rId by md5 hash with id prepend', function (done) {
+    var formatters = require('../formatters/string.js');
+    var _xml = '<Relationships>{d.<Relationship Id="{d.dog:md5:prepend(id)}" Target="{d.dog}"/>toto}</Relationships>';
+    var _expect = '<Relationships>toto<Relationship Id="id319f27934db5dd8f03070e75989ca667" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg"/></Relationships>';
+    var _options = {
+      formatters : {
+        md5     : formatters.md5,
+        prepend : formatters.prepend
+      }
+    };
+    var _data = {
+      dog  : 'https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg',
+      toto : 'toto'
+    };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      console.log(_xmlBuilt);
+      assert.equal(_xmlBuilt, _expect);
+      done();
+    });
+  });
   /* it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [

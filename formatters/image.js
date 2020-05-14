@@ -1,4 +1,5 @@
 const image = require('../lib/image');
+const helper = require('../lib/helper');
 
 /**
  * Add the image url or base64 to the imageDatabase Map.
@@ -25,17 +26,14 @@ function addImageDatabase (options, urlOrBase64, imageSourceProperties = undefin
     return;
   }
   if (imageSourceProperties) {
-    // Merge array properties before the mergeObject.
-    // It is used to merge the `sheetIds` property
-    Object.keys(imageSourceProperties).forEach(key => {
-      // Check if an element is an array. The method "typeof" can't be used because it returns "object" for Objects and Arrays.
-      if (Object.prototype.toString.call(imageSourceProperties[key]) === '[object Array]' &&
-          Object.prototype.toString.call(_imageDatabaseProperties[key]) === '[object Array]') {
-        imageSourceProperties[key].push(..._imageDatabaseProperties[key]);
-      }
-    });
+    // Merge array properties before the mergeObjects call. It is used by XLSX templates with images.
+    if (imageSourceProperties && typeof imageSourceProperties.sheetIds === 'object' &&
+        _imageDatabaseProperties && typeof _imageDatabaseProperties.sheetIds === 'object') {
+      imageSourceProperties.sheetIds.push(..._imageDatabaseProperties.sheetIds);
+    }
     // Merge all properties coming from imageSourceProperties into _imageDatabaseProperties
-    _imageDatabaseProperties = Object.assign(_imageDatabaseProperties, imageSourceProperties);
+    // Properties: imageSourceWidth, imageSourceHeight (DOCX) and sheetIds (XLSX)
+    _imageDatabaseProperties = helper.mergeObjects(_imageDatabaseProperties, imageSourceProperties);
   }
   options.imageDatabase.set(urlOrBase64, _imageDatabaseProperties);
 }

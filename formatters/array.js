@@ -11,7 +11,7 @@
  * @example [ {}                               ]
  * @example [ 20                               ]
  * @example [                                  ]
- * 
+ *
  * @param  {Array}  d           array passed by carbone
  * @param  {String} separator   [optional] item separator (`,` by default)
  * @return {String}             computed result, or `d` if `d` is not an array
@@ -28,7 +28,7 @@ function arrayJoin (d, separator) {
 
 /**
  * Flatten an array of objects
- * 
+ *
  * It ignores nested objects and arrays
  *
  * @example [ [{"id":2, "name":"homer"}, {"id":3, "name":"bart"} ]                    ]
@@ -71,7 +71,7 @@ function arrayMap (d, objSeparator, attributeSeparator) {
         }
       }
       else if (_obj instanceof Object === false) {
-        _flatObj.push(_obj)
+        _flatObj.push(_obj);
       }
       // else, loop on all attributes and print each one if it is not an object
       else {
@@ -92,7 +92,7 @@ function arrayMap (d, objSeparator, attributeSeparator) {
 /**
  * Count and print row number of any array
  *
- * Usage example: `d[i].id:count()` will print a counter of the current row no matter the value of `id` 
+ * Usage example: `d[i].id:count()` will print a counter of the current row no matter the value of `id`
  *
  * @param   {String}  d       Array passed by carbone
  * @param   {String}  start   Number to start with (default: 1)

@@ -81,7 +81,7 @@ describe('formatter', function () {
       var _context = {};
       helper.assert(callWithContext(conditionFormatter.ifEmpty, _context, 0           , 'msgIfEmpty'), 0);
       helper.assert(_context.stopPropagation, false);
-       
+
       var _date = new Date();
       helper.assert(callWithContext(conditionFormatter.ifEmpty, _context, _date       , 'msgIfEmpty'), _date);
       helper.assert(_context.stopPropagation, false);
@@ -465,7 +465,7 @@ describe('formatter', function () {
     });
 
     it.skip('should keep maximal precision if precision is not defined', function () {
-      var _this = {lang : 'fr'};    
+      var _this = {lang : 'fr'};
       helper.assert(numberFormatter.formatN.call(_this, 10000.12345566789), '10 000,12345566789');
     });
 
@@ -540,6 +540,27 @@ describe('formatter', function () {
       helper.assert(numberFormatter.formatC.call(_this, 10000.1), '£100,001.00');
     });
 
+    it('should convert to crypto-currencies/USD by using rates (USD to BTC/ETH AND BTC/ETH to USD)', function () {
+      var _rates = {USD : 1, BTC : 0.000102618, ETH : 0.003695354, XMR : 0.01218769 };
+      /**  USD to BTC */
+      var _this = {lang : 'en-us', currency : { source : 'USD', target : 'BTC', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 1255), '₿0.12878559');
+      /**  USD to ETH */
+      _this.currency.target = 'ETH';
+      helper.assert(numberFormatter.formatC.call(_this, 32.41), 'Ξ0.119766423');
+      /** USD to XMR */
+      _this.currency.target = 'XMR';
+      helper.assert(numberFormatter.formatC.call(_this, 383991.32), 'XMR4,679.96717085');
+      /**  BTC to USD */
+      _rates = {USD : 9736.03, BTC : 1};
+      _this = {lang : 'en-us', currency : { source : 'BTC', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 2.3155321), '$22,544.09');
+      /** ETH to USD */
+      _this.currency.source = 'ETH';
+      _this.currency.rates = { USD : 247.37, ETH : 1 };
+      helper.assert(numberFormatter.formatC.call(_this, 0.54212345), '$134.11');
+    });
+
     it('should accept custom format', function () {
       var _rates = {EUR : 1, USD : 1, GBP : 1};
       var _this = {lang : 'fr-fr', currency : { source : 'EUR', target : 'EUR', rates : _rates }};
@@ -580,12 +601,13 @@ describe('formatter', function () {
       helper.assert(numberFormatter.div('120', '80'), 1.5);
     });
   });
+
 });
 
 /**
- * Call a formatter, passing `context` object as `this` 
+ * Call a formatter, passing `context` object as `this`
  * @param  {Function} func    formatter to call
- * @param  {Object} context   object 
+ * @param  {Object} context   object
  * @return {Mixed}            [description]
  */
 function callWithContext (func, context) {

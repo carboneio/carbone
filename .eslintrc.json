@@ -28,6 +28,7 @@
     "no-empty"                      :   "error",                // Disallow empty blocks
     "no-ex-assign"                  :   "error",                // Disallow reassigning exceptions in catch
     "no-func-assign"                :   "error",                // Disallow reassigning function
+    "no-trailing-spaces"            :   "error",
     "no-unused-vars"                :   "error",                // Disallow unused variables
     "no-unreachable"                :   "error",                // Disallow unreachable code
     "array-callback-return"         :   "error",                // Enforce return statements in array functions

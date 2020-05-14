@@ -5,7 +5,7 @@
   "bin": "bin/carbone",
   "main": "./lib",
   "author": "David Grelaud",
-  "license": "Apache-2.0",
+  "license": "Carbone-Enterprise-Edition",
   "homepage": "https://carbone.io",
   "keywords": [
     "report",
@@ -24,8 +24,10 @@
   },
   "dependencies": {
     "debug": "=2.6.9",
+    "image-size": "=0.7.4",
     "moment": "=2.19.3",
     "moxie-zip": "=0.0.3",
+    "request": "^2.83.0",
     "timsort": "=0.3.0",
     "yauzl": "=2.8.0"
   },

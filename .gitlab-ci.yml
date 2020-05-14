@@ -1,0 +1,14 @@
+default:
+  image: ideolys/carbone-env-docker
+
+stages:
+  - test
+
+test:
+  stage: test
+  cache:
+    paths:
+      - node_modules
+  script:
+    - npm install
+    - npm run test

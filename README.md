@@ -175,6 +175,16 @@ Carbone does a lot of thing for you behind the scene:
   # If you want to use special characters, such as chinese ideograms, you must install a font that support them
   # For example:
   sudo apt install fonts-wqy-zenhei
+
+  # If you want to use barcode fonts
+  cd ~
+  wget https://github.com/graphicore/librebarcode/releases/download/v1.003-alpha/LibreBarcode_v1.003-alpha.zip
+  sudo unzip LibreBarcode_v1.003-alpha.zip -d /usr/share/fonts/truetype/librebarcode
+  sudo chmod 755 /usr/share/fonts/truetype/librebarcode
+  sudo chmod -R 644 /usr/share/fonts/truetype/librebarcode/*
+  # refresh fonts, if the following command does not run, sudo apt install fontconfig 
+  sudo fc-cache -fv
+
 ```
 
 ##### 2 - generate PDF

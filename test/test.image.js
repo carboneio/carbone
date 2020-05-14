@@ -153,7 +153,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     });
   });
 
-  describe.only('DOCX MS document', function () {
+  describe('DOCX MS document', function () {
     it('should replace an image (Created from LO)(base64 jpg)', function (done) {
       const _testedReport = 'docx-simple';
       const _data = {

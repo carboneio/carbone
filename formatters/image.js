@@ -213,11 +213,11 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
  * @returns {Object}            a post process object
  */
 function scaleImageDocxWidth (urlOrBase64, imageWidth) {
-  let _imageSourceParams = {};
+  let _imageSourceProperties = {};
   if (imageWidth) {
-    _imageSourceParams.imageWidth = parseInt(imageWidth);
+    _imageSourceProperties.imageWidth = parseInt(imageWidth);
   }
-  addImageDatabase(this, urlOrBase64, _imageSourceParams);
+  addImageDatabase(this, urlOrBase64, _imageSourceProperties);
   // return a function to call at the end of the building process
   return {
     fn   : setImageDocxWidthPostProcessing,
@@ -257,11 +257,11 @@ function setImageDocxWidthPostProcessing (urlOrBase64) {
  * @returns {Object}             a post process object
  */
 function scaleImageDocxHeight (urlOrBase64, imageHeight) {
-  let _imageSourceParams = {};
+  let _imageSourceProperties = {};
   if (imageHeight) {
-    _imageSourceParams.imageHeight = parseInt(imageHeight);
+    _imageSourceProperties.imageHeight = parseInt(imageHeight);
   }
-  addImageDatabase(this, urlOrBase64, _imageSourceParams);
+  addImageDatabase(this, urlOrBase64, _imageSourceProperties);
   // return a function to call at the end of the building process
   return {
     fn   : setImageDocxHeightPostProcessing,
@@ -285,11 +285,11 @@ function setImageDocxHeightPostProcessing (urlOrBase64) {
 }
 
 function generateImageXlsxReference (urlOrBase64, sheetId) {
-  let _imageSourceParams = {};
+  let _imageSourceProperties = {};
   if (sheetId) {
-    _imageSourceParams.sheetIds = [parseInt(sheetId)];
+    _imageSourceProperties.sheetIds = [parseInt(sheetId)];
   }
-  addImageDatabase(this, urlOrBase64, _imageSourceParams);
+  addImageDatabase(this, urlOrBase64, _imageSourceProperties);
   // return a function to call at the end of the building process
   return {
     fn   : generateImageReferencePostProcessing,

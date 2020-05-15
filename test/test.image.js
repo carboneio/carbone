@@ -8,7 +8,7 @@ const image     = require('../lib/image');
 const nock      = require('nock');
 
 
-describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
+describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -305,73 +305,110 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         done();
       });
     });
-    describe('DOCX scaling', function () {
-      it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
+  });
+
+  describe.only('DOCX ODT scaling', function () {
+    it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
+      let _imageInfo = {
+        unit           : 'emu',
+        data           : new Buffer.from(''),
+        newImageWidth  : -1,
+        newImageHeight : -1
+      };
+      image._getImageSize(_imageInfo);
+      helper.assert(_imageInfo.newImageWidth, -1);
+      helper.assert(_imageInfo.newImageHeight, -1);
+      done();
+    });
+
+    it('_getImageSize: should return the EMU size of a JPEG base64 image', function (done) {
+      image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
         let _imageInfo = {
-          data           : new Buffer.from(''),
+          unit           : 'emu',
+          data           : imageData.data,
           newImageWidth  : -1,
           newImageHeight : -1
         };
-        image._getImageSize(_imageInfo);
-        helper.assert(_imageInfo.newImageWidth, -1);
-        helper.assert(_imageInfo.newImageHeight, -1);
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 952500);
+        helper.assert(_imageInfo.newImageHeight, 590550);
         done();
       });
-
-      it('_getImageSize: should return the EMU size of a JPEG base64 image', function (done) {
-        image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
-          let _imageInfo = {
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
-          };
-          image._getImageSize(_imageInfo);
-          helper.assert(_imageInfo.newImageWidth, 952500);
-          helper.assert(_imageInfo.newImageHeight, 590550);
-          done();
-        });
-      });
+    });
 
 
-      it('_getImageSize: should return the EMU size of a PNG base64 image', function (done) {
-        image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
-          let _imageInfo = {
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
-          };
-          image._getImageSize(_imageInfo);
-          helper.assert(_imageInfo.newImageWidth, 2857500);
-          helper.assert(_imageInfo.newImageHeight, 1905000);
-          done();
-        });
-      });
-
-      it("_computeImageSize 1: should compute the imageFit size as 'contain'", function (done) {
+    it('_getImageSize: should return the EMU size of a PNG base64 image', function (done) {
+      image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
         let _imageInfo = {
-          newImageWidth  : 220,
-          newImageHeight : 100,
-          imageWidth     : 100,
-          imageHeight    : 80
+          unit           : 'emu',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
         };
-        image._computeImageSize(_imageInfo);
-        helper.assert(_imageInfo.imageWidth, 100);
-        helper.assert(_imageInfo.imageHeight, 46);
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 2857500);
+        helper.assert(_imageInfo.newImageHeight, 1905000);
         done();
       });
+    });
 
-      it("_computeImageSize 2: should compute the imageFit size as 'contain'", function (done) {
+    it('_getImageSize: should return the CM size of a JPEG base64 image', function (done) {
+      image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
         let _imageInfo = {
-          newImageWidth  : 2857500,
-          newImageHeight : 1905000,
-          imageWidth     : 952500,
-          imageHeight    : 590550
+          unit           : 'cm',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
         };
-        image._computeImageSize(_imageInfo);
-        helper.assert(_imageInfo.imageWidth, 952500);
-        helper.assert(_imageInfo.imageHeight, 635000);
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 2.65);
+        helper.assert(_imageInfo.newImageHeight, 1.643);
         done();
       });
+    });
+
+
+    it('_getImageSize: should return the CM size of a PNG base64 image', function (done) {
+      image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
+        let _imageInfo = {
+          unit           : 'cm',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
+        };
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 7.95);
+        helper.assert(_imageInfo.newImageHeight, 5.3);
+        done();
+      });
+    });
+
+    it("_computeImageSize 1: should compute the imageFit size as 'contain'", function (done) {
+      let _imageInfo = {
+        unit           : 'emu',
+        newImageWidth  : 220,
+        newImageHeight : 100,
+        imageWidth     : 100,
+        imageHeight    : 80
+      };
+      image._computeImageSize(_imageInfo);
+      helper.assert(_imageInfo.imageWidth, 100);
+      helper.assert(_imageInfo.imageHeight, 46);
+      done();
+    });
+
+    it("_computeImageSize 2: should compute the imageFit size as 'contain'", function (done) {
+      let _imageInfo = {
+        unit           : 'emu',
+        newImageWidth  : 2857500,
+        newImageHeight : 1905000,
+        imageWidth     : 952500,
+        imageHeight    : 590550
+      };
+      image._computeImageSize(_imageInfo);
+      helper.assert(_imageInfo.imageWidth, 952500);
+      helper.assert(_imageInfo.imageHeight, 635000);
+      done();
     });
   });
 

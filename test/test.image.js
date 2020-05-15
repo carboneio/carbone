@@ -50,6 +50,17 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         done();
       });
     });
+    it('should replace 3 images with 3 imageFit `contain` and `fill` and contain by default', function (done) {
+      const _testedReport = 'odt-image-size';
+      const _data = {
+        logo : _imageLogoBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
     it('should replace image with loops (base64 jpg)\
       should accept PNG image even if the template image is a JPEG\
       should accept image in header with conditions i=0\
@@ -85,7 +96,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     });
 
     describe('ODT preprocess XML', function () {
-      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO)', function (done) {
+      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM)', function (done) {
         let template = {
           files : [
             {
@@ -94,13 +105,13 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
       });
 
-      it('should replace the main document tag attributes with markers and formaters (ODT XML from WORD)', function (done) {
+      it('should replace the main document tag attributes with markers and formaters (ODT XML from WORD) (unit: INCH)', function (done) {
         let template = {
           files : [
             {
@@ -109,7 +120,36 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="0.3375in" svg:height="0.20903in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="{d.image:scaleImage(width, 0.3375, in)}in" svg:height="{d.image:scaleImage(height, 0.20903, in)}in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
+        image.preProcessLo(template);
+        helper.assert(template.files[0].data, expectedXML);
+        done();
+      });
+
+      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM) (imageFit contain)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'content.xml',
+              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(contain)}</svg:desc></draw:frame>'
+            }
+          ]
+        };
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        image.preProcessLo(template);
+        helper.assert(template.files[0].data, expectedXML);
+        done();
+      });
+      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM) (imageFit fill)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'content.xml',
+              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(contain)}</svg:desc></draw:frame>'
+            }
+          ]
+        };
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -249,7 +289,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImageDocxWidth(952500)}" cy="{d.image:scaleImageDocxHeight(590550)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference()}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImageDocxWidth(952500)}" cy="{d.image:scaleImageDocxHeight(590550)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference()}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -269,7 +309,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline wp14:editId="5C7CCEE1" wp14:anchorId="63CC715F"><wp:extent cx="{d.tests.child.child.imageDE:scaleImageDocxWidth(2335161)}" cy="{d.tests.child.child.imageDE:scaleImageDocxHeight(1447800)}" /><wp:effectExtent l="0" t="0" r="0" b="0" /><wp:docPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" title="" /><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1" /></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="0" name="" /><pic:cNvPicPr /></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.child.child.imageDE:generateImageDocxReference()}"><a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a14:useLocalDpi val="0" xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" /></a:ext></a:extLst></a:blip><a:stretch><a:fillRect /></a:stretch></pic:blipFill><pic:spPr><a:xfrm rot="0" flipH="0" flipV="0"><a:off x="0" y="0" /><a:ext cx="{d.tests.child.child.imageDE:scaleImageDocxWidth(2335161)}" cy="{d.tests.child.child.imageDE:scaleImageDocxHeight(1447800)}" /></a:xfrm><a:prstGeom prst="rect"><a:avLst /></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline wp14:editId="5C7CCEE1" wp14:anchorId="63CC715F"><wp:extent cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu)}" /><wp:effectExtent l="0" t="0" r="0" b="0" /><wp:docPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" title="" /><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1" /></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="0" name="" /><pic:cNvPicPr /></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.child.child.imageDE:generateImageDocxReference()}"><a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a14:useLocalDpi val="0" xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" /></a:ext></a:extLst></a:blip><a:stretch><a:fillRect /></a:stretch></pic:blipFill><pic:spPr><a:xfrm rot="0" flipH="0" flipV="0"><a:off x="0" y="0" /><a:ext cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu)}" /></a:xfrm><a:prstGeom prst="rect"><a:avLst /></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -284,7 +324,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImageDocxWidth(952500)}" cy="{d.image:scaleImageDocxHeight(590550)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference()}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImageDocxWidth(952500)}" cy="{d.image:scaleImageDocxHeight(590550)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference()}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -305,73 +345,140 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         done();
       });
     });
-    describe('DOCX scaling', function () {
-      it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
+  });
+
+  describe('DOCX ODT scaling', function () {
+    it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
+      let _imageInfo = {
+        unit           : 'emu',
+        data           : new Buffer.from(''),
+        newImageWidth  : -1,
+        newImageHeight : -1
+      };
+      image._getImageSize(_imageInfo);
+      helper.assert(_imageInfo.newImageWidth, -1);
+      helper.assert(_imageInfo.newImageHeight, -1);
+      done();
+    });
+
+    it('_getImageSize: should return the EMU size of a JPEG base64 image', function (done) {
+      image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
         let _imageInfo = {
-          data           : new Buffer.from(''),
+          unit           : 'emu',
+          data           : imageData.data,
           newImageWidth  : -1,
           newImageHeight : -1
         };
-        image._getImageSize(_imageInfo);
-        helper.assert(_imageInfo.newImageWidth, -1);
-        helper.assert(_imageInfo.newImageHeight, -1);
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 952500);
+        helper.assert(_imageInfo.newImageHeight, 590550);
         done();
       });
-
-      it('_getImageSize: should return the EMU size of a JPEG base64 image', function (done) {
-        image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
-          let _imageInfo = {
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
-          };
-          image._getImageSize(_imageInfo);
-          helper.assert(_imageInfo.newImageWidth, 952500);
-          helper.assert(_imageInfo.newImageHeight, 590550);
-          done();
-        });
-      });
+    });
 
 
-      it('_getImageSize: should return the EMU size of a PNG base64 image', function (done) {
-        image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
-          let _imageInfo = {
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
-          };
-          image._getImageSize(_imageInfo);
-          helper.assert(_imageInfo.newImageWidth, 2857500);
-          helper.assert(_imageInfo.newImageHeight, 1905000);
-          done();
-        });
-      });
-
-      it("_computeImageSize 1: should compute the imageFit size as 'contain'", function (done) {
+    it('_getImageSize: should return the EMU size of a PNG base64 image', function (done) {
+      image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
         let _imageInfo = {
-          newImageWidth  : 220,
-          newImageHeight : 100,
-          imageWidth     : 100,
-          imageHeight    : 80
+          unit           : 'emu',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
         };
-        image._computeImageSize(_imageInfo);
-        helper.assert(_imageInfo.imageWidth, 100);
-        helper.assert(_imageInfo.imageHeight, 46);
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 2857500);
+        helper.assert(_imageInfo.newImageHeight, 1905000);
         done();
       });
+    });
 
-      it("_computeImageSize 2: should compute the imageFit size as 'contain'", function (done) {
+    it('_getImageSize: should return the CM size of a JPEG base64 image', function (done) {
+      image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
         let _imageInfo = {
-          newImageWidth  : 2857500,
-          newImageHeight : 1905000,
-          imageWidth     : 952500,
-          imageHeight    : 590550
+          unit           : 'cm',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
         };
-        image._computeImageSize(_imageInfo);
-        helper.assert(_imageInfo.imageWidth, 952500);
-        helper.assert(_imageInfo.imageHeight, 635000);
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 2.65);
+        helper.assert(_imageInfo.newImageHeight, 1.643);
         done();
       });
+    });
+
+
+    it('_getImageSize: should return the CM size of a PNG base64 image', function (done) {
+      image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
+        let _imageInfo = {
+          unit           : 'cm',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
+        };
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 7.95);
+        helper.assert(_imageInfo.newImageHeight, 5.3);
+        done();
+      });
+    });
+
+    it('_getImageSize: should return the INCH size of a JPEG base64 image', function (done) {
+      image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
+        let _imageInfo = {
+          unit           : 'in',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
+        };
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 1.0416666666666667);
+        helper.assert(_imageInfo.newImageHeight, 0.6458333333333334);
+        done();
+      });
+    });
+
+    it('_getImageSize: should return the INCH size of a PNG base64 image', function (done) {
+      image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
+        let _imageInfo = {
+          unit           : 'in',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
+        };
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 3.125);
+        helper.assert(_imageInfo.newImageHeight, 2.0833333333333335);
+        done();
+      });
+    });
+
+    it("_computeImageSize 1: should compute the imageFit size as 'contain'", function (done) {
+      let _imageInfo = {
+        unit           : 'emu',
+        newImageWidth  : 220,
+        newImageHeight : 100,
+        imageWidth     : 100,
+        imageHeight    : 80
+      };
+      image._computeImageSize(_imageInfo);
+      helper.assert(_imageInfo.imageWidth, 100);
+      helper.assert(_imageInfo.imageHeight, 46);
+      done();
+    });
+
+    it("_computeImageSize 2: should compute the imageFit size as 'contain'", function (done) {
+      let _imageInfo = {
+        unit           : 'emu',
+        newImageWidth  : 2857500,
+        newImageHeight : 1905000,
+        imageWidth     : 952500,
+        imageHeight    : 590550
+      };
+      image._computeImageSize(_imageInfo);
+      helper.assert(_imageInfo.imageWidth, 952500);
+      helper.assert(_imageInfo.imageHeight, 635000);
+      done();
     });
   });
 

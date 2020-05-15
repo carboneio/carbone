@@ -117,7 +117,7 @@ function generateOpenDocumentImageMimeType (urlOrBase64) {
 }
 
 /**
- * Generate image reference ID for MS DOCX documents
+ * Generate image a reference id for MS DOCX documents
  *
  * Called by the builder. At this time, we do not know if this image
  * will be kept in final render. We do not know the image type (asynchronuous process)
@@ -157,7 +157,7 @@ function generateImageReferencePostProcessing (urlOrBase64) {
 
 
 /**
- * Generate an image id for MS DOCX documents
+ * Generate an image id for DOCX documents
  *
  * Called by the builder. At this time, we do not know if this image
  * will be kept in final render. We do not know the image type (asynchronuous process)
@@ -196,6 +196,22 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
   return _imageData.id + '';
 }
 
+/**
+ * Generate image a reference id for XLSX documents
+ *
+ * Called by the builder. At this time, we do not know if this image
+ * will be kept in final render. We do not know the image type (asynchronuous process)
+ * So we ask to the builder to call the function generateImageDocxIdPostProcessing
+ * at the end
+ *
+ * `this` is the options
+ *
+ * @private
+ *
+ * @param   {String} urlOrBase64 image data (link or base64)
+ * @param   {String} sheetId     sheet id - an image can be part of multiple sheets
+ * @returns {String}             generated link for OpenDocument
+ */
 function generateImageXlsxReference (urlOrBase64, sheetId) {
   let _imageSourceProperties = {};
   if (sheetId) {
@@ -209,6 +225,21 @@ function generateImageXlsxReference (urlOrBase64, sheetId) {
   };
 }
 
+/**
+ * scaleImage compute the final image size based on the temporary picture.
+ * It takes as input the temporary picture size and the new picture size.
+ * It returns a function called at the end of the building process which returns the new picture size.
+ * This fonction is called only from ODT or DOCX documents.
+ *
+ * `this` is the options
+ *
+ * @private
+ *
+ * @param {String} urlOrBase64 image data (link or base64)
+ * @param {String} measure     width or height
+ * @param {String} value       value
+ * @param {String} unit        can be cm, in or emu
+ */
 function scaleImage (urlOrBase64, measure, value, unit) {
   let _imageSourceProperties = {};
   if (unit === 'cm' || unit === 'in' || unit === 'emu') {
@@ -227,6 +258,18 @@ function scaleImage (urlOrBase64, measure, value, unit) {
   };
 }
 
+/**
+ * Post processing function called at the end of the building process.
+ * It is called only for DOCX and ODT document to create an unique ID.
+ *
+ * this.imageDatabase as been updated by the post-processor and contains image informations.
+ *
+ * @private
+ *
+ * @param  {String} urlOrBase64 image data (link or base64)
+ * @param  {String} measure     width or height
+ * @return {String}             the new image size
+ */
 function setImageSizePostProcessing (urlOrBase64, measure) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
   if (measure === 'width') {

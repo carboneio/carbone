@@ -196,98 +196,6 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
   return _imageData.id + '';
 }
 
-/**
- * It gets the EMU width of the initial image to being computed with the correct new scale.
- *
- * Called by the builder. At this time, we do not know if this image
- * will be kept in final render. We do not know the image type (asynchronuous process)
- * So we ask to the builder to call the function setImageDocxWidthPostProcessing
- * at the end
- *
- * `this` is the options
- *
- * @private
- *
- * @param   {String} urlOrBase64 image data (link or base64)
- * @param   {String} imageWidth image width as EMU unit
- * @returns {Object}            a post process object
- */
-function scaleImageDocxWidth (urlOrBase64, imageWidth) {
-  let _imageSourceProperties = {
-    imageUnit : 'emu'
-  };
-  if (imageWidth) {
-    _imageSourceProperties.imageWidth = parseInt(imageWidth);
-  }
-  addImageDatabase(this, urlOrBase64, _imageSourceProperties);
-  // return a function to call at the end of the building process
-  return {
-    fn   : setImageDocxWidthPostProcessing,
-    args : [urlOrBase64]
-  };
-}
-
-/**
- * Post processing function called at the end of the building process. It return the EMU width of the new image.
- *
- * this.imageDatabase as been updated by the post-processor and contains image info
- *
- * @private
- *
- * @param  {Object} urlOrBase64 image data (link or base64)
- * @return {String}             image EMU witdh
- */
-function setImageDocxWidthPostProcessing (urlOrBase64) {
-  var _imageData = this.imageDatabase.get(urlOrBase64);
-  return _imageData.imageWidth + '';
-}
-
-/**
- * It gets the EMU Height of the initial image to being computed with the correct new scale.
- *
- * Called by the builder. At this time, we do not know if this image
- * will be kept in final render. We do not know the image type (asynchronuous process)
- * So we ask to the builder to call the function setImageDocxWidthPostProcessing
- * at the end
- *
- * `this` is the options
- *
- * @private
- *
- * @param   {String} urlOrBase64 image data (link or base64)
- * @param   {String} imageHeight image height as EMU unit
- * @returns {Object}             a post process object
- */
-function scaleImageDocxHeight (urlOrBase64, imageHeight) {
-  let _imageSourceProperties = {
-    imageUnit : 'emu'
-  };
-  if (imageHeight) {
-    _imageSourceProperties.imageHeight = parseInt(imageHeight);
-  }
-  addImageDatabase(this, urlOrBase64, _imageSourceProperties);
-  // return a function to call at the end of the building process
-  return {
-    fn   : setImageDocxHeightPostProcessing,
-    args : [urlOrBase64]
-  };
-}
-
-/**
- * Post processing function called at the end of the building process. It return the EMU height of the new image.
- *
- * this.imageDatabase as been updated by the post-processor and contains image info
- *
- * @private
- *
- * @param  {Object} urlOrBase64 image data (link or base64)
- * @return {String}             image EMU height
- */
-function setImageDocxHeightPostProcessing (urlOrBase64) {
-  var _imageData = this.imageDatabase.get(urlOrBase64);
-  return _imageData.imageHeight + '';
-}
-
 function generateImageXlsxReference (urlOrBase64, sheetId) {
   let _imageSourceProperties = {};
   if (sheetId) {
@@ -301,44 +209,41 @@ function generateImageXlsxReference (urlOrBase64, sheetId) {
   };
 }
 
-function scaleImageLo (urlOrBase64, measure, value, unit) {
+function scaleImage (urlOrBase64, measure, value, unit) {
   let _imageSourceProperties = {};
-  if (unit === 'cm' || unit === 'in') {
+  if (unit === 'cm' || unit === 'in' || unit === 'emu') {
     _imageSourceProperties.imageUnit = unit;
   }
-  if (measure === 'width') {
+  if (measure === 'width' && value) {
     _imageSourceProperties.imageWidth = parseFloat(value);
   }
-  if (measure === 'height') {
+  if (measure === 'height' && value) {
     _imageSourceProperties.imageHeight = parseFloat(value);
   }
   addImageDatabase(this, urlOrBase64, _imageSourceProperties);
   return {
-    fn   : setImageLoSizePostProcessing,
+    fn   : setImageSizePostProcessing,
     args : [urlOrBase64, measure]
   };
 }
 
-function setImageLoSizePostProcessing (urlOrBase64, measure) {
+function setImageSizePostProcessing (urlOrBase64, measure) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
   if (measure === 'width') {
-    return _imageData.imageWidth + _imageData.imageUnit;
+    return _imageData.imageWidth;
   }
   else if (measure === 'height') {
-    return _imageData.imageHeight + _imageData.imageUnit;
+    return _imageData.imageHeight;
   }
   return '';
 }
-
 
 module.exports = {
   generateOpenDocumentImageHref     : generateOpenDocumentImageHref,
   generateOpenDocumentImageMimeType : generateOpenDocumentImageMimeType,
   generateImageDocxId               : generateImageDocxId,
   generateImageDocxReference        : generateImageDocxReference,
-  scaleImageDocxWidth               : scaleImageDocxWidth,
-  scaleImageDocxHeight              : scaleImageDocxHeight,
   generateImageXlsxReference        : generateImageXlsxReference,
-  scaleImageLo                      : scaleImageLo
+  scaleImage                        : scaleImage,
 };
 

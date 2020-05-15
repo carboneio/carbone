@@ -213,7 +213,9 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
  * @returns {Object}            a post process object
  */
 function scaleImageDocxWidth (urlOrBase64, imageWidth) {
-  let _imageSourceProperties = {};
+  let _imageSourceProperties = {
+    imageUnit : 'emu'
+  };
   if (imageWidth) {
     _imageSourceProperties.imageWidth = parseInt(imageWidth);
   }
@@ -257,7 +259,9 @@ function setImageDocxWidthPostProcessing (urlOrBase64) {
  * @returns {Object}             a post process object
  */
 function scaleImageDocxHeight (urlOrBase64, imageHeight) {
-  let _imageSourceProperties = {};
+  let _imageSourceProperties = {
+    imageUnit : 'emu'
+  };
   if (imageHeight) {
     _imageSourceProperties.imageHeight = parseInt(imageHeight);
   }
@@ -297,6 +301,34 @@ function generateImageXlsxReference (urlOrBase64, sheetId) {
   };
 }
 
+function scaleImageLo (urlOrBase64, measure, value) {
+  let _imageSourceProperties = {
+    imageUnit : 'cm'
+  };
+  if (measure === 'width') {
+    _imageSourceProperties.imageWidth = [parseFloat(value)];
+  }
+  if (measure === 'height') {
+    _imageSourceProperties.imageHeight = [parseFloat(value)];
+  }
+  addImageDatabase(this, urlOrBase64, _imageSourceProperties);
+  return {
+    fn   : setImageLoSizePostProcessing,
+    args : [urlOrBase64, measure]
+  };
+}
+
+function setImageLoSizePostProcessing (urlOrBase64, measure) {
+  var _imageData = this.imageDatabase.get(urlOrBase64);
+  if (measure === 'width') {
+    return _imageData.imageWidth + 'cm';
+  }
+  else if (measure === 'height') {
+    return _imageData.imageHeight + 'cm';
+  }
+  return '';
+}
+
 
 module.exports = {
   generateOpenDocumentImageHref     : generateOpenDocumentImageHref,
@@ -305,6 +337,7 @@ module.exports = {
   generateImageDocxReference        : generateImageDocxReference,
   scaleImageDocxWidth               : scaleImageDocxWidth,
   scaleImageDocxHeight              : scaleImageDocxHeight,
-  generateImageXlsxReference        : generateImageXlsxReference
+  generateImageXlsxReference        : generateImageXlsxReference,
+  scaleImageLo                      : scaleImageLo
 };
 

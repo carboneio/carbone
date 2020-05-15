@@ -235,7 +235,7 @@
     <style:master-page style:name="Standard" style:page-layout-name="Mpm1">
       <style:header>
         <text:p text:style-name="MP1">
-          <draw:frame draw:name="Logo" draw:style-name="Mfr1" draw:z-index="1" svg:height="1.191cm" svg:width="1.933cm" svg:x="0.016cm" svg:y="-0.021cm" text:anchor-type="paragraph">
+          <draw:frame draw:name="Logo" draw:style-name="Mfr1" draw:z-index="1" svg:height="1.1909999999999998cm" svg:width="2.0084999999999997cm" svg:x="0.016cm" svg:y="-0.021cm" text:anchor-type="paragraph">
             <draw:image loext:mime-type="image/jpeg" xlink:actuate="onLoad" xlink:href="Pictures/CarboneImage3.jpeg" xlink:show="embed" xlink:type="simple"/>
             <svg:title></svg:title>
           </draw:frame>ideolys</text:p>

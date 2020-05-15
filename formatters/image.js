@@ -301,15 +301,16 @@ function generateImageXlsxReference (urlOrBase64, sheetId) {
   };
 }
 
-function scaleImageLo (urlOrBase64, measure, value) {
-  let _imageSourceProperties = {
-    imageUnit : 'cm'
-  };
+function scaleImageLo (urlOrBase64, measure, value, unit) {
+  let _imageSourceProperties = {};
+  if (unit === 'cm' || unit === 'in') {
+    _imageSourceProperties.imageUnit = unit;
+  }
   if (measure === 'width') {
-    _imageSourceProperties.imageWidth = [parseFloat(value)];
+    _imageSourceProperties.imageWidth = parseFloat(value);
   }
   if (measure === 'height') {
-    _imageSourceProperties.imageHeight = [parseFloat(value)];
+    _imageSourceProperties.imageHeight = parseFloat(value);
   }
   addImageDatabase(this, urlOrBase64, _imageSourceProperties);
   return {
@@ -321,10 +322,10 @@ function scaleImageLo (urlOrBase64, measure, value) {
 function setImageLoSizePostProcessing (urlOrBase64, measure) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
   if (measure === 'width') {
-    return _imageData.imageWidth + 'cm';
+    return _imageData.imageWidth + _imageData.imageUnit;
   }
   else if (measure === 'height') {
-    return _imageData.imageHeight + 'cm';
+    return _imageData.imageHeight + _imageData.imageUnit;
   }
   return '';
 }

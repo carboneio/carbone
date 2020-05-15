@@ -85,7 +85,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
     });
 
     describe('ODT preprocess XML', function () {
-      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO)', function (done) {
+      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM)', function (done) {
         let template = {
           files : [
             {
@@ -94,13 +94,13 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImageLo(width, 6.92, cm)}" svg:height="{d.image:scaleImageLo(height, 4.616, cm)}" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
       });
 
-      it('should replace the main document tag attributes with markers and formaters (ODT XML from WORD)', function (done) {
+      it('should replace the main document tag attributes with markers and formaters (ODT XML from WORD) (unit: INCH)', function (done) {
         let template = {
           files : [
             {
@@ -109,7 +109,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="0.3375in" svg:height="0.20903in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="{d.image:scaleImageLo(width, 0.3375, in)}" svg:height="{d.image:scaleImageLo(height, 0.20903, in)}" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -307,7 +307,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
     });
   });
 
-  describe.only('DOCX ODT scaling', function () {
+  describe('DOCX ODT scaling', function () {
     it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
       let _imageInfo = {
         unit           : 'emu',
@@ -379,6 +379,36 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         image._getImageSize(_imageInfo, _imageInfo.unit);
         helper.assert(_imageInfo.newImageWidth, 7.95);
         helper.assert(_imageInfo.newImageHeight, 5.3);
+        done();
+      });
+    });
+
+    it('_getImageSize: should return the INCH size of a JPEG base64 image', function (done) {
+      image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
+        let _imageInfo = {
+          unit           : 'in',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
+        };
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 1.0416666666666667);
+        helper.assert(_imageInfo.newImageHeight, 0.6458333333333334);
+        done();
+      });
+    });
+
+    it('_getImageSize: should return the INCH size of a PNG base64 image', function (done) {
+      image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
+        let _imageInfo = {
+          unit           : 'in',
+          data           : imageData.data,
+          newImageWidth  : -1,
+          newImageHeight : -1
+        };
+        image._getImageSize(_imageInfo, _imageInfo.unit);
+        helper.assert(_imageInfo.newImageWidth, 3.125);
+        helper.assert(_imageInfo.newImageHeight, 2.0833333333333335);
         done();
       });
     });

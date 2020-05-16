@@ -34,6 +34,15 @@
 
 ... using your JSON data as input !</p>
 
+>  ⚡️ Breaking news :
+> 
+> **Carbone v2.0 BETA 🚀 is available :**
+>   
+>   - `npm i carbone@2.0.0-beta.1` 
+>   - Changelog : https://github.com/Ideolys/carbone/blob/v2.0/CHANGELOG.md
+>   - The final release should be available at the end of May with everything updated (website, and other new features 😛, ...)
+
+
 ## Table of content
 
 <!-- MarkdownTOC -->
@@ -48,10 +57,11 @@
 - [More examples](#more-examples)
 - [API Reference](#api-reference)
 - [Command line tools](#command-line-tools)
+- [Issues](#issues)
+- [Roadmap](#roadmap)
 - [Performance](#performance)
 - [Licenses and editions](#licenses-and-editions)
 - [Philosophy](#philosophy)
-- [Roadmap](#roadmap)
 - [Contributors](#contributors)
 
 <!-- /MarkdownTOC -->

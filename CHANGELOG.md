@@ -71,7 +71,7 @@
     *Template => Result*
 
     print simple message according to the result of a condition<br>
-    `{d.id:ifEQ(10):showMessage('hey')}` => hey
+    `{d.id:ifEQ(10):show('hey')}` => hey
 
     print simple message according to the result of multiple conditions, combining with dynamic variables! 🤩<br>
     `{d.id:ifEQ(10):and(.qtyA):ifEQ(20):show('hey'):elseShow('hide')}` => hey

@@ -1078,7 +1078,7 @@ describe('Carbone', function () {
         });
       });
       it('should accept to use other formatters (arrays) with conditional blocks', function (done) {
-        var _xml = '<xml>{d.who} <b/>{d.cars:ifEM():hideBegin()} <tr>{d.who} {d.cars[i].brand} </tr><tr> {d.who} {d.cars[i+1].brand} </tr> <a></a>{d.isDataHidden:ifEM():hideEnd()} {d.who}</xml>';
+        var _xml = '<xml>{d.who} <b/>{d.cars:ifEM():hideBegin} <tr>{d.who} {d.cars[i].brand} </tr><tr> {d.who} {d.cars[i+1].brand} </tr> <a></a>{d.isDataHidden:ifEM():hideEnd} {d.who}</xml>';
         var _data = {
           who  : 'my',
           cars : [
@@ -1130,6 +1130,50 @@ describe('Carbone', function () {
                 done();
               });
             });
+          });
+        });
+      });
+      it('should accept conditional block with loops just before and after the if-block\
+        should not break XML even if the if-block is not placed correclty (with showBegin/showEnd)', function (done) {
+        var _xml = '<xml> <table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> <b>{d.isDataHidden:ifEQ(false):showBegin}</b> <a>hey1!</a> <b>{d.isDataHidden:showEnd}</b><table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> </xml>';
+        var _data = {
+          isDataHidden : true,
+          who          : 'my',
+          cars         : [
+            {brand : 'Lumeneo'},
+            {brand : 'Toyota'}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b><b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+          _data.isDataHidden = false;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b> <a>hey1!</a> <b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+            done();
+          });
+        });
+      });
+      it('should accept conditional block with loops just before and after the if-block\
+        should not break XML even if the if-block is not placed correclty (with hideBegin/hideEnd)', function (done) {
+        var _xml = '<xml> <table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> <b>{d.isDataHidden:hideBegin}</b> <a>hey1!</a> <b>{d.isDataHidden:hideEnd}</b><table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> </xml>';
+        var _data = {
+          isDataHidden : true,
+          who          : 'my',
+          cars         : [
+            {brand : 'Lumeneo'},
+            {brand : 'Toyota'}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b><b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+          _data.isDataHidden = false;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b> <a>hey1!</a> <b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+            done();
           });
         });
       });

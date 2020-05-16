@@ -1099,6 +1099,8 @@ describe('parser', function () {
     it('should include self-closing tags', function () {
       helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1><br/><br/><br/></h1></p></xml>', 5, 32), [8, 32]);
       helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1><br/><br/><br/></h1><br/></p></xml>', 5, 37), [8, 37]);
+      helper.assert(parser.findSafeConditionalBlockPosition('<xml><b></b><br/>ab<b></b></xml>', 8, 22), [12, 19]);
+      helper.assert(parser.findSafeConditionalBlockPosition('<xml><b></b>ab<b><br/></b></xml>', 8, 22), [12, 14]);
     });
     it('should include non-XML part', function () {
       helper.assert(parser.findSafeConditionalBlockPosition('<xml><a><a><a><a>  </a></a></a></a></xml>', 5, 19), [17, 19]);
@@ -1106,6 +1108,7 @@ describe('parser', function () {
       helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab</xml>', 5, 7), [5, 7]);
       helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab</xml>', 0, 13), [0, 13]);
       helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab</xml>', 5, 13), [5, 7]);
+      helper.assert(parser.findSafeConditionalBlockPosition('<xml><b></b>ab<b></b></xml>', 8, 17), [12, 14]);
       helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab</xml><div>', 5, 13), [5, 7]);
       helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab<br/><div>', 5, 12), [5, 12]);
       helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab<br/> <div>', 5, 13), [5, 13]);
@@ -1121,9 +1124,10 @@ describe('parser', function () {
       helper.assert(parser.findSafeConditionalBlockPosition('<xml><p>a <h1><br/><br/><br/></h1><br/>a</p></xml>', 5, 40), [8, 40]);
       helper.assert(parser.findSafeConditionalBlockPosition('<xml><p>a<h1><br/><br/><br/></h1><br/></p></xml>', 5, 38), [8, 38]);
     });
-    it('should select first valid part', function () {
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml> <a>b</a> </p></p></p></p> <br/><br/><br/> </xml>', 5, 48), [5, 15]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml>', 5, 53), [5, 20]);
+    it('should select the biggest valid XML part', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition('<xml> <a>b</a> </p></p></p></p> <br/><br/><br/> </xml>', 5, 48), [31, 48]);
+      helper.assert(parser.findSafeConditionalBlockPosition('<xml> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml>', 5, 53), [36, 53]);
+      helper.assert(parser.findSafeConditionalBlockPosition('<xml><b><br/><br/></b><br/>ab<br/><b><br/><br/></b></xml>', 13, 42), [22, 34]);
     });
     it('should select the valid part after the last ending tag', function () {
       helper.assert(parser.findSafeConditionalBlockPosition('<xml> </p><br/><br/><br/></xml>', 5, 25), [10, 25]);

@@ -142,9 +142,9 @@
     - `fill`: The replaced image is sized to fill the element’s content-box (the temporary image). The entire image will fill the box of the previous image. If the object's aspect ratio does not match the aspect ratio of its box, then the object will be stretched to fit.
 
     example: `{d.myImage:imageFit(contain)}` or `{d.myImage:imageFit(fill)}`
-
-
-
+  - dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Select and right click into an element, click on "hyperlinks", insert the marker and validate. It is working properly with ODS, ODT, and DOCX. The compatibility is limited for XLSX files:
+    - the marker should not be written with curly braces ({d.url} => only d.url).
+    - It is not possible to create a list of hyperlinks, only insert dynamic hyperlinks on basic elements (text).
 
 ### v1.2.1
   - Release June 11, 2019

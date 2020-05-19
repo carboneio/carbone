@@ -155,7 +155,7 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
     helper.assert(_template.files[0].data, _expectedResult);
   });
 
-  it('[DOCX] should change unicode characters to ascii character and makes one hyperlink marker valid', function () {
+  it('[DOCX - preprocess] should remove an hyperlink marker from the rels file and move it to the document.xml file', function () {
     const _template = {
       files : [{
         name : '_rels/document.xml.rels',
@@ -165,19 +165,19 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
           + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
           + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="%7Bd.url%7D" TargetMode="External"/>'
           + '</Relationships>'
+      },{
+        name : 'word/document.xml',
+        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="rId2"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>'
       }]
     };
-    const _expectedResult = ''
-      + '<?xml version="1.0" encoding="UTF-8"?>'
-      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
-      + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url}" TargetMode="External"/>'
-      + '</Relationships>';
-    hyperlinks.insertHyperlinksDOCX(_template);
-    helper.assert(_template.files[0].data, _expectedResult);
+    const _expectedRelsResult = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="{d.url:generateHyperlinkReference()}"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>';
+    hyperlinks.preProcesstHyperlinksDocx(_template);
+    helper.assert(_template.files[0].data, _expectedRelsResult);
+    helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
-  it('[DOCX] should change unicode characters to ascii character and makes multiple hyperlink markers valid', function () {
+  it('[DOCX - preprocess] should remove multiple hyperlinks marker from the rels file and move them to the document.xml file', function () {
     const _template = {
       files : [{
         name : '_rels/document.xml.rels',
@@ -192,64 +192,63 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
           + '<Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>'
           + '<Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>'
           + '</Relationships>'
+      }, {
+        name : 'word/document.xml',
+        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="rId2"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>This</w:t></w:r></w:hyperlink></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="rId3"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Is</w:t></w:r></w:hyperlink></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="rId4"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Some</w:t></w:r></w:hyperlink></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="rId5"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Text</w:t></w:r></w:hyperlink></w:p><w:sectPr><w:type w:val="nextPage"/><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:left="1134" w:right="1134" w:header="0" w:top="1134" w:footer="0" w:bottom="1134" w:gutter="0"/><w:pgNumType w:fmt="decimal"/><w:formProt w:val="false"/><w:textDirection w:val="lrTb"/><w:docGrid w:type="default" w:linePitch="100" w:charSpace="0"/></w:sectPr></w:body></w:document>'
       }]
     };
     const _expectedResult = ''
       + '<?xml version="1.0" encoding="UTF-8"?>'
       + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
       + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
-      + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url}" TargetMode="External"/>'
-      + '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url2}" TargetMode="External"/>'
-      + '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url3}" TargetMode="External"/>'
-      + '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url4}" TargetMode="External"/>'
       + '<Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>'
       + '<Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>'
       + '</Relationships>';
-    hyperlinks.insertHyperlinksDOCX(_template);
+    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="{d.url:generateHyperlinkReference()}"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>This</w:t></w:r></w:hyperlink></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="{d.url2:generateHyperlinkReference()}"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Is</w:t></w:r></w:hyperlink></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="{d.url3:generateHyperlinkReference()}"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Some</w:t></w:r></w:hyperlink></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="{d.url4:generateHyperlinkReference()}"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Text</w:t></w:r></w:hyperlink></w:p><w:sectPr><w:type w:val="nextPage"/><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:left="1134" w:right="1134" w:header="0" w:top="1134" w:footer="0" w:bottom="1134" w:gutter="0"/><w:pgNumType w:fmt="decimal"/><w:formProt w:val="false"/><w:textDirection w:val="lrTb"/><w:docGrid w:type="default" w:linePitch="100" w:charSpace="0"/></w:sectPr></w:body></w:document>';
+    hyperlinks.preProcesstHyperlinksDocx(_template);
     helper.assert(_template.files[0].data, _expectedResult);
+    helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
-  it('[DOCX] should change unicode characters to ascii character and makes multi hyperlink markers valid applied on one text', function () {
+  it('[DOCX - preprocess] should remove a picture hyperlink marker from the rels file and move it to the document.xml file', function () {
     const _template = {
       files : [{
         name : '_rels/document.xml.rels',
         data : ''
+          + '<?xml version="1.0" encoding="UTF-8"?>'
           + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
           + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
-          + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="%257Bd.url%257D%257Bd.path%257D%257Bd.query%257D" TargetMode="External"/>'
+          + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/>'
+          + '<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="%257Bd.url%257D" TargetMode="External"/>'
+          + '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>'
+          + '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>'
           + '</Relationships>'
-      }]
+      },
+      {
+        name : 'word/document.xml',
+        data : '<w:drawing><wp:anchor behindDoc="0" distT="0" distB="0" distL="0" distR="0" simplePos="0" locked="0" layoutInCell="1" allowOverlap="1" relativeHeight="2"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="column"><wp:posOffset>64770</wp:posOffset></wp:positionH><wp:positionV relativeFrom="paragraph"><wp:posOffset>28575</wp:posOffset></wp:positionV><wp:extent cx="1575435" cy="1431290"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapSquare wrapText="largest"/><wp:docPr id="1" name="Image1" descr=""><a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" r:id="rId3"/></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="Image1" descr=""><a:hlinkClick r:id="rId3"/></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId2"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="1575435" cy="1431290"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing>'
+      }
+      ]
     };
     const _expectedResult = ''
-      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
-      + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url}{d.path}{d.query}" TargetMode="External"/>'
-      + '</Relationships>';
-    hyperlinks.insertHyperlinksDOCX(_template);
+        + '<?xml version="1.0" encoding="UTF-8"?>'
+        + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+        + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/>'
+        + '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>'
+        + '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>'
+        + '</Relationships>';
+    const _expectedDocumentResult = '<w:drawing><wp:anchor behindDoc="0" distT="0" distB="0" distL="0" distR="0" simplePos="0" locked="0" layoutInCell="1" allowOverlap="1" relativeHeight="2"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="column"><wp:posOffset>64770</wp:posOffset></wp:positionH><wp:positionV relativeFrom="paragraph"><wp:posOffset>28575</wp:posOffset></wp:positionV><wp:extent cx="1575435" cy="1431290"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapSquare wrapText="largest"/><wp:docPr id="1" name="Image1" descr=""><a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" r:id="{d.url:generateHyperlinkReference()}"/></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="Image1" descr=""><a:hlinkClick r:id="{d.url:generateHyperlinkReference()}"/></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId2"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="1575435" cy="1431290"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing>';
+    hyperlinks.preProcesstHyperlinksDocx(_template);
     helper.assert(_template.files[0].data, _expectedResult);
+    helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
-  it('[DOCX] should change unicode characters to ascii character, removed unused text between markers makes multiple hyperlink marker valid', function () {
-    const _template = {
-      files : [{
-        name : '_rels/document.xml.rels',
-        data : ''
-          + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-          + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
-          + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="fewfwefwefe%257Bd.url%257Dfewfewf%257Bd.path%257DThis is random text%257Bd.query%257Dhop this is text" TargetMode="External"/>'
-          + '</Relationships>'
-      }]
-    };
-    const _expectedResult = ''
-      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
-      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
-      + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url}{d.path}{d.query}" TargetMode="External"/>'
-      + '</Relationships>';
-    hyperlinks.insertHyperlinksDOCX(_template);
-    helper.assert(_template.files[0].data, _expectedResult);
-  });
 
-  it('[XLSX] should makes multiple hyperlink marker valid over multiple sheets ("http://d.url" to "{d.url}")', function () {
+
+
+
+  it.skip('[XLSX] should makes multiple hyperlink marker valid over multiple sheets ("http://d.url" to "{d.url}")', function () {
     const _template = {
       files : [{
         name : 'xl/worksheets/_rels/sheet1.xml.rels',
@@ -275,7 +274,7 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
     helper.assert(_template.files[2].data, _expected[2]);
   });
 
-  it('[XLSX] should makes hyperlink markers valid over a single sheets ("http://d.url" to "{d.url}")', function () {
+  it.skip('[XLSX] should makes hyperlink markers valid over a single sheets ("http://d.url" to "{d.url}")', function () {
     const _template = {
       files : [{
         name : 'xl/worksheets/_rels/sheet1.xml.rels',

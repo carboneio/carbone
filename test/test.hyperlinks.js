@@ -230,7 +230,7 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
       }
       ]
     };
-    const _expectedResult = ''
+    const _expectedRelsResult = ''
         + '<?xml version="1.0" encoding="UTF-8"?>'
         + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
         + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
@@ -240,11 +240,39 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
         + '</Relationships>';
     const _expectedDocumentResult = '<w:drawing><wp:anchor behindDoc="0" distT="0" distB="0" distL="0" distR="0" simplePos="0" locked="0" layoutInCell="1" allowOverlap="1" relativeHeight="2"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="column"><wp:posOffset>64770</wp:posOffset></wp:positionH><wp:positionV relativeFrom="paragraph"><wp:posOffset>28575</wp:posOffset></wp:positionV><wp:extent cx="1575435" cy="1431290"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapSquare wrapText="largest"/><wp:docPr id="1" name="Image1" descr=""><a:hlinkClick xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" r:id="{d.url:generateHyperlinkReference()}"/></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="Image1" descr=""><a:hlinkClick r:id="{d.url:generateHyperlinkReference()}"/></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId2"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="1575435" cy="1431290"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing>';
     hyperlinks.preProcesstHyperlinksDocx(_template);
-    helper.assert(_template.files[0].data, _expectedResult);
+    helper.assert(_template.files[0].data, _expectedRelsResult);
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
-
+  it('[DOCX post-process] should fill the relation file from the hyperlinkDatabase', function () {
+    const _template = {
+      files : [{
+        name : 'word/_rels/document.xml.rels',
+        data : '<?xml version="1.0" encoding="UTF-8"?>'
+        + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+        + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/>'
+        + '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>'
+        + '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>'
+        + '</Relationships>'
+      }]
+    };
+    const _options = {
+      hyperlinkDatabase : new Map([['https://carbone.io', {id : 0}], ['https://github.com/Ideolys/carbone', {id : 1}], ['https://carbone.io/documentation.html', {id : 2}]])
+    };
+    const _expectedResult = '<?xml version="1.0" encoding="UTF-8"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+      + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/>'
+      + '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>'
+      + '<Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>'
+      + '<Relationship Id="CarboneHyperlinkId0" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://carbone.io" TargetMode="External"/>'
+      + '<Relationship Id="CarboneHyperlinkId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://github.com/Ideolys/carbone" TargetMode="External"/>'
+      + '<Relationship Id="CarboneHyperlinkId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://carbone.io/documentation.html" TargetMode="External"/>'
+      + '</Relationships>';
+    hyperlinks.postProcessHyperlinksDocx(_template, undefined, _options);
+    helper.assert(_template.files[0].data, _expectedResult);
+  });
 
 
 

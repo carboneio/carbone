@@ -143,7 +143,7 @@
 
     example: `{d.myImage:imageFit(contain)}` or `{d.myImage:imageFit(fill)}`
   - dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Select and right click into an element, click on "hyperlinks", insert the marker and validate. It is working properly with ODS, ODT, and DOCX. The compatibility is limited for XLSX files:
-    - the marker should not be written with curly braces ({d.url} => only d.url).
+    - the marker should not be written with curly braces, example: `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it will work.
     - It is not possible to create a list of hyperlinks, only insert dynamic hyperlinks on basic elements (text).
 
 ### v1.2.1

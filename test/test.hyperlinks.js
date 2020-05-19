@@ -275,8 +275,33 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
   });
 
 
+  it('[XLSX] should make a single hyperlink marker valid on a single sheet ("http://d.url" to "{d.url}")', function () {
+    const _template = {
+      files : [{
+        name : 'xl/worksheets/_rels/sheet1.xml.rels',
+        data : '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url/" TargetMode="External"/></Relationships>'
+      }]
+    };
+    const _expected =
+      '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url}" TargetMode="External"/></Relationships>';
+    hyperlinks.insertHyperlinksXLSX(_template);
+    helper.assert(_template.files[0].data, _expected);
+  });
 
-  it.skip('[XLSX] should makes multiple hyperlink marker valid over multiple sheets ("http://d.url" to "{d.url}")', function () {
+  it('[XLSX] should make multiple hyperlink markers valid on a single sheets ("http://d.url" to "{d.url}")', function () {
+    const _template = {
+      files : [{
+        name : 'xl/worksheets/_rels/sheet1.xml.rels',
+        data : '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url/" TargetMode="External"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url2/" TargetMode="External"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url3/" TargetMode="External"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://d.url4/" TargetMode="External"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url5/" TargetMode="External"/><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url6/" TargetMode="External"/><Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url7/" TargetMode="External"/><Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.urlWithaRealyLargeText12/" TargetMode="External"/></Relationships>'
+      }]
+    };
+    const _expected =
+      '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url}" TargetMode="External"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url2}" TargetMode="External"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url3}" TargetMode="External"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url4}" TargetMode="External"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url5}" TargetMode="External"/><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url6}" TargetMode="External"/><Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url7}" TargetMode="External"/><Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.urlWithaRealyLargeText12}" TargetMode="External"/></Relationships>';
+    hyperlinks.insertHyperlinksXLSX(_template);
+    helper.assert(_template.files[0].data, _expected);
+  });
+
+  it('[XLSX] should make multiple hyperlink marker valid on multiple sheets ("http://d.url" to "{d.url}")', function () {
     const _template = {
       files : [{
         name : 'xl/worksheets/_rels/sheet1.xml.rels',
@@ -301,18 +326,4 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
     helper.assert(_template.files[1].data, _expected[1]);
     helper.assert(_template.files[2].data, _expected[2]);
   });
-
-  it.skip('[XLSX] should makes hyperlink markers valid over a single sheets ("http://d.url" to "{d.url}")', function () {
-    const _template = {
-      files : [{
-        name : 'xl/worksheets/_rels/sheet1.xml.rels',
-        data : '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url/" TargetMode="External"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url2/" TargetMode="External"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url3/" TargetMode="External"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://d.url4/" TargetMode="External"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url5/" TargetMode="External"/><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url6/" TargetMode="External"/><Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.url7/" TargetMode="External"/><Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="http://d.urlWithaRealyLargeText12/" TargetMode="External"/></Relationships>'
-      }]
-    };
-    const _expected =
-      '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url}" TargetMode="External"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url2}" TargetMode="External"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url3}" TargetMode="External"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url4}" TargetMode="External"/><Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url5}" TargetMode="External"/><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url6}" TargetMode="External"/><Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url7}" TargetMode="External"/><Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.urlWithaRealyLargeText12}" TargetMode="External"/></Relationships>';
-    hyperlinks.insertHyperlinksXLSX(_template);
-    helper.assert(_template.files[0].data, _expected);
-  });
-
 });

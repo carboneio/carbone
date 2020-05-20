@@ -24,7 +24,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         done();
       });
     });
-    it('should replace image (base64 jpg)', function (done) {
+    it('should replace an image (base64 jpg)', function (done) {
       const _testedReport = 'odt-simple';
       const _data = {
         image : _imageFRBase64jpg
@@ -94,70 +94,21 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         done();
       });
     });
-
-    describe('ODT preprocess XML', function () {
-      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM)', function (done) {
-        let template = {
-          files : [
-            {
-              name : 'content.xml',
-              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image}</svg:desc></draw:frame>'
-            }
-          ]
-        };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
-        image.preProcessLo(template);
-        helper.assert(template.files[0].data, expectedXML);
-        done();
-      });
-
-      it('should replace the main document tag attributes with markers and formaters (ODT XML from WORD) (unit: INCH)', function (done) {
-        let template = {
-          files : [
-            {
-              name : 'content.xml',
-              data : '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="0.3375in" svg:height="0.20903in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="media/image1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc>{d.image}</svg:desc></draw:frame>'
-            }
-          ]
-        };
-        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="{d.image:scaleImage(width, 0.3375, in)}in" svg:height="{d.image:scaleImage(height, 0.20903, in)}in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
-        image.preProcessLo(template);
-        helper.assert(template.files[0].data, expectedXML);
-        done();
-      });
-
-      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM) (imageFit contain)', function (done) {
-        let template = {
-          files : [
-            {
-              name : 'content.xml',
-              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(contain)}</svg:desc></draw:frame>'
-            }
-          ]
-        };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
-        image.preProcessLo(template);
-        helper.assert(template.files[0].data, expectedXML);
-        done();
-      });
-      it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM) (imageFit fill)', function (done) {
-        let template = {
-          files : [
-            {
-              name : 'content.xml',
-              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(contain)}</svg:desc></draw:frame>'
-            }
-          ]
-        };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
-        image.preProcessLo(template);
-        helper.assert(template.files[0].data, expectedXML);
-        done();
-      });
-    });
   });
 
   describe('OpenDocument ODS', function () {
+    it('should do nothing if there is no marker inside XML', function (done) {
+      const _testedReport = 'ods-simple-without-marker';
+      const _data = {
+        image : _imageFRBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
     it('should replace one image (base64 jpg)', function (done) {
       const _testedReport = 'ods-simple';
       const _data = {
@@ -193,7 +144,79 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     });
   });
 
+  describe('LO (ODT/ODS) preprocess XML', function () {
+    it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM)', function (done) {
+      let template = {
+        files : [
+          {
+            name : 'content.xml',
+            data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image}</svg:desc></draw:frame>'
+          }
+        ]
+      };
+      let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+      image.preProcessLo(template);
+      helper.assert(template.files[0].data, expectedXML);
+      done();
+    });
+
+    it('should replace the main document tag attributes with markers and formaters (ODT XML from WORD) (unit: INCH)', function (done) {
+      let template = {
+        files : [
+          {
+            name : 'content.xml',
+            data : '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="0.3375in" svg:height="0.20903in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="media/image1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc>{d.image}</svg:desc></draw:frame>'
+          }
+        ]
+      };
+      let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="{d.image:scaleImage(width, 0.3375, in)}in" svg:height="{d.image:scaleImage(height, 0.20903, in)}in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
+      image.preProcessLo(template);
+      helper.assert(template.files[0].data, expectedXML);
+      done();
+    });
+
+    it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM) (imageFit contain)', function (done) {
+      let template = {
+        files : [
+          {
+            name : 'content.xml',
+            data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(contain)}</svg:desc></draw:frame>'
+          }
+        ]
+      };
+      let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+      image.preProcessLo(template);
+      helper.assert(template.files[0].data, expectedXML);
+      done();
+    });
+    it('should replace the main document tag attributes with markers and formaters (ODT/ODS XML from LO) (unit: CM) (imageFit fill)', function (done) {
+      let template = {
+        files : [
+          {
+            name : 'content.xml',
+            data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(contain)}</svg:desc></draw:frame>'
+          }
+        ]
+      };
+      let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+      image.preProcessLo(template);
+      helper.assert(template.files[0].data, expectedXML);
+      done();
+    });
+  });
+
   describe('DOCX MS document', function () {
+    it('should do nothing if there is no marker inside the XML (created from LO)', function (done) {
+      const _testedReport = 'docx-simple-without-marker';
+      const _data = {
+        image : _imageFRBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
     it('should replace an image (Created from LO)(base64 jpg)', function (done) {
       const _testedReport = 'docx-simple';
       const _data = {
@@ -483,6 +506,17 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
   });
 
   describe('XLSX documents', function () {
+    it('should do nothing if there is no marker inside the XML', function (done) {
+      const _testedReport = 'xlsx-simple-without-marker';
+      const _data = {
+        image : _imageFRBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
     it('should replace one image (Created from LO)(base64 jpg)', function (done) {
       const _testedReport = 'xlsx-simple';
       const _data = {
@@ -857,7 +891,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
       });
     });
 
-    it('[depreciated base64 img] should return an error because the base64 is TXT file', function (done) {
+    it('[depreciated base64 img] should return an error because the base64 is a TXT file', function (done) {
       const data = {
         $base64dog : {
           data      : '/9j/4AAQSkZJRgABAQEASABIAAD/7QA4UGhvdG9zaG9wIDMuMAA4QklNBAQAAAAAAAA4QklNBCUAAAAAABDUHYzZjwCyBOmACZjs+EJ+/+EAjEV4aWYAAE1NACoAAAAIAAUBEgADAAAAAQABAAABGgAFAAAAAQAAAEoBGwAFAAAAAQAAAFIBKAADAAAAAQACAACHaQAEAAAAAQAAAFoAAAAAAAAASAAAAAEAAABIAAAAAQADoAEAAwAAAAEAAQAAoAIABAAAAAEAAAANoAMABAAAAAEAAAAMAAAAAP/bAEMABQMEBAQDBQQEBAUFBQYHDAgHBwcHDwsLCQwRDxISEQ8RERMWHBcTFBoVEREYIRgaHR0fHx8TFyIkIh4kHB4fHv/bAEMBBQUFBwYHDggIDh4UERQeHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHv/AABEIAAwADQMBIgACEQEDEQH/xAAWAAEBAQAAAAAAAAAAAAAAAAAHBAj/xAAkEAACAgEDBAMBAQAAAAAAAAABAgMEBQYREgAHCBQTISIxof/EABQBAQAAAAAAAAAAAAAAAAAAAAX/xAAaEQABBQEAAAAAAAAAAAAAAAADAAECESEj/9oADAMBAAIRAxEAPwCnutPmNc+Qt/Sdm4fXr2fRx8T2fghib1kkD/YILbuxOw5MPyOPS1496Q1ZpnS93FX9QVSfZEyLA/sxoGUDiqsqmP7Xcj+EtuOs497MLWwPc3O4+tPbsxwWYWR7c5llPJEI5Of0xXcAMSW2Ubk9JHjXhMRlaedsZSibk6zRJ8r2pgxUc9h+XA/zosU7O9JAkebbmL//2Q==',

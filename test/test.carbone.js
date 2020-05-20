@@ -1177,6 +1177,76 @@ describe('Carbone', function () {
           });
         });
       });
+      it('should hide or show some xml part with two consecutive conditional block\
+        it should accept that markers are spread across multiple with XML tag\
+        it should accept the the ending conditional marker contain conditional formatters or not', function (done) {
+        var _xml = ''
+          + '<a> hey </a>'
+          + '<b> {d.isShown:ifEQ(<c>1</c>):showBegin} </b>'
+          + '<d> textD <e>e</e> </d>'
+          + '<f>'
+          + '  <g>{d.isShown:ifEQ(</g>'
+          + '  <h>1</h>'
+          + '  <i>):showEnd}</i>'
+          + '</f>'
+          + '<j/>'
+          + '<k>{d.isShown:ifEQ(<l>0</l>):showBegin}</k>'
+          + '<m>'
+          + '  <n> textN </n>'
+          + '</m>'
+          + '<o>'
+          + '  <p>{d.isShown</p>'
+          + '  <q></q>'
+          + '  <r>:showEnd}</r>'
+          + '</o>';
+        var _data = {
+          isShown : 0
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<a> hey </a><b> <c></c> </b><f>  <g></g><h></h><i></i></f><j/><k><l></l></k><m>  <n> textN </n></m><o>  <p></p><q></q><r></r></o>');
+          _data.isShown = 1;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<a> hey </a><b> <c></c> </b><d> textD <e>e</e> </d><f>  <g></g><h></h><i></i></f><j/><k><l></l></k><o>  <p></p><q></q><r></r></o>');
+            done();
+          });
+        });
+      });
+      it('should remove the most relevant part in XML and accept complex conditions', function (done) {
+        var _xml = ''
+          + '<a>'
+          + '  <b>{d.test.isShown:ifEQ(</b>'
+          + '  <c>1</c>'
+          + '  <d>):</d>'
+          + '  <e>and(.text):ifEQ(</e>'
+          + '  <f>aaa</f>'
+          + '  <g>)</g>'
+          + '  <h>:showBegin}</h>'
+          + '</a>'
+          + '<i>Z</i>'
+          + '<j>'
+          + '  <k>{d.test.isShown:show</k>'
+          + '  <l>End</l>'
+          + '  <m>}</m>'
+          + '</j>';
+        var _data = {
+          test : {
+            isShown : 1,
+            text    : 'aa'
+          }
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<a>  <b></b><c></c><d></d><e></e><f></f><g></g><h></h></a><j>  <k></k><l></l><m></m></j>');
+          _data.test.text = 'aaa';
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<a>  <b></b><c></c><d></d><e></e><f></f><g></g><h></h></a><i>Z</i><j>  <k></k><l></l><m></m></j>');
+            done();
+          });
+        });
+      });
     });
   });
 

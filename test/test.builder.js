@@ -601,7 +601,22 @@ describe('builder', function () {
       ];
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml> <tr><p>Thomas</p><p>A. Anderson<tr>walk on the walls</tr></p></tr> </xml>');
     });
-    it('conditional block', function () {
+    it('should hide or show according to conditional block boolean', function () {
+      var _data     = [
+        { pos : [ 0 ]    , str : '<a> hey </a><b> <c></c> </b>'                                 },
+        { pos : [ 27.8 ] , str : ''                                                             },
+        { pos : [ 27.9 ] , str : '<d> textD <e>e</e> </d>'                          , hide : 0  },
+        { pos : [ 50.8 ] , str : ''                                                 , hide : -1 },
+        { pos : [ 50.9 ] , str : '<f>  <g></g><h></h><i></i></f><j/><k><l></l></k>'             },
+        { pos : [ 98.8 ] , str : ''                                                             },
+        { pos : [ 98.9 ] , str : '<m>  <n> textN </n></m>'                          , hide : 1  },
+        { pos : [ 121.8] , str : ''                                                 , hide : -1 },
+        { pos : [ 121.9] , str : ''                                                             },
+        { pos : [ 122.9] , str : '<o>  <p></p><q></q><r></r></o>'                               }
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 5), '<a> hey </a><b> <c></c> </b><d> textD <e>e</e> </d><f>  <g></g><h></h><i></i></f><j/><k><l></l></k><o>  <p></p><q></q><r></r></o>');
+    });
+    it('should hide all XML within a surrounding conditional block', function () {
       var _data     = [
         { pos : [ 0               ], str : '<xml> '                         },
         { pos : [ 6, 0, 6         ], str : '<tr><p>'            , hide : 1  },

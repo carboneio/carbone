@@ -1712,11 +1712,11 @@ describe('extracter', function () {
             parent   : '',
             parents  : [],
             xmlParts : [
-              {obj : 'd0' , formatters : ['hideBegin'], attr : 'test' , pos : 7.9                , depth : 0 , after : ''},
-              {obj : 'd0' , formatters : []           , attr : 'val'  , pos : 8                  , depth : 0 , after : '<h1></h1>'},
-              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 16.8               , depth : 0 , after : ''},
-              {obj : 'd0' , formatters : []                           , pos : 7.800000000000001  , depth : 0 , after : ''},
-              {obj : 'd0' , formatters : []                           , pos : 16.900000000000002 , depth : 0}
+              {obj : 'd0' , formatters : ['hideBegin'], attr : 'test' , pos : 7.9  , depth : 0 , after : ''},
+              {obj : 'd0' , formatters : []           , attr : 'val'  , pos : 8    , depth : 0 , after : '<h1></h1>'},
+              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 16.8 , depth : 0 , after : ''},
+              {obj : 'd0' , formatters : []                           , pos : 7.8  , depth : 0 , after : ''},
+              {obj : 'd0' , formatters : []                           , pos : 16.9 , depth : 0}
             ]
           }
         }

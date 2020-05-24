@@ -1256,7 +1256,7 @@ describe('Carbone', function () {
           });
         });
       });
-      it('should every possible parts in XML and accept complex conditions', function (done) {
+      it('should remove every possible parts in XML and accept complex conditions', function (done) {
         var _xml = ''
           + '<a>'
           + '  <b>{d.test.isShown:ifEQ(</b>'
@@ -1288,6 +1288,22 @@ describe('Carbone', function () {
             assert.equal(_xmlBuilt, '<a>  <b></b><c></c><d></d><e></e><f></f><g></g><h></h></a><i>Z</i><j>  <k></k><l></l><m></m></j>');
             done();
           });
+        });
+      });
+      it('should hide XML part if values are undefined', function (done) {
+        var _xml = ''
+          + '<a>'
+          + '  <b>{d.test.isShown:ifEQ(1):and(.text):ifEQ(aaa):showBegin}</b>'
+          + '</a>'
+          + '<i>Z</i>'
+          + '<j>'
+          + '  <k>{d.test.isShown:showEnd}</k>'
+          + '</j>';
+        var _data = {};
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<a>  <b></b></a><j><k></k></j>');
+          done();
         });
       });
     });

@@ -609,7 +609,20 @@ describe('Carbone', function () {
           });
         });
       });
-    })
+    });
+
+    describe('security test', function () {
+      it('cannot inject JS using XML', function (done) {
+        var data = {
+          param : 3,
+        };
+        carbone.renderXML("<xml>{d.param}\\'sdsdsd.ss;'{d.param} </xml>", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, "<xml>3\\\\'sdsdsd.ss;3\\' </xml>");
+          done();
+        });
+      });
+    });
   });
 
 

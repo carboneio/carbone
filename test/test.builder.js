@@ -91,6 +91,19 @@ describe('builder', function () {
     });
   });
 
+  describe('injectXMLSecurely', function () {
+    it('should update array, insert new XML part and return its position', function () {
+      var _dictionary = [];
+      // it generate a function for usage conveniance. 
+      var _injectFn = builder.injectXMLSecurely(_dictionary);
+      helper.assert(_injectFn('<xml>'  ), 0);
+      helper.assert(_injectFn('<b></b>'), 1);
+      helper.assert(_injectFn('<a>'    ), 2);
+      helper.assert(_injectFn(';\\\''  ), 3);
+      helper.assert(_dictionary, ['<xml>', '<b></b>', '<a>', ';\\\'']);
+    });
+  });
+
   describe('getFilterString', function () {
     it('should return an empty string if code is empty, attr is empty, the conditions array is not defined', function () {
       var _actual = builder.getFilterString([{left : {parent : 'myObj',attr : 'sort'}, operator : '>', right : '10'}]);

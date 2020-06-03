@@ -1132,26 +1132,6 @@ describe('Carbone', function () {
           done();
         });
       });
-      it.skip('should work even if there are quotes in XML', function (done) {
-        var data = {
-          param : 3,
-        };
-        carbone.renderXML("<a>';]<xml>{d.param}' </xml>", data, function (err, result) {
-          helper.assert(err+'', 'null');
-          helper.assert(result, "<a>\\';]<xml>3\\' </xml>");
-          done();
-        });
-      });
-      it.skip('should work even if there are quotes in XML', function (done) {
-        var data = {
-          param : 3,
-        };
-        carbone.renderXML("<a>\\';]<xml>{d.param}' </xml>", data, function (err, result) {
-          helper.assert(err+'', 'null');
-          helper.assert(result, "<a>\\\\';]<xml>3\\' </xml>");
-          done();
-        });
-      });
       it('should not crash if someone tries to inject JS code in variable', function (done) {
         var _xml = "{#myVar= '];console%2log(sd)'//  }<xml> <t_row> {$myVar} </t_row> </xml>";
         var _data = [
@@ -1196,6 +1176,37 @@ describe('Carbone', function () {
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           helper.assert(err+'', 'null');
           helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+          done();
+        });
+      });
+      it.skip('should work even if there are quotes in XML', function (done) {
+        var data = {
+          param : 3,
+        };
+        carbone.renderXML("<a>';]<xml>{d.param}' </xml>", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, "<a>\\';]<xml>3\\' </xml>");
+          done();
+        });
+      });
+      it.skip('should work even if there are quotes in XML', function (done) {
+        var data = {
+          param : 3,
+        };
+        carbone.renderXML("<a>\\';]<xml>{d.param}' </xml>", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, "<a>\\\\';]<xml>3\\' </xml>");
+          done();
+        });
+      });
+      it.skip('should quotes on varable name of filters', function (done) {
+        var data = [
+          { o : { id : 'at"' }, val : 'at"', res : 5 }
+        ];
+        // val has surrounding whitespaces
+        carbone.renderXML('<xml><tr>{d[i, o.id = "at"", val =  "at""].res}</tr><tr>{d[i+1, o.id = "at"", val = "at""].res}</tr></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><tr>5</tr></xml>');
           done();
         });
       });
@@ -1395,9 +1406,9 @@ describe('Carbone', function () {
           });
         });
       });
-      it.skip('should accept conditional block with loops just before and after the if-block\
+      it('should accept conditional block with loops just before and after the if-block\
         should not break XML even if the if-block is not placed correclty (with hideBegin/hideEnd)', function (done) {
-        var _xml = '<xml> <table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> <b>{d.isDataHidden:hideBegin} <br/></b> <tr>{d.cars[i].id} </tr><tr> {d.cars[i+1].id} </tr> <a>hey1!</a> <b><br/> {d.isDataHidden:hideEnd}</b><table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> </xml>';
+        var _xml = '<xml> <table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> <b>{d.isDataHidden:hideBegin} <br/></b> <li>{d.cars[i].id}</li><li>{d.cars[i+1].id}</li> <a>hey1!</a> <b><br/> {d.isDataHidden:hideEnd}</b><table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> </xml>';
         var _data = {
           isDataHidden : true,
           who          : 'my',
@@ -1412,7 +1423,7 @@ describe('Carbone', function () {
           _data.isDataHidden = false;
           carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
             assert.equal(err+'', 'null');
-            assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b> <a>hey1!</a> <b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+            assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b> <br/></b> <li>1</li><li>2</li> <a>hey1!</a> <b><br/> </b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
             done();
           });
         });

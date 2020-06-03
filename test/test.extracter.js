@@ -1578,8 +1578,7 @@ describe('extracter', function () {
         }
       });
     });
-    it('XML parts of conditional blocks should always contain an empty before/after attribute\
-      even if there are arrays before and after the conditional block.\
+    it('XML parts of conditional blocks should be detected\
       It should also detect the condition with "showBegin" and "showEnd" formatters', function () {
       var _xml = '<div><x><tr></tr><tr></tr></x><p><h1></h1></p><th></th><th></th></div>';
       var _descriptor = {
@@ -1657,14 +1656,9 @@ describe('extracter', function () {
             parent   : 'd0',
             parents  : ['d0'],
             xmlParts : [
-              {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 32.9 , depth : 0 , after : ''}, // if start
+              {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 32.9 , depth : 0 , before : '</x><p>', after : ''}, // if start
               {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33   , depth : 0 , after : '<h1></h1>'},
-              {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 41.8 , depth : 0 , after : ''  }, // if end
-              // Generate empty part to avoid having xml in "before" attribute in the beginning of the IF.
-              // Otherwise, it breaks XML if the block is removed
-              {obj : 'info1', formatters : []                                       , pos : 32.8 , depth : 0 , before : '</x><p>', after : ''},
-              // Generate empty part to avoid having xml in "after" attribute in the ending of the IF
-              {obj : 'info1', formatters : []                                       , pos : 41.9 , depth : 0 , after : '</p>' }
+              {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 41.9 , depth : 0 , after : '</p>'  } // if end
             ]
           },
           menus2 : {
@@ -1685,7 +1679,7 @@ describe('extracter', function () {
       });
     });
 
-    it('should detect conditional blocks with hideBegin and hideEnd and generate empty part', function () {
+    it('should detect conditional blocks with hideBegin and hideEnd', function () {
       var _xml = '<div><p><h1></h1></p></div>';
       var _descriptor = {
         d0 : {
@@ -1714,9 +1708,7 @@ describe('extracter', function () {
             xmlParts : [
               {obj : 'd0' , formatters : ['hideBegin'], attr : 'test' , pos : 7.9  , depth : 0 , after : ''},
               {obj : 'd0' , formatters : []           , attr : 'val'  , pos : 8    , depth : 0 , after : '<h1></h1>'},
-              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 16.8 , depth : 0 , after : ''},
-              {obj : 'd0' , formatters : []                           , pos : 7.8  , depth : 0 , after : ''},
-              {obj : 'd0' , formatters : []                           , pos : 16.9 , depth : 0}
+              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 16.9 , depth : 0 }
             ]
           }
         }

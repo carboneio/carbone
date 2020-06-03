@@ -1141,6 +1141,10 @@ describe('parser', function () {
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<a></a><b></b><c></c><d>text</d><br/>', 3, 28)), [[7, 21], [24, 28]]);
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<a>text</a><b></b><c></c><d></d><br/>', 3, 28)), [[3, 7], [11, 25]]);
     });
+    it('should create only one if-block section even if there are multiple opening and closing tags', function () {
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml><table><tr><td><p></p></td></tr><tr><td><p></p></td></tr></table></xml>', 5, 79)), [[5, 70]]);
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml><table> <tr> <td><p></p></td> </tr>   <tr> <td><p></p></td> </tr> </table></xml>', 5, 79)), [[5, 79]]);
+    });
   });
 
   describe('count formatter', function () {

@@ -5,7 +5,7 @@ var helper = require('../lib/helper');
 
 describe('builder', function () {
 
-  describe('getFormatterString', function () {
+  describe('getFormatterString' , function () {
     var _testedFormatters = {
       int        : function () {},
       toFixed    : function () {},
@@ -16,163 +16,254 @@ describe('builder', function () {
       print      : function () {},
       convCRLF   : function () {}
     };
+    let _safeAccessor = null;
+    let _getSafeValue = null;
+    beforeEach(function () {
+      _safeAccessor = builder.generateSafeJSValueAccessor('dictionary');
+      _getSafeValue = _safeAccessor.get;
+    });
     it('should return an empty string if there is no formatter', function () {
-      var _actual = builder.getFormatterString('_str', 'context', []);
+      var _actual = builder.getFormatterString(_getSafeValue, '_str', 'context', []);
       helper.assert(_actual, '');
     });
     it('should return a simple call of a function for a formatter without arguments', function () {
-      var _actual = builder.getFormatterString('_str', 'context', [ 'int' ], _testedFormatters);
-      helper.assert(_actual, '_str = formatters.int.call(context, _str);\n');
+      var _actual = builder.getFormatterString(_getSafeValue, '_str', 'context', [ 'int' ], _testedFormatters);
+      helper.assert(_actual, 'dictionary[0][0] = _str;\n'
+                           +'_str = formatters.int.apply(context, dictionary[0]);\n');
+      helper.assert(_safeAccessor.getDictionary(), [['']]);
     });
     it('should return a simple call of a function for a formatter without arguments but called with parenthesis', function () {
-      var _actual = builder.getFormatterString('_otherString', '_meta', [ 'int()' ], _testedFormatters);
-      helper.assert(_actual, '_otherString = formatters.int.call(_meta, _otherString);\n');
+      var _actual = builder.getFormatterString(_getSafeValue, '_otherString', '_meta', [ 'int()' ], _testedFormatters);
+      helper.assert(_actual, 'dictionary[0][0] = _otherString;\n'
+                           +'_otherString = formatters.int.apply(_meta, dictionary[0]);\n');
+      helper.assert(_safeAccessor.getDictionary(), [['']]);
     });
     it('should return a call of a function for a formatter with one argument', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'toFixed(2)' ], _testedFormatters);
-      helper.assert(_actual, '_str = formatters.toFixed.call(_options, _str, \'2\');\n');
+      var _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'toFixed(2)' ], _testedFormatters);
+      helper.assert(_actual,  'dictionary[0][0] = _str;\n'
+                           +'_str = formatters.toFixed.apply(_options, dictionary[0]);\n');
+      helper.assert(_safeAccessor.getDictionary(), [['', '2']]);
     });
     it('should return a call of a function for a formatter with one argument which is a string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'format(YYYYMMDD)' ], _testedFormatters);
-      helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYYMMDD');\n");
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'format(YYYYMMDD)' ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), [['', 'YYYYMMDD']]);
     });
     it('should keep whitespaces if it is a string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY MM DD')" ], _testedFormatters);
-      helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY MM DD');\n");
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('YYYY MM DD')" ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), [['', 'YYYY MM DD']]);
     });
     it('should keep anti-slash quotes', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('YYYY \' MM DD')" ], _testedFormatters);
-      helper.assert(_actual, "_str = formatters.format.call(_options, _str, 'YYYY \' MM DD');\n");
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('YYYY \' MM DD')" ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), [['', 'YYYY \' MM DD']]);
     });
     it('should keep parenthesis in the string', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ "format('(YYYY) \' (MM) DD')" ], _testedFormatters);
-      helper.assert(_actual, "_str = formatters.format.call(_options, _str, '(YYYY) \' (MM) DD');\n");
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('(YYYY) \' (MM) DD')" ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), [['', '(YYYY) \' (MM) DD']]);
     });
     it('should return a call of a function for a formatter with two arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(2, 3)' ], _testedFormatters);
-      helper.assert(_actual, '_str = formatters.formatter.call(_options, _str, \'2\', \'3\');\n');
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter(2, 3)' ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), [['', '2', '3']]);
     });
     it('should remove extra whitespaces between arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter(   2   ,   3   )' ], _testedFormatters);
-      helper.assert(_actual, '_str = formatters.formatter.call(_options, _str, \'2\', \'3\');\n');
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter(   2   ,   3   )' ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), [['', '2', '3']]);
     });
     it('should return two calls of functions for two chained formatters', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'int', 'toFixed(2)' ], _testedFormatters);
-      // helper.assert(_actual, '_str = formatters.toFixed.call(_options, formatters.int(d.number), \'2\');');
-      helper.assert(_actual, '_str = formatters.int.call(_options, _str);\n'
+      var _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'int', 'toFixed(2)' ], _testedFormatters);
+      // helper.assert(_actual, '_str = formatters.toFixed.apply(_options, formatters.int(d.number), \'2\');');
+      helper.assert(_actual, 'dictionary[0][0] = _str;\n'
+                           +'_str = formatters.int.apply(_options, dictionary[0]);\n'
                            +'if(_options.stopPropagation === false){\n'
-                           +  '_str = formatters.toFixed.call(_options, _str, \'2\');\n'
+                           +  'dictionary[1][0] = _str;\n'
+                           +  '_str = formatters.toFixed.apply(_options, dictionary[1]);\n'
                            +'}');
+      helper.assert(_safeAccessor.getDictionary(), [[''], ['', '2']]);
     });
     it('should return two calls of functions for two chained formatters each with arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ], _testedFormatters);
-      assert.equal(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\', \'5\');\n'
-                           +'if(_options.stopPropagation === false){\n'
-                           +  '_str = formatters.formatter2.call(_options, _str, \'2\', \'3\');\n'
-                           +'}');
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), [['', '4', '5'], ['', '2', '3']]);
     });
     it('should return three calls of functions for three chained formatters each with arguments', function () {
-      var _actual = builder.getFormatterString('_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)', 'print(\'ok\')' ], _testedFormatters);
-      assert.equal(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\', \'5\');\n'
+      var _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)', 'print(\'ok\')' ], _testedFormatters);
+      assert.equal(_actual, 'dictionary[0][0] = _str;\n'
+                           +'_str = formatters.formatter1.apply(_options, dictionary[0]);\n'
                            +'if(_options.stopPropagation === false){\n'
-                           +  '_str = formatters.formatter2.call(_options, _str, \'2\', \'3\');\n'
+                           +  'dictionary[1][0] = _str;\n'
+                           +  '_str = formatters.formatter2.apply(_options, dictionary[1]);\n'
                            +  'if(_options.stopPropagation === false){\n'
-                           +    '_str = formatters.print.call(_options, _str, \'ok\');\n'
+                           +    'dictionary[2][0] = _str;\n'
+                           +    '_str = formatters.print.apply(_options, dictionary[2]);\n'
                            +  '}'
                            +'}');
+      helper.assert(_safeAccessor.getDictionary(), [['', '4', '5'], ['', '2', '3'], ['', 'ok']]);
     });
     it('should return formatter code according to the filter "canInjectXML"', function () {
       _testedFormatters.convCRLF.canInjectXML = true;
-      var _actual = builder.getFormatterString('_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters);
-      helper.assert(_actual, '_str = formatters.formatter1.call(_options, _str, \'4\');\n');
+      var _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters);
+      helper.assert(_actual, 'dictionary[0][0] = _str;\n'
+                           +'_str = formatters.formatter1.apply(_options, dictionary[0]);\n');
 
-      _actual = builder.getFormatterString('_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters, true);
-      helper.assert(_actual, '_str = formatters.convCRLF.call(_options, _str);\n');
+      _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters, true);
+      helper.assert(_actual, 'dictionary[1][0] = _str;\n'
+                           +'_str = formatters.convCRLF.apply(_options, dictionary[1]);\n');
+    });
+  });
+
+  describe('generateSafeJSValueAccessor', function () {
+    it('should update an array, generate JS code to access this value, return its position in the dictionary, and return the dictionary', function () {
+      var _safeValue = builder.generateSafeJSValueAccessor('dictionary');
+      helper.assert(_safeValue.get('<xml>'  ), 'dictionary[0]');
+      helper.assert(_safeValue.getIndex('<xml>'  ), 0);
+      // should work even if getIndex is called first
+      helper.assert(_safeValue.getIndex('<b></b>'), 1);
+      helper.assert(_safeValue.get('<b></b>'), 'dictionary[1]');
+      helper.assert(_safeValue.getIndex('<a>'    ), 2);
+      helper.assert(_safeValue.getIndex(';\\\''  ), 3);
+      // should return the same index if the string was already registred
+      helper.assert(_safeValue.getIndex('<b></b>'), 1);
+      helper.assert(_safeValue.get('<b></b>'), 'dictionary[1]');
+      helper.assert(_safeValue.getDictionary(), ['<xml>', '<b></b>', '<a>', ';\\\'']);
+      // should reset the dictionary
+      var _safeValue2 = builder.generateSafeJSValueAccessor('dictionary');
+      helper.assert(_safeValue2.getDictionary(), []);
+    });
+    it('should return separate values (one for each instance) even if arrays are the same', function () {
+      var _safeValue = builder.generateSafeJSValueAccessor('dictionary');
+      var _array1 = [1, 2];
+      var _array2 = [1, 2];
+      helper.assert(_safeValue.get(_array1), 'dictionary[0]');
+      helper.assert(_safeValue.get(_array2), 'dictionary[1]');
+      helper.assert(_safeValue.get(_array1), 'dictionary[0]');
+    });
+  });
+
+  describe('generateSafeJSVariable', function () {
+    it('should generate safe JS variable', function () {
+      var _safeVar = builder.generateSafeJSVariable();
+      helper.assert(_safeVar('<xml>'  ), '_gV0');
+      helper.assert(_safeVar('<b></b>'), '_gV1');
+      helper.assert(_safeVar('<a>'    ), '_gV2');
+      helper.assert(_safeVar('<a>'    ), '_gV2');
+      helper.assert(_safeVar('<xml>'  ), '_gV0');
     });
   });
 
   describe('getFilterString', function () {
+    let _safeAccessor = null;
+    let _getSafeValue = null;
+    let _getSafeVar = null;
+    beforeEach(function () {
+      _safeAccessor = builder.generateSafeJSValueAccessor('dictionary');
+      _getSafeVar   = builder.generateSafeJSVariable();
+      _getSafeValue = _safeAccessor.get;
+    });
     it('should return an empty string if code is empty, attr is empty, the conditions array is not defined', function () {
-      var _actual = builder.getFilterString([{left : {parent : 'myObj',attr : 'sort'}, operator : '>', right : '10'}]);
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [{left : {parent : 'myObj',attr : 'sort'}, operator : '>', right : '10'}]);
       assert.equal(_actual, '');
-      _actual = builder.getFilterString([]);
+      _actual = builder.getFilterString(_getSafeVar, _getSafeValue, []);
       assert.equal(_actual, '');
-      _actual = builder.getFilterString();
+      _actual = builder.getFilterString(_getSafeVar, _getSafeValue);
       assert.equal(_actual, '');
-      _actual = builder.getFilterString('d', 'code');
+      _actual = builder.getFilterString(_getSafeVar, _getSafeValue, 'd', 'code');
       assert.equal(_actual, '');
     });
     it('should return a string which contain an "if-condition"', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'sort'}, operator : '>', right : '10'}
       ];
-      var _actual = builder.getFilterString(_conditions, 'code');
-      assert.equal(_actual, 'if((myObj && myObj["sort"]>10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0 && _gV0[dictionary[0]]>dictionary[1])){\n code;\n }');
+      helper.assert(_safeAccessor.getDictionary(), ['sort', '10']);
     });
     it('should accept multiple conditions', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'sort'}, operator : '>', right : '10'},
         {left : {parent : 'myObj',attr : 'id'}, operator : '<', right : '15'}
       ];
-      var _actual = builder.getFilterString(_conditions, 'code');
-      assert.equal(_actual, 'if((myObj && myObj["sort"]>10 && myObj["id"]<15)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0 && _gV0[dictionary[0]]>dictionary[1] && _gV0[dictionary[2]]<dictionary[3])){\n code;\n }');
+      helper.assert(_safeAccessor.getDictionary(), ['sort', '10', 'id', '15']);
     });
     it('should accept than the left part of the condition is in an object', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
       ];
-      var _actual = builder.getFilterString(_conditions, 'code');
-      assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif((_menu_filter && _menu_filter["sort"]>10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
+      assert.equal(_actual, 'var _gV0=_gV1[dictionary[0]];\nif((_gV0 && _gV0[dictionary[1]]>dictionary[2])){\n code;\n }');
+      helper.assert(_safeAccessor.getDictionary(), ['menu', 'sort', '10']);
     });
     it('should add a prefix on the declared variable', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
       ];
-      var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
-      assert.equal(_actual, 'var _prefixmenu_filter=myObj["menu"];\nif((_prefixmenu_filter && _prefixmenu_filter["sort"]>10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
+      assert.equal(_actual, 'var _gV0=_gV1[dictionary[0]];\nif((_gV0 && _gV0[dictionary[1]]>dictionary[2])){\n code;\n }');
     });
     it('should handle the reserved index iterator "i"', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'i'}, operator : '>', right : '10'},
       ];
-      var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
-      assert.equal(_actual, 'if((myObj_i >10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((_gV0_i >10)){\n code;\n }');
     });
     it('should handle the reserved index iterator "i" and negative values', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : '-10'},
       ];
-      var _actual = builder.getFilterString(_conditions, 'code', 'prefix');
-      assert.equal(_actual, 'if((myObj_i =myObj_array_length -10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((_gV0_i =_gV0_array_length -10)){\n code;\n }');
+    });
+    it('should not inject JS if the index contains weird characters (negative index)', function () {
+      var _conditions = [
+        {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : '-10;console.log'},
+      ];
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((_gV0_i =_gV0_array_length -10)){\n code;\n }');
+    });
+    it('should not inject JS if the index contains weird characters (not int)', function () {
+      var _conditions = [
+        {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : ';-10;console.log'},
+      ];
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((_gV0_i =NaN)){\n code;\n }');
+    });
+    it('should not inject JS if the index contains weird characters (positive index)', function () {
+      var _conditions = [
+        {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : '10;console.log'},
+      ];
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
+      assert.equal(_actual, 'if((_gV0_i =10)){\n code;\n }');
     });
     it('should not declare the same variable twice if there are two conditions on the same variable', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '<', right : '20'},
       ];
-      var _actual = builder.getFilterString(_conditions, 'code');
-      assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif((_menu_filter && _menu_filter["sort"]>10 && _menu_filter["sort"]<20)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
+      assert.equal(_actual, 'var _gV0=_gV1[dictionary[0]];\nif((_gV0 && _gV0[dictionary[1]]>dictionary[2] && _gV0[dictionary[1]]<dictionary[3])){\n code;\n }');
+      helper.assert(_safeAccessor.getDictionary(), ['menu', 'sort', '10', '20']);
     });
-    it('should iverse the condition', function () {
+    it('should inverse the condition', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '<', right : '20'},
       ];
-      var _actual = builder.getFilterString(_conditions, 'code', '', true);
-      assert.equal(_actual, 'var _menu_filter=myObj["menu"];\nif(!(_menu_filter && _menu_filter["sort"]>10 && _menu_filter["sort"]<20)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', '', true);
+      assert.equal(_actual, 'var _gV0=_gV1[dictionary[0]];\nif(!(_gV0 && _gV0[dictionary[1]]>dictionary[2] && _gV0[dictionary[1]]<dictionary[3])){\n code;\n }');
     });
     it('should accept multiple conditions nested in an object', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
         {left : {parent : 'myObj',attr : 'car.sort'}, operator : '<', right : '20'},
       ];
-      var _actual = builder.getFilterString(_conditions, 'code');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
       assert.equal(_actual,
-        'var _menu_filter=myObj["menu"];\n'+
-        'var _car_filter=myObj["car"];\n'+
-        'if((_menu_filter && _menu_filter["sort"]>10 && _car_filter && _car_filter["sort"]<20)){\n'+
+        'var _gV0=_gV1[dictionary[0]];\n'+
+        'var _gV2=_gV1[dictionary[3]];\n'+
+        'if((_gV0 && _gV0[dictionary[1]]>dictionary[2] && _gV2 && _gV2[dictionary[1]]<dictionary[4])){\n'+
         ' code;\n }'
       );
+      helper.assert(_safeAccessor.getDictionary(), ['menu', 'sort', '10', 'car', '20']);
     });
   });
 
@@ -541,8 +632,33 @@ describe('builder', function () {
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml> <tr><p>Thomas</p><p>A. Anderson<tr>walk on the walls</tr></p></tr> </xml>');
     });
   });
-
+  
+  
   describe('getBuilderFunction', function () {
+    /**
+     * Take XML strings from dictionary (using part.bef and part.aft index) and place them directly in the part.str
+     *
+     * This function was created when I modified the methode to inject XML string.
+     * To avoid updating all unit tests, this function adapt the new result to old unit tests.
+     *
+     * @param  {Array} dict        dictionary generated by the builder function
+     * @param  {Array} arrayParts  array of XML part coming from builder function
+     * @return {Arrau}             array of XML part updated for old unit tests
+     */
+    function simplify (dict, arrayParts) {
+      for (var i = arrayParts.length - 1; i >= 0; i--) {
+        var _part = arrayParts[i];
+        if (_part.bef !== undefined) {
+          _part.str = dict[_part.bef] + _part.str;
+        }
+        if (_part.aft !== undefined) {
+          _part.str += dict[_part.aft];
+        }
+        delete _part.bef;
+        delete _part.aft;
+      }
+      return arrayParts;
+    }
     it('should return a function which returns an array of xml parts for static data if dynamicData is empty', function () {
       var _desc = {
         staticData : {
@@ -553,7 +669,8 @@ describe('builder', function () {
         dynamicData : {}
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(null, {}), [{pos : [0], str : '<xml>'}, {pos : [1], str : '</xml>'}]);
+      helper.assert(_fn(null, {}, _fn.builderDictionary), [{pos : [0], str : '', bef : 0}, {pos : [1], str : '', aft : 1}]);
+      helper.assert(_fn.builderDictionary, ['<xml>', '</xml>']);
     });
     it('should return an array of xml parts according to the descriptor, the data and the formatters', function (done) {
       var _desc = {
@@ -578,7 +695,7 @@ describe('builder', function () {
         number : 24.55
       };
       var _fn = builder.getBuilderFunction(_desc, carbone.formatters);
-      helper.assert(_fn(_data, {formatters : carbone.formatters}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {formatters : carbone.formatters}, _fn.builderDictionary)), [
         {pos : [5 ],str : '<xml>24', rowShow : true},
         {pos : [6 ],str : '</xml>'}
       ]);
@@ -611,7 +728,7 @@ describe('builder', function () {
         surname   : 'Neo'
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         {pos : [8  ],str : '<xml><p>Thomas', rowShow : true},
         {pos : [15 ],str : '</p><p>A. Anderson', rowShow : true},
         {pos : [22 ],str : '</p><p>Neo', rowShow : true},
@@ -641,13 +758,13 @@ describe('builder', function () {
       };
       var _fn = builder.getBuilderFunction(_desc);
       var _data = {};
-      helper.assert(_fn(_data, {}), [{pos : [8], str : '<xml><p>', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
-      helper.assert(_fn(null, {}) , [{pos : [8], str : '<xml><p>', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [{pos : [8], str : '<xml><p>', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
+      helper.assert(simplify(_fn.builderDictionary, _fn(null, {}, _fn.builderDictionary)), [{pos : [8], str : '<xml><p>', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
       _data = {
         firstname : 'Thomas',
         surname   : 'Neo'
       };
-      helper.assert(_fn(_data, {}) , [{pos : [8], str : '<xml><p>Thomas', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>Neo', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)) , [{pos : [8], str : '<xml><p>Thomas', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>Neo', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
     });
     it('should work even if there is a nested object in the descriptor', function () {
       var _desc = {
@@ -690,7 +807,7 @@ describe('builder', function () {
         }
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 8 ] , str : '<xml><p>Thomas', rowShow : true},
         { pos : [ 15 ], str : '</p><p>A. Anderson', rowShow : true},
         { pos : [ 40 ], str : '</br><p>Neo', rowShow : true},
@@ -740,7 +857,7 @@ describe('builder', function () {
         }
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 8  ], str : '<xml><p>Thomas', rowShow : true},
         { pos : [ 15 ], str : '</p><p>A. Anderson', rowShow : true},
         { pos : [ 40 ], str : '</br><p>Neo', rowShow : true},
@@ -778,7 +895,7 @@ describe('builder', function () {
         {firstname : 'Trinity',  lastname : 'Unknown'}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 0        ], str : '<xml> '                           },
         { pos : [ 6, 0, 6 ], str : '<tr><p>'            , rowStart : true},
         { pos : [ 6, 0, 13 ], str : 'Thomas'            , rowShow : true },
@@ -819,7 +936,7 @@ describe('builder', function () {
         {firstname : 'Trinity',  lastname : 'Unknown'    , show : '1'}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 0        ], str : '<xml> '                  },
         { pos : [ 6, 0, 6 ], str : '<tr><p>'   , rowStart : true},
         { pos : [ 6, 0, 13 ], str : ''         , rowShow : false},
@@ -929,10 +1046,10 @@ describe('builder', function () {
       };
       var _fn = builder.getBuilderFunction(_desc);
       // console.log('\n\n');
-      // console.log(_fn(_data));
+      // console.log(simplify(_fn.builderDictionary, _fn(_data));
       // console.log('\n\n');
 
-      var _xmlParts = _fn(_data, {});
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
       var _xmlResult = builder.assembleXmlParts(_xmlParts, 20);
 
       helper.assert(_xmlResult, '<xml> <t_row> Toyota </t_row><t_row>  </t_row><t_row> Lumeneo </t_row></xml>');
@@ -988,7 +1105,7 @@ describe('builder', function () {
         {firstname : 'Trinity',  lastname : 'Unknown', info : {movie : 'matrix2'}}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 0        ], str : '<xml> '                            },
         { pos : [ 6, 0, 6  ], str : '<tr>'               , rowStart : true},
         { pos : [ 6, 0, 10 ], str : 'Thomas'             , rowShow : true },
@@ -1076,7 +1193,7 @@ describe('builder', function () {
         }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 0        ], str : '<xml> '                            },
         { pos : [ 6, 0, 6  ], str : '<tr>'               , rowStart : true},
         { pos : [ 6, 0, 10 ], str : 'Thomas'             , rowShow : true },
@@ -1148,7 +1265,7 @@ describe('builder', function () {
         ]
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 0         ], str : '<xml> '                            },
         { pos : [ 6 , 0, 6  ], str : '<tr>'               , rowStart : true},
         { pos : [ 6 , 0, 10 ], str : 'matrix'             , rowShow : true },
@@ -1224,7 +1341,7 @@ describe('builder', function () {
         ]
       }];
       var _fn = builder.getBuilderFunction(_desc);
-      var _xmlParts = _fn(_data, {});
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [
         { pos : [ 0               ], str : '<x> '                              },
@@ -1300,7 +1417,7 @@ describe('builder', function () {
         ]
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 0         ], str : '<xml> '                            },
         { pos : [ 6         ], str : '<T>'                               },
         { pos : [ 6 , 0, 6  ], str : '<tr>'               , rowStart : true},
@@ -1372,7 +1489,7 @@ describe('builder', function () {
       }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      var _xmlParts = _fn(_data, {});
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [
         { pos : [ 0               ], str : '<xml> '                            },
@@ -1472,7 +1589,7 @@ describe('builder', function () {
       }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      var _xmlParts = _fn(_data, {});
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [
         { pos : [ 0 ], str : '<xml> '                                          },
@@ -1536,7 +1653,7 @@ describe('builder', function () {
         {firstname : 'Trinity', sort : 11}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 0            ], str : '<xml> '                   },
         { pos : [ 6, 31, 0, 6  ], str : '<tr>'      , rowStart : true},
         { pos : [ 6, 31, 0, 13 ], str : 'Thomas'    , rowShow : true },
@@ -1575,7 +1692,7 @@ describe('builder', function () {
         {firstname : 'Trinity', movie : {sort : 11}}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(_data, {}), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
         { pos : [ 0              ], str : '<xml> '                 },
         { pos : [ 6, 31, 0, 6  ], str : '<tr>'      , rowStart : true},
         { pos : [ 6, 31, 0, 13 ], str : 'Thomas'    , rowShow : true },
@@ -1640,7 +1757,7 @@ describe('builder', function () {
       }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      var _xmlParts = _fn(_data, {});
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [
         { pos : [ 0              ], str : '<xml> '                   },

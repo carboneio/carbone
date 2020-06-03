@@ -28,84 +28,74 @@ describe('builder', function () {
     });
     it('should return a simple call of a function for a formatter without arguments', function () {
       var _actual = builder.getFormatterString(_getSafeValue, '_str', 'context', [ 'int' ], _testedFormatters);
-      helper.assert(_actual, 'dictionary[0][0] = _str;\n'
-                           +'_str = formatters.int.apply(context, dictionary[0]);\n');
-      helper.assert(_safeAccessor.getDictionary(), [['']]);
+      helper.assert(_actual, '_str = formatters.int.call(context, _str);\n');
+      helper.assert(_safeAccessor.getDictionary(), []);
     });
     it('should return a simple call of a function for a formatter without arguments but called with parenthesis', function () {
       var _actual = builder.getFormatterString(_getSafeValue, '_otherString', '_meta', [ 'int()' ], _testedFormatters);
-      helper.assert(_actual, 'dictionary[0][0] = _otherString;\n'
-                           +'_otherString = formatters.int.apply(_meta, dictionary[0]);\n');
-      helper.assert(_safeAccessor.getDictionary(), [['']]);
+      helper.assert(_actual, '_otherString = formatters.int.call(_meta, _otherString);\n');
+      helper.assert(_safeAccessor.getDictionary(), []);
     });
     it('should return a call of a function for a formatter with one argument', function () {
       var _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'toFixed(2)' ], _testedFormatters);
-      helper.assert(_actual,  'dictionary[0][0] = _str;\n'
-                           +'_str = formatters.toFixed.apply(_options, dictionary[0]);\n');
-      helper.assert(_safeAccessor.getDictionary(), [['', '2']]);
+      helper.assert(_actual,  '_str = formatters.toFixed.call(_options, _str, dictionary[0]);\n');
+      helper.assert(_safeAccessor.getDictionary(), ['2']);
     });
     it('should return a call of a function for a formatter with one argument which is a string', function () {
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'format(YYYYMMDD)' ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), [['', 'YYYYMMDD']]);
+      helper.assert(_safeAccessor.getDictionary(), ['YYYYMMDD']);
     });
     it('should keep whitespaces if it is a string', function () {
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('YYYY MM DD')" ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), [['', 'YYYY MM DD']]);
+      helper.assert(_safeAccessor.getDictionary(), ['YYYY MM DD']);
     });
     it('should keep anti-slash quotes', function () {
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('YYYY \' MM DD')" ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), [['', 'YYYY \' MM DD']]);
+      helper.assert(_safeAccessor.getDictionary(), ['YYYY \' MM DD']);
     });
     it('should keep parenthesis in the string', function () {
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('(YYYY) \' (MM) DD')" ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), [['', '(YYYY) \' (MM) DD']]);
+      helper.assert(_safeAccessor.getDictionary(), ['(YYYY) \' (MM) DD']);
     });
     it('should return a call of a function for a formatter with two arguments', function () {
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter(2, 3)' ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), [['', '2', '3']]);
+      helper.assert(_safeAccessor.getDictionary(), ['2', '3']);
     });
     it('should remove extra whitespaces between arguments', function () {
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter(   2   ,   3   )' ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), [['', '2', '3']]);
+      helper.assert(_safeAccessor.getDictionary(), ['2', '3']);
     });
     it('should return two calls of functions for two chained formatters', function () {
       var _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'int', 'toFixed(2)' ], _testedFormatters);
-      // helper.assert(_actual, '_str = formatters.toFixed.apply(_options, formatters.int(d.number), \'2\');');
-      helper.assert(_actual, 'dictionary[0][0] = _str;\n'
-                           +'_str = formatters.int.apply(_options, dictionary[0]);\n'
+      // helper.assert(_actual, '_str = formatters.toFixed.call(_options, formatters.int(d.number), \'2\');');
+      helper.assert(_actual, '_str = formatters.int.call(_options, _str);\n'
                            +'if(_options.stopPropagation === false){\n'
-                           +  'dictionary[1][0] = _str;\n'
-                           +  '_str = formatters.toFixed.apply(_options, dictionary[1]);\n'
+                           +  '_str = formatters.toFixed.call(_options, _str, dictionary[0]);\n'
                            +'}');
-      helper.assert(_safeAccessor.getDictionary(), [[''], ['', '2']]);
+      helper.assert(_safeAccessor.getDictionary(), ['2']);
     });
     it('should return two calls of functions for two chained formatters each with arguments', function () {
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)' ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), [['', '4', '5'], ['', '2', '3']]);
+      helper.assert(_safeAccessor.getDictionary(), ['4', '5', '2', '3']);
     });
     it('should return three calls of functions for three chained formatters each with arguments', function () {
       var _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter1(4, 5)', 'formatter2(2, 3)', 'print(\'ok\')' ], _testedFormatters);
-      assert.equal(_actual, 'dictionary[0][0] = _str;\n'
-                           +'_str = formatters.formatter1.apply(_options, dictionary[0]);\n'
+      assert.equal(_actual, '_str = formatters.formatter1.call(_options, _str, dictionary[0], dictionary[1]);\n'
                            +'if(_options.stopPropagation === false){\n'
-                           +  'dictionary[1][0] = _str;\n'
-                           +  '_str = formatters.formatter2.apply(_options, dictionary[1]);\n'
+                           +  '_str = formatters.formatter2.call(_options, _str, dictionary[2], dictionary[3]);\n'
                            +  'if(_options.stopPropagation === false){\n'
-                           +    'dictionary[2][0] = _str;\n'
-                           +    '_str = formatters.print.apply(_options, dictionary[2]);\n'
+                           +    '_str = formatters.print.call(_options, _str, dictionary[4]);\n'
                            +  '}'
                            +'}');
-      helper.assert(_safeAccessor.getDictionary(), [['', '4', '5'], ['', '2', '3'], ['', 'ok']]);
+      helper.assert(_safeAccessor.getDictionary(), ['4', '5', '2', '3', 'ok']);
     });
     it('should return formatter code according to the filter "canInjectXML"', function () {
       _testedFormatters.convCRLF.canInjectXML = true;
       var _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters);
-      helper.assert(_actual, 'dictionary[0][0] = _str;\n'
-                           +'_str = formatters.formatter1.apply(_options, dictionary[0]);\n');
+      helper.assert(_actual, '_str = formatters.formatter1.call(_options, _str, dictionary[0]);\n');
 
       _actual = builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'convCRLF()', 'formatter1(4)' ], _testedFormatters, true);
-      helper.assert(_actual, 'dictionary[1][0] = _str;\n'
-                           +'_str = formatters.convCRLF.apply(_options, dictionary[1]);\n');
+      helper.assert(_actual, '_str = formatters.convCRLF.call(_options, _str);\n');
     });
   });
 

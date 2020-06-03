@@ -223,7 +223,7 @@ function ifGT (d, value) {
   if (   Number.isNaN(_d) === false && _d                    > _value
       || d instanceof Array         && d.length              > _value
       || typeof d === 'string'      && d.length              > _value
-      || d.constructor === Object   && Object.keys(d).length > _value ) {
+      || d && d.constructor === Object   && Object.keys(d).length > _value ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -238,7 +238,7 @@ function ifGTE (d, value) {
   if (   Number.isNaN(_d) === false && _d                    >= _value
       || d instanceof Array         && d.length              >= _value
       || typeof d === 'string'      && d.length              >= _value
-      || d.constructor === Object   && Object.keys(d).length >= _value ) {
+      || d && d.constructor === Object   && Object.keys(d).length >= _value ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -253,7 +253,7 @@ function ifLT (d, value) {
   if (   Number.isNaN(_d) === false && _d                    < _value
       || d instanceof Array         && d.length              < _value
       || typeof d === 'string'      && d.length              < _value
-      || d.constructor === Object   && Object.keys(d).length < _value ) {
+      || d && d.constructor === Object   && Object.keys(d).length < _value ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -268,7 +268,7 @@ function ifLTE (d, value) {
   if (   Number.isNaN(_d) === false && _d                    <= _value
       || d instanceof Array         && d.length              <= _value
       || typeof d === 'string'      && d.length              <= _value
-      || d.constructor === Object   && Object.keys(d).length <= _value ) {
+      || d && d.constructor === Object   && Object.keys(d).length <= _value ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);

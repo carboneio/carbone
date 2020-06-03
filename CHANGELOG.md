@@ -3,14 +3,14 @@
   - Fix: avoid crashing when a static image was inserted in a loop in MS Word templates
   - Update totals in ODS and XSLX files
   - `formatC` supports many crypto currencies
-  - Fix: Accepts comma in formatter parameters such as `{d.sentenceExist:ifEqual(1, 'Some sentence, some more sentences.')}` 
+  - Fix: Accepts comma in formatter parameters such as `{d.sentenceExist:ifEqual(1, 'Some sentence, some more sentences.')}`
   - Fix: nested array in XML (but not in JSON) was not printed correctly
     ```
       {d.countries[i].name}
         {d.movies[i].subObject.name}
         {d.movies[i+1].subObject.name}
       {d.countries[i+1].name}
-    ``` 
+    ```
   - Fix: avoid crashing when a sub-object is null or undefined in data
   - Fix: avoid crashing when the parent object of an array is null or undefined in data
   - Eslint code + add eslint tools
@@ -20,7 +20,7 @@
     - first, draw a chart in MS Excel and replace your data with Carbone markers
     - datas of the chart should be placed at the top-left corner of the spreadsheet
     - all numbers are formatted with formatN() formatter
-  - Fix: accepts whitespace in array filters with simple quote and double quotes 
+  - Fix: accepts whitespace in array filters with simple quote and double quotes
     Example: `{d.cars[i, type='Tesla car'].name}`
              `{d.cars[i, type="Tesla car"].name}`
   - Accepts to iterate on attributes of objects as is if it was an array:
@@ -34,7 +34,7 @@
     }
     ```
 
-    In the report: 
+    In the report:
     ```
       {d.myObject[i].att} {d.myObject[i].val}
       {d.myObject[i+1].att} {d.myObject[i+1].val}
@@ -44,11 +44,11 @@
 
     You can even access nested objects and nested arrays inside `val`: `{d.myObject[i].val.myArray[i].id}`
 
-  - Accepts dynamic variables in all formatters! 
+  - Accepts dynamic variables in all formatters!
     Carbone passes data to formatters if parameters start with a dot `.` and is not surrounded by quotes. Here is an example:
 
     **Examples:**
-    
+
     *Data*
       ```js
         {
@@ -93,8 +93,8 @@
     - `ifNIN (value)` : Matches none of the values specified in an array or string
     - `ifEM  (value)` : Matches empty values, string, arrays or objects
     - `ifNEM (value)` : Matches not empty values, string, arrays or objects
-    - `and   (value)` : AND operator between two consecutives conditional formatters 
-    - `or    (value)` : (default) OR operator between two consecutives conditional formatters 
+    - `and   (value)` : AND operator between two consecutives conditional formatters
+    - `or    (value)` : (default) OR operator between two consecutives conditional formatters
     - `hideBegin` and `hideEnd` : hide text block between hideBegin and hideEnd if condition is true
     - `showBegin` and `showEnd` : show a text block between showBegin and showEnd if condition is true
     - `show (message)`          : print a message if condition is true
@@ -119,9 +119,22 @@
 
     hide or show a block of text in the document<br>
     `{d.id:ifEQ(10):showBegin}` block of text  `{d.id:showEnd}` => block of text<br>
-    `{d.id:ifEQ(12):showBegin}`  block of text  `{d.id:showEnd}` => 
+    `{d.id:ifEQ(12):showBegin}`  block of text  `{d.id:showEnd}` =>
 
   - (Fix LibreOffice detection on Windows)
+  - Added Libreoffice export filters to PDF rendering. To pass filters to a PDF, it is possible to assign an object to `convertTo` with `formatName:'pdf'` and  `formatOptions` an object with the specified filters. The filter list is avaible on the documentation. Here is an example of PDF with a password and a watermark:
+    ```js
+      options = {
+        convertTo: {
+          formatName: 'pdf',
+          formatOptions: {
+            EncryptFile          : true,
+            DocumentOpenPassword : 'QWERTY1234',
+            Watermark            : 'Watermark Carbone'
+          }
+        }
+      }
+
 
 
 ### v1.2.1
@@ -136,13 +149,13 @@
       - old `toFixed(2):toFR` can be replaced by `formatN(2)`
     - `formatC()` format currency according to the locale and the currency
       - old `toFixed(2)} {t(currency)}` can be replaced by `formatC(2)`
-    - `formatD()` format date according to the locale. Same as `convDate`, but consider parameters are swapped 
+    - `formatD()` format date according to the locale. Same as `convDate`, but consider parameters are swapped
       for consistency with formatN. Moreover, `patternIn` is ISO8601 by default.
     - `convDate()` is deprecated
     - `add(valueToAdd)`, `mul(valueToMultiply)`, `sub(valueToSubstract)`,`div(value)` : mathematical operations
     - `substr(start, end)` : slice strings
   - `carbone.set` and `carbone.render` have new options
-    - `currencySource` : default currency of source data. Ex 'EUR' 
+    - `currencySource` : default currency of source data. Ex 'EUR'
     - `currencyTarget` : default target currency when the formatter `convCurr` is used without target
     - `currencyRates`  : rates, based on EUR { EUR : 1, USD : 1.14 }
   - Fix memory leaks: one file descriptor remains opened
@@ -166,13 +179,13 @@
   - Optimization: gain x10 when sorting 1 Million of rows
   - Add formatter `unaccent` to remove accent from string
   - `carbone.set` does not overwrite user-defined translations
-  - Accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}` 
+  - Accepts iteration on non-XML. Example: `{d[i].brand} , {d[i+1].brand}`
   - Add new formatters
     - `unaccent()` to remove accent from string
     - `count()` to print a counter in loops. Usage: `{d[i].name:count()}`
     - `convCRLF()` to convert text, which contains `\r\n` or `\n`, into "real" carriage return in odt or docx document
   - Formatters which have the property `canInjectXML = true` can inject XML in documents
-  - Return an error in render callback when LibreOffice is not detected 
+  - Return an error in render callback when LibreOffice is not detected
   - Get the last object of an array using negative values when filtering with `i` iterator
     - `{d.cities[i=-1].temperature}` shows the temperature (if the array is not empty) of the last city
     - `{d.cities[i=-2].temperature}` shows the temperature of the city before the last
@@ -208,7 +221,7 @@
 
 ### v0.13.0
   - Release February 20, 2017
-  - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays: 
+  - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays:
     - `{d.cities[i, temp=20]..countryName}` prints `d.countryName` only when the temperature of cities equals 20
   - Built-in conditional formatters, which starts by `if`, stop propagation to next formatters if the condition is true
   - New formatters:
@@ -218,10 +231,10 @@
     - `print(d, message)`: print message
   - New function `carbone.renderXML(xmlString, data, options, callback)` to render XML directly
   - Change the lang dynamically in `carbone.render` and `carbone.renderXML` with `options.lang = 'fr'`. The date formatter is automatically propagated on formatters such as `convDate`
-  - Replace module zipfile by yauzl: faster, lighter, asynchrone 
+  - Replace module zipfile by yauzl: faster, lighter, asynchrone
   - XLSX templates are accepted (beta)
   - Parse embedded XLSX and DOCX documents
-  - Add a tool to search a text within a marker in all reports `carbone find :formatterName` 
+  - Add a tool to search a text within a marker in all reports `carbone find :formatterName`
 
 
 ### v0.12.5
@@ -231,7 +244,7 @@
   - Fix: in formatters `convert`, `format`, `addDays`, `parse`: if the date is null or undefined these formatters return null or undefined instead of "Invalid Date"
 
 ### v0.12.4
-  - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions` 
+  - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions`
 
 ### v0.12.3
   - Fix: on OSX, the LibreOffice 5.2 path has changed

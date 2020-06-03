@@ -24,6 +24,7 @@ parser.add_argument("-i", "--input")
 parser.add_argument("-o", "--output")
 parser.add_argument("-f", "--format")
 parser.add_argument("-fo", "--formatOptions")
+parser.add_argument("-e", "--export", nargs='*')
 
 
 def UnoProps(**args):
@@ -121,6 +122,31 @@ def convert(message):
     if fileOption.formatOptions != '':
         outputprops += UnoProps(FilterOptions=fileOption.formatOptions)
     outputurl = unohelper.absolutize(cwd, unohelper.systemPathToFileUrl(fileOption.output) )
+
+    exportfilter = []
+    try:
+        if fileOption.export:
+            for filterArg in fileOption.export:
+                l = filterArg.split('=')
+                if len(l) == 2:
+                    (name, value) = l
+                    if value in ('True', 'true'):
+                        exportfilter.append(PropertyValue(name, 0, True, 0))
+                    elif value in ('False', 'false'):
+                        exportfilter.append(PropertyValue(name, 0, False, 0))
+                    else:
+                        try:
+                            exportfilter.append(PropertyValue(name, 0, int(value), 0))
+                        except ValueError:
+                            exportfilter.append(PropertyValue(name, 0, value, 0))
+    except:
+        sendErrorOrExit('400')
+        document.dispose()
+        document.close(True)
+        return
+
+    if exportfilter:
+        outputprops += (PropertyValue("FilterData", 0, uno.Any("[]com.sun.star.beans.PropertyValue", tuple(exportfilter), ), 0), )
 
     try:
         document.storeToURL(outputurl, tuple(outputprops) )

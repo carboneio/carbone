@@ -6,6 +6,7 @@ var helper = require('../lib/helper');
 var converter = require('../lib/converter');
 var exec = require('child_process').exec;
 var tempPath = path.join(__dirname, 'temp');
+var pdfjsLib = require('pdfjs-dist/build/pdf.js');
 
 var defaultOptions = {
   pipeNamePrefix : '_carbone',
@@ -103,6 +104,46 @@ describe('Converter', function () {
             done();
           });
         });
+      });
+    });
+    it('should render and not open a pdf with a bad password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+        if (err) {
+          assert.equal(err, null);
+        }
+        var _buf = new Buffer.from(result);
+        assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : 'ThisIsABadPassWord' });
+        loadingTask.promise.then(() => {
+          done(new Error('The password is wrong and it is possible to open the report'));
+        }, () => {
+          done();
+        });
+      }, null, null, {
+        EncryptFile          : true,
+        DocumentOpenPassword : 'Password1234'
+      });
+    });
+    it('should render and open a pdf with a password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      const _password = 'P4ssW0rd';
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+        if (err) {
+          assert.equal(err, null);
+        }
+        var _buf = new Buffer.from(result);
+        assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : _password });
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad Password'));
+        });
+      }, null, null, {
+        EncryptFile          : true,
+        DocumentOpenPassword : _password
       });
     });
     it('should restart automatically the conversion factory if it crashes', function (done) {

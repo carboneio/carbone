@@ -35,6 +35,7 @@
     "yauzl": "=2.8.0"
   },
   "devDependencies": {
+    "pdfjs-dist": "=2.2.228",
     "eslint": "=6.8.0",
     "mocha": "=3.5.3",
     "should": "=11.1.2",

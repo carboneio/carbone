@@ -711,6 +711,7 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err, null);
       assert.equal(_xmlBuilt, '<xml><t_row><td>C</td><td>D</td><td>E</td></t_row><t_row><td>A</td><td>B</td></t_row></xml>');
       done();
     });
@@ -852,6 +853,7 @@ describe('builder.buildXML', function () {
       {brand : 'Toyota'      , speed : {high : 44, low : 20}}
     ];
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err, null);
       helper.assert(_xmlBuilt, '<xml> <tr> Lumeneo    Lumeneo </tr></xml>');
       done();
     });
@@ -954,7 +956,19 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it('should accept conditionnal arrays on string', function (done) {
+  it('should accept conditionnal arrays on string (simple quotes)', function (done) {
+    var _xml = '<xml> <t_row> {d[brand=\'Tesla\'].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Toyota' , id : 1},
+      {brand : 'Tesla'  , id : 2},
+      {brand : 'Toyota' , id : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept conditionnal arrays on string (double quotes)', function (done) {
     var _xml = '<xml> <t_row> {d[brand="Tesla"].brand} </t_row></xml>';
     var _data = [
       {brand : 'Toyota' , id : 1},

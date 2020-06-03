@@ -122,7 +122,7 @@
     `{d.id:ifEQ(12):showBegin}`  block of text  `{d.id:showEnd}` =>
 
   - (Fix LibreOffice detection on Windows)
-  - Added Libreoffice export filters to PDF rendering. To pass filters to a PDF, it is possible to assign an object to `convertTo` with `formatName:'pdf'` and  `formatOptions` an object with the specified filters. The filter list is avaible on the documentation. Here is an example of PDF with a password and a watermark:
+  - Added Libreoffice export filters for PDF rendering. To apply filters to a PDF, it is possible to assign an object to `convertTo` with `formatName:'pdf'` and  `formatOptions` an object with the specified filters. The filter list is available on the documentation. Here is an example of a PDF with a password and a watermark:
     ```js
       options = {
         convertTo: {

@@ -250,10 +250,10 @@ describe('parser', function () {
         helper.assert(markers, [
           { pos : 5,  name : '_root.d.menu' },
           { pos : 38, name : '_root.d.menu' },
-          { pos : 38, name : '_root.d[i].menu' },
-          { pos : 38, name : '_root.c.memu' },
-          { pos : 38, name : '_root.c[i].menu' },
-          { pos : 38, name : '_root.$menu' }
+          { pos : 38.015625, name : '_root.d[i].menu' },
+          { pos : 38.03125, name : '_root.c.memu' },
+          { pos : 38.046875, name : '_root.c[i].menu' },
+          { pos : 38.0625, name : '_root.$menu' }
         ]);
         helper.assert(cleanedXml, '<xml><td><td><td></td></td></td></xml>{D.menu}{C.menu}{C.menu}{DZZDZD-DSDZD-1131}');
         done();
@@ -1140,6 +1140,10 @@ describe('parser', function () {
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<a>text</a><b></b><c></c><d>text</d><br/>', 3, 32)), [[3, 7], [11, 25], [28,32]]);
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<a></a><b></b><c></c><d>text</d><br/>', 3, 28)), [[7, 21], [24, 28]]);
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<a>text</a><b></b><c></c><d></d><br/>', 3, 28)), [[3, 7], [11, 25]]);
+    });
+    it('should create only one if-block section even if there are multiple opening and closing tags', function () {
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml><table><tr><td><p></p></td></tr><tr><td><p></p></td></tr></table></xml>', 5, 79)), [[5, 70]]);
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml><table> <tr> <td><p></p></td> </tr>   <tr> <td><p></p></td> </tr> </table></xml>', 5, 79)), [[5, 79]]);
     });
   });
 

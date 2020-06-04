@@ -1223,6 +1223,45 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should accept condition markers next to another condition marker', function (done) {
+        var _xml = '<xml> {d.val:showBegin}hey{d.val:showEnd}{d.val:showBegin}joe{d.val:showEnd} </xml>';
+        var _data = {
+          val : 1
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> heyjoe </xml>');
+          done();
+        });
+      });
+      it('should accept 3 nested condition markers next to each over', function (done) {
+        var _xml = '<xml> {d.val:showBegin}{d.id:showBegin}{d.o:showBegin}joe{d.val:showEnd}{d.id:showEnd}{d.o:showEnd} </xml>';
+        var _data = {
+          val : 1,
+          id  : 3,
+          o   : 4
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> joe </xml>');
+          done();
+        });
+      });
+      it('should return an error if begin or end is missing', function (done) {
+        carbone.renderXML('<xml> {d.val:ifEQ(3):hideBegin} </xml>', {}, function (err) {
+          assert.equal(err+'', 'Error: Missing at least one showEnd or hideEnd');
+          carbone.renderXML('<xml> {d.val:ifEQ(3):showBegin} </xml>', {}, function (err) {
+            assert.equal(err+'', 'Error: Missing at least one showEnd or hideEnd');
+            carbone.renderXML('<xml> {d.val:ifEQ(3):showEnd} </xml>', {}, function (err) {
+              assert.equal(err+'', 'Error: Missing at least one showBegin or hideBegin');
+              carbone.renderXML('<xml> {d.val:ifEQ(3):hideEnd} </xml>', {}, function (err) {
+                assert.equal(err+'', 'Error: Missing at least one showBegin or hideBegin');
+                done();
+              });
+            });
+          });
+        });
+      });
       it('should accept conditional block with complex conditions', function (done) {
         var _xml = '<xml> {d.val:ifEQ(3):and(.other):ifGTE(10):showBegin}<a></a>{d.val:showEnd} </xml>';
         carbone.renderXML(_xml, { val : 3, other : 10 }, function (err, _xmlBuilt) {
@@ -1407,7 +1446,7 @@ describe('Carbone', function () {
         });
       });
       it('should accept conditional block with loops just before and after the if-block\
-        should not break XML even if the if-block is not placed correclty (with hideBegin/hideEnd)', function (done) {
+        should not break XML even if the if-block is not placed correctly (with hideBegin/hideEnd)', function (done) {
         var _xml = '<xml> <table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> <b>{d.isDataHidden:hideBegin} <br/></b> <li>{d.cars[i].id}</li><li>{d.cars[i+1].id}</li> <a>hey1!</a> <b><br/> {d.isDataHidden:hideEnd}</b><table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> </xml>';
         var _data = {
           isDataHidden : true,
@@ -1426,6 +1465,21 @@ describe('Carbone', function () {
             assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b> <br/></b> <li>1</li><li>2</li> <a>hey1!</a> <b><br/> </b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
             done();
           });
+        });
+      });
+      it('should be able to show or hide a table with a lot of nested xml tags ', function (done) {
+        var _xml = '<xml>{d.cars:ifGT(0):showBegin}<table> <tr> <td><p>{d.cars[i].brand}</p></td> </tr>   <tr> <td><p>{d.cars[i+1].brand}</p></td> </tr> </table>{d.variants:showEnd}</xml>';
+        var _data = {
+          cars : [
+            {brand : 'Lumeneo', id : 1},
+            {brand : 'Toyota' , id : 2}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml><table> <tr> <td><p>Lumeneo</p></td> </tr>   <tr> <td><p>Toyota</p></td> </tr>    </table></xml>');
+          _data.isDataHidden = false;
+          done();
         });
       });
       it('should hide or show some xml part with two consecutive conditional block\

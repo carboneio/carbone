@@ -128,6 +128,7 @@
   - (Fix LibreOffice detection on Windows)
   - Accepts non-alphanumeric characters in variables names, values, ... For example, `{d.i💎d}` is allowed
   - Improve security in the builder and reduce memory consumption
+  - Fix crash when markers are next to each over `{d.id}{d.other}` 
 
 
 ### v1.2.1

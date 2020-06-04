@@ -205,7 +205,7 @@ describe('formatter', function () {
     });
   });
 
-  describe.only('ifEQ', function () {
+  describe('ifEQ', function () {
     it('should turn the `isConditionTrue` to True if a data is equal to a variable', function () {
       var _context = {};
       callWithContext(conditionFormatter.ifEQ, _context, 0, 0);
@@ -298,7 +298,7 @@ describe('formatter', function () {
     });
   });
 
-  describe.only('ifNE', function () {
+  describe('ifNE', function () {
     it('should turn the `isConditionTrue` to false if a data is equal to a variable', function () {
       var _context = {};
       callWithContext(conditionFormatter.ifNE, _context, 0, 0);
@@ -390,6 +390,46 @@ describe('formatter', function () {
       helper.assert(_context.stopPropagation, false);
     });
   });
+
+  describe.only('ifGT', function () {
+    it('should matches values, string.length, array.length or object.length that are greater than a specified value', function () {
+      let _context = {isConditionTrue : false};
+      callWithContext(conditionFormatter.ifGT, _context, 50, -29);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifGT, _context, 1290, 768);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifGT, _context, 'This is a long string', 'Hello');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifGT, _context, 'Hello1234', '1');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifGT, _context, [1, 2, 3, 4, 5], [1, 2, 3]);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifGT, _context, ['apple', 'banana', 'jackfruit'], ['tomato', 'cabbage']);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+    });
+  });
+  describe('ifGTE', function () { });
+  describe('ifLT', function () { });
+  describe('ifLTE', function () { });
+  describe('ifIN', function () { });
+  describe('ifNIN', function () { });
+  describe('ifIn', function () { });
+  describe('ifEM', function () { });
+  describe('ifNEM', function () { });
+  describe('END', function () { });
+  describe('OR', function () { });
+  describe('SHOW / ESLE SHOW', function () { });
 
   describe('print', function () {
     it('should print the message', function () {

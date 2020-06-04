@@ -1223,6 +1223,30 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should accept condition markers next to another condition marker', function (done) {
+        var _xml = '<xml> {d.val:showBegin}hey{d.val:showEnd}{d.val:showBegin}joe{d.val:showEnd} </xml>';
+        var _data = {
+          val : 1
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> heyjoe </xml>');
+          done();
+        });
+      });
+      it('should accept 3 nested condition markers next to each over', function (done) {
+        var _xml = '<xml> {d.val:showBegin}{d.id:showBegin}{d.o:showBegin}joe{d.val:showEnd}{d.id:showEnd}{d.o:showEnd} </xml>';
+        var _data = {
+          val : 1,
+          id  : 3,
+          o   : 4
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> joe </xml>');
+          done();
+        });
+      });
       it('should return an error if begin or end is missing', function (done) {
         carbone.renderXML('<xml> {d.val:ifEQ(3):hideBegin} </xml>', {}, function (err) {
           assert.equal(err+'', 'Error: Missing at least one showEnd or hideEnd');

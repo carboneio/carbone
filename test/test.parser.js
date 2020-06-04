@@ -250,10 +250,10 @@ describe('parser', function () {
         helper.assert(markers, [
           { pos : 5,  name : '_root.d.menu' },
           { pos : 38, name : '_root.d.menu' },
-          { pos : 38, name : '_root.d[i].menu' },
-          { pos : 38, name : '_root.c.memu' },
-          { pos : 38, name : '_root.c[i].menu' },
-          { pos : 38, name : '_root.$menu' }
+          { pos : 38.015625, name : '_root.d[i].menu' },
+          { pos : 38.03125, name : '_root.c.memu' },
+          { pos : 38.046875, name : '_root.c[i].menu' },
+          { pos : 38.0625, name : '_root.$menu' }
         ]);
         helper.assert(cleanedXml, '<xml><td><td><td></td></td></td></xml>{D.menu}{C.menu}{C.menu}{DZZDZD-DSDZD-1131}');
         done();

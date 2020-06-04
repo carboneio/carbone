@@ -74,6 +74,15 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept a second marker next to the first one', function (done) {
+    var _xml = '<xml> {d.title}{c.date} </xml>';
+    var _data = {title : 'boo'};
+    var _complement = {date : 'today'};
+    builder.buildXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> bootoday </xml>');
+      done();
+    });
+  });
   it('should replace null or undefined data by an empty string', function (done) {
     var _xml = '<xml> {d.title} </xml>';
     builder.buildXML(_xml, {title : null}, function (err, _xmlBuilt) {

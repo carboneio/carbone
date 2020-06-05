@@ -5,7 +5,7 @@ var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
 var helper = require('../lib/helper');
 
-describe.only('formatter', function () {
+describe('formatter', function () {
   describe('convDate', function () {
     it('should accept use this.lang to set convert date', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
@@ -1149,7 +1149,7 @@ describe.only('formatter', function () {
         helper.assert(_context.isAndOperator, true);
       });
     });
-    describe.only('OR', function () {
+    describe('OR', function () {
       it('should be true | ifNE / ifNIN', function () {
         let _context = {isConditionTrue : false};
         callWithContext(conditionFormatter.ifNE, _context, 'delorean', 'tesla');
@@ -1172,11 +1172,90 @@ describe.only('formatter', function () {
         helper.assert(_context.isAndOperator, false);
       });
     });
-    describe('SHOW / ESLE SHOW', function () {
-
-    });
-    describe('END/OR/SHOW/ELSE SHOW', function () {
-
+    describe('AND/OR/SHOW/ELSE SHOW', function () {
+      it('Should SHOW + or', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifGT, _context, 234, 2);
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifLTE, _context, 10, 2);
+        helper.assert(callWithContext(conditionFormatter.show, _context, null, 'space'), 'space');
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, false);
+        helper.assert(_context.stopPropagation, true);
+      });
+      it('Should NOT SHOW + or', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifGTE, _context, 2, 20);
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifLT, _context, 10, 2);
+        callWithContext(conditionFormatter.show, _context);
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.isAndOperator, false);
+        helper.assert(_context.stopPropagation, false);
+      });
+      it('Should ELSESHOW + or', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifGTE, _context, 2, 20);
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifLT, _context, 10, 2);
+        callWithContext(conditionFormatter.show, _context);
+        helper.assert(_context.stopPropagation, false);
+        helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'space'), 'space');
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.isAndOperator, false);
+        helper.assert(_context.stopPropagation, true);
+      });
+      it('Should SHOW + and', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifIN, _context, [2, 30, 'apple', -1], 'apple');
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifLT, _context, -199, 21);
+        helper.assert(callWithContext(conditionFormatter.show, _context, null, 'space'), 'space');
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, true);
+        helper.assert(_context.stopPropagation, true);
+      });
+      it('Should SHOW + multiple and', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifNIN, _context, 'This is a sentence 1234 hey', 'Hello');
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifLTE, _context, 200, 200);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifLT, _context, 0, 1);
+        helper.assert(callWithContext(conditionFormatter.show, _context, null, 'space'), 'space');
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, true);
+        helper.assert(_context.stopPropagation, true);
+      });
+      it('Should SHOW + multiple or', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifNIN, _context, 'This is a sentence 1234 hey', 'hey');
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifLTE, _context, 22333333, 2100);
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifEM, _context, null);
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifGTE, _context, -1, 0);
+        helper.assert(callWithContext(conditionFormatter.show, _context, null, 'space'), 'space');
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, false);
+        helper.assert(_context.stopPropagation, true);
+      });
+      it('Should elseShow + multiple or', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifNIN, _context, 'This is a sentence 1234 hey', 'hey');
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifLTE, _context, 22222222, 2100);
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifEM, _context, 'no empty');
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifGTE, _context, -1, 0);
+        callWithContext(conditionFormatter.show, _context);
+        helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'space'), 'space');
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.isAndOperator, false);
+        helper.assert(_context.stopPropagation, true);
+      });
     });
   });
 

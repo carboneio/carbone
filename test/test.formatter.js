@@ -981,8 +981,126 @@ describe.only('formatter', function () {
     });
   });
 
-  describe('ifEM', function () { });
-  describe('ifNEM', function () { });
+  describe.only('ifEM', function () {
+    it ('should matches empty values, string, arrays or objects', function () {
+      let _context = {isConditionTrue : false};
+      callWithContext(conditionFormatter.ifEM, _context, '');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, null);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, undefined);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, []);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, NaN);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, {});
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+    });
+
+    it('should matches not empty values, string, arrays or objects', function () {
+      var _context = {};
+
+      callWithContext(conditionFormatter.ifEM, _context, 0);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, new Date());
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, 'sdsd');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, 12.33);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, true);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, [12, 23]);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifEM, _context, {d : 'd'});
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+    });
+  });
+  describe.only('ifNEM', function () {
+    it('should matches not empty values, string, arrays or objects', function () {
+      var _context = {};
+
+      callWithContext(conditionFormatter.ifNEM, _context, 0);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, new Date());
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, 'sdsd');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, 12.33);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, true);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, [12, 23]);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, {d : 'd'});
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+    });
+
+    it ('should matches empty values, string, arrays or objects', function () {
+      let _context = {isConditionTrue : false};
+      callWithContext(conditionFormatter.ifNEM, _context, '');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, null);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, undefined);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, []);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, NaN);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      _context.isConditionTrue = false;
+      callWithContext(conditionFormatter.ifNEM, _context, {});
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+    });
+  });
   describe('END', function () { });
   describe('OR', function () { });
   describe('SHOW / ESLE SHOW', function () { });

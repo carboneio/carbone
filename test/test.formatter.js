@@ -5,7 +5,7 @@ var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
 var helper = require('../lib/helper');
 
-describe('formatter', function () {
+describe.only('formatter', function () {
   describe('convDate', function () {
     it('should accept use this.lang to set convert date', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
@@ -741,7 +741,7 @@ describe('formatter', function () {
       helper.assert(_context.stopPropagation, false);
     });
   });
-  describe.only('ifLTE', function () {
+  describe('ifLTE', function () {
     it('should matches values, string.length, array.length or object.length that are less than or equal to a specified value', function () {
       let _context = {isConditionTrue : false};
       callWithContext(conditionFormatter.ifLTE, _context, -23, 19);
@@ -861,9 +861,126 @@ describe('formatter', function () {
       helper.assert(_context.stopPropagation, false);
     });
   });
-  describe('ifIN', function () { });
-  describe('ifNIN', function () { });
-  describe('ifIn', function () { });
+  describe('ifIN', function () {
+    it('Matches any of the values specified in an array or string', function () {
+      var _context = {};
+      callWithContext(conditionFormatter.ifIN, _context, 'car is broken', 'is');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, 'car is broken', 'car is');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, [1, 2, 'toto'], 'toto');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, [1, 2, 'toto'], 2);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+    });
+    it('Matches none of the values specified in an array or string', function () {
+      var _context = {};
+      callWithContext(conditionFormatter.ifIN, _context, 'car is broken', 'are');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, 'car is broken',  'caris');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, [1, 2, 'toto'], 'titi');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, [], 3);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, null, 'titi');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, 'titi', null);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, null, null);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, undefined, null);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, undefined, 'titi');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, 'titi', undefined);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, undefined, undefined);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, 12, 'titi');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifIN, _context, {toto : 2 }, 3);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+    });
+  });
+  describe('ifNIN', function () {
+    it('should matches none of the values specified in an array or string', function () {
+      var _context = {};
+      callWithContext(conditionFormatter.ifNIN, _context, 'car is broken', 'are');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, 'car is broken',  'caris');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, [1, 2, 'toto'], 'titi');
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, [], 3);
+      helper.assert(_context.isConditionTrue, true);
+      helper.assert(_context.stopPropagation, false);
+    });
+
+    it('should matches any of the values specified in an array or string', function () {
+      var _context = {};
+      callWithContext(conditionFormatter.ifNIN, _context, 'car is broken', 'is');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, 'car is broken', 'car is');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, [1, 2, 'toto'], 'toto');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, [1, 2, 'toto'], 2);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, null, 'titi');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, 'titi', null);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, null, null);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, undefined, null);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, undefined, 'titi');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, 'titi', undefined);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, undefined, undefined);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, 12, 'titi');
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+      callWithContext(conditionFormatter.ifNIN, _context, {toto : 2 }, 3);
+      helper.assert(_context.isConditionTrue, false);
+      helper.assert(_context.stopPropagation, false);
+    });
+  });
+
   describe('ifEM', function () { });
   describe('ifNEM', function () { });
   describe('END', function () { });

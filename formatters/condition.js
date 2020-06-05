@@ -277,7 +277,7 @@ function ifLTE (d, value) {
 
 function ifIN (d, value) {
   var _result = false;
-  if ((typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) !== -1) {
+  if (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) !== -1) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -286,7 +286,7 @@ function ifIN (d, value) {
 
 function ifNIN (d, value) {
   var _result = false;
-  if ((typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) === -1) {
+  if (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) === -1) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);

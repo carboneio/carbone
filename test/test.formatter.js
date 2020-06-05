@@ -981,7 +981,7 @@ describe.only('formatter', function () {
     });
   });
 
-  describe.only('ifEM', function () {
+  describe('ifEM', function () {
     it ('should matches empty values, string, arrays or objects', function () {
       let _context = {isConditionTrue : false};
       callWithContext(conditionFormatter.ifEM, _context, '');
@@ -1041,7 +1041,7 @@ describe.only('formatter', function () {
       helper.assert(_context.stopPropagation, false);
     });
   });
-  describe.only('ifNEM', function () {
+  describe('ifNEM', function () {
     it('should matches not empty values, string, arrays or objects', function () {
       var _context = {};
 
@@ -1101,9 +1101,84 @@ describe.only('formatter', function () {
       helper.assert(_context.stopPropagation, false);
     });
   });
-  describe('END', function () { });
-  describe('OR', function () { });
-  describe('SHOW / ESLE SHOW', function () { });
+  describe('Combined conditions', function () {
+    describe('AND', function () {
+      it('should be true | ifNE / ifEQ / ifGTE / ifGT / ifLT / ifLTE / ifIN / ifNIN / ifEM / ifNEM', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifNE, _context, 'delorean', 'tesla');
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifEQ, _context, 'dragon', 'dragon');
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifGT, _context, 20, 1);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifGTE, _context, -100, -100);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifLT, _context, -1000, 30);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifLTE, _context, 13987, 13987);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifIN, _context, ['potatoes', 'bananas', 'tomatoes'], 'tomatoes');
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifNIN, _context, ['potatoes', 'bananas', 'tomatoes'], 'grapes');
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifEM, _context, null);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifNEM, _context, new Date());
+        callWithContext(conditionFormatter.and, _context);
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, true);
+      });
+      it('should be false | ifNE / ifNIN', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifNE, _context, 'delorean', 'tesla');
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifNIN, _context, ['potatoes', 'bananas', 'tomatoes'], 'tomatoes');
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.isAndOperator, true);
+      });
+      it('should be false | ifEQ / ifEM / ifNEM', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'delorean');
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifEM, _context, []);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifEM, _context, {id : '1'});
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifNEM, _context, 'Hey');
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.isAndOperator, true);
+      });
+    });
+    describe.only('OR', function () {
+      it('should be true | ifNE / ifNIN', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifNE, _context, 'delorean', 'tesla');
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifNIN, _context, ['potatoes', 'bananas', 'tomatoes'], 'tomatoes');
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, false);
+      });
+
+      it('should be true | ifEQ / ifNEM / ifEM', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'tesla');
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifNEM, _context, [1, 2, 3, 4, 5]);
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifEM, _context, {});
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifNEM, _context, 'Hey');
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, false);
+      });
+    });
+    describe('SHOW / ESLE SHOW', function () {
+
+    });
+    describe('END/OR/SHOW/ELSE SHOW', function () {
+
+    });
+  });
 
   describe('print', function () {
     it('should print the message', function () {

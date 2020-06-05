@@ -219,9 +219,8 @@ function ifGT (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-
   // Convert everything in string (not strict Equal)
-  if (Number.isNaN(_d) === false && _d                    > _value
+  if (typeof d === 'number' && _d                    > _value
       || typeof d === 'string'      && value && d.length              > value.length
       || Array.isArray(d) === true  && value && d.length              > value.length
       || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length > Object.keys(value).length ) {
@@ -236,10 +235,10 @@ function ifGTE (d, value) {
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
   // Convert everything in string (not strict Equal)
-  if (   Number.isNaN(_d) === false && _d                    >= _value
-      || d instanceof Array         && d.length              >= _value
-      || typeof d === 'string'      && d.length              >= _value
-      || d && d.constructor === Object   && Object.keys(d).length >= _value ) {
+  if (   typeof d === 'number' && _d                    >= _value
+      || typeof d === 'string'      &&  value && d.length    >= value.length
+      || Array.isArray(d) === true  && value && d.length     >= value.length
+      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length >= Object.keys(value).length ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -251,10 +250,10 @@ function ifLT (d, value) {
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
   // Convert everything in string (not strict Equal)
-  if (   Number.isNaN(_d) === false && _d                    < _value
-      || d instanceof Array         && d.length              < _value
-      || typeof d === 'string'      && d.length              < _value
-      || d && d.constructor === Object   && Object.keys(d).length < _value ) {
+  if (   typeof d === 'number' && _d < _value
+      || typeof d === 'string' && value && d.length < value.length
+      || Array.isArray(d) === true  && value && d.length < value.length
+      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length < Object.keys(value).length ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -266,10 +265,10 @@ function ifLTE (d, value) {
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
   // Convert everything in string (not strict Equal)
-  if (   Number.isNaN(_d) === false && _d                    <= _value
-      || d instanceof Array         && d.length              <= _value
-      || typeof d === 'string'      && d.length              <= _value
-      || d && d.constructor === Object   && Object.keys(d).length <= _value ) {
+  if (   typeof d === 'number' && _d <= _value
+      || typeof d === 'string' && value && d.length <= value.length
+      || Array.isArray(d) === true  && value && d.length <= value.length
+      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length <= Object.keys(value).length ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);

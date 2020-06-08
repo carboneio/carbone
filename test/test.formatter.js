@@ -478,121 +478,56 @@ describe('formatter', function () {
   describe('ifLTE', function () {
     it('should matches values, string.length, array.length or object.length that are less than or equal to a specified value', function () {
       let _context = {isConditionTrue : false};
-      callWithContext(conditionFormatter.ifLTE, _context, -23, 19);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 1, 768);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 0, 0);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, '1' , '1234');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 'Short sentence', 'Hello, this is a long sentence');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 'ThisEqual', 'Hello1234');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, [1, 2], [1, 2, 3, 4, 5, 6]);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, [1, 2, 3, 4, 5], [1, 2, 3, 4, 6]);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, ['apple', 'banana'], ['tomato', 'cabbage', 'jackfruit', 'berry']);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, ['apple', 'banana'], ['tomato', 'cabbage']);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, {id : 2, name : 'John'}, {id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'});
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, {id : 2, name : 'John'}, {id : 3, name : 'Wick'});
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
+      const _dataSet = [
+        [-23, 19],
+        [1, 768],
+        [0, 0],
+        ['1' , '1234'],
+        ['Short sentence', 'Hello, this is a long sentence'],
+        ['ThisEqual', 'Hello1234'],
+        [[1, 2], [1, 2, 3, 4, 5, 6]],
+        [[1, 2, 3, 4, 5], [1, 2, 3, 4, 6]],
+        [['apple', 'banana'], ['tomato', 'cabbage', 'jackfruit', 'berry']],
+        [['apple', 'banana'], ['tomato', 'cabbage']],
+        [{id : 2, name : 'John'}, {id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}],
+        [{id : 2, name : 'John'}, {id : 3, name : 'Wick'}] ,
+      ];
+      for (let i = 0, n = _dataSet.length; i < n; i++) {
+        const el = _dataSet[i];
+        _context.isConditionTrue = false;
+        callWithContext(conditionFormatter.ifLTE, _context, el[0], el[1]);
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.stopPropagation, false);
+      }
     });
 
     it('should matches values, string.length, array.length or object.length that are NOT less than or equal to a specified value', function () {
       let _context = {isConditionTrue : false};
-      callWithContext(conditionFormatter.ifLTE, _context, 50, -29);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 1290, 768);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, '1234', '1');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 'This is a long string', 'Hello');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 'Hello1234', '1');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, [1, 2, 3, 4, 5], [1, 2, 3]);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, ['apple', 'banana', 'jackfruit'], ['tomato', 'cabbage']);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, {id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}, {id : 3, name : 'John'});
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, {id : 2, name : 'John'}, null);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, null, 'Lion and giraffe');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 'Lion and giraffe',  null);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, null, null);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, {id : 2, name : 'John'}, undefined);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, undefined, 'Lion and giraffe');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, 'Lion and giraffe',  undefined);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifLTE, _context, undefined, undefined);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
+      const _dataSet = [
+        [50, -29],
+        [1290, 768],
+        ['1234', '1'],
+        ['This is a long string', 'Hello'],
+        ['Hello1234', '1'],
+        [[1, 2, 3, 4, 5], [1, 2, 3]],
+        [['apple', 'banana', 'jackfruit'], ['tomato', 'cabbage']],
+        [{id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}, {id : 3, name : 'John'}],
+        [{id : 2, name : 'John'}, null],
+        [null, 'Lion and giraffe'],
+        ['Lion and giraffe',  null],
+        [null, null],
+        [{id : 2, name : 'John'}, undefined],
+        [undefined, 'Lion and giraffe'],
+        ['Lion and giraffe',  undefined],
+        [undefined, undefined],
+      ];
+      for (let i = 0, n = _dataSet.length; i < n; i++) {
+        const el = _dataSet[i];
+        _context.isConditionTrue = false;
+        callWithContext(conditionFormatter.ifLTE, _context, el[0], el[1]);
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.stopPropagation, false);
+      }
     });
   });
   describe('ifIN', function () {

@@ -3,4 +3,5 @@
 doc/
 0perso/
 test/
+build/
 .DS_Store

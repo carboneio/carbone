@@ -207,94 +207,54 @@ describe('formatter', function () {
 
   describe('ifEQ', function () {
     it('should turn the `isConditionTrue` to True if a data is equal to a variable', function () {
+      const _dataSet = [
+        [0, 0],
+        [0, '0'],
+        [true, true],
+        ['true', 'true'],
+        [true, 'true'],
+        ['false', 'false'],
+        [false, 'false'],
+        [false, false],
+        ['titi', 'titi'],
+        [undefined, undefined],
+        [null, null],
+        // object identiques, it is comparing "[object Object]" === "[object Object]"
+        [{value : 10, name : 'john', address : { name : '123 street'} }, {value : 10, name : 'john', address : { name : '123 street'}}],
+        [{ name : '85 street'}, {value : 10, name : 'wick', address : { name : '321 street'}}],
+        [[1, 2, 3, 4, 6, 7, 8, 9], [1, 2, 3, 4, 6, 7, 8, 9]]
+      ];
       var _context = {};
-      callWithContext(conditionFormatter.ifEQ, _context, 0, 0);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, 0, '0');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, true, true);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, 'true', 'true');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, true, 'true');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, false, 'false');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, 'false', 'false');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, false, false);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, false, 'false');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, 'titi', 'titi');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, undefined, undefined);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, null, null);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      // object identiques, it is comparing "[object Object]" === "[object Object]"
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEQ, _context, {value : 10, name : 'john', address : { name : '123 street'} }, {value : 10, name : 'john', address : { name : '123 street'}});
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      // different objects, it is comparing "[object Object]" === "[object Object]"
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEQ, _context, {value : 20, name : 'Eric', address : { name : '85 street'} }, {value : 10, name : 'wick', address : { name : '321 street'}});
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      // Tableau identique
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEQ, _context, [1, 2, 3, 4, 6, 7, 8, 9], [1, 2, 3, 4, 6, 7, 8, 9]);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
+      for (let i = 0, n = _dataSet.length; i < n; i++) {
+        const el = _dataSet[i];
+        _context.isConditionTrue = false;
+        callWithContext(conditionFormatter.ifEQ, _context, el[0], el[1]);
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.stopPropagation, false);
+      }
     });
 
     it('should turn the `isConditionTrue` to false if the data is not equal to a variable', function () {
       var _context = {};
-      callWithContext(conditionFormatter.ifEQ, _context, 0, 3);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, 0, '1');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, true, false);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, 'true', false);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, 'false', 'true');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, false, true);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, 'titi', 'toto');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifEQ, _context, undefined, 'titi');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEQ, _context, 'titi', null);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEQ, _context, [1, 2, 3], [1, 3]);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
+      const _dataSet = [
+        [0, 3],
+        [0, '1'],
+        [true, false],
+        ['true', false],
+        ['false', 'true'],
+        [false, true],
+        ['titi', 'toto'],
+        [undefined, 'titi'],
+        ['titi', null],
+        [[1, 2, 3], [1, 3]],
+      ];
+      for (let i = 0, n = _dataSet.length; i < n; i++) {
+        const el = _dataSet[i];
+        _context.isConditionTrue = false;
+        callWithContext(conditionFormatter.ifEQ, _context, el[0], el[1]);
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.stopPropagation, false);
+      }
     });
   });
 

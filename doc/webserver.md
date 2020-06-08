@@ -1,29 +1,28 @@
 Carbone On-Premise Draft doc
 ============================
 
-Two installation solutions : 
-  - One binary exectuable + LibreOffice
-  - Docker
+Two installation methods : 
+  - One self-contained binary executable + external LibreOffice (used for conversion)
+  - Docker [NOT IMPLEMENTED]
 
-# Binary solution
+# Binary executable (method 1)
 
 ### Installation
 
-- 1 - Download Carbone On-premise binary for your server
-- 2 - Install LibreOffice (see below)
-- 3 - Start carbone weserver
+- 1 - Download Carbone On-premise binary for your server/OS: Mac, Linux or Windows (Coming soon) 
+- 2 - Install LibreOffice (Optional). See instruction below.
+- 3 - Start Carbone web server
 
 ```bash
   ./carbone webserver --port 4000 --workdir .
 ```
-
-It creates these directories in `--workdir` [-w]:
+It creates directories in `--workdir` [-w]  (executable directory by default)
 
 - `template`  : where carbone keeps templates (cache)
 - `render`    : temp directory where report are generated 
 - `asset`     : internal are generated 
 - `config`    : [NOT IMPLEMENTED] config and licenses
-- `logs`      : [NOT IMPLEMENTED] formated output logs 
+- `logs`      : [NOT IMPLEMENTED] formatted output logs 
 - `plugin `   : [NOT IMPLEMENTED] where to put custom plugin 
 
 
@@ -38,13 +37,20 @@ Carbone On-Premise will be compatible with our SDK for Python, Go, JS, PHP, ...
 - Get the result    : GET /render.carbone.io/render/:renderId
 
 
-[NOT IMPLEMENTED] You can also send an URL instead of a templateId. Carbone will download the templates automatically.
+[NOT IMPLEMENTED] You can also send an URL instead of a templateId. Carbone will download the template automatically.
 
 
-### How to install LibreOffice on Ubuntu server
+### How and why install LibreOffice?
 
+###### on OSX
 
-```
+- Install LibreOffice normally using the stable version from https://www.libreoffice.org/
+
+###### on Ubuntu Server & Ubuntu desktop
+
+> Be careful, LibreOffice which is provided by the PPA libreoffice/ppa does not bundled python (mandatory for Carbone). The best solution is to download the LibreOffice Package from the official website and install it manually:
+
+```bash
   # remove all old version of LibreOffice
   sudo apt remove --purge libreoffice*
   sudo apt autoremove --purge
@@ -74,8 +80,21 @@ Carbone On-Premise will be compatible with our SDK for Python, Go, JS, PHP, ...
   sudo apt install fonts-wqy-zenhei
 ```
 
+###### Why?
 
-# Docker solution
+Carbone uses efficiently LibreOffice to convert documents. Among all tested solutions, it is the most reliable and stable one in production for now.
+
+Carbone does a lot of thing for you behind the scene:
+
+- starts LibreOffice in "server-mode": headless, no User Interface loaded
+- manages multiple LibreOffice workers to maximize performance (configurable number of workers)
+- automatically restarts LibreOffice worker if it crashes or does not respond
+- job queue, re-try conversion three times if something bad happen
+
+
+
+# Docker (method 2)
 
 TODO
+
 

@@ -5,7 +5,7 @@ var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
 var helper = require('../lib/helper');
 
-describe.only('formatter', function () {
+describe('formatter', function () {
   describe('convDate', function () {
     it('should accept use this.lang to set convert date', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
@@ -702,6 +702,50 @@ describe.only('formatter', function () {
       }
     });
   });
+
+  describe('ifBlocks - showBegin/showEnd/hideBegin/hideEnd + Combined conditions', function () {
+    it('should show the content', function () {
+      let _context = {isConditionTrue : false};
+      callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'delorean');
+      callWithContext(conditionFormatter.showBegin, _context);
+      helper.assert(_context.isHidden, 0);
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(_context.isConditionTrue, true);
+      callWithContext(conditionFormatter.showEnd, _context);
+      helper.assert(_context.isHidden, -1);
+    });
+    it('should not show the content', function () {
+      let _context = {isConditionTrue : false};
+      callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'tesla');
+      callWithContext(conditionFormatter.showBegin, _context);
+      helper.assert(_context.isHidden, 1);
+      helper.assert(_context.stopPropagation, false);
+      helper.assert(_context.isConditionTrue, false);
+      callWithContext(conditionFormatter.showEnd, _context);
+      helper.assert(_context.isHidden, -1);
+    });
+    it('should hide the content', function () {
+      let _context = {isConditionTrue : false};
+      callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'delorean');
+      callWithContext(conditionFormatter.hideBegin, _context);
+      helper.assert(_context.isHidden, 1);
+      helper.assert(_context.stopPropagation, true);
+      helper.assert(_context.isConditionTrue, true);
+      callWithContext(conditionFormatter.hideEnd, _context);
+      helper.assert(_context.isHidden, -1);
+    });
+    it('should not hide the content', function () {
+      let _context = {isConditionTrue : false};
+      callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'tesla');
+      callWithContext(conditionFormatter.hideBegin, _context);
+      helper.assert(_context.isHidden, 0);
+      helper.assert(_context.stopPropagation, false);
+      helper.assert(_context.isConditionTrue, false);
+      callWithContext(conditionFormatter.hideEnd, _context);
+      helper.assert(_context.isHidden, -1);
+    });
+  });
+
   describe('Combined conditions', function () {
     describe('AND', function () {
       it('should be true | ifNE / ifEQ / ifGTE / ifGT / ifLT / ifLTE / ifIN / ifNIN / ifEM / ifNEM', function () {

@@ -23,11 +23,18 @@
     "lint:fix": "eslint ./*/**.js --fix"
   },
   "dependencies": {
+    "body-parser": "=1.19.0",
+    "cors": "=2.8.5",
     "debug": "=2.6.9",
+    "formidable": "=1.2.2",
     "moment": "=2.19.3",
     "moxie-zip": "=0.0.3",
+    "restana": "=4.6.1",
     "timsort": "=0.3.0",
     "yauzl": "=2.8.0"
+  },
+  "pkg": {
+    "assets": "lib/converter.py"
   },
   "devDependencies": {
     "eslint": "=6.8.0",

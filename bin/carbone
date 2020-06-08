@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+var webserver = require('../lib/webserver');
 var translator = require('../lib/translator');
 var tool = require('../lib/tool');
 var _action = process.argv[2];
@@ -11,8 +11,11 @@ switch (_action) {
   case 'find':
     tool.findMarkers(process.argv.slice(3));
     break;
+  case 'webserver':
+    webserver(process.argv.slice(3));
+    break;
   default:
-    usage(); 
+    usage();
 }
 
 function usage () {
@@ -20,5 +23,6 @@ function usage () {
   console.log('Carbone usage:');
   console.log('   carbone translate [--help]');
   console.log('   carbone find [--help]');
+  console.log('   carbone webserver [--help]');
   process.exit();
 }

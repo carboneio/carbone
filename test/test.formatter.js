@@ -576,61 +576,45 @@ describe('formatter', function () {
   describe('ifNIN', function () {
     it('should matches none of the values specified in an array or string', function () {
       var _context = {};
-      callWithContext(conditionFormatter.ifNIN, _context, 'car is broken', 'are');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, 'car is broken',  'caris');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, [1, 2, 'toto'], 'titi');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, [], 3);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
+      const _dataSet = [
+        ['car is broken', 'are'],
+        ['car is broken',  'caris'],
+        [[1, 2, 'toto'], 'titi'],
+        [[], 3],
+      ];
+      for (let i = 0, n = _dataSet.length; i < n; i++) {
+        const el = _dataSet[i];
+        _context.isConditionTrue = false;
+        callWithContext(conditionFormatter.ifNIN, _context, el[0], el[1]);
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.stopPropagation, false);
+      }
     });
 
     it('should matches any of the values specified in an array or string', function () {
       var _context = {};
-      callWithContext(conditionFormatter.ifNIN, _context, 'car is broken', 'is');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, 'car is broken', 'car is');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, [1, 2, 'toto'], 'toto');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, [1, 2, 'toto'], 2);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, null, 'titi');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, 'titi', null);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, null, null);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, undefined, null);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, undefined, 'titi');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, 'titi', undefined);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, undefined, undefined);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, 12, 'titi');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      callWithContext(conditionFormatter.ifNIN, _context, {toto : 2 }, 3);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
+      const _dataSet = [
+        ['car is broken', 'is'],
+        ['car is broken', 'car is'],
+        [[1, 2, 'toto'], 'toto'],
+        [[1, 2, 'toto'], 2],
+        [null, 'titi'],
+        ['titi', null],
+        [null, null],
+        [undefined, null],
+        [undefined, 'titi'],
+        ['titi', undefined],
+        [undefined, undefined],
+        [12, 'titi'],
+        [{toto : 2 }, 3],
+      ];
+      for (let i = 0, n = _dataSet.length; i < n; i++) {
+        const el = _dataSet[i];
+        _context.isConditionTrue = false;
+        callWithContext(conditionFormatter.ifNIN, _context, el[0], el[1]);
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.stopPropagation, false);
+      }
     });
   });
 

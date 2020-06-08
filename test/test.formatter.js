@@ -5,7 +5,7 @@ var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
 var helper = require('../lib/helper');
 
-describe('formatter', function () {
+describe.only('formatter', function () {
   describe('convDate', function () {
     it('should accept use this.lang to set convert date', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
@@ -319,6 +319,7 @@ describe('formatter', function () {
         [50, -29],
         [1290, 768],
         ['1234', '1'],
+        ['32q', '4q2'],
         ['This is a long string', 'Hello'],
         ['Hello1234', '1'],
         [[1, 2, 3, 4, 5], [1, 2, 3]],
@@ -341,6 +342,7 @@ describe('formatter', function () {
         [1, 768],
         [0, 0],
         ['1' , '1234'],
+        ['123dsf', '103123'],
         ['Short sentence', 'Hello, this is a long sentence'],
         [[1, 2], [1, 2, 3, 4, 5, 6]],
         [[1, 2, 3, 4, 5], [1, 2, 3, 4, 6]],
@@ -427,6 +429,7 @@ describe('formatter', function () {
         [-23, 19],
         [1, 768],
         ['1' , '1234'],
+        ['123dsf', '103123'],
         ['Short sentence', 'Hello, this is a long sentence'],
         [[1, 2], [1, 2, 3, 4, 5, 6]],
         [['apple', 'banana'], ['tomato', 'cabbage', 'jackfruit', 'berry']],
@@ -448,6 +451,7 @@ describe('formatter', function () {
         [0, 0],
         [1290, 768],
         ['1234', '1'],
+        ['32q', '4q2'],
         ['This is a long string', 'Hello'],
         ['ThisEqual', 'Hello1234'],
         ['Hello1234', '1'],

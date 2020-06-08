@@ -621,61 +621,41 @@ describe('formatter', function () {
   describe('ifEM', function () {
     it ('should matches empty values, string, arrays or objects', function () {
       let _context = {isConditionTrue : false};
-      callWithContext(conditionFormatter.ifEM, _context, '');
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, null);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, undefined);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, []);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, NaN);
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, {});
-      helper.assert(_context.isConditionTrue, true);
-      helper.assert(_context.stopPropagation, false);
+      const _dataSet = [
+        [''],
+        [null],
+        [undefined],
+        [[]],
+        [NaN],
+        [{}],
+      ];
+      for (let i = 0, n = _dataSet.length; i < n; i++) {
+        const el = _dataSet[i];
+        _context.isConditionTrue = false;
+        callWithContext(conditionFormatter.ifEM, _context, el[0]);
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.stopPropagation, false);
+      }
     });
 
     it('should matches not empty values, string, arrays or objects', function () {
       var _context = {};
-
-      callWithContext(conditionFormatter.ifEM, _context, 0);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, new Date());
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, 'sdsd');
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, 12.33);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, true);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, [12, 23]);
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
-      _context.isConditionTrue = false;
-      callWithContext(conditionFormatter.ifEM, _context, {d : 'd'});
-      helper.assert(_context.isConditionTrue, false);
-      helper.assert(_context.stopPropagation, false);
+      const _dataSet = [
+        [0],
+        [new Date()],
+        ['sdsd'],
+        [12.33],
+        [true],
+        [[12, 23]],
+        [{d : 'd'}],
+      ];
+      for (let i = 0, n = _dataSet.length; i < n; i++) {
+        const el = _dataSet[i];
+        _context.isConditionTrue = false;
+        callWithContext(conditionFormatter.ifEM, _context, el[0]);
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.stopPropagation, false);
+      }
     });
   });
   describe('ifNEM', function () {

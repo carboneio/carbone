@@ -135,10 +135,7 @@ def convert(message):
                     elif value in ('False', 'false'):
                         exportfilter.append(PropertyValue(name, 0, False, 0))
                     else:
-                        try:
-                            exportfilter.append(PropertyValue(name, 0, int(value), 0))
-                        except ValueError:
-                            exportfilter.append(PropertyValue(name, 0, value, 0))
+                        exportfilter.append(PropertyValue(name, 0, value, 0))
     except:
         sendErrorOrExit('400')
         document.dispose()

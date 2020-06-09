@@ -116,7 +116,7 @@ describe('Converter', function () {
         assert.equal(_buf.slice(0, 4).toString(), '%PDF');
         const loadingTask = pdfjsLib.getDocument({data : result, password : 'ThisIsABadPassWord' });
         loadingTask.promise.then(() => {
-          done(new Error('The password is wrong and it is possible to open the report'));
+          done(new Error('The password is wrong and it is not possible to open the report'));
         }, () => {
           done();
         });
@@ -128,6 +128,27 @@ describe('Converter', function () {
     it('should render and open a pdf with a password  (it takes 5000ms on average to finish)', function (done) {
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       const _password = 'P4ssW0rd';
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+        if (err) {
+          assert.equal(err, null);
+        }
+        var _buf = new Buffer.from(result);
+        assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : _password });
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad Password'));
+        });
+      }, null, null, {
+        EncryptFile          : true,
+        DocumentOpenPassword : _password
+      });
+    });
+    it('should render and open a pdf with a number as password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      const _password = '1234533';
       converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
         if (err) {
           assert.equal(err, null);

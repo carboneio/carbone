@@ -1090,6 +1090,18 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept direct access without writing i=10', function (done) {
+    var _xml = '<xml> <t_row> {d[2].brand} </t_row><t_row> {d[1].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : 1},
+      {brand : 'Tesla motors', id : 2},
+      {brand : 'Toyota'      , id : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
   it('should print the last row if "i=-1", and the row before the last if i=-2 ...', function (done) {
     var _xml = '<xml> <t_row> {d[i=-1].brand} </t_row><t_row> {d[i=-2].brand} </t_row></xml>';
     var _data = [

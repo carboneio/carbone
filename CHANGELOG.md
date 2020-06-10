@@ -1,56 +1,8 @@
 ### v2.0.x
 
-  - Fix: avoid crashing when a static image was inserted in a loop in MS Word templates
-  - Update totals in ODS and XSLX files
-  - `formatC` supports many crypto currencies
-  - Fix: Accepts comma in formatter parameters such as `{d.sentenceExist:ifEqual(1, 'Some sentence, some more sentences.')}`
-  - Fix: nested array in XML (but not in JSON) was not printed correctly
-    ```
-      {d.countries[i].name}
-        {d.movies[i].subObject.name}
-        {d.movies[i+1].subObject.name}
-      {d.countries[i+1].name}
-    ```
-  - Fix: avoid crashing when a sub-object is null or undefined in data
-  - Fix: avoid crashing when the parent object of an array is null or undefined in data
-  - Eslint code + add eslint tools
-  - Fix: accepts dashes characters in JSON data. Before, Carbones crashes when using `{d.my-att-with-dash}`
-  - Fix: avoid crashing when a XLSX template contains charts
-  - Beta: supports dynamic charts rendering in XLSX if these conditions are met:
-    - first, draw a chart in MS Excel and replace your data with Carbone markers
-    - datas of the chart should be placed at the top-left corner of the spreadsheet
-    - all numbers are formatted with formatN() formatter
-  - Fix: accepts whitespace in array filters with simple quote and double quotes
-    Example: `{d.cars[i, type='Tesla car'].name}`
-             `{d.cars[i, type="Tesla car"].name}`
-  - Accepts to iterate on attributes of objects as is if it was an array:
-    ```js
-    {
-      myObject : {
-        paul : '10',
-        jack : '20',
-        bob  : '30'
-      }
-    }
-    ```
+  - 🚀 **Accepts dynamic variables in all formatters!**
 
-    In the report:
-    ```
-      {d.myObject[i].att} {d.myObject[i].val}
-      {d.myObject[i+1].att} {d.myObject[i+1].val}
-    ```
-    - use .att to print the attribue
-    - use .val to print the value
-
-    You can even access nested objects and nested arrays inside `val`: `{d.myObject[i].val.myArray[i].id}`
-
-  - Image processing completely rewritten:
-    - Consider only the first marker occurences in alternative Text of ODT (enables oyther marker)
-
-  - Accepts dynamic variables in all formatters!
     Carbone passes data to formatters if parameters start with a dot `.` and is not surrounded by quotes. Here is an example:
-
-    **Examples:**
 
     *Data*
       ```js
@@ -85,25 +37,29 @@
     You cannot access arrays<br>
     `{d.subObject.qtyB:add(..subArray[0].qtyE)}` => [[C_ERROR]] subArray[0] not defined
 
-  - New conditional formatters, and a new IF-block
-    - `ifEQ  (value)` : Matches values that are equal to a specified value
+  - ⚡️ **New conditional formatters, and a new IF-block system to hide/show a part of the document** 
+
+    - `ifEQ  (value)` : Matches values that are equal to a specified value, it replaces `ifEqual`
     - `ifNE  (value)` : Matches all values that are not equal to a specified value
     - `ifGT  (value)` : Matches values, string.length, array.length or object.length that are greater than a specified value
     - `ifGTE (value)` : Matches values, string.length, array.length or object.length that are greater than or equal to a specified value
     - `ifLT  (value)` : Matches values, string.length, array.length or object.length that are less than a specified value
     - `ifLTE (value)` : Matches values, string.length, array.length or object.length that are less than or equal to a specified value
-    - `ifIN  (value)` : Matches any of the values specified in an array or string
+    - `ifIN  (value)` : Matches any of the values specified in an array or string, it replaces `ifContain`
     - `ifNIN (value)` : Matches none of the values specified in an array or string
-    - `ifEM  (value)` : Matches empty values, string, arrays or objects
+    - `ifEM  (value)` : Matches empty values, string, arrays or objects, it replaces `ifEmpty`
     - `ifNEM (value)` : Matches not empty values, string, arrays or objects
-    - `and   (value)` : AND operator between two consecutives conditional formatters
-    - `or    (value)` : (default) OR operator between two consecutives conditional formatters
+    - `and   (value)` : AND operator between two consecutive conditional formatters 
+    - `or    (value)` : (default) OR operator between two consecutive conditional formatters 
     - `hideBegin` and `hideEnd` : hide text block between hideBegin and hideEnd if condition is true
     - `showBegin` and `showEnd` : show a text block between showBegin and showEnd if condition is true
     - `show (message)`          : print a message if condition is true
     - `elseShow (message)`      : print a message if condition is false
 
-    **Examples:**
+    No formatters can be chained after `hideBegin`, `hideEnd`, `showBegin`, `showEnd`.
+
+    These new formatters replace the old ones `ifEqual`, `ifEmpty` and `ifContain`. We keep these old formatters
+    for backwards compatibility. You should avoid using them in new templates.
 
     *Data*
       ```js
@@ -115,17 +71,67 @@
     *Template => Result*
 
     print simple message according to the result of a condition<br>
-    `{d.id:ifEQ(10):showMessage('hey')}` => hey
+    `{d.id:ifEQ(10):show('hey')}` => hey
 
-    print simple message according to the result of multiple conditions<br>
+    print simple message according to the result of multiple conditions, combining with dynamic variables! 🤩<br>
     `{d.id:ifEQ(10):and(.qtyA):ifEQ(20):show('hey'):elseShow('hide')}` => hey
 
-    hide or show a block of text in the document<br>
+    hide or show a block of text in the document ⚡️<br>
     `{d.id:ifEQ(10):showBegin}` block of text  `{d.id:showEnd}` => block of text<br>
     `{d.id:ifEQ(12):showBegin}`  block of text  `{d.id:showEnd}` =>
 
-  - (Fix LibreOffice detection on Windows)
-  - Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` bypassing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the marker as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the marker.
+  - ☀️ **Accepts to iterate on attributes of objects as is if it was an array**
+    ```js
+    {
+      myObject : {
+        paul : '10',
+        jack : '20',
+        bob  : '30'
+      }
+    }
+    ```
+
+    In the report: 
+    ```
+      {d.myObject[i].att} {d.myObject[i].val}
+      {d.myObject[i+1].att} {d.myObject[i+1].val}
+    ```
+    - use .att to print the attribute
+    - use .val to print the value
+
+    You can even access nested objects and nested arrays inside `val`: `{d.myObject[i].val.myArray[i].id}`
+
+  - Fix: avoid crashing when a static image was inserted in a loop in MS Word templates
+  - Update totals in ODS and XSLX files
+  - `formatC` supports many crypto currencies
+  - Fix: Accepts comma in formatter parameters such as `{d.sentenceExist:ifEqual(1, 'Some sentence, some more sentences.')}`
+  - Fix: nested array in XML (but not in JSON) was not printed correctly
+    ```
+      {d.countries[i].name}
+        {d.movies[i].subObject.name}
+        {d.movies[i+1].subObject.name}
+      {d.countries[i+1].name}
+    ``` 
+  - Fix: avoid crashing when a sub-object is null or undefined in data
+  - Fix: avoid crashing when the parent object of an array is null or undefined in data
+  - Eslint code + add eslint tools
+  - Fix: accepts dashes characters in JSON data. Before, Carbone crashes when using `{d.my-att-with-dash}`
+  - Fix: avoid crashing when a XLSX template contains charts
+  - Beta: supports dynamic charts rendering in XLSX if these conditions are met:
+    - first, draw a chart in MS Excel and replace your data with Carbone markers
+    - datas of the chart should be placed at the top-left corner of the spreadsheet
+    - all numbers are formatted with formatN() formatter
+  - Fix: accepts white-space in array filters with simple quote and double quotes 
+    Example: `{d.cars[i, type='Tesla car'].name}`
+             `{d.cars[i, type="Tesla car"].name}`
+
+  - Fix LibreOffice detection on Windows
+  - Accepts non-alphanumeric characters in variables names, values, ... For example, `{d.i💎d}` is allowed
+  - Improve security in the builder and reduce memory consumption
+  - Fix crash when markers are next to each over `{d.id}{d.other}`
+  - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
+  - Image processing completely rewritten
+  - Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` by passing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the marker as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the marker.
 
     The place to insert the marker on the temporary picture may change depends on the file format:
 

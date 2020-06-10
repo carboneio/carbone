@@ -1055,6 +1055,231 @@ describe('Carbone', function () {
         });
       });
     });
+
+    describe('security test', function () {
+      it('cannot inject JS using XML', function (done) {
+        var data = {
+          param : 3,
+        };
+        carbone.renderXML("<xml>{d.param}\\'sdsdsd.ss;'{d.param} </xml>", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, "<xml>3\\'sdsdsd.ss;'3 </xml>");
+          done();
+        });
+      });
+      it('should accept non-alphanumeric characters in variable names', function (done) {
+        var data = {
+          o           : { id : 2 },
+          'r🚀cket'   : { id : 3 },
+          'qu\\\'ote' : { id : 4 },
+          报道          : { id : 5 },
+          'qu\'ote'   : { id : 6 }
+        };
+        carbone.renderXML('<xml>{d.o.id} ha {d.r🚀cket.id} he {d.qu\\\'ote.id} ch {d.报道.id} or {d.qu\'ote.id}</xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>2 ha 3 he 4 ch 5 or 6</xml>');
+          done();
+        });
+      });
+      it('should accept non-alphanumeric characters in arrays', function (done) {
+        var data = [{
+          o           : { id : 2 },
+          'r🚀cket'   : { id : 3 },
+          'qu\\\'ote' : { id : 4 },
+          报道          : { id : 5 },
+          'qu\'ote'   : { id : 6 }
+        }];
+        carbone.renderXML('<xml><tr>{d[i].o.id} ha {d[i].r🚀cket.id} he {d[i].qu\\\'ote.id} ch {d[i].报道.id} or {d[i].qu\'ote.id}</tr><tr>{d[i+1].o.id}</tr></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><tr>2 ha 3 he 4 ch 5 or 6</tr></xml>');
+          done();
+        });
+      });
+      it('should accept non-alphanumeric characters in arrays conditions', function (done) {
+        var data = [{
+          o           : { id : 2, 'i💎d' : 200, 'i\\\'d' : 2000 },
+          'r🚀cket'   : { id : 3, 'i💎d' : 300, 'i\\\'d' : 3000 },
+          'qu\\\'ote' : { id : 4, 'i💎d' : 400, 'i\\\'d' : 4000 },
+          报道          : { id : 5, 'i💎d' : 500, 'i\\\'d' : 5000 },
+          'qu"ote'    : { id : 6, 'i💎d' : 600, 'i"d' : 600 },
+          'qu\'ote'   : { id : 7, 'i💎d' : 700, 'i\'d' : 7000 },
+        },
+        {
+          o           : { id : 12, 'i💎d' : 1200, 'i\\\'d' : 1200 },
+          'r🚀cket'   : { id : 13, 'i💎d' : 1300, 'i\\\'d' : 1300 },
+          'qu\\\'ote' : { id : 14, 'i💎d' : 1400, 'i\\\'d' : 1400 },
+          报道          : { id : 15, 'i💎d' : 1500, 'i\\\'d' : 1500 },
+          'qu"ote'    : { id : 16, 'i💎d' : 1600, 'i"d' : 1600 },
+          'qu\'ote'   : { id : 17, 'i💎d' : 1700, 'i\'d' : 1700 }
+        }];
+        carbone.renderXML('<xml><tr>{d[i, r🚀cket.id = 3 ].o.id}</tr><tr>{d[i+1, r🚀cket.id = 3].o.id}</tr></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><tr>2</tr></xml>');
+          carbone.renderXML('<xml><tr>{d[i, r🚀cket.i💎d = 300 ].o.id}</tr><tr>{d[i+1, r🚀cket.i💎d = 300].o.id}</tr></xml>', data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml><tr>2</tr></xml>');
+            carbone.renderXML('<xml><tr>{d[i, r🚀cket.i\\\'d = 3000 ].o.id}</tr><tr>{d[i+1, r🚀cket.i\\\'d = 3000].o.id}</tr></xml>', data, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml><tr>2</tr></xml>');
+              carbone.renderXML('<xml><tr>{d[i, qu\\\'ote.id = 4 ].o.id}</tr><tr>{d[i+1, qu\\\'ote.id = 4].o.id}</tr></xml>', data, function (err, result) {
+                helper.assert(err+'', 'null');
+                helper.assert(result, '<xml><tr>2</tr></xml>');
+                carbone.renderXML('<xml><tr>{d[i, 报道.id = 5 ].o.id}</tr><tr>{d[i+1, 报道.id = 5].o.id}</tr></xml>', data, function (err, result) {
+                  helper.assert(err+'', 'null');
+                  helper.assert(result, '<xml><tr>2</tr></xml>');
+                  carbone.renderXML('<xml><tr>{d[i, qu"ote.i"d = 600 ].qu"ote.i"d}</tr><tr>{d[i+1, qu"ote.i"d = 600].qu"ote.i"d}</tr></xml>', data, function (err, result) {
+                    helper.assert(err+'', 'null');
+                    helper.assert(result, '<xml><tr>600</tr></xml>');
+                    carbone.renderXML('<xml><tr>{d[i, qu\'ote.i\'d = 700 ].qu\'ote.i\'d}</tr><tr>{d[i+1, qu\'ote.i\'d = 700].qu\'ote.i\'d}</tr></xml>', data, function (err, result) {
+                      helper.assert(err+'', 'null'); // it does not crash
+                      // helper.assert(result, '<xml><tr>700</tr></xml>'); // but it does not work
+                      done();
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+      it('should accept non-alphanumeric characters in conditions values', function (done) {
+        var data = [
+          { o : { id : 'i💎d'   }, val : 'i💎d'  , res : 1 },
+          { o : { id : 'i\\\'d' }, val : 'i\\\'d', res : 2 },
+          { o : { id : '报道'    }, val : '报道'   , res : 3 },
+          { o : { id : 'tes\\"' }, val : 'tes\\"', res : 4 },
+          { o : { id : 'at"'    }, val : 'at"'   , res : 5 }
+        ];
+        carbone.renderXML('<xml><tr>{d[i, o.id = i💎d, val = i💎d ].res}</tr><tr>{d[i+1, o.id = i💎d, val = i💎d].res}</tr></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><tr>1</tr></xml>');
+          carbone.renderXML('<xml><tr>{d[i, o.id = i\\\'d, val = i\\\'d ].res}</tr><tr>{d[i+1, o.id = i\\\'d, val = i\\\'d ].res}</tr></xml>', data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml><tr>2</tr></xml>');
+            carbone.renderXML('<xml><tr>{d[i, o.id = 报道, val = 报道 ].res}</tr><tr>{d[i+1, o.id = 报道, val = 报道 ].res}</tr></xml>', data, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml><tr>3</tr></xml>');
+              carbone.renderXML('<xml><tr>{d[i, o.id = "tes\\"", val = "tes\\""].res}</tr><tr>{d[i+1, o.id = "tes\\"", val = "tes\\""].res}</tr></xml>', data, function (err, result) {
+                helper.assert(err+'', 'null');
+                helper.assert(result, '<xml><tr>4</tr></xml>');
+                carbone.renderXML('<xml><tr>{d[i, o.id = "at"",val=  "at""].res}</tr><tr>{d[i+1, o.id = "at"",val= "at""].res}</tr></xml>', data, function (err, result) {
+                  helper.assert(err+'', 'null');
+                  helper.assert(result, '<xml><tr>5</tr></xml>');
+                  done();
+                });
+              });
+            });
+          });
+        });
+      });
+      it('should work even with backslash and quotes', function (done) {
+        var data = {
+          "p\\\\'aram" : 3,
+        };
+        carbone.renderXML("<xml>{d.p\\\\'aram}</xml>", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>3</xml>');
+          done();
+        });
+      });
+      it('should work even if there are quotes in XML and attributes', function (done) {
+        var data = {
+          "p\\\\'aram" : 3,
+        };
+        carbone.renderXML("<xml>{d.p\\\\'aram}' </xml>", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>3\' </xml>');
+          done();
+        });
+      });
+      it('should not crash if someone tries to inject JS code in variable', function (done) {
+        var _xml = "{#myVar= '];console%2log(sd)'//  }<xml> <t_row> {$myVar} </t_row> </xml>";
+        var _data = [
+          {brand : 'Lumeneo'     , id : 1},
+          {brand : 'Tesla motors', id : 2},
+          {brand : 'Toyota'      , id : 3}
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<xml> <t_row>  </t_row> </xml>');
+          done();
+        });
+      });
+      it('should not crash if weird quotes are injected in formatter parameters', function (done) {
+        var data = {};
+        carbone.renderXML('<xml>{d:ifEmpty(\'\\\\\'yeah\')}</xml>', data, {complement : {}}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>\\\\\'yeah</xml>');
+          done();
+        });
+      });
+      it('should not crash if the iterator contains string and is negative', function (done) {
+        var _xml = '<xml> <t_row> {d[i=-1a].brand} </t_row><t_row> {d[i=-2a].brand} </t_row></xml>';
+        var _data = [
+          {brand : 'Lumeneo'     , id : 1},
+          {brand : 'Tesla motors', id : 2},
+          {brand : 'Toyota'      , id : 3}
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+          done();
+        });
+      });
+      it('should not crash if the iterator contains string', function (done) {
+        var _xml = '<xml> <t_row> {d[i=1a].brand} </t_row><t_row> {d[i=2a].brand} </t_row></xml>';
+        var _data = [
+          {brand : 'Lumeneo'     , id : 1},
+          {brand : 'Tesla motors', id : 2},
+          {brand : 'Toyota'      , id : 3}
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+          done();
+        });
+      });
+      it('should work even if there are quotes in XML', function (done) {
+        var data = {
+          param : 3,
+        };
+        carbone.renderXML("<a>';]<xml>{d.param}' </xml>", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, "<a>';]<xml>3' </xml>");
+          done();
+        });
+      });
+      it('should work even if there are quotes with two backlashes in XML', function (done) {
+        var data = {
+          param : 3,
+        };
+        carbone.renderXML("<a>\\';]<xml>{d.param}' </xml>", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, "<a>\\';]<xml>3' </xml>");
+          done();
+        });
+      });
+      it('should work with multiple simple quotes', function (done) {
+        var _xml = '<p>table\'stable\'stable\'s</p><p>{d.title}</p>';
+        var _data = {title : 'h1'};
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<p>table\'stable\'stable\'s</p><p>h1</p>');
+          done();
+        });
+      });
+      it.skip('should accept quotes on variable name of filters', function (done) {
+        var data = [
+          { o : { id : 'at"' }, val : 'at"', res : 5 }
+        ];
+        // val has surrounding whitespaces
+        carbone.renderXML('<xml><tr>{d[i, o.id = "at"", val =  "at""].res}</tr><tr>{d[i+1, o.id = "at"", val = "at""].res}</tr></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><tr>5</tr></xml>');
+          done();
+        });
+      });
+    });
     describe('Conditional block and conditions formatters showBegin/showEnd', function () {
       it('should accept to use other formatters with conditional blocks', function (done) {
         var _xml = '<xml> {d.val:ifEQ(3):hideBegin} <a></a> {d.val:hideEnd} {d.val:ifEQ(2):hideBegin} <b></b> {d.val:hideEnd} </xml>';
@@ -1065,6 +1290,45 @@ describe('Carbone', function () {
           assert.equal(err+'', 'null');
           assert.equal(_xmlBuilt, '<xml>   <b></b>  </xml>');
           done();
+        });
+      });
+      it('should accept condition markers next to another condition marker', function (done) {
+        var _xml = '<xml> {d.val:showBegin}hey{d.val:showEnd}{d.val:showBegin}joe{d.val:showEnd} </xml>';
+        var _data = {
+          val : 1
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> heyjoe </xml>');
+          done();
+        });
+      });
+      it('should accept 3 nested condition markers next to each over', function (done) {
+        var _xml = '<xml> {d.val:showBegin}{d.id:showBegin}{d.o:showBegin}joe{d.val:showEnd}{d.id:showEnd}{d.o:showEnd} </xml>';
+        var _data = {
+          val : 1,
+          id  : 3,
+          o   : 4
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> joe </xml>');
+          done();
+        });
+      });
+      it('should return an error if begin or end is missing', function (done) {
+        carbone.renderXML('<xml> {d.val:ifEQ(3):hideBegin} </xml>', {}, function (err) {
+          assert.equal(err+'', 'Error: Missing at least one showEnd or hideEnd');
+          carbone.renderXML('<xml> {d.val:ifEQ(3):showBegin} </xml>', {}, function (err) {
+            assert.equal(err+'', 'Error: Missing at least one showEnd or hideEnd');
+            carbone.renderXML('<xml> {d.val:ifEQ(3):showEnd} </xml>', {}, function (err) {
+              assert.equal(err+'', 'Error: Missing at least one showBegin or hideBegin');
+              carbone.renderXML('<xml> {d.val:ifEQ(3):hideEnd} </xml>', {}, function (err) {
+                assert.equal(err+'', 'Error: Missing at least one showBegin or hideBegin');
+                done();
+              });
+            });
+          });
         });
       });
       it('should accept conditional block with complex conditions', function (done) {
@@ -1129,8 +1393,29 @@ describe('Carbone', function () {
           });
         });
       });
+      it('should remove every piece of string without breaking XML, and accept dynamic variables', function (done) {
+        var _xml = '<xml><a>{d.test.other.id:ifEQ(true):and(..isDataHidden):ifEQ(0):showBegin} hey </a> <br/> test <br/><b> whahou {d.test.other.id:ifEQ(true):and(..isDataHidden):ifEQ(0):showEnd}</b></xml>';
+        var _data = {
+          test : {
+            other : {
+              id : true
+            },
+            isDataHidden : 0
+          }
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml><a> hey </a> <br/> test <br/><b> whahou </b></xml>');
+          _data.test.isDataHidden = 1;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<xml><a></a><b></b></xml>');
+            done();
+          });
+        });
+      });
       it('should accept to use other formatters (arrays) with conditional blocks', function (done) {
-        var _xml = '<xml>{d.who} <b/>{d.cars:ifEM():hideBegin()} <tr>{d.who} {d.cars[i].brand} </tr><tr> {d.who} {d.cars[i+1].brand} </tr> <a></a>{d.isDataHidden:ifEM():hideEnd()} {d.who}</xml>';
+        var _xml = '<xml>{d.who} <b/>{d.cars:ifEM():hideBegin} <tr>{d.who} {d.cars[i].brand} </tr><tr> {d.who} {d.cars[i+1].brand} </tr> <a></a>{d.isDataHidden:ifEM():hideEnd} {d.who}</xml>';
         var _data = {
           who  : 'my',
           cars : [
@@ -1156,7 +1441,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           assert.equal(err+'', 'null');
-          assert.equal(_xmlBuilt, '<xml><tr> a  b </tr>f</xml>');
+          assert.equal(_xmlBuilt, '<xml><tr> a </tr>f</xml>');
           _data.isDataHidden = false;
           carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
             assert.equal(err+'', 'null');
@@ -1183,6 +1468,173 @@ describe('Carbone', function () {
               });
             });
           });
+        });
+      });
+      it('should accept conditional block with loops just before and after the if-block\
+        should not break XML even if the if-block is not placed correclty (with showBegin/showEnd)', function (done) {
+        var _xml = '<xml> <table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> <b>{d.isDataHidden:ifEQ(false):showBegin}</b> <a>hey1!</a> <b>{d.isDataHidden:showEnd}</b><table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> </xml>';
+        var _data = {
+          isDataHidden : true,
+          who          : 'my',
+          cars         : [
+            {brand : 'Lumeneo'},
+            {brand : 'Toyota'}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b><b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+          _data.isDataHidden = false;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b> <a>hey1!</a> <b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+            done();
+          });
+        });
+      });
+      it('should accept conditional block with loops just before and after the if-block\
+        should not break XML even if the if-block is not placed correclty (with hideBegin/hideEnd)', function (done) {
+        var _xml = '<xml> <table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> <b>{d.isDataHidden:hideBegin}</b> <a>hey1!</a> <b>{d.isDataHidden:hideEnd}</b><table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> </xml>';
+        var _data = {
+          isDataHidden : true,
+          who          : 'my',
+          cars         : [
+            {brand : 'Lumeneo'},
+            {brand : 'Toyota'}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b><b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+          _data.isDataHidden = false;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b> <a>hey1!</a> <b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+            done();
+          });
+        });
+      });
+      it('should accept conditional block with loops just before and after the if-block\
+        should not break XML even if the if-block is not placed correctly (with hideBegin/hideEnd)', function (done) {
+        var _xml = '<xml> <table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> <b>{d.isDataHidden:hideBegin} <br/></b> <li>{d.cars[i].id}</li><li>{d.cars[i+1].id}</li> <a>hey1!</a> <b><br/> {d.isDataHidden:hideEnd}</b><table> <tr>{d.cars[i].brand} </tr><tr> {d.cars[i+1].brand} </tr> </table> </xml>';
+        var _data = {
+          isDataHidden : true,
+          who          : 'my',
+          cars         : [
+            {brand : 'Lumeneo', id : 1},
+            {brand : 'Toyota' , id : 2}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b></b><b></b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+          _data.isDataHidden = false;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<xml> <table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> <b> <br/></b> <li>1</li><li>2</li> <a>hey1!</a> <b><br/> </b><table> <tr>Lumeneo </tr><tr>Toyota </tr> </table> </xml>');
+            done();
+          });
+        });
+      });
+      it('should be able to show or hide a table with a lot of nested xml tags ', function (done) {
+        var _xml = '<xml>{d.cars:ifGT(0):showBegin}<table> <tr> <td><p>{d.cars[i].brand}</p></td> </tr>   <tr> <td><p>{d.cars[i+1].brand}</p></td> </tr> </table>{d.variants:showEnd}</xml>';
+        var _data = {
+          cars : [
+            {brand : 'Lumeneo', id : 1},
+            {brand : 'Toyota' , id : 2}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml><table> <tr> <td><p>Lumeneo</p></td> </tr>   <tr> <td><p>Toyota</p></td> </tr>    </table></xml>');
+          _data.isDataHidden = false;
+          done();
+        });
+      });
+      it('should hide or show some xml part with two consecutive conditional block\
+        it should accept that markers are spread across multiple with XML tag\
+        it should accept the the ending conditional marker contain conditional formatters or not', function (done) {
+        var _xml = ''
+          + '<a> hey </a>'
+          + '<b> {d.isShown:ifEQ(<c>1</c>):showBegin}</b>'
+          + '<d> textD <e>e</e> </d>'
+          + '<f>'
+          + '  <g>{d.isShown:ifEQ(</g>'
+          + '  <h>1</h>'
+          + '  <i>):showEnd}</i>'
+          + '</f>'
+          + '<j/>'
+          + '<k>{d.isShown:ifEQ(<l>0</l>):showBegin}</k>'
+          + '<m>'
+          + '  <n> textN </n>'
+          + '</m>'
+          + '<o>'
+          + '  <p>{d.isShown</p>'
+          + '  <q></q>'
+          + '  <r>:showEnd}</r>'
+          + '</o>';
+        var _data = {
+          isShown : 0
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<a> hey </a><b> </b><f><g></g><h></h><i></i></f><j/><k><l></l></k><m>  <n> textN </n></m><o>  <p></p><q></q><r></r></o>');
+          _data.isShown = 1;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<a> hey </a><b> <c></c></b><d> textD <e>e</e> </d><f>  <g></g><h></h><i></i></f><j/><k></k><o><p></p><q></q><r></r></o>');
+            done();
+          });
+        });
+      });
+      it('should remove every possible parts in XML and accept complex conditions', function (done) {
+        var _xml = ''
+          + '<a>'
+          + '  <b>{d.test.isShown:ifEQ(</b>'
+          + '  <c>1</c>'
+          + '  <d>):</d>'
+          + '  <e>and(.text):ifEQ(</e>'
+          + '  <f>aaa</f>'
+          + '  <g>)</g>'
+          + '  <h>:showBegin}</h>'
+          + '</a>'
+          + '<i>Z</i>'
+          + '<j>'
+          + '  <k>{d.test.isShown:show</k>'
+          + '  <l>End</l>'
+          + '  <m>}</m>'
+          + '</j>';
+        var _data = {
+          test : {
+            isShown : 1,
+            text    : 'aa'
+          }
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<a>  <b></b></a><j><k></k><l></l><m></m></j>');
+          _data.test.text = 'aaa';
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<a>  <b></b><c></c><d></d><e></e><f></f><g></g><h></h></a><i>Z</i><j>  <k></k><l></l><m></m></j>');
+            done();
+          });
+        });
+      });
+      it('should hide XML part if values are undefined', function (done) {
+        var _xml = ''
+          + '<a>'
+          + '  <b>{d.test.isShown:ifEQ(1):and(.text):ifEQ(aaa):showBegin}</b>'
+          + '</a>'
+          + '<i>Z</i>'
+          + '<j>'
+          + '  <k>{d.test.isShown:showEnd}</k>'
+          + '</j>';
+        var _data = {};
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<a>  <b></b></a><j><k></k></j>');
+          done();
         });
       });
     });

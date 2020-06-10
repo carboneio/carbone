@@ -219,10 +219,12 @@ function ifGT (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-  // Convert everything in string (not strict Equal)
-  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && _d > _value
+
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d > _value
       || typeof d === 'string'      && value && d.length > value.length
       || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length > value.length
+      || Array.isArray(d) === true && Number.isNaN(value) === false && d.length > value
+      || Number.isNaN(d) === false && Array.isArray(value) === true && d > value.length
       || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length > Object.keys(value).length ) {
     _result = true;
   }
@@ -234,9 +236,12 @@ function ifGTE (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && _d >= _value
+
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d >= _value
       || typeof d === 'string'      && value && d.length >= value.length
       || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length >= value.length
+      || Array.isArray(d) === true && Number.isNaN(value) === false && d.length >= value
+      || Number.isNaN(d) === false && Array.isArray(value) === true && d >= value.length
       || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length >= Object.keys(value).length ) {
     _result = true;
   }
@@ -248,11 +253,13 @@ function ifLT (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-  // Convert everything in string (not strict Equal)
-  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && _d < _value
-  || typeof d === 'string'      && value && d.length < value.length
-  || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length < value.length
-  || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length < Object.keys(value).length ) {
+
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d < _value
+      || typeof d === 'string'      && value && d.length < value.length
+      || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length < value.length
+      || Array.isArray(d) === true && Number.isNaN(value) === false && d.length < value
+      || Number.isNaN(d) === false && Array.isArray(value) === true && d < value.length
+      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length < Object.keys(value).length ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -264,10 +271,12 @@ function ifLTE (d, value) {
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
   // Convert everything in string (not strict Equal)
-  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && _d <= _value
-  || typeof d === 'string'      && value && d.length <= value.length
-  || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length <= value.length
-  || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length <= Object.keys(value).length ) {
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d <= _value
+      || typeof d === 'string'      && value && d.length <= value.length
+      || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length <= value.length
+      || Array.isArray(d) === true && Number.isNaN(value) === false && d.length <= value
+      || Number.isNaN(d) === false && Array.isArray(value) === true && d <= value.length
+      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length <= Object.keys(value).length ) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);

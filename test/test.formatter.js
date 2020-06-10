@@ -5,7 +5,7 @@ var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
 var helper = require('../lib/helper');
 
-describe.only('formatter', function () {
+describe('formatter', function () {
   describe('convDate', function () {
     it('should accept use this.lang to set convert date', function () {
       helper.assert(dateFormatter.convDate.call({lang : 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');

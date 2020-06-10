@@ -418,6 +418,51 @@ describe('extracter', function () {
         }
       });
     });
+    it('should manage arrays with conditions and accept direct access [0] [1]', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site[ 1303 ].id'},
+        {pos : 30, name : 'd.site[0].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        d : {
+          name     : 'd',
+          type     : 'object',
+          parent   : '',
+          parents  : [],
+          xmlParts : []
+        },
+        // eslint-disable-next-line
+        dsitei__1303 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [
+            { attr : 'id', formatters : [], obj : 'dsitei__1303', pos : 20 }
+          ],
+          conditions : [
+            { left : { parent : 'dsitei__1303',  attr : 'i' }, operator : '==', right : '1303' }
+          ]
+        },
+        // eslint-disable-next-line
+        dsitei__0 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [
+            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30 }
+          ],
+          conditions : [
+            { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
+          ]
+        }
+      });
+    });
     it('should detect multiple conditions separated by a comma', function () {
       var _markers = [
         {pos : 20, name : 'd.site[ i = 1, sort >  310].id'},

@@ -1011,7 +1011,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML("<xml>{d.param}\\'sdsdsd.ss;'{d.param} </xml>", data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, "<xml>3\\\\'sdsdsd.ss;3\\' </xml>");
+          helper.assert(result, "<xml>3\\'sdsdsd.ss;'3 </xml>");
           done();
         });
       });
@@ -1020,11 +1020,12 @@ describe('Carbone', function () {
           o           : { id : 2 },
           'r🚀cket'   : { id : 3 },
           'qu\\\'ote' : { id : 4 },
-          报道          : { id : 5 }
+          报道          : { id : 5 },
+          'qu\'ote'   : { id : 6 }
         };
-        carbone.renderXML('<xml>{d.o.id} ha {d.r🚀cket.id} he {d.qu\\\'ote.id} ch {d.报道.id}</xml>', data, function (err, result) {
+        carbone.renderXML('<xml>{d.o.id} ha {d.r🚀cket.id} he {d.qu\\\'ote.id} ch {d.报道.id} or {d.qu\'ote.id}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>2 ha 3 he 4 ch 5</xml>');
+          helper.assert(result, '<xml>2 ha 3 he 4 ch 5 or 6</xml>');
           done();
         });
       });
@@ -1033,11 +1034,12 @@ describe('Carbone', function () {
           o           : { id : 2 },
           'r🚀cket'   : { id : 3 },
           'qu\\\'ote' : { id : 4 },
-          报道          : { id : 5 }
+          报道          : { id : 5 },
+          'qu\'ote'   : { id : 6 }
         }];
-        carbone.renderXML('<xml><tr>{d[i].o.id} ha {d[i].r🚀cket.id} he {d[i].qu\\\'ote.id} ch {d[i].报道.id}</tr><tr>{d[i+1].o.id}</tr></xml>', data, function (err, result) {
+        carbone.renderXML('<xml><tr>{d[i].o.id} ha {d[i].r🚀cket.id} he {d[i].qu\\\'ote.id} ch {d[i].报道.id} or {d[i].qu\'ote.id}</tr><tr>{d[i+1].o.id}</tr></xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml><tr>2 ha 3 he 4 ch 5</tr></xml>');
+          helper.assert(result, '<xml><tr>2 ha 3 he 4 ch 5 or 6</tr></xml>');
           done();
         });
       });
@@ -1047,14 +1049,16 @@ describe('Carbone', function () {
           'r🚀cket'   : { id : 3, 'i💎d' : 300, 'i\\\'d' : 3000 },
           'qu\\\'ote' : { id : 4, 'i💎d' : 400, 'i\\\'d' : 4000 },
           报道          : { id : 5, 'i💎d' : 500, 'i\\\'d' : 5000 },
-          'qu"ote'    : { id : 6, 'i💎d' : 600, 'i"d' : 600 }
+          'qu"ote'    : { id : 6, 'i💎d' : 600, 'i"d' : 600 },
+          'qu\'ote'   : { id : 7, 'i💎d' : 700, 'i\'d' : 7000 },
         },
         {
           o           : { id : 12, 'i💎d' : 1200, 'i\\\'d' : 1200 },
           'r🚀cket'   : { id : 13, 'i💎d' : 1300, 'i\\\'d' : 1300 },
           'qu\\\'ote' : { id : 14, 'i💎d' : 1400, 'i\\\'d' : 1400 },
           报道          : { id : 15, 'i💎d' : 1500, 'i\\\'d' : 1500 },
-          'qu"ote'    : { id : 16, 'i💎d' : 1600, 'i"d' : 1600 }
+          'qu"ote'    : { id : 16, 'i💎d' : 1600, 'i"d' : 1600 },
+          'qu\'ote'   : { id : 17, 'i💎d' : 1700, 'i\'d' : 1700 }
         }];
         carbone.renderXML('<xml><tr>{d[i, r🚀cket.id = 3 ].o.id}</tr><tr>{d[i+1, r🚀cket.id = 3].o.id}</tr></xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
@@ -1074,7 +1078,11 @@ describe('Carbone', function () {
                   carbone.renderXML('<xml><tr>{d[i, qu"ote.i"d = 600 ].qu"ote.i"d}</tr><tr>{d[i+1, qu"ote.i"d = 600].qu"ote.i"d}</tr></xml>', data, function (err, result) {
                     helper.assert(err+'', 'null');
                     helper.assert(result, '<xml><tr>600</tr></xml>');
-                    done();
+                    carbone.renderXML('<xml><tr>{d[i, qu\'ote.i\'d = 700 ].qu\'ote.i\'d}</tr><tr>{d[i+1, qu\'ote.i\'d = 700].qu\'ote.i\'d}</tr></xml>', data, function (err, result) {
+                      helper.assert(err+'', 'null'); // it does not crash
+                      // helper.assert(result, '<xml><tr>700</tr></xml>'); // but it does not work
+                      done();
+                    });
                   });
                 });
               });
@@ -1112,7 +1120,7 @@ describe('Carbone', function () {
           });
         });
       });
-      it('should work even with antislash and quotes', function (done) {
+      it('should work even with backslash and quotes', function (done) {
         var data = {
           "p\\\\'aram" : 3,
         };
@@ -1128,7 +1136,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML("<xml>{d.p\\\\'aram}' </xml>", data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>3\\\' </xml>');
+          helper.assert(result, '<xml>3\' </xml>');
           done();
         });
       });
@@ -1179,27 +1187,36 @@ describe('Carbone', function () {
           done();
         });
       });
-      it.skip('should work even if there are quotes in XML', function (done) {
+      it('should work even if there are quotes in XML', function (done) {
         var data = {
           param : 3,
         };
         carbone.renderXML("<a>';]<xml>{d.param}' </xml>", data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, "<a>\\';]<xml>3\\' </xml>");
+          helper.assert(result, "<a>';]<xml>3' </xml>");
           done();
         });
       });
-      it.skip('should work even if there are quotes in XML', function (done) {
+      it('should work even if there are quotes with two backlashes in XML', function (done) {
         var data = {
           param : 3,
         };
         carbone.renderXML("<a>\\';]<xml>{d.param}' </xml>", data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, "<a>\\\\';]<xml>3\\' </xml>");
+          helper.assert(result, "<a>\\';]<xml>3' </xml>");
           done();
         });
       });
-      it.skip('should quotes on varable name of filters', function (done) {
+      it('should work with multiple simple quotes', function (done) {
+        var _xml = '<p>table\'stable\'stable\'s</p><p>{d.title}</p>';
+        var _data = {title : 'h1'};
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<p>table\'stable\'stable\'s</p><p>h1</p>');
+          done();
+        });
+      });
+      it.skip('should accept quotes on variable name of filters', function (done) {
         var data = [
           { o : { id : 'at"' }, val : 'at"', res : 5 }
         ];

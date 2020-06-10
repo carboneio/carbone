@@ -49,8 +49,8 @@
     - `ifNIN (value)` : Matches none of the values specified in an array or string
     - `ifEM  (value)` : Matches empty values, string, arrays or objects, it replaces `ifEmpty`
     - `ifNEM (value)` : Matches not empty values, string, arrays or objects
-    - `and   (value)` : AND operator between two consecutives conditional formatters 
-    - `or    (value)` : (default) OR operator between two consecutives conditional formatters 
+    - `and   (value)` : AND operator between two consecutive conditional formatters 
+    - `or    (value)` : (default) OR operator between two consecutive conditional formatters 
     - `hideBegin` and `hideEnd` : hide text block between hideBegin and hideEnd if condition is true
     - `showBegin` and `showEnd` : show a text block between showBegin and showEnd if condition is true
     - `show (message)`          : print a message if condition is true
@@ -96,7 +96,7 @@
       {d.myObject[i].att} {d.myObject[i].val}
       {d.myObject[i+1].att} {d.myObject[i+1].val}
     ```
-    - use .att to print the attribue
+    - use .att to print the attribute
     - use .val to print the value
 
     You can even access nested objects and nested arrays inside `val`: `{d.myObject[i].val.myArray[i].id}`
@@ -115,20 +115,21 @@
   - Fix: avoid crashing when a sub-object is null or undefined in data
   - Fix: avoid crashing when the parent object of an array is null or undefined in data
   - Eslint code + add eslint tools
-  - Fix: accepts dashes characters in JSON data. Before, Carbones crashes when using `{d.my-att-with-dash}`
+  - Fix: accepts dashes characters in JSON data. Before, Carbone crashes when using `{d.my-att-with-dash}`
   - Fix: avoid crashing when a XLSX template contains charts
   - Beta: supports dynamic charts rendering in XLSX if these conditions are met:
     - first, draw a chart in MS Excel and replace your data with Carbone markers
     - datas of the chart should be placed at the top-left corner of the spreadsheet
     - all numbers are formatted with formatN() formatter
-  - Fix: accepts whitespace in array filters with simple quote and double quotes 
+  - Fix: accepts white-space in array filters with simple quote and double quotes 
     Example: `{d.cars[i, type='Tesla car'].name}`
              `{d.cars[i, type="Tesla car"].name}`
 
-  - (Fix LibreOffice detection on Windows)
+  - Fix LibreOffice detection on Windows
   - Accepts non-alphanumeric characters in variables names, values, ... For example, `{d.i💎d}` is allowed
   - Improve security in the builder and reduce memory consumption
-  - Fix crash when markers are next to each over `{d.id}{d.other}` 
+  - Fix crash when markers are next to each over `{d.id}{d.other}`
+  - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
 
 
 ### v1.2.1

@@ -203,7 +203,7 @@ describe('parser', function () {
     it('should convert conflicting characters', function (done) {
       parser.findMarkers("<div>{d.menu}<div> it's \n   {d.city}", function (err, cleanedXml) {
         helper.assert(err, null);
-        helper.assert(cleanedXml, "<div><div> it\\'s     ");
+        helper.assert(cleanedXml, "<div><div> it's     ");
         done();
       });
     });

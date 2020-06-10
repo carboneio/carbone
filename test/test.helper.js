@@ -95,6 +95,24 @@ describe('helper', function () {
     });
   });
 
+  describe('removeQuote', function () {
+    it('should do nothing if it is not a string', function () {
+      helper.assert(helper.removeQuote(), undefined);
+      helper.assert(helper.removeQuote(null), null);
+      helper.assert(helper.removeQuote(22), 22);
+    });
+    it('should remove quote form string', function () {
+      helper.assert(helper.removeQuote('sdsd'), 'sdsd');
+      helper.assert(helper.removeQuote('\'sdsd\''), 'sdsd');
+      helper.assert(helper.removeQuote('"sdsd"'), 'sdsd');
+    });
+    it('should not remove quote inside string', function () {
+      helper.assert(helper.removeQuote('"sd \' sd"'), 'sd \' sd');
+      helper.assert(helper.removeQuote('\'sd " sd\''), 'sd " sd');
+    });
+  });
+
+  
   describe('readFileDirSync', function () {
     beforeEach(function () {
       helper.rmDirRecursive(testPath);

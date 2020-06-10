@@ -17,6 +17,7 @@ describe('builder.buildXML', function () {
     var _xml = '<xml> {d.title} </xml>';
     var _data = {title : 'boo'};
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'null');
       helper.assert(_xmlBuilt, '<xml> boo </xml>');
       done();
     });
@@ -70,6 +71,15 @@ describe('builder.buildXML', function () {
     var _complement = {date : 'today'};
     builder.buildXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
       helper.assert(_xmlBuilt, '<xml> boo today </xml>');
+      done();
+    });
+  });
+  it('should accept a second marker next to the first one', function (done) {
+    var _xml = '<xml> {d.title}{c.date} </xml>';
+    var _data = {title : 'boo'};
+    var _complement = {date : 'today'};
+    builder.buildXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> bootoday </xml>');
       done();
     });
   });
@@ -763,6 +773,7 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err, null);
       assert.equal(_xmlBuilt, '<xml><t_row><td>C</td><td>D</td><td>E</td></t_row><t_row><td>A</td><td>B</td></t_row></xml>');
       done();
     });
@@ -904,6 +915,7 @@ describe('builder.buildXML', function () {
       {brand : 'Toyota'      , speed : {high : 44, low : 20}}
     ];
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err, null);
       helper.assert(_xmlBuilt, '<xml> <tr> Lumeneo    Lumeneo </tr></xml>');
       done();
     });
@@ -1006,7 +1018,19 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it('should accept conditionnal arrays on string', function (done) {
+  it('should accept conditionnal arrays on string (simple quotes)', function (done) {
+    var _xml = '<xml> <t_row> {d[brand=\'Tesla\'].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Toyota' , id : 1},
+      {brand : 'Tesla'  , id : 2},
+      {brand : 'Toyota' , id : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept conditionnal arrays on string (double quotes)', function (done) {
     var _xml = '<xml> <t_row> {d[brand="Tesla"].brand} </t_row></xml>';
     var _data = [
       {brand : 'Toyota' , id : 1},
@@ -1056,6 +1080,18 @@ describe('builder.buildXML', function () {
   });
   it('should accept conditions on the main iterators "i"', function (done) {
     var _xml = '<xml> <t_row> {d[i=2].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : 1},
+      {brand : 'Tesla motors', id : 2},
+      {brand : 'Toyota'      , id : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept direct access without writing i=10', function (done) {
+    var _xml = '<xml> <t_row> {d[2].brand} </t_row><t_row> {d[1].brand} </t_row></xml>';
     var _data = [
       {brand : 'Lumeneo'     , id : 1},
       {brand : 'Tesla motors', id : 2},

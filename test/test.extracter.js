@@ -418,6 +418,51 @@ describe('extracter', function () {
         }
       });
     });
+    it('should manage arrays with conditions and accept direct access [0] [1]', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site[ 1303 ].id'},
+        {pos : 30, name : 'd.site[0].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        d : {
+          name     : 'd',
+          type     : 'object',
+          parent   : '',
+          parents  : [],
+          xmlParts : []
+        },
+        // eslint-disable-next-line
+        dsitei__1303 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [
+            { attr : 'id', formatters : [], obj : 'dsitei__1303', pos : 20 }
+          ],
+          conditions : [
+            { left : { parent : 'dsitei__1303',  attr : 'i' }, operator : '==', right : '1303' }
+          ]
+        },
+        // eslint-disable-next-line
+        dsitei__0 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [
+            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30 }
+          ],
+          conditions : [
+            { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
+          ]
+        }
+      });
+    });
     it('should detect multiple conditions separated by a comma', function () {
       var _markers = [
         {pos : 20, name : 'd.site[ i = 1, sort >  310].id'},
@@ -1578,7 +1623,108 @@ describe('extracter', function () {
         }
       });
     });
-    it('conditional blocks', function () {
+    it('XML parts of conditional blocks should be detected\
+      It should also detect the condition with "showBegin" and "showEnd" formatters', function () {
+      var _xml = '<div><x><tr></tr><tr></tr></x><p><h1></h1></p><th></th><th></th></div>';
+      var _descriptor = {
+        d0 : {
+          name     : '',
+          type     : 'object',
+          parent   : '',
+          parents  : [],
+          xmlParts : []
+        },
+        element1 : {
+          name      : 'element',
+          type      : 'array',
+          parent    : 'd0',
+          parents   : ['d0'],
+          position  : {start : 12, end : 21}, /* Approximative position */
+          iterators : [{ attr : 'i' }],
+          xmlParts  : [
+            {obj : 'element1', attr : 'id', pos : 12}
+          ]
+        },
+        info1 : {
+          name     : 'info',
+          type     : 'object',
+          parent   : 'd0',
+          parents  : ['d0'],
+          xmlParts : [
+            {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 30}, // if start
+            {obj : 'info1', formatters : []           , attr : 'val' , pos : 33},
+            {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42} // if end
+          ]
+        },
+        menus2 : {
+          name      : 'menus',
+          type      : 'array',
+          parent    : 'd0',
+          parents   : ['d0'],
+          position  : {start : 50, end : 59}, /* Approximative position */
+          iterators : [{ attr : 'i' }],
+          xmlParts  : [
+            {obj : 'menus2', attr : 'id', pos : 50}
+          ]
+        }
+      };
+      helper.assert(extracter.splitXml(_xml, _descriptor), {
+        staticData : {
+          before : '<div><x>',
+          after  : '</div>'
+        },
+        dynamicData : {
+          d0 : {
+            name     : '',
+            type     : 'object',
+            parent   : '',
+            parents  : [],
+            xmlParts : []
+          },
+          element1 : {
+            name      : 'element',
+            type      : 'array',
+            parent    : 'd0',
+            parents   : ['d0'],
+            position  : {start : 8, end : 17, endOdd : 26},
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : 'element1', attr : 'id'    , pos : 12, depth : 1},
+              {obj : 'element1', array : 'start', pos : 8,  depth : 1, after : '<tr>'},
+              {obj : 'element1', array : 'end'  , pos : 17, depth : 1, before : '</tr>'}
+            ],
+            depth : 1
+          },
+          info1 : {
+            name     : 'info',
+            type     : 'object',
+            parent   : 'd0',
+            parents  : ['d0'],
+            xmlParts : [
+              {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 32.9 , depth : 0 , before : '</x><p>', after : ''}, // if start
+              {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33   , depth : 0 , after : '<h1></h1>'},
+              {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 41.9 , depth : 0 , after : '</p>'  } // if end
+            ]
+          },
+          menus2 : {
+            name      : 'menus',
+            type      : 'array',
+            parent    : 'd0',
+            parents   : ['d0'],
+            position  : {start : 46, end : 55, endOdd : 64},
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : 'menus2', attr : 'id'    , pos : 50, depth : 1},
+              {obj : 'menus2', array : 'start', pos : 46,  depth : 1, after : '<th>'},
+              {obj : 'menus2', array : 'end'  , pos : 55, depth : 1, before : '</th>'}
+            ],
+            depth : 1
+          },
+        }
+      });
+    });
+
+    it('should detect conditional blocks with hideBegin and hideEnd', function () {
       var _xml = '<div><p><h1></h1></p></div>';
       var _descriptor = {
         d0 : {
@@ -1607,7 +1753,7 @@ describe('extracter', function () {
             xmlParts : [
               {obj : 'd0' , formatters : ['hideBegin'], attr : 'test' , pos : 7.9  , depth : 0 , after : ''},
               {obj : 'd0' , formatters : []           , attr : 'val'  , pos : 8    , depth : 0 , after : '<h1></h1>'},
-              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 16.9 , depth : 0}
+              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 16.9 , depth : 0 }
             ]
           }
         }

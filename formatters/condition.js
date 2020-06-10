@@ -222,9 +222,9 @@ function ifGT (d, value) {
 
   if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d > _value
       || typeof d === 'string'      && value && d.length > value.length
-      || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length > value.length
-      || Array.isArray(d) === true && Number.isNaN(value) === false && d.length > value
-      || Number.isNaN(d) === false && Array.isArray(value) === true && d > value.length
+      || value && Array.isArray(d) === true && Array.isArray(value) === true && d.length > value.length
+      || d && value && (Array.isArray(d) === true || typeof d === 'string') && Number.isNaN(value) === false && d.length > value
+      || d && value && Number.isNaN(d) === false && (Array.isArray(value) === true || typeof value === 'string') && d > value.length
       || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length > Object.keys(value).length ) {
     _result = true;
   }
@@ -240,8 +240,8 @@ function ifGTE (d, value) {
   if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d >= _value
       || typeof d === 'string'      && value && d.length >= value.length
       || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length >= value.length
-      || Array.isArray(d) === true && Number.isNaN(value) === false && d.length >= value
-      || Number.isNaN(d) === false && Array.isArray(value) === true && d >= value.length
+      || d && value && (Array.isArray(d) === true || typeof d === 'string') && Number.isNaN(value) === false && d.length >= value
+      || d && value && Number.isNaN(d) === false && (Array.isArray(value) === true || typeof value === 'string') && d >= value.length
       || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length >= Object.keys(value).length ) {
     _result = true;
   }
@@ -257,8 +257,8 @@ function ifLT (d, value) {
   if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d < _value
       || typeof d === 'string'      && value && d.length < value.length
       || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length < value.length
-      || Array.isArray(d) === true && Number.isNaN(value) === false && d.length < value
-      || Number.isNaN(d) === false && Array.isArray(value) === true && d < value.length
+      || d && value && (Array.isArray(d) === true || typeof d === 'string') && Number.isNaN(value) === false && d.length < value
+      || d && value && Number.isNaN(d) === false && (Array.isArray(value) === true || typeof value === 'string') && d < value.length
       || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length < Object.keys(value).length ) {
     _result = true;
   }
@@ -274,8 +274,8 @@ function ifLTE (d, value) {
   if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d <= _value
       || typeof d === 'string'      && value && d.length <= value.length
       || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length <= value.length
-      || Array.isArray(d) === true && Number.isNaN(value) === false && d.length <= value
-      || Number.isNaN(d) === false && Array.isArray(value) === true && d <= value.length
+      || d && value && (Array.isArray(d) === true || typeof d === 'string') && Number.isNaN(value) === false && d.length <= value
+      || d && value && Number.isNaN(d) === false && (Array.isArray(value) === true || typeof value === 'string') && d <= value.length
       || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length <= Object.keys(value).length ) {
     _result = true;
   }

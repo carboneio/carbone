@@ -220,12 +220,7 @@ function ifGT (d, value) {
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
 
-  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d > _value
-      || typeof d === 'string'      && value && d.length > value.length
-      || value && Array.isArray(d) === true && Array.isArray(value) === true && d.length > value.length
-      || d && value && (Array.isArray(d) === true || typeof d === 'string') && Number.isNaN(value) === false && d.length > value
-      || d && value && Number.isNaN(d) === false && (Array.isArray(value) === true || typeof value === 'string') && d > value.length
-      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length > Object.keys(value).length ) {
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && _d > _value) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -237,12 +232,7 @@ function ifGTE (d, value) {
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
 
-  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d >= _value
-      || typeof d === 'string'      && value && d.length >= value.length
-      || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length >= value.length
-      || d && value && (Array.isArray(d) === true || typeof d === 'string') && Number.isNaN(value) === false && d.length >= value
-      || d && value && Number.isNaN(d) === false && (Array.isArray(value) === true || typeof value === 'string') && d >= value.length
-      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length >= Object.keys(value).length ) {
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && _d >= _value) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -254,12 +244,7 @@ function ifLT (d, value) {
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
 
-  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d < _value
-      || typeof d === 'string'      && value && d.length < value.length
-      || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length < value.length
-      || d && value && (Array.isArray(d) === true || typeof d === 'string') && Number.isNaN(value) === false && d.length < value
-      || d && value && Number.isNaN(d) === false && (Array.isArray(value) === true || typeof value === 'string') && d < value.length
-      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length < Object.keys(value).length ) {
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && _d < _value) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -270,13 +255,8 @@ function ifLTE (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-  // Convert everything in string (not strict Equal)
-  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && Array.isArray(d) === false && Array.isArray(value) === false && _d <= _value
-      || typeof d === 'string'      && value && d.length <= value.length
-      || Array.isArray(d) === true && Array.isArray(value) === true && value && d.length <= value.length
-      || d && value && (Array.isArray(d) === true || typeof d === 'string') && Number.isNaN(value) === false && d.length <= value
-      || d && value && Number.isNaN(d) === false && (Array.isArray(value) === true || typeof value === 'string') && d <= value.length
-      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length <= Object.keys(value).length ) {
+
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && _d <= _value) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
@@ -345,6 +325,19 @@ function hideEnd () {
   return '';
 }
 
+/**
+ * Returns the length of a string or array.
+ *
+ * @param {Mixed} d Array or String
+ * @returns {Number} Length of the element
+ */
+function len (d) {
+  if (typeof d === 'string' || Array.isArray(d)) {
+    return d.length;
+  }
+  return 0;
+}
+
 module.exports = {
   ifContain,
   ifEmpty,
@@ -366,5 +359,6 @@ module.exports = {
   show,
   elseShow,
   and,
-  or
+  or,
+  len
 };

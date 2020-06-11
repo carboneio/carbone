@@ -320,15 +320,14 @@ describe('formatter', function () {
         [1290, 768],
         ['1234', '1'],
         ['32q', '4q2'],
-        ['This is a long string', 'Hello'],
-        ['Hello1234', '1'],
-        ['Hello1234', 8],
-        [10, 'Hello1234'],
-        [[1, 2, 3, 4, 5], [1, 2, 3]],
-        [[1, 2, 3, 4, 5], 3],
-        [6, [1, 2, 3, 4, 5]],
-        [['apple', 'banana', 'jackfruit'], ['tomato', 'cabbage']],
-        [{id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}, {id : 3, name : 'John'}],
+        ['1234Hello', '1'],
+        ['1234Hello', 8],
+        [10, '8Hello1234'],
+        [[1, 2, 3, 4, 5].length, [1, 2, 3].length],
+        [[1, 2, 3, 4, 5].length, 3],
+        ['6', [1, 2, 3, 4, 5].length],
+        [['apple', 'banana', 'jackfruit'].length, ['tomato', 'cabbage'].length],
+        [Object.keys({id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}).length, Object.keys({id : 3, name : 'John'}).length],
       ];
       for (let i = 0, n = _dataSet.length; i < n; i++) {
         const el = _dataSet[i];
@@ -345,21 +344,25 @@ describe('formatter', function () {
         [-23, 19],
         [1, 768],
         [0, 0],
+        [-2891, '33Hello'],
         ['1' , '1234'],
         ['123dsf', '103123'],
+        ['13dsf21354t43534534543', '103123093fcce3'],
         ['Short sentence', 'Hello, this is a long sentence'],
         ['Short sentence', 'Hello, this is a long sentence'],
         ['Hello1234', 10],
         ['Hello1234', 9],
         [2, 'Hello1234'],
         [9, 'Hello1234'],
-        [[1, 2], [1, 2, 3, 4, 5, 6]],
-        [[1, 2, 3, 4, 5], [1, 2, 3, 4, 6]],
-        [[1, 2, 3, 4, 5], 10],
-        [[1, 2, 3, 4, 5], 5],
-        [5, [1, 2, 3, 4, 5]],
-        [3, [1, 2, 3, 4, 5]],
+        ['Short sentence'.length, 'Hello, this is a long sentence'.length],
+        [[1, 2].length, [1, 2, 3, 4, 5, 6].length],
+        [[1, 2, 3, 4, 5].length, [1, 2, 3, 4, 6].length],
+        [[1, 2, 3, 4, 5].length, 10],
+        [[1, 2, 3, 4, 5].length, 5],
+        [5, [1, 2, 3, 4, 5].length],
+        [3, [1, 2, 3, 4, 5].length],
         [['apple', 'banana'], ['tomato', 'cabbage', 'jackfruit', 'berry']],
+        [['apple', 'banana'].length, ['tomato', 'cabbage', 'jackfruit', 'berry']],
         [{id : 2, name : 'John'}, {id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}],
         [{id : 2, name : 'John'}, null],
         [null, 'Lion and giraffe'],
@@ -370,10 +373,12 @@ describe('formatter', function () {
         ['Lion and giraffe',  undefined],
         [undefined, undefined],
         [{id : 2, name : 'John'}, {id : 3, name : 'Wick'}],
+        [0, 0]
       ];
       for (let i = 0, n = _dataSet.length; i < n; i++) {
         const el = _dataSet[i];
         _context.isConditionTrue = false;
+        console.log(el);
         callWithContext(conditionFormatter.ifGT, _context, el[0], el[1]);
         helper.assert(_context.isConditionTrue, false);
         helper.assert(_context.stopPropagation, false);
@@ -388,23 +393,23 @@ describe('formatter', function () {
         [0, 0],
         [1290, 768],
         ['1234', '1'],
-        ['This is a long string', 'Hello'],
-        ['ThisEqual', 'Hello1234'],
-        ['Hello1234', '1'],
-        ['Hello1234', 8],
-        ['Hello1234', 9],
-        [10, 'Hello1234'],
-        [9, 'Hello1234'],
-        [[1, 2, 3, 4, 5], [1, 2, 3]],
-        [[1, 2, 3, 4, 5], [1, 2, 3, 4, 6]],
-        [[1, 2, 3, 4, 5], 3],
-        [[1, 2, 3, 4, 5], 5],
-        [6, [1, 2, 3, 4, 5]],
-        [5, [1, 2, 3, 4, 5]],
-        [['apple', 'banana', 'jackfruit'], ['tomato', 'cabbage']],
-        [['apple', 'banana'], ['tomato', 'cabbage']],
-        [{id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}, {id : 3, name : 'John'}],
-        [{id : 2, name : 'John'}, {id : 3, name : 'Wick'}],
+        ['This is a long string'.length, 'Hello'.length],
+        ['ThisEqual'.length, 'Hello1234'.length],
+        ['1234Hello', '1'],
+        ['1234Hello'.length, 8],
+        ['Hello1234'.length, 9],
+        [10, 'Hello1234'.length],
+        [9, 'Hello1234'.length],
+        [[1, 2, 3, 4, 5].length, [1, 2, 3].length],
+        [[1, 2, 3, 4, 5].length, [1, 2, 3, 4, 6].length],
+        [[1, 2, 3, 4, 5].length, 3],
+        [[1, 2, 3, 4, 5].length, 5],
+        [6, [1, 2, 3, 4, 5].length],
+        [5, [1, 2, 3, 4, 5].length],
+        [['apple', 'banana', 'jackfruit'].length, ['tomato', 'cabbage'].length],
+        [['apple', 'banana'].length, ['tomato', 'cabbage'].length],
+        [Object.keys({id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}).length, Object.keys({id : 3, name : 'John'}).length],
+        [Object.keys({id : 2, name : 'John'}).length, Object.keys({id : 3, name : 'Wick'}).length],
       ];
       for (let i = 0, n = _dataSet.length; i < n; i++) {
         const el = _dataSet[i];
@@ -423,12 +428,12 @@ describe('formatter', function () {
         ['1' , '1234'],
         ['Short sentence', 'Hello, this is a long sentence'],
         ['Hello1234', 10],
-        [2, 'Hello1234'],
-        [[1, 2], [1, 2, 3, 4, 5, 6]],
-        [[1, 2, 3, 4, 5], 10],
-        [3, [1, 2, 3, 4, 5]],
-        [['apple', 'banana'], ['tomato', 'cabbage', 'jackfruit', 'berry']],
-        [{id : 2, name : 'John'}, {id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}],
+        [2, '1234Hello'],
+        [[1, 2].length, [1, 2, 3, 4, 5, 6].length],
+        [[1, 2, 3, 4, 5].length, '10'],
+        ['3', [1, 2, 3, 4, 5].length],
+        [['apple', 'banana'].length, ['tomato', 'cabbage', 'jackfruit', 'berry'].length],
+        [Object.entries({id : 2, name : 'John'}).length, Object.entries({id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}).length],
         [{id : 2, name : 'John'}, null],
         [null, 'Lion and giraffe'],
         ['Lion and giraffe',  null],
@@ -437,6 +442,7 @@ describe('formatter', function () {
         [undefined, 'Lion and giraffe'],
         ['Lion and giraffe',  undefined],
         [undefined, undefined],
+        [undefined, null],
       ];
       for (let i = 0, n = _dataSet.length; i < n; i++) {
         const el = _dataSet[i];
@@ -455,14 +461,15 @@ describe('formatter', function () {
         [1, 768],
         ['1' , '1234'],
         ['123dsf', '103123'],
-        ['Short sentence', 'Hello, this is a long sentence'],
-        ['Hello1234', 10],
-        [2, 'Hello1234'],
-        [[1, 2], [1, 2, 3, 4, 5, 6]],
-        [[1, 2, 3, 4, 5], 20],
-        [3, [1, 2, 3, 4, 5]],
-        [['apple', 'banana'], ['tomato', 'cabbage', 'jackfruit', 'berry']],
-        [{id : 2, name : 'John'}, {id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}],
+        [-1299283, '-2891feihuwf'],
+        ['Short sentence'.length, 'Hello, this is a long sentence'.length],
+        ['Hello1234'.length, 10],
+        [2, 'Hello1234'.length],
+        [[1, 2].length, [1, 2, 3, 4, 5, 6].length],
+        [[1, 2, 3, 4, 5].length, 20],
+        [3, [1, 2, 3, 4, 5].length],
+        [['apple', 'banana'].length, ['tomato', 'cabbage', 'jackfruit', 'berry'].length],
+        [Object.keys({id : 2, name : 'John'}).length, Object.keys({id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}).length],
       ];
       for (let i = 0, n = _dataSet.length; i < n; i++) {
         const el = _dataSet[i];
@@ -480,20 +487,21 @@ describe('formatter', function () {
         [0, 0],
         [1290, 768],
         ['1234', '1'],
-        ['32q', '4q2'],
-        ['This is a long string', 'Hello'],
-        ['ThisEqual', 'Hello1234'],
-        ['Hello1234', '1'],
-        ['Hello1234', 2],
-        ['Hello1234', 9],
-        [10, 'Hello1234'],
-        [9, 'Hello1234'],
-        [[1, 2, 3, 4, 5], [1, 2, 3]],
-        [[1, 2, 3, 4, 5], [1, 2, 3, 4, 6]],
-        [[1, 2, 3, 4, 5], 2],
-        [6, [1, 2, 3, 4, 5]],
-        [5, [1, 2, 3, 4, 5]],
-        [['apple', 'banana', 'jackfruit'], ['tomato', 'cabbage']],
+        ['32qdwq', '4q2'],
+        ['256sddwq', -202],
+        ['2This is a long string', '1Hello'],
+        ['ThisEqual'.length, 'Hello1234'.length],
+        ['1234Hello', '1'],
+        ['Hello1234'.length, 2],
+        ['Hello1234'.length, 9],
+        [10, 'Hello1234'.length],
+        [9, 'Hello1234'.length],
+        [[1, 2, 3, 4, 5].length, [1, 2, 3].length],
+        [[1, 2, 3, 4, 5].length, [1, 2, 3, 4, 6].length],
+        [[1, 2, 3, 4, 5].length, 2],
+        [6, [1, 2, 3, 4, 5].length],
+        [5, [1, 2, 3, 4, 5].length],
+        [['apple', 'banana', 'jackfruit'].length, ['tomato', 'cabbage'].length],
         [['apple', 'banana'], ['tomato', 'cabbage']],
         [{id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}, {id : 3, name : 'John'}],
         [{id : 2, name : 'John'}, {id : 3, name : 'Wick'}],
@@ -505,6 +513,7 @@ describe('formatter', function () {
         [undefined, 'Lion and giraffe'],
         ['Lion and giraffe',  undefined],
         [undefined, undefined],
+        [undefined, null],
       ];
       for (let i = 0, n = _dataSet.length; i < n; i++) {
         const el = _dataSet[i];
@@ -523,22 +532,24 @@ describe('formatter', function () {
         [1, 768],
         [0, 0],
         ['1' , '1234'],
-        ['Short sentence', 'Hello, this is a long sentence'],
-        ['ThisEqual', 'Hello1234'],
-        ['Hello1234', 10],
-        ['Hello1234', 9],
-        [2, 'Hello1234'],
-        [9, 'Hello1234'],
-        [[1, 2], [1, 2, 3, 4, 5, 6]],
-        [[1, 2, 3, 4, 5], [1, 2, 3, 4, 6]],
-        [[1, 2, 3, 4, 5], 10],
-        [[1, 2, 3, 4, 5], 5],
-        [3, [1, 2, 3, 4, 5]],
-        [5, [1, 2, 3, 4, 5]],
-        [['apple', 'banana'], ['tomato', 'cabbage', 'jackfruit', 'berry']],
-        [['apple', 'banana'], ['tomato', 'cabbage']],
-        [{id : 2, name : 'John'}, {id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}],
-        [{id : 2, name : 'John'}, {id : 3, name : 'Wick'}] ,
+        ['54356fewfewf432', '54356HelloThere'],
+        ['23fwe', 123],
+        ['4Hello', 10],
+        ['Short sentence'.length, 'Hello, this is a long sentence'.length],
+        ['ThisEqual'.length, 'Hello1234'.length],
+        ['Hello1234'.length, 9],
+        [2, 'Hello1234'.length],
+        [9, 'Hello1234'.length],
+        [[1, 2].length, [1, 2, 3, 4, 5, 6].length],
+        [[1, 2, 3, 4, 5].length, [1, 2, 3, 4, 6].length],
+        [[1, 2, 3, 4, 5].length, 10],
+        [[1, 2, 3, 4, 5].length, 5],
+        [3, [1, 2, 3, 4, 5].length],
+        [5, [1, 2, 3, 4, 5].length],
+        [['apple', 'banana'].length, ['tomato', 'cabbage', 'jackfruit', 'berry'].length],
+        [['apple', 'banana'].length, ['tomato', 'cabbage'].length],
+        [Object.keys({id : 2, name : 'John'}).length, Object.keys({id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}).length],
+        [Object.keys({id : 2, name : 'John'}).length, Object.keys({id : 3, name : 'Wick'}).length] ,
       ];
       for (let i = 0, n = _dataSet.length; i < n; i++) {
         const el = _dataSet[i];
@@ -555,15 +566,16 @@ describe('formatter', function () {
         [50, -29],
         [1290, 768],
         ['1234', '1'],
-        ['This is a long string', 'Hello'],
+        ['1234ThisIsText', 1],
+        ['This is a long string'.length, 'Hello'.length],
         ['Hello1234', '1'],
         ['Hello1234', 2],
         [10, 'Hello1234'],
-        [[1, 2, 3, 4, 5], [1, 2, 3]],
-        [[1, 2, 3, 4, 5], 2],
-        [6, [1, 2, 3, 4, 5]],
-        [['apple', 'banana', 'jackfruit'], ['tomato', 'cabbage']],
-        [{id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}, {id : 3, name : 'John'}],
+        [[1, 2, 3, 4, 5].length, [1, 2, 3].length],
+        [[1, 2, 3, 4, 5].length, 2],
+        [6, [1, 2, 3, 4, 5].length],
+        [['apple', 'banana', 'jackfruit'].length, ['tomato', 'cabbage'].length],
+        [Object.keys({id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}).length, Object.keys({id : 3, name : 'John'}).length],
         [{id : 2, name : 'John'}, null],
         [null, 'Lion and giraffe'],
         ['Lion and giraffe',  null],
@@ -572,6 +584,7 @@ describe('formatter', function () {
         [undefined, 'Lion and giraffe'],
         ['Lion and giraffe',  undefined],
         [undefined, undefined],
+        [undefined, null],
       ];
       for (let i = 0, n = _dataSet.length; i < n; i++) {
         const el = _dataSet[i];
@@ -949,6 +962,55 @@ describe('formatter', function () {
         helper.assert(_context.isAndOperator, false);
         helper.assert(_context.stopPropagation, true);
       });
+      it('Should show + AND + len', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 1997);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifGT, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 10);
+        helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, true);
+        helper.assert(_context.stopPropagation, true);
+      });
+
+      it('Should elseShow + AND + len', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 10);
+        callWithContext(conditionFormatter.and, _context);
+        callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 41);
+        callWithContext(conditionFormatter.show, _context);
+        helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'Apple'), 'Apple');
+        helper.assert(_context.isConditionTrue, false);
+        helper.assert(_context.isAndOperator, true);
+        helper.assert(_context.stopPropagation, true);
+      });
+
+      it('Should show + OR + len', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifLT, _context, conditionFormatter.len(['car', 'train', 'plane']), 2);
+        callWithContext(conditionFormatter.or, _context);
+        callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('Hello12345'), 10);
+        helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
+        helper.assert(_context.isConditionTrue, true);
+        helper.assert(_context.isAndOperator, false);
+        helper.assert(_context.stopPropagation, true);
+      });
+    });
+  });
+
+  describe('LEN', function () {
+    it('should return the string length or array length', function () {
+      helper.assert(conditionFormatter.len('This is a string'), 16);
+      helper.assert(conditionFormatter.len(''), 0);
+      helper.assert(conditionFormatter.len('樂而不淫 建章曰'), 8);
+      helper.assert(conditionFormatter.len('This is a longer string lenght'), 30);
+      helper.assert(conditionFormatter.len([0, 1, 2, 3]), 4);
+      helper.assert(conditionFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
+      helper.assert(conditionFormatter.len([]), 0);
+      helper.assert(conditionFormatter.len({name : 'John'}), 0);
+      helper.assert(conditionFormatter.len(undefined), 0);
+      helper.assert(conditionFormatter.len(null), 0);
+      helper.assert(conditionFormatter.len(-1), 0);
     });
   });
 

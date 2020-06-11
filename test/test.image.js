@@ -8,7 +8,7 @@ const image     = require('../lib/image');
 const nock      = require('nock');
 
 
-describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
+describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -847,13 +847,28 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     });
 
 
+    it('should return different errors (ETIMEDOUT, ESOCKETTIMEDOUT, ...)', function (done) {
+      const errorList = ['ETIMEDOUT', 'ESOCKETTIMEDOUT', 'ECONNREFUSED', 'EPIPE', 'ENOTFOUND', 'ECONNRESET'];
+      for (let i = 0, n = errorList.length; i < n; i++) {
+        const errorCode = errorList[i];
+        nock('https://google.com')
+          .get('/random-image.jpeg')
+          .replyWithError({code : errorCode});
+        image.downloadImage('https://google.com/random-image.jpeg', {}, function (err, imageInfo) {
+          helper.assert(err.code, errorCode);
+          assert(imageInfo+'', 'undefined');
+        });
+      }
+      done();
+    });
+
     it('should return an error when the request timeout', function (done) {
-      const errorCode = 'ETIMEDOUT';
       nock('https://google.com')
         .get('/random-image.jpeg')
-        .replyWithError({code : errorCode});
+        .delay(6000)
+        .reply(200, '<html></html>');
       image.downloadImage('https://google.com/random-image.jpeg', {}, function (err, imageInfo) {
-        helper.assert(err.code, errorCode);
+        helper.assert(err.message, 'Request timed out');
         assert(imageInfo+'', 'undefined');
         done();
       });

@@ -112,7 +112,6 @@ describe('helper', function () {
     });
   });
 
-  
   describe('readFileDirSync', function () {
     beforeEach(function () {
       helper.rmDirRecursive(testPath);
@@ -443,5 +442,19 @@ describe('helper', function () {
     });
   });
 
+  describe('Get file extension from URL', function () {
+    it('should return a png/jpeg/gif/txt extension', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png'), 'png');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif'), 'gif');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg'), 'jpeg');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt'), 'txt');
+    });
+    it('should return a png/jpeg/gif/txt extension with query parameters', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png?fewfw=223&lala=few'), 'png');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif#fewfw=223?lala=few'), 'gif');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg&name=John'), 'jpeg');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt?name=john&age=2#lala'), 'txt');
+    });
+  });
 
 });

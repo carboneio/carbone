@@ -154,17 +154,17 @@ function _updateCondition (isAndOperator, currentConditionState, newValue) {
 }
 
 /**
- * Matches empty values, string, arrays or objects (null, undefined, [], {}, ...), it replaces `ifEmpty`.
+ * Test if data is empty (null, undefined, [], {}, ...)
  *
  * @version 2.0
- * @exampleContextFormatter [ null    , "Result true", "Result false"]
- * @exampleContextFormatter [ []      , "Result true", "Result false"]
- * @exampleContextFormatter [ {}      , "Result true", "Result false"]
- * @exampleContextFormatter [ ""      , "Result true", "Result false"]
- * @exampleContextFormatter [ 0       , "Result true", "Result false"]
- * @exampleContextFormatter [ "homer" , "Result true", "Result false"]
- * @exampleContextFormatter [ [23]    , "Result true", "Result false"]
- * @exampleContextFormatter [ {"id":3}, "Result true", "Result false"]
+ * @example [ null     ]
+ * @example [ []       ]
+ * @example [ {}       ]
+ * @example [ ""       ]
+ * @example [ 0        ]
+ * @example [ "homer"  ]
+ * @example [ [23]     ]
+ * @example [ {"id":3} ]
  *
  * @param  {Mixed} d  data
  */
@@ -197,7 +197,7 @@ function ifNEM (d) {
 }
 
 /**
- * Matches values that are equal to a specified value, it replaces `ifEqual`. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
+ * @description Test if a value equals a variable. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
  *
  * @exampleContextFormatter [ 100      , 100     ]
  * @exampleContextFormatter [ 100      , 101     ]

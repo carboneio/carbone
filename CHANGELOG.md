@@ -55,6 +55,7 @@
     - `showBegin` and `showEnd` : show a text block between showBegin and showEnd if condition is true
     - `show (message)`          : print a message if condition is true
     - `elseShow (message)`      : print a message if condition is false
+    - `len()` : returns the length of a string or array.
 
     No formatters can be chained after `hideBegin`, `hideEnd`, `showBegin`, `showEnd`.
 

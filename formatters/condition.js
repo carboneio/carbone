@@ -182,21 +182,6 @@ function ifEM (d) {
   return d;
 }
 
-/**
- * Matches not empty values, string, arrays or objects
- *
- * @version 2.0
- * @exampleContextFormatter [ 0       , "Result true", "Result false"]
- * @exampleContextFormatter [ "homer" , "Result true", "Result false"]
- * @exampleContextFormatter [ [23]    , "Result true", "Result false"]
- * @exampleContextFormatter [ {"id":3}, "Result true", "Result false"]
- * @exampleContextFormatter [ null    , "Result true", "Result false"]
- * @exampleContextFormatter [ []      , "Result true", "Result false"]
- * @exampleContextFormatter [ {}      , "Result true", "Result false"]
- * @exampleContextFormatter [ ""      , "Result true", "Result false"]
- *
- * @param  {Mixed} d  data
- */
 function ifNEM (d) {
   var _result = true;
   if (  d === null

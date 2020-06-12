@@ -369,6 +369,18 @@ function ifLTE (d, value) {
   return d;
 }
 
+/**
+ * Matches any of the values specified in an array or string, it replaces `ifContain`.
+ *
+ * @exampleContextFormatter ["car is broken", "is"] true
+ * @exampleContextFormatter [[1, 2, "toto"], 2] true
+ * @exampleContextFormatter ["car is broken", "are"] false
+ * @exampleContextFormatter [[1, 2, "toto"], "titi"] false
+ *
+ * @param {Integer|String|Array} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifIN (d, value) {
   var _result = false;
   if (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) !== -1) {
@@ -378,6 +390,18 @@ function ifIN (d, value) {
   return d;
 }
 
+/**
+ * Matches none of the values specified in an array or string.
+ *
+ * @exampleContextFormatter ["car is broken", "are"] true
+ * @exampleContextFormatter [[1, 2, "toto"], "titi"] true
+ * @exampleContextFormatter ["car is broken", "is"] false
+ * @exampleContextFormatter [[1, 2, "toto"], 2] false
+ *
+ * @param {Integer|String|Array} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifNIN (d, value) {
   var _result = false;
   if (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) === -1) {
@@ -387,6 +411,14 @@ function ifNIN (d, value) {
   return d;
 }
 
+/**
+ * Print a message if condition is true. It should be used with other formatters to print conditional content.
+ *
+ * @example ["Carbone.io"]
+ *
+ * @param {Mixed} d marker
+ * @param {*} message message to print
+ */
 function show (d, message) {
   if (this.isConditionTrue === true || this.isConditionTrue === null && d) {
     this.stopPropagation = true;
@@ -395,6 +427,12 @@ function show (d, message) {
   return d;
 }
 
+/**
+ * Print a message if condition is false. It should be used with other formatters to print conditional content.
+ *
+ * @param {Mixed} d marker
+ * @param {*} message message to print
+ */
 function elseShow (d, message) {
   if (this.isConditionTrue === false || this.isConditionTrue === null && !d) {
     this.stopPropagation = true;
@@ -403,6 +441,11 @@ function elseShow (d, message) {
   return d;
 }
 
+/**
+ * Show a text block between showBegin and showEnd if condition is true
+ * @private
+ * @param {*} d
+ */
 function showBegin (d) {
   this.isHidden = 1;
   if (this.isConditionTrue === true || this.isConditionTrue === null && d) {
@@ -412,11 +455,20 @@ function showBegin (d) {
   return '';
 }
 
+/**
+ * show a text block between showBegin and showEnd if condition is true
+ * @private
+ */
 function showEnd () {
   this.isHidden = -1;
   return '';
 }
 
+/**
+ * hide text block between hideBegin and hideEnd if condition is true
+ * @private
+ * @param {*} d
+ */
 function hideBegin (d) {
   this.isHidden = 0;
   if (this.isConditionTrue === true || this.isConditionTrue === null && d) {
@@ -426,6 +478,10 @@ function hideBegin (d) {
   return '';
 }
 
+/**
+ * hide text block between hideBegin and hideEnd if condition is true
+ * @private
+ */
 function hideEnd () {
   this.isHidden = -1;
   return '';
@@ -433,6 +489,11 @@ function hideEnd () {
 
 /**
  * Returns the length of a string or array.
+ *
+ * @example ["Hello World"]
+ * @example [""]
+ * @example [[1, 2, 3, 4, 5]]
+ * @example [[1, "Hello"]]
  *
  * @param {Mixed} d Array or String
  * @returns {Number} Length of the element

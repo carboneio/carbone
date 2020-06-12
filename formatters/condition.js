@@ -259,16 +259,17 @@ function ifNE (d, value) {
 }
 
 /**
- * Matches values, string.length, array.length or object.length that are greater than a specified value.
+ * Matches values that are greater than a specified value.
  *
- * @exampleContextFormatter [ 3      , 10     ] true
- * @exampleContextFormatter [ 100      , 101     ] true
- * @exampleContextFormatter [ "homer"  , "homer" ] false
- * @exampleContextFormatter [ "homer"  , "bart"  ] true
- * @exampleContextFormatter [ ""       , ""      ] false
- * @exampleContextFormatter [ null     , 100     ] true
- * @exampleContextFormatter [ null     , null    ] false
- * @exampleContextFormatter [ 0        , 100     ] true
+ * @exampleContextFormatter [1234, 1] true
+ * @exampleContextFormatter ["50", "-29"] true
+ * @exampleContextFormatter ["32q", "4q2"] true
+ * @exampleContextFormatter ["1234Hello", "1"] true
+ * @exampleContextFormatter ["10", "8Hello1234"] true
+ * @exampleContextFormatter [-23, 19] false
+ * @exampleContextFormatter [1, 768] false
+ * @exampleContextFormatter [0, 0] false
+ * @exampleContextFormatter [-2891, "33Hello"] false
  *
  * @param {Integer} d
  * @param {Integer} value value to test
@@ -286,6 +287,22 @@ function ifGT (d, value) {
   return d;
 }
 
+/**
+ * Matches values, string.length, array.length or object.length that are greater than or equal to a specified value
+ *
+ * @exampleContextFormatter [ 3      , 10     ] true
+ * @exampleContextFormatter [ 100      , 101     ] true
+ * @exampleContextFormatter [ "homer"  , "homer" ] false
+ * @exampleContextFormatter [ "homer"  , "bart"  ] true
+ * @exampleContextFormatter [ ""       , ""      ] false
+ * @exampleContextFormatter [ null     , 100     ] true
+ * @exampleContextFormatter [ null     , null    ] false
+ * @exampleContextFormatter [ 0        , 100     ] true
+ *
+ * @param {Integer} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifGTE (d, value) {
   var _result = false;
   var _value = parseFloat(value);

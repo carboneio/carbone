@@ -41,10 +41,10 @@
 
     - `ifEQ  (value)` : Matches values that are equal to a specified value, it replaces `ifEqual`
     - `ifNE  (value)` : Matches all values that are not equal to a specified value
-    - `ifGT  (value)` : Matches values, string.length, array.length or object.length that are greater than a specified value. It compares the length of the same type or a length type with a number.
-    - `ifGTE (value)` : Matches values, string.length, array.length or object.length that are greater than or equal to a specified value. It compares the length of the same type or a length type with a number.
-    - `ifLT  (value)` : Matches values, string.length, array.length or object.length that are less than a specified value. It compares the length of the same type or a length type with a number.
-    - `ifLTE (value)` : Matches values, string.length, array.length or object.length that are less than or equal to a specified value. It compares the length of the same type or a length type with a number.
+    - `ifGT  (value)` : Matches values that are greater than a specified value.
+    - `ifGTE (value)` : Matches values that are greater than or equal to a specified value.
+    - `ifLT  (value)` : Matches values that are less than a specified value.
+    - `ifLTE (value)` : Matches values that are less than or equal to a specified value.
     - `ifIN  (value)` : Matches any of the values specified in an array or string, it replaces `ifContain`
     - `ifNIN (value)` : Matches none of the values specified in an array or string
     - `ifEM  (value)` : Matches empty values, string, arrays or objects, it replaces `ifEmpty`

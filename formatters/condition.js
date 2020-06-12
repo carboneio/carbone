@@ -89,10 +89,6 @@ function ifContain (d, value, messageIfTrue, continueOnSuccess) {
   return d;
 }
 
-/* ***************************************************************************** */
-/* CONDITION V2 */
-/* ***************************************************************************** */
-
 /**
  * Change default operator between conditional formatters
  *
@@ -154,17 +150,17 @@ function _updateCondition (isAndOperator, currentConditionState, newValue) {
 }
 
 /**
- * Test if data is empty (null, undefined, [], {}, ...)
+ * Matches empty values, string, arrays or objects (null, undefined, [], {}, ...), it replaces `ifEmpty`.
  *
  * @version 2.0
- * @example [ null     ]
- * @example [ []       ]
- * @example [ {}       ]
- * @example [ ""       ]
- * @example [ 0        ]
- * @example [ "homer"  ]
- * @example [ [23]     ]
- * @example [ {"id":3} ]
+ * @exampleContextFormatter [ null     ] true
+ * @exampleContextFormatter [ []       ] true
+ * @exampleContextFormatter [ {}       ] true
+ * @exampleContextFormatter [ ""       ] true
+ * @exampleContextFormatter [ 0        ] false
+ * @exampleContextFormatter [ "homer"  ] false
+ * @exampleContextFormatter [ [23]     ] false
+ * @exampleContextFormatter [ {"id":3} ] false
  *
  * @param  {Mixed} d  data
  */
@@ -182,6 +178,21 @@ function ifEM (d) {
   return d;
 }
 
+/**
+ * Matches not empty values, string, arrays or objects
+ *
+ * @version 2.0
+ * @exampleContextFormatter [ 0        ] true
+ * @exampleContextFormatter [ "homer"  ] true
+ * @exampleContextFormatter [ [23]     ] true
+ * @exampleContextFormatter [ {"id":3} ] true
+ * @exampleContextFormatter [ null     ] false
+ * @exampleContextFormatter [ []       ] false
+ * @exampleContextFormatter [ {}       ] false
+ * @exampleContextFormatter [ ""       ] false
+ *
+ * @param  {Mixed} d  data
+ */
 function ifNEM (d) {
   var _result = true;
   if (  d === null
@@ -196,6 +207,22 @@ function ifNEM (d) {
   return d;
 }
 
+/**
+ * Matches all values that are not equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
+ *
+ * @exampleContextFormatter [ 100      , 100     ] false
+ * @exampleContextFormatter [ 100      , 101     ] true
+ * @exampleContextFormatter [ "homer"  , "homer" ] false
+ * @exampleContextFormatter [ "homer"  , "bart"  ] true
+ * @exampleContextFormatter [ ""       , ""      ] false
+ * @exampleContextFormatter [ null     , 100     ] true
+ * @exampleContextFormatter [ null     , null    ] false
+ * @exampleContextFormatter [ 0        , 100     ] true
+ *
+ * @param {String|Array|Integer} d
+ * @param {String|Array|Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifEQ (d, value) {
   var _result = false;
   // Convert everything in string (not strict Equal)
@@ -206,6 +233,22 @@ function ifEQ (d, value) {
   return d;
 }
 
+/**
+ * Matches all values that are not equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
+ *
+ * @exampleContextFormatter [ 100      , 100     ] false
+ * @exampleContextFormatter [ 100      , 101     ] true
+ * @exampleContextFormatter [ "homer"  , "homer" ] false
+ * @exampleContextFormatter [ "homer"  , "bart"  ] true
+ * @exampleContextFormatter [ ""       , ""      ] false
+ * @exampleContextFormatter [ null     , 100     ] true
+ * @exampleContextFormatter [ null     , null    ] false
+ * @exampleContextFormatter [ 0        , 100     ] true
+ *
+ * @param {String|Array|Integer} d
+ * @param {String|Array|Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifNE (d, value) {
   var _result = true;
   if (d + '' === value + '') {
@@ -215,6 +258,22 @@ function ifNE (d, value) {
   return d;
 }
 
+/**
+ * Matches values, string.length, array.length or object.length that are greater than a specified value.
+ *
+ * @exampleContextFormatter [ 3      , 10     ] true
+ * @exampleContextFormatter [ 100      , 101     ] true
+ * @exampleContextFormatter [ "homer"  , "homer" ] false
+ * @exampleContextFormatter [ "homer"  , "bart"  ] true
+ * @exampleContextFormatter [ ""       , ""      ] false
+ * @exampleContextFormatter [ null     , 100     ] true
+ * @exampleContextFormatter [ null     , null    ] false
+ * @exampleContextFormatter [ 0        , 100     ] true
+ *
+ * @param {Integer} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifGT (d, value) {
   var _result = false;
   var _value = parseFloat(value);

@@ -196,6 +196,22 @@ function ifNEM (d) {
   return d;
 }
 
+/**
+ * @description Test if a value equals a variable. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
+ *
+ * @exampleContextFormatter [ 100      , 100     ]
+ * @exampleContextFormatter [ 100      , 101     ]
+ * @exampleContextFormatter [ "homer"  , "homer" ]
+ * @exampleContextFormatter [ "homer"  , "bart"  ]
+ * @exampleContextFormatter [ ""       , ""      ]
+ * @exampleContextFormatter [ null     , 100     ]
+ * @exampleContextFormatter [ null     , null    ]
+ * @exampleContextFormatter [ 0        , 100     ]
+ *
+ * @param {String|Array|Integer} d
+ * @param {String|Array|Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifEQ (d, value) {
   var _result = false;
   // Convert everything in string (not strict Equal)

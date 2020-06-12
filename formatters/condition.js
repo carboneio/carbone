@@ -141,10 +141,10 @@ function or (d, value) {
  * @private
  *
  * @version 2.0
- * @param  {Boolean} isAndOperator         if true, the operator is AND otherwise it is an OR operatorls
- * @param  {Boolean} currentConditionState current condition state
- * @param  {Boolean} newValue              new condition state
- * @return {Boolean}                       Returned the new state from currentConditionState and newValue
+ * @param  {[type]} operator              [description]
+ * @param  {[type]} currentConditionState [description]
+ * @param  {[type]} newValue              [description]
+ * @return {[type]}                       [description]
  */
 function _updateCondition (isAndOperator, currentConditionState, newValue) {
   if (isAndOperator === true) {

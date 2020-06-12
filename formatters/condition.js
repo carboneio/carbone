@@ -237,6 +237,23 @@ function ifEQ (d, value) {
   return d;
 }
 
+
+/**
+ * Matches all values that are not equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
+ *
+ * @exampleContextFormatter [ 100      , 100     , "Result true", "Result false"]
+ * @exampleContextFormatter [ 100      , 101     , "Result true", "Result false"]
+ * @exampleContextFormatter [ "homer"  , "homer" , "Result true", "Result false"]
+ * @exampleContextFormatter [ "homer"  , "bart"  , "Result true", "Result false"]
+ * @exampleContextFormatter [ ""       , ""      , "Result true", "Result false"]
+ * @exampleContextFormatter [ null     , 100     , "Result true", "Result false"]
+ * @exampleContextFormatter [ null     , null    , "Result true", "Result false"]
+ * @exampleContextFormatter [ 0        , 100     , "Result true", "Result false"]
+ *
+ * @param {String|Array|Integer} d
+ * @param {String|Array|Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifNE (d, value) {
   var _result = true;
   if (d + '' === value + '') {

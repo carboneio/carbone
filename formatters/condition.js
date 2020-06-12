@@ -157,14 +157,14 @@ function _updateCondition (isAndOperator, currentConditionState, newValue) {
  * Matches empty values, string, arrays or objects (null, undefined, [], {}, ...), it replaces `ifEmpty`.
  *
  * @version 2.0
- * @exampleContextFormatter [ null    , "Result true", "Result false"]
- * @exampleContextFormatter [ []      , "Result true", "Result false"]
- * @exampleContextFormatter [ {}      , "Result true", "Result false"]
- * @exampleContextFormatter [ ""      , "Result true", "Result false"]
- * @exampleContextFormatter [ 0       , "Result true", "Result false"]
- * @exampleContextFormatter [ "homer" , "Result true", "Result false"]
- * @exampleContextFormatter [ [23]    , "Result true", "Result false"]
- * @exampleContextFormatter [ {"id":3}, "Result true", "Result false"]
+ * @exampleContextFormatter [ null     ] true
+ * @exampleContextFormatter [ []       ] true
+ * @exampleContextFormatter [ {}       ] true
+ * @exampleContextFormatter [ ""       ] true
+ * @exampleContextFormatter [ 0        ] false
+ * @exampleContextFormatter [ "homer"  ] false
+ * @exampleContextFormatter [ [23]     ] false
+ * @exampleContextFormatter [ {"id":3} ] false
  *
  * @param  {Mixed} d  data
  */
@@ -186,14 +186,14 @@ function ifEM (d) {
  * Matches not empty values, string, arrays or objects
  *
  * @version 2.0
- * @exampleContextFormatter [ 0       , "Result true", "Result false"]
- * @exampleContextFormatter [ "homer" , "Result true", "Result false"]
- * @exampleContextFormatter [ [23]    , "Result true", "Result false"]
- * @exampleContextFormatter [ {"id":3}, "Result true", "Result false"]
- * @exampleContextFormatter [ null    , "Result true", "Result false"]
- * @exampleContextFormatter [ []      , "Result true", "Result false"]
- * @exampleContextFormatter [ {}      , "Result true", "Result false"]
- * @exampleContextFormatter [ ""      , "Result true", "Result false"]
+ * @exampleContextFormatter [ 0        ] true
+ * @exampleContextFormatter [ "homer"  ] true
+ * @exampleContextFormatter [ [23]     ] true
+ * @exampleContextFormatter [ {"id":3} ] true
+ * @exampleContextFormatter [ null     ] false
+ * @exampleContextFormatter [ []       ] false
+ * @exampleContextFormatter [ {}       ] false
+ * @exampleContextFormatter [ ""       ] false
  *
  * @param  {Mixed} d  data
  */
@@ -214,14 +214,14 @@ function ifNEM (d) {
 /**
  * Matches values that are equal to a specified value, it replaces `ifEqual`. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
  *
- * @exampleContextFormatter [ 100      , 100     ]
- * @exampleContextFormatter [ 100      , 101     ]
- * @exampleContextFormatter [ "homer"  , "homer" ]
- * @exampleContextFormatter [ "homer"  , "bart"  ]
- * @exampleContextFormatter [ ""       , ""      ]
- * @exampleContextFormatter [ null     , 100     ]
- * @exampleContextFormatter [ null     , null    ]
- * @exampleContextFormatter [ 0        , 100     ]
+ * @exampleContextFormatter [ 100      , 100     ] true
+ * @exampleContextFormatter [ 100      , 101     ] false
+ * @exampleContextFormatter [ "homer"  , "homer" ] true
+ * @exampleContextFormatter [ "homer"  , "bart"  ] false
+ * @exampleContextFormatter [ ""       , ""      ] true
+ * @exampleContextFormatter [ null     , 100     ] false
+ * @exampleContextFormatter [ null     , null    ] true
+ * @exampleContextFormatter [ 0        , 100     ] false
  *
  * @param {String|Array|Integer} d
  * @param {String|Array|Integer} value value to test
@@ -241,14 +241,14 @@ function ifEQ (d, value) {
 /**
  * Matches all values that are not equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
  *
- * @exampleContextFormatter [ 100      , 100     , "Result true", "Result false"]
- * @exampleContextFormatter [ 100      , 101     , "Result true", "Result false"]
- * @exampleContextFormatter [ "homer"  , "homer" , "Result true", "Result false"]
- * @exampleContextFormatter [ "homer"  , "bart"  , "Result true", "Result false"]
- * @exampleContextFormatter [ ""       , ""      , "Result true", "Result false"]
- * @exampleContextFormatter [ null     , 100     , "Result true", "Result false"]
- * @exampleContextFormatter [ null     , null    , "Result true", "Result false"]
- * @exampleContextFormatter [ 0        , 100     , "Result true", "Result false"]
+ * @exampleContextFormatter [ 100      , 100     ] false
+ * @exampleContextFormatter [ 100      , 101     ] true
+ * @exampleContextFormatter [ "homer"  , "homer" ] false
+ * @exampleContextFormatter [ "homer"  , "bart"  ] true
+ * @exampleContextFormatter [ ""       , ""      ] false
+ * @exampleContextFormatter [ null     , 100     ] true
+ * @exampleContextFormatter [ null     , null    ] false
+ * @exampleContextFormatter [ 0        , 100     ] true
  *
  * @param {String|Array|Integer} d
  * @param {String|Array|Integer} value value to test

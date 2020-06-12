@@ -288,16 +288,15 @@ function ifGT (d, value) {
 }
 
 /**
- * Matches values, string.length, array.length or object.length that are greater than or equal to a specified value
+ * Matches values that are greater than or equal to a specified value.
  *
- * @exampleContextFormatter [ 3      , 10     ] true
- * @exampleContextFormatter [ 100      , 101     ] true
- * @exampleContextFormatter [ "homer"  , "homer" ] false
- * @exampleContextFormatter [ "homer"  , "bart"  ] true
- * @exampleContextFormatter [ ""       , ""      ] false
- * @exampleContextFormatter [ null     , 100     ] true
- * @exampleContextFormatter [ null     , null    ] false
- * @exampleContextFormatter [ 0        , 100     ] true
+ * @exampleContextFormatter [50, -29] true
+ * @exampleContextFormatter [1, 1] true
+ * @exampleContextFormatter [1290, 768] true
+ * @exampleContextFormatter ["1234", "1"] true
+ * @exampleContextFormatter [-23, 19] false
+ * @exampleContextFormatter [1, 768] false
+ * @exampleContextFormatter ["1" , "1234"] false
  *
  * @param {Integer} d
  * @param {Integer} value value to test
@@ -315,6 +314,23 @@ function ifGTE (d, value) {
   return d;
 }
 
+/**
+ * Matches values that are less than a specified value.
+ *
+ * @exampleContextFormatter [-23, 19] true
+ * @exampleContextFormatter [1, 768] true
+ * @exampleContextFormatter ["1" , "1234"] true
+ * @exampleContextFormatter ["123dsf", "103123"] true
+ * @exampleContextFormatter [-1299283, "-2891feihuwf"] true
+ * @exampleContextFormatter [50, -29] false
+ * @exampleContextFormatter [0, 0] false
+ * @exampleContextFormatter [1290, 768] false
+ * @exampleContextFormatter ["1234", "1"] false
+ *
+ * @param {Integer} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifLT (d, value) {
   var _result = false;
   var _value = parseFloat(value);
@@ -327,6 +343,20 @@ function ifLT (d, value) {
   return d;
 }
 
+/**
+ * Matches values that are less than or equal to a specified value.
+ *
+ * @exampleContextFormatter [-23, 19] true
+ * @exampleContextFormatter [1, 768] true
+ * @exampleContextFormatter [5, 5] true
+ * @exampleContextFormatter ["1" , "1234"] true
+ * @exampleContextFormatter [1290, 768] false
+ * @exampleContextFormatter ["1234", "1"] false
+ *
+ * @param {Integer} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifLTE (d, value) {
   var _result = false;
   var _value = parseFloat(value);

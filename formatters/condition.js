@@ -89,10 +89,6 @@ function ifContain (d, value, messageIfTrue, continueOnSuccess) {
   return d;
 }
 
-/* ***************************************************************************** */
-/* CONDITION V2 */
-/* ***************************************************************************** */
-
 /**
  * Change default operator between conditional formatters
  *
@@ -141,10 +137,10 @@ function or (d, value) {
  * @private
  *
  * @version 2.0
- * @param  {[type]} operator              [description]
- * @param  {[type]} currentConditionState [description]
- * @param  {[type]} newValue              [description]
- * @return {[type]}                       [description]
+ * @param  {Boolean} operator              if true, the operator is AND, otherwhise it is OR
+ * @param  {Boolean} currentConditionState the current condition state
+ * @param  {Boolean} newValue              the value coming form the previous condition
+ * @return {Boolean}                       the condition result
  */
 function _updateCondition (isAndOperator, currentConditionState, newValue) {
   if (isAndOperator === true) {
@@ -154,17 +150,17 @@ function _updateCondition (isAndOperator, currentConditionState, newValue) {
 }
 
 /**
- * Test if data is empty (null, undefined, [], {}, ...)
+ * Matches empty values, string, arrays or objects (null, undefined, [], {}, ...), it replaces `ifEmpty`.
  *
  * @version 2.0
- * @example [ null     ]
- * @example [ []       ]
- * @example [ {}       ]
- * @example [ ""       ]
- * @example [ 0        ]
- * @example [ "homer"  ]
- * @example [ [23]     ]
- * @example [ {"id":3} ]
+ * @exampleContextFormatter [ null     ] true
+ * @exampleContextFormatter [ []       ] true
+ * @exampleContextFormatter [ {}       ] true
+ * @exampleContextFormatter [ ""       ] true
+ * @exampleContextFormatter [ 0        ] false
+ * @exampleContextFormatter [ "homer"  ] false
+ * @exampleContextFormatter [ [23]     ] false
+ * @exampleContextFormatter [ {"id":3} ] false
  *
  * @param  {Mixed} d  data
  */
@@ -182,6 +178,21 @@ function ifEM (d) {
   return d;
 }
 
+/**
+ * Matches not empty values, string, arrays or objects
+ *
+ * @version 2.0
+ * @exampleContextFormatter [ 0        ] true
+ * @exampleContextFormatter [ "homer"  ] true
+ * @exampleContextFormatter [ [23]     ] true
+ * @exampleContextFormatter [ {"id":3} ] true
+ * @exampleContextFormatter [ null     ] false
+ * @exampleContextFormatter [ []       ] false
+ * @exampleContextFormatter [ {}       ] false
+ * @exampleContextFormatter [ ""       ] false
+ *
+ * @param  {Mixed} d  data
+ */
 function ifNEM (d) {
   var _result = true;
   if (  d === null
@@ -196,6 +207,23 @@ function ifNEM (d) {
   return d;
 }
 
+/**
+ * Matches all values that are not equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
+ *
+ * @version 2.0
+ * @exampleContextFormatter [ 100      , 100     ] false
+ * @exampleContextFormatter [ 100      , 101     ] true
+ * @exampleContextFormatter [ "homer"  , "homer" ] false
+ * @exampleContextFormatter [ "homer"  , "bart"  ] true
+ * @exampleContextFormatter [ ""       , ""      ] false
+ * @exampleContextFormatter [ null     , 100     ] true
+ * @exampleContextFormatter [ null     , null    ] false
+ * @exampleContextFormatter [ 0        , 100     ] true
+ *
+ * @param {String|Array|Integer} d
+ * @param {String|Array|Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifEQ (d, value) {
   var _result = false;
   // Convert everything in string (not strict Equal)
@@ -206,6 +234,23 @@ function ifEQ (d, value) {
   return d;
 }
 
+/**
+ * Matches all values that are not equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
+ *
+ * @version 2.0
+ * @exampleContextFormatter [ 100      , 100     ] false
+ * @exampleContextFormatter [ 100      , 101     ] true
+ * @exampleContextFormatter [ "homer"  , "homer" ] false
+ * @exampleContextFormatter [ "homer"  , "bart"  ] true
+ * @exampleContextFormatter [ ""       , ""      ] false
+ * @exampleContextFormatter [ null     , 100     ] true
+ * @exampleContextFormatter [ null     , null    ] false
+ * @exampleContextFormatter [ 0        , 100     ] true
+ *
+ * @param {String|Array|Integer} d
+ * @param {String|Array|Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifNE (d, value) {
   var _result = true;
   if (d + '' === value + '') {
@@ -215,66 +260,134 @@ function ifNE (d, value) {
   return d;
 }
 
+/**
+ * Matches values that are greater than a specified value.
+ *
+ * @version 2.0
+ * @exampleContextFormatter [1234, 1] true
+ * @exampleContextFormatter ["50", "-29"] true
+ * @exampleContextFormatter ["32q", "4q2"] true
+ * @exampleContextFormatter ["1234Hello", "1"] true
+ * @exampleContextFormatter ["10", "8Hello1234"] true
+ * @exampleContextFormatter [-23, 19] false
+ * @exampleContextFormatter [1, 768] false
+ * @exampleContextFormatter [0, 0] false
+ * @exampleContextFormatter [-2891, "33Hello"] false
+ *
+ * @param {Integer} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifGT (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-  // Convert everything in string (not strict Equal)
-  if (typeof d === 'number' && _d                    > _value
-      || typeof d === 'string'      && value && d.length              > value.length
-      || Array.isArray(d) === true  && value && d.length              > value.length
-      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length > Object.keys(value).length ) {
+
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && _d > _value) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
   return d;
 }
 
+/**
+ * Matches values that are greater than or equal to a specified value.
+ *
+ * @version 2.0
+ * @exampleContextFormatter [50, -29] true
+ * @exampleContextFormatter [1, 1] true
+ * @exampleContextFormatter [1290, 768] true
+ * @exampleContextFormatter ["1234", "1"] true
+ * @exampleContextFormatter [-23, 19] false
+ * @exampleContextFormatter [1, 768] false
+ * @exampleContextFormatter ["1" , "1234"] false
+ *
+ * @param {Integer} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifGTE (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-  // Convert everything in string (not strict Equal)
-  if (   typeof d === 'number' && _d                    >= _value
-      || typeof d === 'string'      &&  value && d.length    >= value.length
-      || Array.isArray(d) === true  && value && d.length     >= value.length
-      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length >= Object.keys(value).length ) {
+
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && _d >= _value) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
   return d;
 }
 
+/**
+ * Matches values that are less than a specified value.
+ *
+ * @version 2.0
+ * @exampleContextFormatter [-23, 19] true
+ * @exampleContextFormatter [1, 768] true
+ * @exampleContextFormatter ["1" , "1234"] true
+ * @exampleContextFormatter ["123dsf", "103123"] true
+ * @exampleContextFormatter [-1299283, "-2891feihuwf"] true
+ * @exampleContextFormatter [50, -29] false
+ * @exampleContextFormatter [0, 0] false
+ * @exampleContextFormatter [1290, 768] false
+ * @exampleContextFormatter ["1234", "1"] false
+ *
+ * @param {Integer} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifLT (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-  // Convert everything in string (not strict Equal)
-  if (   typeof d === 'number' && _d < _value
-      || typeof d === 'string' && value && d.length < value.length
-      || Array.isArray(d) === true  && value && d.length < value.length
-      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length < Object.keys(value).length ) {
+
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && _d < _value) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
   return d;
 }
 
+/**
+ * Matches values that are less than or equal to a specified value.
+ *
+ * @version 2.0
+ * @exampleContextFormatter [-23, 19] true
+ * @exampleContextFormatter [1, 768] true
+ * @exampleContextFormatter [5, 5] true
+ * @exampleContextFormatter ["1" , "1234"] true
+ * @exampleContextFormatter [1290, 768] false
+ * @exampleContextFormatter ["1234", "1"] false
+ *
+ * @param {Integer} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifLTE (d, value) {
   var _result = false;
   var _value = parseFloat(value);
   var _d     = parseFloat(d);
-  // Convert everything in string (not strict Equal)
-  if (   typeof d === 'number' && _d <= _value
-      || typeof d === 'string' && value && d.length <= value.length
-      || Array.isArray(d) === true  && value && d.length <= value.length
-      || d && d.constructor === Object && value && value.constructor === Object && Object.keys(d).length <= Object.keys(value).length ) {
+
+  if (Number.isNaN(_d) === false && Number.isNaN(_value) === false && _d <= _value) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
   return d;
 }
 
+/**
+ * Matches any of the values specified in an array or string, it replaces `ifContain`.
+ *
+ * @version 2.0
+ * @exampleContextFormatter ["car is broken", "is"] true
+ * @exampleContextFormatter [[1, 2, "toto"], 2] true
+ * @exampleContextFormatter ["car is broken", "are"] false
+ * @exampleContextFormatter [[1, 2, "toto"], "titi"] false
+ *
+ * @param {Integer|String|Array} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifIN (d, value) {
   var _result = false;
   if (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) !== -1) {
@@ -284,6 +397,19 @@ function ifIN (d, value) {
   return d;
 }
 
+/**
+ * Matches none of the values specified in an array or string.
+ *
+ * @version 2.0
+ * @exampleContextFormatter ["car is broken", "are"] true
+ * @exampleContextFormatter [[1, 2, "toto"], "titi"] true
+ * @exampleContextFormatter ["car is broken", "is"] false
+ * @exampleContextFormatter [[1, 2, "toto"], 2] false
+ *
+ * @param {Integer|String|Array} d
+ * @param {Integer} value value to test
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
 function ifNIN (d, value) {
   var _result = false;
   if (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) === -1) {
@@ -293,6 +419,15 @@ function ifNIN (d, value) {
   return d;
 }
 
+/**
+ * Print a message if condition is true. It should be used with other formatters to print conditional content.
+ *
+ * @version 2.0
+ * @example ["Carbone.io"]
+ *
+ * @param {Mixed} d marker
+ * @param {*} message message to print
+ */
 function show (d, message) {
   if (this.isConditionTrue === true || this.isConditionTrue === null && d) {
     this.stopPropagation = true;
@@ -301,6 +436,13 @@ function show (d, message) {
   return d;
 }
 
+/**
+ * Print a message if condition is false. It should be used with other formatters to print conditional content.
+ *
+ * @version 2.0
+ * @param {Mixed} d marker
+ * @param {*} message message to print
+ */
 function elseShow (d, message) {
   if (this.isConditionTrue === false || this.isConditionTrue === null && !d) {
     this.stopPropagation = true;
@@ -309,6 +451,12 @@ function elseShow (d, message) {
   return d;
 }
 
+/**
+ * Show a text block between showBegin and showEnd if condition is true
+ * @version 2.0
+ * @private
+ * @param {*} d
+ */
 function showBegin (d) {
   this.isHidden = 1;
   if (this.isConditionTrue === true || this.isConditionTrue === null && d) {
@@ -318,11 +466,22 @@ function showBegin (d) {
   return '';
 }
 
+/**
+ * show a text block between showBegin and showEnd if condition is true
+ * @version 2.0
+ * @private
+ */
 function showEnd () {
   this.isHidden = -1;
   return '';
 }
 
+/**
+ * hide text block between hideBegin and hideEnd if condition is true
+ * @version 2.0
+ * @private
+ * @param {*} d
+ */
 function hideBegin (d) {
   this.isHidden = 0;
   if (this.isConditionTrue === true || this.isConditionTrue === null && d) {
@@ -332,9 +491,33 @@ function hideBegin (d) {
   return '';
 }
 
+/**
+ * hide text block between hideBegin and hideEnd if condition is true
+ * @version 2.0
+ * @private
+ */
 function hideEnd () {
   this.isHidden = -1;
   return '';
+}
+
+/**
+ * Returns the length of a string or array.
+ *
+ * @version 2.0
+ * @example ["Hello World"]
+ * @example [""]
+ * @example [[1, 2, 3, 4, 5]]
+ * @example [[1, "Hello"]]
+ *
+ * @param {Mixed} d Array or String
+ * @returns {Number} Length of the element
+ */
+function len (d) {
+  if (typeof d === 'string' || Array.isArray(d)) {
+    return d.length;
+  }
+  return 0;
 }
 
 module.exports = {
@@ -358,5 +541,6 @@ module.exports = {
   show,
   elseShow,
   and,
-  or
+  or,
+  len
 };

@@ -1468,7 +1468,7 @@ describe('Carbone', function () {
         });
       });
       it('should be able to show or hide a table with a lot of nested xml tags ', function (done) {
-        var _xml = '<xml>{d.cars:ifGT(0):showBegin}<table> <tr> <td><p>{d.cars[i].brand}</p></td> </tr>   <tr> <td><p>{d.cars[i+1].brand}</p></td> </tr> </table>{d.variants:showEnd}</xml>';
+        var _xml = '<xml>{d.cars:ifNEM:showBegin}<table> <tr> <td><p>{d.cars[i].brand}</p></td> </tr>   <tr> <td><p>{d.cars[i+1].brand}</p></td> </tr> </table>{d.variants:showEnd}</xml>';
         var _data = {
           cars : [
             {brand : 'Lumeneo', id : 1},

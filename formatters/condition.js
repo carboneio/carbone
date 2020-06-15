@@ -1,5 +1,5 @@
 /**
- * Change the default operator between conditional formatters
+ * Change the default operator between conditional formatters.
  *
  * For example: `{d.car:ifEQ('delorean'):and(.speed):ifGT(80):show('TravelInTime'):elseShow('StayHere')}`
  * means "if  d.car equals 'delorean' AND d.speed is greater than 80, then it prints 'TravelInTime', otherwise
@@ -19,7 +19,7 @@ function and (d, value) {
 }
 
 /**
- * Change the default operator between conditional formatters
+ * Change the default operator between conditional formatters.
  *
  * For example: `{d.car:ifEQ('delorean'):or(.speed):ifGT(80):show('TravelInTime'):elseShow('StayHere')}`
  * means "if  d.car equals 'delorean' OR d.speed is greater than 80, then it prints 'TravelInTime', otherwise
@@ -40,9 +40,9 @@ function or (d, value) {
 }
 
 /**
- * Update the condition according to the operator and / or
+ * Update the condition according to the operator and / or.
  *
- * By default, we consider "or" operator
+ * By default, we consider "or" operator.
  * @private
  *
  * @version 2.0.0
@@ -88,7 +88,7 @@ function ifEM (d) {
 }
 
 /**
- * Matches not empty values, string, arrays or objects
+ * Matches not empty values, string, arrays or objects.
  *
  * @version 2.0.0
  * @exampleContextFormatter [ 0        ] true

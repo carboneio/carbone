@@ -208,17 +208,17 @@ function ifNEM (d) {
 }
 
 /**
- * Matches all values that are not equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
+ * Matches all values that are equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
  *
  * @version 2.0
- * @exampleContextFormatter [ 100      , 100     ] false
- * @exampleContextFormatter [ 100      , 101     ] true
- * @exampleContextFormatter [ "homer"  , "homer" ] false
- * @exampleContextFormatter [ "homer"  , "bart"  ] true
- * @exampleContextFormatter [ ""       , ""      ] false
- * @exampleContextFormatter [ null     , 100     ] true
- * @exampleContextFormatter [ null     , null    ] false
- * @exampleContextFormatter [ 0        , 100     ] true
+ * @exampleContextFormatter [ 100      , 100     ] true
+ * @exampleContextFormatter [ 100      , 101     ] false
+ * @exampleContextFormatter [ "homer"  , "homer" ] true
+ * @exampleContextFormatter [ "homer"  , "bart"  ] false
+ * @exampleContextFormatter [ ""       , ""      ] true
+ * @exampleContextFormatter [ null     , 100     ] false
+ * @exampleContextFormatter [ null     , null    ] true
+ * @exampleContextFormatter [ 0        , 100     ] false
  *
  * @param {String|Array|Integer} d
  * @param {String|Array|Integer} value value to test

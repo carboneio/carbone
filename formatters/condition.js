@@ -90,13 +90,13 @@ function ifContain (d, value, messageIfTrue, continueOnSuccess) {
 }
 
 /**
- * Change default operator between conditional formatters
+ * Change the default operator between conditional formatters
  *
  * For example: `{d.car:ifEQ('delorean'):and(.speed):ifGT(80):show('TravelInTime'):elseShow('StayHere')}`
  * means "if  d.car equals 'delorean' AND d.speed is greater than 80, then it prints 'TravelInTime', otherwise
  * it prints 'StayHere'
  *
- * @version 2.0
+ * @version 2.0.0
  * @param  {Mixed} d      data
  * @param  {Mixed} value  [optional] new value to test
  * @return {Mixed}        if `value` is defined, the next formatter "sees" this new value instead of the original value
@@ -110,14 +110,14 @@ function and (d, value) {
 }
 
 /**
- * Change default operator between conditional formatters
+ * Change the default operator between conditional formatters
  *
  * For example: `{d.car:ifEQ('delorean'):or(.speed):ifGT(80):show('TravelInTime'):elseShow('StayHere')}`
  * means "if  d.car equals 'delorean' OR d.speed is greater than 80, then it prints 'TravelInTime', otherwise
  * it prints 'StayHere'
  *
  *
- * @version 2.0
+ * @version 2.0.0
  * @param  {Mixed} d      data
  * @param  {Mixed} value  [optional] new value to test
  * @return {Mixed}        if `value` is defined, the next formatter "sees" this new value instead of the original value
@@ -131,12 +131,12 @@ function or (d, value) {
 }
 
 /**
- * Update condition according to operator and / or
+ * Update the condition according to the operator and / or
  *
  * By default, we consider "or" operator
  * @private
  *
- * @version 2.0
+ * @version 2.0.0
  * @param  {Boolean} operator              if true, the operator is AND, otherwhise it is OR
  * @param  {Boolean} currentConditionState the current condition state
  * @param  {Boolean} newValue              the value coming form the previous condition
@@ -152,7 +152,7 @@ function _updateCondition (isAndOperator, currentConditionState, newValue) {
 /**
  * Matches empty values, string, arrays or objects (null, undefined, [], {}, ...), it replaces `ifEmpty`.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter [ null     ] true
  * @exampleContextFormatter [ []       ] true
  * @exampleContextFormatter [ {}       ] true
@@ -181,7 +181,7 @@ function ifEM (d) {
 /**
  * Matches not empty values, string, arrays or objects
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter [ 0        ] true
  * @exampleContextFormatter [ "homer"  ] true
  * @exampleContextFormatter [ [23]     ] true
@@ -210,7 +210,7 @@ function ifNEM (d) {
 /**
  * Matches all values that are equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter [ 100      , 100     ] true
  * @exampleContextFormatter [ 100      , 101     ] false
  * @exampleContextFormatter [ "homer"  , "homer" ] true
@@ -237,7 +237,7 @@ function ifEQ (d, value) {
 /**
  * Matches all values that are not equal to a specified value. It can be combined with other formatters to create conditional content. It returns the initial marker. The state of the condition is not returned.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter [ 100      , 100     ] false
  * @exampleContextFormatter [ 100      , 101     ] true
  * @exampleContextFormatter [ "homer"  , "homer" ] false
@@ -263,7 +263,7 @@ function ifNE (d, value) {
 /**
  * Matches values that are greater than a specified value.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter [1234, 1] true
  * @exampleContextFormatter ["50", "-29"] true
  * @exampleContextFormatter ["32q", "4q2"] true
@@ -293,7 +293,7 @@ function ifGT (d, value) {
 /**
  * Matches values that are greater than or equal to a specified value.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter [50, -29] true
  * @exampleContextFormatter [1, 1] true
  * @exampleContextFormatter [1290, 768] true
@@ -321,7 +321,7 @@ function ifGTE (d, value) {
 /**
  * Matches values that are less than a specified value.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter [-23, 19] true
  * @exampleContextFormatter [1, 768] true
  * @exampleContextFormatter ["1" , "1234"] true
@@ -351,7 +351,7 @@ function ifLT (d, value) {
 /**
  * Matches values that are less than or equal to a specified value.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter [-23, 19] true
  * @exampleContextFormatter [1, 768] true
  * @exampleContextFormatter [5, 5] true
@@ -378,7 +378,7 @@ function ifLTE (d, value) {
 /**
  * Matches any of the values specified in an array or string, it replaces `ifContain`.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter ["car is broken", "is"] true
  * @exampleContextFormatter [[1, 2, "toto"], 2] true
  * @exampleContextFormatter ["car is broken", "are"] false
@@ -400,7 +400,7 @@ function ifIN (d, value) {
 /**
  * Matches none of the values specified in an array or string.
  *
- * @version 2.0
+ * @version 2.0.0
  * @exampleContextFormatter ["car is broken", "are"] true
  * @exampleContextFormatter [[1, 2, "toto"], "titi"] true
  * @exampleContextFormatter ["car is broken", "is"] false
@@ -420,9 +420,9 @@ function ifNIN (d, value) {
 }
 
 /**
- * Print a message if condition is true. It should be used with other formatters to print conditional content.
+ * Print a message if the condition is true. It should be used with other formatters to print conditional content.
  *
- * @version 2.0
+ * @version 2.0.0
  * @example ["Carbone.io"]
  *
  * @param {Mixed} d marker
@@ -437,9 +437,9 @@ function show (d, message) {
 }
 
 /**
- * Print a message if condition is false. It should be used with other formatters to print conditional content.
+ * Print a message if the condition is false. It should be used with other formatters to print conditional content.
  *
- * @version 2.0
+ * @version 2.0.0
  * @param {Mixed} d marker
  * @param {*} message message to print
  */
@@ -452,8 +452,8 @@ function elseShow (d, message) {
 }
 
 /**
- * Show a text block between showBegin and showEnd if condition is true
- * @version 2.0
+ * Show a text block between showBegin and showEnd if the condition is true
+ * @version 2.0.0
  * @private
  * @param {*} d
  */
@@ -467,8 +467,8 @@ function showBegin (d) {
 }
 
 /**
- * show a text block between showBegin and showEnd if condition is true
- * @version 2.0
+ * show a text block between showBegin and showEnd if the condition is true
+ * @version 2.0.0
  * @private
  */
 function showEnd () {
@@ -477,8 +477,8 @@ function showEnd () {
 }
 
 /**
- * hide text block between hideBegin and hideEnd if condition is true
- * @version 2.0
+ * hide text block between hideBegin and hideEnd if the condition is true
+ * @version 2.0.0
  * @private
  * @param {*} d
  */
@@ -492,8 +492,8 @@ function hideBegin (d) {
 }
 
 /**
- * hide text block between hideBegin and hideEnd if condition is true
- * @version 2.0
+ * hide text block between hideBegin and hideEnd if the condition is true
+ * @version 2.0.0
  * @private
  */
 function hideEnd () {
@@ -504,7 +504,7 @@ function hideEnd () {
 /**
  * Returns the length of a string or array.
  *
- * @version 2.0
+ * @version 2.0.0
  * @example ["Hello World"]
  * @example [""]
  * @example [[1, 2, 3, 4, 5]]

@@ -39,8 +39,10 @@
   "devDependencies": {
     "eslint": "=6.8.0",
     "mocha": "=3.5.3",
+    "mocha-sinon": "^2.1.2",
     "nock": "=12.0.0",
     "should": "=11.1.2",
+    "sinon": "^9.0.2",
     "xml-beautifier": "0.4.3",
     "zipfile": "=0.5.11"
   },

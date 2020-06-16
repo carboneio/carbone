@@ -6,6 +6,7 @@ const xmlFormat = require('xml-beautifier');
 const fs        = require('fs');
 const image     = require('../lib/image');
 const nock      = require('nock');
+require('mocha-sinon');
 
 
 describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
@@ -205,22 +206,32 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     });
 
     describe("_isImageListAnchorTypeBlockLO : Check if the anchor type of a list of images is set to 'as character' ", function () {
+
+      beforeEach( function () {
+        this.sinon.stub(console, 'error');
+      });
+
       it("should return nothing if the image anchor type is set to 'as character' (xml from ODT template)", function () {
         let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
         let _marker = '{d.list[i].img}';
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), true);
+        console.warn(console.error.calledOnce);
       });
 
       it("should return a warning if the image anchor type is NOT set to 'as character' (xml from ODT template)", function () {
         let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
         let _marker = '{d.list[i].img}';
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), false);
+        helper.assert(console.error.calledOnce, true);
+        helper.assert(console.error.calledWith('Carbone warning: the template contains a list of floating images, you must change the images anchor-type to "as character" where the marker "{d.list[i].img}" is bound.'), true);
       });
 
       it("should return a warning if there's a list of images in an ODS template (xml from ODS template)", function () {
         let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
         let _marker = '{d.list[i].img}';
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), false);
+        helper.assert(console.error.calledOnce, true);
+        helper.assert(console.error.calledWith('Carbone warning: the template contains a list of images, it is not supported and may break the report.'), true);
       });
 
       it('should return true if the xml or marker are not provided or the marker is not a list', function () {
@@ -356,7 +367,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     });
 
     describe('DOCX preprocess XML', function () {
-      it('should replace the main document tag attributes with markers and formaters (common DOCX xml from LO or MS)', function (done) {
+      it('should replace the main document tag attributes with markers and formatters (common DOCX xml from LO or MS)', function (done) {
         let template = {
           files : [
             {
@@ -624,6 +635,47 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         helper.assert(err+'', 'null');
         assertFullReport(res, _testedReport, true);
         done();
+      });
+    });
+
+    describe('XLSX preprocess xml', function () {
+      it('should replace the main document tag attributes with markers and formatters', function (done) {
+        let _template = {
+          files : [
+            {
+              name : 'xl/drawings/drawing1.xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr="{d.tests.image}"></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId1"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>'
+            }
+          ]
+        };
+        let _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr=""></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="{d.tests.image:generateImageXlsxReference(1)}"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>';
+        image.preProcessXLSX(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+        done();
+      });
+
+      describe('throw error or warnings', function () {
+        beforeEach( function () {
+          this.sinon.stub(console, 'warn');
+        });
+
+        it('should throw a warning if the template contains a list of images', function (done) {
+          let _template = {
+            files : [
+              {
+                name : 'xl/drawings/drawing1.xml',
+                data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr="{d.list[i].img}"></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId1"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>'
+              }
+            ]
+          };
+          let _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr=""></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="{d.list[i].img:generateImageXlsxReference(1)}"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>';
+          image.preProcessXLSX(_template);
+          helper.assert(_template.files[0].data, _expectedXML);
+          helper.assert(console.warn.calledOnce, true);
+          helper.assert(console.warn.calledWith('Warning: carbone does not support a list of images on XLSX template.'), true);
+          done();
+        });
+
       });
     });
   });

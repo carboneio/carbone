@@ -1,7 +1,7 @@
 {
   "name": "carbone",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "2.0.0-beta.5",
+  "version": "2.0.0-beta.7",
   "bin": "bin/carbone",
   "main": "./lib",
   "author": "David Grelaud",
@@ -20,7 +20,8 @@
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
     "lint": "eslint ./*/**.js",
-    "lint:fix": "eslint ./*/**.js --fix"
+    "lint:fix": "eslint ./*/**.js --fix",
+    "postpublish" : "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin --tags && git push github-origin --tags"
   },
   "dependencies": {
     "body-parser": "=1.19.0",

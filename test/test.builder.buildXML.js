@@ -162,6 +162,21 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept markers next to other loop markers (without whitespaces)', function (done) {
+    var _xml = '<xml> {d.id}<t_row>{d.id}{d.cars[i].brand}{d.id}</t_row>{d.id}<t_row>{d.id}{d.cars[i+1].brand}{d.id}</t_row>{d.id}</xml>';
+    var _data = {
+      id   : 3,
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> 3<t_row>3Lumeneo3</t_row>3<t_row>3Tesla motors3</t_row>3<t_row>3Toyota3</t_row>33</xml>');
+      done();
+    });
+  });
   it('should accept non-XML structure', function (done) {
     var _xml = '{d[i].brand} , {d[i+1].brand}';
     var _data = [

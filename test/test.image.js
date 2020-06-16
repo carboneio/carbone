@@ -9,7 +9,7 @@ const nock      = require('nock');
 require('mocha-sinon');
 
 
-describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
+describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -208,30 +208,30 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     describe("_isImageListAnchorTypeBlockLO : Check if the anchor type of a list of images is set to 'as character' ", function () {
 
       beforeEach( function () {
-        this.sinon.stub(console, 'error');
+        this.sinon.stub(console, 'warn');
       });
 
       it("should return nothing if the image anchor type is set to 'as character' (xml from ODT template)", function () {
         let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
         let _marker = '{d.list[i].img}';
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), true);
-        console.warn(console.error.calledOnce);
+        console.warn(console.warn.calledOnce);
       });
 
       it("should return a warning if the image anchor type is NOT set to 'as character' (xml from ODT template)", function () {
         let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
         let _marker = '{d.list[i].img}';
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), false);
-        helper.assert(console.error.calledOnce, true);
-        helper.assert(console.error.calledWith('Carbone warning: the template contains a list of floating images, you must change the images anchor-type to "as character" where the marker "{d.list[i].img}" is bound.'), true);
+        helper.assert(console.warn.calledOnce, true);
+        helper.assert(console.warn.calledWith('Carbone warning: the template contains a list of floating images, you must change the images anchor-type to "as character" where the marker "{d.list[i].img}" is bound.'), true);
       });
 
       it("should return a warning if there's a list of images in an ODS template (xml from ODS template)", function () {
         let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
         let _marker = '{d.list[i].img}';
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), false);
-        helper.assert(console.error.calledOnce, true);
-        helper.assert(console.error.calledWith('Carbone warning: the template contains a list of images, it is not supported and may break the report.'), true);
+        helper.assert(console.warn.calledOnce, true);
+        helper.assert(console.warn.calledWith('Carbone warning: the template contains a list of images, it is not supported and may break the report.'), true);
       });
 
       it('should return true if the xml or marker are not provided or the marker is not a list', function () {

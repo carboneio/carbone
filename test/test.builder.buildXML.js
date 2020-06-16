@@ -162,6 +162,21 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept markers next to other loop markers (without whitespaces)', function (done) {
+    var _xml = '<xml> {d.id}<t_row>{d.id}{d.cars[i].brand}{d.id}</t_row>{d.id}<t_row>{d.id}{d.cars[i+1].brand}{d.id}</t_row>{d.id}</xml>';
+    var _data = {
+      id   : 3,
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> 3<t_row>3Lumeneo3</t_row>3<t_row>3Tesla motors3</t_row>3<t_row>3Toyota3</t_row>33</xml>');
+      done();
+    });
+  });
   it('should accept non-XML structure', function (done) {
     var _xml = '{d[i].brand} , {d[i+1].brand}';
     var _data = [
@@ -580,6 +595,60 @@ describe('builder.buildXML', function () {
           +  '</td>'
         +  '</td>'
         +'</xml>';
+      assert.equal(_xmlBuilt, _expectedResult);
+      done();
+    });
+  });
+  it('should work with two independant arrays in sub objects', function (done) {
+    var _xml =
+        '<table>'
+      + '  <row>'
+      + '    {d.cars.bills[i].name}'
+      + '    a: {d.cars.bills[i].range.dist}'
+      + '  </row>'
+      + '  <row>'
+      + '    {d.cars.bills[i+1].name}'
+      + '  </row>'
+      + '</table>'
+      + '<table>'
+      + '  <row>'
+      + '    {d.fruit.vitamins[i].name}'
+      + '  </row>'
+      + '  <row>'
+      + '    {d.fruit.vitamins[i+1].name}'
+      + '  </row>'
+      + '</table>'
+    ;
+    var _data = {
+      cars : {
+        bills : [
+          { name : 'Tesla'   , range : { dist : 1000 } },
+          { name : 'Delorean', range : { dist : 1200 } }
+        ]
+      },
+      fruit : {
+        vitamins : [{ name : 'B1', }]
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      var _expectedResult =
+          '<table>'
+        + '  <row>'
+        + '    Tesla'
+        + '    a: 1000'
+        + '  </row>'
+        + '  <row>'
+        + '    Delorean'
+        + '    a: 1200'
+        + '  </row>  '
+        + '</table>'
+        + '<table>'
+        + '  <row>'
+        + '    B1'
+        + '  </row>  '
+        + '</table>'
+      ;
       assert.equal(_xmlBuilt, _expectedResult);
       done();
     });

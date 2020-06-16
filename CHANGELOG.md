@@ -131,6 +131,7 @@
   - Improve security in the builder and reduce memory consumption
   - Fix crash when markers are next to each over `{d.id}{d.other}`
   - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
+  - Fix crash when two consecutive arrays, nested in object, were used
 
 
 ### v1.2.1

@@ -1264,6 +1264,105 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should accepts conditions around array. Markers are moved by the process, markers are next to each over', function (done) {
+        var _xml = '<body><p>{d.fruits:ifNEM():showBegin}</p><p>{d.fruits[i].name}</p><p>{d.fruits[i+1].name}</p><p>{d.fruits:showEnd}</p></body>';
+        var _data = {
+          fruits : []
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<body><p></p><p></p></body>');
+          done();
+        });
+      });
+      it('should accepts multiple conditions next to arrays markers', function (done) {
+        var _xml = '<body><a>{d.isShown:ifEQ(true):showBegin}</a>{d.isMegaShown:ifEQ(true):showBegin}{d.isShown:ifNE(false):showBegin}'
+                  +'<p>{d.fruits:ifNEM():showBegin}{d.fruits[i].name}{d.fruits:showEnd}</p>'
+                  +'{d.isShown:showEnd}'
+                  +'<p>{d.fruits:ifNEM():showBegin}{d.fruits[i+1].name}{d.fruits:showEnd}</p>'
+                  +'{d.isShown:ifNE(false):showBegin}{d.isShown:showEnd}{d.isMegaShown:showEnd}'
+                  +'<n>{d.isShown:showEnd}</n></body>';
+        var _data = {
+          isShown     : true,
+          isMegaShown : true,
+          fruits      : [{name : 'apple'}]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<body><a></a><p>apple</p><n></n></body>');
+          _data.isMegaShown = false;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<body><a></a><n></n></body>');
+            done();
+          });
+        });
+      });
+      it('should accepts multiple conditions next to arrays markers even if these arrays are flatten', function (done) {
+        var _xml = '<body><a>{d.isShown:ifEQ(true):showBegin}</a>{d.isMegaShown:ifEQ(true):showBegin}{d.isShown:ifNE(false):showBegin}'
+                  +'<p>{d.fruits:ifNEM():showBegin}{d.fruits[i].name}{d.fruits[i].vitamins[i].name}{d.fruits:showEnd}</p>'
+                  +'{d.isShown:showEnd}'
+                  +'<p>{d.fruits:ifNEM():showBegin}{d.fruits[i+1].name}{d.fruits[i+1].vitamins[i+1].name}{d.fruits:showEnd}</p>'
+                  +'{d.isShown:ifNE(false):showBegin}{d.isShown:showEnd}{d.isMegaShown:showEnd}'
+                  +'<n>{d.isShown:showEnd}</n></body>';
+        var _data = {
+          isShown     : true,
+          isMegaShown : true,
+          fruits      : [
+            {name : 'apple' , vitamins : [{name : 'B5'}, {name : 'B6'}]},
+            {name : 'orange', vitamins : [{name : 'C5'}, {name : 'C6'}]}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<body><a></a><p>appleB5</p><p>appleB6</p><p>orangeC5</p><p>orangeC6</p><n></n></body>');
+          _data.isMegaShown = false;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<body><a></a><n></n></body>');
+            done();
+          });
+        });
+      });
+      it('should accepts multiple conditions next to arrays markers even if these arrays are flatten (inverse order)', function (done) {
+        var _xml = '<body><a>{d.isShown:ifEQ(true):showBegin}</a>{d.isMegaShown:ifEQ(true):showBegin}{d.isShown:ifNE(false):showBegin}'
+                  +'<p>{d.fruits:ifNEM():showBegin}{d.fruits[i].vitamins[i].name}{d.fruits[i].name}{d.fruits:showEnd}</p>'
+                  +'{d.isShown:showEnd}'
+                  +'<p>{d.fruits:ifNEM():showBegin}{d.fruits[i+1].vitamins[i+1].name}{d.fruits[i+1].name}{d.fruits:showEnd}</p>'
+                  +'{d.isShown:ifNE(false):showBegin}{d.isShown:showEnd}{d.isMegaShown:showEnd}'
+                  +'<n>{d.isShown:showEnd}</n></body>';
+        var _data = {
+          isShown     : true,
+          isMegaShown : true,
+          fruits      : [
+            {name : 'apple' , vitamins : [{name : 'B5'}, {name : 'B6'}]},
+            {name : 'orange', vitamins : [{name : 'C5'}, {name : 'C6'}]}
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<body><a></a><p>B5apple</p><p>B6apple</p><p>C5orange</p><p>C6orange</p><n></n></body>');
+          _data.isMegaShown = false;
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<body><a></a><n></n></body>');
+            done();
+          });
+        });
+      });
+      it('should accept conditions next to nested condition markers', function (done) {
+        var _xml = '<body><p>{d.fruits[i].name}</p>{d.fruits:ifNEM():showBegin}hey{d.fruits:showEnd}<p>{d.fruits[i+1].name}</p></body>';
+        var _data = {
+          fruits : [{
+            name : 'apple'
+          }]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<body><p>apple</p>hey</body>');
+          done();
+        });
+      });
       it('should return an error if begin or end is missing', function (done) {
         carbone.renderXML('<xml> {d.val:ifEQ(3):hideBegin} </xml>', {}, function (err) {
           assert.equal(err+'', 'Error: Missing at least one showEnd or hideEnd');

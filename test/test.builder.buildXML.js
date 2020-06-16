@@ -599,6 +599,60 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should work with two independant arrays in sub objects', function (done) {
+    var _xml =
+        '<table>'
+      + '  <row>'
+      + '    {d.cars.bills[i].name}'
+      + '    a: {d.cars.bills[i].range.dist}'
+      + '  </row>'
+      + '  <row>'
+      + '    {d.cars.bills[i+1].name}'
+      + '  </row>'
+      + '</table>'
+      + '<table>'
+      + '  <row>'
+      + '    {d.fruit.vitamins[i].name}'
+      + '  </row>'
+      + '  <row>'
+      + '    {d.fruit.vitamins[i+1].name}'
+      + '  </row>'
+      + '</table>'
+    ;
+    var _data = {
+      cars : {
+        bills : [
+          { name : 'Tesla'   , range : { dist : 1000 } },
+          { name : 'Delorean', range : { dist : 1200 } }
+        ]
+      },
+      fruit : {
+        vitamins : [{ name : 'B1', }]
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      var _expectedResult =
+          '<table>'
+        + '  <row>'
+        + '    Tesla'
+        + '    a: 1000'
+        + '  </row>'
+        + '  <row>'
+        + '    Delorean'
+        + '    a: 1200'
+        + '  </row>  '
+        + '</table>'
+        + '<table>'
+        + '  <row>'
+        + '    B1'
+        + '  </row>  '
+        + '</table>'
+      ;
+      assert.equal(_xmlBuilt, _expectedResult);
+      done();
+    });
+  });
   it('should repeat automatically all markers which are on the same row of a deeper array (third level here). It will flatten the JSON', function (done) {
     var _xml =
        '<xml>'

@@ -38,7 +38,7 @@
 > 
 > **Carbone v2.0 BETA 🚀 is available :**
 >   
->   - `npm i carbone@2.0.0-beta.6` 
+>   - `npm i carbone@2.0.0-beta.7` 
 >   - Changelog : https://github.com/Ideolys/carbone/blob/v2.0/CHANGELOG.md
 >   - The final release will be available before mid-June with everything updated (website, and other new features 😛, ...)
 

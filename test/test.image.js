@@ -211,24 +211,24 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), true);
       });
 
-      it("should return a warning if the image anchor type is NOT set to 'as character'", function () {
+      it("should return a warning if the image anchor type is NOT set to 'as character' (xml from ODT template)", function () {
         let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
         let _marker = '{d.list[i].img}';
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), false);
       });
 
-      it('should return false if the marker bound to the image is not a list', function () {
-        let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
-        let _marker = '{d.img}';
-        helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), false);
-      });
-
-      it('should return false if the image anchor type does not exist OR the xml or marker are not provided', function () {
+      it("should return a warning if there's a list of images in an ODS template (xml from ODS template)", function () {
         let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
         let _marker = '{d.list[i].img}';
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), false);
-        helper.assert(image._isImageListAnchorTypeBlockLO(undefined, _marker), false);
-        helper.assert(image._isImageListAnchorTypeBlockLO(_xml, undefined), false);
+      });
+
+      it('should return true if the xml or marker are not provided or the marker is not a list', function () {
+        let _xml = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:width="2.646cm" svg:height="1.64cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000000640000003E014CEF59845421C2.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.list[i].img}</svg:desc></draw:frame>';
+        let _marker = '{d.img}';
+        helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), true);
+        helper.assert(image._isImageListAnchorTypeBlockLO(undefined, _marker), true);
+        helper.assert(image._isImageListAnchorTypeBlockLO(_xml, undefined), true);
       });
     });
   });

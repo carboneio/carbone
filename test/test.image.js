@@ -259,6 +259,31 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
       });
     });
 
+    it.skip('should create a list of images (Created from Libre Office)(base64 jpg)', function (done) {
+      const _testedReport = 'docx-list';
+      const _data = {
+        list : [
+          {
+            img : _imageFRBase64jpg
+          },
+          {
+            img : _imageDEBase64jpg
+          },
+          {
+            img : _imageITBase64png
+          },
+          {
+            img : _imageLogoBase64jpg
+          }
+        ]
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
     it('should replace 4 images to invalid image', function (done) {
       const _testedReport = 'docx-errors';
       const _data = {

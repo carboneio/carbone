@@ -41,10 +41,10 @@
 
     - `ifEQ  (value)` : Matches values that are equal to a specified value, it replaces `ifEqual`
     - `ifNE  (value)` : Matches all values that are not equal to a specified value
-    - `ifGT  (value)` : Matches values, string.length, array.length or object.length that are greater than a specified value
-    - `ifGTE (value)` : Matches values, string.length, array.length or object.length that are greater than or equal to a specified value
-    - `ifLT  (value)` : Matches values, string.length, array.length or object.length that are less than a specified value
-    - `ifLTE (value)` : Matches values, string.length, array.length or object.length that are less than or equal to a specified value
+    - `ifGT  (value)` : Matches values that are greater than a specified value.
+    - `ifGTE (value)` : Matches values that are greater than or equal to a specified value.
+    - `ifLT  (value)` : Matches values that are less than a specified value.
+    - `ifLTE (value)` : Matches values that are less than or equal to a specified value.
     - `ifIN  (value)` : Matches any of the values specified in an array or string, it replaces `ifContain`
     - `ifNIN (value)` : Matches none of the values specified in an array or string
     - `ifEM  (value)` : Matches empty values, string, arrays or objects, it replaces `ifEmpty`
@@ -55,6 +55,7 @@
     - `showBegin` and `showEnd` : show a text block between showBegin and showEnd if condition is true
     - `show (message)`          : print a message if condition is true
     - `elseShow (message)`      : print a message if condition is false
+    - `len()` : returns the length of a string or array.
 
     No formatters can be chained after `hideBegin`, `hideEnd`, `showBegin`, `showEnd`.
 
@@ -130,6 +131,7 @@
   - Improve security in the builder and reduce memory consumption
   - Fix crash when markers are next to each over `{d.id}{d.other}`
   - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
+  - Fix crash when two consecutive arrays, nested in object, were used
   - Image processing completely rewritten
   - Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` by passing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the marker as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the marker.
 

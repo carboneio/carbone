@@ -118,7 +118,7 @@
         </w:drawing>
       </w:r>
     </w:p>
-     <w:p>
+    <w:p>
       <w:pPr>
         <w:pStyle w:val="Normal"/>
         <w:bidi w:val="0"/>
@@ -234,6 +234,17 @@
             </a:graphic>
           </wp:inline>
         </w:drawing>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="Normal"/>
+        <w:bidi w:val="0"/>
+        <w:jc w:val="left"/>
+        <w:rPr></w:rPr>
+      </w:pPr>
+      <w:r>
+        <w:rPr></w:rPr>
       </w:r>
     </w:p>
     <w:sectPr>

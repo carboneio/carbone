@@ -298,7 +298,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
       });
     });
 
-    it.skip('should create a list of images (Created from Libre Office)(base64 jpg)', function (done) {
+    it.only('should create a list of images (Created from Libre Office)(base64 jpg)', function (done) {
       const _testedReport = 'docx-list';
       const _data = {
         list : [

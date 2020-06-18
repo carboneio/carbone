@@ -748,6 +748,10 @@ describe('parser', function () {
     it('should accept variable in xml', function () {
       assert.equal(parser.findOpeningTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p><p></p>',48), 24);
     });
+    it('should work even if XML contain http link with slashes', function () {
+      assert.equal(parser.findOpeningTagPosition('<body> <tr><pic a="aa"></pic></tr>'), 7);
+      assert.equal(parser.findOpeningTagPosition('<body> <tr><pic a="http://"></pic></tr>'), 7);
+    });
   });
 
   describe('findClosingTagPosition', function () {
@@ -785,6 +789,10 @@ describe('parser', function () {
     });
     it('should accept variable in xml', function () {
       assert.equal(parser.findClosingTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p></p></p></p>'), 106);
+    });
+    it('should work even if XML contain http link with slashes', function () {
+      assert.equal(parser.findClosingTagPosition('<tr><pic a="aa"></pic></tr><b>'), 27);
+      assert.equal(parser.findClosingTagPosition('<tr><pic a="http://"></pic></tr><b>'), 32);
     });
   });
 
@@ -966,6 +974,15 @@ describe('parser', function () {
         part2Start : {tag : 'tr', pos : 52 }
       };
       var _expectedRange = {startEven : 7,  endEven : 52, startOdd : 52, endOdd : 102};
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
+    });
+    it('detect repetition section even if XML contains slashes (http link)', function () {
+      var _xml = '<body> <tr><w></w><pic a="http://"></pic></tr><tr><w></w><pic a="http://"></pic></tr></body>';
+      var _pivot = {
+        part1End   : { tag : 'p', pos : 46 },
+        part2Start : { tag : 'p', pos : 46 }
+      };
+      var _expectedRange = {startEven : 7,  endEven : 46, startOdd : 46, endOdd : 85};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
     it('should detect the repetition even if the start tag contains some meta data', function () {

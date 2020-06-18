@@ -1748,6 +1748,32 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should repeat section even if the XML contains http links', function (done) {
+    var _xml = ''
+     + '<body>'
+     + '  <p>'
+     + '    <w id="{d.list[i].id}"></w>'
+     + '    <pic a="http://ee"></pic>'
+     + '  </p>'
+     + '  <p>'
+     + '    <w id="{d.list[i+1].id}"></w>'
+     + '    <pic a="http://ee"></pic>'
+     + '  </p>'
+     + '</body>'
+    ;
+    var _data = {
+      list : [
+        {id : 100},
+        {id : 200},
+        {id : 300}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt.match(/body/g).length, 2);
+      assert.equal(_xmlBuilt, '<body>  <p>    <w id="100"></w>    <pic a="http://ee"></pic>  </p>  <p>    <w id="200"></w>    <pic a="http://ee"></pic>  </p>  <p>    <w id="300"></w>    <pic a="http://ee"></pic>  </p>  </body>');
+      done();
+    });
+  });
   it('should replace rId by md5 hash with id prepend', function (done) {
     var formatters = require('../formatters/string.js');
     var _xml = '<Relationships>{d.<Relationship Id="{d.dog:md5:prepend(id)}" Target="{d.dog}"/>toto}</Relationships>';

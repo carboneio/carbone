@@ -1153,6 +1153,12 @@ describe('parser', function () {
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml> </p><br/><br/><br/> </xml>', 5, 26)), [[5, 6], [10, 26]]);
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml> </p></p></p></p> <br/><br/><br/> </xml>', 5, 39)), [[5, 6], [22, 39]]);
     });
+    it('should include trailing characters', function () {
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<div><if>aa</if><if>bb</if></div>', 10, 21)), [[10, 11], [20, 21]]);
+    });
+    it('should accept tag with URLs and slashes', function () {
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<div><if url="https://">a<br></br>abb</if><if>sssss</if></div>', 5, 49)), [[5, 42], [46, 49]]);
+    });
     it('should include non-XML part at the beginning and ending of condition', function () {
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<a>text</a><b></b><c></c><d>text</d><br/>', 3, 32)), [[3, 7], [11, 25], [28,32]]);
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<a></a><b></b><c></c><d>text</d><br/>', 3, 28)), [[7, 21], [24, 28]]);
@@ -1161,6 +1167,11 @@ describe('parser', function () {
     it('should create only one if-block section even if there are multiple opening and closing tags', function () {
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml><table><tr><td><p></p></td></tr><tr><td><p></p></td></tr></table></xml>', 5, 79)), [[5, 70]]);
       helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml><table> <tr> <td><p></p></td> </tr>   <tr> <td><p></p></td> </tr> </table></xml>', 5, 79)), [[5, 79]]);
+    });
+    it('should accept float position if markers are next to each over in XML', function () {
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>', 24, 24.03125)), [[24, 24.03125]]);
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>', 24.03125, 24.8)), [[24.03125, 24.8]]);
+      helper.assert(rmLast(parser.findSafeConditionalBlockPosition('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>', 24, 24)), [[24, 24]]);
     });
   });
 

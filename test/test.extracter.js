@@ -1726,6 +1726,51 @@ describe('extracter', function () {
         }
       });
     });
+    it('should generate new if-block (and keep array conditions) to remove everything without breaking XML', function () {
+      var _xml = '<div><p></p><if>aa</if><if>bb</if><br/></div>';
+      var _condition = [{left : {parent : 'd0', attr : 'menu'}, operator : '>', right : '10'}];
+      var _descriptor = {
+        d0 : {
+          name      : '',
+          type      : 'array',
+          parent    : '',
+          parents   : [],
+          position  : {start : 16, end : 39},
+          iterators : [{ attr : 'i' }],
+          xmlParts  : [
+            {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 17, posOrigin : 17, conditions : _condition},
+            {obj : 'd0', attr : 'menu', pos : 18, posOrigin : 18, conditions : _condition},
+            {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 28, posOrigin : 28, conditions : _condition}
+          ]
+        }
+      };
+      helper.assert(extracter.splitXml(_xml, _descriptor), {
+        staticData : {
+          before : '<div><p></p>',
+          after  : '</div>'
+        },
+        dynamicData : {
+          d0 : {
+            name      : '',
+            type      : 'array',
+            parent    : '',
+            parents   : [],
+            position  : {start : 12, end : 34, endOdd : 39 },
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 17,        posOrigin : 17, conditions : _condition, depth : 1, after : 'a'},
+              {obj : 'd0'                                         , attr : 'menu', pos : 18,        posOrigin : 18, conditions : _condition, depth : 1, after : '' },
+              {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 18.015625, posOrigin : 28, conditions : _condition, depth : 1, after : '</if><if>'},
+              {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 27,        posOrigin : 17, conditions : _condition, depth : 1, after : 'b'},
+              {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 28,        posOrigin : 28, conditions : _condition, depth : 1},
+              {obj : 'd0', array : 'start'                                       , pos : 12,        posOrigin : 16, depth : 1,  after : '<if>a'},
+              {obj : 'd0', array : 'end'                                         , pos : 34,        posOrigin : 39, depth : 1, before : 'b</if>'},
+            ],
+            depth : 1
+          }
+        }
+      });
+    });
 
     it('should detect conditional blocks with hideBegin and hideEnd', function () {
       var _xml = '<div><p><h1></h1></p></div>';

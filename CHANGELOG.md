@@ -129,7 +129,9 @@
   - Fix LibreOffice detection on Windows
   - Accepts non-alphanumeric characters in variables names, values, ... For example, `{d.i💎d}` is allowed
   - Improve security in the builder and reduce memory consumption
-  - Fix crash when markers are next to each over `{d.id}{d.other}`
+  - Fix crash when markers are next to each over `{d.id}{d.other}` in many situations:
+    - with or without conditional blocks
+    - with or without loops
   - Fix crash when some documents like DOCX contain images in repetition section
   - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
   - Fix crash when two consecutive arrays, nested in object, were used

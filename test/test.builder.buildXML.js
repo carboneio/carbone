@@ -1229,7 +1229,7 @@ describe('builder.buildXML', function () {
       });
     });
   });
-  it('should accept xml tags with URLs between loop start and end', function(done) {
+  it('should accept xml tags with URLs between loop start and end', function (done) {
     var _data = {
       list : [
         {name : 'Lumeneo'},
@@ -1238,7 +1238,7 @@ describe('builder.buildXML', function () {
       ]
     };
     var _xml = '<document><p><w>{d.list[i].name}</w></p><a url="http://sdsd/"></a><p><w>{d.list[i+1].name}</w></p></document>';
-    builder.buildXML(_xml, _data, function(err, _xmlBuilt) {
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       helper.assert(err+'', 'null');
       helper.assert(_xmlBuilt,  '<document><p><w>Lumeneo</w></p><a url="http://sdsd/"></a><p><w>Tesla motors</w></p><a url="http://sdsd/"></a><p><w>Toyota</w></p><a url="http://sdsd/"></a></document>');
       done();

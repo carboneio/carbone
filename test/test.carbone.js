@@ -1635,6 +1635,118 @@ describe('Carbone', function () {
           });
         });
       });
+      it('should accept complex loop with filters, with markers surrounded by conditional blocks without characters between markers', function (done) {
+        var _xml = '<xml> <table>'
+                 +   ' <tr>{d.cars[i].brand} '
+                 +      '<li>{d.cars[i].wheels[i, size = 300].color:ifEQ(red):showBegin}'
+                 +             '{d.cars[i].wheels[i, size = 300].color}'
+                 +           '{d.cars[i].wheels[i, size = 300].color:showEnd}'
+                 +      '</li>'
+                 +      '<li> {d.cars[i].wheels[i+1, size = 300].color:ifEQ(red):showBegin}'
+                 +              '{d.cars[i].wheels[i+1, size = 300].color}'
+                 +           '{d.cars[i].wheels[i+1, size = 300].color:showEnd}'
+                 +      '</li>'
+                 +   ' </tr>'
+                 +   ' <tr>{d.cars[i+1].brand}</tr>'
+                 +   '</table> </xml>';
+        var _data = {
+          isDataHidden : true,
+          cars         : [
+            {
+              brand  : 'Lumeneo',
+              id     : 1,
+              wheels : [
+                {size : 300, color : 'red'},
+                {size : 300, color : 'blue'},
+                {size : 400, color : 'black'}
+              ]
+            },
+            {
+              brand  : 'Toyota',
+              id     : 2,
+              wheels : [
+                {size : 300, color : 'red'},
+                {size : 400, color : 'black'}
+              ]
+            }
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> <table>'
+           +  ' <tr>Lumeneo '
+           +     '<li>'
+           +       'red'
+           +     '</li>'
+           +     '<li>'
+           +     '</li>'
+           +  ' </tr>'
+           +  ' <tr>Toyota '
+           +     '<li>'
+           +        'red'
+           +     '</li>'
+           +  ' </tr>'
+           +  ' </table> </xml>');
+          _data.isDataHidden = false;
+          done();
+        });
+      });
+      it('should accept complex loop with filters, with markers surrounded by conditional blocks with characters between markers', function (done) {
+        var _xml = '<xml> <table>'
+                 +   ' <tr>{d.cars[i].brand} '
+                 +      '<li><p>a {d.cars[i].wheels[i, size = 300].color:ifNE(red):showBegin} good</p>'
+                 +             'mor'
+                 +           '<p>ning {d.cars[i].wheels[i, size = 300].color:showEnd} a</p>'
+                 +      '</li>'
+                 +      '<li>'
+                 +         '{d.cars[i].wheels[i+1, size = 300].color}'
+                 +      '</li>'
+                 +   ' </tr>'
+                 +   ' <tr>{d.cars[i+1].brand}</tr>'
+                 +   '</table> </xml>';
+        var _data = {
+          isDataHidden : true,
+          cars         : [
+            {
+              brand  : 'Lumeneo',
+              id     : 1,
+              wheels : [
+                {size : 300, color : 'red'},
+                {size : 300, color : 'blue'},
+                {size : 400, color : 'black'}
+              ]
+            },
+            {
+              brand  : 'Toyota',
+              id     : 2,
+              wheels : [
+                {size : 300, color : 'red'},
+                {size : 400, color : 'black'}
+              ]
+            }
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> <table>'
+           +  ' <tr>Lumeneo '
+           +     '<li>'
+           +       '<p>a </p><p> a</p>'
+           +     '</li>'
+           +     '<li>'
+           +       '<p>a  good</p>mor<p>ning  a</p>'
+           +     '</li>'
+           +  ' </tr>'
+           +  ' <tr>Toyota '
+           +     '<li>'
+           +        '<p>a </p><p> a</p>'
+           +     '</li>'
+           +  ' </tr>'
+           +  ' </table> </xml>');
+          _data.isDataHidden = false;
+          done();
+        });
+      });
       it('should be able to show or hide a table with a lot of nested xml tags ', function (done) {
         var _xml = '<xml>{d.cars:ifNEM:showBegin}<table> <tr> <td><p>{d.cars[i].brand}</p></td> </tr>   <tr> <td><p>{d.cars[i+1].brand}</p></td> </tr> </table>{d.variants:showEnd}</xml>';
         var _data = {

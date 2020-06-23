@@ -83,7 +83,7 @@
           <wp:inline distT="0" distB="0" distL="0" distR="0">
             <wp:extent cx="952500" cy="590550"/>
             <wp:effectExtent l="0" t="0" r="0" b="0"/>
-            <wp:docPr id="1" name="Image2" descr=""></wp:docPr>
+            <wp:docPr id="1" name="Image1" descr=""></wp:docPr>
             <wp:cNvGraphicFramePr>
               <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>
             </wp:cNvGraphicFramePr>
@@ -91,7 +91,7 @@
               <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
                 <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
                   <pic:nvPicPr>
-                    <pic:cNvPr id="1" name="Image2" descr=""></pic:cNvPr>
+                    <pic:cNvPr id="1" name="Image1" descr=""></pic:cNvPr>
                     <pic:cNvPicPr>
                       <a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>
                     </pic:cNvPicPr>
@@ -140,9 +140,9 @@
         <w:rPr></w:rPr>
         <w:drawing>
           <wp:inline distT="0" distB="0" distL="0" distR="0">
-            <wp:extent cx="952500" cy="590550"/>
+            <wp:extent cx="952500" cy="635000"/>
             <wp:effectExtent l="0" t="0" r="0" b="0"/>
-            <wp:docPr id="2" name="Image2" descr=""></wp:docPr>
+            <wp:docPr id="2" name="Image1" descr=""></wp:docPr>
             <wp:cNvGraphicFramePr>
               <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>
             </wp:cNvGraphicFramePr>
@@ -150,7 +150,7 @@
               <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
                 <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
                   <pic:nvPicPr>
-                    <pic:cNvPr id="2" name="Image2" descr=""></pic:cNvPr>
+                    <pic:cNvPr id="2" name="Image1" descr=""></pic:cNvPr>
                     <pic:cNvPicPr>
                       <a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>
                     </pic:cNvPicPr>
@@ -164,7 +164,7 @@
                   <pic:spPr bwMode="auto">
                     <a:xfrm>
                       <a:off x="0" y="0"/>
-                      <a:ext cx="952500" cy="590550"/>
+                      <a:ext cx="952500" cy="635000"/>
                     </a:xfrm>
                     <a:prstGeom prst="rect">
                       <a:avLst/>
@@ -199,9 +199,9 @@
         <w:rPr></w:rPr>
         <w:drawing>
           <wp:inline distT="0" distB="0" distL="0" distR="0">
-            <wp:extent cx="952500" cy="590550"/>
+            <wp:extent cx="590550" cy="590550"/>
             <wp:effectExtent l="0" t="0" r="0" b="0"/>
-            <wp:docPr id="3" name="Image2" descr=""></wp:docPr>
+            <wp:docPr id="3" name="Image1" descr=""></wp:docPr>
             <wp:cNvGraphicFramePr>
               <a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>
             </wp:cNvGraphicFramePr>
@@ -209,7 +209,7 @@
               <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
                 <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
                   <pic:nvPicPr>
-                    <pic:cNvPr id="3" name="Image2" descr=""></pic:cNvPr>
+                    <pic:cNvPr id="3" name="Image1" descr=""></pic:cNvPr>
                     <pic:cNvPicPr>
                       <a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>
                     </pic:cNvPicPr>
@@ -223,7 +223,7 @@
                   <pic:spPr bwMode="auto">
                     <a:xfrm>
                       <a:off x="0" y="0"/>
-                      <a:ext cx="952500" cy="590550"/>
+                      <a:ext cx="590550" cy="590550"/>
                     </a:xfrm>
                     <a:prstGeom prst="rect">
                       <a:avLst/>

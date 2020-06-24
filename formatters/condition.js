@@ -519,7 +519,30 @@ function ifContain (d, value, messageIfTrue, continueOnSuccess) {
   return d;
 }
 
+/**
+ * Detect conditional block begin/end
+ *
+ * @private
+ * @param  {String}   marker
+ * @return {Boolean}  true if there is a showEnd/hideEnd formatter
+ */
+function _isConditionalBlockEndMarker (marker) {
+  return /:(?:showEnd|hideEnd)/.test(marker.replace(/\s/g, ''));
+}
+/**
+ * Detect conditional block begin/end
+ *
+ * @private
+ * @param  {String}   marker
+ * @return {Boolean}  true if there is a showBegin/hideBegin formatter
+ */
+function _isConditionalBlockBeginMarker (marker) {
+  return /:(?:showBegin|hideBegin)/.test(marker.replace(/\s/g, ''));
+}
+
 module.exports = {
+  _isConditionalBlockEndMarker,
+  _isConditionalBlockBeginMarker,
   ifContain,
   ifEmpty,
   ifEqual,

@@ -18,6 +18,48 @@ describe('preprocessor', function () {
         done();
       });
     });
+    describe('ODT preprocessing', function () {
+      var _xml = `<office:document-content>
+          <office:body>
+            <office:text text:use-soft-page-breaks="true">
+              <table:table-cell office:value-type="string" table:style-name="Table6.A2">
+                <text:p text:style-name="P19">bla
+                  <text:span text:style-name="T134">nam</text:span>
+                  <text:soft-page-break/>
+                  </text:p>
+              </table:table-cell>
+              <table:table-cell office:value-type="string" table:style-name="Table6.A2">
+                <text:p text:style-name="P29">
+                  <text:span text:style-name="T42">sd</text:span>
+                  <text:soft-page-break></text:soft-page-break>
+                  <text:span text:style-name="T43">position</text:span>
+                  <text:soft-page-break/>
+                  <text:span text:style-name="T42"></text:span>
+                </text:p>
+              </table:table-cell>
+            </office:text>
+          </office:body>
+        </office:document-content>`
+      ;
+      it('should replace shared string by inline strings in a real xlsx file. The shared string should be removed', function (done) {
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.xlsx',
+          embeddings : [],
+          extension  : 'odt',
+          files      : [
+            { name : 'other.xml'  , parent : '', data : '<text:soft-page-break/>'},
+            { name : 'content.xml', parent : '', data : _xml}
+          ]
+        };
+        preprocessor.execute(_report, function (err, tmpl) {
+          helper.assert(err + '', 'null');
+          helper.assert(/soft-page-break/.test(tmpl.files[0].data), true);
+          helper.assert(/soft-page-break/.test(tmpl.files[1].data), false);
+          done();
+        });
+      });
+    });
     describe('XSLX preprocessing', function () {
       var _sharedStringBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
                               + '<t>{d.name}</t></si><si><t>{d.id}</t></si></sst>';

@@ -81,6 +81,10 @@
     `{d.id:ifEQ(10):showBegin}` block of text  `{d.id:showEnd}` => block of text<br>
     `{d.id:ifEQ(12):showBegin}`  block of text  `{d.id:showEnd}` =>
 
+    A smart and generic algorithm detects automatically pattern (paragraph, bullet-list, etc) to remove in document even if the conditional block
+    is not placed correctly in XML. For example: `BEGIN<p> blabla END</p>` becomes `BEGIN<p> blabla </p>END`.
+    It improves the final result by removing empty spaces in document.
+
   - ☀️ **Accepts to iterate on attributes of objects as is if it was an array**
     ```js
     {
@@ -135,6 +139,7 @@
   - Fix crash when some documents like DOCX contain images in repetition section
   - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
   - Fix crash when two consecutive arrays, nested in object, were used
+  - Remove useless soft-page-break in ODT documents as suggested by the OpenDocument specification
 
 
 ### v1.2.1

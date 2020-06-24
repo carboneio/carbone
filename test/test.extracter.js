@@ -680,7 +680,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr       : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20,
+            {attr       : 'id', formatters : [], obj        : 'dsite', pos        : 20, posOrigin  : 20,
               conditions : [
                 {
                   left     : {parent : 'dsite', attr : 'sort', formatters : ['int']},
@@ -1628,7 +1628,7 @@ describe('extracter', function () {
     });
     it('XML parts of conditional blocks should be detected\
       It should also detect the condition with "showBegin" and "showEnd" formatters', function () {
-      var _xml = '<div><x><tr></tr><tr></tr></x><p><h1></h1></p><th></th><th></th></div>';
+      var _xml = '<div><x><tr></tr><tr></tr></x><p><h1></h1>p</p><th></th><th></th></div>';
       var _descriptor = {
         d0 : {
           name     : '',
@@ -1664,10 +1664,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd0',
           parents   : ['d0'],
-          position  : {start : 50, end : 59}, /* Approximative position */
+          position  : {start : 51, end : 60}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'menus2', attr : 'id', pos : 50, posOrigin : 50}
+            {obj : 'menus2', attr : 'id', pos : 51, posOrigin : 51}
           ]
         }
       };
@@ -1706,7 +1706,7 @@ describe('extracter', function () {
             xmlParts : [
               {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 33       , posOrigin : 30 , depth : 0 , before : '</x><p>', after : ''}, // if start
               {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33.015625, posOrigin : 30 , depth : 0 , after : '<h1></h1>'},
-              {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42       , posOrigin : 42 , depth : 0 , after : '</p>'  } // if end
+              {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42       , posOrigin : 42 , depth : 0 , after : 'p</p>'  } // if end
             ]
           },
           menus2 : {
@@ -1714,12 +1714,12 @@ describe('extracter', function () {
             type      : 'array',
             parent    : 'd0',
             parents   : ['d0'],
-            position  : {start : 46, end : 55, endOdd : 64},
+            position  : {start : 47, end : 56, endOdd : 65},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'menus2', attr : 'id'    , pos : 50, posOrigin : 50, depth : 1},
-              {obj : 'menus2', array : 'start', pos : 46, posOrigin : 50,  depth : 1, after : '<th>'},
-              {obj : 'menus2', array : 'end'  , pos : 55, posOrigin : 59, depth : 1, before : '</th>'}
+              {obj : 'menus2', attr : 'id'    , pos : 51, posOrigin : 51, depth : 1},
+              {obj : 'menus2', array : 'start', pos : 47, posOrigin : 51,  depth : 1, after : '<th>'},
+              {obj : 'menus2', array : 'end'  , pos : 56, posOrigin : 60, depth : 1, before : '</th>'}
             ],
             depth : 1
           },
@@ -1773,7 +1773,7 @@ describe('extracter', function () {
     });
 
     it('should detect conditional blocks with hideBegin and hideEnd', function () {
-      var _xml = '<div><p><h1></h1></p></div>';
+      var _xml = '<div><p><h1></h1>p</p></div>';
       var _descriptor = {
         d0 : {
           name     : '',
@@ -1790,7 +1790,7 @@ describe('extracter', function () {
       helper.assert(extracter.splitXml(_xml, _descriptor), {
         staticData : {
           before : '<div><p>',
-          after  : '</p></div>'
+          after  : 'p</p></div>'
         },
         dynamicData : {
           d0 : {
@@ -2529,7 +2529,7 @@ describe('extracter', function () {
             type      : 'array',
             parent    : '_rootd',
             parents   : ['_root', '_rootd'],
-            position  : {start : 5,end :  25.015625, endOdd : 43},
+            position  : {start : 5,end : 25.015625, endOdd : 43},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
               {obj : '_rootdcars', attr : 'brand' , pos : 13, posOrigin : 13, depth : 2, moveTo : '_rootdcarswheels' , after : ' '   },

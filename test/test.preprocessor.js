@@ -1,7 +1,5 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
-var dynpics = require('../lib/dynpics');
-const should = require('should');
 
 describe('preprocessor', function () {
   describe('color', function () {
@@ -262,6 +260,48 @@ describe('preprocessor', function () {
         done();
       });
     });
+    describe('ODT preprocessing', function () {
+      var _xml = `<office:document-content>
+          <office:body>
+            <office:text text:use-soft-page-breaks="true">
+              <table:table-cell office:value-type="string" table:style-name="Table6.A2">
+                <text:p text:style-name="P19">bla
+                  <text:span text:style-name="T134">nam</text:span>
+                  <text:soft-page-break/>
+                  </text:p>
+              </table:table-cell>
+              <table:table-cell office:value-type="string" table:style-name="Table6.A2">
+                <text:p text:style-name="P29">
+                  <text:span text:style-name="T42">sd</text:span>
+                  <text:soft-page-break></text:soft-page-break>
+                  <text:span text:style-name="T43">position</text:span>
+                  <text:soft-page-break/>
+                  <text:span text:style-name="T42"></text:span>
+                </text:p>
+              </table:table-cell>
+            </office:text>
+          </office:body>
+        </office:document-content>`
+      ;
+      it('should replace shared string by inline strings in a real xlsx file. The shared string should be removed', function (done) {
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.xlsx',
+          embeddings : [],
+          extension  : 'odt',
+          files      : [
+            { name : 'other.xml'  , parent : '', data : '<text:soft-page-break/>'},
+            { name : 'content.xml', parent : '', data : _xml}
+          ]
+        };
+        preprocessor.execute(_report, function (err, tmpl) {
+          helper.assert(err + '', 'null');
+          helper.assert(/soft-page-break/.test(tmpl.files[0].data), true);
+          helper.assert(/soft-page-break/.test(tmpl.files[1].data), false);
+          done();
+        });
+      });
+    });
     describe('XSLX preprocessing', function () {
       var _sharedStringBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
                               + '<t>{d.name}</t></si><si><t>{d.id}</t></si></sst>';
@@ -298,8 +338,8 @@ describe('preprocessor', function () {
             helper.assert(err + '', 'null');
             // tmpl.files[0].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[0].data.should.be.eql(_sharedStringAfter);
-            should(tmpl.files[0].name).be.eql('xl/worksheets/sheet1.xml');
-            should(tmpl.files[0].data).be.eql(_sheetAfter);
+            helper.assert(tmpl.files[0].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[0].data, _sheetAfter);
             done();
           });
         });
@@ -317,15 +357,15 @@ describe('preprocessor', function () {
           };
           preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err + '', 'null');
-            should(tmpl.files[0].name).be.eql('my_file.xml');
-            should(tmpl.files[0].data).be.eql('some text');
-            should(tmpl.files[0].parent).be.eql('');
+            helper.assert(tmpl.files[0].name, 'my_file.xml');
+            helper.assert(tmpl.files[0].data, 'some text');
+            helper.assert(tmpl.files[0].parent, '');
             // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
             // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            should(tmpl.files[1].name).be.eql('xl/worksheets/sheet1.xml');
-            should(tmpl.files[1].data).be.eql(_sheetAfter);
-            should(tmpl.files[1].parent).be.eql('embedded/spreadsheet.xlsx');
+            helper.assert(tmpl.files[1].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[1].data, _sheetAfter);
+            helper.assert(tmpl.files[1].parent, 'embedded/spreadsheet.xlsx');
             done();
           });
         });
@@ -345,21 +385,21 @@ describe('preprocessor', function () {
           };
           preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err + '', 'null');
-            should(tmpl.files[0].name).be.eql('my_file.xml');
-            should(tmpl.files[0].data).be.eql('some text');
-            should(tmpl.files[0].parent).be.eql('');
+            helper.assert(tmpl.files[0].name, 'my_file.xml');
+            helper.assert(tmpl.files[0].data, 'some text');
+            helper.assert(tmpl.files[0].parent, '');
             // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
             // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            should(tmpl.files[1].name).be.eql('xl/worksheets/sheet1.xml');
-            should(tmpl.files[1].data).be.eql(_sheetAfter);
-            should(tmpl.files[1].parent).be.eql('embedded/spreadsheet.xlsx');
+            helper.assert(tmpl.files[1].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[1].data, _sheetAfter);
+            helper.assert(tmpl.files[1].parent, 'embedded/spreadsheet.xlsx');
             // tmpl.files[2].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[2].data.should.be.eql(_sharedStringAfter2);
             // tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
-            should(tmpl.files[2].name).be.eql('xl/worksheets/sheet1.xml');
-            should(tmpl.files[2].data).be.eql(_sheetAfter2);
-            should(tmpl.files[2].parent).be.eql('embedded/spreadsheet2.xlsx');
+            helper.assert(tmpl.files[2].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[2].data, _sheetAfter2);
+            helper.assert(tmpl.files[2].parent, 'embedded/spreadsheet2.xlsx');
             done();
           });
         });
@@ -769,221 +809,130 @@ describe('preprocessor', function () {
     });
     describe('Dynamic pictures preprocessing ODT ONLY', function () {
 
-      it('should do nothing (no picture)', function () {
-        var xml = '<xml></xml>';
-        var report = {
-          files : [
-            { name : 'content.xml'    , parent : '', data : xml }
-          ]
-        };
-        var expectedReport = {
-          files : [
-            { name : 'content.xml'    , parent : '', data : xml }
-          ]
-        };
-        dynpics.manageOdt(report, function (error, result) {
-          helper.assert(result, expectedReport);
-        });
-      });
 
-      describe('Without loops', function () {
+      describe('prepareOpenDocumentImage', function () {
 
         it('should do nothing', function (done) {
-          var xml = '<xml><text:p></text:p></xml>';
-          var expected = '<xml><text:p></text:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
+          var _xml = '<xml><text:p></text:p></xml>';
+          var _expected = '<xml><text:p></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml'    , parent : '', data : _xml }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
-        it('should replace pictures link by alt text marker', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
+        it('should replace pictures link by alt text marker and add special formatter generateOpenDocumentImageHref', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0">'
+                   + '<draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.dog:scaleImage(width, 5.87, cm)}cm" svg:height="{d.dog:scaleImage(height, 3.302, cm)}cm" draw:z-index="0">'
+                   + '<draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml' , parent : '', data : _xml }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
-        it('should replace pictures link by alt text marker (in styles file)', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
-          var report = {
-            files : [
-              { name : 'styles.xml' , parent : '', data : xml },
+        it('should replace pictures link by alt text marker and add special formatter generateOpenDocumentImageHref', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0">'
+                   + '<draw:image loext:mime-type="image/jpeg" xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.dog:scaleImage(width, 5.87, cm)}cm" svg:height="{d.dog:scaleImage(height, 3.302, cm)}cm" draw:z-index="0">'
+                   + '<draw:image loext:mime-type="{d.dog:generateOpenDocumentImageMimeType()}" xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml' , parent : '', data : _xml }
+            ]
+          };
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
+            done();
+          });
+        });
+
+
+        it('should leave other markers in alternative text and take into account only the first marker for image', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}  {d.altText}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.dog:scaleImage(width, 5.87, cm)}cm" svg:height="{d.dog:scaleImage(height, 3.302, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>  {d.altText}</svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml' , parent : '', data : _xml }
+            ]
+          };
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
+            done();
+          });
+        });
+
+        it('should replace pictures alt text marker in styles file also', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.dog:scaleImage(width, 5.87, cm)}cm" svg:height="{d.dog:scaleImage(height, 3.302, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'styles.xml' , parent : '', data : _xml },
               { name : 'content.xml', parent : '', data : ''  }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
-        it('should replace the dynamic picture (text before picture bug)', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.cat}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.cat}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml', parent : '', data : xml }
+        it('should replace pictures alt text marker on all images and it should not modify other markers', function (done) {
+          var _xml = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.cat}</svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.dog:scaleImage(width, 5.87, cm)}cm" svg:height="{d.dog:scaleImage(height, 3.302, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.cat:scaleImage(width, 5.87, cm)}cm" svg:height="{d.cat:scaleImage(height, 3.302, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.cat:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml', parent : '', data : _xml }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
-            done();
-          });
-        });
-
-        it('should replace pictures link by alt text marker (two pictures)', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.cat}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.cat}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
-            ]
-          };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });
 
         it('should replace pictures link by alt text marker (with captions)', function (done) {
-          var xml = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
-          var expected = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
+          var _xml = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
+          var _expected = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="{d.dog:scaleImage(width, 17, cm)}cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="{d.dog:scaleImage(width, 17, cm)}cm" style:rel-width="100%" svg:height="{d.dog:scaleImage(height, 9.562, cm)}cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.dog:scaleImage(width, 17, cm)}cm" style:rel-width="100%" svg:height="{d.dog:scaleImage(height, 9.562, cm)}cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
+          var _report = {
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'content.xml'    , parent : '', data : _xml }
             ]
           };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
-            done();
-          });
-        });
-
-      });
-
-      describe('With loops', function () {
-
-        it('should replace pictures link by alt text marker and wrap in loop', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.dog}{d.loop[i+1]}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1">{d.loop[i]}</text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1">{d.loop[i+1]}</text:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
-            ]
-          };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
-            done();
-          });
-        });
-
-        it('should replace pictures link by alt text marker and wrap in loop (two pictures)', function (done) {
-          var xml = '<xml><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.dog}{d.loop[i+1]}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.cat}{d.loop[i+1]}</svg:title></draw:frame></text:p></xml>';
-          var expected = '<xml><text:p text:style-name="P1">{d.loop[i]}</text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1">{d.loop[i+1]}</text:p><text:p text:style-name="P1">{d.loop[i]}</text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="{d.cat}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1">{d.loop[i+1]}</text:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
-            ]
-          };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
-            done();
-          });
-        });
-
-        it('should replace pictures link by alt text marker and wrap in loop (with captions)', function (done) {
-          var xml = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.loop[i]}{d.dog}{d.loop[i+1]}</svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p>';
-          var expected = '<text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/></text:sequence-decls><text:p text:style-name="P1">{d.loop[i]}</text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Frame1" text:anchor-type="paragraph" svg:width="17cm" draw:z-index="0"><draw:text-box fo:min-height="9.562cm"><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale-min" draw:z-index="1"><draw:text-box><text:p text:style-name="Illustration"><draw:frame draw:style-name="fr3" draw:name="Image1" text:anchor-type="as-char" svg:width="17cm" style:rel-width="100%" svg:height="9.562cm" style:rel-height="scale" draw:z-index="2"><draw:image xlink:href="{d.dog}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration1" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">1</text:sequence>: and another</text:p></draw:text-box></draw:frame><text:span text:style-name="T1"><text:line-break/></text:span>Illustration <text:sequence text:ref-name="refIllustration0" text:name="Illustration" text:formula="ooow:Illustration+1" style:num-format="1">2</text:sequence>: captionned</text:p><text:p text:style-name="Text">Text <text:sequence text:ref-name="refText0" text:name="Text" text:formula="ooow:Text+1" style:num-format="1">1</text:sequence>: twice</text:p></draw:text-box></draw:frame></text:p><text:p text:style-name="P1">{d.loop[i+1]}</text:p>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
-            ]
-          };
-          dynpics.manageOdt(report, function (err, report) {
-            helper.assert(report.files[0].data, expected);
-            done();
-          });
-        });
-
-      });
-
-    });
-
-    describe('Dynamic pictures preprocessing DOCX ONLY', function () {
-
-      it('should do nothing (no picture)', function (done) {
-        var xml = '<xml></xml>';
-        var report = {
-          files : [
-            { name : 'word/document.xml'    , parent : '', data : xml }
-          ]
-        };
-        var expectedReport = {
-          files : [
-            { name : 'word/document.xml'    , parent : '', data : xml }
-          ]
-        };
-        dynpics.manageDocx(report, function (error, result) {
-          helper.assert(result, expectedReport);
-          done();
-        });
-      });
-
-      describe('Without loops', function () {
-
-        it('should do nothing', function (done) {
-          var xml = '<xml><w:p></w:p></xml>';
-          var expected = '<xml><w:p></w:p></xml>';
-          var report = {
-            files : [
-              { name : 'content.xml'    , parent : '', data : xml }
-            ]
-          };
-          // eslint-disable-next-line no-unused-vars
-          dynpics.manageOdt(report, function (err, result) {
-            helper.assert(report.files[0].data, expected);
-            done();
-          });
-        });
-
-        it('should add a relation and link to it (basic)', function (done) {
-          var _rootRels        = '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml" Id="rId3" /><Relationship Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml" Id="rId2" /><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml" Id="rId1" /></Relationships>';
-          var _xml             = '<?xml version="1.0" encoding="utf-8"?><xml><w:p w14:paraId="7DEA1F7F" w14:textId="77777777" w:rsidR="00E67D1A" w:rsidRDefault="006F0085"><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="19C73DC8" wp14:editId="0B99D1D7"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="1" name="Image 1" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="1E31A505" w14:textId="66AFCDB5" w:rsidR="006959F6" w:rsidRDefault="006959F6"><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="017380FC" wp14:editId="1C0957DB"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="2" name="Image 2"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:bookmarkEnd w:id="0"/></w:p></xml>';
-          var _xmlRels         = '<?xml version="1.0" encoding="utf-8"?><Relationships><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/image0.jpg" TargetMode="External"/></Relationships>';
-
-          var _expectedXml     = '<?xml version="1.0" encoding="utf-8"?><xml><w:p w14:paraId="7DEA1F7F" w14:textId="77777777" w:rsidR="00E67D1A" w:rsidRDefault="006F0085"><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="19C73DC8" wp14:editId="0B99D1D7"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="1" name="Image 1" descr="{d.dog}"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.dog:md5:prepend(rId)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="1E31A505" w14:textId="66AFCDB5" w:rsidR="006959F6" w:rsidRDefault="006959F6"><w:bookmarkStart w:id="0" w:name="_GoBack"/><w:r><w:rPr><w:noProof/><w:lang w:eastAsia="fr-FR"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="017380FC" wp14:editId="1C0957DB"><wp:extent cx="5756910" cy="3238500"/><wp:effectExtent l="0" t="0" r="8890" b="12700"/><wp:docPr id="2" name="Image 2"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="GRUMPYCAT.jpg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId6"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5756910" cy="3238500"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:bookmarkEnd w:id="0"/></w:p></xml>';
-          var _expectedXmlRels = '<?xml version="1.0" encoding="utf-8"?><Relationships><Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/image0.jpg" TargetMode="External"/><Relationship Id="{d.dog:md5:prepend(rId)}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="{d.dog}" TargetMode="External"/></Relationships>';
-
-          var report = {
-            files : [
-              { name : '_rels/.rels'                  , parent : '' , data : _rootRels },
-              { name : 'word/document.xml'            , parent : '' , data : _xml },
-              { name : 'word/_rels/document.xml.rels' , parent : '' , data : _xmlRels }
-            ]
-          };
-          var expectedReport = {
-            files : [
-              { name : '_rels/.rels'                  , parent : '' , data : _rootRels },
-              { name : 'word/document.xml'            , parent : '' , data : _expectedXml },
-              { name : 'word/_rels/document.xml.rels' , parent : '' , data : _expectedXmlRels }
-            ]
-          };
-          dynpics.manageDocx(report, function (error, result) {
-            helper.assert(result, expectedReport);
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files[0].data, _expected);
             done();
           });
         });

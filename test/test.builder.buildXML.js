@@ -162,6 +162,21 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept markers next to other loop markers (without whitespaces)', function (done) {
+    var _xml = '<xml> {d.id}<t_row>{d.id}{d.cars[i].brand}{d.id}</t_row>{d.id}<t_row>{d.id}{d.cars[i+1].brand}{d.id}</t_row>{d.id}</xml>';
+    var _data = {
+      id   : 3,
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> 3<t_row>3Lumeneo3</t_row>3<t_row>3Tesla motors3</t_row>3<t_row>3Toyota3</t_row>33</xml>');
+      done();
+    });
+  });
   it('should accept non-XML structure', function (done) {
     var _xml = '{d[i].brand} , {d[i+1].brand}';
     var _data = [
@@ -580,6 +595,60 @@ describe('builder.buildXML', function () {
           +  '</td>'
         +  '</td>'
         +'</xml>';
+      assert.equal(_xmlBuilt, _expectedResult);
+      done();
+    });
+  });
+  it('should work with two independant arrays in sub objects', function (done) {
+    var _xml =
+        '<table>'
+      + '  <row>'
+      + '    {d.cars.bills[i].name}'
+      + '    a: {d.cars.bills[i].range.dist}'
+      + '  </row>'
+      + '  <row>'
+      + '    {d.cars.bills[i+1].name}'
+      + '  </row>'
+      + '</table>'
+      + '<table>'
+      + '  <row>'
+      + '    {d.fruit.vitamins[i].name}'
+      + '  </row>'
+      + '  <row>'
+      + '    {d.fruit.vitamins[i+1].name}'
+      + '  </row>'
+      + '</table>'
+    ;
+    var _data = {
+      cars : {
+        bills : [
+          { name : 'Tesla'   , range : { dist : 1000 } },
+          { name : 'Delorean', range : { dist : 1200 } }
+        ]
+      },
+      fruit : {
+        vitamins : [{ name : 'B1', }]
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      var _expectedResult =
+          '<table>'
+        + '  <row>'
+        + '    Tesla'
+        + '    a: 1000'
+        + '  </row>'
+        + '  <row>'
+        + '    Delorean'
+        + '    a: 1200'
+        + '  </row>  '
+        + '</table>'
+        + '<table>'
+        + '  <row>'
+        + '    B1'
+        + '  </row>  '
+        + '</table>'
+      ;
       assert.equal(_xmlBuilt, _expectedResult);
       done();
     });
@@ -1160,7 +1229,7 @@ describe('builder.buildXML', function () {
       });
     });
   });
-  it('should accept xml tags with URLs between loop start and end', function(done) {
+  it('should accept xml tags with URLs between loop start and end', function (done) {
     var _data = {
       list : [
         {name : 'Lumeneo'},
@@ -1169,7 +1238,7 @@ describe('builder.buildXML', function () {
       ]
     };
     var _xml = '<document><p><w>{d.list[i].name}</w></p><a url="http://sdsd/"></a><p><w>{d.list[i+1].name}</w></p></document>';
-    builder.buildXML(_xml, _data, function(err, _xmlBuilt) {
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       helper.assert(err+'', 'null');
       helper.assert(_xmlBuilt,  '<document><p><w>Lumeneo</w></p><a url="http://sdsd/"></a><p><w>Tesla motors</w></p><a url="http://sdsd/"></a><p><w>Toyota</w></p><a url="http://sdsd/"></a></document>');
       done();
@@ -1679,6 +1748,32 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should repeat section even if the XML contains http links', function (done) {
+    var _xml = ''
+     + '<body>'
+     + '  <p>'
+     + '    <w id="{d.list[i].id}"></w>'
+     + '    <pic a="http://ee"></pic>'
+     + '  </p>'
+     + '  <p>'
+     + '    <w id="{d.list[i+1].id}"></w>'
+     + '    <pic a="http://ee"></pic>'
+     + '  </p>'
+     + '</body>'
+    ;
+    var _data = {
+      list : [
+        {id : 100},
+        {id : 200},
+        {id : 300}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt.match(/body/g).length, 2);
+      assert.equal(_xmlBuilt, '<body>  <p>    <w id="100"></w>    <pic a="http://ee"></pic>  </p>  <p>    <w id="200"></w>    <pic a="http://ee"></pic>  </p>  <p>    <w id="300"></w>    <pic a="http://ee"></pic>  </p>  </body>');
+      done();
+    });
+  });
   it('should replace rId by md5 hash with id prepend', function (done) {
     var formatters = require('../formatters/string.js');
     var _xml = '<Relationships>{d.<Relationship Id="{d.dog:md5:prepend(id)}" Target="{d.dog}"/>toto}</Relationships>';
@@ -1891,6 +1986,39 @@ describe('builder.buildXML', function () {
       builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
         helper.assert(err+'', 'null');
         helper.assert(_xmlBuilt, '<xml><tr>paul : 10</tr><tr>jack : 20</tr><tr>bob : 30</tr><tr>neo : 50</tr><tr>trinity : 40</tr></xml>');
+        done();
+      });
+    });
+  });
+
+  describe('post-injection of data', function () {
+    it('should accept formatters which returns another formatter which can be called at the end of the process', function (done) {
+      var _xml    = '<xml> {d.titleA:postProcess()} <b/> {d.titleB:postProcess()} <b/> {d.titleC:postProcess()} </xml>';
+      var _data   = {
+        titleA : 'a',
+        titleB : 'b',
+        titleC : 'c'
+      };
+      // first formater called
+      function postProcess (value) {
+        this.sum++;
+        return {
+          // second formatter called at the end of the process
+          fn : function (postValue, runningSum) {
+            return postValue + ' ' + runningSum + ' ' + this.sum;
+          },
+          args : [value, this.sum]
+        };
+      }
+      var _option = {
+        formatters : {
+          postProcess : postProcess
+        },
+        imageDatabase : new Map(),
+        sum           : 0
+      };
+      builder.buildXML(_xml, _data, _option, function (err, _xmlBuilt) {
+        helper.assert(_xmlBuilt, '<xml> a 1 3 <b/> b 2 3 <b/> c 3 3 </xml>');
         done();
       });
     });

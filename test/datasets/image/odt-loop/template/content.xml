@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content office:version="1.2" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:ooo="http://openoffice.org/2004/office" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:rpt="http://openoffice.org/2005/report" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <office:scripts/>
+  <office:font-face-decls>
+    <style:font-face style:font-family-generic="swiss" style:name="Arial Unicode MS1" svg:font-family="Arial Unicode MS"/>
+    <style:font-face style:font-family-generic="roman" style:font-pitch="variable" style:name="Liberation Serif" svg:font-family="Liberation Serif"/>
+    <style:font-face style:font-family-generic="swiss" style:font-pitch="variable" style:name="Liberation Sans" svg:font-family="Liberation Sans"/>
+    <style:font-face style:font-family-generic="system" style:font-pitch="variable" style:name="Arial Unicode MS" svg:font-family="Arial Unicode MS"/>
+    <style:font-face style:font-family-generic="system" style:font-pitch="variable" style:name="PingFang SC" svg:font-family="PingFang SC"/>
+    <style:font-face style:font-family-generic="system" style:font-pitch="variable" style:name="Songti SC" svg:font-family="Songti SC"/>
+  </office:font-face-decls>
+  <office:automatic-styles>
+    <style:style style:family="table" style:master-page-name="" style:name="Table1">
+      <style:table-properties fo:break-after="auto" fo:break-before="auto" fo:keep-with-next="auto" style:may-break-between-rows="true" style:page-number="auto" style:shadow="none" style:width="17cm" table:align="margins" table:border-model="collapsing"/>
+    </style:style>
+    <style:style style:family="table-column" style:name="Table1.A">
+      <style:table-column-properties style:column-width="9.7cm" style:rel-column-width="5499*"/>
+    </style:style>
+    <style:style style:family="table-column" style:name="Table1.B">
+      <style:table-column-properties style:column-width="7.301cm" style:rel-column-width="4139*"/>
+    </style:style>
+    <style:style style:family="table-row" style:name="Table1.1">
+      <style:table-row-properties fo:keep-together="auto"/>
+    </style:style>
+    <style:style style:family="table-cell" style:name="Table1.A1">
+      <style:table-cell-properties fo:background-color="#ce181e" fo:border-bottom="none" fo:border-left="0.75pt solid #ce181e" fo:border-right="none" fo:border-top="0.75pt solid #ce181e" fo:padding="0.199cm" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:family="table-cell" style:name="Table1.B1">
+      <style:table-cell-properties fo:background-color="#ce181e" fo:border-bottom="none" fo:border-left="none" fo:border-right="0.75pt solid #ce181e" fo:border-top="0.75pt solid #ce181e" fo:padding="0.199cm" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:family="table-cell" style:name="Table1.A2">
+      <style:table-cell-properties fo:background-color="transparent" fo:border-bottom="none" fo:border-left="0.75pt solid #ce181e" fo:border-right="none" fo:border-top="none" fo:padding="0.199cm" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:data-style-name="N20000" style:family="table-cell" style:name="Table1.B2">
+      <style:table-cell-properties fo:background-color="transparent" fo:border-bottom="none" fo:border-left="none" fo:border-right="0.75pt solid #ce181e" fo:border-top="none" fo:padding="0.199cm" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:family="table-cell" style:name="Table1.A3">
+      <style:table-cell-properties fo:background-color="#fcd3c1" fo:border-bottom="0.75pt solid #ce181e" fo:border-left="0.75pt solid #ce181e" fo:border-right="none" fo:border-top="none" fo:padding="0.199cm" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:data-style-name="N20000" style:family="table-cell" style:name="Table1.B3">
+      <style:table-cell-properties fo:background-color="#fcd3c1" fo:border-bottom="0.75pt solid #ce181e" fo:border-left="none" fo:border-right="0.75pt solid #ce181e" fo:border-top="none" fo:padding="0.199cm" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P1" style:parent-style-name="Header">
+      <style:paragraph-properties fo:text-align="end" style:justify-single-word="false"/>
+      <style:text-properties officeooo:paragraph-rsid="00070eea" officeooo:rsid="00070eea"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P2" style:parent-style-name="Standard">
+      <style:text-properties officeooo:paragraph-rsid="00036162" officeooo:rsid="00036162"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P3" style:parent-style-name="Standard">
+      <style:text-properties officeooo:paragraph-rsid="0004d9f1" officeooo:rsid="00036162"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P4" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties fo:color="#000000" fo:font-size="12pt" fo:font-style="normal" fo:font-weight="bold" fo:text-shadow="none" officeooo:paragraph-rsid="00062b29" officeooo:rsid="00036162" style:font-name="Liberation Sans" style:font-size-asian="12pt" style:font-size-complex="12pt" style:font-style-asian="normal" style:font-style-complex="normal" style:font-weight-asian="bold" style:font-weight-complex="bold" style:text-line-through-style="none" style:text-line-through-type="none" style:text-outline="false" style:text-overline-color="font-color" style:text-overline-style="none" style:text-underline-style="none"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P5" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties officeooo:paragraph-rsid="0004d9f1"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P6" style:parent-style-name="Table_20_Contents">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties fo:color="#ffffff" fo:font-size="12pt" fo:font-style="normal" fo:font-weight="bold" fo:text-shadow="none" officeooo:paragraph-rsid="0004d9f1" officeooo:rsid="0004d9f1" style:font-name="Liberation Sans" style:font-size-asian="12pt" style:font-size-complex="12pt" style:font-style-asian="normal" style:font-style-complex="normal" style:font-weight-asian="bold" style:font-weight-complex="bold" style:text-line-through-style="none" style:text-line-through-type="none" style:text-outline="false" style:text-overline-color="font-color" style:text-overline-style="none" style:text-underline-style="none"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P7" style:parent-style-name="Table_20_Contents">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties fo:color="#000000" fo:font-size="12pt" fo:font-style="normal" fo:font-weight="normal" fo:text-shadow="none" style:font-name="Liberation Sans" style:font-size-asian="12pt" style:font-size-complex="12pt" style:font-style-asian="normal" style:font-style-complex="normal" style:font-weight-asian="normal" style:font-weight-complex="normal" style:text-line-through-style="none" style:text-line-through-type="none" style:text-outline="false" style:text-overline-color="font-color" style:text-overline-style="none" style:text-underline-style="none"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P8" style:parent-style-name="Table_20_Contents">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties fo:color="#000000" fo:font-size="12pt" fo:font-style="normal" fo:font-weight="bold" fo:text-shadow="none" style:font-name="Liberation Sans" style:font-size-asian="12pt" style:font-size-complex="12pt" style:font-style-asian="normal" style:font-style-complex="normal" style:font-weight-asian="bold" style:font-weight-complex="bold" style:text-line-through-style="none" style:text-line-through-type="none" style:text-outline="false" style:text-overline-color="font-color" style:text-overline-style="none" style:text-underline-style="none"/>
+    </style:style>
+    <style:style style:family="text" style:name="T1">
+      <style:text-properties officeooo:rsid="0004d9f1"/>
+    </style:style>
+    <style:style style:family="text" style:name="T2">
+      <style:text-properties fo:color="#000000" fo:font-size="12pt" fo:font-style="normal" fo:font-weight="normal" fo:text-shadow="none" officeooo:rsid="00036162" style:font-name="Liberation Sans" style:font-size-asian="12pt" style:font-size-complex="12pt" style:font-style-asian="normal" style:font-style-complex="normal" style:font-weight-asian="normal" style:font-weight-complex="normal" style:text-line-through-style="none" style:text-line-through-type="none" style:text-outline="false" style:text-overline-color="font-color" style:text-overline-style="none" style:text-underline-style="none"/>
+    </style:style>
+    <style:style style:family="text" style:name="T3">
+      <style:text-properties fo:color="#000000" fo:font-size="12pt" fo:font-style="normal" fo:font-weight="normal" fo:text-shadow="none" officeooo:rsid="0004d9f1" style:font-name="Liberation Sans" style:font-size-asian="12pt" style:font-size-complex="12pt" style:font-style-asian="normal" style:font-style-complex="normal" style:font-weight-asian="normal" style:font-weight-complex="normal" style:text-line-through-style="none" style:text-line-through-type="none" style:text-outline="false" style:text-overline-color="font-color" style:text-overline-style="none" style:text-underline-style="none"/>
+    </style:style>
+    <style:style style:family="text" style:name="T4">
+      <style:text-properties fo:color="#000000" fo:font-size="12pt" fo:font-style="normal" fo:font-weight="normal" fo:text-shadow="none" officeooo:rsid="00062b29" style:font-name="Liberation Sans" style:font-size-asian="12pt" style:font-size-complex="12pt" style:font-style-asian="normal" style:font-style-complex="normal" style:font-weight-asian="normal" style:font-weight-complex="normal" style:text-line-through-style="none" style:text-line-through-type="none" style:text-outline="false" style:text-overline-color="font-color" style:text-overline-style="none" style:text-underline-style="none"/>
+    </style:style>
+    <style:style style:family="text" style:name="T5">
+      <style:text-properties fo:font-size="18.2000007629395pt" fo:font-weight="bold" officeooo:rsid="0004d9f1" style:font-name="Liberation Sans" style:font-name-asian="PingFang SC" style:font-name-complex="Arial Unicode MS" style:font-size-asian="18.2000007629395pt" style:font-size-complex="18.2000007629395pt" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+    </style:style>
+    <style:style style:family="text" style:name="T6">
+      <style:text-properties fo:font-size="18.2000007629395pt" fo:font-weight="bold" officeooo:rsid="00062b29" style:font-name="Liberation Sans" style:font-name-asian="PingFang SC" style:font-name-complex="Arial Unicode MS" style:font-size-asian="18.2000007629395pt" style:font-size-complex="18.2000007629395pt" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+    </style:style>
+    <style:style style:family="graphic" style:name="fr1" style:parent-style-name="Graphics">
+      <style:graphic-properties draw:blue="0%" draw:color-inversion="false" draw:color-mode="standard" draw:contrast="0%" draw:gamma="100%" draw:green="0%" draw:image-opacity="100%" draw:luminance="0%" draw:red="0%" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" style:run-through="foreground" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:wrap="none"/>
+    </style:style>
+    <style:style style:family="graphic" style:name="fr2" style:parent-style-name="Graphics">
+      <style:graphic-properties draw:blue="0%" draw:color-inversion="false" draw:color-mode="standard" draw:contrast="0%" draw:gamma="100%" draw:green="0%" draw:image-opacity="100%" draw:luminance="0%" draw:red="0%" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" style:horizontal-pos="left" style:horizontal-rel="paragraph" style:mirror="none" style:number-wrapped-paragraphs="no-limit" style:run-through="foreground" style:wrap="left" style:wrap-contour="false"/>
+    </style:style>
+    <number:number-style number:country="FR" number:language="fr" style:name="N20000">
+      <number:number number:min-integer-digits="1"/>
+    </number:number-style>
+  </office:automatic-styles>
+  <office:body>
+    <office:text>
+      <office:forms form:apply-design-mode="false" form:automatic-focus="false"/>
+      <text:sequence-decls>
+        <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
+      </text:sequence-decls>
+      <text:h text:outline-level="1" text:style-name="Heading_20_1">{d.
+        <text:span text:style-name="T1">cars[i].</text:span>
+        <text:span text:style-name="T5">n</text:span>
+        <text:span text:style-name="T6">ame</text:span>
+        <text:span text:style-name="T1">}</text:span></text:h>
+      <text:p text:style-name="P2"/>
+      <text:p text:style-name="P3"/>
+      <table:table table:name="Table1" table:style-name="Table1" table:template-name="Box List Red">
+        <table:table-column table:style-name="Table1.A"/>
+        <table:table-column table:style-name="Table1.B"/>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell office:value-type="string" table:style-name="Table1.A1">
+            <text:p text:style-name="P6">Country</text:p>
+          </table:table-cell>
+          <table:table-cell office:value-type="string" table:style-name="Table1.B1">
+            <text:p text:style-name="P6">Image</text:p>
+          </table:table-cell>
+        </table:table-row>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell office:value-type="string" table:style-name="Table1.A2">
+            <text:p text:style-name="P5">
+              <text:span text:style-name="T2">{d.</text:span>
+              <text:span text:style-name="T3">cars[i].countries[i].</text:span>
+              <text:span text:style-name="T4">name</text:span>
+              <text:span text:style-name="T3">}</text:span>
+            </text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B2">
+            <text:p text:style-name="P7">
+              <draw:frame draw:name="Image1" draw:style-name="fr2" draw:z-index="0" svg:height="2.185cm" svg:width="3.551cm" text:anchor-type="paragraph">
+                <draw:image loext:mime-type="image/jpeg" xlink:actuate="onLoad" xlink:href="Pictures/100000000000028A0000019030F7A0DAE3E753B1.jpg" xlink:show="embed" xlink:type="simple"/>
+                <svg:title>{d.cars[i].countries[i].image}</svg:title>
+              </draw:frame>
+            </text:p>
+          </table:table-cell>
+        </table:table-row>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell office:value-type="string" table:style-name="Table1.A3">
+            <text:p text:style-name="P4">{d.
+              <text:span text:style-name="T1">cars[i].countries[i+1].name}</text:span></text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B3">
+            <text:p text:style-name="P8"/>
+          </table:table-cell>
+        </table:table-row>
+      </table:table>
+      <text:p text:style-name="P3"/>
+      <text:p text:style-name="Standard"/>
+      <text:h text:outline-level="1" text:style-name="Heading_20_1">{d.
+        <text:span text:style-name="T1">cars[i+1].</text:span>
+        <text:span text:style-name="T5">n</text:span>
+        <text:span text:style-name="T6">ame</text:span>
+        <text:span text:style-name="T1">}</text:span></text:h>
+    </office:text>
+  </office:body>
+</office:document-content>

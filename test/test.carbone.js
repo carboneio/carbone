@@ -111,6 +111,58 @@ describe('Carbone', function () {
     });
   });
 
+  describe('barcode Formatter', function () {
+
+    it('should return an empty string with a wrong parameter', function (done) {
+      var _xml = '<xml> {d.ean13code:barcode(\'ean1\')} </xml>';
+      var _data = { ean13code : '9780201134476' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should return an empty string with a false ean13 barcode', function (done) {
+      var _xml = '<xml> {d.ean13code:barcode(\'ean13\')} </xml>';
+      var _data = { ean13code : '978020113447' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should return an empty string with a false ean8 barcode', function (done) {
+      var _xml = '<xml> {d.ean8code:barcode(\'ean8\')} </xml>';
+      var _data = { ean8code : '978020' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should format the ean13 barcode to EAN13.ttf code font', function (done) {
+      var _xml = '<xml> {d.ean13code1:barcode(\'ean13\')} {d.ean13code2:barcode(\'ean13\')} </xml>';
+      var _data = { ean13code1 : '9780201134476', ean13code2 : '2001000076727' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> 9HSKCKB*bdeehg+ 2AALKAK*ahghch+ </xml>');
+        done();
+      });
+    });
+
+    it('should format the ean8 barcode to EAN13.ttf code font', function (done) {
+      var _xml = '<xml> {d.ean8code1:barcode(\'ean8\')} {d.ean8code2:barcode(\'ean8\')} </xml>';
+      var _data = { ean8code1 : '35967101', ean8code2 : '96385074'};
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> :DFJG*hbab+ :JGDI*fahe+ </xml>');
+        done();
+      });
+    });
+  });
 
 
 
@@ -2661,6 +2713,52 @@ describe('Carbone', function () {
           // assert.equal((_elapsed < 200), true);
           done();
         }
+      });
+    });
+  });
+
+  describe('convert', function () {
+    var _templatePath = path.join(__dirname, 'datasets');
+    var defaultOptions = {
+      pipeNamePrefix : '_carbone',
+      factories      : 1,
+      startFactory   : false,
+      attempts       : 2
+    };
+    afterEach(function (done) {
+      converter.exit(function () {
+        converter.init(defaultOptions, done);
+        carbone.reset();
+      });
+    });
+    beforeEach(function () {
+      carbone.set({templatePath : _templatePath});
+    });
+    it('should convert a file to another format', function (done) {
+      var _options = {
+        fieldSeparator : ',',
+        textDelimiter  : '"',
+        characterSet   : '76',
+        extension      : 'ods'
+      };
+      var _fileData = fs.readFileSync(path.join(__dirname, 'datasets', 'test_spreadsheet.ods'));
+      carbone.convert(_fileData, 'csv', _options, function (err, data) {
+        helper.assert(err, null);
+        helper.assert(data.toString(), ',,\n,{d[i].id},{d[i].name}\n,{d[i+1].id},{d[i+1].name}\n');
+        done();
+      });
+    });
+    it('should return an error if the file input type is not defined', function (done) {
+      var _options = {
+        fieldSeparator : ',',
+        textDelimiter  : '"',
+        characterSet   : '76'
+      };
+      var _fileData = fs.readFileSync(path.join(__dirname, 'datasets', 'test_spreadsheet.ods'));
+      carbone.convert(_fileData, 'csv', _options, function (err, data) {
+        helper.assert(err, 'options.extension must be set to detect input file type');
+        helper.assert(data, null);
+        done();
       });
     });
   });

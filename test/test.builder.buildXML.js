@@ -1774,6 +1774,26 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should replace rId by md5 hash with id prepend', function (done) {
+    var formatters = require('../formatters/string.js');
+    var _xml = '<Relationships>{d.<Relationship Id="{d.dog:md5:prepend(id)}" Target="{d.dog}"/>toto}</Relationships>';
+    var _expect = '<Relationships>toto<Relationship Id="id319f27934db5dd8f03070e75989ca667" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg"/></Relationships>';
+    var _options = {
+      formatters : {
+        md5     : formatters.md5,
+        prepend : formatters.prepend
+      }
+    };
+    var _data = {
+      dog  : 'https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg',
+      toto : 'toto'
+    };
+    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+      console.log(_xmlBuilt);
+      assert.equal(_xmlBuilt, _expect);
+      done();
+    });
+  });
   /* it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [
@@ -1966,6 +1986,39 @@ describe('builder.buildXML', function () {
       builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
         helper.assert(err+'', 'null');
         helper.assert(_xmlBuilt, '<xml><tr>paul : 10</tr><tr>jack : 20</tr><tr>bob : 30</tr><tr>neo : 50</tr><tr>trinity : 40</tr></xml>');
+        done();
+      });
+    });
+  });
+
+  describe('post-injection of data', function () {
+    it('should accept formatters which returns another formatter which can be called at the end of the process', function (done) {
+      var _xml    = '<xml> {d.titleA:postProcess()} <b/> {d.titleB:postProcess()} <b/> {d.titleC:postProcess()} </xml>';
+      var _data   = {
+        titleA : 'a',
+        titleB : 'b',
+        titleC : 'c'
+      };
+      // first formater called
+      function postProcess (value) {
+        this.sum++;
+        return {
+          // second formatter called at the end of the process
+          fn : function (postValue, runningSum) {
+            return postValue + ' ' + runningSum + ' ' + this.sum;
+          },
+          args : [value, this.sum]
+        };
+      }
+      var _option = {
+        formatters : {
+          postProcess : postProcess
+        },
+        imageDatabase : new Map(),
+        sum           : 0
+      };
+      builder.buildXML(_xml, _data, _option, function (err, _xmlBuilt) {
+        helper.assert(_xmlBuilt, '<xml> a 1 3 <b/> b 2 3 <b/> c 3 3 </xml>');
         done();
       });
     });

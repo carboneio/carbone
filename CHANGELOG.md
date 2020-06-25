@@ -37,7 +37,7 @@
     You cannot access arrays<br>
     `{d.subObject.qtyB:add(..subArray[0].qtyE)}` => [[C_ERROR]] subArray[0] not defined
 
-  - ⚡️ **New conditional formatters, and a new IF-block system to hide/show a part of the document**
+  - ⚡️ **New conditional formatters, and a new IF-block system to hide/show a part of the document** 
 
     - `ifEQ  (value)` : Matches values that are equal to a specified value, it replaces `ifEqual`
     - `ifNE  (value)` : Matches all values that are not equal to a specified value
@@ -49,8 +49,8 @@
     - `ifNIN (value)` : Matches none of the values specified in an array or string
     - `ifEM  (value)` : Matches empty values, string, arrays or objects, it replaces `ifEmpty`
     - `ifNEM (value)` : Matches not empty values, string, arrays or objects
-    - `and   (value)` : AND operator between two consecutive conditional formatters
-    - `or    (value)` : (default) OR operator between two consecutive conditional formatters
+    - `and   (value)` : AND operator between two consecutive conditional formatters 
+    - `or    (value)` : (default) OR operator between two consecutive conditional formatters 
     - `hideBegin` and `hideEnd` : hide text block between hideBegin and hideEnd if condition is true
     - `showBegin` and `showEnd` : show a text block between showBegin and showEnd if condition is true
     - `show (message)`          : print a message if condition is true
@@ -96,7 +96,7 @@
     }
     ```
 
-    In the report:
+    In the report: 
     ```
       {d.myObject[i].att} {d.myObject[i].val}
       {d.myObject[i+1].att} {d.myObject[i+1].val}
@@ -116,7 +116,7 @@
         {d.movies[i].subObject.name}
         {d.movies[i+1].subObject.name}
       {d.countries[i+1].name}
-    ```
+    ``` 
   - Fix: avoid crashing when a sub-object is null or undefined in data
   - Fix: avoid crashing when the parent object of an array is null or undefined in data
   - Eslint code + add eslint tools
@@ -126,7 +126,7 @@
     - first, draw a chart in MS Excel and replace your data with Carbone markers
     - datas of the chart should be placed at the top-left corner of the spreadsheet
     - all numbers are formatted with formatN() formatter
-  - Fix: accepts white-space in array filters with simple quote and double quotes
+  - Fix: accepts white-space in array filters with simple quote and double quotes 
     Example: `{d.cars[i, type='Tesla car'].name}`
              `{d.cars[i, type="Tesla car"].name}`
 
@@ -142,6 +142,26 @@
   - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
   - Fix crash when two consecutive arrays, nested in object, were used
   - Remove useless soft-page-break in ODT documents as suggested by the OpenDocument specification
+  - Image processing completely rewritten
+  - Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` by passing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the marker as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the marker.
+
+    The place to insert the marker on the temporary picture may change depends on the file format:
+
+      - ODS file: set the marker on the image title
+      - ODT file: set the marker on the image alternative text
+      - DOCX file: set the marker either on the image title, image description, or alternative text
+      - XLSX file: set the marker either on the image title, image description, or alternative text
+
+    The accepted images type are: `png`, `jpeg`/`jpg`, `gif`, `svg`
+
+    If an error occurs for some reason (fetch failed, image type not supported), a replacement image is used with the message "invalid image".
+  - dynamic images: new formatter `:imageFit()` only available for `DOCX` and `ODT` files. It sets how the image should be resized to fit its container. An argument has to be passed to the formatter: `contain` or `fill`. If the formatter is not defined, the image is resized as `contain` by default.
+    - `contain`: The replaced image is scaled to maintain its aspect ratio while fitting within the element’s content-box (the temporary image).
+    - `fill`: The replaced image is sized to fill the element’s content-box (the temporary image). The entire image will fill the box of the previous image. If the object's aspect ratio does not match the aspect ratio of its box, then the object will be stretched to fit.
+
+    example: `{d.myImage:imageFit(contain)}` or `{d.myImage:imageFit(fill)}`
+
+
 
 
 ### v1.2.1

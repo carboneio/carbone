@@ -112,7 +112,6 @@ describe('helper', function () {
     });
   });
 
-  
   describe('readFileDirSync', function () {
     beforeEach(function () {
       helper.rmDirRecursive(testPath);
@@ -274,5 +273,188 @@ describe('helper', function () {
     });
   });
 
+  describe('genericQueue', () => {
+
+    it('should process one element', () => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }]
+        , item => {
+          _nb.push(item.id);
+        }
+      );
+
+      _queue.start();
+      helper.assert(_nb, [1]);
+    });
+
+    it('should process multiple elements', () => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }, { id : 2 }, { id : 3 }]
+        , (item, next) => {
+          _nb.push(item.id);
+          next();
+        }
+      );
+
+      _queue.start();
+      helper.assert(_nb, [1, 2, 3]);
+    });
+
+    it('should return error', () => {
+      let _nb    = [];
+      let _error = null;
+      let _queue = helper.genericQueue(
+        [{ id : 1 , error : 'error' }, { id : 2 }, { id : 3 }]
+        , (item, next) => {
+          if (item.error) {
+            return next(item.error);
+          }
+
+          _nb.push(item.id);
+          next();
+        }
+        , err => {
+          _error = err;
+        }
+      );
+
+      _queue.start();
+      helper.assert(_nb,[2, 3]);
+      helper.assert(_error, 'error');
+    });
+
+    it('should stop the queue on error when option is set', () => {
+
+      let _nb    = [];
+      let _error = null;
+      let _success = false;
+      let _items = [{ id : 1 }, { id : 2, error : 'error' }, { id : 3 }];
+      let _options = { stopOnError : true };
+
+      function handlerItem (item, next) {
+        if (item.error) {
+          return next(item.error);
+        }
+
+        _nb.push(item.id);
+        next();
+      }
+
+      function handlerSuccess () {
+        _success = true;
+      }
+
+      function handlerError (err) {
+        _error = err;
+      }
+
+      helper.genericQueue(_items, handlerItem, handlerError, handlerSuccess, _options).start();
+
+      helper.assert(_nb, [1]);
+      helper.assert(_error, 'error');
+      helper.assert(_success, false);
+    });
+
+    it('should process multiple elements and call callback end function when it is finished', (done) => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }, { id : 2 }, { id : 3 }]
+        , (item, next) => {
+          setTimeout(() => {
+            _nb.push(item.id);
+            next();
+          }, 100);
+        }
+        , null
+        , () => {
+          helper.assert(_nb, [1, 2, 3]);
+          done();
+        }
+      );
+
+      _queue.start();
+    });
+
+    it('should not start the queue twice if .start is called twice', (done) => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }, { id : 2 }, { id : 3 }]
+        , (item, next) => {
+          setTimeout(() => {
+            _nb.push(item.id);
+            next();
+          }, 100 / item.id);
+        }
+        , null
+        , () => {
+          helper.assert(_nb, [1, 2, 3]);
+          done();
+        }
+      );
+      _queue.start();
+      _queue.start();
+    });
+
+    it('should restart even after a first run', () => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 }]
+        , (item, next) => {
+          _nb.push(item.id);
+          next();
+        }
+      );
+      _queue.start();
+      helper.assert(_nb, [1]);
+      _queue.items.push({ id : 2 });
+      _queue.start();
+      helper.assert(_nb, [1, 2]);
+    });
+
+  });
+
+  describe('mergeObjects', () => {
+    it('should merge obj2 into obj1 with a simple property', function () {
+      let obj1 = { firstname : 'John' };
+      let obj2 = { lastname : 'Wick' };
+      obj1 = helper.mergeObjects(obj1, obj2);
+      helper.assert(obj1, {firstname : 'John', lastname : 'Wick' });
+    });
+    it('should merge obj2 into obj1 with multiple properties 1', function () {
+      let obj1 = { firstname : 'John', lastname : 'Wick', age : 55, city : 'Toronto', postalcode : 32123 };
+      let obj2 = { lastname : 'Cena', age : 43, city : 'West Newbury' };
+      obj1 = helper.mergeObjects(obj1, obj2);
+      helper.assert(obj1, { firstname : 'John', lastname : 'Cena', age : 43, city : 'West Newbury', postalcode : 32123 });
+    });
+    it('should merge obj2 into obj1 with multiple properties 2', function () {
+      let obj1 = { fruit : 'apple', id : 2, validate : false, limit : 5, name : 'foo' };
+      let obj2 = { firstname : 'John', lastname : 'Wick', id : 9, validate : true, name : 'bar' };
+      obj1 = helper.mergeObjects(obj1, obj2);
+      helper.assert(obj1, { fruit : 'apple', id : 9,  validate : true, limit : 5, name : 'bar', firstname : 'John', lastname : 'Wick' });
+    });
+    it('should merge obj2 into obj1 with multiple properties 3', function () {
+      let obj1 = { validate : false, limit : 5, name : 'foo', fruitsList : ['banana'], properties : { child : { id : 1}} };
+      let obj2 = { validate : true, name : 'bar', fruitsList : ['tomatoes', 'apples', 'pineapples'], properties : { child : { id : 2}} };
+      obj1 = helper.mergeObjects(obj1, obj2);
+      helper.assert(obj1, { validate : true, limit : 5, name : 'bar', fruitsList : ['tomatoes', 'apples', 'pineapples'], properties : { child : { id : 2 } }  });
+    });
+  });
+
+  describe('Get file extension from URL', function () {
+    it('should return a png/jpeg/gif/txt extension', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png'), 'png');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif'), 'gif');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg'), 'jpeg');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt'), 'txt');
+    });
+    it('should return a png/jpeg/gif/txt extension with query parameters', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png?fewfw=223&lala=few'), 'png');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif#fewfw=223?lala=few'), 'gif');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg&name=John'), 'jpeg');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt?name=john&age=2#lala'), 'txt');
+    });
+  });
 
 });

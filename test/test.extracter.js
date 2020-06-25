@@ -1,7 +1,6 @@
 var extracter = require('../lib/extracter');
 var helper = require('../lib/helper');
 var assert = require('assert');
-const should = require('should');
 
 describe('extracter', function () {
 
@@ -187,8 +186,8 @@ describe('extracter', function () {
           extracter.splitMarkers(_markers);
         },
         (err) => {
-          should(err).be.an.instanceOf(Error);
-          should(err.message).containEql('Cannot access parent object in "d.site...name" (too high)');
+          helper.assert(err instanceof Error, true)
+          helper.assert(err.toString(), 'Error: Cannot access parent object in "d.site...name" (too high)')
           return true;
         }
       );

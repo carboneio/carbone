@@ -7,7 +7,6 @@ var params = require('../lib/params');
 var converter = require('../lib/converter');
 var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
-var should = require('should'); // eslint-disable-line
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
 
@@ -2486,11 +2485,11 @@ describe('Carbone', function () {
         fs.writeFileSync(_document, result);
         unzipSystem(_document, _unzipPath, function (err, files) {
           var _xmlExpectedContent = files['xl/worksheets/sheet1.xml'];
-          _xmlExpectedContent.should.containEql(''
+          helper.assert(_xmlExpectedContent.indexOf( ''
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de sirop d’érable 25cl</t></is></c><c  t="inlineStr"><is><t>4</t></is></c></row>'
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de cidre de glace 1L</t></is></c><c  t="inlineStr"><is><t>2</t></is></c></row>'
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Sachet de Cranberry 200g</t></is></c><c  t="inlineStr"><is><t>3</t></is></c></row>'
-          );
+          ), 682);
           done();
         });
       });
@@ -2514,11 +2513,11 @@ describe('Carbone', function () {
         fs.writeFileSync(_document, result);
         unzipSystem(_document, _unzipPath, function (err, files) {
           var _xmlExpectedContent = files['xl/worksheets/sheet1.xml'];
-          _xmlExpectedContent.should.containEql(''
+          helper.assert(_xmlExpectedContent.indexOf( ''
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de sirop d’érable 25cl</t></is></c><c  t="inlineStr"><is><t>4</t></is></c></row>'
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de cidre de glace 1L</t></is></c><c  t="inlineStr"><is><t>2</t></is></c></row>'
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Sachet de Cranberry 200g</t></is></c><c  t="inlineStr"><is><t>3</t></is></c></row>'
-          );
+          ), 682);
           done();
         });
       });
@@ -2542,11 +2541,11 @@ describe('Carbone', function () {
         fs.writeFileSync(_document, result);
         unzipSystem(_document, _unzipPath, function (err, files) {
           var _xmlExpectedContent = files['xl/worksheets/sheet1.xml'];
-          _xmlExpectedContent.should.containEql(''
+          helper.assert(_xmlExpectedContent.indexOf( ''
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de sirop d’érable 25cl</t></is></c><c  t="inlineStr"><is><t>4</t></is></c></row>'
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Bouteille de cidre de glace 1L</t></is></c><c  t="inlineStr"><is><t>2</t></is></c></row>'
             +'<row   x14ac:dyDescent="0.2"><c  t="inlineStr"><is><t>Sachet de Cranberry 200g</t></is></c><c  t="inlineStr"><is><t>3</t></is></c></row>'
-          );
+          ), 682);
           done();
         });
       });

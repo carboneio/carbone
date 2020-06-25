@@ -1,5 +1,4 @@
 var assert = require('assert');
-var should = require('should'); // eslint-disable-line
 var file = require('../lib/file');
 var helper = require('../lib/helper');
 var carbone = require('../lib/index');
@@ -10,7 +9,99 @@ var spawn = require('child_process').spawn;
 var zipfile = require('zipfile');
 
 describe('file', function () {
-  
+  describe('Detect types', function () {
+    before(function () {
+      var _templatePath = path.resolve('./test/datasets');
+      carbone.set({templatePath : _templatePath});
+    });
+    after(function () {
+      carbone.reset();
+    });
+    it('should detect a docx type', function (done) {
+      carbone.getFileExtension('test_word_render_A.docx', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'docx');
+        done();
+      });
+    });
+    it('should detect a xlsx type', function (done) {
+      carbone.getFileExtension('test_xlsx_list.xlsx', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'xlsx');
+        done();
+      });
+    });
+    it('should detect a pptx type', function (done) {
+      carbone.getFileExtension('test_simple_ppt.pptx', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'pptx');
+        done();
+      });
+    });
+    it('should detect an odt type', function (done) {
+      carbone.getFileExtension('test_odt_to_translate.odt', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'odt');
+        done();
+      });
+    });
+    it('should detect an ods type', function (done) {
+      carbone.getFileExtension('test_spreadsheet.ods', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'ods');
+        done();
+      });
+    });
+    it('should detect an odp type', function (done) {
+      carbone.getFileExtension('test_odp.odp', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'odp');
+        done();
+      });
+    });
+    it('should detect a docx type without extension', function (done) {
+      carbone.getFileExtension('test_word_render_A_without_ext', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'docx');
+        done();
+      });
+    });
+    it('should detect a html type', function (done) {
+      carbone.getFileExtension('test_html.html', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'html');
+        done();
+      });
+    });
+    it('should detect a xhtml type', function (done) {
+      carbone.getFileExtension('test_xhtml.xhtml', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'xhtml');
+        done();
+      });
+    });
+    it('should detect a xml type', function (done) {
+      carbone.getFileExtension('test_xml.xml', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'xml');
+        done();
+      });
+    });
+    it('should accept txt files', function (done) {
+      carbone.getFileExtension('test_txt.txt', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'txt');
+        done();
+      });
+    });
+    it('should not detect type if nothing has been matched', function (done) {
+      carbone.getFileExtension('test_unknown_file_type', function (err) {
+        helper.assert(err, 'Cannot detect file extension');
+        done();
+      });
+    });
+  });
+
   describe('isZipped', function () {
     it('should return true if the file is zipped', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_A.docx');
@@ -81,12 +172,12 @@ describe('file', function () {
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Unzip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' unzip tasks\n\n\n');
         assert.equal((_elapsed < 7), true);
-        done(); 
+        done();
       }
     });
     it('should be reliable', function (done) {
       var _testedZips = helper.walkDirSync(path.join(__dirname, 'datasets', 'zip'));
-      _testedZips.should.have.length(8);
+      helper.assert(_testedZips.length, 8);
       testEachFile(_testedZips);
       function testEachFile (testedZips) {
         if (testedZips.length === 0) {
@@ -101,7 +192,7 @@ describe('file', function () {
             if (err) {
               throw err;
             }
-            yauzlUnzippedFiles.should.be.eql(zipfilelUnzippedFiles);
+            helper.assert(yauzlUnzippedFiles, zipfilelUnzippedFiles);
             testEachFile(testedZips);
           });
         });
@@ -109,8 +200,8 @@ describe('file', function () {
     });
     it('should return an error if the file is corrupted', function (done) {
       file.unzip(path.join(__dirname, 'datasets', 'zip-failure', 'too_many_length_or_distance_symbols.zip'), function (err) {
-        err.should.be.instanceOf(Error);
-        err.toString().should.containEql('too many length');
+        helper.assert(err instanceof Error, true);
+        helper.assert(/too many length/.test(err.toString()) === true, true);
         done();
       });
     });
@@ -118,9 +209,9 @@ describe('file', function () {
       fs.readFile(path.join(__dirname, 'datasets', 'test.simple_zip.zip'), function (err, buffer) {
         file.unzip(buffer, function (err, files) {
           assert.equal(err, null);
-          files.should.have.length(1);
-          files[0].name.should.be.eql('coucou.txt');
-          files[0].data.toString().should.be.eql('coucou');
+          helper.assert(files.length, 1);
+          helper.assert(files[0].name, 'coucou.txt');
+          helper.assert(files[0].data.toString(), 'coucou');
           done();
         });
       });
@@ -155,6 +246,37 @@ describe('file', function () {
         });
       });
     });
+    it('should catch exception when file data is not bufferable and keep valid files', function (done) {
+      file.buildFile({
+        isZipped : true,
+        files    : [
+          {
+            name : 'test',
+            data : null
+          },
+          {
+            name : 'test2',
+            data : 'bonjour'
+          }
+        ]
+      }, (err, data) => {
+        assert.equal(err, null);
+        assert.equal(data.constructor, Buffer);
+
+        fs.mkdirSync(testPath, parseInt('0755', 8));
+        var _zipFilePath = path.join(testPath, 'file.zip');
+        var _unzipFilePath = path.join(testPath, 'unzip0');
+        fs.writeFileSync(_zipFilePath, data);
+        unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
+          var _expected = {
+            test2 : 'bonjour'
+          };
+
+          assert.equal(JSON.stringify(result), JSON.stringify(_expected));
+          done();
+        });
+      });
+    });
     it('should be fast to zip', function (done) {
       var _files = [
         {name : 'my_file.xml'            , data : new Buffer(generateRandomText(9000),'utf8')},
@@ -179,7 +301,7 @@ describe('file', function () {
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Zip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' zip tasks\n\n\n');
         assert.equal((_elapsed < 5), true);
-        //* ***** check the first one and the 90th 
+        //* ***** check the first one and the 90th
         fs.mkdirSync(testPath, parseInt('0755', 8));
         var _zipFilePath = path.join(testPath, 'file.zip');
         var _unzipFilePath = path.join(testPath, 'unzip0');
@@ -282,7 +404,7 @@ describe('file', function () {
           return file.name === 'xl/tables/table1.xml';
         });
         helper.assert(_oneFileOfXlsx.length, 1);
-        _oneFileOfXlsx[0].data.should.containEql('Tableau1');
+        helper.assert(/Tableau1/.test(_oneFileOfXlsx[0].data), true);
         done();
       });
     });
@@ -422,7 +544,7 @@ function generateRandomText (length) {
 /**
  * Zipfile was used before yauzl.
  * Zipfie uses the rock-solid C library libzip. I use it as a comparison tool. Should I use the system unzip?
- * @param  {String}   filePath 
+ * @param  {String}   filePath
  * @param  {Function} callback(err, template)
  */
 function unzipWithZipFile (filePath, callback) {
@@ -440,4 +562,3 @@ function unzipWithZipFile (filePath, callback) {
   }
   callback(null, _unzippedFiles);
 }
-

@@ -20,12 +20,14 @@ node_modules
 npm-debug.log
 
 
-####### IDE 
+####### IDE
 .emacs*
 *.flymake
 .#*
 .idea
 *.sublime-*
+temp
+.vscode
 
 
 ####### LibreOffice & MS Office
@@ -35,5 +37,6 @@ npm-debug.log
 
 ######## project-specific
 0perso/*
+build/*
 0formation/*
 

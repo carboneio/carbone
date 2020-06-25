@@ -43,7 +43,7 @@ def send(message):
 
 def sendErrorOrExit(code):
     ### Tell to python that we want to modify the global variable
-    global nbConsecutiveAttemptOpeningDocument 
+    global nbConsecutiveAttemptOpeningDocument
     nbConsecutiveAttemptOpeningDocument += 1
     if nbConsecutiveAttemptOpeningDocument < nbConsecutiveAttemptOpeningDocumentMax:
         send(code)  # The document could not be opened.
@@ -55,7 +55,7 @@ def sendErrorOrExit(code):
 def retryloop(attempts, timeout, delay=1):
     starttime = time.time()
     success = set()
-    for i in range(attempts): 
+    for i in range(attempts):
         success.add(True)
         yield success.clear
         if success:
@@ -68,8 +68,8 @@ def retryloop(attempts, timeout, delay=1):
 
 
 def convert(message):
-    global nbConsecutiveAttemptOpeningDocument 
-    ### Parse the message 
+    global nbConsecutiveAttemptOpeningDocument
+    ### Parse the message
     messageSplit = shlex.split(message)
     fileOption = parser.parse_args(args=messageSplit)
 
@@ -90,6 +90,13 @@ def convert(message):
 
     ### Reset counter
     nbConsecutiveAttemptOpeningDocument = 0
+
+    ### Update document totals
+    try:
+        document.calculateAll()
+    except AttributeError:
+        # the document doesn't implement the calculateAll interface
+        pass
 
     ### Update document links (update sub-documents)
     try:

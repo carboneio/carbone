@@ -2,10 +2,10 @@ var moment = require('moment');
 
 
 /**
- * Format dates 
- * 
+ * Format dates
+ *
  * Since 1.2.0, by default, it considers the input format is "ISO 8601"
- * 
+ *
  * @exampleContext {"lang":"en"}
  * @example ["20160131", "L"]
  * @example ["20160131", "LL"]
@@ -21,7 +21,7 @@ var moment = require('moment');
  * @exampleContext {"lang":"fr"}
  * @example ["20160131", "dddd", "YYYYMMDD"]
  * @example [1410715640, "LLLL", "X" ]
- * 
+ *
  * @param  {String|Number} d   date to format
  * @param  {String} patternOut output format
  * @param  {String} patternIn  [optional] input format, ISO8601 by default
@@ -43,7 +43,7 @@ function formatD (d, patternOut, patternIn) {
  * Format dates
  *
  * @deprecated
- * 
+ *
  * @exampleContext {"lang":"en"}
  * @example ["20160131", "YYYYMMDD", "L"]
  * @example ["20160131", "YYYYMMDD", "LL"]
@@ -54,9 +54,9 @@ function formatD (d, patternOut, patternIn) {
  * @exampleContext {"lang":"fr"}
  * @example ["20160131", "YYYYMMDD", "LLLL"]
  * @example ["20160131", "YYYYMMDD", "dddd"]
- * 
+ *
  * @param  {String|Number} d   date to format
- * @param  {String} patternIn  input format 
+ * @param  {String} patternIn  input format
  * @param  {String} patternOut output format
  * @return {String}            return formatted date
  */

@@ -322,7 +322,7 @@ describe('builder', function () {
       var _nbRows = 1000000;
       var _data = [];
       for (var i = 0; i < _nbRows; i++) {
-        _data.push({ 
+        _data.push({
           pos : [i % 100, i % 50, i % 1000, i % 60]
         });
       }
@@ -421,9 +421,9 @@ describe('builder', function () {
       It should remove the array name in _currentlyVisitedArrays', function () {
       var _currentlyVisitedArrays = ['d', 'cars'];
       var _objDependencyDescriptor = {
-        d    : {type : 'array', parent : ''},
-        cars : {type : 'array', parent : 'd'},
-        test : {type : 'array', parent : 'd'}
+        d    : {type : 'array', parent : '' , depth : 1},
+        cars : {type : 'array', parent : 'd', depth : 2},
+        test : {type : 'array', parent : 'd', depth : 2}
       };
       var _nextAttrName = 'test';
       var _nbArrayExit = 0;
@@ -437,10 +437,10 @@ describe('builder', function () {
     it('should call the callback for each array we are leaving', function () {
       var _currentlyVisitedArrays = ['d', 'cars', 'wheels'];
       var _objDependencyDescriptor = {
-        d      : {type : 'array', parent : ''},
-        cars   : {type : 'array', parent : 'd'},
-        wheels : {type : 'array', parent : 'cars'},
-        site   : {type : 'object', parent : 'd'}
+        d      : {type : 'array', parent : ''     , depth : 1},
+        cars   : {type : 'array', parent : 'd'    , depth : 2},
+        wheels : {type : 'array', parent : 'cars' , depth : 3},
+        site   : {type : 'object', parent : 'd' }
       };
       var _nextAttrName = 'site';
       var _nbArrayExit = 0;
@@ -455,10 +455,10 @@ describe('builder', function () {
     it('2. should call the callback for each array we are leaving', function () {
       var _currentlyVisitedArrays = ['d', 'cars', 'wheels'];
       var _objDependencyDescriptor = {
-        d      : {type : 'array', parent : ''},
-        cars   : {type : 'array', parent : 'd'},
-        wheels : {type : 'array', parent : 'cars'},
-        site   : {type : 'object', parent : 'cars'}
+        d      : {type : 'array', parent : ''      , depth : 1},
+        cars   : {type : 'array', parent : 'd'     , depth : 2},
+        wheels : {type : 'array', parent : 'cars'  , depth : 3},
+        site   : {type : 'object', parent : 'cars' }
       };
       var _nextAttrName = 'site';
       var _nbArrayExit = 0;
@@ -473,13 +473,13 @@ describe('builder', function () {
     it('should works even if the arrays are nested in objects', function () {
       var _currentlyVisitedArrays = ['d', 'cars', 'wheels'];
       var _objDependencyDescriptor = {
-        d       : {type : 'array' , parent : ''},
-        obj     : {type : 'object', parent : 'd'},
-        cars    : {type : 'array' , parent : 'obj'},
-        spec    : {type : 'object', parent : 'cars'},
-        wheels  : {type : 'array' , parent : 'spec'},
-        site    : {type : 'object', parent : 'wheels'},
-        players : {type : 'array', parent : 'obj'}
+        d       : {type : 'array' , parent : ''       , depth : 1},
+        obj     : {type : 'object', parent : 'd'                 },
+        cars    : {type : 'array' , parent : 'obj'    , depth : 2},
+        spec    : {type : 'object', parent : 'cars'              },
+        wheels  : {type : 'array' , parent : 'spec'   , depth : 3},
+        site    : {type : 'object', parent : 'wheels'            },
+        players : {type : 'array', parent : 'obj'     , depth : 2}
       };
       var _nextAttrName = 'site';
       var _nbArrayExit = 0;
@@ -510,11 +510,72 @@ describe('builder', function () {
       };
       var _nextAttrName = 'tyres';
       var _nbArrayExit = 0;
+      // eslint-disable-next-line no-unused-vars
       builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
         _nbArrayExit++;
       });
       helper.assert(_nbArrayExit, 0);
       helper.assert(_currentlyVisitedArrays, ['d', 'cars', 'wheels']);
+    });
+    it('should not leave the array "countries" if the array "movies" is nested in "countries" in XML (depth >)', function () {
+      var _currentlyVisitedArrays = ['countries', 'cars'];
+      var _objDependencyDescriptor = {
+        d          : {type : 'object' , parent : ''                 },
+        countries  : {type : 'array'  , parent : 'd'    , depth : 1 },
+        movies     : {type : 'array'  , parent : 'd'    , depth : 2 },
+        subObject  : {type : 'object' , parent : 'movies'           },
+        cars       : {type : 'array'  , parent : 'd'    , depth : 2 },
+        subObject2 : {type : 'object' , parent : 'cars'             }
+      };
+      var _nextAttrName = 'movies';
+      var _nbArrayExit = 0;
+      // eslint-disable-next-line no-unused-vars
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 1);
+      helper.assert(_currentlyVisitedArrays, ['countries']);
+    });
+    it('should not leave the array "cars" if the object "subObject3" come from cars', function () {
+      var _currentlyVisitedArrays = ['countries', 'cars'];
+      var _objDependencyDescriptor = {
+        d          : {type : 'object' , parent : ''                 },
+        countries  : {type : 'array'  , parent : 'd'    , depth : 1 },
+        movies     : {type : 'array'  , parent : 'd'    , depth : 2 },
+        subObject  : {type : 'object' , parent : 'movies'           },
+        cars       : {type : 'array'  , parent : 'd'    , depth : 2 },
+        subObject2 : {type : 'object' , parent : 'cars'             },
+        subObject3 : {type : 'object' , parent : 'subObject2'       }
+      };
+      var _nextAttrName = 'subObject3';
+      var _nbArrayExit = 0;
+      // eslint-disable-next-line no-unused-vars
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 0);
+      helper.assert(_currentlyVisitedArrays, ['countries', 'cars']);
+    });
+    it('should leave the array "cars" if the object "subObject4" come from movies and movies is at the same depth in XML', function () {
+      var _currentlyVisitedArrays = ['countries', 'cars'];
+      var _objDependencyDescriptor = {
+        d          : {type : 'object' , parent : ''                 },
+        countries  : {type : 'array'  , parent : 'd'    , depth : 1 },
+        movies     : {type : 'array'  , parent : 'd'    , depth : 2 },
+        subObject  : {type : 'object' , parent : 'movies'           },
+        subObject4 : {type : 'object' , parent : 'subObject'        },
+        cars       : {type : 'array'  , parent : 'd'    , depth : 2 },
+        subObject2 : {type : 'object' , parent : 'cars'             },
+        subObject3 : {type : 'object' , parent : 'subObject2'       }
+      };
+      var _nextAttrName = 'subObject4';
+      var _nbArrayExit = 0;
+      // eslint-disable-next-line no-unused-vars
+      builder.forEachArrayExit(_currentlyVisitedArrays, _objDependencyDescriptor, _nextAttrName, function (arrayLeft) {
+        _nbArrayExit++;
+      });
+      helper.assert(_nbArrayExit, 1);
+      helper.assert(_currentlyVisitedArrays, ['countries']);
     });
   });
 
@@ -621,9 +682,48 @@ describe('builder', function () {
       ];
       helper.assert(builder.assembleXmlParts(_data, 5), '<xml> <tr><p>Thomas</p><p>A. Anderson<tr>walk on the walls</tr></p></tr> </xml>');
     });
+    it('should hide or show according to conditional block boolean', function () {
+      var _data     = [
+        { pos : [ 0 ]    , str : '<a> hey </a><b> <c></c> </b>'                                 },
+        { pos : [ 27.8 ] , str : ''                                                             },
+        { pos : [ 27.9 ] , str : '<d> textD <e>e</e> </d>'                          , hide : 0  },
+        { pos : [ 50.8 ] , str : ''                                                 , hide : -1 },
+        { pos : [ 50.9 ] , str : '<f>  <g></g><h></h><i></i></f><j/><k><l></l></k>'             },
+        { pos : [ 98.8 ] , str : ''                                                             },
+        { pos : [ 98.9 ] , str : '<m>  <n> textN </n></m>'                          , hide : 1  },
+        { pos : [ 121.8] , str : ''                                                 , hide : -1 },
+        { pos : [ 121.9] , str : ''                                                             },
+        { pos : [ 122.9] , str : '<o>  <p></p><q></q><r></r></o>'                               }
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 5), '<a> hey </a><b> <c></c> </b><d> textD <e>e</e> </d><f>  <g></g><h></h><i></i></f><j/><k><l></l></k><o>  <p></p><q></q><r></r></o>');
+    });
+    it('should hide all XML within a surrounding conditional block', function () {
+      var _data     = [
+        { pos : [ 0               ], str : '<xml> '                         },
+        { pos : [ 6, 0, 6         ], str : '<tr><p>'            , hide : 1  },
+        { pos : [ 6, 0, 13        ], str : 'Thomas'             ,           },
+        { pos : [ 6, 0, 20        ], str : '</p><p>A. Anderson' ,           },
+        { pos : [ 6, 0, 20, 0, 20 ], str : '<tr>'               ,           },
+        { pos : [ 6, 0, 20, 0, 24 ], str : 'survive'            , hide : 0  },
+        { pos : [ 6, 0, 20, 0, 29 ], str : '</tr>'              , hide : -1 },
+        { pos : [ 6, 0, 20, 1, 20 ], str : '<tr>'               , hide : 1  },
+        { pos : [ 6, 0, 20, 1, 24 ], str : 'walk on the walls'  ,           },
+        { pos : [ 6, 0, 20, 1, 29 ], str : '</tr>'              , hide : -1 },
+        { pos : [ 6, 0, 38        ], str : '</p></tr>'          ,           },
+        { pos : [ 6, 1, 6         ], str : '<tr><p>'            ,           },
+        { pos : [ 6, 1, 13        ], str : 'Trinity'            ,           },
+        { pos : [ 6, 1, 20        ], str : '</p><p>Unknown'     ,           },
+        { pos : [ 6, 1, 20, 0, 20 ], str : '<tr>'               ,           },
+        { pos : [ 6, 1, 20, 0, 24 ], str : 'hack'               ,           },
+        { pos : [ 6, 1, 20, 0, 29 ], str : '</tr>'              ,           },
+        { pos : [ 6, 1, 38        ], str : '</p></tr>'          , hide : -1 },
+        { pos : [ 39              ], str : ' </xml>'                        }
+      ];
+      helper.assert(builder.assembleXmlParts(_data, 5), '<xml> </p></tr> </xml>');
+    });
   });
-  
-  
+
+
   describe('getBuilderFunction', function () {
     /**
      * Take XML strings from dictionary (using part.bef and part.aft index) and place them directly in the part.str
@@ -659,7 +759,7 @@ describe('builder', function () {
         dynamicData : {}
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(_fn(null, {}, _fn.builderDictionary), [{pos : [0], str : '', bef : 0}, {pos : [1], str : '', aft : 1}]);
+      helper.assert(_fn(null, {}, helper, _fn.builderDictionary), [{pos : [0], str : '', bef : 0}, {pos : [1], str : '', aft : 1}]);
       helper.assert(_fn.builderDictionary, ['<xml>', '</xml>']);
     });
     it('should return an array of xml parts according to the descriptor, the data and the formatters', function (done) {
@@ -673,6 +773,7 @@ describe('builder', function () {
           _root : {
             name     : '',
             parent   : '',
+            parents  : [],
             type     : 'object',
             depth    : 0,
             xmlParts : [
@@ -685,7 +786,7 @@ describe('builder', function () {
         number : 24.55
       };
       var _fn = builder.getBuilderFunction(_desc, carbone.formatters);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {formatters : carbone.formatters}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {formatters : carbone.formatters}, helper, _fn.builderDictionary)), [
         {pos : [5 ],str : '<xml>24', rowShow : true},
         {pos : [6 ],str : '</xml>'}
       ]);
@@ -702,6 +803,7 @@ describe('builder', function () {
           _root : {
             name     : '',
             parent   : '',
+            parents  : [],
             type     : 'object',
             depth    : 0,
             xmlParts : [
@@ -718,7 +820,7 @@ describe('builder', function () {
         surname   : 'Neo'
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         {pos : [8  ],str : '<xml><p>Thomas', rowShow : true},
         {pos : [15 ],str : '</p><p>A. Anderson', rowShow : true},
         {pos : [22 ],str : '</p><p>Neo', rowShow : true},
@@ -736,6 +838,7 @@ describe('builder', function () {
           _root : {
             name     : '',
             parent   : '',
+            parents  : [],
             type     : 'object',
             depth    : 0,
             xmlParts : [
@@ -748,13 +851,13 @@ describe('builder', function () {
       };
       var _fn = builder.getBuilderFunction(_desc);
       var _data = {};
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [{pos : [8], str : '<xml><p>', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
-      helper.assert(simplify(_fn.builderDictionary, _fn(null, {}, _fn.builderDictionary)), [{pos : [8], str : '<xml><p>', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [{pos : [8], str : '<xml><p>', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
+      helper.assert(simplify(_fn.builderDictionary, _fn(null, {}, helper, _fn.builderDictionary)), [{pos : [8], str : '<xml><p>', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
       _data = {
         firstname : 'Thomas',
         surname   : 'Neo'
       };
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)) , [{pos : [8], str : '<xml><p>Thomas', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>Neo', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)) , [{pos : [8], str : '<xml><p>Thomas', rowShow : true}, {pos : [15], str : '</p><p>', rowShow : true}, {pos : [22], str : '</p><p>Neo', rowShow : true}, {pos : [23], str : '</p></xml>'}]);
     });
     it('should work even if there is a nested object in the descriptor', function () {
       var _desc = {
@@ -767,6 +870,7 @@ describe('builder', function () {
           _root : {
             name     : '',
             parent   : '',
+            parents  : [],
             type     : 'object',
             depth    : 0,
             xmlParts : [
@@ -778,6 +882,7 @@ describe('builder', function () {
           info1 : {
             name     : 'info',
             parent   : '_root',
+            parents  : ['_root'],
             type     : 'object',
             depth    : 0,
             xmlParts : [
@@ -797,7 +902,7 @@ describe('builder', function () {
         }
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 8 ] , str : '<xml><p>Thomas', rowShow : true},
         { pos : [ 15 ], str : '</p><p>A. Anderson', rowShow : true},
         { pos : [ 40 ], str : '</br><p>Neo', rowShow : true},
@@ -817,6 +922,7 @@ describe('builder', function () {
           info1 : {
             name     : 'info',
             parent   : '_root',
+            parents  : ['_root'],
             type     : 'object',
             depth    : 0,
             xmlParts : [
@@ -827,6 +933,7 @@ describe('builder', function () {
           _root : {
             name     : '',
             parent   : '',
+            parents  : [],
             type     : 'object',
             depth    : 0,
             xmlParts : [
@@ -847,7 +954,7 @@ describe('builder', function () {
         }
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 8  ], str : '<xml><p>Thomas', rowShow : true},
         { pos : [ 15 ], str : '</p><p>A. Anderson', rowShow : true},
         { pos : [ 40 ], str : '</br><p>Neo', rowShow : true},
@@ -867,6 +974,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 29},
@@ -885,7 +993,7 @@ describe('builder', function () {
         {firstname : 'Trinity',  lastname : 'Unknown'}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 0        ], str : '<xml> '                           },
         { pos : [ 6, 0, 6 ], str : '<tr><p>'            , rowStart : true},
         { pos : [ 6, 0, 13 ], str : 'Thomas'            , rowShow : true },
@@ -909,6 +1017,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 29},
@@ -926,7 +1035,7 @@ describe('builder', function () {
         {firstname : 'Trinity',  lastname : 'Unknown'    , show : '1'}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 0        ], str : '<xml> '                  },
         { pos : [ 6, 0, 6 ], str : '<tr><p>'   , rowStart : true},
         { pos : [ 6, 0, 13 ], str : ''         , rowShow : false},
@@ -1039,7 +1148,7 @@ describe('builder', function () {
       // console.log(simplify(_fn.builderDictionary, _fn(_data));
       // console.log('\n\n');
 
-      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary));
       var _xmlResult = builder.assembleXmlParts(_xmlParts, 20);
 
       helper.assert(_xmlResult, '<xml> <t_row> Toyota </t_row><t_row>  </t_row><t_row> Lumeneo </t_row></xml>');
@@ -1068,6 +1177,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 29},
@@ -1082,6 +1192,7 @@ describe('builder', function () {
           info1 : {
             name     : 'info',
             parent   : '_root',
+            parents  : ['_root'],
             type     : 'object',
             depth    : 1,
             xmlParts : [
@@ -1095,7 +1206,7 @@ describe('builder', function () {
         {firstname : 'Trinity',  lastname : 'Unknown', info : {movie : 'matrix2'}}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 0        ], str : '<xml> '                            },
         { pos : [ 6, 0, 6  ], str : '<tr>'               , rowStart : true},
         { pos : [ 6, 0, 10 ], str : 'Thomas'             , rowShow : true },
@@ -1121,6 +1232,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 29},
@@ -1135,6 +1247,7 @@ describe('builder', function () {
           info1 : {
             name     : 'info',
             parent   : '_root',
+            parents  : ['_root'],
             type     : 'object',
             depth    : 1,
             xmlParts : [
@@ -1144,6 +1257,7 @@ describe('builder', function () {
           info2 : {
             name     : 'info',
             parent   : 'info1',
+            parents  : ['_root', 'info1'],
             type     : 'object',
             depth    : 1,
             xmlParts : [
@@ -1153,6 +1267,7 @@ describe('builder', function () {
           info3 : {
             name     : 'info',
             parent   : 'info2',
+            parents  : ['_root', 'info1', 'info2'],
             type     : 'object',
             depth    : 1,
             xmlParts : [
@@ -1183,7 +1298,7 @@ describe('builder', function () {
         }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 0        ], str : '<xml> '                            },
         { pos : [ 6, 0, 6  ], str : '<tr>'               , rowStart : true},
         { pos : [ 6, 0, 10 ], str : 'Thomas'             , rowShow : true },
@@ -1213,12 +1328,14 @@ describe('builder', function () {
           _root : {
             name     : '',
             parent   : '',
+            parents  : [],
             type     : 'object',
             xmlParts : []
           },
           movies1 : {
             name      : 'movies',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 15},
@@ -1232,6 +1349,7 @@ describe('builder', function () {
           cars2 : {
             name      : 'cars',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 1,
             position  : {start : 20, end : 29},
@@ -1255,7 +1373,7 @@ describe('builder', function () {
         ]
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 0         ], str : '<xml> '                            },
         { pos : [ 6 , 0, 6  ], str : '<tr>'               , rowStart : true},
         { pos : [ 6 , 0, 10 ], str : 'matrix'             , rowShow : true },
@@ -1283,6 +1401,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 4, end : 35},
@@ -1295,6 +1414,7 @@ describe('builder', function () {
           movies1 : {
             name      : 'movies',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 2,
             position  : {start : 6, end : 15},
@@ -1308,6 +1428,7 @@ describe('builder', function () {
           cars2 : {
             name      : 'cars',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 2,
             position  : {start : 20, end : 29},
@@ -1331,7 +1452,7 @@ describe('builder', function () {
         ]
       }];
       var _fn = builder.getBuilderFunction(_desc);
-      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary));
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [
         { pos : [ 0               ], str : '<x> '                              },
@@ -1363,12 +1484,14 @@ describe('builder', function () {
           _root : {
             name     : '',
             parent   : '',
+            parents  : [],
             type     : 'object',
             xmlParts : []
           },
           movies1 : {
             name      : 'movies',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 15},
@@ -1383,6 +1506,7 @@ describe('builder', function () {
           cars2 : {
             name      : 'cars',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 1,
             position  : {start : 20, end : 29},
@@ -1407,7 +1531,7 @@ describe('builder', function () {
         ]
       };
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 0         ], str : '<xml> '                            },
         { pos : [ 6         ], str : '<T>'                               },
         { pos : [ 6 , 0, 6  ], str : '<tr>'               , rowStart : true},
@@ -1437,6 +1561,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 38},
@@ -1451,6 +1576,7 @@ describe('builder', function () {
           skills1 : {
             name      : 'skills',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 2,
             position  : {start : 20, end : 29},
@@ -1467,19 +1593,19 @@ describe('builder', function () {
         firstname : 'Thomas',
         lastname  : 'A. Anderson',
         skills    : [
-            {name : 'survive'},
-            {name : 'walk on the walls'}
+          {name : 'survive'},
+          {name : 'walk on the walls'}
         ]
       },{
         firstname : 'Trinity',
         lastname  : 'Unknown',
         skills    : [
-            {name : 'hack'}
+          {name : 'hack'}
         ]
       }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary));
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [
         { pos : [ 0               ], str : '<xml> '                            },
@@ -1516,6 +1642,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 48},
@@ -1530,6 +1657,7 @@ describe('builder', function () {
           skills1 : {
             name      : 'skills',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 2,
             position  : {start : 20, end : 39},
@@ -1543,6 +1671,7 @@ describe('builder', function () {
           when2 : {
             name      : 'when',
             parent    : 'skills1',
+            parents   : ['_root', 'skills1'],
             type      : 'array',
             depth     : 3,
             position  : {start : 25, end : 34},
@@ -1563,23 +1692,23 @@ describe('builder', function () {
           {
             name : 'survive',
             when : [
-                {day : 'monday'},
-                {day : 'thursday'},
-                {day : 'friday'}
+              {day : 'monday'},
+              {day : 'thursday'},
+              {day : 'friday'}
             ]
           },
-            {name : 'walk on the walls'}
+          {name : 'walk on the walls'}
         ]
       },{
         firstname : 'Trinity',
         lastname  : 'Unknown',
         skills    : [
-            {name : 'hack'}
+          {name : 'hack'}
         ]
       }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary));
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [
         { pos : [ 0 ], str : '<xml> '                                          },
@@ -1626,6 +1755,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 29},
@@ -1643,7 +1773,7 @@ describe('builder', function () {
         {firstname : 'Trinity', sort : 11}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 0            ], str : '<xml> '                   },
         { pos : [ 6, 31, 0, 6  ], str : '<tr>'      , rowStart : true},
         { pos : [ 6, 31, 0, 13 ], str : 'Thomas'    , rowShow : true },
@@ -1665,6 +1795,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 29},
@@ -1682,7 +1813,7 @@ describe('builder', function () {
         {firstname : 'Trinity', movie : {sort : 11}}
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary)), [
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary)), [
         { pos : [ 0              ], str : '<xml> '                 },
         { pos : [ 6, 31, 0, 6  ], str : '<tr>'      , rowStart : true},
         { pos : [ 6, 31, 0, 13 ], str : 'Thomas'    , rowShow : true },
@@ -1704,6 +1835,7 @@ describe('builder', function () {
           _root : {
             name      : '',
             parent    : '',
+            parents   : [],
             type      : 'array',
             depth     : 2,
             position  : {start : 13, end : 22},
@@ -1714,6 +1846,7 @@ describe('builder', function () {
           skills1 : {
             name      : 'skills',
             parent    : '_root',
+            parents   : ['_root'],
             type      : 'array',
             depth     : 1,
             position  : {start : 6, end : 38},
@@ -1732,22 +1865,22 @@ describe('builder', function () {
         firstname : 'Thomas',
         lastname  : 'A. Anderson',
         skills    : [
-            {name : 'skill1_1'},
-            {name : 'skill1_2'},
-            {name : 'skill1_3'}
+          {name : 'skill1_1'},
+          {name : 'skill1_2'},
+          {name : 'skill1_3'}
         ]
       },{
         firstname : 'Trinity',
         lastname  : 'Unknown',
         skills    : [
-            {name : 'skill2_1'},
-            {name : 'skill2_2'},
-            {name : 'skill2_3'}
+          {name : 'skill2_1'},
+          {name : 'skill2_2'},
+          {name : 'skill2_3'}
         ]
       }
       ];
       var _fn = builder.getBuilderFunction(_desc);
-      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, _fn.builderDictionary));
+      var _xmlParts = simplify(_fn.builderDictionary, _fn(_data, {}, helper, _fn.builderDictionary));
       builder.sortXmlParts(_xmlParts, 100);
       helper.assert(_xmlParts, [
         { pos : [ 0              ], str : '<xml> '                   },

@@ -9,6 +9,7 @@ var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
+var pdfjsLib = require('pdfjs-dist/build/pdf.js');
 
 describe('Carbone', function () {
 
@@ -2915,8 +2916,36 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should render and open a pdf with a password (complete) (it takes 5000ms on average)', function (done) {
+      const _password = 'Ro0T1234';
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'pdf',
+          formatOptions : {
+            EncryptFile          : true,
+            DocumentOpenPassword : _password
+          }
+        }
+      };
+      // test_word_render_2003_XML.xml;
+      carbone.render('test_spreadsheet.ods', data, _options, (err, result) => {
+        helper.assert(err, null);
+        assert.equal(result.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : _password});
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad password.'));
+        });
+      });
+    });
   });
-
 });
 
 

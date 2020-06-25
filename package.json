@@ -21,23 +21,22 @@
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
     "lint": "eslint ./*/**.js",
     "lint:fix": "eslint ./*/**.js --fix",
-    "postpublish" : "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin --tags && git push github-origin --tags"
+    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin --tags && git push github-origin --tags"
   },
   "dependencies": {
-    "debug": "=2.6.9",
+    "debug": "=4.1.1",
     "moment": "=2.19.3",
     "moxie-zip": "=0.0.3",
     "timsort": "=0.3.0",
     "which": "=2.0.2",
-    "yauzl": "=2.8.0"
+    "yauzl": "=2.10.0"
   },
   "devDependencies": {
-    "eslint": "=6.8.0",
+    "eslint": "=7.3.1",
     "mocha": "=3.5.3",
-    "should": "=11.1.2",
     "zipfile": "=0.5.11"
   },
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">= 10.15.0"
   }
 }

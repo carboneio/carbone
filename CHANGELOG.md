@@ -81,6 +81,10 @@
     `{d.id:ifEQ(10):showBegin}` block of text  `{d.id:showEnd}` => block of text<br>
     `{d.id:ifEQ(12):showBegin}`  block of text  `{d.id:showEnd}` =>
 
+    A smart and generic algorithm detects automatically pattern (paragraph, bullet-list, etc) to remove in document even if the conditional block
+    is not placed correctly in XML. For example: `BEGIN<p> blabla END</p>` becomes `BEGIN<p> blabla </p>END`.
+    It improves the final result by removing empty spaces in document.
+
   - ☀️ **Accepts to iterate on attributes of objects as is if it was an array**
     ```js
     {
@@ -127,11 +131,17 @@
              `{d.cars[i, type="Tesla car"].name}`
 
   - Fix LibreOffice detection on Windows
+  - Remove compatibility with older NodeJS versions (lower than 10.15.0)
+  - Upgrade some dependencies and remove useless ones (should)
   - Accepts non-alphanumeric characters in variables names, values, ... For example, `{d.i💎d}` is allowed
   - Improve security in the builder and reduce memory consumption
-  - Fix crash when markers are next to each over `{d.id}{d.other}`
+  - Fix crash when markers are next to each over `{d.id}{d.other}` in many situations:
+    - with or without conditional blocks
+    - with or without loops
+  - Fix crash when some documents like DOCX contain images in repetition section
   - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
   - Fix crash when two consecutive arrays, nested in object, were used
+  - Remove useless soft-page-break in ODT documents as suggested by the OpenDocument specification
 
 
 ### v1.2.1

@@ -1,6 +1,5 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
-const should = require('should');
 
 describe('preprocessor', function () {
   describe('execute', function () {
@@ -16,6 +15,48 @@ describe('preprocessor', function () {
         helper.assert(err + '', 'null');
         helper.assert(tmpl, null);
         done();
+      });
+    });
+    describe('ODT preprocessing', function () {
+      var _xml = `<office:document-content>
+          <office:body>
+            <office:text text:use-soft-page-breaks="true">
+              <table:table-cell office:value-type="string" table:style-name="Table6.A2">
+                <text:p text:style-name="P19">bla
+                  <text:span text:style-name="T134">nam</text:span>
+                  <text:soft-page-break/>
+                  </text:p>
+              </table:table-cell>
+              <table:table-cell office:value-type="string" table:style-name="Table6.A2">
+                <text:p text:style-name="P29">
+                  <text:span text:style-name="T42">sd</text:span>
+                  <text:soft-page-break></text:soft-page-break>
+                  <text:span text:style-name="T43">position</text:span>
+                  <text:soft-page-break/>
+                  <text:span text:style-name="T42"></text:span>
+                </text:p>
+              </table:table-cell>
+            </office:text>
+          </office:body>
+        </office:document-content>`
+      ;
+      it('should replace shared string by inline strings in a real xlsx file. The shared string should be removed', function (done) {
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.xlsx',
+          embeddings : [],
+          extension  : 'odt',
+          files      : [
+            { name : 'other.xml'  , parent : '', data : '<text:soft-page-break/>'},
+            { name : 'content.xml', parent : '', data : _xml}
+          ]
+        };
+        preprocessor.execute(_report, function (err, tmpl) {
+          helper.assert(err + '', 'null');
+          helper.assert(/soft-page-break/.test(tmpl.files[0].data), true);
+          helper.assert(/soft-page-break/.test(tmpl.files[1].data), false);
+          done();
+        });
       });
     });
     describe('XSLX preprocessing', function () {
@@ -54,8 +95,8 @@ describe('preprocessor', function () {
             helper.assert(err + '', 'null');
             // tmpl.files[0].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[0].data.should.be.eql(_sharedStringAfter);
-            should(tmpl.files[0].name).be.eql('xl/worksheets/sheet1.xml');
-            should(tmpl.files[0].data).be.eql(_sheetAfter);
+            helper.assert(tmpl.files[0].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[0].data, _sheetAfter);
             done();
           });
         });
@@ -73,15 +114,15 @@ describe('preprocessor', function () {
           };
           preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err + '', 'null');
-            should(tmpl.files[0].name).be.eql('my_file.xml');
-            should(tmpl.files[0].data).be.eql('some text');
-            should(tmpl.files[0].parent).be.eql('');
+            helper.assert(tmpl.files[0].name, 'my_file.xml');
+            helper.assert(tmpl.files[0].data, 'some text');
+            helper.assert(tmpl.files[0].parent, '');
             // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
             // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            should(tmpl.files[1].name).be.eql('xl/worksheets/sheet1.xml');
-            should(tmpl.files[1].data).be.eql(_sheetAfter);
-            should(tmpl.files[1].parent).be.eql('embedded/spreadsheet.xlsx');
+            helper.assert(tmpl.files[1].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[1].data, _sheetAfter);
+            helper.assert(tmpl.files[1].parent, 'embedded/spreadsheet.xlsx');
             done();
           });
         });
@@ -101,21 +142,21 @@ describe('preprocessor', function () {
           };
           preprocessor.execute(_report, function (err, tmpl) {
             helper.assert(err + '', 'null');
-            should(tmpl.files[0].name).be.eql('my_file.xml');
-            should(tmpl.files[0].data).be.eql('some text');
-            should(tmpl.files[0].parent).be.eql('');
+            helper.assert(tmpl.files[0].name, 'my_file.xml');
+            helper.assert(tmpl.files[0].data, 'some text');
+            helper.assert(tmpl.files[0].parent, '');
             // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
             // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
-            should(tmpl.files[1].name).be.eql('xl/worksheets/sheet1.xml');
-            should(tmpl.files[1].data).be.eql(_sheetAfter);
-            should(tmpl.files[1].parent).be.eql('embedded/spreadsheet.xlsx');
+            helper.assert(tmpl.files[1].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[1].data, _sheetAfter);
+            helper.assert(tmpl.files[1].parent, 'embedded/spreadsheet.xlsx');
             // tmpl.files[2].name.should.be.eql('xl/sharedStrings.xml');
             // tmpl.files[2].data.should.be.eql(_sharedStringAfter2);
             // tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
-            should(tmpl.files[2].name).be.eql('xl/worksheets/sheet1.xml');
-            should(tmpl.files[2].data).be.eql(_sheetAfter2);
-            should(tmpl.files[2].parent).be.eql('embedded/spreadsheet2.xlsx');
+            helper.assert(tmpl.files[2].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[2].data, _sheetAfter2);
+            helper.assert(tmpl.files[2].parent, 'embedded/spreadsheet2.xlsx');
             done();
           });
         });

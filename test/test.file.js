@@ -1,5 +1,4 @@
 var assert = require('assert');
-var should = require('should'); // eslint-disable-line
 var file = require('../lib/file');
 var helper = require('../lib/helper');
 var carbone = require('../lib/index');
@@ -178,7 +177,7 @@ describe('file', function () {
     });
     it('should be reliable', function (done) {
       var _testedZips = helper.walkDirSync(path.join(__dirname, 'datasets', 'zip'));
-      _testedZips.should.have.length(8);
+      helper.assert(_testedZips.length, 8);
       testEachFile(_testedZips);
       function testEachFile (testedZips) {
         if (testedZips.length === 0) {
@@ -193,7 +192,7 @@ describe('file', function () {
             if (err) {
               throw err;
             }
-            yauzlUnzippedFiles.should.be.eql(zipfilelUnzippedFiles);
+            helper.assert(yauzlUnzippedFiles, zipfilelUnzippedFiles);
             testEachFile(testedZips);
           });
         });
@@ -201,8 +200,8 @@ describe('file', function () {
     });
     it('should return an error if the file is corrupted', function (done) {
       file.unzip(path.join(__dirname, 'datasets', 'zip-failure', 'too_many_length_or_distance_symbols.zip'), function (err) {
-        err.should.be.instanceOf(Error);
-        err.toString().should.containEql('too many length');
+        helper.assert(err instanceof Error, true);
+        helper.assert(/too many length/.test(err.toString()) === true, true);
         done();
       });
     });
@@ -210,9 +209,9 @@ describe('file', function () {
       fs.readFile(path.join(__dirname, 'datasets', 'test.simple_zip.zip'), function (err, buffer) {
         file.unzip(buffer, function (err, files) {
           assert.equal(err, null);
-          files.should.have.length(1);
-          files[0].name.should.be.eql('coucou.txt');
-          files[0].data.toString().should.be.eql('coucou');
+          helper.assert(files.length, 1);
+          helper.assert(files[0].name, 'coucou.txt');
+          helper.assert(files[0].data.toString(), 'coucou');
           done();
         });
       });
@@ -405,7 +404,7 @@ describe('file', function () {
           return file.name === 'xl/tables/table1.xml';
         });
         helper.assert(_oneFileOfXlsx.length, 1);
-        _oneFileOfXlsx[0].data.should.containEql('Tableau1');
+        helper.assert(/Tableau1/.test(_oneFileOfXlsx[0].data), true);
         done();
       });
     });

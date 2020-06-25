@@ -1229,7 +1229,7 @@ describe('builder.buildXML', function () {
       });
     });
   });
-  it('should accept xml tags with URLs between loop start and end', function(done) {
+  it('should accept xml tags with URLs between loop start and end', function (done) {
     var _data = {
       list : [
         {name : 'Lumeneo'},
@@ -1238,7 +1238,7 @@ describe('builder.buildXML', function () {
       ]
     };
     var _xml = '<document><p><w>{d.list[i].name}</w></p><a url="http://sdsd/"></a><p><w>{d.list[i+1].name}</w></p></document>';
-    builder.buildXML(_xml, _data, function(err, _xmlBuilt) {
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       helper.assert(err+'', 'null');
       helper.assert(_xmlBuilt,  '<document><p><w>Lumeneo</w></p><a url="http://sdsd/"></a><p><w>Tesla motors</w></p><a url="http://sdsd/"></a><p><w>Toyota</w></p><a url="http://sdsd/"></a></document>');
       done();
@@ -1745,6 +1745,32 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(_xmlBuilt, '<xml><tr> test </tr></xml>');
+      done();
+    });
+  });
+  it('should repeat section even if the XML contains http links', function (done) {
+    var _xml = ''
+     + '<body>'
+     + '  <p>'
+     + '    <w id="{d.list[i].id}"></w>'
+     + '    <pic a="http://ee"></pic>'
+     + '  </p>'
+     + '  <p>'
+     + '    <w id="{d.list[i+1].id}"></w>'
+     + '    <pic a="http://ee"></pic>'
+     + '  </p>'
+     + '</body>'
+    ;
+    var _data = {
+      list : [
+        {id : 100},
+        {id : 200},
+        {id : 300}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt.match(/body/g).length, 2);
+      assert.equal(_xmlBuilt, '<body>  <p>    <w id="100"></w>    <pic a="http://ee"></pic>  </p>  <p>    <w id="200"></w>    <pic a="http://ee"></pic>  </p>  <p>    <w id="300"></w>    <pic a="http://ee"></pic>  </p>  </body>');
       done();
     });
   });

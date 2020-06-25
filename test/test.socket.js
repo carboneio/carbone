@@ -1,11 +1,9 @@
 var assert = require('assert');
-var net = require('net');
 var fs = require('fs');
 var spawn = require('child_process').spawn;
 var Socket = require('../lib/socket');
 var helper  = require('../lib/helper');
 var path = require('path');
-const should = require('should');
 
 var server;
 
@@ -368,7 +366,7 @@ describe('Socket', function () {
       });
     });
 
-    it.skip('should not concatenate the socket buffer forever', function (done) {
+    /* it.skip('should not concatenate the socket buffer forever', function (done) {
       const _server = new Socket(4000, '127.0.0.1');
       const _client = new Socket(4000, '127.0.0.1');
       var _otherSocket;
@@ -435,7 +433,7 @@ describe('Socket', function () {
           });
         }, 600);
       });
-    });
+    }); */
 
   });
 

@@ -93,8 +93,8 @@ Carbone is working only on the server-side.
 
 ## Minimum Requirements
 
-- NodeJS 8.x+
-- Runs on OSX, Linux (servers and desktop), and coming soon on Windows
+- NodeJS 10.x+
+- Runs on OSX, Linux (servers and desktop), and Windows
 
 #### Optional
 

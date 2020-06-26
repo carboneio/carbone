@@ -356,9 +356,9 @@ describe('Converter', function () {
       });
     });
 
-    it('should not timeout and should not kill the factory process.', function (done) {
+    it('should not timeout and should not kill the factory process. (timeout disabled)', function (done) {
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
-      memoryOptions.converterFactoryTimeout = 4000;
+      memoryOptions.converterFactoryTimeout = 0;
       converter.init(memoryOptions, function (factories) {
         const _officePID = factories['0'].pid;
         converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {

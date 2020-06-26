@@ -282,6 +282,81 @@ describe('Converter', function () {
     });
   });
 
+  describe('LO Memory monitoring', function () {
+    const memoryOptions = {
+      factories              : 1,
+      startFactory           : true,
+      tempPath               : tempPath,
+      factoryMemoryCheck     : true,
+      factoryMemoryFileSize  : 20,
+      factoryMemoryThreshold : 5 // tested on a 16GB system
+    };
+
+    afterEach(function (done) {
+      converter.exit(done);
+    });
+
+    it('should not reach the memory threshold and the factory process shouldn\'t be killed', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.init(memoryOptions, function (factories) {
+        const _officePID = factories['0'].pid;
+        const _maxLoops = 10;
+        for (let i = 0; i <= _maxLoops; i++) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+            helper.assert(err+'', 'null');
+            var _buf = new Buffer(result);
+            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            assert.equal(factories['0'].pid, _officePID);
+            if (i === _maxLoops) {
+              done();
+            }
+          });
+        }
+      });
+    });
+
+    it('should reach the memory threshold  and the factory process should be killed', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.init(memoryOptions, function (factories) {
+        const _officePID = factories['0'].pid;
+        const _maxLoops = 50;
+        for (let i = 0; i <= _maxLoops; i++) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+            helper.assert(err+'', 'null');
+            var _buf = new Buffer(result);
+            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            if (i === _maxLoops) {
+              assert.notEqual(factories['0'].pid, _officePID);
+              done();
+            }
+          });
+        }
+      });
+    });
+
+    it('should reach the memory threshold and 4 factories should be killed', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      memoryOptions.factories = 4;
+      converter.init(memoryOptions, function (factories) {
+        const _officePIDs = [factories['0'].pid, factories['1'].pid, factories['2'].pid, factories['3'].pid];
+        const _maxLoops = 200;
+        for (let i = 0; i <= _maxLoops; i++) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+            helper.assert(err+'', 'null');
+            var _buf = new Buffer(result);
+            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            if (i === _maxLoops) {
+              for (let i = 0; i < _officePIDs.length; i++) {
+                assert.notEqual(factories[i+''].pid, _officePIDs[i]);
+              }
+              done();
+            }
+          });
+        }
+      });
+    });
+  });
+
   describe('exit', function () {
     before(function () {
       var _tempContent = helper.walkDirSync(tempPath);

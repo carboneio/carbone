@@ -282,7 +282,7 @@ describe('Converter', function () {
     });
   });
 
-  describe('LO Memory monitoring', function () {
+  describe('LO Memory monitoring and report timeout', function () {
     const memoryOptions = {
       factories              : 1,
       startFactory           : true,
@@ -353,6 +353,33 @@ describe('Converter', function () {
             }
           });
         }
+      });
+    });
+
+    it('should not timeout and should not kill the factory process.', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      memoryOptions.converterFactoryTimeout = 4000;
+      converter.init(memoryOptions, function (factories) {
+        const _officePID = factories['0'].pid;
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+          helper.assert(err+'', 'null');
+          var _buf = new Buffer(result);
+          assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+          assert.equal(factories['0'].pid, _officePID);
+          done();
+        });
+      });
+    });
+
+    it('should timeout and return an error.', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      memoryOptions.converterFactoryTimeout = 500;
+      converter.init(memoryOptions, function () {
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+          helper.assert(err, 'Carbone Converter timeout error: the process is taking too long.');
+          helper.assert(result+'', 'null');
+          done();
+        });
       });
     });
   });

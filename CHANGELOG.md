@@ -142,6 +142,10 @@
   - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
   - Fix crash when two consecutive arrays, nested in object, were used
   - Remove useless soft-page-break in ODT documents as suggested by the OpenDocument specification
+  - LibreOffice 6+ has a memory leak. So Carbone automatically restarts LibreOffice after a certain amount of document conversion.
+    The number of conversions depends on new parameters `factoryMemoryFileSize` and `factoryMemoryThreshold`
+  - Add conversion timeout parameter `converterFactoryTimeout` (60s by default).
+    It kills LibreOffice if the conversion is too long and returns an error
 
 
 ### v1.2.1

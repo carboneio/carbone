@@ -1,5 +1,5 @@
 ### v2.0.x
-
+  - Release June 28th, 2020
   - 🚀 **Accepts dynamic variables in all formatters!**
 
     Carbone passes data to formatters if parameters start with a dot `.` and is not surrounded by quotes. Here is an example:
@@ -146,6 +146,8 @@
     The number of conversions depends on new parameters `factoryMemoryFileSize` and `factoryMemoryThreshold`
   - Add conversion timeout parameter `converterFactoryTimeout` (60s by default).
     It kills LibreOffice if the conversion is too long and returns an error
+  - Remove compatibility with NodeJS < 10
+  - Remove deprecated NodeJS "new Buffer"
 
 
 ### v1.2.1

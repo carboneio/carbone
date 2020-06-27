@@ -124,15 +124,12 @@ describe('Converter', function () {
       var _pdfResultPath = path.resolve('./test/datasets/test_odt_render_static.pdf');
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
-        var _buf = new Buffer(result);
-        assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-        var bufPDF = new Buffer(_buf.length);
-        fs.open(_pdfResultPath, 'r', function (status, fd) {
-          fs.read(fd, bufPDF, 0, _buf.length, 0, function (err, bytesRead, buffer) {
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-            assert.equal(_buf.slice(8, 70).toString(), buffer.slice(8, 70).toString());
-            done();
-          });
+        helper.assert(Buffer.isBuffer(result), true);
+        assert.equal(result.slice(0, 4).toString(), '%PDF');
+        fs.readFile(_pdfResultPath, function (err, content) {
+          helper.assert(err+'', 'null');
+          assert.equal(result.slice(8, 70).toString(), content.slice(8, 70).toString());
+          done();
         });
       });
     });
@@ -158,8 +155,8 @@ describe('Converter', function () {
       converter.init({factories : 1, startFactory : true, tempPath : tempPath}, function (factories) {
         converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
           helper.assert(err+'', 'null');
-          var _buf = new Buffer(result);
-          assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+          helper.assert(Buffer.isBuffer(result), true);
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
           // kill LibreOffice thread
           process.kill(factories['0'].pid);
           // try another conversion
@@ -167,8 +164,8 @@ describe('Converter', function () {
           setTimeout(function () {
             converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
               helper.assert(err+'', 'null');
-              var _buf = new Buffer(result);
-              assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+              helper.assert(Buffer.isBuffer(result), true);
+              assert.equal(result.slice(0, 4).toString(), '%PDF');
               done();
             });
           }, 200);
@@ -198,8 +195,8 @@ describe('Converter', function () {
           var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
           console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions (usally around 65ms) \n\n\n');
           for (var i = 0; i < _results.length; i++) {
-            var _buf = new Buffer(_results[i]);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            helper.assert(Buffer.isBuffer(_results[i]), true);
+            assert.equal(_results[i].slice(0, 4).toString(), '%PDF');
           }
           assert.equal((_elapsed < 350), true);
           done();
@@ -243,8 +240,8 @@ describe('Converter', function () {
           var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
           console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions with '+(_nbExecuted/_crashModulo).toFixed(0)+' crashes\n\n\n');
           for (var i = 0; i < _results.length; i++) {
-            var _buf = new Buffer(_results[i]);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            helper.assert(Buffer.isBuffer(_results[i]), true);
+            assert.equal(_results[i].slice(0, 4).toString(), '%PDF');
           }
           assert.equal((_elapsed < 400), true);
           done();
@@ -292,8 +289,8 @@ describe('Converter', function () {
                 var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
                 converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
                   assert.equal(err, null);
-                  var _buf = new Buffer(result);
-                  assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+                  helper.assert(Buffer.isBuffer(result), true);
+                  assert.equal(result.slice(0, 4).toString(), '%PDF');
                   done();
                 });
               });
@@ -358,8 +355,8 @@ describe('Converter', function () {
         for (let i = 0; i <= nbConversionWithoutRestart; i++) {
           converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
             helper.assert(err+'', 'null');
-            var _buf = new Buffer(result);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            helper.assert(Buffer.isBuffer(result), true);
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
             assert.equal(factories['0'].pid, _officePID);
             if (i === nbConversionWithoutRestart) {
               done();
@@ -376,8 +373,8 @@ describe('Converter', function () {
         for (let i = 0; i <= nbConversionForRestart; i++) {
           converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
             helper.assert(err+'', 'null');
-            var _buf = new Buffer(result);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            helper.assert(Buffer.isBuffer(result), true);
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
             if (i === nbConversionForRestart) {
               assert.notEqual(factories['0'].pid, _officePID);
               done();
@@ -396,8 +393,8 @@ describe('Converter', function () {
         for (let i = 0; i <= _maxLoops; i++) {
           converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
             helper.assert(err+'', 'null');
-            var _buf = new Buffer(result);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            helper.assert(Buffer.isBuffer(result), true);
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
             if (i === _maxLoops) {
               for (let i = 0; i < _officePIDs.length; i++) {
                 assert.notEqual(factories[i+''].pid, _officePIDs[i]);
@@ -416,8 +413,8 @@ describe('Converter', function () {
         const _officePID = factories['0'].pid;
         converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
           helper.assert(err+'', 'null');
-          var _buf = new Buffer(result);
-          assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+          helper.assert(Buffer.isBuffer(result), true);
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
           assert.equal(factories['0'].pid, _officePID);
           done();
         });
@@ -438,8 +435,8 @@ describe('Converter', function () {
             const _newOfficePIDAfter = factories['0'].pid;
             helper.assert(_officePID !== _newOfficePIDAfter, true);
             helper.assert(err+'', 'null');
-            var _buf = new Buffer(result);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            helper.assert(Buffer.isBuffer(result), true);
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
             done();
           });
         });
@@ -456,8 +453,8 @@ describe('Converter', function () {
           const _newOfficePID = factories['0'].pid;
           helper.assert(_officePID, _newOfficePID);
           helper.assert(err+'', 'null');
-          var _buf = new Buffer(result);
-          assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+          helper.assert(Buffer.isBuffer(result), true);
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
           params.converterFactoryTimeout = 2;
           converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
             helper.assert(err instanceof Error, true);
@@ -468,8 +465,8 @@ describe('Converter', function () {
               const _newOfficePIDAfter = factories['0'].pid;
               helper.assert(_officePID !== _newOfficePIDAfter, true);
               helper.assert(err+'', 'null');
-              var _buf = new Buffer(result);
-              assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+              helper.assert(Buffer.isBuffer(result), true);
+              assert.equal(result.slice(0, 4).toString(), '%PDF');
               done();
             });
           });

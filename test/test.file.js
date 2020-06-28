@@ -227,9 +227,9 @@ describe('file', function () {
     });
     it('should zip an array of files into one buffer', function (done) {
       var _files = [
-        {name : 'my_file.xml'            , data : new Buffer( 'some text','utf8')},
-        {name : 'subdir/my_file.xml'     , data : new Buffer( 'content of the file in the sub dir','utf8')},
-        {name : 'subdir/dir/my_file2.txt', data : new Buffer( 'content of the another file','utf8')}
+        {name : 'my_file.xml'            , data : Buffer.from( 'some text','utf8')},
+        {name : 'subdir/my_file.xml'     , data : Buffer.from( 'content of the file in the sub dir','utf8')},
+        {name : 'subdir/dir/my_file2.txt', data : Buffer.from( 'content of the another file','utf8')}
       ];
       fs.mkdirSync(testPath, parseInt('0755', 8));
       file.zip(_files, function (err, zipBuffer) {
@@ -279,9 +279,9 @@ describe('file', function () {
     });
     it('should be fast to zip', function (done) {
       var _files = [
-        {name : 'my_file.xml'            , data : new Buffer(generateRandomText(9000),'utf8')},
-        {name : 'subdir/my_file.xml'     , data : new Buffer(generateRandomText(8500),'utf8')},
-        {name : 'subdir/dir/my_file2.txt', data : new Buffer(generateRandomText(6250),'utf8')}
+        {name : 'my_file.xml'            , data : Buffer.from(generateRandomText(9000),'utf8')},
+        {name : 'subdir/my_file.xml'     , data : Buffer.from(generateRandomText(8500),'utf8')},
+        {name : 'subdir/dir/my_file2.txt', data : Buffer.from(generateRandomText(6250),'utf8')}
       ];
       var _nbExecuted = 200;
       var _results = [];
@@ -426,7 +426,7 @@ describe('file', function () {
         files    : [
           {name : 'my_file.xml'            , data : 'some text'},
           {name : 'subdir/my_file.xml'     , data : 'content of the file in the sub dir'},
-          {name : 'subdir/dir/my_file2.txt', data : new Buffer( 'content of the another file','utf8')}
+          {name : 'subdir/dir/my_file2.txt', data : Buffer.from( 'content of the another file','utf8')}
         ]
       };
       var _filesCopy = _report.files.slice(); // buildFile empties _report.files
@@ -442,7 +442,7 @@ describe('file', function () {
           for (var i = 0; i < _filesCopy.length; i++) {
             var _file = _filesCopy[i];
             if (Buffer.isBuffer(_file.data)===false) {
-              _file.data = new Buffer(_file.data, 'utf8');
+              _file.data = Buffer.from(_file.data, 'utf8');
             }
             assert.equal(result[file.name], file.data);
           }
@@ -456,11 +456,11 @@ describe('file', function () {
         files    : [
           {name : 'my_file.xml'            , parent : '', data : 'some text'},
           {name : 'subdir/my_file.xml'     , parent : '', data : 'content of the file in the sub dir'},
-          {name : 'subdir/dir/my_file2.txt', parent : '', data : new Buffer( 'content of the another file','utf8')},
+          {name : 'subdir/dir/my_file2.txt', parent : '', data : Buffer.from( 'content of the another file','utf8')},
           {name : 'other/table.xml'        , parent : 'embedded/spreadsheet.xlsx' , data : 'array of data'},
           {name : 'other/other.xml'        , parent : 'embedded/spreadsheet.xlsx' , data : 'second file'},
-          {name : 'other/images/bin.png'   , parent : 'embedded/spreadsheet.xlsx' , data : new Buffer( 'my favorite movies', 'utf8')},
-          {name : 'other/table.zip'        , parent : 'embedded/spreadsheet2.xlsx', data : new Buffer( 'other image', 'utf8')},
+          {name : 'other/images/bin.png'   , parent : 'embedded/spreadsheet.xlsx' , data : Buffer.from( 'my favorite movies', 'utf8')},
+          {name : 'other/table.zip'        , parent : 'embedded/spreadsheet2.xlsx', data : Buffer.from( 'other image', 'utf8')},
           {name : 'other/xml/doc.xml'      , parent : 'embedded/spreadsheet2.xlsx', data : 'third file'},
         ]
       };

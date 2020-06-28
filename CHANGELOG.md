@@ -1,5 +1,5 @@
-### v2.0.x
-
+### v2.0.0
+  - Release June 28th, 2020
   - 🚀 **Accepts dynamic variables in all formatters!**
 
     Carbone passes data to formatters if parameters start with a dot `.` and is not surrounded by quotes. Here is an example:
@@ -132,9 +132,9 @@
 
   - Fix LibreOffice detection on Windows
   - Remove compatibility with older NodeJS versions (lower than 10.15.0)
-  - Upgrade some dependencies and remove useless ones (should)
+  - Upgrade some dependencies (moment, debug, yauzl) and remove useless ones (should)
   - Accepts non-alphanumeric characters in variables names, values, ... For example, `{d.i💎d}` is allowed
-  - Improve security in the builder and reduce memory consumption
+  - Fix many security issues and reduce memory consumption
   - Fix crash when markers are next to each over `{d.id}{d.other}` in many situations:
     - with or without conditional blocks
     - with or without loops
@@ -142,6 +142,13 @@
   - Accept direct access in arrays such as `{d.myArray[2].val}` instead of `{d.myArray[i=2].val}`
   - Fix crash when two consecutive arrays, nested in object, were used
   - Remove useless soft-page-break in ODT documents as suggested by the OpenDocument specification
+  - LibreOffice 6+ has a memory leak. So Carbone automatically restarts LibreOffice after a certain amount of document conversion.
+    The number of conversions depends on new parameters `factoryMemoryFileSize` and `factoryMemoryThreshold`
+  - Add conversion timeout parameter `converterFactoryTimeout` (60s by default).
+    It kills LibreOffice if the conversion is too long and returns an error
+  - Remove deprecated NodeJS "new Buffer"
+  - Fix: avoid crashing if a object/array is null or undefined. Print empty text instead.
+  - Fix: variables, which begin by the same characters, were not detected correctly since NodeJS 11
   - Image processing completely rewritten
   - Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` by passing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the marker as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the marker.
 

@@ -29,7 +29,7 @@
   "dependencies": {
     "debug": "=4.1.1",
     "image-size": "=0.7.4",
-    "moment": "=2.19.3",
+    "moment": "=2.27.0",
     "moxie-zip": "=0.0.3",
     "simple-get": "=4.0.0",
     "timsort": "=0.3.0",

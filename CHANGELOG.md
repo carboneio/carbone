@@ -148,6 +148,7 @@
     It kills LibreOffice if the conversion is too long and returns an error
   - Remove deprecated NodeJS "new Buffer"
   - Fix: avoid crashing if a object/array is null or undefined. Print empty text instead.
+  - Fix: variables, which begin by the same characters, were not detected correctly since NodeJS 11
 
 
 ### v1.2.1

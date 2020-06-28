@@ -150,6 +150,18 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should not crash if a parent object/array is null or undefined', function (done) {
+    var _xml = '<xml> {d.title.sub.id} a {d.other.sub.id} b {d.nonArray[i=0].sub.id} c {d.nonArray[i=0].sub.id} d {d.myArr[i=0].sub.id} </xml>';
+    var _data = {
+      title : null,
+      myArr : null
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'null');
+      helper.assert(_xmlBuilt, '<xml>  a  b  c  d  </xml>');
+      done();
+    });
+  });
   it('should automatically repeat the xml if the root is an array of objects', function (done) {
     var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1].brand} </t_row></xml>';
     var _data = [

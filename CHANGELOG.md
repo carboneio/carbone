@@ -1,4 +1,4 @@
-### v2.0.x
+### v2.0.0
   - Release June 28th, 2020
   - 🚀 **Accepts dynamic variables in all formatters!**
 
@@ -146,8 +146,8 @@
     The number of conversions depends on new parameters `factoryMemoryFileSize` and `factoryMemoryThreshold`
   - Add conversion timeout parameter `converterFactoryTimeout` (60s by default).
     It kills LibreOffice if the conversion is too long and returns an error
-  - Remove compatibility with NodeJS < 10
   - Remove deprecated NodeJS "new Buffer"
+  - Fix: avoid crashing if a object/array is null or undefined. Print empty text instead.
 
 
 ### v1.2.1

@@ -1,7 +1,7 @@
 {
-  "name": "carbone",
+  "name": "carbone-enterprise-edition",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "2.0.0-enterprise-edition",
+  "version": "2.0.0",
   "bin": "bin/carbone",
   "main": "./lib",
   "publishConfig": {

@@ -134,7 +134,7 @@
   - Remove compatibility with older NodeJS versions (lower than 10.15.0)
   - Upgrade some dependencies (moment, debug, yauzl) and remove useless ones (should)
   - Accepts non-alphanumeric characters in variables names, values, ... For example, `{d.i💎d}` is allowed
-  - Improve security in the builder and reduce memory consumption
+  - Fix many security issues and reduce memory consumption
   - Fix crash when markers are next to each over `{d.id}{d.other}` in many situations:
     - with or without conditional blocks
     - with or without loops

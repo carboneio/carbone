@@ -1,6 +1,7 @@
 ### v2.0.1
   - Release July 8th, 2020
   - Add regression tests
+  - [EE] : fix crash when an array was printed directly without formatters `{d.myArray}` 
 
 ### v2.0.0
   - Release June 28th, 2020
@@ -153,8 +154,8 @@
   - Remove deprecated NodeJS "new Buffer"
   - Fix: avoid crashing if a object/array is null or undefined. Print empty text instead.
   - Fix: variables, which begin by the same characters, were not detected correctly since NodeJS 11
-  - Image processing completely rewritten
-  - Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` by passing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the marker as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the marker.
+  - [EE] Image processing completely rewritten
+  - [EE] Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` by passing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the marker as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the marker.
 
     The place to insert the marker on the temporary picture may change depends on the file format:
 
@@ -166,13 +167,13 @@
     The accepted images type are: `png`, `jpeg`/`jpg`, `gif`, `svg`
 
     If an error occurs for some reason (fetch failed, image type not supported), a replacement image is used with the message "invalid image".
-  - dynamic images: new formatter `:imageFit()` only available for `DOCX` and `ODT` files. It sets how the image should be resized to fit its container. An argument has to be passed to the formatter: `contain` or `fill`. If the formatter is not defined, the image is resized as `contain` by default.
+  - [EE] dynamic images: new formatter `:imageFit()` only available for `DOCX` and `ODT` files. It sets how the image should be resized to fit its container. An argument has to be passed to the formatter: `contain` or `fill`. If the formatter is not defined, the image is resized as `contain` by default.
     - `contain`: The replaced image is scaled to maintain its aspect ratio while fitting within the element’s content-box (the temporary image).
     - `fill`: The replaced image is sized to fill the element’s content-box (the temporary image). The entire image will fill the box of the previous image. If the object's aspect ratio does not match the aspect ratio of its box, then the object will be stretched to fit.
 
     example: `{d.myImage:imageFit(contain)}` or `{d.myImage:imageFit(fill)}`
 
-  - Added Libreoffice export filters for PDF rendering. To apply filters to a PDF, it is possible to assign an object to `convertTo` with `formatName:'pdf'` and  `formatOptions` an object with the specified filters. The filter list is available on the documentation. Here is an example of a PDF with a password and a watermark:
+  - [EE] Added Libreoffice export filters for PDF rendering. To apply filters to a PDF, it is possible to assign an object to `convertTo` with `formatName:'pdf'` and  `formatOptions` an object with the specified filters. The filter list is available on the documentation. Here is an example of a PDF with a password and a watermark:
     ```js
       options = {
         convertTo: {
@@ -184,7 +185,7 @@
           }
         }
       }
-
+    ```
 
 
 ### v1.2.1

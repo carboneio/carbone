@@ -24,7 +24,7 @@
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
     "lint": "eslint ./*/**.js",
     "lint:fix": "eslint ./*/**.js --fix",
-    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]' | cat <\\(echo -n 'ee-'\\) - ) && git tag $PACKAGE_VERSION && git push origin $PACKAGE_VERSION"
+    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
     "debug": "=4.1.1",

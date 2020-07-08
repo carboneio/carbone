@@ -1,3 +1,7 @@
+### v2.0.1
+  - Release July 8th, 2020
+  - Add regression tests
+
 ### v2.0.0
   - Release June 28th, 2020
   - 🚀 **Accepts dynamic variables in all formatters!**

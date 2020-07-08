@@ -235,6 +235,16 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should print an array without usng a formatter', function (done) {
+      var data = {
+        param : ['test', 'bla']
+      };
+      carbone.renderXML('<xml>{d.param}</xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>test,bla</xml>');
+        done();
+      });
+    });
     it('should render an XML string with dash in array keys', function (done) {
       var data = {
         'param-dash' : [{

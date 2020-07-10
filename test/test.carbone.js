@@ -9,6 +9,7 @@ var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
+var pdfjsLib = require('pdfjs-dist/build/pdf.js');
 
 describe('Carbone', function () {
 
@@ -231,6 +232,16 @@ describe('Carbone', function () {
       carbone.renderXML('<xml>{d.param.new-param-s-t-u-popo.value}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>test</xml>');
+        done();
+      });
+    });
+    it('should print an array without usng a formatter', function (done) {
+      var data = {
+        param : ['test', 'bla']
+      };
+      carbone.renderXML('<xml>{d.param}</xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>test,bla</xml>');
         done();
       });
     });
@@ -2297,8 +2308,8 @@ describe('Carbone', function () {
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Basic rendering: Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' attempts (usally around 10ms)\n\n\n');
         for (var i = 0; i < _results.length; i++) {
-          var _buf = new Buffer(_results[i]);
-          assert.equal((_buf.slice(0, 2).toString() === 'PK'), true);
+          assert.equal(Buffer.isBuffer(_results[i]), true);
+          assert.equal((_results[i].slice(0, 2).toString() === 'PK'), true);
         }
         assert.equal((_elapsed < 200), true);
         done();
@@ -2636,15 +2647,12 @@ describe('Carbone', function () {
       };
       carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
         assert.equal(err, null);
-        var buf = new Buffer(result);
-        assert.equal(buf.slice(0, 4).toString(), '%PDF');
-        var bufPDF = new Buffer(buf.length);
-        fs.open(_pdfResultPath, 'r', function (status, fd) {
-          fs.read(fd, bufPDF, 0, buf.length, 0, function (err, bytesRead, buffer) {
-            assert.equal(buf.slice(0, 4).toString(), '%PDF');
-            assert.equal(buf.slice(8, 50).toString(), buffer.slice(8, 50).toString());
-            done();
-          });
+        assert.equal(result.slice(0, 4).toString(), '%PDF');
+        fs.readFile(_pdfResultPath, function (err, expected) {
+          assert.equal(err+'', 'null');
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
+          assert.equal(result.slice(8, 50).toString(), expected.slice(8, 50).toString());
+          done();
         });
       });
     });
@@ -2657,8 +2665,7 @@ describe('Carbone', function () {
       };
       carbone.render(path.resolve('./test/datasets/test_word_render_A.docx'), data, {convertTo : 'pdf'}, function (err, result) {
         assert.equal(err, null);
-        var buf = new Buffer(result);
-        assert.equal(buf.slice(0, 4).toString(), '%PDF');
+        assert.equal(result.slice(0, 4).toString(), '%PDF');
         done();
       });
     });
@@ -2707,8 +2714,8 @@ describe('Carbone', function () {
           var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
           console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions (usally around 65ms) \n\n\n');
           for (var i = 0; i < _results.length; i++) {
-            var _buf = new Buffer(_results[i]);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            assert.equal(Buffer.isBuffer(_results[i]), true);
+            assert.equal(_results[i].slice(0, 4).toString(), '%PDF');
           }
           // assert.equal((_elapsed < 200), true);
           done();
@@ -2915,8 +2922,36 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should render and open a pdf with a password (complete) (it takes 5000ms on average)', function (done) {
+      const _password = 'Ro0T1234';
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'pdf',
+          formatOptions : {
+            EncryptFile          : true,
+            DocumentOpenPassword : _password
+          }
+        }
+      };
+      // test_word_render_2003_XML.xml;
+      carbone.render('test_spreadsheet.ods', data, _options, (err, result) => {
+        helper.assert(err, null);
+        assert.equal(result.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : _password});
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad password.'));
+        });
+      });
+    });
   });
-
 });
 
 

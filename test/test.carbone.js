@@ -2511,6 +2511,31 @@ describe('Carbone', function () {
     it.skip('should parse embedded documents (should be ok but not perfect)');
     it.skip('should re-generate r=1, c=A1 in Excel documents');
     it.skip('should not remove empty cells in XLSX files (needs pre-processing to add empty cells)');
+
+    it('should render a template (docx) and update the table of content by using libre office (loRendering set to true)', function (done) {
+      var options = {
+        convertTo   : 'docx',
+        loRendering : true
+      };
+      carbone.render('test_docx_refresh_table_of_content.docx', {}, options, function (err, result) {
+        assert.equal(err, null);
+        fs.mkdirSync(testPath, parseInt('0755',8));
+        var _document = path.join(testPath, 'file.docx');
+        var _unzipPath = path.join(testPath, 'unzip');
+        fs.writeFileSync(_document, result);
+        unzipSystem(_document, _unzipPath, function (err, files) {
+          var _xmlExpectedContent = files['word/document.xml'];
+          // Previous table of content
+          assert.equal(_xmlExpectedContent.indexOf('Main title'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('subtitle1'), -1);
+          assert.equal(_xmlExpectedContent.indexOf('This is a text1'), -1);
+          // New table of content
+          assert.notEqual(_xmlExpectedContent.indexOf('subtitle2'), -1);
+          assert.notEqual(_xmlExpectedContent.indexOf('This is a text2'), -1);
+          done();
+        });
+      });
+    });
   });
 
 

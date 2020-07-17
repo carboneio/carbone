@@ -1231,7 +1231,7 @@ const locales = {
   },
   'pt-br' : {
     number : {
-      separator : ' ',
+      separator : '.',
       decimal   : ',',
       group     : 3
     },

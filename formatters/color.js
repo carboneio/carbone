@@ -8,16 +8,23 @@ const color = require("../lib/color")
  * @param  {Object} options
  * @param  {String} color
  */
-function addColorDatabase (options, colorValue) {
+function addColorDatabase (options, colorReference, colorValue, colorElement) {
   var _colorDatabaseProperties = null;
-  if (options.colorDatabase.has(colorValue)) {
-    return ;
+  const _newColor = {color: colorValue, element: colorElement};
+  console.log(_newColor);
+  if (!options.colorDatabase.has(colorReference)) {
+    // If the colorReference doesn't exist, it create a new ID and set the new color
+    _colorDatabaseProperties = {
+      id : options.colorDatabase.size,
+      colors: [_newColor]
+    }
+  } else {
+    // retrieve the colorReference and add the new color
+    _colorDatabaseProperties = options.colorDatabase.get(colorReference)
+    _colorDatabaseProperties.colors.push(_newColor);
   }
-  // If the color doesn't exist, it create a new ID
-  _colorDatabaseProperties = {
-    id : options.colorDatabase.size
-  };
-  options.colorDatabase.set(colorValue, _colorDatabaseProperties);
+  options.colorDatabase.set(colorReference, _colorDatabaseProperties);
+  console.log("Add Color Datase called: ", options.colorDatabase);
 }
 
 /**
@@ -29,26 +36,29 @@ function addColorDatabase (options, colorValue) {
  *
  * @private
  *
- * @param   {String} color image data (link or base64)
- * @returns {String}             generated link for OpenDocument
+ * @param {String} colorValue new color from the dataset
+ * @param {String} colorReference style name used as reference (example "P1", "P2", "P3")
+ * @param {String} colorElement The element where the color is applied
+ * @param {Integer} returnReference if returnReference === 0, the post process formatter should return de new reference.
  */
-function generateColorOdtReference (colorValue) {
-  addColorDatabase(this, colorValue);
+function saveColorAndGetReference (colorValue, colorReference, colorElement, returnReference) {
+  addColorDatabase(this, colorReference, colorValue, colorElement);
+  if (returnReference>0) return;
   // return a function to call at the end of the building process
   return {
-    fn   : generateColorOdtReferencePostProcessing,
-    args : [colorValue]
+    fn   : getColorOdtReferencePostProcessing,
+    args : [colorReference]
   };
 }
 
 /** ==================================== POST PROCESSING ========================================= */
 
-function generateColorOdtReferencePostProcessing (colorValue) {
-  var _colorData = this.colorDatabase.get(colorValue);
+function getColorOdtReferencePostProcessing (colorReference) {
+  var _colorData = this.colorDatabase.get(colorReference);
   return  color.getColorReference(_colorData.id);
 }
 
 module.exports = {
-  generateColorOdtReference,
-  generateColorOdtReferencePostProcessing
+  saveColorAndGetReference,
+  getColorOdtReferencePostProcessing
 }

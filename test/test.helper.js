@@ -457,4 +457,31 @@ describe('helper', function () {
     });
   });
 
+  describe('Find the relative path between 2 markers', function () {
+    it('should find the relative path between 2 markers', function () {
+      helper.assert(helper.findMarkerRelativePath('d.list[i].color', 'd.list[i].color2'), '.color2');
+    });
+    it('should find the relative path from a list 2', function () {
+      helper.assert(helper.findMarkerRelativePath('d.list[i].color', 'd.color2'), '..color2');
+    });
+    it('should find the relative path from list and return an empty string', function () {
+      helper.assert(helper.findMarkerRelativePath('d.color', 'd.list2[i].color2'), '.list2[i].color2');
+    });
+    it('should find the relative path from a nested list', function () {
+      helper.assert(helper.findMarkerRelativePath('d.list[i].list[2].color', 'd.list[i].color2'), '..color2');
+    });
+    it('should not find the relative path from list and return an empty string', function () {
+      helper.assert(helper.findMarkerRelativePath('d.list[i].color', 'd.element.color2'), '..element.color2');
+    });
+    it('should not find the relative path from list and return an empty string', function () {
+      helper.assert(helper.findMarkerRelativePath('d.element.color2', 'd.list[i].color'), '..list[i].color');
+    });
+    it('should not find the relative path from list and return an empty string', function () {
+      helper.assert(helper.findMarkerRelativePath('d.element.color2', 'd.element.list[i].color'), '.list[i].color');
+    });
+    it('should not find the relative path from list and return an empty string', function () {
+      helper.assert(helper.findMarkerRelativePath('d.list[i].color', 'd.list2[i].color2'), '..list2[i].color2');
+    });
+  });
+
 });

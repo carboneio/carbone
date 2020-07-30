@@ -1,4 +1,4 @@
-const color = require("../lib/color")
+const color = require('../lib/color');
 
 /**
  * Add the color to the colorDatabase Map.
@@ -6,25 +6,37 @@ const color = require("../lib/color")
  * @private
  *
  * @param  {Object} options
- * @param  {String} color
+ * @param  {Array} color
  */
-function addColorDatabase (options, colorReference, colorValue, colorElement) {
+function addColorDatabase (options, colorId, styleName, colors) {
   var _colorDatabaseProperties = null;
-  const _newColor = {color: colorValue, element: colorElement};
-  console.log(_newColor);
-  if (!options.colorDatabase.has(colorReference)) {
-    // If the colorReference doesn't exist, it create a new ID and set the new color
+
+  // If the colorReference doesn't exist, it create a new ID and set the new color
+  if (!options.colorDatabase.has(colorId)) {
+    let _styleFamily = '';
+    // Loop through colorStyleList to find the style family and color element
+    // to improve
+    options.colorStyleList.forEach(x => {
+      if (x.styleName === styleName && x.dynColor === true) {
+        _styleFamily = x.styleFamily; // get the familly of the tag ['paragraph', 'text', 'shape']
+        x.colors.forEach(co => {
+          colors.forEach(cof => {
+            if (co.color === cof.oldColor) {
+              cof.element = co.element;
+            }
+          });
+        });
+      }
+    });
     _colorDatabaseProperties = {
-      id : options.colorDatabase.size,
-      colors: [_newColor]
-    }
-  } else {
-    // retrieve the colorReference and add the new color
-    _colorDatabaseProperties = options.colorDatabase.get(colorReference)
-    _colorDatabaseProperties.colors.push(_newColor);
+      id          : options.colorDatabase.size,
+      colors      : colors,
+      styleFamily : _styleFamily
+    };
+    // console.log(_colorDatabaseProperties);
+    options.colorDatabase.set(colorId, _colorDatabaseProperties);
+    // console.log(options.colorDatabase);
   }
-  options.colorDatabase.set(colorReference, _colorDatabaseProperties);
-  console.log("Add Color Datase called: ", options.colorDatabase);
 }
 
 /**
@@ -35,30 +47,47 @@ function addColorDatabase (options, colorReference, colorValue, colorElement) {
  * `this` is the options
  *
  * @private
- *
- * @param {String} colorValue new color from the dataset
- * @param {String} colorReference style name used as reference (example "P1", "P2", "P3")
- * @param {String} colorElement The element where the color is applied
- * @param {Integer} returnReference if returnReference === 0, the post process formatter should return de new reference.
  */
-function saveColorAndGetReference (colorValue, colorReference, colorElement, returnReference) {
-  addColorDatabase(this, colorReference, colorValue, colorElement);
-  if (returnReference>0) return;
+function updateColorAndGetReference () {
+  let _newColorId = '';
+  let _styleName = '';
+  let _colors = [];
+
+  for (let i = 0, j = arguments.length; i < j; i++) {
+    if (i % 2 === 0 && i+1 < arguments.length) {
+      // Aggregate the color object (oldColor/newColor)
+      _colors.push({
+        newColor : arguments[i] && arguments[i].indexOf('C_ERROR') === -1 ? arguments[i] : '',
+        oldColor : arguments[i+1]
+      });
+    }
+    else {
+      // Retrieve the style name, it is the last argument
+      _styleName = arguments[i];
+    }
+    // Generate an ID from the argument list
+    if (arguments[i] && arguments[i].indexOf('C_ERROR') === -1) {
+      _newColorId += arguments[i];
+    }
+  }
+
+  addColorDatabase(this, _newColorId, _styleName, _colors);
+
   // return a function to call at the end of the building process
   return {
     fn   : getColorOdtReferencePostProcessing,
-    args : [colorReference]
+    args : [_newColorId]
   };
 }
 
 /** ==================================== POST PROCESSING ========================================= */
 
-function getColorOdtReferencePostProcessing (colorReference) {
-  var _colorData = this.colorDatabase.get(colorReference);
+function getColorOdtReferencePostProcessing (colorId) {
+  const _colorData = this.colorDatabase.get(colorId);
   return  color.getColorReference(_colorData.id);
 }
 
 module.exports = {
-  saveColorAndGetReference,
+  updateColorAndGetReference,
   getColorOdtReferencePostProcessing
-}
+};

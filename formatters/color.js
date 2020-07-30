@@ -12,26 +12,20 @@ function addColorDatabase (options, colorId, styleName, colors) {
   var _colorDatabaseProperties = null;
 
   // If the colorReference doesn't exist, it create a new ID and set the new color
-  if (!options.colorDatabase.has(colorId)) {
-    let _styleFamily = '';
-    // Loop through colorStyleList to find the style family and color element
-    // to improve
-    options.colorStyleList.forEach(x => {
-      if (x.styleName === styleName && x.dynColor === true) {
-        _styleFamily = x.styleFamily; // get the familly of the tag ['paragraph', 'text', 'shape']
-        x.colors.forEach(co => {
-          colors.forEach(cof => {
-            if (co.color === cof.oldColor) {
-              cof.element = co.element;
-            }
-          });
-        });
+  if (!options.colorDatabase.has(colorId) && options.colorStyleList[styleName]) {
+    // Loop through colorStyleList to find the color element
+    for (let i = 0, j = options.colorStyleList[styleName].colors.length; i < j; i++) {
+      const colorStyleEl = options.colorStyleList[styleName].colors[i];
+      for (let k = 0, l = colors.length; k < l; k++) {
+        if (colorStyleEl.color === colors[k].oldColor) {
+          colors[k].element = colorStyleEl.element;
+        }
       }
-    });
+    }
     _colorDatabaseProperties = {
       id          : options.colorDatabase.size,
       colors      : colors,
-      styleFamily : _styleFamily
+      styleFamily : options.colorStyleList[styleName].styleFamily // the familly of the tag ['paragraph', 'text', 'shape']
     };
     // console.log(_colorDatabaseProperties);
     options.colorDatabase.set(colorId, _colorDatabaseProperties);

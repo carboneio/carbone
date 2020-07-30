@@ -27,7 +27,6 @@ function addColorDatabase (options, colorId, styleName, colors) {
       colors      : colors,
       styleFamily : options.colorStyleList[styleName].styleFamily // the familly of the tag ['paragraph', 'text', 'shape']
     };
-    // console.log(_colorDatabaseProperties);
     options.colorDatabase.set(colorId, _colorDatabaseProperties);
     // console.log(options.colorDatabase);
   }
@@ -48,21 +47,21 @@ function updateColorAndGetReference () {
   let _colors = [];
 
   for (let i = 0, j = arguments.length; i < j; i++) {
+    const _arg = arguments[i].indexOf('C_ERROR') === -1 ? arguments[i] : '';
     if (i % 2 === 0 && i+1 < arguments.length) {
       // Aggregate the color object (oldColor/newColor)
+      // if arguments[i] return an error (ex: C_ERROR), it means the color was undefined on the data object
       _colors.push({
-        newColor : arguments[i] && arguments[i].indexOf('C_ERROR') === -1 ? arguments[i] : '',
-        oldColor : arguments[i+1]
+        newColor : _arg,          // color from the data object
+        oldColor : arguments[i+1] // color from the template
       });
     }
     else {
-      // Retrieve the style name, it is the last argument
-      _styleName = arguments[i];
+      // Retrieve the style name as last argument
+      _styleName = _arg;
     }
     // Generate an ID from the argument list
-    if (arguments[i] && arguments[i].indexOf('C_ERROR') === -1) {
-      _newColorId += arguments[i];
-    }
+    _newColorId += _arg;
   }
 
   addColorDatabase(this, _newColorId, _styleName, _colors);

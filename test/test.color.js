@@ -274,5 +274,21 @@ describe('Dynamic colors', function () {
         });
       });
     });
+    describe('post processor', function () {
+      // should do nothing if template.xml does not exist
+      // should do nothing if options.colorDatabase is empty
+      // replace 1 text with a colortype RGB
+      // replace 1 background color with a colortype HSL
+      // replace 1 text + background color + static color
+    });
+  });
+  describe('util methods', function () {
+    // color converters - #hexa
+    // color converters - hexa
+    // color converters - rgbToHexa
+    // color converters - hslToHexa
+    // color converters - hslToRGB
+    // color converters - colors
+    //
   });
 });

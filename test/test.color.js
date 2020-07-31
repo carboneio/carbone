@@ -5,6 +5,82 @@ describe('Dynamic colors', function () {
 
   describe('ODT Files', function () {
     describe('pre processor methods', function () {
+      describe('preProcessODT', function () {
+
+        beforeEach( function () {
+          this.sinon.stub(console, 'error');
+        });
+
+        it('should do nothing if the file content.xml does not exist', function () {
+          const _template = {
+            files : [{
+              name : 'random.xml',
+              data : '<xml></xml>'
+            }]
+          };
+          color.preProcessODT(_template, {});
+          helper.assert(_template, {
+            files : [{
+              name : 'random.xml',
+              data : '<xml></xml>'
+            }]
+          });
+        });
+        it('should insert a color marker and formatter from a single bindColor marker', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/><text:sequence-decl text:display-outline-level="0" text:name="Figure"/></text:sequence-decls><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2">{bindColor(ff<text:span text:style-name="T2">00</text:span>00, #hexa) = d.color1}</text:p></text:p></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/><text:sequence-decl text:display-outline-level="0" text:name="Figure"/></text:sequence-decls><text:p text:style-name="{d.color1:updateColorAndGetReference(#ff0000, null, #ffff00, P3)}">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2"></text:p></text:p></office:text></office:body></office:document-content>';
+          const _options = {};
+          const _expectedOptions = { colorStyleList : { P3 : { styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' }] } } };
+          color.preProcessODT(_template, _options);
+          helper.assert(_template.files[0].data, _expectedXML);
+          helper.assert(_options, _expectedOptions);
+        });
+
+        // should insert color markers and formatters from multiple bindColor marker
+        it('should insert a color marker and formatter from a single bindColor marker', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P3"/><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P2">{bindColor(ff<text:span text:style-name="T2">00</text:span>00, #hexa) = d.color1}</text:p><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, #hexa) = d.color<text:span text:style-name="T3">2</text:span>}<text:p text:style-name="P6">{bindColor(00<text:span text:style-name="T2">00</text:span>ff, #hexa) = d.list[i].element}</text:p></text:p></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="{d.color1:updateColorAndGetReference(#ff0000, .color2, #ffff00, P3)}">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="{d.color1:updateColorAndGetReference(#ff0000, .color2, #ffff00, P3)}"/><text:p text:style-name="{d.list[i].element:updateColorAndGetReference(#0000ff, null, transparent, P4)}">{d.lastname}</text:p><text:p text:style-name="P2"></text:p><text:p text:style-name="P5"><text:p text:style-name="P6"></text:p></text:p></office:text></office:body></office:document-content>';
+          const _options = {};
+          const _expectedOptions = { colorStyleList :
+            {
+              P3 : { styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : '#hexa' }] },
+              P4 : { styleFamily : 'paragraph', colors : [{ color : '#0000ff', element : 'textColor', marker : 'd.list[i].element', colorType : '#hexa' }, { color : 'transparent', element : 'textBackgroundColor' } ] }
+            }
+          };
+          color.preProcessODT(_template, _options);
+          helper.assert(_template.files[0].data, _expectedXML);
+          helper.assert(_options, _expectedOptions);
+        });
+        //
+
+        it('should console an error because it changes the text color and background color from 2 different lists', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2">{bindColor(ff<text:span text:style-name="T2">00</text:span>00, #hexa) = d.list[i].color1}</text:p><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, #hexa) = d.list2[i].color2}</text:p></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="{d.list2[i].color2:updateColorAndGetReference(#ffff00, null, #ff0000, P3)}">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2"></text:p><text:p text:style-name="P5"></text:p></office:text></office:body></office:document-content>';
+          const _options = {};
+          const _expectedOptions = { colorStyleList : { P3 : { styleFamily : 'paragraph', colors : [{color : '#ffff00', element : 'textBackgroundColor',  marker : 'd.list2[i].color2', colorType : '#hexa' }, {color : '#ff0000', element : 'textColor',  marker : 'd.list[i].color1', colorType : '#hexa' }] } } };
+          color.preProcessODT(_template, _options);
+          helper.assert(_template.files[0].data, _expectedXML);
+          helper.assert(_options, _expectedOptions);
+          helper.assert(console.error.calledOnce, true);
+          helper.assert(console.error.calledWith("Carbone bindColor error: it is not possible to get the color binded to the following marker: 'd.list[i].color1'"), true);
+        });
+
+      });
       describe('getBindColorMarkers', function () {
         beforeEach( function () {
           this.sinon.stub(console, 'warn');
@@ -44,7 +120,6 @@ describe('Dynamic colors', function () {
             helper.assert(err+'', 'null');
             helper.assert(newXmlContent, _xmlExpectedContent);
             helper.assert(bindColorArray, _expectedBindColorList);
-            // console.log(bindColorArray);
             done();
           });
         });

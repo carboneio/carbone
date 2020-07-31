@@ -5,7 +5,7 @@ describe('Dynamic colors', function () {
 
   describe('ODT Files', function () {
     describe('pre processor methods', function () {
-      describe.only('getBindColorMarkers', function () {
+      describe('getBindColorMarkers', function () {
         beforeEach( function () {
           this.sinon.stub(console, 'warn');
         });
@@ -95,6 +95,107 @@ describe('Dynamic colors', function () {
             helper.assert(console.warn.calledWith("Carbone bindColor warning: 2 bindColor markers try to edit the same color 'ffff00'."), true);
             done();
           });
+        });
+      });
+      describe('getColorStyleListODT', function () {
+        it('should not find any style and return an empty colorStyleList', function (done) {
+          const _xmlContent = '<xml><office:body></office:body></xml>';
+          const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
+
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, {});
+          done();
+        });
+        it('should not find any color or background color attribute on the style and return an empty colorStyleList', function (done) {
+          const _xmlContent = '<style:style style:name="T1" style:family="text"><style:text-properties officeooo:rsid="00174da5"/></style:style><style:style style:name="T2" style:family="text"><style:text-properties officeooo:rsid="0022fb00"/></style:style>';
+          const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
+
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, {});
+          done();
+        });
+        it('should not find any familly attribute on the style and return an empty colorStyleList', function (done) {
+          const _xmlContent = '<style:style style:name="T1"><style:text-properties fo:color="#ff0000" officeooo:rsid="00174da5"/></style:style><style:style style:name="T2" style:family="text"><style:text-properties officeooo:rsid="0022fb00"/></style:style>';
+          const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
+
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, {});
+          done();
+        });
+        it('should not find any name attribute on the style and return an empty colorStyleList', function (done) {
+          const _xmlContent = '<style:style style:name="T1"><style:text-properties fo:color="#ff0000" officeooo:rsid="00174da5"/></style:style><style:style style:name="T2" style:family="text"><style:text-properties officeooo:rsid="0022fb00"/></style:style>';
+          const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
+
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, {});
+          done();
+        });
+        it('should return a colorStyleList element that match a color in the bindColorList [text color only]', function (done) {
+          const _xmlContent = '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>';
+          const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
+          const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ] } };
+
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, _expectedColorListElement);
+          done();
+        });
+        it('should return a colorStyleList element that match a color in the bindColorList [background text color only]', function (done) {
+          const _xmlContent = '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:background-color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>';
+          const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
+          const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa' } ] } };
+
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, _expectedColorListElement);
+          done();
+        });
+
+        it('should return a colorStyleList element that match a color in the bindColorList [text + background color]', function (done) {
+          const _xmlContent = ' <style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>';
+          const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#ffff00', colorType : 'color', marker : 'd.color2' }];
+          const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : 'color' } ] } };
+
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, _expectedColorListElement);
+          done();
+        });
+
+        it('should return a colorStyleList element that match a color in the bindColorList [text + background + static color]', function (done) {
+          const _xmlContent = ' <style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>';
+          const _bindColorList = [
+            { referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' },
+            { referenceColor : '#000000', colorType : 'color', marker : 'd.color2' },
+            { referenceColor : 'transparent', colorType : 'hsl', marker : 'd.list[i].color'}
+          ];
+          const _expectedColorListElement = {
+            P2 : { styleFamily : 'paragraph', colors : [{ color : '#000000', element : 'textColor', marker : 'd.color2', colorType : 'color' }]},
+            P3 : { styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' } ] },
+            P4 : { styleFamily : 'paragraph', colors : [{ color : 'transparent', element : 'textBackgroundColor', marker : 'd.list[i].color', colorType : 'hsl' }, {color : '#0000ff', element : 'textColor' }]},
+          };
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, _expectedColorListElement);
+          done();
+        });
+
+        it('should return a colorStyleList element with the color sorted (because the style contains a static text color)', function (done) {
+          const _xmlContent = '<style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#92AF11"/></style:style>';
+          const _bindColorList = [{ referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.color1' }];
+          const _expectedColorListElement = {
+            P4 : { styleFamily : 'paragraph', colors : [{color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {color : '#0000ff', element : 'textColor'}]}
+          };
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, _expectedColorListElement);
+          done();
+        });
+
+        it('should return a colorStyleList element with the color sorted (because the second color changed is a color from a list, but it needs to be the first color on the list)', function (done) {
+          const _xmlContent = '<style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#92AF11"/></style:style>';
+          const _bindColorList = [{ referenceColor : '#0000ff', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.list[i].element' }];
+          const _expectedColorListElement = {
+            P4 : { styleFamily : 'paragraph', colors : [{color : '#92AF11', element : 'textBackgroundColor', marker : 'd.list[i].element', colorType : '#hexa'}, {color : '#0000ff', element : 'textColor', marker : 'd.color1', colorType : '#hexa'}]}
+          };
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, _expectedColorListElement);
+          done();
         });
       });
     });

@@ -457,7 +457,7 @@ describe('helper', function () {
     });
   });
 
-  describe.only('Find the relative path between 2 markers', function () {
+  describe('Find the relative path between 2 markers', function () {
     it('should find the relative path between 2 markers', function () {
       helper.assert(helper.getMarkerRelativePath('d.list[i].color', 'd.list[i].color2'), '.color2');
     });

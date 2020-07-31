@@ -12,20 +12,22 @@ function addColorDatabase (options, colorId, styleName, colors) {
   var _colorDatabaseProperties = null;
 
   // If the colorReference doesn't exist, it create a new ID and set the new color
-  if (!options.colorDatabase.has(colorId) && options.colorStyleList[styleName]) {
+  const _styleTag = options.colorStyleList[styleName];
+  if (!options.colorDatabase.has(colorId) && _styleTag) {
     // Loop through colorStyleList to find the color element
-    for (let i = 0, j = options.colorStyleList[styleName].colors.length; i < j; i++) {
-      const colorStyleEl = options.colorStyleList[styleName].colors[i];
+    for (let i = 0, j = _styleTag.colors.length; i < j; i++) {
+      const styleTagColor = _styleTag.colors[i];
       for (let k = 0, l = colors.length; k < l; k++) {
-        if (colorStyleEl.color === colors[k].oldColor) {
-          colors[k].element = colorStyleEl.element;
+        if (styleTagColor.color === colors[k].oldColor) {
+          colors[k].element = styleTagColor.element;
+          colors[k].colorType = styleTagColor.colorType;
         }
       }
     }
     _colorDatabaseProperties = {
       id          : options.colorDatabase.size,
       colors      : colors,
-      styleFamily : options.colorStyleList[styleName].styleFamily // the familly of the tag ['paragraph', 'text', 'shape']
+      styleFamily : _styleTag.styleFamily // the familly of the tag ['paragraph', 'text', 'shape']
     };
     options.colorDatabase.set(colorId, _colorDatabaseProperties);
     // console.log(options.colorDatabase);
@@ -47,7 +49,7 @@ function updateColorAndGetReference () {
   let _colors = [];
 
   for (let i = 0, j = arguments.length; i < j; i++) {
-    const _arg = arguments[i].indexOf('C_ERROR') === -1 ? arguments[i] : '';
+    const _arg = typeof arguments[i] === 'string' && arguments[i].indexOf('C_ERROR') !== -1 ? '' : arguments[i];
     if (i % 2 === 0 && i+1 < arguments.length) {
       // Aggregate the color object (oldColor/newColor)
       // if arguments[i] return an error (ex: C_ERROR), it means the color was undefined on the data object

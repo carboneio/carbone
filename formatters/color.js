@@ -63,9 +63,12 @@ function updateColorAndGetReference () {
       _styleName = _arg;
     }
     // Generate an ID from the argument list
-    _newColorId += _arg;
+    // If the new color is an object (rgb or hsl), it is converted to a string
+    _newColorId += typeof _arg === 'object' ? JSON.stringify(_arg) : _arg;
+
   }
 
+  // console.log(_newColorId, _styleName, _colors);
   addColorDatabase(this, _newColorId, _styleName, _colors);
 
   // return a function to call at the end of the building process

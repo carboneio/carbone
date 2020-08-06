@@ -1,3 +1,6 @@
+### v2.0.2
+  - Fix locales de-ch and pt-br
+
 ### v2.0.1
   - Release July 8th, 2020
   - Add regression tests

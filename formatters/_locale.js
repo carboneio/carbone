@@ -854,12 +854,12 @@ const locales = {
   },
   'de-ch' : {
     number : {
-      separator : ' ',
-      decimal   : ',',
+      separator : '\'',
+      decimal   : '.',
       group     : 3
     },
     currency : {
-      L    : commonFormatFn.v_S,
+      L    : commonFormatFn.S_v,
       LL   : commonFormatFn.v_M,
       M    : commonFormatFn.M,
       code : 'CHF'

@@ -5,6 +5,9 @@ const commonFormatFn = {
   Sv : (v, S, s, M, m, n) => {
     return `${S}${v}`;
   },
+  S_v : (v, S, s, M, m, n) => {
+    return `${S} ${v}`;
+  },
   v_S : (v, S, s, M, m, n) => {
     return `${v} ${S}`;
   },
@@ -1228,12 +1231,12 @@ const locales = {
   },
   'pt-br' : {
     number : {
-      separator : ' ',
+      separator : '.',
       decimal   : ',',
       group     : 3
     },
     currency : {
-      L    : commonFormatFn.v_S,
+      L    : commonFormatFn.S_v,
       LL   : commonFormatFn.v_M,
       M    : commonFormatFn.M,
       code : 'BRL'

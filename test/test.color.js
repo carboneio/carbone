@@ -393,7 +393,7 @@ describe.only('Dynamic colors', function () {
   });
   describe('Color format converters', function () {
     // color converters - #hexa
-    it('[#HEXA => #HEXA] should return an #hexa color from the color format #hexa', function () {
+    it('[#HEXA => #HEXA] should return an #hexa color from the color format "#hexa" and the report type', function () {
       // ODT
       helper.assert(color.colorFormatConverter['#hexa']('#FF21A3', 'odt'), '#FF21A3');
       helper.assert(color.colorFormatConverter['#hexa']('#FF0000', 'odt'), '#FF0000');
@@ -401,7 +401,7 @@ describe.only('Dynamic colors', function () {
       helper.assert(color.colorFormatConverter['#hexa']('#FF21A3', 'docx'), 'FF21A3');
       helper.assert(color.colorFormatConverter['#hexa']('#FF0000', 'docx'), 'FF0000');
     });
-    it('[HEXA => #HEXA] should return an #hexa color from the color format hexa', function () {
+    it('[HEXA => #HEXA] should return an #hexa color from the color format "hexa"', function () {
       // ODT
       helper.assert(color.colorFormatConverter.hexa('FF21A3', 'odt'), '#FF21A3');
       helper.assert(color.colorFormatConverter.hexa('FF0000', 'odt'), '#FF0000');
@@ -460,6 +460,18 @@ describe.only('Dynamic colors', function () {
       helper.assert(color.colorFormatConverter.hslToRgb({h : 0, s : 100, l : 50}), {r : 255, g : 0, b : 0});
       helper.assert(color.colorFormatConverter.hslToRgb({h : 142, s : 80, l : 20}), {r : 10, g : 92, b : 40});
       helper.assert(color.colorFormatConverter.hslToRgb({h : 300, s : 15, l : 80}), {r : 212, g : 196, b : 212});
+    });
+
+    it('[manageHexadecimalHashtag] should return the hexadecimal with OR without hashtag based on the report type', function () {
+      // ODT
+      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000', 'odt'), '#ff0000');
+      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b', 'odt'), '#ff238b');
+      // DOCX
+      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000', 'docx'), 'ff0000');
+      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b', 'docx'), 'ff238b');
+      // Without report type
+      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000'), 'ff0000');
+      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b'), 'ff238b');
     });
   });
 });

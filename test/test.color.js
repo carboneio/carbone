@@ -99,7 +99,7 @@ describe.only('Dynamic colors', function () {
         it('should return a single bindColor element and should clean the xml [single]', function (done) {
           const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
           const _xmlExpectedContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>';
-          const _expectedBindColorList = [{ referenceColor : '#0000ff', colorType : 'hsl', marker : 'd.color6' }];
+          const _expectedBindColorList = [{ referenceColor : '0000ff', colorType : 'hsl', marker : 'd.color6' }];
           color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
             helper.assert(err+'', 'null');
             helper.assert(newXmlContent, _xmlExpectedContent);
@@ -112,9 +112,9 @@ describe.only('Dynamic colors', function () {
           const _xmlInitialContent = '<office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P2">{bindColor(ff<text:span text:style-name="T2">00</text:span>00, #hexa) = d.color1}</text:p><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, color) = d.color<text:span text:style-name="T3">2</text:span>}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
           const _xmlExpectedContent = '<office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P2"></text:p><text:p text:style-name="P5"></text:p><text:p text:style-name="P6"></text:p></office:text>';
           const _expectedBindColorList = [
-            { referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' },
-            { referenceColor : '#ffff00', colorType : 'color', marker : 'd.color2' },
-            { referenceColor : '#0000ff', colorType : 'hsl', marker : 'd.color6' }
+            { referenceColor : 'ff0000', colorType : '#hexa', marker : 'd.color1' },
+            { referenceColor : 'ffff00', colorType : 'color', marker : 'd.color2' },
+            { referenceColor : '0000ff', colorType : 'hsl', marker : 'd.color6' }
           ];
           color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
             helper.assert(err+'', 'null');
@@ -160,7 +160,7 @@ describe.only('Dynamic colors', function () {
 
         it('should return a console warning if the color has already been defined to be replace in a previous bindColor statement, should clean the XML and should return a single element on bindColorArray', function (done) {
           const _xmlInitialContent = '<office:text><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, #hexa) = d.color<text:span text:style-name="T3">2</text:span>}</text:p><text:p text:style-name="P6">{bindColor(ffff00, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-          const _expectedBindColorList = [{ referenceColor : '#ffff00', colorType : '#hexa', marker : 'd.color2' }];
+          const _expectedBindColorList = [{ referenceColor : 'ffff00', colorType : '#hexa', marker : 'd.color2' }];
           color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
             helper.assert(err+'', 'null');
             helper.assert(newXmlContent, '<office:text><text:p text:style-name="P5"></text:p><text:p text:style-name="P6"></text:p></office:text>');
@@ -394,34 +394,64 @@ describe.only('Dynamic colors', function () {
   describe('Color format converters', function () {
     // color converters - #hexa
     it('[#HEXA => #HEXA] should return an #hexa color from the color format #hexa', function () {
-      helper.assert(color.colorFormatConverter['#hexa']('#FF21A3'), '#FF21A3');
-      helper.assert(color.colorFormatConverter['#hexa']('#FF0000'), '#FF0000');
+      // ODT
+      helper.assert(color.colorFormatConverter['#hexa']('#FF21A3', 'odt'), '#FF21A3');
+      helper.assert(color.colorFormatConverter['#hexa']('#FF0000', 'odt'), '#FF0000');
+      // DOCX
+      helper.assert(color.colorFormatConverter['#hexa']('#FF21A3', 'docx'), 'FF21A3');
+      helper.assert(color.colorFormatConverter['#hexa']('#FF0000', 'docx'), 'FF0000');
     });
     it('[HEXA => #HEXA] should return an #hexa color from the color format hexa', function () {
-      helper.assert(color.colorFormatConverter.hexa('FF21A3'), '#FF21A3');
-      helper.assert(color.colorFormatConverter.hexa('FF0000'), '#FF0000');
-      helper.assert(color.colorFormatConverter.hexa('A0B8F1'), '#A0B8F1');
+      // ODT
+      helper.assert(color.colorFormatConverter.hexa('FF21A3', 'odt'), '#FF21A3');
+      helper.assert(color.colorFormatConverter.hexa('FF0000', 'odt'), '#FF0000');
+      helper.assert(color.colorFormatConverter.hexa('A0B8F1', 'odt'), '#A0B8F1');
+      // DOCX
+      helper.assert(color.colorFormatConverter.hexa('FF21A3', 'docx'), 'FF21A3');
+      helper.assert(color.colorFormatConverter.hexa('FF0000', 'docx'), 'FF0000');
+      helper.assert(color.colorFormatConverter.hexa('A0B8F1', 'docx'), 'A0B8F1');
     });
     it('[RGB => #HEXA] should return an #hexa color from a RGB object format', function () {
-      helper.assert(color.colorFormatConverter.rgb({r : 19, g : 200, b : 149}), '#13c895');
-      helper.assert(color.colorFormatConverter.rgb({r : 200, g : 140, b : 250}), '#c88cfa');
-      helper.assert(color.colorFormatConverter.rgb({r : 0, g : 0, b : 255}), '#0000ff');
+      // ODT
+      helper.assert(color.colorFormatConverter.rgb({r : 19, g : 200, b : 149}, 'odt'), '#13c895');
+      helper.assert(color.colorFormatConverter.rgb({r : 200, g : 140, b : 250}, 'odt'), '#c88cfa');
+      helper.assert(color.colorFormatConverter.rgb({r : 0, g : 0, b : 255}, 'odt'), '#0000ff');
+      // DOCX
+      helper.assert(color.colorFormatConverter.rgb({r : 19, g : 200, b : 149}, 'docx'), '13c895');
+      helper.assert(color.colorFormatConverter.rgb({r : 200, g : 140, b : 250}, 'docx'), 'c88cfa');
+      helper.assert(color.colorFormatConverter.rgb({r : 0, g : 0, b : 255}, 'docx'), '0000ff');
     });
     it('[HSL => #HEXA] should return an #hexa color from a HSL object format', function () {
+      // ==== ODT
       // Ratio [0-360/0-100/0-100]
-      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 100, l : 50}), '#ff0000');
-      helper.assert(color.colorFormatConverter.hsl({h : 142, s : 80, l : 20}), '#0a5c28');
-      helper.assert(color.colorFormatConverter.hsl({h : 300, s : 15, l : 80}), '#d4c4d4');
+      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 100, l : 50}, 'odt'), '#ff0000');
+      helper.assert(color.colorFormatConverter.hsl({h : 142, s : 80, l : 20}, 'odt'), '#0a5c28');
+      helper.assert(color.colorFormatConverter.hsl({h : 300, s : 15, l : 80}, 'odt'), '#d4c4d4');
       // Ratio [0-1/0-1/0-1]
-      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 1, l : 0.5}), '#ff0000');
-      helper.assert(color.colorFormatConverter.hsl({h : 0.39444, s : 0.8, l : 0.2}), '#0a5c28');
-      helper.assert(color.colorFormatConverter.hsl({h : 0.8333, s : 0.15, l : 0.80}), '#d4c4d4');
+      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 1, l : 0.5}, 'odt'), '#ff0000');
+      helper.assert(color.colorFormatConverter.hsl({h : 0.39444, s : 0.8, l : 0.2}, 'odt'), '#0a5c28');
+      helper.assert(color.colorFormatConverter.hsl({h : 0.8333, s : 0.15, l : 0.80}, 'odt'), '#d4c4d4');
+
+      // ==== DOCX
+      // Ratio [0-360/0-100/0-100]
+      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 100, l : 50}, 'docx'), 'ff0000');
+      helper.assert(color.colorFormatConverter.hsl({h : 142, s : 80, l : 20}, 'docx'), '0a5c28');
+      helper.assert(color.colorFormatConverter.hsl({h : 300, s : 15, l : 80}, 'docx'), 'd4c4d4');
+      // Ratio [0-1/0-1/0-1]
+      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 1, l : 0.5}, 'docx'), 'ff0000');
+      helper.assert(color.colorFormatConverter.hsl({h : 0.39444, s : 0.8, l : 0.2}, 'docx'), '0a5c28');
+      helper.assert(color.colorFormatConverter.hsl({h : 0.8333, s : 0.15, l : 0.80}, 'docx'), 'd4c4d4');
     });
     // color converters - colors
     it('[COLOR => #HEXA] should return an #hexa color from a color name', function () {
-      helper.assert(color.colorFormatConverter.color('blue'), '#0000ff');
-      helper.assert(color.colorFormatConverter.color('magenta'), '#ff00ff');
-      helper.assert(color.colorFormatConverter.color('yellow'), '#ffff00');
+      // ODT
+      helper.assert(color.colorFormatConverter.color('blue', 'odt'), '#0000ff');
+      helper.assert(color.colorFormatConverter.color('magenta', 'odt'), '#ff00ff');
+      helper.assert(color.colorFormatConverter.color('yellow', 'odt'), '#ffff00');
+      // DOCX
+      helper.assert(color.colorFormatConverter.color('blue', 'docx'), '0000ff');
+      helper.assert(color.colorFormatConverter.color('magenta', 'docx'), 'ff00ff');
+      helper.assert(color.colorFormatConverter.color('yellow', 'docx'), 'ffff00');
     });
     // color converters - hslToRGB
     it('[HSL => RGB] should return a RGB color from a HSL object format', function () {

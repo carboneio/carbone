@@ -34,8 +34,10 @@ function addColorDatabase (options, colorId, styleName, colors) {
   }
 }
 
+/** ==================================== ODT FORMATTERS ========================================= */
+
 /**
- * Generate color areference id for MS DOCX documents
+ * Generate color a reference id for ODT documents
  *
  * Called by the builder.
  *
@@ -78,14 +80,23 @@ function updateColorAndGetReference () {
   };
 }
 
-/** ==================================== POST PROCESSING ========================================= */
-
 function getColorOdtReferencePostProcessing (colorId) {
   const _colorData = this.colorDatabase.get(colorId);
   return  color.getColorReference(_colorData.id);
 }
 
+/** ==================================== DOCX FORMATTERS ========================================= */
+
+function getAndConvertColorDocx (colorName, colorType, elementType) {
+  // check if colorName exist, the element is probably null or undefined on the JSON dataset
+  if (colorName && colorType && elementType) {
+    return color.colorFormatConverter[colorType](colorName, 'docx', elementType);
+  }
+  return colorName;
+}
+
 module.exports = {
   updateColorAndGetReference,
-  getColorOdtReferencePostProcessing
+  getColorOdtReferencePostProcessing,
+  getAndConvertColorDocx
 };

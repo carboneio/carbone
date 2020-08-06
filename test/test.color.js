@@ -1,15 +1,19 @@
 const color = require('../lib/color');
 const helper = require('../lib/helper');
+require('mocha-sinon');
 
 describe.only('Dynamic colors', function () {
 
-  describe('ODT Files', function () {
-    describe('pre processor methods', function () {
-      describe('preProcessODT', function () {
+  beforeEach( function () {
+    this.sinon.stub(console, 'error');
+    this.sinon.stub(console, 'warn');
+  });
 
-        beforeEach( function () {
-          this.sinon.stub(console, 'error');
-        });
+  describe('ODT Files', function () {
+    describe('ODT pre processor methods', function () {
+      describe('preProcess ODT', function () {
+
+
 
         it('should do nothing if the file content.xml does not exist', function () {
           const _template = {
@@ -42,7 +46,7 @@ describe.only('Dynamic colors', function () {
         });
 
         // should insert color markers and formatters from multiple bindColor marker
-        it('should insert a color marker and formatter from a single bindColor marker', function () {
+        it('should insert 2 color markers and formatters from a 2 bindColor marker', function () {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -79,99 +83,8 @@ describe.only('Dynamic colors', function () {
           helper.assert(console.error.calledOnce, true);
           helper.assert(console.error.calledWith("Carbone bindColor error: it is not possible to get the color binded to the following marker: 'd.list[i].color1'"), true);
         });
-
       });
-      describe('getBindColorMarkers', function () {
-        beforeEach( function () {
-          this.sinon.stub(console, 'warn');
-        });
 
-        it('should do nothing without bindColor marker', function (done) {
-          const _xmlContent = '<style:style style:name="T11" style:family="text"><style:text-properties officeooo:rsid="00373c34"/></style:style>';
-          color.getBindColorMarkers(_xmlContent, (err, newXmlContent, bindColorArray) => {
-            helper.assert(err+'', 'null');
-            helper.assert(newXmlContent, _xmlContent);
-            helper.assert(bindColorArray.length, 0);
-            done();
-          });
-        });
-
-        it('should return a single bindColor element and should clean the xml [single]', function (done) {
-          const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-          const _xmlExpectedContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>';
-          const _expectedBindColorList = [{ referenceColor : '0000ff', colorType : 'hsl', marker : 'd.color6' }];
-          color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-            helper.assert(err+'', 'null');
-            helper.assert(newXmlContent, _xmlExpectedContent);
-            helper.assert(bindColorArray, _expectedBindColorList);
-            done();
-          });
-        });
-
-        it('should return a bindColor elements and should clean the xml [list]', function (done) {
-          const _xmlInitialContent = '<office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P2">{bindColor(ff<text:span text:style-name="T2">00</text:span>00, #hexa) = d.color1}</text:p><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, color) = d.color<text:span text:style-name="T3">2</text:span>}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-          const _xmlExpectedContent = '<office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P2"></text:p><text:p text:style-name="P5"></text:p><text:p text:style-name="P6"></text:p></office:text>';
-          const _expectedBindColorList = [
-            { referenceColor : 'ff0000', colorType : '#hexa', marker : 'd.color1' },
-            { referenceColor : 'ffff00', colorType : 'color', marker : 'd.color2' },
-            { referenceColor : '0000ff', colorType : 'hsl', marker : 'd.color6' }
-          ];
-          color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-            helper.assert(err+'', 'null');
-            helper.assert(newXmlContent, _xmlExpectedContent);
-            helper.assert(bindColorArray, _expectedBindColorList);
-            done();
-          });
-        });
-
-        it('should return an error if bindColor is invalid', function (done) {
-          const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff<text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-          color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-            helper.assert(err, '{bindColor(0000ffhsl)=d.color6} ');
-            helper.assert(newXmlContent, undefined);
-            helper.assert(bindColorArray, undefined);
-            done();
-          });
-        });
-
-        it('should return a console warning if the bindColor marker is invalid, should clean the XML and should return an empty bindColorArray', function (done) {
-          const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-          color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-            helper.assert(err+'', 'null');
-            helper.assert(newXmlContent, '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>');
-            helper.assert(bindColorArray.length, 0);
-            helper.assert(console.warn.calledOnce, true);
-            helper.assert(console.warn.calledWith("Carbone bindColor warning: the marker is not valid 'color6'."), true);
-            done();
-          });
-        });
-
-        it('should return a console warning if the bindColor color type does not exist, should clean the XML and should return an empty bindColorArray', function (done) {
-          const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">doesnotExist</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-          color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-            helper.assert(err+'', 'null');
-            helper.assert(newXmlContent, '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>');
-            helper.assert(bindColorArray.length, 0);
-            helper.assert(console.warn.calledOnce, true);
-            helper.assert(console.warn.calledWith('Carbone bindColor warning: the color format does not exist. Use one of the following: "#hexa", "hexa", "color", "hsl", "rgb".'), true);
-            done();
-          });
-        });
-
-        it('should return a console warning if the color has already been defined to be replace in a previous bindColor statement, should clean the XML and should return a single element on bindColorArray', function (done) {
-          const _xmlInitialContent = '<office:text><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, #hexa) = d.color<text:span text:style-name="T3">2</text:span>}</text:p><text:p text:style-name="P6">{bindColor(ffff00, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-          const _expectedBindColorList = [{ referenceColor : 'ffff00', colorType : '#hexa', marker : 'd.color2' }];
-          color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-            helper.assert(err+'', 'null');
-            helper.assert(newXmlContent, '<office:text><text:p text:style-name="P5"></text:p><text:p text:style-name="P6"></text:p></office:text>');
-            helper.assert(bindColorArray.length, 1);
-            helper.assert(bindColorArray, _expectedBindColorList);
-            helper.assert(console.warn.calledOnce, true);
-            helper.assert(console.warn.calledWith("Carbone bindColor warning: 2 bindColor markers try to edit the same color 'ffff00'."), true);
-            done();
-          });
-        });
-      });
       describe('getColorStyleListODT', function () {
         it('should not find any style and return an empty colorStyleList', function (done) {
           const _xmlContent = '<xml><office:body></office:body></xml>';
@@ -274,7 +187,8 @@ describe.only('Dynamic colors', function () {
         });
       });
     });
-    describe('post processor', function () {
+
+    describe('post processor ODT', function () {
       it('should do nothing if template.xml does not exist', function (done) {
         const _data = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/><text:p text:style-name="CC1">TMTC</text:p></office:text></office:body></office:document-content>';
         const _template = {
@@ -391,87 +305,210 @@ describe.only('Dynamic colors', function () {
       });
     });
   });
-  describe('Color format converters', function () {
-    // color converters - #hexa
-    it('[#HEXA => #HEXA] should return an #hexa color from the color format "#hexa" and the report type', function () {
-      // ODT
-      helper.assert(color.colorFormatConverter['#hexa']('#FF21A3', 'odt'), '#FF21A3');
-      helper.assert(color.colorFormatConverter['#hexa']('#FF0000', 'odt'), '#FF0000');
-      // DOCX
-      helper.assert(color.colorFormatConverter['#hexa']('#FF21A3', 'docx'), 'FF21A3');
-      helper.assert(color.colorFormatConverter['#hexa']('#FF0000', 'docx'), 'FF0000');
-    });
-    it('[HEXA => #HEXA] should return an #hexa color from the color format "hexa"', function () {
-      // ODT
-      helper.assert(color.colorFormatConverter.hexa('FF21A3', 'odt'), '#FF21A3');
-      helper.assert(color.colorFormatConverter.hexa('FF0000', 'odt'), '#FF0000');
-      helper.assert(color.colorFormatConverter.hexa('A0B8F1', 'odt'), '#A0B8F1');
-      // DOCX
-      helper.assert(color.colorFormatConverter.hexa('FF21A3', 'docx'), 'FF21A3');
-      helper.assert(color.colorFormatConverter.hexa('FF0000', 'docx'), 'FF0000');
-      helper.assert(color.colorFormatConverter.hexa('A0B8F1', 'docx'), 'A0B8F1');
-    });
-    it('[RGB => #HEXA] should return an #hexa color from a RGB object format', function () {
-      // ODT
-      helper.assert(color.colorFormatConverter.rgb({r : 19, g : 200, b : 149}, 'odt'), '#13c895');
-      helper.assert(color.colorFormatConverter.rgb({r : 200, g : 140, b : 250}, 'odt'), '#c88cfa');
-      helper.assert(color.colorFormatConverter.rgb({r : 0, g : 0, b : 255}, 'odt'), '#0000ff');
-      // DOCX
-      helper.assert(color.colorFormatConverter.rgb({r : 19, g : 200, b : 149}, 'docx'), '13c895');
-      helper.assert(color.colorFormatConverter.rgb({r : 200, g : 140, b : 250}, 'docx'), 'c88cfa');
-      helper.assert(color.colorFormatConverter.rgb({r : 0, g : 0, b : 255}, 'docx'), '0000ff');
-    });
-    it('[HSL => #HEXA] should return an #hexa color from a HSL object format', function () {
-      // ==== ODT
-      // Ratio [0-360/0-100/0-100]
-      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 100, l : 50}, 'odt'), '#ff0000');
-      helper.assert(color.colorFormatConverter.hsl({h : 142, s : 80, l : 20}, 'odt'), '#0a5c28');
-      helper.assert(color.colorFormatConverter.hsl({h : 300, s : 15, l : 80}, 'odt'), '#d4c4d4');
-      // Ratio [0-1/0-1/0-1]
-      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 1, l : 0.5}, 'odt'), '#ff0000');
-      helper.assert(color.colorFormatConverter.hsl({h : 0.39444, s : 0.8, l : 0.2}, 'odt'), '#0a5c28');
-      helper.assert(color.colorFormatConverter.hsl({h : 0.8333, s : 0.15, l : 0.80}, 'odt'), '#d4c4d4');
 
-      // ==== DOCX
-      // Ratio [0-360/0-100/0-100]
-      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 100, l : 50}, 'docx'), 'ff0000');
-      helper.assert(color.colorFormatConverter.hsl({h : 142, s : 80, l : 20}, 'docx'), '0a5c28');
-      helper.assert(color.colorFormatConverter.hsl({h : 300, s : 15, l : 80}, 'docx'), 'd4c4d4');
-      // Ratio [0-1/0-1/0-1]
-      helper.assert(color.colorFormatConverter.hsl({h : 0, s : 1, l : 0.5}, 'docx'), 'ff0000');
-      helper.assert(color.colorFormatConverter.hsl({h : 0.39444, s : 0.8, l : 0.2}, 'docx'), '0a5c28');
-      helper.assert(color.colorFormatConverter.hsl({h : 0.8333, s : 0.15, l : 0.80}, 'docx'), 'd4c4d4');
+  describe('DOCX', function () {
+    describe('preprocess docx', function () {
+      // should do nothing if document.xml does not exist
+      // should do nothing if the xml doesn't contain bindColor markers
+      // should do nothing if the xml doesn't contain a color on the report
+      // should replace a text color
+      // should replace a text background color
+      // should replace a text and background color
+      // should console a warning if color format is not defined to "color" for the background color
     });
-    // color converters - colors
-    it('[COLOR => #HEXA] should return an #hexa color from a color name', function () {
-      // ODT
-      helper.assert(color.colorFormatConverter.color('blue', 'odt'), '#0000ff');
-      helper.assert(color.colorFormatConverter.color('magenta', 'odt'), '#ff00ff');
-      helper.assert(color.colorFormatConverter.color('yellow', 'odt'), '#ffff00');
-      // DOCX
-      helper.assert(color.colorFormatConverter.color('blue', 'docx'), '0000ff');
-      helper.assert(color.colorFormatConverter.color('magenta', 'docx'), 'ff00ff');
-      helper.assert(color.colorFormatConverter.color('yellow', 'docx'), 'ffff00');
-    });
-    // color converters - hslToRGB
-    it('[HSL => RGB] should return a RGB color from a HSL object format', function () {
-      // Ratio [0-360/0-100/0-100]
-      helper.assert(color.colorFormatConverter.hslToRgb({h : 0, s : 100, l : 0}), {r : 0, g : 0, b : 0});
-      helper.assert(color.colorFormatConverter.hslToRgb({h : 0, s : 100, l : 50}), {r : 255, g : 0, b : 0});
-      helper.assert(color.colorFormatConverter.hslToRgb({h : 142, s : 80, l : 20}), {r : 10, g : 92, b : 40});
-      helper.assert(color.colorFormatConverter.hslToRgb({h : 300, s : 15, l : 80}), {r : 212, g : 196, b : 212});
+  });
+
+  describe('utils', function () {
+    describe('getBindColorMarkers', function () {
+
+      it('should do nothing without bindColor marker', function (done) {
+        const _xmlContent = '<style:style style:name="T11" style:family="text"><style:text-properties officeooo:rsid="00373c34"/></style:style>';
+        color.getBindColorMarkers(_xmlContent, (err, newXmlContent, bindColorArray) => {
+          helper.assert(err+'', 'null');
+          helper.assert(newXmlContent, _xmlContent);
+          helper.assert(bindColorArray.length, 0);
+          done();
+        });
+      });
+
+      it('should return a single bindColor element and should clean the xml [single]', function (done) {
+        const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
+        const _xmlExpectedContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>';
+        const _expectedBindColorList = [{ referenceColor : '0000ff', colorType : 'hsl', marker : 'd.color6' }];
+        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
+          helper.assert(err+'', 'null');
+          helper.assert(newXmlContent, _xmlExpectedContent);
+          helper.assert(bindColorArray, _expectedBindColorList);
+          done();
+        });
+      });
+
+      it('should return a bindColor elements and should clean the xml [list]', function (done) {
+        const _xmlInitialContent = '<office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P2">{bindColor(ff<text:span text:style-name="T2">00</text:span>00, #hexa) = d.color1}</text:p><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, color) = d.color<text:span text:style-name="T3">2</text:span>}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
+        const _xmlExpectedContent = '<office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P2"></text:p><text:p text:style-name="P5"></text:p><text:p text:style-name="P6"></text:p></office:text>';
+        const _expectedBindColorList = [
+          { referenceColor : 'ff0000', colorType : '#hexa', marker : 'd.color1' },
+          { referenceColor : 'ffff00', colorType : 'color', marker : 'd.color2' },
+          { referenceColor : '0000ff', colorType : 'hsl', marker : 'd.color6' }
+        ];
+        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
+          helper.assert(err+'', 'null');
+          helper.assert(newXmlContent, _xmlExpectedContent);
+          helper.assert(bindColorArray, _expectedBindColorList);
+          done();
+        });
+      });
+
+      it('should return an error if bindColor is invalid', function (done) {
+        const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff<text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
+        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
+          helper.assert(err, '{bindColor(0000ffhsl)=d.color6} ');
+          helper.assert(newXmlContent, undefined);
+          helper.assert(bindColorArray, undefined);
+          done();
+        });
+      });
+
+      it('should return a console warning if the bindColor marker is invalid, should clean the XML and should return an empty bindColorArray', function (done) {
+        const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
+        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
+          helper.assert(err+'', 'null');
+          helper.assert(newXmlContent, '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>');
+          helper.assert(bindColorArray.length, 0);
+          helper.assert(console.warn.calledOnce, true);
+          helper.assert(console.warn.calledWith("Carbone bindColor warning: the marker is not valid 'color6'."), true);
+          done();
+        });
+      });
+
+      it('should return a console warning if the bindColor color type does not exist, should clean the XML and should return an empty bindColorArray', function (done) {
+        const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">doesnotExist</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
+        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
+          helper.assert(err+'', 'null');
+          helper.assert(newXmlContent, '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>');
+          helper.assert(bindColorArray.length, 0);
+          helper.assert(console.warn.calledOnce, true);
+          helper.assert(console.warn.calledWith('Carbone bindColor warning: the color format does not exist. Use one of the following: "#hexa", "hexa", "color", "hsl", "rgb".'), true);
+          done();
+        });
+      });
+
+      it('should return a console warning if the color has already been defined to be replace in a previous bindColor statement, should clean the XML and should return a single element on bindColorArray', function (done) {
+        const _xmlInitialContent = '<office:text><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, #hexa) = d.color<text:span text:style-name="T3">2</text:span>}</text:p><text:p text:style-name="P6">{bindColor(ffff00, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
+        const _expectedBindColorList = [{ referenceColor : 'ffff00', colorType : '#hexa', marker : 'd.color2' }];
+        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
+          helper.assert(err+'', 'null');
+          helper.assert(newXmlContent, '<office:text><text:p text:style-name="P5"></text:p><text:p text:style-name="P6"></text:p></office:text>');
+          helper.assert(bindColorArray.length, 1);
+          helper.assert(bindColorArray, _expectedBindColorList);
+          helper.assert(console.warn.calledOnce, true);
+          helper.assert(console.warn.calledWith("Carbone bindColor warning: 2 bindColor markers try to edit the same color 'ffff00'."), true);
+          done();
+        });
+      });
     });
 
-    it('[manageHexadecimalHashtag] should return the hexadecimal with OR without hashtag based on the report type', function () {
-      // ODT
-      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000', 'odt'), '#ff0000');
-      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b', 'odt'), '#ff238b');
-      // DOCX
-      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000', 'docx'), 'ff0000');
-      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b', 'docx'), 'ff238b');
-      // Without report type
-      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000'), 'ff0000');
-      helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b'), 'ff238b');
+    describe('Color format converters', function () {
+      // color converters - #hexa
+      it('["#hexa": #HEXA => #HEXA] should return an #hexa color from the color format "#hexa" and the report type', function () {
+        // ODT
+        helper.assert(color.colorFormatConverter['#hexa']('#FF21A3', 'odt'), '#FF21A3');
+        helper.assert(color.colorFormatConverter['#hexa']('#FF0000', 'odt'), '#FF0000');
+        // DOCX
+        helper.assert(color.colorFormatConverter['#hexa']('#FF21A3', 'docx'), 'FF21A3');
+        helper.assert(color.colorFormatConverter['#hexa']('#FF0000', 'docx'), 'FF0000');
+      });
+      it('["hexa": HEXA => #HEXA] should return an #hexa color from the color format "hexa"  and the report type', function () {
+        // ODT
+        helper.assert(color.colorFormatConverter.hexa('FF21A3', 'odt'), '#FF21A3');
+        helper.assert(color.colorFormatConverter.hexa('FF0000', 'odt'), '#FF0000');
+        helper.assert(color.colorFormatConverter.hexa('A0B8F1', 'odt'), '#A0B8F1');
+        // DOCX
+        helper.assert(color.colorFormatConverter.hexa('FF21A3', 'docx'), 'FF21A3');
+        helper.assert(color.colorFormatConverter.hexa('FF0000', 'docx'), 'FF0000');
+        helper.assert(color.colorFormatConverter.hexa('A0B8F1', 'docx'), 'A0B8F1');
+      });
+      it('["rgb": RGB => #HEXA] should return an #hexa color from a RGB object format  and the report type', function () {
+        // ODT
+        helper.assert(color.colorFormatConverter.rgb({r : 19, g : 200, b : 149}, 'odt'), '#13c895');
+        helper.assert(color.colorFormatConverter.rgb({r : 200, g : 140, b : 250}, 'odt'), '#c88cfa');
+        helper.assert(color.colorFormatConverter.rgb({r : 0, g : 0, b : 255}, 'odt'), '#0000ff');
+        // DOCX
+        helper.assert(color.colorFormatConverter.rgb({r : 19, g : 200, b : 149}, 'docx'), '13c895');
+        helper.assert(color.colorFormatConverter.rgb({r : 200, g : 140, b : 250}, 'docx'), 'c88cfa');
+        helper.assert(color.colorFormatConverter.rgb({r : 0, g : 0, b : 255}, 'docx'), '0000ff');
+      });
+      it('["hsl": HSL => #HEXA] should return an #hexa color from a HSL object format  and the report type', function () {
+        // ==== ODT
+        // Ratio [0-360/0-100/0-100]
+        helper.assert(color.colorFormatConverter.hsl({h : 0, s : 100, l : 50}, 'odt'), '#ff0000');
+        helper.assert(color.colorFormatConverter.hsl({h : 142, s : 80, l : 20}, 'odt'), '#0a5c28');
+        helper.assert(color.colorFormatConverter.hsl({h : 300, s : 15, l : 80}, 'odt'), '#d4c4d4');
+        // Ratio [0-1/0-1/0-1]
+        helper.assert(color.colorFormatConverter.hsl({h : 0, s : 1, l : 0.5}, 'odt'), '#ff0000');
+        helper.assert(color.colorFormatConverter.hsl({h : 0.39444, s : 0.8, l : 0.2}, 'odt'), '#0a5c28');
+        helper.assert(color.colorFormatConverter.hsl({h : 0.8333, s : 0.15, l : 0.80}, 'odt'), '#d4c4d4');
+
+        // ==== DOCX
+        // Ratio [0-360/0-100/0-100]
+        helper.assert(color.colorFormatConverter.hsl({h : 0, s : 100, l : 50}, 'docx'), 'ff0000');
+        helper.assert(color.colorFormatConverter.hsl({h : 142, s : 80, l : 20}, 'docx'), '0a5c28');
+        helper.assert(color.colorFormatConverter.hsl({h : 300, s : 15, l : 80}, 'docx'), 'd4c4d4');
+        // Ratio [0-1/0-1/0-1]
+        helper.assert(color.colorFormatConverter.hsl({h : 0, s : 1, l : 0.5}, 'docx'), 'ff0000');
+        helper.assert(color.colorFormatConverter.hsl({h : 0.39444, s : 0.8, l : 0.2}, 'docx'), '0a5c28');
+        helper.assert(color.colorFormatConverter.hsl({h : 0.8333, s : 0.15, l : 0.80}, 'docx'), 'd4c4d4');
+      });
+      // color converters - colors
+      it('["color" method: COLOR => #HEXA OR COLOR] should return an #hexa color or a color name from a color name and the report type', function () {
+        // ODT
+        helper.assert(color.colorFormatConverter.color('blue', 'odt'), '#0000ff');
+        helper.assert(color.colorFormatConverter.color('magenta', 'odt'), '#ff00ff');
+        helper.assert(color.colorFormatConverter.color('yellow', 'odt'), '#ffff00');
+        // DOCX
+        helper.assert(color.colorFormatConverter.color('blue', 'docx'), '0000ff');
+        helper.assert(color.colorFormatConverter.color('magenta', 'docx'), 'ff00ff');
+        helper.assert(color.colorFormatConverter.color('yellow', 'docx'), 'ffff00');
+        // DOCX
+        helper.assert(color.colorFormatConverter.color('blue', 'docx', color.elementTypes.TEXT_COLOR), '0000ff');
+        helper.assert(color.colorFormatConverter.color('green', 'docx', color.elementTypes.TEXT_COLOR), '00ff00');
+        helper.assert(color.colorFormatConverter.color('blue', 'docx', color.elementTypes.TEXT_BG_COLOR), 'blue');
+        helper.assert(color.colorFormatConverter.color('magenta', 'docx', color.elementTypes.TEXT_BG_COLOR), 'magenta');
+        helper.assert(color.colorFormatConverter.color('yellow', 'docx', color.elementTypes.TEXT_BG_COLOR), 'yellow');
+      });
+
+      it('["color" method] should console a warning if the color name does not exist and should find an alternative color [1].', function () {
+        helper.assert(color.colorFormatConverter.color('greem', 'docx'), 'null');
+        helper.assert(console.warn.calledOnce, true);
+        helper.assert(console.warn.calledWith('Carbone bindColor warning: the color "greem" does not exist. Do you mean "green"?'), true);
+      });
+
+      it('["color" method] should console a warning if the color name does not exist and should find an alternative color [2].', function () {
+        helper.assert(color.colorFormatConverter.color('darkGrey', 'docx'), 'null');
+        helper.assert(console.warn.calledOnce, true);
+        helper.assert(console.warn.calledWith('Carbone bindColor warning: the color "darkGrey" does not exist. Do you mean "darkGray"?'), true);
+      });
+
+      // color converters - hslToRGB
+      it('["hslToRgb": HSL => RGB] should return a RGB color from a HSL object format', function () {
+        // Ratio [0-360/0-100/0-100]
+        helper.assert(color.colorFormatConverter.hslToRgb({h : 0, s : 100, l : 0}), {r : 0, g : 0, b : 0});
+        helper.assert(color.colorFormatConverter.hslToRgb({h : 0, s : 100, l : 50}), {r : 255, g : 0, b : 0});
+        helper.assert(color.colorFormatConverter.hslToRgb({h : 142, s : 80, l : 20}), {r : 10, g : 92, b : 40});
+        helper.assert(color.colorFormatConverter.hslToRgb({h : 300, s : 15, l : 80}), {r : 212, g : 196, b : 212});
+      });
+
+      it('[manageHexadecimalHashtag] should return the hexadecimal with OR without hashtag based on the report type', function () {
+        // ODT
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000', 'odt'), '#ff0000');
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b', 'odt'), '#ff238b');
+        // DOCX
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000', 'docx'), 'ff0000');
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b', 'docx'), 'ff238b');
+        // Without report type
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000'), 'ff0000');
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b'), 'ff238b');
+      });
     });
   });
 });

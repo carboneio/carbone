@@ -13,12 +13,8 @@ describe.only('Dynamic colors', function () {
               data : '<xml></xml>'
             }]
           };
-          color.preProcessOdt(_template, {});
-          helper.assert(_template, {
-            files : [{
-              name : 'random.xml',
-              data : '<xml></xml>'
-            }]
+          assert.throws(() => color.preProcessOdt(_template, {}), {
+            message : 'the "content.xml" file does not exist.'
           });
         });
         it('should insert a color marker and formatter from a single bindColor marker', function () {
@@ -185,11 +181,10 @@ describe.only('Dynamic colors', function () {
 
     describe('post processor ODT', function () {
       it('should do nothing if template.xml does not exist', function (done) {
-        const _data = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/><text:p text:style-name="CC1">TMTC</text:p></office:text></office:body></office:document-content>';
         const _template = {
           files : [{
             name : 'random.xml',
-            data : _data
+            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/><text:p text:style-name="CC1">TMTC</text:p></office:text></office:body></office:document-content>'
           }]
         };
         const _options = {
@@ -204,8 +199,11 @@ describe.only('Dynamic colors', function () {
             element   : 'textColor',
             colorType : '#hexa' }]
         });
-        color.postProcessODT(_template, null, _options);
-        helper.assert(_template.files[0].data, _data);
+        assert.throws(()=> {
+          color.postProcessODT(_template, null, _options);
+        }, {
+          message : 'the "content.xml" file does not exist.'
+        });
         done();
       });
       it('should do nothing if options.colorDatabase is empty', function (done) {
@@ -334,12 +332,8 @@ describe.only('Dynamic colors', function () {
             data : '<xml></xml>'
           }]
         };
-        color.preProcessDocx(_template, {});
-        helper.assert(_template, {
-          files : [{
-            name : 'random.xml',
-            data : '<xml></xml>'
-          }]
+        assert.throws(() => color.preProcessDocx(_template, {}), {
+          message : 'the "word/document.xml" file does not exist.'
         });
       });
 

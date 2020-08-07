@@ -1,5 +1,6 @@
 const color = require('../lib/color');
 const helper = require('../lib/helper');
+const assert = require('assert');
 require('mocha-sinon');
 
 describe.only('Dynamic colors', function () {
@@ -306,7 +307,7 @@ describe.only('Dynamic colors', function () {
     });
   });
 
-  describe.only('DOCX', function () {
+  describe('DOCX', function () {
     describe('preprocess docx', function () {
       it ('should do nothing if document.xml does not exist', function () {
         const _template = {
@@ -325,13 +326,84 @@ describe.only('Dynamic colors', function () {
       });
 
       it ("should do nothing if the xml doesn't contain bindColor markers", function () {
+        const _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p></w:body></w:document>';
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : _expectedXML
+          }]
+        };
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it ('should replace a text color with a marker + formatter', function () {
+        const _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr><w:color w:val="{d.color6:getAndConvertColorDocx(hsl, textColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="{d.color6:getAndConvertColorDocx(hsl, textColor)}"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{d.lastname}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr><w:t></w:t></w:r></w:p></w:body></w:document>';
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr><w:color w:val="0000FF"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="0000FF"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{d.lastname}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr><w:t>{bindColor(</w:t></w:r><w:r><w:rPr></w:rPr><w:t>0000ff</w:t></w:r><w:r><w:rPr></w:rPr><w:t>, hsl) = d.color6}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it ('should replace a text background color with a marker + formatter', function () {
+        const _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t></w:t></w:r></w:p></w:body></w:document>';
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{bindColor(</w:t></w:r><w:r><w:rPr><w:rFonts w:eastAsia="Songti SC" w:cs="Arial Unicode MS"/><w:b w:val="false"/><w:color w:val="000000"/><w:kern w:val="2"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="en-GB" w:eastAsia="zh-CN" w:bidi="hi-IN"/></w:rPr><w:t>yellow</w:t></w:r><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>, color) = d.color3}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it ('should replace a text background color with a marker + formatter', function () {
+        const _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t></w:t></w:r></w:p></w:body></w:document>';
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{bindColor(</w:t></w:r><w:r><w:rPr><w:rFonts w:eastAsia="Songti SC" w:cs="Arial Unicode MS"/><w:b w:val="false"/><w:color w:val="000000"/><w:kern w:val="2"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="en-GB" w:eastAsia="zh-CN" w:bidi="hi-IN"/></w:rPr><w:t>yellow</w:t></w:r><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>, color) = d.color3}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it ('should throw an error if the color format is not defined to "color" for the background color', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{bindColor(</w:t></w:r><w:r><w:rPr><w:rFonts w:eastAsia="Songti SC" w:cs="Arial Unicode MS"/><w:b w:val="false"/><w:color w:val="000000"/><w:kern w:val="2"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="en-GB" w:eastAsia="zh-CN" w:bidi="hi-IN"/></w:rPr><w:t>yellow</w:t></w:r><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>, hsl) = d.color3}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+
+        assert.throws(
+          () => {
+            color.preProcessDocx(_template);
+          },
+          {
+            message : 'Carbone bindColor warning: the background color on DOCX documents can only be changed with the color name format, use the color format "color" instead of "hsl".',
+          }
+        );
 
       });
-      // should do nothing if the xml doesn't contain a color on the report
-      // should replace a text color
-      // should replace a text background color
-      // should replace a text and background color
-      // should throw an error if the color format is not defined to "color" for the background color
+
+      it ('should replace 2 text colors and a background color with a marker + formatter', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{bindColor(ff0000, #hexa) = d.color1}</w:t></w:r></w:p><w:p><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{bindColor(</w:t></w:r><w:r><w:rPr><w:rFonts w:eastAsia="Songti SC" w:cs="Arial Unicode MS"/><w:b w:val="false"/><w:color w:val="000000"/><w:kern w:val="2"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="en-GB" w:eastAsia="zh-CN" w:bidi="hi-IN"/></w:rPr><w:t>yellow</w:t></w:r><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>, color) = d.color3}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr><w:color w:val="0000FF"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="0000FF"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{d.lastname}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr><w:t>{bindColor(</w:t></w:r><w:r><w:rPr></w:rPr><w:t>0000ff</w:t></w:r><w:r><w:rPr></w:rPr><w:t>, hsl) = d.color6}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        const _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="{d.color1:getAndConvertColorDocx(#hexa, textColor)}"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="{d.color1:getAndConvertColorDocx(#hexa, textColor)}"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t></w:t></w:r></w:p><w:p><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t></w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr><w:color w:val="{d.color6:getAndConvertColorDocx(hsl, textColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="{d.color6:getAndConvertColorDocx(hsl, textColor)}"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{d.lastname}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr><w:t></w:t></w:r></w:p></w:body></w:document>';
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
     });
   });
 

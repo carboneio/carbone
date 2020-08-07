@@ -1,5 +1,6 @@
 ### v2.0.2
   - Fix locales de-ch and pt-br
+  - [EE] : fix server exit on "Ctrl+C"
 
 ### v2.0.1
   - Release July 8th, 2020

@@ -88,7 +88,7 @@ describe.only('Dynamic colors', function () {
           helper.assert(_colorStyleList, {});
           done();
         });
-        it('should not find any familly attribute on the style and return an empty colorStyleList', function (done) {
+        it('should not find any FAMILLY attribute on the style and return an empty colorStyleList', function (done) {
           const _xmlContent = '<style:style style:name="T1"><style:text-properties fo:color="#ff0000" officeooo:rsid="00174da5"/></style:style><style:style style:name="T2" style:family="text"><style:text-properties officeooo:rsid="0022fb00"/></style:style>';
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
 
@@ -96,7 +96,7 @@ describe.only('Dynamic colors', function () {
           helper.assert(_colorStyleList, {});
           done();
         });
-        it('should not find any name attribute on the style and return an empty colorStyleList', function (done) {
+        it('should not find any NAME attribute on the style and return an empty colorStyleList', function (done) {
           const _xmlContent = '<style:style style:name="T1"><style:text-properties fo:color="#ff0000" officeooo:rsid="00174da5"/></style:style><style:style style:name="T2" style:family="text"><style:text-properties officeooo:rsid="0022fb00"/></style:style>';
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
 
@@ -104,9 +104,18 @@ describe.only('Dynamic colors', function () {
           helper.assert(_colorStyleList, {});
           done();
         });
-        it('should return a colorStyleList element that match a color in the bindColorList [text color only]', function (done) {
+        it('should return a colorStyleList element that match a color in the bindColorList [text color only][bind color hexadecimal lowercase]', function (done) {
           const _xmlContent = '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>';
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
+          const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ] } };
+
+          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          helper.assert(_colorStyleList, _expectedColorListElement);
+          done();
+        });
+        it('should return a colorStyleList element that match a color in the bindColorList [text color only][bind color hexadecimal uppercase]', function (done) {
+          const _xmlContent = '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>';
+          const _bindColorList = [{ referenceColor : 'FF0000', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ] } };
 
           const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);

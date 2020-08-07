@@ -67,7 +67,6 @@ function updateColorAndGetReference () {
     // Generate an ID from the argument list
     // If the new color is an object (rgb or hsl), it is converted to a string
     _newColorId += typeof _arg === 'object' ? JSON.stringify(_arg) : _arg;
-
   }
 
   // console.log(_newColorId, _styleName, _colors);

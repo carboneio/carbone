@@ -22,7 +22,7 @@ describe.only('Dynamic colors', function () {
               data : '<xml></xml>'
             }]
           };
-          color.preProcessODT(_template, {});
+          color.preProcessOdt(_template, {});
           helper.assert(_template, {
             files : [{
               name : 'random.xml',
@@ -40,7 +40,7 @@ describe.only('Dynamic colors', function () {
           const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/><text:sequence-decl text:display-outline-level="0" text:name="Figure"/></text:sequence-decls><text:p text:style-name="{d.color1:updateColorAndGetReference(#ff0000, null, #ffff00, P3)}">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2"></text:p></text:p></office:text></office:body></office:document-content>';
           const _options = {};
           const _expectedOptions = { colorStyleList : { P3 : { styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' }] } } };
-          color.preProcessODT(_template, _options);
+          color.preProcessOdt(_template, _options);
           helper.assert(_template.files[0].data, _expectedXML);
           helper.assert(_options, _expectedOptions);
         });
@@ -61,7 +61,7 @@ describe.only('Dynamic colors', function () {
               P4 : { styleFamily : 'paragraph', colors : [{ color : '#0000ff', element : 'textColor', marker : 'd.list[i].element', colorType : '#hexa' }, { color : 'transparent', element : 'textBackgroundColor' } ] }
             }
           };
-          color.preProcessODT(_template, _options);
+          color.preProcessOdt(_template, _options);
           helper.assert(_template.files[0].data, _expectedXML);
           helper.assert(_options, _expectedOptions);
         });
@@ -77,7 +77,7 @@ describe.only('Dynamic colors', function () {
           const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="{d.list2[i].color2:updateColorAndGetReference(#ffff00, null, #ff0000, P3)}">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2"></text:p><text:p text:style-name="P5"></text:p></office:text></office:body></office:document-content>';
           const _options = {};
           const _expectedOptions = { colorStyleList : { P3 : { styleFamily : 'paragraph', colors : [{color : '#ffff00', element : 'textBackgroundColor',  marker : 'd.list2[i].color2', colorType : '#hexa' }, {color : '#ff0000', element : 'textColor',  marker : 'd.list[i].color1', colorType : '#hexa' }] } } };
-          color.preProcessODT(_template, _options);
+          color.preProcessOdt(_template, _options);
           helper.assert(_template.files[0].data, _expectedXML);
           helper.assert(_options, _expectedOptions);
           helper.assert(console.error.calledOnce, true);
@@ -306,15 +306,32 @@ describe.only('Dynamic colors', function () {
     });
   });
 
-  describe('DOCX', function () {
+  describe.only('DOCX', function () {
     describe('preprocess docx', function () {
-      // should do nothing if document.xml does not exist
-      // should do nothing if the xml doesn't contain bindColor markers
+      it ('should do nothing if document.xml does not exist', function () {
+        const _template = {
+          files : [{
+            name : 'random.xml',
+            data : '<xml></xml>'
+          }]
+        };
+        color.preProcessDocx(_template, {});
+        helper.assert(_template, {
+          files : [{
+            name : 'random.xml',
+            data : '<xml></xml>'
+          }]
+        });
+      });
+
+      it ("should do nothing if the xml doesn't contain bindColor markers", function () {
+
+      });
       // should do nothing if the xml doesn't contain a color on the report
       // should replace a text color
       // should replace a text background color
       // should replace a text and background color
-      // should console a warning if color format is not defined to "color" for the background color
+      // should throw an error if the color format is not defined to "color" for the background color
     });
   });
 

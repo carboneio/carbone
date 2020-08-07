@@ -30,7 +30,6 @@ function addColorDatabase (options, colorId, styleName, colors) {
       styleFamily : _styleTag.styleFamily // the familly of the tag ['paragraph', 'text', 'shape']
     };
     options.colorDatabase.set(colorId, _colorDatabaseProperties);
-    // console.log(options.colorDatabase);
   }
 }
 
@@ -69,7 +68,6 @@ function updateColorAndGetReference () {
     _newColorId += typeof _arg === 'object' ? JSON.stringify(_arg) : _arg;
   }
 
-  // console.log(_newColorId, _styleName, _colors);
   addColorDatabase(this, _newColorId, _styleName, _colors);
 
   // return a function to call at the end of the building process

@@ -1,21 +1,11 @@
 const color = require('../lib/color');
 const helper = require('../lib/helper');
 const assert = require('assert');
-require('mocha-sinon');
 
 describe.only('Dynamic colors', function () {
-
-  beforeEach( function () {
-    this.sinon.stub(console, 'error');
-    this.sinon.stub(console, 'warn');
-  });
-
   describe('ODT Files', function () {
     describe('ODT pre processor methods', function () {
       describe('preProcess ODT', function () {
-
-
-
         it('should do nothing if the file content.xml does not exist', function () {
           const _template = {
             files : [{
@@ -68,21 +58,16 @@ describe.only('Dynamic colors', function () {
         });
         //
 
-        it('should console an error because it changes the text color and background color from 2 different lists', function () {
+        it('should throw an error because it changes the text color and background color from 2 different lists', function () {
           const _template = {
             files : [{
               name : 'content.xml',
               data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2">{bindColor(ff<text:span text:style-name="T2">00</text:span>00, #hexa) = d.list[i].color1}</text:p><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, #hexa) = d.list2[i].color2}</text:p></office:text></office:body></office:document-content>'
             }]
           };
-          const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="{d.list2[i].color2:updateColorAndGetReference(#ffff00, null, #ff0000, P3)}">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2"></text:p><text:p text:style-name="P5"></text:p></office:text></office:body></office:document-content>';
-          const _options = {};
-          const _expectedOptions = { colorStyleList : { P3 : { styleFamily : 'paragraph', colors : [{color : '#ffff00', element : 'textBackgroundColor',  marker : 'd.list2[i].color2', colorType : '#hexa' }, {color : '#ff0000', element : 'textColor',  marker : 'd.list[i].color1', colorType : '#hexa' }] } } };
-          color.preProcessOdt(_template, _options);
-          helper.assert(_template.files[0].data, _expectedXML);
-          helper.assert(_options, _expectedOptions);
-          helper.assert(console.error.calledOnce, true);
-          helper.assert(console.error.calledWith("Carbone bindColor error: it is not possible to get the color binded to the following marker: 'd.list[i].color1'"), true);
+          assert.throws(() => color.preProcessOdt(_template, {}), {
+            message : "Carbone bindColor error: it is not possible to get the color binded to the following marker: 'd.list[i].color1'"
+          });
         });
       });
 
@@ -448,51 +433,40 @@ describe.only('Dynamic colors', function () {
         });
       });
 
-      it('should return an error if bindColor is invalid', function (done) {
+      it('should return an error if bindColor is invalid', function () {
         const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff<text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-          helper.assert(err, '{bindColor(0000ffhsl)=d.color6} ');
-          helper.assert(newXmlContent, undefined);
-          helper.assert(bindColorArray, undefined);
-          done();
+        assert.throws(() => {
+          color.getBindColorMarkers(_xmlInitialContent, () => {});
+        }, {
+          message : 'Carbone bindColor warning: the marker is not valid "{bindColor(0000ffhsl)=d.color6}".',
         });
       });
 
-      it('should return a console warning if the bindColor marker is invalid, should clean the XML and should return an empty bindColorArray', function (done) {
+      it('should throw an error if the bindColor marker is invalid, should clean the XML and should return an empty bindColorArray', function () {
         const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">hsl</text:span>) = color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-          helper.assert(err+'', 'null');
-          helper.assert(newXmlContent, '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>');
-          helper.assert(bindColorArray.length, 0);
-          helper.assert(console.warn.calledOnce, true);
-          helper.assert(console.warn.calledWith("Carbone bindColor warning: the marker is not valid 'color6'."), true);
-          done();
+        assert.throws(() => {
+          color.getBindColorMarkers(_xmlInitialContent, () => {});
+        }, {
+          message : 'Carbone bindColor warning: the marker is not valid "color6".',
         });
+
       });
 
-      it('should return a console warning if the bindColor color type does not exist, should clean the XML and should return an empty bindColorArray', function (done) {
+      it('should throw an error if the bindColor color type does not exist, should clean the XML and should return an empty bindColorArray', function () {
         const _xmlInitialContent = '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6">{bindColor(0000ff, <text:span text:style-name="T11">doesnotExist</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-          helper.assert(err+'', 'null');
-          helper.assert(newXmlContent, '<office:text><text:p text:style-name="P4">{d.lastname}</text:p><text:p text:style-name="P6"></text:p></office:text>');
-          helper.assert(bindColorArray.length, 0);
-          helper.assert(console.warn.calledOnce, true);
-          helper.assert(console.warn.calledWith('Carbone bindColor warning: the color format does not exist. Use one of the following: "#hexa", "hexa", "color", "hsl", "rgb".'), true);
-          done();
+        assert.throws(() => {
+          color.getBindColorMarkers(_xmlInitialContent, () => {});
+        }, {
+          message : 'Carbone bindColor warning: the color format does not exist. Use one of the following: "#hexa", "hexa", "color", "hsl", "rgb".',
         });
       });
 
-      it('should return a console warning if the color has already been defined to be replace in a previous bindColor statement, should clean the XML and should return a single element on bindColorArray', function (done) {
+      it('should throw an error if the color has already been defined to be replace in a previous bindColor statement, should clean the XML and should return a single element on bindColorArray', function () {
         const _xmlInitialContent = '<office:text><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, #hexa) = d.color<text:span text:style-name="T3">2</text:span>}</text:p><text:p text:style-name="P6">{bindColor(ffff00, <text:span text:style-name="T11">hsl</text:span>) = d.color<text:span text:style-name="T11">6</text:span>}</text:p></office:text>';
-        const _expectedBindColorList = [{ referenceColor : 'ffff00', colorType : '#hexa', marker : 'd.color2' }];
-        color.getBindColorMarkers(_xmlInitialContent, (err, newXmlContent, bindColorArray) => {
-          helper.assert(err+'', 'null');
-          helper.assert(newXmlContent, '<office:text><text:p text:style-name="P5"></text:p><text:p text:style-name="P6"></text:p></office:text>');
-          helper.assert(bindColorArray.length, 1);
-          helper.assert(bindColorArray, _expectedBindColorList);
-          helper.assert(console.warn.calledOnce, true);
-          helper.assert(console.warn.calledWith("Carbone bindColor warning: 2 bindColor markers try to edit the same color 'ffff00'."), true);
-          done();
+        assert.throws(() => {
+          color.getBindColorMarkers(_xmlInitialContent, () => {});
+        }, {
+          message : 'Carbone bindColor warning: 2 bindColor markers try to edit the same color "ffff00".',
         });
       });
     });
@@ -566,16 +540,16 @@ describe.only('Dynamic colors', function () {
         helper.assert(color.colorFormatConverter.color('yellow', 'docx', color.elementTypes.TEXT_BG_COLOR), 'yellow');
       });
 
-      it('["color" method] should console a warning if the color name does not exist and should find an alternative color [1].', function () {
-        helper.assert(color.colorFormatConverter.color('greem', 'docx'), 'null');
-        helper.assert(console.warn.calledOnce, true);
-        helper.assert(console.warn.calledWith('Carbone bindColor warning: the color "greem" does not exist. Do you mean "green"?'), true);
+      it('["color" method] should throw an error if the color name does not exist and should find an alternative color [1].', function () {
+        assert.throws(() => color.colorFormatConverter.color('greem', 'docx'), {
+          message : 'Carbone bindColor warning: the color "greem" does not exist. Do you mean "green"?'
+        });
       });
 
-      it('["color" method] should console a warning if the color name does not exist and should find an alternative color [2].', function () {
-        helper.assert(color.colorFormatConverter.color('darkGrey', 'docx'), 'null');
-        helper.assert(console.warn.calledOnce, true);
-        helper.assert(console.warn.calledWith('Carbone bindColor warning: the color "darkGrey" does not exist. Do you mean "darkGray"?'), true);
+      it('["color" method] should throw an error if the color name does not exist and should find an alternative color [2].', function () {
+        assert.throws(() => color.colorFormatConverter.color('darkGrey', 'docx'), {
+          message : 'Carbone bindColor warning: the color "darkGrey" does not exist. Do you mean "darkGray"?'
+        });
       });
 
       // color converters - hslToRGB

@@ -214,7 +214,7 @@ describe.only('Dynamic colors', function () {
         helper.assert(_template.files[0].data, _data);
         done();
       });
-      it('replace 1 text with a colortype RGB', function (done) {
+      it('should replace 1 text with a colortype RGB', function (done) {
         const _template = {
           files : [{
             name : 'content.xml',
@@ -238,7 +238,31 @@ describe.only('Dynamic colors', function () {
         helper.assert(_template.files[0].data, _expectedData);
         done();
       });
-      it('replace 1 background color with a colortype HSL', function (done) {
+      it('should use the old Color because the new color is undefined (returned by the builder)', function (done) {
+        const _template = {
+          files : [{
+            name : 'content.xml',
+            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
+          }]
+        };
+        const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff0000" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
+        const _options = {
+          colorDatabase : new Map()
+        };
+        _options.colorDatabase.set('undefined#ff0000#00ffff#ffff00P3', {
+          id          : 0,
+          styleFamily : 'paragraph',
+          colors      : [{
+            newColor  : undefined,
+            oldColor  : '#ff0000',
+            element   : 'textColor',
+            colorType : 'rgb' }]
+        });
+        color.postProcessODT(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedData);
+        done();
+      });
+      it('should replace 1 background color with a colortype HSL', function (done) {
         const _template = {
           files : [{
             name : 'content.xml',

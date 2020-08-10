@@ -1,5 +1,6 @@
 ### v2.0.2
   - Fix locales de-ch and pt-br
+  - Fix direct access in a nested array `{d.array[i].nestedArray[i=0].id}` 
   - [EE] : fix server exit on "Ctrl+C"
 
 ### v2.0.1

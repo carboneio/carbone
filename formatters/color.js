@@ -11,23 +11,11 @@ const color = require('../lib/color');
 function addColorDatabase (options, colorId, styleName, colors) {
   var _colorDatabaseProperties = null;
 
-  // If the colorReference doesn't exist, it create a new ID and set the new color
-  const _styleTag = options.colorStyleList[styleName];
-  if (!options.colorDatabase.has(colorId) && _styleTag) {
-    // Loop through colorStyleList to find the color element
-    for (let i = 0, j = _styleTag.colors.length; i < j; i++) {
-      const styleTagColor = _styleTag.colors[i];
-      for (let k = 0, l = colors.length; k < l; k++) {
-        if (styleTagColor.color === colors[k].oldColor) {
-          colors[k].element = styleTagColor.element;
-          colors[k].colorType = styleTagColor.colorType;
-        }
-      }
-    }
+  if (!options.colorDatabase.has(colorId)) {
     _colorDatabaseProperties = {
-      id          : options.colorDatabase.size,
-      colors      : colors,
-      styleFamily : _styleTag.styleFamily // the familly of the tag ['paragraph', 'text', 'shape']
+      id        : options.colorDatabase.size,
+      colors    : colors,
+      styleName : styleName
     };
     options.colorDatabase.set(colorId, _colorDatabaseProperties);
   }
@@ -51,7 +39,7 @@ function updateColorAndGetReference () {
 
   for (let i = 0, j = arguments.length; i < j; i++) {
     const _arg = typeof arguments[i] === 'string' && arguments[i].indexOf('C_ERROR') !== -1 ? '' : arguments[i];
-    if (i % 2 === 0 && i+1 < arguments.length) {
+    if (i % 2 === 0 && i + 1 < arguments.length) {
       // Aggregate the color object (oldColor/newColor)
       // if arguments[i] return an error (ex: C_ERROR), it means the color was undefined on the data object
       _colors.push({

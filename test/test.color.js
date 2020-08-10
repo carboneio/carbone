@@ -180,7 +180,7 @@ describe.only('Dynamic colors', function () {
     });
 
     describe('post processor ODT', function () {
-      it('should do nothing if template.xml does not exist', function (done) {
+      it.only('should do nothing if template.xml does not exist', function (done) {
         const _template = {
           files : [{
             name : 'random.xml',
@@ -188,16 +188,28 @@ describe.only('Dynamic colors', function () {
           }]
         };
         const _options = {
-          colorDatabase : new Map()
+          colorDatabase  : new Map(),
+          colorStyleList : [
+            {
+              styleName   : 'P3',
+              styleFamily : 'paragraph',
+              colors      : [
+                {
+                  color     : '#ff0000',
+                  element   : 'textColor',
+                  colorType : '#hexa'
+                }
+              ]
+            }
+          ]
         };
         _options.colorDatabase.set('#654321#ff0000#00ffff#ffff00P3', {
-          id          : 0,
-          styleFamily : 'paragraph',
-          colors      : [{
-            newColor  : '#654321',
-            oldColor  : '#ff0000',
-            element   : 'textColor',
-            colorType : '#hexa' }]
+          id        : 0,
+          styleName : 'P3',
+          colors    : [{
+            newColor : '#654321',
+            oldColor : '#ff0000',
+          }]
         });
         assert.throws(()=> {
           color.postProcessODT(_template, null, _options);
@@ -221,7 +233,8 @@ describe.only('Dynamic colors', function () {
         helper.assert(_template.files[0].data, _data);
         done();
       });
-      it('should replace 1 text with a colortype RGB', function (done) {
+
+      it.only('should replace 1 text with a colortype RGB', function (done) {
         const _template = {
           files : [{
             name : 'content.xml',
@@ -230,16 +243,27 @@ describe.only('Dynamic colors', function () {
         };
         const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff00ff" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
         const _options = {
-          colorDatabase : new Map()
+          colorDatabase  : new Map(),
+          colorStyleList : {
+            P3 : {
+              styleFamily : 'paragraph',
+              colors      : [
+                {
+                  color     : '#ff0000',
+                  element   : 'textColor',
+                  colorType : 'rgb'
+                }
+              ]
+            }
+          }
         };
-        _options.colorDatabase.set('{r:255,g:0,b:255}#ff0000#00ffff#ffff00P3', {
-          id          : 0,
-          styleFamily : 'paragraph',
-          colors      : [{
-            newColor  : { r : 255, g : 0, b : 255 },
-            oldColor  : '#ff0000',
-            element   : 'textColor',
-            colorType : 'rgb' }]
+        _options.colorDatabase.set('{r:255,g:0,b:255}#ff0000P3', {
+          id        : 0,
+          styleName : 'P3',
+          colors    : [{
+            newColor : { r : 255, g : 0, b : 255 },
+            oldColor : '#ff0000',
+          }]
         });
         color.postProcessODT(_template, null, _options);
         helper.assert(_template.files[0].data, _expectedData);

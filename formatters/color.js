@@ -89,7 +89,7 @@ function getAndConvertColorDocx (colorName, colorType, elementType) {
   if (colorName && colorType && elementType) {
     return color.colorFormatConverter[colorType](colorName, 'docx', elementType);
   }
-  return colorName;
+  return '';
 }
 
 module.exports = {

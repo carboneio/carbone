@@ -598,6 +598,10 @@ describe.only('Dynamic colors', function () {
         // Without report type
         helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff0000'), 'ff0000');
         helper.assert(color.colorFormatConverter.manageHexadecimalHashtag('ff238b'), 'ff238b');
+        // Random
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag(undefined, 'odt'), undefined);
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag(null), null);
+        helper.assert(color.colorFormatConverter.manageHexadecimalHashtag(undefined), undefined);
       });
     });
   });

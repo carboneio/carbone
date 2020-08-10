@@ -325,7 +325,7 @@ describe.only('Dynamic colors', function () {
 
   describe('DOCX', function () {
     describe('preprocess docx', function () {
-      it ('should do nothing if document.xml does not exist', function () {
+      it.skip('should do nothing if document.xml does not exist', function () {
         const _template = {
           files : [{
             name : 'random.xml',

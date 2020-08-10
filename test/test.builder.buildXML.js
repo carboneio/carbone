@@ -1423,6 +1423,44 @@ describe('builder.buildXML', function () {
       done();
     }
   });
+  it('should direct access to a property in a loop inside a table', function (done) {
+    var _xml = ''
+      + '<table>'
+      + '  <tr>'
+      + '    {d.modules[i].id} : {d.modules[i].observations[i=0].url}'
+      + '  </tr>'
+      + '  <tr>'
+      + '    {d.modules[i+1].id}'
+      + '  </tr>'
+      + '</table>';
+
+    var _res = ''
+      + '<table>'
+      + '  <tr>'
+      + '    1 : '
+      + '  </tr>'
+      + '  <tr>'
+      + '    2 : foo'
+      + '  </tr>'
+      + '  <tr>'
+      + '    3 : '
+      + '  </tr>  '
+      + '</table>';
+    var _data = {
+      modules : [
+        { id : '1' },
+        {
+          id           : '2',
+          observations : [ { url : 'foo' } ],
+        },
+        { id : '3' }
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, _res);
+      done();
+    });
+  });
   it('should accept to increment two nested arrays in the same time. Thus, the nested array is flattened', function (done) {
     var _xml =
        '<xml>'

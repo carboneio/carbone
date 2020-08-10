@@ -168,200 +168,249 @@ describe.only('Dynamic colors', function () {
       });
     });
 
-    describe('post processor ODT', function () {
-      it('should do nothing if template.xml does not exist', function (done) {
-        const _template = {
-          files : [{
-            name : 'random.xml',
-            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/><text:p text:style-name="CC1">TMTC</text:p></office:text></office:body></office:document-content>'
-          }]
-        };
-        const _options = {
-          colorDatabase  : new Map(),
-          colorStyleList : [
-            {
-              styleName   : 'P3',
-              styleFamily : 'paragraph',
-              colors      : [
-                {
-                  color     : '#ff0000',
-                  element   : 'textColor',
-                  colorType : '#hexa'
-                }
-              ]
-            }
-          ]
-        };
-        _options.colorDatabase.set('#654321#ff0000#00ffff#ffff00P3', {
-          id        : 0,
-          styleName : 'P3',
-          colors    : [{
-            newColor : '#654321',
-            oldColor : '#ff0000',
-          }]
+    describe('post processor ODT methods', function () {
+      describe('postProcessOdt', function () {
+        it('should do nothing if template.xml does not exist', function (done) {
+          const _template = {
+            files : [{
+              name : 'random.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/><text:p text:style-name="CC1">TMTC</text:p></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _options = {
+            colorDatabase  : new Map(),
+            colorStyleList : [
+              {
+                styleName   : 'P3',
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color     : '#ff0000',
+                    element   : 'textColor',
+                    colorType : '#hexa'
+                  }
+                ]
+              }
+            ]
+          };
+          _options.colorDatabase.set('#654321#ff0000#00ffff#ffff00P3', {
+            id        : 0,
+            styleName : 'P3',
+            colors    : [{
+              newColor : '#654321',
+              oldColor : '#ff0000',
+            }]
+          });
+          assert.throws(()=> {
+            color.postProcessODT(_template, null, _options);
+          }, {
+            message : 'the "content.xml" file does not exist.'
+          });
+          done();
         });
-        assert.throws(()=> {
+        it('should do nothing if options.colorDatabase is empty', function (done) {
+          const _data = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/><text:p text:style-name="CC1">TMTC</text:p></office:text></office:body></office:document-content>';
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : _data
+            }]
+          };
+          const _options = {
+            colorDatabase : new Map()
+          };
           color.postProcessODT(_template, null, _options);
-        }, {
-          message : 'the "content.xml" file does not exist.'
+          helper.assert(_template.files[0].data, _data);
+          done();
         });
-        done();
-      });
-      it('should do nothing if options.colorDatabase is empty', function (done) {
-        const _data = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/><text:p text:style-name="CC1">TMTC</text:p></office:text></office:body></office:document-content>';
-        const _template = {
-          files : [{
-            name : 'content.xml',
-            data : _data
-          }]
-        };
-        const _options = {
-          colorDatabase : new Map()
-        };
-        color.postProcessODT(_template, null, _options);
-        helper.assert(_template.files[0].data, _data);
-        done();
-      });
-      it('should do nothing if option.colorStyleList is empty', function (done) {
-        const _template = {
-          files : [{
-            name : 'content.xml',
-            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
-          }]
-        };
-        const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
-        const _options = {
-          colorDatabase  : new Map(),
-          colorStyleList : {}
-        };
-        _options.colorDatabase.set('{r:255,g:0,b:255}#ff0000P3', {
-          id        : 0,
-          styleName : 'P3',
-          colors    : [{
-            newColor : { r : 255, g : 0, b : 255 },
-            oldColor : '#ff0000',
-          }]
+        it('should do nothing if option.colorStyleList is empty', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
+          const _options = {
+            colorDatabase  : new Map(),
+            colorStyleList : {}
+          };
+          _options.colorDatabase.set('{r:255,g:0,b:255}#ff0000P3', {
+            id        : 0,
+            styleName : 'P3',
+            colors    : [{
+              newColor : { r : 255, g : 0, b : 255 },
+              oldColor : '#ff0000',
+            }]
+          });
+          color.postProcessODT(_template, null, _options);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
         });
-        color.postProcessODT(_template, null, _options);
-        helper.assert(_template.files[0].data, _expectedData);
-        done();
+
+        it('should replace 1 text with a colortype RGB', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff00ff" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
+          const _options = {
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              P3 : {
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color     : '#ff0000',
+                    element   : 'textColor',
+                    colorType : 'rgb'
+                  }
+                ]
+              }
+            }
+          };
+          _options.colorDatabase.set('{r:255,g:0,b:255}#ff0000P3', {
+            id        : 0,
+            styleName : 'P3',
+            colors    : [{
+              newColor : { r : 255, g : 0, b : 255 },
+              oldColor : '#ff0000',
+            }]
+          });
+          color.postProcessODT(_template, null, _options);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
+        it('should use the old Color because the new color is undefined (returned by the builder)', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff0000" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
+          const _options = {
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              P3 : {
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color     : '#ff0000',
+                    element   : 'textColor',
+                    colorType : 'rgb'
+                  }
+                ]
+              }
+            }
+          };
+          _options.colorDatabase.set('undefined#ff0000P3', {
+            id        : 0,
+            styleName : 'P3',
+            colors    : [{
+              newColor : undefined,
+              oldColor : '#ff0000'
+            }]
+          });
+          color.postProcessODT(_template, null, _options);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
+        it('should replace 1 background color with a colortype HSL', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:background-color="#537326" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
+          const _options = {
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              P1 : {
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color     : '#ff0000',
+                    element   : 'textBackgroundColor',
+                    colorType : 'hsl'
+                  }
+                ]
+              }
+            }
+          };
+          _options.colorDatabase.set('{"h":85,"s":50,"l":30}#0000ffP1', {
+            id        : 0,
+            styleName : 'P1',
+            colors    : [{
+              newColor : { h : 85, s : 50, l : 30 },
+              oldColor : '#ff0000' }]
+          });
+          color.postProcessODT(_template, null, _options);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
+        it('replace 1 text + background color + static color', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style><style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="CC1"/><text:p text:style-name="CC1">Onduleur TMTC</text:p></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style><style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#654321" fo:background-color="#00ffff" /></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#537326" fo:background-color="transparent" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="CC1"/><text:p text:style-name="CC1">Onduleur TMTC</text:p></office:text></office:body></office:document-content>';
+          const _options = {
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              P6 : {
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color : '#ff0000', element : 'textColor', colorType : '#hexa'
+                  },
+                  {
+                    color : '#ffff00', element : 'textBackgroundColor', colorType : '#hexa'
+                  }
+                ]
+              },
+              P1 : {
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color : '#0000ff', element : 'textColor', colorType : 'hsl'
+                  },
+                  {
+                    color : 'transparent', element : 'textBackgroundColor'
+                  }
+                ]
+              }
+            }
+          };
+          _options.colorDatabase.set('#654321#ff0000#00ffff#ffff00P6', {
+            id        : 0,
+            styleName : 'P6',
+            colors    : [
+              { newColor : '#654321', oldColor : '#ff0000' },
+              { newColor : '#00ffff', oldColor : '#ffff00'}
+            ]
+          });
+          _options.colorDatabase.set('{"h":85,"s":50,"l":30}#0000ffnulltransparentP1', {
+            id        : 1,
+            styleName : 'P1',
+            colors    : [
+              { newColor : { h : 85, s : 50, l : 30 }, oldColor : '#0000ff'},
+              { newColor : 'null', oldColor : 'transparent' }]
+          });
+          color.postProcessODT(_template, null, _options);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
       });
 
-      it('should replace 1 text with a colortype RGB', function (done) {
-        const _template = {
-          files : [{
-            name : 'content.xml',
-            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
-          }]
-        };
-        const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff00ff" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
-        const _options = {
-          colorDatabase  : new Map(),
-          colorStyleList : {
-            P3 : {
-              styleFamily : 'paragraph',
-              colors      : [
-                {
-                  color     : '#ff0000',
-                  element   : 'textColor',
-                  colorType : 'rgb'
-                }
-              ]
-            }
-          }
-        };
-        _options.colorDatabase.set('{r:255,g:0,b:255}#ff0000P3', {
-          id        : 0,
-          styleName : 'P3',
-          colors    : [{
-            newColor : { r : 255, g : 0, b : 255 },
-            oldColor : '#ff0000',
-          }]
-        });
-        color.postProcessODT(_template, null, _options);
-        helper.assert(_template.files[0].data, _expectedData);
-        done();
-      });
-      it('should use the old Color because the new color is undefined (returned by the builder)', function (done) {
-        const _template = {
-          files : [{
-            name : 'content.xml',
-            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
-          }]
-        };
-        const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff0000" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
-        const _options = {
-          colorDatabase  : new Map(),
-          colorStyleList : {
-            P3 : {
-              styleFamily : 'paragraph',
-              colors      : [
-                {
-                  color     : '#ff0000',
-                  element   : 'textColor',
-                  colorType : 'rgb'
-                }
-              ]
-            }
-          }
-        };
-        _options.colorDatabase.set('undefined#ff0000P3', {
-          id        : 0,
-          styleName : 'P3',
-          colors    : [{
-            newColor : undefined,
-            oldColor : '#ff0000'
-          }]
-        });
-        color.postProcessODT(_template, null, _options);
-        helper.assert(_template.files[0].data, _expectedData);
-        done();
-      });
-      it('should replace 1 background color with a colortype HSL', function (done) {
-        const _template = {
-          files : [{
-            name : 'content.xml',
-            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
-          }]
-        };
-        const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:background-color="#537326" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
-        const _options = {
-          colorDatabase  : new Map(),
-          colorStyleList : {
-            P1 : {
-              styleFamily : 'paragraph',
-              colors      : [
-                {
-                  color     : '#ff0000',
-                  element   : 'textBackgroundColor',
-                  colorType : 'hsl'
-                }
-              ]
-            }
-          }
-        };
-        _options.colorDatabase.set('{"h":85,"s":50,"l":30}#0000ffP1', {
-          id        : 0,
-          styleName : 'P1',
-          colors    : [{
-            newColor : { h : 85, s : 50, l : 30 },
-            oldColor : '#ff0000' }]
-        });
-        color.postProcessODT(_template, null, _options);
-        helper.assert(_template.files[0].data, _expectedData);
-        done();
-      });
-      it('replace 1 text + background color + static color', function (done) {
-        const _template = {
-          files : [{
-            name : 'content.xml',
-            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style><style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="CC1"/><text:p text:style-name="CC1">Onduleur TMTC</text:p></office:text></office:body></office:document-content>'
-          }]
-        };
-        const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style><style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#654321" fo:background-color="#00ffff" /></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#537326" fo:background-color="transparent" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="CC1"/><text:p text:style-name="CC1">Onduleur TMTC</text:p></office:text></office:body></office:document-content>';
-        const _options = {
-          colorDatabase  : new Map(),
-          colorStyleList : {
+      describe('getColorTagPropertiesOdt', function () {
+        it('should return the color properties from a colorStyleList', function () {
+          const _colorTag =  {
             P6 : {
               styleFamily : 'paragraph',
               colors      : [
@@ -369,41 +418,24 @@ describe.only('Dynamic colors', function () {
                   color : '#ff0000', element : 'textColor', colorType : '#hexa'
                 },
                 {
-                  color : '#ffff00', element : 'textBackgroundColor', colorType : '#hexa'
+                  color : '#ffff00', element : 'textBackgroundColor', colorType : 'hsl'
                 }
               ]
             },
-            P1 : {
-              styleFamily : 'paragraph',
-              colors      : [
-                {
-                  color : '#0000ff', element : 'textColor', colorType : 'hsl'
-                },
-                {
-                  color : 'transparent', element : 'textBackgroundColor'
-                }
-              ]
-            }
-          }
-        };
-        _options.colorDatabase.set('#654321#ff0000#00ffff#ffff00P6', {
-          id        : 0,
-          styleName : 'P6',
-          colors    : [
-            { newColor : '#654321', oldColor : '#ff0000' },
-            { newColor : '#00ffff', oldColor : '#ffff00'}
-          ]
+          };
+          helper.assert(color.getColorTagPropertiesOdt('#ff0000', _colorTag.P6.colors), {
+            element   : 'textColor',
+            colorType : '#hexa'
+          });
+          helper.assert(color.getColorTagPropertiesOdt('#ffff00', _colorTag.P6.colors), {
+            element   : 'textBackgroundColor',
+            colorType : 'hsl'
+          });
         });
-        _options.colorDatabase.set('{"h":85,"s":50,"l":30}#0000ffnulltransparentP1', {
-          id        : 1,
-          styleName : 'P1',
-          colors    : [
-            { newColor : { h : 85, s : 50, l : 30 }, oldColor : '#0000ff'},
-            { newColor : 'null', oldColor : 'transparent' }]
+
+        it('should return an empty color property object if the colors array is empty', function () {
+          helper.assert(color.getColorTagPropertiesOdt('#ff0000', []), {});
         });
-        color.postProcessODT(_template, null, _options);
-        helper.assert(_template.files[0].data, _expectedData);
-        done();
       });
     });
   });

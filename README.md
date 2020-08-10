@@ -38,9 +38,8 @@
 > 
 > **Carbone v2.0 🚀 is here :**
 >   
->   - `npm i carbone@2.0.0`
+>   - `npm i carbone@2.0.2`
 >   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
->   - The website and Carbone Render/Studio will be updated this week
 
 
 ## Table of content

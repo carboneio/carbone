@@ -1,3 +1,9 @@
+### v2.0.2
+  - Release August 10th, 2020
+  - Fix locales de-ch and pt-br
+  - Fix direct access in a nested array `{d.array[i].nestedArray[i=0].id}` 
+  - [EE] : fix server exit on "Ctrl+C"
+
 ### v2.0.1
   - Release July 8th, 2020
   - Add regression tests

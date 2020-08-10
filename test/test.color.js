@@ -4,9 +4,9 @@ const assert = require('assert');
 
 describe.only('Dynamic colors', function () {
   describe('ODT Files', function () {
-    describe('ODT pre processor methods', function () {
-      describe('preProcess ODT', function () {
-        it('should insert a color marker and formatter from a single bindColor marker', function () {
+    describe('ODT/ODS pre processor methods', function () {
+      describe('preProcessLo', function () {
+        it('should insert a color marker and formatter from a single bindColor marker [ODT]', function () {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -14,15 +14,40 @@ describe.only('Dynamic colors', function () {
             }]
           };
           const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/><text:sequence-decl text:display-outline-level="0" text:name="Figure"/></text:sequence-decls><text:p text:style-name="{d.color1:updateColorAndGetReference(#ff0000, null, #ffff00, P3)}">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2"></text:p></text:p></office:text></office:body></office:document-content>';
-          const _options = {};
+          const _options = {
+
+          };
           const _expectedOptions = { colorStyleList : { P3 : { styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' }] } } };
-          color.preProcessOdt(_template, _options);
+          color.preProcessLo(_template, _options);
+          helper.assert(_template.files[0].data, _expectedXML);
+          helper.assert(_options, _expectedOptions);
+        });
+
+        it('should insert a color marker and formatter from a single bindColor marker [ODS]', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:scripts/><style:style style:name="ta1" style:family="table" style:master-page-name="Default"><style:table-properties table:display="true" style:writing-mode="lr-tb"/></style:style><style:style style:name="ce1" style:family="table-cell" style:parent-style-name="Default"><style:text-properties fo:color="#ff0000"/></style:style></office:automatic-styles><office:body><office:spreadsheet><table:table table:name="Sheet1" table:style-name="ta1"><table:table-column table:style-name="co1" table:default-cell-style-name="Default"/><table:table-column table:style-name="co2" table:number-columns-repeated="3" table:default-cell-style-name="Default"/><table:table-row table:style-name="ro1"><table:table-cell table:style-name="ce1" office:value-type="string" calcext:value-type="string"><text:p>{d.name}</text:p></table:table-cell></table:table-row><table:table-row table:style-name="ro1"><table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{bindColor(FF0000, #hexa) = d.color2}</text:p></table:table-cell><table:table-cell table:number-columns-repeated="3"/></table:table-row></table:table><table:named-expressions/></office:spreadsheet></office:body></office:document-content>'
+            }]
+          };
+          const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:scripts/><style:style style:name="ta1" style:family="table" style:master-page-name="Default"><style:table-properties table:display="true" style:writing-mode="lr-tb"/></style:style><style:style style:name="ce1" style:family="table-cell" style:parent-style-name="Default"><style:text-properties fo:color="#ff0000"/></style:style></office:automatic-styles><office:body><office:spreadsheet><table:table table:name="Sheet1" table:style-name="ta1"><table:table-column table:style-name="co1" table:default-cell-style-name="Default"/><table:table-column table:style-name="co2" table:number-columns-repeated="3" table:default-cell-style-name="Default"/><table:table-row table:style-name="ro1"><table:table-cell table:style-name="{d.color2:updateColorAndGetReference(#ff0000, ce1)}" office:value-type="string" calcext:value-type="string"><text:p>{d.name}</text:p></table:table-cell></table:table-row><table:table-row table:style-name="ro1"><table:table-cell office:value-type="string" calcext:value-type="string"><text:p></text:p></table:table-cell><table:table-cell table:number-columns-repeated="3"/></table:table-row></table:table><table:named-expressions/></office:spreadsheet></office:body></office:document-content>';
+          const _options = {
+
+          };
+          const _expectedOptions = {
+            colorStyleList : {
+              ce1 : {
+                styleFamily : 'table-cell',
+                colors      : [{ color : '#ff0000', element : 'textColor', marker : 'd.color2', colorType : '#hexa' }]
+              }
+            }};
+          color.preProcessLo(_template, _options);
           helper.assert(_template.files[0].data, _expectedXML);
           helper.assert(_options, _expectedOptions);
         });
 
         // should insert color markers and formatters from multiple bindColor marker
-        it('should insert 2 color markers and formatters from a 2 bindColor marker', function () {
+        it('should insert 2 color markers and formatters from a 2 bindColor marker [ODT]', function () {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -37,31 +62,31 @@ describe.only('Dynamic colors', function () {
               P4 : { styleFamily : 'paragraph', colors : [{ color : '#0000ff', element : 'textColor', marker : 'd.list[i].element', colorType : '#hexa' }, { color : 'transparent', element : 'textBackgroundColor' } ] }
             }
           };
-          color.preProcessOdt(_template, _options);
+          color.preProcessLo(_template, _options);
           helper.assert(_template.files[0].data, _expectedXML);
           helper.assert(_options, _expectedOptions);
         });
         //
 
-        it('should throw an error because it changes the text color and background color from 2 different lists', function () {
+        it('should throw an error because it changes the text color and background color from 2 different lists [ODT]', function () {
           const _template = {
             files : [{
               name : 'content.xml',
               data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="P3">{d.<text:span text:style-name="T1">name</text:span>}</text:p><text:p text:style-name="P2">{bindColor(ff<text:span text:style-name="T2">00</text:span>00, #hexa) = d.list[i].color1}</text:p><text:p text:style-name="P5">{bindColor(ff<text:span text:style-name="T3">ff</text:span>00, #hexa) = d.list2[i].color2}</text:p></office:text></office:body></office:document-content>'
             }]
           };
-          assert.throws(() => color.preProcessOdt(_template, {}), {
+          assert.throws(() => color.preProcessLo(_template, {  }), {
             message : "Carbone bindColor error: it is not possible to get the color binded to the following marker: 'd.list[i].color1'"
           });
         });
       });
 
-      describe('getColorStyleListODT', function () {
+      describe('getColorStyleListLo', function () {
         it('should not find any style and return an empty colorStyleList', function (done) {
           const _xmlContent = '<xml><office:body></office:body></xml>';
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
 
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, {});
           done();
         });
@@ -69,7 +94,7 @@ describe.only('Dynamic colors', function () {
           const _xmlContent = '<style:style style:name="T1" style:family="text"><style:text-properties officeooo:rsid="00174da5"/></style:style><style:style style:name="T2" style:family="text"><style:text-properties officeooo:rsid="0022fb00"/></style:style>';
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
 
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, {});
           done();
         });
@@ -77,7 +102,7 @@ describe.only('Dynamic colors', function () {
           const _xmlContent = '<style:style style:name="T1"><style:text-properties fo:color="#ff0000" officeooo:rsid="00174da5"/></style:style><style:style style:name="T2" style:family="text"><style:text-properties officeooo:rsid="0022fb00"/></style:style>';
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
 
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, {});
           done();
         });
@@ -85,7 +110,7 @@ describe.only('Dynamic colors', function () {
           const _xmlContent = '<style:style style:name="T1"><style:text-properties fo:color="#ff0000" officeooo:rsid="00174da5"/></style:style><style:style style:name="T2" style:family="text"><style:text-properties officeooo:rsid="0022fb00"/></style:style>';
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
 
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, {});
           done();
         });
@@ -94,7 +119,7 @@ describe.only('Dynamic colors', function () {
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ] } };
 
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
           done();
         });
@@ -103,7 +128,7 @@ describe.only('Dynamic colors', function () {
           const _bindColorList = [{ referenceColor : 'FF0000', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ] } };
 
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
           done();
         });
@@ -112,7 +137,7 @@ describe.only('Dynamic colors', function () {
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa' } ] } };
 
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
           done();
         });
@@ -122,7 +147,7 @@ describe.only('Dynamic colors', function () {
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#ffff00', colorType : 'color', marker : 'd.color2' }];
           const _expectedColorListElement = { P3 : { styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : 'color' } ] } };
 
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
           done();
         });
@@ -139,7 +164,7 @@ describe.only('Dynamic colors', function () {
             P3 : { styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' } ] },
             P4 : { styleFamily : 'paragraph', colors : [{ color : 'transparent', element : 'textBackgroundColor', marker : 'd.list[i].color', colorType : 'hsl' }, {color : '#0000ff', element : 'textColor' }]},
           };
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
           done();
         });
@@ -150,7 +175,7 @@ describe.only('Dynamic colors', function () {
           const _expectedColorListElement = {
             P4 : { styleFamily : 'paragraph', colors : [{color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {color : '#0000ff', element : 'textColor'}]}
           };
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
           done();
         });
@@ -161,15 +186,15 @@ describe.only('Dynamic colors', function () {
           const _expectedColorListElement = {
             P4 : { styleFamily : 'paragraph', colors : [{color : '#92AF11', element : 'textBackgroundColor', marker : 'd.list[i].element', colorType : '#hexa'}, {color : '#0000ff', element : 'textColor', marker : 'd.color1', colorType : '#hexa'}]}
           };
-          const _colorStyleList = color.getColorStyleListODT(_xmlContent, _bindColorList);
+          const _colorStyleList = color.getColorStyleListLo(_xmlContent, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
           done();
         });
       });
     });
 
-    describe('post processor ODT methods', function () {
-      describe('postProcessOdt', function () {
+    describe('ODT/ODS post processor methods', function () {
+      describe('postProcessLo', function () {
         it('should do nothing if template.xml does not exist', function (done) {
           const _template = {
             files : [{
@@ -202,7 +227,7 @@ describe.only('Dynamic colors', function () {
             }]
           });
           assert.throws(()=> {
-            color.postProcessODT(_template, null, _options);
+            color.postProcessLo(_template, null, _options);
           }, {
             message : 'the "content.xml" file does not exist.'
           });
@@ -219,7 +244,7 @@ describe.only('Dynamic colors', function () {
           const _options = {
             colorDatabase : new Map()
           };
-          color.postProcessODT(_template, null, _options);
+          color.postProcessLo(_template, null, _options);
           helper.assert(_template.files[0].data, _data);
           done();
         });
@@ -243,12 +268,123 @@ describe.only('Dynamic colors', function () {
               oldColor : '#ff0000',
             }]
           });
-          color.postProcessODT(_template, null, _options);
+          color.postProcessLo(_template, null, _options);
           helper.assert(_template.files[0].data, _expectedData);
           done();
         });
 
-        it('should replace 1 text with a colortype RGB', function (done) {
+        it('should replace 1 text with a colortype hexa [ODS file]', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:scripts/><office:automatic-styles><style:style style:name="ce3" style:family="table-cell" style:parent-style-name="Default"><style:table-cell-properties fo:background-color="#729fcf"/><style:text-properties fo:color="#cccccc"/></style:style></office:automatic-styles><office:body><office:spreadsheet><table:table table:name="Sheet1" table:style-name="ta1"><table:table-column table:style-name="co1" table:default-cell-style-name="Default"/><table:table-column table:style-name="co2" table:number-columns-repeated="3" table:default-cell-style-name="Default"/><table:table-row table:style-name="ro1"><table:table-cell table:style-name="CC0" office:value-type="string" calcext:value-type="string"><text:p>John Wick</text:p></table:table-cell></table:table-row></table:table></office:spreadsheet></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:scripts/><office:automatic-styles><style:style style:name="ce3" style:family="table-cell" style:parent-style-name="Default"><style:table-cell-properties fo:background-color="#729fcf"/><style:text-properties fo:color="#cccccc"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#fb02a2"/></style:style></office:automatic-styles><office:body><office:spreadsheet><table:table table:name="Sheet1" table:style-name="ta1"><table:table-column table:style-name="co1" table:default-cell-style-name="Default"/><table:table-column table:style-name="co2" table:number-columns-repeated="3" table:default-cell-style-name="Default"/><table:table-row table:style-name="ro1"><table:table-cell table:style-name="CC0" office:value-type="string" calcext:value-type="string"><text:p>John Wick</text:p></table:table-cell></table:table-row></table:table></office:spreadsheet></office:body></office:document-content>';
+          const _options = {
+            extension      : 'ods',
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              Ce1 : {
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color     : '#ff0000',
+                    element   : 'textColor',
+                    colorType : '#hexa'
+                  }
+                ]
+              }
+            }
+          };
+          _options.colorDatabase.set('#fb02a2#ff0000Ce1', {
+            id        : 0,
+            styleName : 'Ce1',
+            colors    : [{
+              newColor : '#fb02a2',
+              oldColor : '#ff0000',
+            }]
+          });
+          color.postProcessLo(_template, null, _options);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
+
+        it('should replace 1 text + static background + dynamic background with a multiple colortypes [ODS file]', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:scripts/><office:automatic-styles><style:style style:name="ce4" style:family="table-cell" style:parent-style-name="Default"><style:table-cell-properties fo:background-color="#069a2e"/><style:text-properties fo:color="#ff0000"/></style:style><style:style style:name="ce2" style:family="table-cell" style:parent-style-name="Default"><style:table-cell-properties fo:background-color="#ffff00"/></style:style><style:style style:name="ce3" style:family="table-cell" style:parent-style-name="Default"><style:table-cell-properties fo:background-color="#729fcf"/><style:text-properties fo:color="#cccccc"/></style:style></office:automatic-styles><office:body><office:spreadsheet><table:calculation-settings table:case-sensitive="false" table:automatic-find-labels="false" table:use-regular-expressions="false" table:use-wildcards="true"><table:iteration table:maximum-difference="0.0001"/></table:calculation-settings><table:table table:name="Sheet1" table:style-name="ta1"><table:table-column table:style-name="co1" table:default-cell-style-name="Default"/><table:table-column table:style-name="co2" table:number-columns-repeated="3" table:default-cell-style-name="Default"/><table:table-row table:style-name="ro1"><table:table-cell table:style-name="CC0" office:value-type="string" calcext:value-type="string"><text:p>John Wick</text:p></table:table-cell><table:table-cell table:style-name="CC1" office:value-type="string" calcext:value-type="string"><text:p>Onduleur TMTC</text:p></table:table-cell><table:table-cell/><table:table-cell table:style-name="CC2" office:value-type="string" calcext:value-type="string"><text:p>Test</text:p></table:table-cell></table:table-row></table:table><table:named-expressions/></office:spreadsheet></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:scripts/><office:automatic-styles><style:style style:name="ce4" style:family="table-cell" style:parent-style-name="Default"><style:table-cell-properties fo:background-color="#069a2e"/><style:text-properties fo:color="#ff0000"/></style:style><style:style style:name="ce2" style:family="table-cell" style:parent-style-name="Default"><style:table-cell-properties fo:background-color="#ffff00"/></style:style><style:style style:name="ce3" style:family="table-cell" style:parent-style-name="Default"><style:table-cell-properties fo:background-color="#729fcf"/><style:text-properties fo:color="#cccccc"/></style:style><style:style style:name="CC0" style:family="table-cell"><style:text-properties fo:color="#00ffff"/><style:table-cell-properties fo:background-color="#069a2e"/></style:style><style:style style:name="CC1" style:family="table-cell"><style:table-cell-properties fo:background-color="#537326"/></style:style><style:style style:name="CC2" style:family="table-cell"><style:text-properties fo:color="#ff00ff"/><style:table-cell-properties fo:background-color="#898900"/></style:style></office:automatic-styles><office:body><office:spreadsheet><table:calculation-settings table:case-sensitive="false" table:automatic-find-labels="false" table:use-regular-expressions="false" table:use-wildcards="true"><table:iteration table:maximum-difference="0.0001"/></table:calculation-settings><table:table table:name="Sheet1" table:style-name="ta1"><table:table-column table:style-name="co1" table:default-cell-style-name="Default"/><table:table-column table:style-name="co2" table:number-columns-repeated="3" table:default-cell-style-name="Default"/><table:table-row table:style-name="ro1"><table:table-cell table:style-name="CC0" office:value-type="string" calcext:value-type="string"><text:p>John Wick</text:p></table:table-cell><table:table-cell table:style-name="CC1" office:value-type="string" calcext:value-type="string"><text:p>Onduleur TMTC</text:p></table:table-cell><table:table-cell/><table:table-cell table:style-name="CC2" office:value-type="string" calcext:value-type="string"><text:p>Test</text:p></table:table-cell></table:table-row></table:table><table:named-expressions/></office:spreadsheet></office:body></office:document-content>';
+          const _options = {
+            extension      : 'ods',
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              Ce4 : {
+                styleFamily : 'table-cell',
+                colors      : [
+                  { color     : '#ff0000',
+                    element   : 'textColor',
+                    marker    : 'd.color2',
+                    colorType : '#hexa' },
+                  { color : '#069a2e', element : 'textBackgroundColor' }
+                ]
+              },
+              Ce2 : {
+                styleFamily : 'table-cell',
+                colors      : [
+                  { color     : '#ffff00',
+                    element   : 'textBackgroundColor',
+                    marker    : 'd.color6',
+                    colorType : 'hsl' }
+                ]
+              },
+              Ce3 : {
+                styleFamily : 'table-cell',
+                colors      : [
+                  { color     : '#cccccc',
+                    element   : 'textColor',
+                    marker    : 'd.color5',
+                    colorType : 'rgb' },
+                  { color     : '#729fcf',
+                    element   : 'textBackgroundColor',
+                    marker    : 'd.color3',
+                    colorType : 'color' }
+                ]
+              }
+            }
+          };
+          _options.colorDatabase.set('#00ffff#ff0000null#069a2ece4', {
+            id        : 0,
+            styleName : 'Ce4',
+            colors    : [
+              { newColor : '#00ffff', oldColor : '#ff0000' },
+              { newColor : 'null', oldColor : '#069a2e' }
+            ]
+          });
+          _options.colorDatabase.set('{"h":85,"s":50,"l":30}#ffff00ce2', {
+            id        : 1,
+            styleName : 'Ce2',
+            colors    : [
+              { newColor : { h : 85, s : 50, l : 30 }, oldColor : '#ffff00' }
+            ]
+          });
+          _options.colorDatabase.set('{"r":255,"g":0,"b":255}#ccccccdarkYellow#729fcfce3', {
+            id        : 2,
+            styleName : 'Ce3',
+            colors    : [
+              { newColor : { r : 255, g : 0, b : 255 }, oldColor : '#cccccc' },
+              { newColor : 'darkYellow', oldColor : '#729fcf' }
+            ]
+          });
+          color.postProcessLo(_template, null, _options);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
+
+        it('should replace 1 text with a colortype RGB [ODT file]', function (done) {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -257,6 +393,7 @@ describe.only('Dynamic colors', function () {
           };
           const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff00ff" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
           const _options = {
+            extension      : 'odt',
             colorDatabase  : new Map(),
             colorStyleList : {
               P3 : {
@@ -279,11 +416,11 @@ describe.only('Dynamic colors', function () {
               oldColor : '#ff0000',
             }]
           });
-          color.postProcessODT(_template, null, _options);
+          color.postProcessLo(_template, null, _options);
           helper.assert(_template.files[0].data, _expectedData);
           done();
         });
-        it('should use the old Color because the new color is undefined (returned by the builder)', function (done) {
+        it('should use the old Color because the new color is undefined (returned by the builder) [ODT file]', function (done) {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -292,6 +429,7 @@ describe.only('Dynamic colors', function () {
           };
           const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff0000" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
           const _options = {
+            extension      : 'odt',
             colorDatabase  : new Map(),
             colorStyleList : {
               P3 : {
@@ -314,11 +452,11 @@ describe.only('Dynamic colors', function () {
               oldColor : '#ff0000'
             }]
           });
-          color.postProcessODT(_template, null, _options);
+          color.postProcessLo(_template, null, _options);
           helper.assert(_template.files[0].data, _expectedData);
           done();
         });
-        it('should replace 1 background color with a colortype HSL', function (done) {
+        it('should replace 1 background color with a colortype HSL [ODT file]', function (done) {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -327,6 +465,7 @@ describe.only('Dynamic colors', function () {
           };
           const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:background-color="#537326" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
           const _options = {
+            extension      : 'odt',
             colorDatabase  : new Map(),
             colorStyleList : {
               P1 : {
@@ -348,11 +487,11 @@ describe.only('Dynamic colors', function () {
               newColor : { h : 85, s : 50, l : 30 },
               oldColor : '#ff0000' }]
           });
-          color.postProcessODT(_template, null, _options);
+          color.postProcessLo(_template, null, _options);
           helper.assert(_template.files[0].data, _expectedData);
           done();
         });
-        it('replace 1 text + background color + static color', function (done) {
+        it('replace 1 text + background color + static color [ODT file]', function (done) {
           const _template = {
             files : [{
               name : 'content.xml',
@@ -361,6 +500,7 @@ describe.only('Dynamic colors', function () {
           };
           const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style><style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#654321" fo:background-color="#00ffff" /></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#537326" fo:background-color="transparent" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="CC1"/><text:p text:style-name="CC1">Onduleur TMTC</text:p></office:text></office:body></office:document-content>';
           const _options = {
+            extension      : 'odt',
             colorDatabase  : new Map(),
             colorStyleList : {
               P6 : {
@@ -402,13 +542,13 @@ describe.only('Dynamic colors', function () {
               { newColor : { h : 85, s : 50, l : 30 }, oldColor : '#0000ff'},
               { newColor : 'null', oldColor : 'transparent' }]
           });
-          color.postProcessODT(_template, null, _options);
+          color.postProcessLo(_template, null, _options);
           helper.assert(_template.files[0].data, _expectedData);
           done();
         });
       });
 
-      describe('getColorTagPropertiesOdt', function () {
+      describe('getColorTagPropertiesLo', function () {
         it('should return the color properties from a colorStyleList', function () {
           const _colorTag =  {
             P6 : {
@@ -423,18 +563,18 @@ describe.only('Dynamic colors', function () {
               ]
             },
           };
-          helper.assert(color.getColorTagPropertiesOdt('#ff0000', _colorTag.P6.colors), {
+          helper.assert(color.getColorTagPropertiesLo('#ff0000', _colorTag.P6.colors), {
             element   : 'textColor',
             colorType : '#hexa'
           });
-          helper.assert(color.getColorTagPropertiesOdt('#ffff00', _colorTag.P6.colors), {
+          helper.assert(color.getColorTagPropertiesLo('#ffff00', _colorTag.P6.colors), {
             element   : 'textBackgroundColor',
             colorType : 'hsl'
           });
         });
 
         it('should return an empty color property object if the colors array is empty', function () {
-          helper.assert(color.getColorTagPropertiesOdt('#ff0000', []), {});
+          helper.assert(color.getColorTagPropertiesLo('#ff0000', []), {});
         });
       });
     });

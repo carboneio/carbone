@@ -3,7 +3,7 @@ const helper = require('../lib/helper');
 const assert = require('assert');
 const colorFormatters = require('../formatters/color');
 
-describe.only('Dynamic colors', function () {
+describe('Dynamic colors', function () {
   describe('ODT Files', function () {
     describe('ODT/ODS pre processor methods', function () {
       describe('preProcessLo', function () {
@@ -582,7 +582,7 @@ describe.only('Dynamic colors', function () {
 
     describe('ODS/ODT post process formatters', function () {
       describe('updateColorAndGetReferenceLo + addColorDatabase + getNewColorReferencePostProcessingLo', function () {
-        it.only('should save in the colorDatabase Map the color Pair, generate a unique ID and return a new color reference', function () {
+        it('should save in the colorDatabase Map the color Pair, generate a unique ID and return a new color reference', function () {
           const _options = {
             colorDatabase : new Map()
           };
@@ -602,7 +602,7 @@ describe.only('Dynamic colors', function () {
           const _colorReference = _postProcess.fn.apply(_options, _postProcess.args);
           helper.assert(_colorReference, 'CC0');
         });
-        it.only('should save in the colorDatabase Map multiple color pair (rgb + hsl + static color), generate a unique IDs and return color references', function () {
+        it('should save in the colorDatabase Map multiple color pair (rgb + hsl + static color), generate a unique IDs and return color references', function () {
           const _options = {
             colorDatabase : new Map()
           };
@@ -664,7 +664,26 @@ describe.only('Dynamic colors', function () {
             });
           helper.assert(_postProcess4.fn.apply(_options, _postProcess4.args), 'CC3');
         });
-        // test if a color is undefined (error: C_ERROR)
+        it('should save in the colorDatabase Map the color Pair even if the builder return the error "[[C_ERROR]]"', function () {
+          const _options = {
+            colorDatabase : new Map()
+          };
+          const _postProcess = colorFormatters.updateColorAndGetReferenceLo.apply(_options, ['[[C_ERROR]]', '38A291', 'P1']);
+          helper.assert(_options.colorDatabase.has('38A291P1'), true);
+          helper.assert(_options.colorDatabase.get('38A291P1'),
+            {
+              id     : 0,
+              colors : [
+                {
+                  newColor : '',
+                  oldColor : '38A291'
+                }
+              ],
+              styleName : 'P1'
+            });
+          const _colorReference = _postProcess.fn.apply(_options, _postProcess.args);
+          helper.assert(_colorReference, 'CC0');
+        });
       });
     });
   });
@@ -755,8 +774,15 @@ describe.only('Dynamic colors', function () {
     describe('DOCX formatter methods', function () {
       describe('getAndConvertColorDocx', function () {
         // convert the color as RGB
-        // convert the color as color
-        // test error - pass an empty new color
+        it('should convert the RGB color to an hexadecimal color', function() {
+          helper.assert(colorFormatters.getAndConvertColorDocx.apply({}, [{ r : 255, g : 255, b : 0}, 'rgb', 'textColor']), 'ffff00');
+        });
+        it('should convert the color name to an hexadecimal color', function () {
+          helper.assert(colorFormatters.getAndConvertColorDocx.apply({}, ['red', 'color', 'textColor']), 'ff0000');
+        });
+        it('should return an empty string if the new color is undefined', function () {
+          helper.assert(colorFormatters.getAndConvertColorDocx.apply({}, [undefined, 'color', 'textColor']), '');
+        });
       });
     });
   });

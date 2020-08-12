@@ -1,6 +1,7 @@
 const color = require('../lib/color');
 const helper = require('../lib/helper');
 const assert = require('assert');
+const colorFormatters = require('../formatters/color');
 
 describe.only('Dynamic colors', function () {
   describe('ODT Files', function () {
@@ -578,6 +579,94 @@ describe.only('Dynamic colors', function () {
         });
       });
     });
+
+    describe('ODS/ODT post process formatters', function () {
+      describe('updateColorAndGetReferenceLo + addColorDatabase + getNewColorReferencePostProcessingLo', function () {
+        it.only('should save in the colorDatabase Map the color Pair, generate a unique ID and return a new color reference', function () {
+          const _options = {
+            colorDatabase : new Map()
+          };
+          const _postProcess = colorFormatters.updateColorAndGetReferenceLo.apply(_options, ['#ff0000', '38A291', 'P1']);
+          helper.assert(_options.colorDatabase.has('#ff000038A291P1'), true);
+          helper.assert(_options.colorDatabase.get('#ff000038A291P1'),
+            {
+              id     : 0,
+              colors : [
+                {
+                  newColor : '#ff0000',
+                  oldColor : '38A291'
+                }
+              ],
+              styleName : 'P1'
+            });
+          const _colorReference = _postProcess.fn.apply(_options, _postProcess.args);
+          helper.assert(_colorReference, 'CC0');
+        });
+        it.only('should save in the colorDatabase Map multiple color pair (rgb + hsl + static color), generate a unique IDs and return color references', function () {
+          const _options = {
+            colorDatabase : new Map()
+          };
+          // First Color
+          const _postProcess1 = colorFormatters.updateColorAndGetReferenceLo.apply(_options, ['ff0000', '38A291', 'P1']);
+          helper.assert(_options.colorDatabase.has('ff000038A291P1'), true);
+          helper.assert(_postProcess1.fn.apply(_options, _postProcess1.args), 'CC0');
+          // Second Color
+          const _postProcess2 = colorFormatters.updateColorAndGetReferenceLo.apply(_options, [{r : 0, g : 255, b : 0 }, '0000ff', 'P2']);
+          helper.assert(_options.colorDatabase.has('{"r":0,"g":255,"b":0}0000ffP2'), true);
+          helper.assert(_options.colorDatabase.get('{"r":0,"g":255,"b":0}0000ffP2'),
+            {
+              id     : 1,
+              colors : [
+                {
+                  newColor : {
+                    r : 0,
+                    g : 255,
+                    b : 0
+                  },
+                  oldColor : '0000ff'
+                }
+              ],
+              styleName : 'P2'
+            });
+          helper.assert(_postProcess2.fn.apply(_options, _postProcess2.args), 'CC1');
+          // Third Color
+          const _postProcess3 = colorFormatters.updateColorAndGetReferenceLo.apply(_options, [{h : 300, s : 100, l : 20 }, '12e2ff', 'P3']);
+          helper.assert(_options.colorDatabase.has('{"h":300,"s":100,"l":20}12e2ffP3'), true);
+          helper.assert(_options.colorDatabase.get('{"h":300,"s":100,"l":20}12e2ffP3'),
+            {
+              id     : 2,
+              colors : [
+                {
+                  newColor : {
+                    h : 300,
+                    s : 100,
+                    l : 20
+                  },
+                  oldColor : '12e2ff'
+                }
+              ],
+              styleName : 'P3'
+            });
+          helper.assert(_postProcess3.fn.apply(_options, _postProcess3.args), 'CC2');
+          // Fourth Color
+          const _postProcess4 = colorFormatters.updateColorAndGetReferenceLo.apply(_options, [null, 'ff00ff', 'Ce2']);
+          helper.assert(_options.colorDatabase.has('nullff00ffCe2'), true);
+          helper.assert(_options.colorDatabase.get('nullff00ffCe2'),
+            {
+              id     : 3,
+              colors : [
+                {
+                  newColor : null,
+                  oldColor : 'ff00ff'
+                }
+              ],
+              styleName : 'Ce2'
+            });
+          helper.assert(_postProcess4.fn.apply(_options, _postProcess4.args), 'CC3');
+        });
+        // test if a color is undefined (error: C_ERROR)
+      });
+    });
   });
 
   describe('DOCX', function () {
@@ -661,6 +750,14 @@ describe.only('Dynamic colors', function () {
         helper.assert(_template.files[0].data, _expectedXML);
       });
 
+    });
+
+    describe('DOCX formatter methods', function () {
+      describe('getAndConvertColorDocx', function () {
+        // convert the color as RGB
+        // convert the color as color
+        // test error - pass an empty new color
+      });
     });
   });
 

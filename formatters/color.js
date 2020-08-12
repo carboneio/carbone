@@ -32,7 +32,7 @@ function addColorDatabase (options, colorId, styleName, colors) {
  *
  * @private
  */
-function updateColorAndGetReference () {
+function updateColorAndGetReferenceLo () {
   let _newColorId = '';
   let _styleName = '';
   let _colors = [];
@@ -60,12 +60,12 @@ function updateColorAndGetReference () {
 
   // return a function to call at the end of the building process
   return {
-    fn   : getColorOdtReferencePostProcessing,
+    fn   : getNewColorReferencePostProcessingLo,
     args : [_newColorId]
   };
 }
 
-function getColorOdtReferencePostProcessing (colorId) {
+function getNewColorReferencePostProcessingLo (colorId) {
   const _colorData = this.colorDatabase.get(colorId);
   return  color.getColorReference(_colorData.id);
 }
@@ -81,7 +81,7 @@ function getAndConvertColorDocx (colorName, colorType, elementType) {
 }
 
 module.exports = {
-  updateColorAndGetReference,
-  getColorOdtReferencePostProcessing,
+  updateColorAndGetReferenceLo,
+  getNewColorReferencePostProcessingLo,
   getAndConvertColorDocx
 };

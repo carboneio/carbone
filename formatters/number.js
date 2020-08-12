@@ -90,14 +90,17 @@ function _format (value, format, precision = 3) {
 }
 
 /**
- * Format number according to the locale
+ * Format number according to the locale.
+ * Applying a number of decimals depends on the report type:
+ * - For ODS/XLSX, the number of decimals has to be formatted based on the text editor.
+ * - For the other type of files, the number of decimals depends on the `precision` parameter passed to the formatter.
  *
  * @exampleContext {"lang":"en-us"}
  * @example ["10"          ]
  * @example ["1000.456"    ]
  *
  * @param  {Number} d          Number to format
- * @param  {Number} precision  [optional] Number of decimal
+ * @param  {Number} precision  [optional] Number of decimals
  * @return {String} return     converted values
  */
 function formatN (d, precision) {

@@ -1,4 +1,3 @@
-/* eslint-disable eqeqeq */
 const locale   = require('./_locale.js');
 const currency = require('./_currency.js');
 

@@ -2512,10 +2512,10 @@ describe('Carbone', function () {
     it.skip('should re-generate r=1, c=A1 in Excel documents');
     it.skip('should not remove empty cells in XLSX files (needs pre-processing to add empty cells)');
 
-    it('should render a template (docx) and update the table of content by using libre office (loRendering set to true)', function (done) {
+    it('should render a template (docx) and update the table of content by using libre office (hardRefresh set to true)', function (done) {
       var options = {
         convertTo   : 'docx',
-        loRendering : true
+        hardRefresh : true
       };
       carbone.render('test_docx_refresh_table_of_content.docx', {}, options, function (err, result) {
         assert.equal(err, null);

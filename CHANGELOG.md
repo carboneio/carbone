@@ -2,7 +2,7 @@
   - Performance: huge gain from x11 to x30 for the compression of reports.
     Now, some huge reports takes 0.1s to render instead of 4s.
     It reduces also the blocking of Node's event loop.
-  - New rendering option `hardRefresh`: The content of the report is refreshed at the end of the Carbone process. For example, it can be used to refresh the table of content, update calculations, etc...
+  - New rendering option `hardRefresh`: The content of the report is refreshed at the end of the Carbone process. For example, it can be used to refresh the table of content or update calculations.
 
 ### v2.0.2
   - Release August 10th, 2020

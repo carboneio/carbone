@@ -165,7 +165,9 @@ function formatC (d, precisionOrFormat) {
     return _formatFn(_valueRaw,
       _currencyInfo.symbol,
       _currencyInfo.minSymbol,
+      // eslint-disable-next-line eqeqeq
       (d != 1 ? _currencyInfo.major + 's' : _currencyInfo.major),
+      // eslint-disable-next-line eqeqeq
       (d != 1 ? _currencyInfo.minor + 's' : _currencyInfo.minor),
       _currencyInfo.name
     );

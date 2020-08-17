@@ -3,7 +3,7 @@ const helper = require('../lib/helper');
 const assert = require('assert');
 const colorFormatters = require('../formatters/color');
 
-describe.only('Dynamic colors', function () {
+describe('Dynamic colors', function () {
   describe('ODT Files', function () {
     describe('ODT/ODS pre processor methods', function () {
       describe('preProcessLo', function () {

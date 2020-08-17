@@ -50,10 +50,12 @@ describe('builder', function () {
       helper.assert(_safeAccessor.getDictionary(), ['YYYY MM DD']);
     });
     it('should keep anti-slash quotes', function () {
+      // eslint-disable-next-line no-useless-escape
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('YYYY \' MM DD')" ], _testedFormatters);
       helper.assert(_safeAccessor.getDictionary(), ['YYYY \' MM DD']);
     });
     it('should keep parenthesis in the string', function () {
+      // eslint-disable-next-line no-useless-escape
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('(YYYY) \' (MM) DD')" ], _testedFormatters);
       helper.assert(_safeAccessor.getDictionary(), ['(YYYY) \' (MM) DD']);
     });

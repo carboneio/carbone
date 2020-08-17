@@ -22,8 +22,8 @@
   ],
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
-    "lint": "eslint ./*/**.js",
-    "lint:fix": "eslint ./*/**.js --fix",
+    "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
+    "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {

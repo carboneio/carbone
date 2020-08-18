@@ -247,7 +247,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
   });
 
   describe('DOCX MS document', function () {
-    describe('[Full test] DOCX', function() {
+    describe('[Full test] DOCX', function () {
 
       it('should do nothing if there is no marker inside the XML (created from LO)', function (done) {
         const _testedReport = 'docx-simple-without-marker';
@@ -461,7 +461,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
   });
 
   describe('XLSX documents', function () {
-    describe('[Full test] XLSX', function() {
+    describe('[Full test] XLSX', function () {
       it('should do nothing if there is no marker inside the XML', function (done) {
         const _testedReport = 'xlsx-simple-without-marker';
         const _data = {

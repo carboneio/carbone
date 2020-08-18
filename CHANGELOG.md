@@ -1,3 +1,6 @@
+### v2.0.3
+  - [EE] fix dynamic images in header & footers of docx templates
+
 ### v2.0.2
   - Release August 10th, 2020
   - Fix locales de-ch and pt-br

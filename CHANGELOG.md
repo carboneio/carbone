@@ -1,4 +1,5 @@
 ### v2.0.3
+  - [EE] fix dynamic images in header & footers of docx templates
   - Injecting dynamic colors received a lot of improvements and stability:
     - ODT, DOCX, and ODS reports are fully supported. XLSX can't be supported by design for now.
     - Better error management, it throws errors when:
@@ -9,6 +10,7 @@
       - 2 different lists of colors are used to edit the same element
 
 ### v2.0.2
+  - Release August 10th, 2020
   - Fix locales de-ch and pt-br
   - Fix direct access in a nested array `{d.array[i].nestedArray[i=0].id}`
   - [EE] : fix server exit on "Ctrl+C"

@@ -26,13 +26,13 @@ function addImageDatabase (options, urlOrBase64, imageSourceProperties = undefin
     return;
   }
   if (imageSourceProperties) {
-    // Merge array properties before the mergeObjects call. It is used by XLSX templates with images.
+    // Merge array properties before the mergeObjects call. It is used by XLSX/DOCX templates with images.
     if (imageSourceProperties && typeof imageSourceProperties.sheetIds === 'object' &&
         _imageDatabaseProperties && typeof _imageDatabaseProperties.sheetIds === 'object') {
       imageSourceProperties.sheetIds.push(..._imageDatabaseProperties.sheetIds);
     }
     // Merge all properties coming from imageSourceProperties into _imageDatabaseProperties
-    // Properties: imageSourceWidth, imageSourceHeight (DOCX) and sheetIds (XLSX)
+    // Properties: imageSourceWidth, imageSourceHeight (DOCX) and sheetIds (XLSX/DOCX)
     _imageDatabaseProperties = helper.mergeObjects(_imageDatabaseProperties, imageSourceProperties);
   }
   options.imageDatabase.set(urlOrBase64, _imageDatabaseProperties);
@@ -131,8 +131,12 @@ function generateOpenDocumentImageMimeType (urlOrBase64) {
  * @param   {String} urlOrBase64 image data (link or base64)
  * @returns {String}             generated link for OpenDocument
  */
-function generateImageDocxReference (urlOrBase64) {
-  addImageDatabase(this, urlOrBase64);
+function generateImageDocxReference (urlOrBase64, fileName) {
+  let _imageProperties = {};
+  if (fileName) {
+    _imageProperties.sheetIds = [fileName];
+  }
+  addImageDatabase(this, urlOrBase64, _imageProperties);
   // return a function to call at the end of the building process
   return {
     fn   : generateImageReferencePostProcessing,

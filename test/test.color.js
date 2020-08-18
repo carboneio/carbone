@@ -949,7 +949,7 @@ describe('Dynamic colors', function () {
 
       });
 
-      it ('should replace 2 text colors and a background color with a marker + formatter', function () {
+      it('should replace 2 text colors and a background color with a marker + formatter', function () {
         const _template = {
           files : [{
             name : 'word/document.xml',
@@ -959,6 +959,42 @@ describe('Dynamic colors', function () {
         const _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="{d.color1:getAndConvertColorDocx(#hexa, textColor)}"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="{d.color1:getAndConvertColorDocx(#hexa, textColor)}"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t></w:t></w:r></w:p><w:p><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t></w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr><w:color w:val="{d.color6:getAndConvertColorDocx(hsl, textColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="{d.color6:getAndConvertColorDocx(hsl, textColor)}"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{d.lastname}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr><w:t></w:t></w:r></w:p></w:body></w:document>';
         color.preProcessDocx(_template);
         helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it('should replace colors in the header and footer', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p w14:paraId="7E72D57D" w14:textId="77777777" w:rsidR="00D57CD1" w:rsidRDefault="00B14014"><w:pPr><w:spacing w:line="279" w:lineRule="atLeast"/></w:pPr><w:r><w:rPr><w:color w:val="000000"/></w:rPr><w:t>{</w:t></w:r><w:proofErr w:type="spellStart"/><w:proofErr w:type="gramStart"/><w:r><w:rPr><w:color w:val="000000"/></w:rPr><w:t>bindColor</w:t></w:r><w:proofErr w:type="spellEnd"/><w:r><w:rPr><w:color w:val="000000"/></w:rPr><w:t>(</w:t></w:r><w:proofErr w:type="gramEnd"/><w:r><w:rPr><w:color w:val="000000"/></w:rPr><w:t>yellow</w:t></w:r><w:r><w:rPr><w:color w:val="000000"/></w:rPr><w:t xml:space="preserve">, </w:t></w:r><w:proofErr w:type="spellStart"/><w:r><w:rPr><w:color w:val="000000"/></w:rPr><w:t>color</w:t></w:r><w:proofErr w:type="spellEnd"/><w:r><w:rPr><w:color w:val="000000"/></w:rPr><w:t>) = d.color3}</w:t></w:r></w:p></w:body></w:document>'
+          },
+          {
+            name : 'word/header2.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr><w:p w14:paraId="769384A4" w14:textId="77777777" w:rsidR="00870089" w:rsidRDefault="00870089" w:rsidP="00870089"><w:pPr><w:rPr><w:color w:val="FF0000"/><w:highlight w:val="yellow"/></w:rPr></w:pPr></w:p><w:p w14:paraId="095A1BDF" w14:textId="77777777" w:rsidR="00870089" w:rsidRDefault="00870089" w:rsidP="00870089"><w:pPr><w:rPr><w:color w:val="FF0000"/><w:highlight w:val="yellow"/></w:rPr></w:pPr></w:p><w:p w14:paraId="5483BD9B" w14:textId="50FC70D8" w:rsidR="00870089" w:rsidRPr="00B3635C" w:rsidRDefault="00870089" w:rsidP="00B3635C"><w:pPr><w:spacing w:line="279" w:lineRule="atLeast"/></w:pPr><w:r><w:rPr><w:color w:val="FF0000"/><w:highlight w:val="yellow"/></w:rPr><w:t>{d.name}</w:t></w:r><w:r w:rsidR="00B3635C"><w:rPr><w:color w:val="FF0000"/><w:highlight w:val="yellow"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r w:rsidR="00B3635C"><w:rPr><w:color w:val="000000"/></w:rPr><w:t>{</w:t></w:r><w:proofErr w:type="spellStart"/><w:proofErr w:type="gramStart"/><w:r w:rsidR="00B3635C"><w:rPr><w:color w:val="000000"/></w:rPr><w:t>bindColor</w:t></w:r><w:proofErr w:type="spellEnd"/><w:r w:rsidR="00B3635C"><w:rPr><w:color w:val="000000"/></w:rPr><w:t>(</w:t></w:r><w:proofErr w:type="gramEnd"/><w:r w:rsidR="00B3635C"><w:rPr><w:color w:val="000000"/></w:rPr><w:t>ff0000, #hexa) = d.color</w:t></w:r><w:r w:rsidR="00583D40"><w:rPr><w:color w:val="000000"/></w:rPr><w:t>2</w:t></w:r><w:r w:rsidR="00B3635C"><w:rPr><w:color w:val="000000"/></w:rPr><w:t>}</w:t></w:r></w:p><w:p w14:paraId="7FEDA80B" w14:textId="77777777" w:rsidR="00870089" w:rsidRDefault="00870089"><w:pPr><w:pStyle w:val="Header"/><w:rPr><w:rFonts w:hint="eastAsia"/></w:rPr></w:pPr></w:p></w:hdr>'
+          },
+          {
+            name : 'word/footer2.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr><w:p w14:paraId="228A1212" w14:textId="3F11F73D" w:rsidR="00870089" w:rsidRDefault="00870089" w:rsidP="00870089"><w:pPr><w:spacing w:line="279" w:lineRule="atLeast"/></w:pPr><w:r><w:rPr><w:color w:val="0000FF"/></w:rPr><w:t>{</w:t></w:r><w:proofErr w:type="spellStart"/><w:r><w:rPr><w:color w:val="0000FF"/></w:rPr><w:t>d.lastname</w:t></w:r><w:proofErr w:type="spellEnd"/><w:r><w:rPr><w:color w:val="0000FF"/></w:rPr><w:t>}</w:t></w:r><w:r><w:rPr><w:color w:val="0000FF"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r><w:t>{</w:t></w:r><w:proofErr w:type="spellStart"/><w:r><w:t>bindColor</w:t></w:r><w:proofErr w:type="spellEnd"/><w:r><w:t xml:space="preserve">(0000ff, </w:t></w:r><w:r w:rsidR="00656DC2"><w:t>color</w:t></w:r><w:r><w:t>) = d.</w:t></w:r><w:r w:rsidR="00A150F9"><w:t>color</w:t></w:r><w:r w:rsidR="00656DC2"><w:t>4</w:t></w:r><w:r w:rsidR="00A150F9"><w:t xml:space="preserve"></w:t></w:r><w:r><w:t>}</w:t></w:r></w:p><w:p w14:paraId="04E41FC2" w14:textId="77777777" w:rsidR="00870089" w:rsidRPr="00870089" w:rsidRDefault="00870089" w:rsidP="00870089"><w:pPr><w:spacing w:line="279" w:lineRule="atLeast"/></w:pPr></w:p><w:p w14:paraId="0E3F20E9" w14:textId="77777777" w:rsidR="00870089" w:rsidRDefault="00870089"><w:pPr><w:pStyle w:val="Footer"/><w:rPr><w:rFonts w:hint="eastAsia"/></w:rPr></w:pPr></w:p></w:ftr>'
+          }]
+        };
+
+        const _expectedTemplate = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p w14:paraId="7E72D57D" w14:textId="77777777" w:rsidR="00D57CD1" w:rsidRDefault="00B14014"><w:pPr><w:spacing w:line="279" w:lineRule="atLeast"/></w:pPr><w:r><w:rPr><w:color w:val="000000"/></w:rPr><w:t></w:t></w:r></w:p></w:body></w:document>'
+          },
+          {
+            name : 'word/header2.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr><w:p w14:paraId="769384A4" w14:textId="77777777" w:rsidR="00870089" w:rsidRDefault="00870089" w:rsidP="00870089"><w:pPr><w:rPr><w:color w:val="{d.color2:getAndConvertColorDocx(#hexa, textColor)}"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr></w:p><w:p w14:paraId="095A1BDF" w14:textId="77777777" w:rsidR="00870089" w:rsidRDefault="00870089" w:rsidP="00870089"><w:pPr><w:rPr><w:color w:val="{d.color2:getAndConvertColorDocx(#hexa, textColor)}"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr></w:p><w:p w14:paraId="5483BD9B" w14:textId="50FC70D8" w:rsidR="00870089" w:rsidRPr="00B3635C" w:rsidRDefault="00870089" w:rsidP="00B3635C"><w:pPr><w:spacing w:line="279" w:lineRule="atLeast"/></w:pPr><w:r><w:rPr><w:color w:val="{d.color2:getAndConvertColorDocx(#hexa, textColor)}"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t>{d.name}</w:t></w:r><w:r w:rsidR="00B3635C"><w:rPr><w:color w:val="{d.color2:getAndConvertColorDocx(#hexa, textColor)}"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r w:rsidR="00B3635C"><w:rPr><w:color w:val="000000"/></w:rPr><w:t></w:t></w:r></w:p><w:p w14:paraId="7FEDA80B" w14:textId="77777777" w:rsidR="00870089" w:rsidRDefault="00870089"><w:pPr><w:pStyle w:val="Header"/><w:rPr><w:rFonts w:hint="eastAsia"/></w:rPr></w:pPr></w:p></w:hdr>'
+          },
+          {
+            name : 'word/footer2.xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr><w:p w14:paraId="228A1212" w14:textId="3F11F73D" w:rsidR="00870089" w:rsidRDefault="00870089" w:rsidP="00870089"><w:pPr><w:spacing w:line="279" w:lineRule="atLeast"/></w:pPr><w:r><w:rPr><w:color w:val="{d.color4:getAndConvertColorDocx(color, textColor)}"/></w:rPr><w:t>{</w:t></w:r><w:proofErr w:type="spellStart"/><w:r><w:rPr><w:color w:val="{d.color4:getAndConvertColorDocx(color, textColor)}"/></w:rPr><w:t>d.lastname</w:t></w:r><w:proofErr w:type="spellEnd"/><w:r><w:rPr><w:color w:val="{d.color4:getAndConvertColorDocx(color, textColor)}"/></w:rPr><w:t>}</w:t></w:r><w:r><w:rPr><w:color w:val="{d.color4:getAndConvertColorDocx(color, textColor)}"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r><w:t></w:t></w:r></w:p><w:p w14:paraId="04E41FC2" w14:textId="77777777" w:rsidR="00870089" w:rsidRPr="00870089" w:rsidRDefault="00870089" w:rsidP="00870089"><w:pPr><w:spacing w:line="279" w:lineRule="atLeast"/></w:pPr></w:p><w:p w14:paraId="0E3F20E9" w14:textId="77777777" w:rsidR="00870089" w:rsidRDefault="00870089"><w:pPr><w:pStyle w:val="Footer"/><w:rPr><w:rFonts w:hint="eastAsia"/></w:rPr></w:pPr></w:p></w:ftr>'
+          }]
+        };
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedTemplate.files[0].data);
+        helper.assert(_template.files[1].data, _expectedTemplate.files[1].data);
+        helper.assert(_template.files[2].data, _expectedTemplate.files[2].data);
       });
 
     });

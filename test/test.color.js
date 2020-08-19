@@ -1197,15 +1197,21 @@ describe('Dynamic colors', function () {
         helper.assert(color.colorFormatConverter.color('yellow', 'docx', color.elementTypes.TEXT_BG_COLOR), 'yellow');
       });
 
-      it('["color" method] should throw an error if the color name does not exist and should find an alternative color [1].', function () {
+      it('["color" method] should throw an error if the color name does not exist and should find an alternative color [1] [DOCX].', function () {
         assert.throws(() => color.colorFormatConverter.color('greem', 'docx'), {
           message : 'Carbone bindColor warning: the color "greem" does not exist. Do you mean "green"?'
         });
       });
 
-      it('["color" method] should throw an error if the color name does not exist and should find an alternative color [2].', function () {
+      it('["color" method] should throw an error if the color name does not exist and should find an alternative color [2] [DOCX].', function () {
         assert.throws(() => color.colorFormatConverter.color('darkGrey', 'docx'), {
           message : 'Carbone bindColor warning: the color "darkGrey" does not exist. Do you mean "darkGray"?'
+        });
+      });
+
+      it('["color" method for DOCX] should throw an error if the color background name used is "transparent".', function () {
+        assert.throws(() => color.colorFormatConverter.color('transparent', 'docx', 'textBackgroundColor'), {
+          message : 'Carbone bindColor warning: DOCX document does not support "transparent" as a background color.'
         });
       });
 

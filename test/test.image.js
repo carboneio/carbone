@@ -9,7 +9,7 @@ const nock      = require('nock');
 require('mocha-sinon');
 
 
-describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
+describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -458,7 +458,196 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         done();
       });
     });
-    describe.only('DOCX postprocess XML - defineImageContentTypeDocx', function () {
+
+    describe('DOCX postProcessDocx ', function () {
+      it ('should do nothing if imageDatabase is empty', function () {
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>';
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : _expectedContent
+          }]
+        };
+        const _options = {
+          imageDatabase : new Map()
+        };
+        image.postProcessDocx(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+      });
+
+      it ('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>',
+          },
+          {
+            name : '[Content_Types].xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>';
+        const _expectedContentType = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/></Types>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('carbone.io/logo.png', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'png'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1].data, _expectedContentType);
+        helper.assert(_template.files[2], {
+          name   : 'word/media/CarboneImage0.png',
+          parent : '',
+          data   : '1234'
+        });
+      });
+
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define a different media path because the template is coming from word online', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/image2.png" Id="R1e71cf0a0beb4eb3" /></Relationships>',
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/image2.png" Id="R1e71cf0a0beb4eb3" /><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/CarboneImage0.gif" Id="rIdCarbone0"/></Relationships>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.gif', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'gif'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1], {
+          name   : 'media/CarboneImage0.gif',
+          parent : '',
+          data   : '1234'
+        });
+      });
+
+      it('should add multiple images references into "word/_rels/document.xml.rels" by using imageDatabase', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>',
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage1.jpg" Id="rIdCarbone1"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage2.svg" Id="rIdCarbone2"/></Relationships>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.png', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'png'
+        });
+        _options.imageDatabase.set('image.jpg', {
+          data      : '5678',
+          id        : 1,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'jpg'
+        });
+        _options.imageDatabase.set('image.svg', {
+          data      : '9101112',
+          id        : 2,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'svg'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1], {
+          name   : 'word/media/CarboneImage0.png',
+          parent : '',
+          data   : '1234'
+        });
+        helper.assert(_template.files[2], {
+          name   : 'word/media/CarboneImage1.jpg',
+          parent : '',
+          data   : '5678'
+        });
+        helper.assert(_template.files[3], {
+          name   : 'word/media/CarboneImage2.svg',
+          parent : '',
+          data   : '9101112'
+        });
+      });
+
+      it('should add image references into the document, header and footer by using imageDatabase and should save the new image only one time on the object `template.files`', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/header1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/header2.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/footer1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/footer2.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          }]
+        };
+        const _expectedTemplate = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/header1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/header2.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/footer1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/footer2.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name   : 'word/media/CarboneImage0.png',
+            parent : '',
+            data   : '1234'
+          }]
+        };
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.png', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml', 'header2.xml', 'footer1.xml' ],
+          extension : 'png'
+        });
+        image.postProcessDocx(_template, null, _options);
+        _template.files.forEach((file, $index) => {
+          helper.assert(file.data, _expectedTemplate.files[$index].data);
+        });
+      });
+    });
+
+    describe('DOCX pdefineImageContentTypeDocx (part of postProcessDocx)', function () {
       it('should not add the image type definition if the image type list is empty []', function () {
         const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
                             '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+

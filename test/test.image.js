@@ -458,6 +458,96 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         done();
       });
     });
+    describe.only('DOCX postprocess XML - defineImageContentTypeDocx', function () {
+      it('should not add the image type definition if the image type list is empty []', function () {
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                            '<Default Extension="xml" ContentType="application/xml"/></Types>';
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : _expectedXml
+            }
+          ]
+        };
+        image.defineImageContentTypeDocx(_template, []);
+        helper.assert(_template.files[0].data, _expectedXml);
+      });
+      it ('should add the image type definition [PNG, JPG, SVG]', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                    '<Default Extension="xml" ContentType="application/xml"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                            '<Default Extension="xml" ContentType="application/xml"/>'+
+                            '<Default Extension="png" ContentType="image/png"/>'+
+                            '<Default Extension="jpg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
+        image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'svg']);
+        helper.assert(_template.files[0].data, _expectedXml);
+      });
+      it ('should not add the image type definition multiple times [PNG, JPG, PNG, JPEG, SVG, SVG]', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                    '<Default Extension="xml" ContentType="application/xml"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                            '<Default Extension="xml" ContentType="application/xml"/>'+
+                            '<Default Extension="png" ContentType="image/png"/>'+
+                            '<Default Extension="jpg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
+        image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'png', 'jpeg', 'svg', 'svg', 'jpg']);
+        helper.assert(_template.files[0].data, _expectedXml);
+      });
+      it ('should not add the image type definition if the image mime type format does not exist [PNG, JPG, SVG, JSON, HTML]', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                    '<Default Extension="xml" ContentType="application/xml"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                            '<Default Extension="xml" ContentType="application/xml"/>'+
+                            '<Default Extension="png" ContentType="image/png"/>'+
+                            '<Default Extension="jpg" ContentType="image/jpeg"/></Types>';
+        image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'json', 'html']);
+        helper.assert(_template.files[0].data, _expectedXml);
+      });
+    });
   });
 
   describe('XLSX documents', function () {

@@ -145,7 +145,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
     });
   });
 
-  describe('Pre Processor methods for LO (ODT/ODS)', function () {
+  describe('Methods for LO (ODT/ODS)', function () {
     describe('preProcessLo', function () {
       it('should replace the main document tag attributes with image markers and formaters (ODT/ODS XML from LO) (unit: CM)', function (done) {
         let template = {
@@ -244,10 +244,70 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, undefined), true);
       });
     });
+
+    describe('postProcessLo', function () {
+      it('should insert an image references in META-INF/manifest.xml', function () {
+        const _template = {
+          files : [{
+            name : 'META-INF/manifest.xml',
+            data : '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" manifest:media-type="image/jpeg"/></manifest:manifest>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" manifest:media-type="image/jpeg"/><manifest:file-entry manifest:full-path="Pictures/CarboneImage1.jpeg" manifest:media-type="image/jpeg"/></manifest:manifest>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.jpeg', {
+          mimetype  : 'image/jpeg',
+          extension : 'jpeg',
+          id        : 1,
+          data      : '1234',
+        });
+        image.postProcessLo(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1], { name : 'Pictures/CarboneImage1.jpeg', parent : '', data : '1234' });
+      });
+
+      it('should insert images references in META-INF/manifest.xml', function () {
+        const _template = {
+          files : [{
+            name : 'META-INF/manifest.xml',
+            data : '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" manifest:media-type="image/jpeg"/></manifest:manifest>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" manifest:media-type="image/jpeg"/><manifest:file-entry manifest:full-path="Pictures/CarboneImage0.jpeg" manifest:media-type="image/jpeg"/><manifest:file-entry manifest:full-path="Pictures/CarboneImage1.png" manifest:media-type="image/png"/><manifest:file-entry manifest:full-path="Pictures/CarboneImage2.gif" manifest:media-type="image/gif"/></manifest:manifest>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.jpeg', {
+          mimetype  : 'image/jpeg',
+          extension : 'jpeg',
+          id        : 0,
+          data      : '1234',
+        });
+        _options.imageDatabase.set('logo.png', {
+          mimetype  : 'image/png',
+          extension : 'png',
+          id        : 1,
+          data      : '5678',
+        });
+        _options.imageDatabase.set('logo.gif', {
+          mimetype  : 'image/gif',
+          extension : 'gif',
+          id        : 2,
+          data      : '9101112',
+        });
+        image.postProcessLo(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1], { name : 'Pictures/CarboneImage0.jpeg', parent : '', data : '1234' });
+        helper.assert(_template.files[2], { name : 'Pictures/CarboneImage1.png', parent : '', data : '5678' });
+        helper.assert(_template.files[3], { name : 'Pictures/CarboneImage2.gif', parent : '', data : '9101112' });
+      });
+    });
   });
 
   describe('DOCX MS document', function () {
-    describe('[Full test] DOCX', function() {
+    describe('[Full test] DOCX', function () {
 
       it('should do nothing if there is no marker inside the XML (created from LO)', function (done) {
         const _testedReport = 'docx-simple-without-marker';
@@ -740,7 +800,7 @@ describe.only('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () 
   });
 
   describe('XLSX documents', function () {
-    describe('[Full test] XLSX', function() {
+    describe('[Full test] XLSX', function () {
       it('should do nothing if there is no marker inside the XML', function (done) {
         const _testedReport = 'xlsx-simple-without-marker';
         const _data = {

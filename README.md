@@ -42,7 +42,7 @@
 >   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
 >   - The website and Carbone Render/Studio will be updated this week
 
-Read this in other languages: [简体中文](./.github/README.zh-cn.md), [English](README.md)
+Read this in other languages: [简体中文](./doc/README.zh-cn.md), [English](README.md)
 
 ## Table of content
 

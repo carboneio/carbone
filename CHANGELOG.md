@@ -1,16 +1,19 @@
+### v2.0.4
+  - [EE] fix dynamic images in DOCX files that were making the report invalid in Word
+
 ### v2.0.3
   - [EE] fix dynamic images in header & footers of docx templates
 
 ### v2.0.2
   - Release August 10th, 2020
   - Fix locales de-ch and pt-br
-  - Fix direct access in a nested array `{d.array[i].nestedArray[i=0].id}` 
+  - Fix direct access in a nested array `{d.array[i].nestedArray[i=0].id}`
   - [EE] : fix server exit on "Ctrl+C"
 
 ### v2.0.1
   - Release July 8th, 2020
   - Add regression tests
-  - [EE] : fix crash when an array was printed directly without formatters `{d.myArray}` 
+  - [EE] : fix crash when an array was printed directly without formatters `{d.myArray}`
 
 ### v2.0.0
   - Release June 28th, 2020
@@ -51,7 +54,7 @@
     You cannot access arrays<br>
     `{d.subObject.qtyB:add(..subArray[0].qtyE)}` => [[C_ERROR]] subArray[0] not defined
 
-  - ⚡️ **New conditional formatters, and a new IF-block system to hide/show a part of the document** 
+  - ⚡️ **New conditional formatters, and a new IF-block system to hide/show a part of the document**
 
     - `ifEQ  (value)` : Matches values that are equal to a specified value, it replaces `ifEqual`
     - `ifNE  (value)` : Matches all values that are not equal to a specified value
@@ -63,8 +66,8 @@
     - `ifNIN (value)` : Matches none of the values specified in an array or string
     - `ifEM  (value)` : Matches empty values, string, arrays or objects, it replaces `ifEmpty`
     - `ifNEM (value)` : Matches not empty values, string, arrays or objects
-    - `and   (value)` : AND operator between two consecutive conditional formatters 
-    - `or    (value)` : (default) OR operator between two consecutive conditional formatters 
+    - `and   (value)` : AND operator between two consecutive conditional formatters
+    - `or    (value)` : (default) OR operator between two consecutive conditional formatters
     - `hideBegin` and `hideEnd` : hide text block between hideBegin and hideEnd if condition is true
     - `showBegin` and `showEnd` : show a text block between showBegin and showEnd if condition is true
     - `show (message)`          : print a message if condition is true
@@ -110,7 +113,7 @@
     }
     ```
 
-    In the report: 
+    In the report:
     ```
       {d.myObject[i].att} {d.myObject[i].val}
       {d.myObject[i+1].att} {d.myObject[i+1].val}
@@ -130,7 +133,7 @@
         {d.movies[i].subObject.name}
         {d.movies[i+1].subObject.name}
       {d.countries[i+1].name}
-    ``` 
+    ```
   - Fix: avoid crashing when a sub-object is null or undefined in data
   - Fix: avoid crashing when the parent object of an array is null or undefined in data
   - Eslint code + add eslint tools
@@ -140,7 +143,7 @@
     - first, draw a chart in MS Excel and replace your data with Carbone markers
     - datas of the chart should be placed at the top-left corner of the spreadsheet
     - all numbers are formatted with formatN() formatter
-  - Fix: accepts white-space in array filters with simple quote and double quotes 
+  - Fix: accepts white-space in array filters with simple quote and double quotes
     Example: `{d.cars[i, type='Tesla car'].name}`
              `{d.cars[i, type="Tesla car"].name}`
 

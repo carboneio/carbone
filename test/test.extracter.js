@@ -186,8 +186,8 @@ describe('extracter', function () {
           extracter.splitMarkers(_markers);
         },
         (err) => {
-          helper.assert(err instanceof Error, true)
-          helper.assert(err.toString(), 'Error: Cannot access parent object in "d.site...name" (too high)')
+          helper.assert(err instanceof Error, true);
+          helper.assert(err.toString(), 'Error: Cannot access parent object in "d.site...name" (too high)');
           return true;
         }
       );

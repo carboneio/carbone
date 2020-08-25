@@ -22,8 +22,8 @@
   ],
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
-    "lint": "eslint ./*/**.js",
-    "lint:fix": "eslint ./*/**.js --fix",
+    "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
+    "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "pdfjs-dist": "=2.2.228",
-    "eslint": "=7.3.1",
+    "eslint": "=7.7.0",
     "mocha": "=3.5.3",
     "mocha-sinon": "=2.1.2",
     "nock": "=12.0.0",

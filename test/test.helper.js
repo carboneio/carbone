@@ -112,7 +112,7 @@ describe('helper', function () {
     });
   });
 
-  
+
   describe('readFileDirSync', function () {
     beforeEach(function () {
       helper.rmDirRecursive(testPath);

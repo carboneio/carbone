@@ -72,6 +72,6 @@ function convDate (d, patternIn, patternOut) {
 
 
 module.exports = {
-  formatD : formatD,
+  formatD  : formatD,
   convDate : convDate
 };

@@ -145,7 +145,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     });
   });
 
-  describe('Pre Processor methods for LO (ODT/ODS)', function () {
+  describe('Methods for LO (ODT/ODS)', function () {
     describe('preProcessLo', function () {
       it('should replace the main document tag attributes with image markers and formaters (ODT/ODS XML from LO) (unit: CM)', function (done) {
         let template = {
@@ -242,6 +242,66 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, _marker), true);
         helper.assert(image._isImageListAnchorTypeBlockLO(undefined, _marker), true);
         helper.assert(image._isImageListAnchorTypeBlockLO(_xml, undefined), true);
+      });
+    });
+
+    describe('postProcessLo', function () {
+      it('should insert an image references in META-INF/manifest.xml', function () {
+        const _template = {
+          files : [{
+            name : 'META-INF/manifest.xml',
+            data : '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" manifest:media-type="image/jpeg"/></manifest:manifest>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" manifest:media-type="image/jpeg"/><manifest:file-entry manifest:full-path="Pictures/CarboneImage1.jpeg" manifest:media-type="image/jpeg"/></manifest:manifest>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.jpeg', {
+          mimetype  : 'image/jpeg',
+          extension : 'jpeg',
+          id        : 1,
+          data      : '1234',
+        });
+        image.postProcessLo(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1], { name : 'Pictures/CarboneImage1.jpeg', parent : '', data : '1234' });
+      });
+
+      it('should insert images references in META-INF/manifest.xml', function () {
+        const _template = {
+          files : [{
+            name : 'META-INF/manifest.xml',
+            data : '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" manifest:media-type="image/jpeg"/></manifest:manifest>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2"><manifest:file-entry manifest:full-path="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" manifest:media-type="image/jpeg"/><manifest:file-entry manifest:full-path="Pictures/CarboneImage0.jpeg" manifest:media-type="image/jpeg"/><manifest:file-entry manifest:full-path="Pictures/CarboneImage1.png" manifest:media-type="image/png"/><manifest:file-entry manifest:full-path="Pictures/CarboneImage2.gif" manifest:media-type="image/gif"/></manifest:manifest>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.jpeg', {
+          mimetype  : 'image/jpeg',
+          extension : 'jpeg',
+          id        : 0,
+          data      : '1234',
+        });
+        _options.imageDatabase.set('logo.png', {
+          mimetype  : 'image/png',
+          extension : 'png',
+          id        : 1,
+          data      : '5678',
+        });
+        _options.imageDatabase.set('logo.gif', {
+          mimetype  : 'image/gif',
+          extension : 'gif',
+          id        : 2,
+          data      : '9101112',
+        });
+        image.postProcessLo(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1], { name : 'Pictures/CarboneImage0.jpeg', parent : '', data : '1234' });
+        helper.assert(_template.files[2], { name : 'Pictures/CarboneImage1.png', parent : '', data : '5678' });
+        helper.assert(_template.files[3], { name : 'Pictures/CarboneImage2.gif', parent : '', data : '9101112' });
       });
     });
   });
@@ -381,7 +441,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -398,7 +458,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline wp14:editId="5C7CCEE1" wp14:anchorId="63CC715F"><wp:extent cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu)}" /><wp:effectExtent l="0" t="0" r="0" b="0" /><wp:docPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" title="" /><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1" /></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="0" name="" /><pic:cNvPicPr /></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.child.child.imageDE:generateImageDocxReference(documentName1234.xml)}"><a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a14:useLocalDpi val="0" xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" /></a:ext></a:extLst></a:blip><a:stretch><a:fillRect /></a:stretch></pic:blipFill><pic:spPr><a:xfrm rot="0" flipH="0" flipV="0"><a:off x="0" y="0" /><a:ext cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu)}" /></a:xfrm><a:prstGeom prst="rect"><a:avLst /></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline wp14:editId="5C7CCEE1" wp14:anchorId="63CC715F"><wp:extent cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu)}" /><wp:effectExtent l="0" t="0" r="0" b="0" /><wp:docPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" title="" /><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1" /></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" /><pic:cNvPicPr /></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.child.child.imageDE:generateImageDocxReference(documentName1234.xml)}"><a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a14:useLocalDpi val="0" xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" /></a:ext></a:extLst></a:blip><a:stretch><a:fillRect /></a:stretch></pic:blipFill><pic:spPr><a:xfrm rot="0" flipH="0" flipV="0"><a:off x="0" y="0" /><a:ext cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu)}" /></a:xfrm><a:prstGeom prst="rect"><a:avLst /></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -413,7 +473,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -428,7 +488,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="952500" cy="590550"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="952500" cy="590550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="952500" cy="590550"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="952500" cy="590550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helper.assert(template.files[0].data, expectedXML);
         done();
@@ -452,10 +512,289 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
           ]
         };
         image.preProcessDocx(template);
-        helper.assert(template.files[0].data, '<w:document><w:body><w:p w14:paraId="10D86908" w14:textId="594213EC" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="57033187" wp14:editId="308FFE5B"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu)}" cy="{d.tests.image:scaleImage(height, 702021, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 6" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="3" name="Picture 3" descr="{d.tests.image}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(document.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu)}" cy="{d.tests.image:scaleImage(height, 721727, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:body></w:document>');
-        helper.assert(template.files[1].data, '<w:ftr><w:p w14:paraId="570D5375" w14:textId="1642C3D9" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB" w:rsidP="00F040CB"><w:pPr><w:pStyle w:val="Footer"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="1A6006B2" wp14:editId="70ED8A3E"><wp:extent cx="{d.image:scaleImage(width, 925689, emu)}" cy="{d.image:scaleImage(height, 694318, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 7" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="Picture 2" descr="{d.image}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(footer2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu)}" cy="{d.image:scaleImage(height, 721508, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:ftr>');
-        helper.assert(template.files[2].data, '<w:hdr><w:p w14:paraId="50A57CAF" w14:textId="03063553" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34" w:rsidP="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="26BB6EA6" wp14:editId="7EC70FEB"><wp:extent cx="{d.image:scaleImage(width, 925689, emu)}" cy="{d.image:scaleImage(height, 694318, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 2" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="2" name="Picture 2" descr="{d.image}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu)}" cy="{d.image:scaleImage(height, 721508, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="75994D6B" wp14:editId="4DEE8DEE"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu)}" cy="{d.tests.image:scaleImage(height, 702021, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 3" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="3" name="Picture 3" descr="{d.tests.image}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu)}" cy="{d.tests.image:scaleImage(height, 721727, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="46E11299" w14:textId="77777777" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr></w:p></w:hdr>');
+        helper.assert(template.files[0].data, '<w:document><w:body><w:p w14:paraId="10D86908" w14:textId="594213EC" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="57033187" wp14:editId="308FFE5B"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu)}" cy="{d.tests.image:scaleImage(height, 702021, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 6" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(document.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu)}" cy="{d.tests.image:scaleImage(height, 721727, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:body></w:document>');
+        helper.assert(template.files[1].data, '<w:ftr><w:p w14:paraId="570D5375" w14:textId="1642C3D9" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB" w:rsidP="00F040CB"><w:pPr><w:pStyle w:val="Footer"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="1A6006B2" wp14:editId="70ED8A3E"><wp:extent cx="{d.image:scaleImage(width, 925689, emu)}" cy="{d.image:scaleImage(height, 694318, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 7" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(footer2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu)}" cy="{d.image:scaleImage(height, 721508, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:ftr>');
+        helper.assert(template.files[2].data, '<w:hdr><w:p w14:paraId="50A57CAF" w14:textId="03063553" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34" w:rsidP="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="26BB6EA6" wp14:editId="7EC70FEB"><wp:extent cx="{d.image:scaleImage(width, 925689, emu)}" cy="{d.image:scaleImage(height, 694318, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 2" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu)}" cy="{d.image:scaleImage(height, 721508, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="75994D6B" wp14:editId="4DEE8DEE"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu)}" cy="{d.tests.image:scaleImage(height, 702021, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 3" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu)}" cy="{d.tests.image:scaleImage(height, 721727, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="46E11299" w14:textId="77777777" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr></w:p></w:hdr>');
         done();
+      });
+    });
+
+    describe('DOCX postProcessDocx ', function () {
+      it ('should do nothing if imageDatabase is empty', function () {
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>';
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : _expectedContent
+          }]
+        };
+        const _options = {
+          imageDatabase : new Map()
+        };
+        image.postProcessDocx(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+      });
+
+      it ('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>',
+          },
+          {
+            name : '[Content_Types].xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>';
+        const _expectedContentType = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/></Types>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('carbone.io/logo.png', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'png'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1].data, _expectedContentType);
+        helper.assert(_template.files[2], {
+          name   : 'word/media/CarboneImage0.png',
+          parent : '',
+          data   : '1234'
+        });
+      });
+
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define a different media path because the template is coming from word online', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/image2.png" Id="R1e71cf0a0beb4eb3" /></Relationships>',
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/image2.png" Id="R1e71cf0a0beb4eb3" /><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/CarboneImage0.gif" Id="rIdCarbone0"/></Relationships>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.gif', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'gif'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1], {
+          name   : 'media/CarboneImage0.gif',
+          parent : '',
+          data   : '1234'
+        });
+      });
+
+      it('should add multiple images references into "word/_rels/document.xml.rels" by using imageDatabase', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>',
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage1.jpg" Id="rIdCarbone1"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage2.svg" Id="rIdCarbone2"/></Relationships>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.png', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'png'
+        });
+        _options.imageDatabase.set('image.jpg', {
+          data      : '5678',
+          id        : 1,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'jpg'
+        });
+        _options.imageDatabase.set('image.svg', {
+          data      : '9101112',
+          id        : 2,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'svg'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1], {
+          name   : 'word/media/CarboneImage0.png',
+          parent : '',
+          data   : '1234'
+        });
+        helper.assert(_template.files[2], {
+          name   : 'word/media/CarboneImage1.jpg',
+          parent : '',
+          data   : '5678'
+        });
+        helper.assert(_template.files[3], {
+          name   : 'word/media/CarboneImage2.svg',
+          parent : '',
+          data   : '9101112'
+        });
+      });
+
+      it('should add image references into the document, header and footer by using imageDatabase and should save the new image only one time on the object `template.files`', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/header1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/header2.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/footer1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/footer2.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          }]
+        };
+        const _expectedTemplate = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/header1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/header2.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/footer1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+          },
+          {
+            name : 'word/_rels/footer2.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+          },
+          {
+            name   : 'word/media/CarboneImage0.png',
+            parent : '',
+            data   : '1234'
+          }]
+        };
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.png', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml', 'header2.xml', 'footer1.xml' ],
+          extension : 'png'
+        });
+        image.postProcessDocx(_template, null, _options);
+        _template.files.forEach((file, $index) => {
+          helper.assert(file.data, _expectedTemplate.files[$index].data);
+        });
+      });
+    });
+
+    describe('DOCX pdefineImageContentTypeDocx (part of postProcessDocx)', function () {
+      it('should not add the image type definition if the image type list is empty []', function () {
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                            '<Default Extension="xml" ContentType="application/xml"/></Types>';
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : _expectedXml
+            }
+          ]
+        };
+        image.defineImageContentTypeDocx(_template, []);
+        helper.assert(_template.files[0].data, _expectedXml);
+      });
+      it ('should add the image type definition [PNG, JPG, SVG]', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                    '<Default Extension="xml" ContentType="application/xml"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                            '<Default Extension="xml" ContentType="application/xml"/>'+
+                            '<Default Extension="png" ContentType="image/png"/>'+
+                            '<Default Extension="jpg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
+        image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'svg']);
+        helper.assert(_template.files[0].data, _expectedXml);
+      });
+      it ('should not add the image type definition multiple times [PNG, JPG, PNG, JPEG, SVG, SVG]', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                    '<Default Extension="xml" ContentType="application/xml"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                            '<Default Extension="xml" ContentType="application/xml"/>'+
+                            '<Default Extension="png" ContentType="image/png"/>'+
+                            '<Default Extension="jpg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
+        image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'png', 'jpeg', 'svg', 'svg', 'jpg']);
+        helper.assert(_template.files[0].data, _expectedXml);
+      });
+      it ('should not add the image type definition if the image mime type format does not exist [PNG, JPG, SVG, JSON, HTML]', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                    '<Default Extension="xml" ContentType="application/xml"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="jpeg" ContentType="image/jpeg"/>'+
+                            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'+
+                            '<Default Extension="xml" ContentType="application/xml"/>'+
+                            '<Default Extension="png" ContentType="image/png"/>'+
+                            '<Default Extension="jpg" ContentType="image/jpeg"/></Types>';
+        image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'json', 'html']);
+        helper.assert(_template.files[0].data, _expectedXml);
       });
     });
   });

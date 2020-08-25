@@ -1140,8 +1140,7 @@ describe('Carbone', function () {
                   carbone.renderXML('<xml><tr>{d[i, qu"ote.i"d = 600 ].qu"ote.i"d}</tr><tr>{d[i+1, qu"ote.i"d = 600].qu"ote.i"d}</tr></xml>', data, function (err, result) {
                     helper.assert(err+'', 'null');
                     helper.assert(result, '<xml><tr>600</tr></xml>');
-                    // eslint-disable-next-line no-unused-vars
-                    carbone.renderXML('<xml><tr>{d[i, qu\'ote.i\'d = 700 ].qu\'ote.i\'d}</tr><tr>{d[i+1, qu\'ote.i\'d = 700].qu\'ote.i\'d}</tr></xml>', data, function (err, result) {
+                    carbone.renderXML('<xml><tr>{d[i, qu\'ote.i\'d = 700 ].qu\'ote.i\'d}</tr><tr>{d[i+1, qu\'ote.i\'d = 700].qu\'ote.i\'d}</tr></xml>', data, function (err) {
                       helper.assert(err+'', 'null'); // it does not crash
                       // helper.assert(result, '<xml><tr>700</tr></xml>'); // but it does not work
                       done();

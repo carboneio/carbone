@@ -197,7 +197,7 @@ function generateImageDocxId (urlOrBase64) {
  */
 function generateImageDocxIdPostProcessing (urlOrBase64) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
-  return _imageData.id + '';
+  return _imageData.id + 1000 + '';
 }
 
 /**

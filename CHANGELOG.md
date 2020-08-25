@@ -1,3 +1,6 @@
+### v2.0.4
+  - [EE] fix dynamic images in DOCX files that were making the report invalid in Word
+
 ### v2.0.3
   - [EE] fix dynamic images in header & footers of docx templates
   - Injecting dynamic colors received a lot of improvements and stability:

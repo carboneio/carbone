@@ -19,8 +19,8 @@
   ],
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
-    "lint": "eslint ./*/**.js",
-    "lint:fix": "eslint ./*/**.js --fix",
+    "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
+    "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin $PACKAGE_VERSION && git push github-origin $PACKAGE_VERSION"
   },
   "dependencies": {
@@ -32,7 +32,7 @@
     "yauzl": "=2.10.0"
   },
   "devDependencies": {
-    "eslint": "=7.3.1",
+    "eslint": "=7.7.0",
     "mocha": "=3.5.3",
     "zipfile": "=0.5.11"
   },

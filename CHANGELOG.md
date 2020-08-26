@@ -3,6 +3,15 @@
 
 ### v2.0.3
   - [EE] fix dynamic images in header & footers of docx templates
+  - Injecting dynamic colors received a lot of improvements and stability:
+    - ODT, DOCX, and ODS reports are fully supported. XLSX can't be supported by design for now.
+    - Text and background colors in footers and headers are supported for ODT and DOCX templates.
+    - Better error management, it throws errors when:
+      - bindColor is not correctly formatted
+      - 2 bindColor markers try to edit the same color
+      - the background color format on DOCX documents is different than "color"
+      - the color format does not exist
+      - 2 different lists of colors are used to edit the same element
 
 ### v2.0.2
   - Release August 10th, 2020

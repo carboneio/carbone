@@ -20,7 +20,6 @@ function addHtmlDatabase (options, htmlContent, styleName) {
       styleList
     };
     options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
-    console.log(options.htmlDatabase);
   }
 }
 
@@ -35,7 +34,6 @@ const getHtmlContent = function (htmlContent, styleName) {
 
 const getHtmlContentPostProcess = function (htmlContentId) {
   const _htmlProperties = this.htmlDatabase.get(htmlContentId);
-  console.log(_htmlProperties.content);
   return _htmlProperties.content;
 };
 
@@ -49,7 +47,6 @@ const getHtmlStyleName = function (htmlContent, styleName) {
 
 const getHtmlStyleNamePostProcess = function (htmlContentId) {
   const _htmlProperties = this.htmlDatabase.get(htmlContentId);
-  console.log(html.generateStyleName(_htmlProperties.id));
   return html.generateStyleName(_htmlProperties.id);
 };
 

@@ -8,27 +8,26 @@ const html = require('../lib/html');
  * @param  {Object} options
  * @param  {Array} color
  */
-function addHtmlDatabase (options, contentId, htmlContent) {
+function addHtmlDatabase (options, htmlContent) {
   var _htmlDatabaseProperties = null;
 
-  if (!options.htmlDatabase.has(contentId)) {
+  if (!options.htmlDatabase.has(htmlContent)) {
     const { styleList, content } = html.parseStyleAndGetStyleList(htmlContent);
     _htmlDatabaseProperties = {
       id : options.htmlDatabase.size,
       content,
       styleList
     };
-    options.htmlDatabase.set(contentId, _htmlDatabaseProperties);
+    options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
   }
 }
 
 
 const getHtmlContent = function (htmlContent) {
-  const _contentId = htmlContent;
-  addHtmlDatabase(this, _contentId, htmlContent);
+  addHtmlDatabase(this, htmlContent);
   return {
     fn   : getHtmlContentPostProcess,
-    args : [_contentId]
+    args : [htmlContent]
   };
 };
 
@@ -38,11 +37,10 @@ const getHtmlContentPostProcess = function (contentId) {
 };
 
 const getHtmlStyleName = function (htmlContent) {
-  const _contentId = htmlContent;
-  addHtmlDatabase(this, _contentId, htmlContent);
+  addHtmlDatabase(this, htmlContent);
   return {
     fn   : getHtmlStyleNamePostProcess,
-    args : [_contentId]
+    args : [htmlContent]
   };
 };
 

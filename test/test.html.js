@@ -1,4 +1,5 @@
 const html = require('../lib/html');
+const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 
 describe.only('Dynamic HTML BOLD/ITALIC/UNDERLINED/STRIKED', function () {
@@ -154,7 +155,51 @@ describe.only('Dynamic HTML BOLD/ITALIC/UNDERLINED/STRIKED', function () {
     });
 
     describe('formatters/postProcessFormatters ODT', function () {
+      it('getHtmlContent - should add style element to htmlDatabase + get clean content without HTML', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = '<strong>This is some content</strong>';
+        const _postProcess = htmlFormatters.getHtmlContent.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, {
+          id        : 0,
+          content   : 'This is some content',
+          styleList : 'fo:font-weight="bold" '
+        });
+        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), 'This is some content');
+      });
 
+      it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = '<em><b>This is some content</b></em>';
+        const _postProcess = htmlFormatters.getHtmlStyleName.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, {
+          id        : 0,
+          content   : 'This is some content',
+          styleList : 'fo:font-style="italic" fo:font-weight="bold" '
+        });
+        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), 'TC0');
+      });
+
+      it('getHtmlStyleName + getHtmlContent - should not add the same HTML content to htmlDatabase', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = '<em><b>This is some content</b></em>';
+        htmlFormatters.getHtmlContent.call(_options, _content);
+        htmlFormatters.getHtmlStyleName.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_properties, {
+          id        : 0,
+          content   : 'This is some content',
+          styleList : 'fo:font-style="italic" fo:font-weight="bold" '
+        });
+      });
     });
     describe('utils', function () {
       describe('parseStyleAndGetStyleList', () => {

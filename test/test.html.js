@@ -158,7 +158,36 @@ describe.only('Dynamic HTML BOLD/ITALIC/UNDERLINED/STRIKED', function () {
     });
     describe('utils', function () {
       describe('parseStyleAndGetStyleList', () => {
-
+        it('should do nothing if the content does not have HTML tag', () => {
+          const _content = 'This is a text';
+          const res = html.parseStyleAndGetStyleList(_content);
+          helper.assert(res.content, _content);
+          helper.assert(res.styleList, '');
+        });
+        it('should parse the HTML tag, return the style list and the cleaned content [STRONG]', () => {
+          const _content = '<strong>This is a text</strong>';
+          const _expectedContent = 'This is a text';
+          const _expectedStyleList = 'fo:font-weight="bold" ';
+          const res = html.parseStyleAndGetStyleList(_content);
+          helper.assert(res.content, _expectedContent);
+          helper.assert(res.styleList, _expectedStyleList);
+        });
+        it('should parse the HTML tag, return the style list and the cleaned content [ITALIC <em> and <i>]', () => {
+          const _content = '<i><em>This is a text</em></i>';
+          const _expectedContent = 'This is a text';
+          const _expectedStyleList = 'fo:font-style="italic" ';
+          const res = html.parseStyleAndGetStyleList(_content);
+          helper.assert(res.content, _expectedContent);
+          helper.assert(res.styleList, _expectedStyleList);
+        });
+        it('should parse the HTML tag, return the style list and the cleaned content [MIXED: strong italic underlined striked]', () => {
+          const _content = '<i><em><b><u><s>This is a text</s></u><b></em></i>';
+          const _expectedContent = 'This is a text';
+          const _expectedStyleList = 'fo:font-style="italic" fo:font-weight="bold" style:text-underline-style="solid" style:text-line-through-style="solid" ';
+          const res = html.parseStyleAndGetStyleList(_content);
+          helper.assert(res.content, _expectedContent);
+          helper.assert(res.styleList, _expectedStyleList);
+        });
       });
     });
   });

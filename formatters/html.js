@@ -1,12 +1,12 @@
 const html = require('../lib/html');
 
 /**
- * Add the color to the htmlDatabase Map.
+ * Add the content to the htmlDatabase Map.
  *
  * @private
  *
- * @param  {Object} options
- * @param  {Array} color
+ * @param  {Object} options contains htmlDatabase
+ * @param  {String} htmlContent string with html tags
  */
 function addHtmlDatabase (options, htmlContent) {
   var _htmlDatabaseProperties = null;

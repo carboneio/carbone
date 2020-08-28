@@ -1,5 +1,5 @@
 ### v2.0.5
-  - [EE] ODT New feature: Support HTML rich content, by adding the `:html()` formatter it is possible to render the following HTML tag: `<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`.
+  - [EE] ODT New feature: Support HTML rich content, by adding the `:html()` formatter it is possible to render the following HTML tag: `<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`. The marker should be simple, for example: `<b>content</b>` or `<u><em>content</em></u>`
 
 ### v2.0.4
   - [EE] fix dynamic images in DOCX files that were making the report invalid in Word

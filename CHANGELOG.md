@@ -1,4 +1,5 @@
 ### v2.1.0
+  - Release September 1st, 2020
   - Performance: huge gain from x11 to x30 for the compression of reports.
     Now, some huge reports takes 0.1s to render instead of 4s.
     It reduces also the blocking of Node's event loop.

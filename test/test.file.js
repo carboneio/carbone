@@ -276,7 +276,7 @@ describe('file', function () {
         });
       });
     });
-    it('should zip an array of 100 files (with a size between 150 to 200 bytes) and directory into one buffer', function (done) {
+    it('should zip an array of 120 files (with a size between 150 to 200 bytes) and directory into one buffer', function (done) {
       var _files = [];
       const _max = 200;
       const _min = 150;

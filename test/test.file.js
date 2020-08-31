@@ -246,6 +246,67 @@ describe('file', function () {
         });
       });
     });
+    it('should zip an array of files and directory into one buffer', function (done) {
+      const _fileLength1 = 10000;
+      const _fileLength2 = 100000;
+      var _files = [
+        {name : 'my_file.xml'            , data : Buffer.from( 'some text','utf8')},
+        {name : 'subdir/'                , data : null },
+        {name : 'subdir/my_file.xml'     , data : Buffer.from( 'content of the file in the sub dir','utf8')},
+        {name : 'subdir/dir/'            , data : null },
+        {name : 'subdir/dir/my_file2.txt', data : Buffer.from( 'content of the another file','utf8')},
+        {name : 'subdir/dir/my_big_file.txt', data : Buffer.from(generateRandomText(_fileLength1),'utf8')},
+        {name : 'subdir/dir/my_big_file2.txt', data : Buffer.from(generateRandomText(_fileLength2),'utf8')}
+      ];
+      fs.mkdirSync(testPath, parseInt('0755', 8));
+      file.zip(_files, function (err, zipBuffer) {
+        assert.equal(err, null);
+        var _zipFilePath = path.join(testPath, 'file.zip');
+        var _unzipFilePath = path.join(testPath, 'unzip');
+        fs.writeFileSync(_zipFilePath, zipBuffer);
+        unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
+          for (var i = 0; i < _files.length; i++) {
+            var _file = _files[i];
+            if (_file.name.indexOf('big') !== -1) {
+              assert.equal(result[_file.name].length, _file.data.length);
+            }
+            assert.equal(result[_file.name], _file.data);
+          }
+          done();
+        });
+      });
+    });
+    it('should zip an array of 100 files (with a size between 150 to 200 bytes) and directory into one buffer', function (done) {
+      var _files = [];
+      const _max = 200;
+      const _min = 150;
+      const _numberFiles = 120;
+      let _dir = '';
+      for (let i = 0; i < _numberFiles; i++) {
+        let _filename = `my_file${i}.xml`;
+        if (i % 10 === 1) {
+          _dir += 'dir/';
+          _files.push({ name : _dir, data : null });
+        }
+        _filename = `${_dir}${_filename}`;
+        _files.push({ name : _filename, data : Buffer.from(generateRandomText(Math.floor(Math.random() * (_max - _min + 1)) + _min), 'utf8')});
+      }
+      fs.mkdirSync(testPath, parseInt('0755', 8));
+      file.zip(_files, function (err, zipBuffer) {
+        assert.equal(err, null);
+        var _zipFilePath = path.join(testPath, 'file.zip');
+        var _unzipFilePath = path.join(testPath, 'unzip');
+        fs.writeFileSync(_zipFilePath, zipBuffer);
+        unzipSystem(_zipFilePath, _unzipFilePath, function (err, result) {
+          helper.assert(_files.length, _numberFiles + _numberFiles / 10);
+          for (var i = 0; i < _files.length; i++) {
+            var _file = _files[i];
+            assert.equal(result[_file.name], _file.data);
+          }
+          done();
+        });
+      });
+    });
     it('should catch exception when file data is not bufferable and keep valid files', function (done) {
       file.buildFile({
         isZipped : true,

@@ -26,7 +26,6 @@
   "dependencies": {
     "debug": "=4.1.1",
     "moment": "=2.27.0",
-    "moxie-zip": "=0.0.3",
     "timsort": "=0.3.0",
     "which": "=2.0.2",
     "yauzl": "=2.10.0",

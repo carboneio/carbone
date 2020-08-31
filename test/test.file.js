@@ -251,7 +251,7 @@ describe('file', function () {
         isZipped : true,
         files    : [
           {
-            name : 'test',
+            name : 'test/',
             data : null
           },
           {

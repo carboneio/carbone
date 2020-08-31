@@ -1,12 +1,14 @@
-### v2.0.5
+### v2.x.x
   - [EE] ODT New feature: Support HTML rich content, by adding the `:html()` formatter it is possible to render the following HTML tag: `<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`. The marker should be simple, for example: `<b>content</b>` or `<u><em>content</em></u>`
 
-### v2.0.4
+### v2.1.0
+  - Performance: huge gain from x11 to x30 for the compression of reports.
+    Now, some huge reports takes 0.1s to render instead of 4s.
+    It reduces also the blocking of Node's event loop.
+  - New rendering option `hardRefresh`: The content of the report is refreshed at the end of the Carbone process. For example, it can be used to refresh the table of content or update calculations. The option `convertTo` has to be defined.
   - [EE] fix dynamic images in DOCX files that were making the report invalid in Word
-
-### v2.0.3
   - [EE] fix dynamic images in header & footers of docx templates
-  - Injecting dynamic colors received a lot of improvements and stability:
+  - [EE] Injecting dynamic colors received a lot of improvements and stability:
     - ODT, DOCX, and ODS reports are fully supported. XLSX can't be supported by design for now.
     - Text and background colors in footers and headers are supported for ODT and DOCX templates.
     - Better error management, it throws errors when:

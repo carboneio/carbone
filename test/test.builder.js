@@ -50,12 +50,12 @@ describe('builder', function () {
       helper.assert(_safeAccessor.getDictionary(), ['YYYY MM DD']);
     });
     it('should keep anti-slash quotes', function () {
-      builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('YYYY \' MM DD')" ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), ['YYYY \' MM DD']);
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('YYYY \\' MM DD')" ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), ["YYYY \\' MM DD"]);
     });
     it('should keep parenthesis in the string', function () {
-      builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('(YYYY) \' (MM) DD')" ], _testedFormatters);
-      helper.assert(_safeAccessor.getDictionary(), ['(YYYY) \' (MM) DD']);
+      builder.getFormatterString(_getSafeValue, '_str', '_options', [ "format('(YYYY) ' (MM) DD')" ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), ["(YYYY) ' (MM) DD"]);
     });
     it('should return a call of a function for a formatter with two arguments', function () {
       builder.getFormatterString(_getSafeValue, '_str', '_options', [ 'formatter(2, 3)' ], _testedFormatters);

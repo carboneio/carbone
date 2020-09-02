@@ -1,7 +1,7 @@
 {
   "name": "carbone-ee",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "bin": "bin/carbone",
   "main": "./lib",
   "publishConfig": {
@@ -22,8 +22,8 @@
   ],
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
-    "lint": "eslint ./*/**.js",
-    "lint:fix": "eslint ./*/**.js --fix",
+    "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
+    "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
@@ -33,19 +33,19 @@
     "cors": "=2.8.5",
     "formidable": "=1.2.2",
     "moment": "=2.27.0",
-    "moxie-zip": "=0.0.3",
     "simple-get": "=4.0.0",
     "restana": "=4.6.1",
     "timsort": "=0.3.0",
     "which": "=2.0.2",
-    "yauzl": "=2.10.0"
+    "yauzl": "=2.10.0",
+    "yazl": "=2.5.1"
   },
   "pkg": {
     "assets": "lib/converter.py"
   },
   "devDependencies": {
     "pdfjs-dist": "=2.2.228",
-    "eslint": "=7.3.1",
+    "eslint": "=7.7.0",
     "mocha": "=3.5.3",
     "mocha-sinon": "=2.1.2",
     "nock": "=12.0.0",

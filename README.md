@@ -30,18 +30,16 @@
 
 
 
-<p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...
-
-... using your JSON data as input !</p>
+<p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using your JSON data as input !</p>
 
 >  ⚡️ Breaking news :
-> 
+>
 > **Carbone v2.0 🚀 is here :**
->   
->   - `npm i carbone@2.0.0`
+>
+>   - `npm i carbone@2.0.2`
 >   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
->   - The website and Carbone Render/Studio will be updated this week
 
+README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
 
 ## Table of content
 
@@ -192,7 +190,7 @@ Carbone does a lot of thing for you behind the scene:
   sudo unzip LibreBarcode_v1.003-alpha.zip -d /usr/share/fonts/truetype/librebarcode
   sudo chmod 755 /usr/share/fonts/truetype/librebarcode
   sudo chmod -R 644 /usr/share/fonts/truetype/librebarcode/*
-  # refresh fonts, if the following command does not run, sudo apt install fontconfig 
+  # refresh fonts, if the following command does not run, sudo apt install fontconfig
   sudo fc-cache -fv
 
 ```

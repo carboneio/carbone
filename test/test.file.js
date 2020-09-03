@@ -587,7 +587,7 @@ describe('file', function () {
 
 function unzipSystem (filePath, destPath, callback) {
   var _unzippedFiles = {};
-  exec(`unzip -o ${filePath} -d ${destPath}`, function(err, stdout, stderr) {
+  exec(`unzip -o ${filePath} -d ${destPath}`, function (err, stdout, stderr) {
     if (err) {
       callback(err, null);
     }

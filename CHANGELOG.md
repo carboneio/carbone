@@ -1,3 +1,7 @@
+### v2.1.1
+  - the 'zipfile' dev dependency removed, the unit tests that were using the library is now calling the unzip from the system.
+  - 8.1.3 mocha upgrade
+
 ### v2.1.0
   - Release September 1st, 2020
   - Performance: huge gain from x11 to x30 for the compression of reports.
@@ -8,7 +12,7 @@
 ### v2.0.2
   - Release August 10th, 2020
   - Fix locales de-ch and pt-br
-  - Fix direct access in a nested array `{d.array[i].nestedArray[i=0].id}` 
+  - Fix direct access in a nested array `{d.array[i].nestedArray[i=0].id}`
 
 ### v2.0.1
   - Release July 8th, 2020

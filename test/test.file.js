@@ -7,7 +7,7 @@ var fs = require('fs');
 var testPath = path.join(__dirname,'test_file');
 var { exec } = require('child_process');
 
-describe.only('file', function () {
+describe('file', function () {
   describe('Detect types', function () {
     before(function () {
       var _templatePath = path.resolve('./test/datasets');

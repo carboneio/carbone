@@ -29,7 +29,7 @@ function uploadFile (callback) {
   })
 }
 
-describe.only('Webserver', () => {
+describe('Webserver', () => {
   let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
 
   before((done) => {

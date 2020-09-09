@@ -44,12 +44,13 @@
     "assets": "lib/converter.py"
   },
   "devDependencies": {
-    "pdfjs-dist": "=2.2.228",
     "eslint": "=7.7.0",
+    "form-data": "^3.0.0",
     "mocha": "=3.5.3",
     "mocha-sinon": "=2.1.2",
     "nock": "=12.0.0",
-    "sinon": "=9.0.2",
+    "pdfjs-dist": "=2.2.228",
+    "sinon": "^9.0.3",
     "xml-beautifier": "0.4.3",
     "zipfile": "=0.5.11"
   },

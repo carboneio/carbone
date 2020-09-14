@@ -27,14 +27,15 @@
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
-    "debug": "=4.1.1",
-    "image-size": "=0.7.4",
     "body-parser": "=1.19.0",
     "cors": "=2.8.5",
+    "debug": "=4.1.1",
     "formidable": "=1.2.2",
+    "image-size": "=0.7.4",
+    "kitten-jwt": "^1.0.0",
     "moment": "=2.27.0",
-    "simple-get": "=4.0.0",
     "restana": "=4.6.1",
+    "simple-get": "=4.0.0",
     "timsort": "=0.3.0",
     "which": "=2.0.2",
     "yauzl": "=2.10.0",

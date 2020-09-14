@@ -17,7 +17,18 @@ switch (_action) {
     tool.findMarkers(process.argv.slice(3));
     break;
   case 'webserver':
-    webserver(process.argv.slice(3));
+    webserver.handleParams(process.argv.slice(3));
+    break;
+  case 'generate-token':
+    webserver.generateToken((err, token) => {
+      if (err) {
+        console.log(err.toString());
+        process.exit();
+      }
+
+      console.log('JWT token: ' + token)
+      process.exit();
+    })
     break;
   default:
     usage();
@@ -30,5 +41,6 @@ function usage () {
   console.log('   carbone translate [--help]');
   console.log('   carbone find [--help]');
   console.log('   carbone webserver [--help]');
+  console.log('   carbone generate-token');
   process.exit();
 }

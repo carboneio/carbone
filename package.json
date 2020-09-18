@@ -39,12 +39,11 @@
   "devDependencies": {
     "pdfjs-dist": "=2.2.228",
     "eslint": "=7.7.0",
-    "mocha": "=3.5.3",
+    "mocha": "=8.1.3",
     "mocha-sinon": "=2.1.2",
     "nock": "=12.0.0",
     "sinon": "=9.0.2",
-    "xml-beautifier": "0.4.3",
-    "zipfile": "=0.5.11"
+    "xml-beautifier": "0.4.3"
   },
   "engines": {
     "node": ">= 10.15.0"

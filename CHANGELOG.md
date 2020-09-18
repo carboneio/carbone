@@ -1,3 +1,8 @@
+### v2.1.1
+  - Fixes `arrayJoin(\n):convCRLF`. Now it works in carbone v2.x.x like in v1.x.x.
+  - Removes 'zipfile' dev dependency. Tests use unzip from the system instead.
+  - 8.1.3 mocha upgrade
+
 ### v2.1.0
   - Release September 1st, 2020
   - Performance: huge gain from x11 to x30 for the compression of reports.

@@ -1,4 +1,4 @@
-const webserver  = require('../lib/webserver');
+let webserver  = null;
 const get        = require('simple-get');
 const fs         = require('fs');
 const path       = require('path');
@@ -7,7 +7,8 @@ const assert     = require('assert');
 const carbone    = require('../lib/index');
 const { render } = require('../lib/index');
 const sinon      = require('sinon');
-const { exec } = require('child_process');
+const os         = require('os');
+const { exec }   = require('child_process');
 
 function uploadFile (callback) {
   let form = new FormData();
@@ -42,7 +43,6 @@ function writeConfigFile () {
 
   fs.mkdirSync(path.join(process.cwd(), 'config'));
   fs.mkdirSync(path.join(process.cwd(), 'addons'));
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'addons', 'authentication.js'), path.join(process.cwd(), 'addons', 'authentication.js'));
   fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'config.json'), path.join(process.cwd(), 'config', 'config.json'));
   fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pem'), path.join(process.cwd(), 'config', 'key.pem'));
   fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'config', 'key.pub'));
@@ -55,7 +55,6 @@ function unlinkConfigFile () {
   fs.unlinkSync(path.join(process.cwd(), 'config', 'config.json'));
   fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pem'));
   fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pub'));
-  fs.unlinkSync(path.join(process.cwd(), 'addons', 'authentication.js'));
   fs.rmdirSync(path.join(process.cwd(), 'config'));
   fs.rmdirSync(path.join(process.cwd(), 'addons'));
 
@@ -76,10 +75,150 @@ describe.only('Webserver', () => {
     unlinkConfigFile();
   });
 
-  describe.only('Without authentication', () => {
+  describe('With authentication with addons', () => {
+    let token = null;
+    let toDelete = [];
+
+    before((done) => {
+      fs.copyFileSync(path.join(__dirname, 'datasets', 'addons', 'authentication.js'), path.join(process.cwd(), 'addons', 'authentication.js'));
+      fs.copyFileSync(path.join(__dirname, 'datasets', 'addons', 'storage.js'), path.join(process.cwd(), 'addons', 'storage.js'));
+      fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pub'));
+      fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'key.pub'));
+      webserver = require('../lib/webserver');
+      webserver.handleParams(['--auth', '--port', 4001], () => {
+        webserver.generateToken((_, newToken) => {
+          token = newToken;
+          done();
+        });
+      });
+    });
+
+    after((done) => {
+      fs.unlinkSync(path.join(process.cwd(), 'key.pub'));
+      fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'config', 'key.pub'));
+      fs.unlinkSync(path.join(process.cwd(), 'addons', 'authentication.js'));
+      fs.unlinkSync(path.join(process.cwd(), 'addons', 'storage.js'));
+      webserver.stopServer(done);
+    });
+
+    afterEach(() => {
+      for (let i = 0; i < toDelete.length; i++) {
+        if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
+          fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+        }
+      }
+
+      toDelete = [];
+    });
+
+    it('should upload the template and use authentication and storage addons', (done) => {
+      let form = new FormData();
+
+      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+
+      get.concat({
+        url: 'http://localhost:4001/template',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary(),
+          'Authorization': 'Bearer ' + token
+        },
+        body: form
+      }, (err, res, data) => {
+        assert.strictEqual(err, null);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        let exists = fs.existsSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+        assert.strictEqual(exists, true);
+        fs.unlinkSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+        done();
+      });
+    });
+  });
+
+  describe('With authentication without addons', () => {
+    let token = null;
+    let toDelete = [];
+
+    before((done) => {
+      webserver = require('../lib/webserver');
+
+      webserver.handleParams(['--auth', '--port', 4001], () => {
+        webserver.generateToken((_, newToken) => {
+          token = newToken;
+          done();
+        });
+      });
+    });
+
+    after((done) => {
+      webserver.stopServer(done);
+    });
+
+    afterEach(() => {
+      for (let i = 0; i < toDelete.length; i++) {
+        if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
+          fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+        }
+      }
+
+      toDelete = [];
+    });
+
+    it('should not upload template if user is not authenticated', (done) => {
+      let form = new FormData();
+
+      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+
+      get.concat({
+        url: 'http://localhost:4001/template',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
+        },
+        body: form
+      }, (err, res, data) => {
+        assert.strictEqual(err, null);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.error, 'Error: No JSON Web Token detected in Authorization header or Cookie. Format is "Authorization: jwt" or "Cookie: access_token=jwt"');
+        done();
+      });
+    });
+
+    it('should upload the template if user is authenticated', (done) => {
+      let form = new FormData();
+
+      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+
+      get.concat({
+        url: 'http://localhost:4001/template',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary(),
+          'Authorization': 'Bearer ' + token
+        },
+        body: form
+      }, (err, res, data) => {
+        assert.strictEqual(err, null);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        let exists = fs.existsSync(path.join(__dirname, '..', 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+        assert.strictEqual(exists, true);
+        toDelete.push('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        done();
+      });
+    });
+  });
+
+  describe('Without authentication', () => {
     let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
 
     before((done) => {
+      webserver = require('../lib/webserver');
+
       webserver.handleParams([], done)
     });
 
@@ -559,80 +698,6 @@ describe.only('Webserver', () => {
           assert.strictEqual(data.error, 'Request Error: "template" field is empty');
           done();
         });
-      });
-    });
-  });
-
-  describe.only('With authentication', () => {
-    let token = null;
-    let toDelete = [];
-
-    before((done) => {
-      webserver.handleParams(['--auth', '--port', 4001], () => {
-        webserver.generateToken((_, newToken) => {
-          token = newToken;
-          done();
-        });
-      });
-    });
-
-    after((done) => {
-      webserver.stopServer(done);
-    });
-
-    afterEach(() => {
-      for (let i = 0; i < toDelete.length; i++) {
-        if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
-          fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
-        }
-      }
-
-      toDelete = [];
-    });
-
-    it('should not upload template if user is not authenticated', (done) => {
-      let form = new FormData();
-
-      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
-
-      get.concat({
-        url: 'http://localhost:4001/template',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
-        },
-        body: form
-      }, (err, res, data) => {
-        assert.strictEqual(err, null);
-        data = JSON.parse(data);
-        assert.strictEqual(data.success, false);
-        assert.strictEqual(data.error, 'Error: No JSON Web Token detected in Authorization header or Cookie. Format is "Authorization: jwt" or "Cookie: access_token=jwt"');
-        done();
-      });
-    });
-
-    it('should upload the template if user is authenticated', (done) => {
-      let form = new FormData();
-
-      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
-
-      get.concat({
-        url: 'http://localhost:4001/template',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary(),
-          'Authorization': 'Bearer ' + token
-        },
-        body: form
-      }, (err, res, data) => {
-        assert.strictEqual(err, null);
-        data = JSON.parse(data);
-        assert.strictEqual(data.success, true);
-        assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
-        let exists = fs.existsSync(path.join(__dirname, '..', 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
-        assert.strictEqual(exists, true);
-        toDelete.push('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
-        done();
       });
     });
   });

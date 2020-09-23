@@ -34,9 +34,9 @@
 
 >  ⚡️ Breaking news :
 > 
-> **Carbone v2.0 🚀 is here :**
+> **Carbone v2.x 🚀 is here :**
 >   
->   - `npm i carbone@2.0.2`
+>   - `npm i carbone@2.1.1`
 >   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
 
 README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)

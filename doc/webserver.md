@@ -1,11 +1,13 @@
 Carbone On-Premise Draft doc
 ============================
 
+# Installation
+
 Two installation methods : 
   - One self-contained binary executable + external LibreOffice (used for conversion)
   - Docker [NOT IMPLEMENTED]
 
-# Binary executable (method 1)
+## Binary executable (method 1)
 
 ### Installation
 
@@ -21,9 +23,9 @@ It creates directories in `--workdir` [-w]  (executable directory by default)
 - `template`  : where carbone keeps templates (cache)
 - `render`    : temp directory where report are generated 
 - `asset`     : internal are generated 
-- `config`    : [NOT IMPLEMENTED] config and licenses
+- `config`    : config and licenses
 - `logs`      : [NOT IMPLEMENTED] formatted output logs 
-- `plugin `   : [NOT IMPLEMENTED] where to put custom plugin 
+- `plugin `   : where to put custom plugin 
 
 
 ### How to use it?
@@ -42,11 +44,11 @@ Carbone On-Premise will be compatible with our SDK for Python, Go, JS, PHP, ...
 
 ### How and why install LibreOffice?
 
-###### on OSX
+#### on OSX
 
 - Install LibreOffice normally using the stable version from https://www.libreoffice.org/
 
-###### on Ubuntu Server & Ubuntu desktop
+#### on Ubuntu Server & Ubuntu desktop
 
 > Be careful, LibreOffice which is provided by the PPA libreoffice/ppa does not bundled python (mandatory for Carbone). The best solution is to download the LibreOffice Package from the official website and install it manually:
 
@@ -80,7 +82,7 @@ Carbone On-Premise will be compatible with our SDK for Python, Go, JS, PHP, ...
   sudo apt install fonts-wqy-zenhei
 ```
 
-###### Why?
+#### Why?
 
 Carbone uses efficiently LibreOffice to convert documents. Among all tested solutions, it is the most reliable and stable one in production for now.
 
@@ -93,8 +95,184 @@ Carbone does a lot of thing for you behind the scene:
 
 
 
-# Docker (method 2)
+## Docker (method 2)
 
 TODO
 
+# Carbone CLI
 
+## Run the webserver
+
+To run the Carbone server, you have to call the binary with `webserver` as argument:
+
+```bash
+./carbone webserver
+```
+
+If you need to see the command usage, call
+
+```bash
+./carbone webserver --help
+```
+
+## Generate a JWT token for authentication
+
+You can generate a JWT token with the CLI to easily test the authentication
+
+```bash
+./carbone generate-token
+```
+
+# Launch and setup
+
+## Launch Carbone on premise
+
+You can override default Carbone parameters with different ways.
+
+- CLI parameters
+- With environment variable
+- With the config file
+
+*Note: Parameters priority is first the CLI, than environment variable and in last the config file.*
+
+You can override following parameters:
+
+- port
+- bind
+- factories
+- workdir
+- attempts
+- auth
+
+### Override with CLI
+
+You can override with Carbone CLI as follow
+
+```bash
+./carbone webserver --port 4001 --bind 127.0.0.1 --factories 4 --workdir /var/www/carbone --attemps 2 --auth
+```
+
+### Override with config file
+
+To override with config file, copy/paste the following JSON data in `config/config.json`
+
+```json
+{
+  "port": 4001,
+  "bind": "127.0.0.1",
+  "factories": 4,
+  "workdir": "/var/www/carbone",
+  "attemps": 2,
+  "auth": true
+}
+```
+
+### Override with environment variable
+
+To override with environment variable, you have to uppercase the name and prefix it with `CARBONE_EE_`. For example:
+
+```bash
+export CARBONE_EE_PORT=3600
+export CARBONE_EE_BIND=127.0.0.1
+export CARBONE_EE_FACTORIES=4
+export CARBONE_EE_WORKDIR=/var/www/carbone
+export CARBONE_EE_ATTEMPS=2
+export CARBONE_EE_AUTH=true
+```
+
+## Setup plugins
+
+You have the possibility to override a few things in carbone on premise. The allow you to choose where to save your templates for example.
+
+Here is the list of what you can override:
+
+- Write template
+- Key.pub location (for authentication)
+- [NOT IMPLEMENTED] Read template
+- [NOT IMPLEMENTED] Write render
+- [NOT IMPLEMENTED] Read render
+
+To override them, we recommand you to create a node repository. So if you want to use for example a module to use amazon s3 to store your template for example, you can do it easily.
+
+```bash
+# Create a separate folder
+mkdir carbone-on-premise
+
+# Initialize a node repository
+npm init
+
+# Move the carbone binary inside this folder
+mv /path/to/binary/carbone ./carbone
+```
+
+When you launch for the first time carbone on premise, all folders will be created, included the `plugin` folder.
+
+### Override write template
+
+To override template writing, you have to create the file `storage.js` in the `plugin` folder. The function to export is `writeTemplate` and is described as follow
+
+```js
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+/**
+ * @param {Stream} stream : File stream
+ * @param {String} filename : Template name
+ * @param {Function} callback : Function to call at the end
+ */
+function writeTemplate (stream, filename, callback) {
+  // We create a write stream which will write the template in the tmp dir of the os
+  const writeStream = fs.createWriteStream(path.join(os.tmpdir(), filename));
+
+  // Check errors
+  writeStream.on('error', (err) => {
+    return callback(new Error('Error when uploading file'));
+  });
+
+  // When it's finish, we call the callback without errors
+  writeStream.on('finish', () => {
+    return callback(null);
+  });
+
+  stream.pipe(writeStream);
+}
+
+// Export the writeTemplate function
+module.exports = {
+  writeTemplate
+}
+```
+
+### Override get key.pub for authentication
+
+To override the get key.pub location, you have to create the file `authentication.js` in the `plugin` folder. The function to export is `getPublicKey` and is described as follow:
+
+```js
+const fs = require('fs');
+const path = require('path');
+
+/**
+ * @param {Object} req : Request from the request
+ * @param {Object} res : Response from the request
+ * @param {Object} payload : https://github.com/Ideolys/kitten-jwt#api-usage to see object details
+ * @param {Function} callback : Function to call at the end
+ * @return (publicKeyContent)
+ */
+function getPublicKey (req, res, payload, callback) {
+  // Read the public key on disk or wherever you want
+  fs.readFile(path.join(__dirname, '..', 'config', 'key.pub'), 'utf8', (err, content) => {
+    if (err) {
+      return callback(new Error('Cannot read public key ' + err.toString()));
+    }
+
+    // Return the public key content in the callback
+    return callback(content)
+  });
+}
+
+// Export the getPublicKey function
+module.exports = {
+  getPublicKey
+}
+```

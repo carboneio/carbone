@@ -31,35 +31,35 @@ function uploadFile (callback) {
 }
 
 function writeConfigFile () {
-  const addonsDir = path.join(process.cwd(), 'addons');
+  const pluginDir = path.join(process.cwd(), 'plugin');
   const configDir = path.join(process.cwd(), 'config');
 
-  if (fs.existsSync(addonsDir)) {
-    fs.renameSync(addonsDir, path.join(process.cwd(), 'wait-addons'))
+  if (fs.existsSync(pluginDir)) {
+    fs.renameSync(pluginDir, path.join(process.cwd(), 'wait-plugin'))
   }
   if (fs.existsSync(configDir)) {
     fs.renameSync(configDir, path.join(process.cwd(), 'wait-config'))
   }
 
   fs.mkdirSync(path.join(process.cwd(), 'config'));
-  fs.mkdirSync(path.join(process.cwd(), 'addons'));
+  fs.mkdirSync(path.join(process.cwd(), 'plugin'));
   fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'config.json'), path.join(process.cwd(), 'config', 'config.json'));
   fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pem'), path.join(process.cwd(), 'config', 'key.pem'));
   fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'config', 'key.pub'));
 }
 
 function unlinkConfigFile () {
-  const addonsDir = path.join(process.cwd(), 'wait-addons');
+  const pluginDir = path.join(process.cwd(), 'wait-plugin');
   const configDir = path.join(process.cwd(), 'wait-config');
 
   fs.unlinkSync(path.join(process.cwd(), 'config', 'config.json'));
   fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pem'));
   fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pub'));
   fs.rmdirSync(path.join(process.cwd(), 'config'));
-  fs.rmdirSync(path.join(process.cwd(), 'addons'));
+  fs.rmdirSync(path.join(process.cwd(), 'plugin'));
 
-  if (fs.existsSync(addonsDir)) {
-    fs.renameSync(addonsDir, path.join(process.cwd(), 'addons'))
+  if (fs.existsSync(pluginDir)) {
+    fs.renameSync(pluginDir, path.join(process.cwd(), 'plugin'))
   }
   if (fs.existsSync(configDir)) {
     fs.renameSync(configDir, path.join(process.cwd(), 'config'))
@@ -75,13 +75,13 @@ describe.only('Webserver', () => {
     unlinkConfigFile();
   });
 
-  describe('With authentication with addons', () => {
+  describe('With authentication with plugins', () => {
     let token = null;
     let toDelete = [];
 
     before((done) => {
-      fs.copyFileSync(path.join(__dirname, 'datasets', 'addons', 'authentication.js'), path.join(process.cwd(), 'addons', 'authentication.js'));
-      fs.copyFileSync(path.join(__dirname, 'datasets', 'addons', 'storage.js'), path.join(process.cwd(), 'addons', 'storage.js'));
+      fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'authentication.js'), path.join(process.cwd(), 'plugin', 'authentication.js'));
+      fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage.js'), path.join(process.cwd(), 'plugin', 'storage.js'));
       fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pub'));
       fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'key.pub'));
       webserver = require('../lib/webserver');
@@ -96,8 +96,8 @@ describe.only('Webserver', () => {
     after((done) => {
       fs.unlinkSync(path.join(process.cwd(), 'key.pub'));
       fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'config', 'key.pub'));
-      fs.unlinkSync(path.join(process.cwd(), 'addons', 'authentication.js'));
-      fs.unlinkSync(path.join(process.cwd(), 'addons', 'storage.js'));
+      fs.unlinkSync(path.join(process.cwd(), 'plugin', 'authentication.js'));
+      fs.unlinkSync(path.join(process.cwd(), 'plugin', 'storage.js'));
       webserver.stopServer(done);
     });
 
@@ -111,7 +111,7 @@ describe.only('Webserver', () => {
       toDelete = [];
     });
 
-    it('should upload the template and use authentication and storage addons', (done) => {
+    it('should upload the template and use authentication and storage plugin', (done) => {
       let form = new FormData();
 
       form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
@@ -137,7 +137,7 @@ describe.only('Webserver', () => {
     });
   });
 
-  describe('With authentication without addons', () => {
+  describe('With authentication without plugin', () => {
     let token = null;
     let toDelete = [];
 

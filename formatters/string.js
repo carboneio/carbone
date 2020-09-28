@@ -147,7 +147,7 @@ function unaccent (d) {
 
 
 /**
- * Convert carriage return `\r\n` and line feed `\n` to XML-specific code in rendered document
+ * Convert carriage return `\\r\\n` and line feed `\\n` to XML-specific code in rendered document
  *
  * Compatible with odt, and docx (beta)
  *

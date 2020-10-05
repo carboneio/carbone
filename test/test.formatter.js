@@ -1090,6 +1090,7 @@ describe('formatter', function () {
       var _datas = ['1', '2', 'hey!'];
       helper.assert(arrayFormatter.arrayJoin(_datas, ''), '12hey!');
       helper.assert(arrayFormatter.arrayJoin(_datas, ' | '), '1 | 2 | hey!');
+      helper.assert(arrayFormatter.arrayJoin(_datas, '\\n'), '1\n2\nhey!');
     });
     it('should not crash if datas is null or undefined', function () {
       helper.assert(arrayFormatter.arrayMap(null), null);

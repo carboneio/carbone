@@ -1298,7 +1298,12 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
             image.downloadImage('', {}, function (err, imageInfo) {
               assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
               helper.assert(imageInfo+'', 'undefined');
-              done();
+
+              image.downloadImage({id : 1}, {}, function (err, imageInfo) {
+                assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
+                helper.assert(imageInfo+'', 'undefined');
+                done();
+              });
             });
           });
         });

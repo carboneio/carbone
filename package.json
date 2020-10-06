@@ -1,7 +1,7 @@
 {
   "name": "carbone-ee",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "bin": "bin/carbone",
   "main": "./lib",
   "publishConfig": {
@@ -47,14 +47,11 @@
   },
   "devDependencies": {
     "eslint": "=7.7.0",
-    "form-data": "^3.0.0",
-    "mocha": "=3.5.3",
+    "mocha": "=8.1.3",
     "mocha-sinon": "=2.1.2",
     "nock": "=12.0.0",
-    "pdfjs-dist": "=2.2.228",
-    "sinon": "^9.0.3",
-    "xml-beautifier": "0.4.3",
-    "zipfile": "=0.5.11"
+    "sinon": "=9.0.2",
+    "xml-beautifier": "0.4.3"
   },
   "engines": {
     "node": ">= 10.15.0"

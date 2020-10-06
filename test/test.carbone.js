@@ -2681,6 +2681,26 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should render a template (docx), generate to PDF and give output', function (done) {
+      var _pdfExpectedPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2',
+      };
+      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf', isBufferOutput : false}, function (err, resultPath) {
+        assert.equal(err, null);
+        console.log(resultPath)
+        assert.equal(resultPath.endsWith('.pdf'), true);
+        fs.readFile(_pdfExpectedPath, function (err, expected) {
+          fs.readFile(resultPath, function (err, result) {
+            assert.equal(err+'', 'null');
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            assert.equal(result.slice(8, 50).toString(), expected.slice(8, 50).toString());
+            done();
+          });
+        });
+      });
+    });
     it('should not crash if datas contain XML-incompatible control code', function (done) {
       // eslint-disable-next-line no-unused-vars
       var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');

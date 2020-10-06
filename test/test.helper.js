@@ -15,6 +15,15 @@ describe('helper', function () {
     });
   });
 
+  describe('getRandomString', function () {
+    it('should return a random id', function () {
+      var _uid = helper.getRandomString();
+      var _uid2 = helper.getRandomString();
+      helper.assert(_uid.length, 22);
+      helper.assert((_uid!==_uid2), true);
+    });
+  });
+
   describe('cleanJavascriptVariable', function () {
     it('should return the same attribute name if there is no forbidden character in it', function () {
       helper.assert(helper.cleanJavascriptVariable('aa'), 'aa');

@@ -9,18 +9,33 @@ const { render } = require('../lib/index');
 const sinon      = require('sinon');
 const os         = require('os');
 const { exec }   = require('child_process');
+const params     = require('../lib/params');
 
-function uploadFile (callback) {
+function deleteRequiredFiles () {
+  try {
+    delete require.cache[require.resolve('../lib/webserver')];
+    delete require.cache[require.resolve(path.join(params.workDir, 'plugin', 'authentication.js'))];
+    delete require.cache[require.resolve(path.join(params.workDir, 'plugin', 'storage.js'))];
+  } catch (e) {}
+}
+
+function uploadFile (port, token, callback) {
   let form = new FormData();
 
   form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
 
+  let headers = {
+    'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
+  };
+
+  if (token !== null) {
+    headers.Authorization = 'Bearer ' + token
+  }
+
   get.concat({
-    url: 'http://localhost:4000/template',
+    url: 'http://localhost:'+port+'/template',
     method: 'POST',
-    headers: {
-      'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
-    },
+    headers,
     body: form
   }, (err, res, data) => {
     assert.strictEqual(err, null);
@@ -66,7 +81,7 @@ function unlinkConfigFile () {
   }
 }
 
-describe.only('Webserver', () => {
+describe('Webserver', () => {
   before(() => {
     writeConfigFile();
   });
@@ -79,60 +94,155 @@ describe.only('Webserver', () => {
     let token = null;
     let toDelete = [];
 
-    before((done) => {
-      fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'authentication.js'), path.join(process.cwd(), 'plugin', 'authentication.js'));
-      fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage.js'), path.join(process.cwd(), 'plugin', 'storage.js'));
-      fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pub'));
-      fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'key.pub'));
-      webserver = require('../lib/webserver');
-      webserver.handleParams(['--auth', '--port', 4001], () => {
-        webserver.generateToken((_, newToken) => {
-          token = newToken;
+    describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender', () => {
+      before((done) => {
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'authentication.js'), path.join(process.cwd(), 'plugin', 'authentication.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage.js'), path.join(process.cwd(), 'plugin', 'storage.js'));
+        fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pub'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'key.pub'));
+        deleteRequiredFiles();
+        webserver = require('../lib/webserver');
+        webserver.handleParams(['--auth', '--port', 4001], () => {
+          webserver.generateToken((_, newToken) => {
+            token = newToken;
+            done();
+          });
+        });
+      });
+
+      after((done) => {
+        fs.unlinkSync(path.join(process.cwd(), 'key.pub'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'config', 'key.pub'));
+        fs.unlinkSync(path.join(process.cwd(), 'plugin', 'authentication.js'));
+        fs.unlinkSync(path.join(process.cwd(), 'plugin', 'storage.js'));
+        webserver.stopServer(done);
+      });
+
+      afterEach(() => {
+        for (let i = 0; i < toDelete.length; i++) {
+          if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
+            fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+          }
+        }
+
+        toDelete = [];
+      });
+
+      it('should upload the template and use authentication and storage plugin', (done) => {
+        let form = new FormData();
+
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+
+        get.concat({
+          url: 'http://localhost:4001/template',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary(),
+            'Authorization': 'Bearer ' + token
+          },
+          body: form
+        }, (err, res, data) => {
+          assert.strictEqual(err, null);
+          data = JSON.parse(data);
+          assert.strictEqual(data.success, true);
+          assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          let exists = fs.existsSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+          assert.strictEqual(exists, true);
+          fs.unlinkSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           done();
+        });
+      });
+
+      it('should render a template using readTemplate, onRenderEnd and readRender plugins', (done) => {
+        let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
+
+        uploadFile(4001, token, () => {
+          get.concat({
+            url: 'http://localhost:4001/render/' + templateId,
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + token
+            },
+            json: true,
+            body: {
+              data: {
+                firstname: 'John',
+                lastname: 'Doe'
+              },
+              complement: {},
+              enum: {}
+            }
+          }, (err, res, data) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(data.success, true);
+            assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'titi' + data.data.renderId)), true);
+
+            get.concat({
+              url: 'http://localhost:4001/render/' + data.data.renderId,
+              headers: {
+                'Authorization': 'Bearer ' + token
+              }
+            }, (err, res, data) => {
+              assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+              done();
+            });
+          });
         });
       });
     });
 
-    after((done) => {
-      fs.unlinkSync(path.join(process.cwd(), 'key.pub'));
-      fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'config', 'key.pub'));
-      fs.unlinkSync(path.join(process.cwd(), 'plugin', 'authentication.js'));
-      fs.unlinkSync(path.join(process.cwd(), 'plugin', 'storage.js'));
-      webserver.stopServer(done);
-    });
+    describe('Plugins: onRenderEnd (change filename)', () => {
+      before((done) => {
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage2.js'), path.join(process.cwd(), 'plugin', 'storage.js'));
+        deleteRequiredFiles();
+        webserver = require('../lib/webserver');
+        webserver.handleParams(['--port', 4002], done);
+      });
 
-    afterEach(() => {
-      for (let i = 0; i < toDelete.length; i++) {
-        if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
-          fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+      after((done) => {
+        fs.unlinkSync(path.join(process.cwd(), 'plugin', 'storage.js'));
+        webserver.stopServer(done);
+      });
+
+      afterEach(() => {
+        for (let i = 0; i < toDelete.length; i++) {
+          if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
+            fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+          }
         }
-      }
 
-      toDelete = [];
-    });
+        toDelete = [];
+      });
 
-    it('should upload the template and use authentication and storage plugin', (done) => {
-      let form = new FormData();
+      it('should render a template using onRenderEnd (change filename)', (done) => {
+        let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
 
-      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+        uploadFile(4002, token, () => {
+          get.concat({
+            url: 'http://localhost:4002/render/' + templateId,
+            method: 'POST',
+            json: true,
+            body: {
+              data: {
+                firstname: 'Johnn',
+                lastname: 'Doe'
+              },
+              complement: {},
+              enum: {}
+            }
+          }, (err, res, data) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(data.success, true);
+            assert.strictEqual(data.data.renderId.startsWith('tata'), true);
 
-      get.concat({
-        url: 'http://localhost:4001/template',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary(),
-          'Authorization': 'Bearer ' + token
-        },
-        body: form
-      }, (err, res, data) => {
-        assert.strictEqual(err, null);
-        data = JSON.parse(data);
-        assert.strictEqual(data.success, true);
-        assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
-        let exists = fs.existsSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
-        assert.strictEqual(exists, true);
-        fs.unlinkSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
-        done();
+            get.concat({
+              url: 'http://localhost:4002/render/' + data.data.renderId
+            }, (err, res, data) => {
+              assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM Johnn Doe</p> </html> ');
+              done();
+            });
+          });
+        });
       });
     });
   });
@@ -142,6 +252,7 @@ describe.only('Webserver', () => {
     let toDelete = [];
 
     before((done) => {
+      deleteRequiredFiles();
       webserver = require('../lib/webserver');
 
       webserver.handleParams(['--auth', '--port', 4001], () => {
@@ -217,6 +328,7 @@ describe.only('Webserver', () => {
     let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
 
     before((done) => {
+      deleteRequiredFiles();
       webserver = require('../lib/webserver');
 
       webserver.handleParams([], done)
@@ -231,7 +343,7 @@ describe.only('Webserver', () => {
       let spyRender = null;
 
       before((done) => {
-        uploadFile(done)
+        uploadFile(4000, null, done)
       });
 
       beforeEach(() => {

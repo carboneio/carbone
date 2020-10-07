@@ -16,6 +16,29 @@ function writeTemplate (stream, filename, callback) {
   stream.pipe(writeStream);
 }
 
+function readTemplate (templateName, callback) {
+  return callback(null, path.join(os.tmpdir(), templateName));
+}
+
+function onRenderEnd (req, res, reportName, content, next) {
+  fs.writeFile(path.join(os.tmpdir(), 'titi' + reportName), content, () => {
+
+    return res.send({
+      success: true,
+      data: {
+        renderId: reportName
+      }
+    });
+  });
+}
+
+function readRender (req, res, renderName, next) {
+  return next(null, 'titi' + renderName, os.tmpdir());
+}
+
 module.exports = {
-  writeTemplate
+  writeTemplate,
+  readTemplate,
+  onRenderEnd,
+  readRender
 }

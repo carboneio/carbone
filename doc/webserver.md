@@ -188,9 +188,9 @@ Here is the list of what you can override:
 
 - Write template
 - Key.pub location (for authentication)
-- [NOT IMPLEMENTED] Read template
-- [NOT IMPLEMENTED] Write render
-- [NOT IMPLEMENTED] Read render
+- Read template
+- Write render
+- Read render
 
 To override them, we recommand you to create a node repository. So if you want to use for example a module to use amazon s3 to store your template for example, you can do it easily.
 
@@ -202,10 +202,21 @@ mkdir carbone-on-premise
 npm init
 
 # Move the carbone binary inside this folder
-mv /path/to/binary/carbone ./carbone
+mv /path/to/carbone/binary ./carbone
 ```
 
 When you launch for the first time carbone on premise, all folders will be created, included the `plugin` folder.
+
+### Override render filename
+
+You can override and choose the filename you want for your render. To do this, add a function `generateOutputFilename` in the `storage.js` plugin and export it.
+
+```js
+function generateOutputFilename (finalReportName, extension) {
+  // Return a complete path with the new render name
+  return path.join(process.cwd(), 'new', 'path', encodeURIComponent(`${finalReportName}.${extension}`));
+}
+```
 
 ### Override write template
 
@@ -241,6 +252,77 @@ function writeTemplate (stream, filename, callback) {
 // Export the writeTemplate function
 module.exports = {
   writeTemplate
+}
+```
+
+### Override read template
+
+To override template reading, always in the file `storage.js` in the `plugin` folder, you have to export the function `readTemplate` which is descibred as follow:
+
+```js
+function readTemplate (templateName, callback) {
+  // Read your template and return a local path for carbone
+}
+
+module.exports = {
+  readTemplate
+}
+```
+
+This function must return a local path to carbone so it can read it on the disk.
+
+### Override write render
+
+To override render writing, you have to add the function `onRenderEnd` in the `storage.js` file and export it.
+
+```js
+function onRenderEnd (req, res, reportName, reportPath, next) {
+  // Write or rename your render
+
+  return next(null)
+}
+
+module.exports = {
+  onRenderEnd
+}
+```
+
+This function can be used to move the render on AWS for example.
+
+With this function you can totally override the response and choose the one you want. For example:
+
+```js
+res.send({
+  success: true,
+  data: {
+    newField: reportName
+  }
+});
+```
+
+### Override read render
+
+To override render reading, you have to add the function `readRender` in the `storage.js` file and export it.
+
+```js
+function readRender (req, res, renderName, next) {
+  // Return the directly render or a local path
+}
+```
+
+With this function you can either return directly the file using res or return the new render name or path you choose with `onRenderEnd` function.
+
+```js
+// Return the new render name
+function readRender (req, res, renderName, next) {
+  return next(null, 'newRenderName')
+}
+
+// OR
+
+// Return the new path on disk
+function (req, res, renderName, next) {
+  return next(null, renderName, '/new/path/on/disk')
 }
 ```
 

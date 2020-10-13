@@ -93,6 +93,15 @@ describe('Webserver', () => {
   describe('With authentication with plugins', () => {
     let token = null;
     let toDelete = [];
+    let oldGenerateOutputFilename = null;
+
+    before(() => {
+      oldGenerateOutputFilename = carbone.generateOutputFilename;
+    })
+
+    after(() => {
+      carbone.generateOutputFilename = oldGenerateOutputFilename;
+    })
 
     describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender', () => {
       before((done) => {
@@ -176,6 +185,8 @@ describe('Webserver', () => {
             assert.strictEqual(err, null);
             assert.strictEqual(data.success, true);
             assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'titi' + data.data.renderId)), true);
+            assert.strictEqual(data.data.renderId.startsWith('REPORT_'), true);
+            assert.strictEqual(data.data.renderId.endsWith('.html'), true);
 
             get.concat({
               url: 'http://localhost:4001/render/' + data.data.renderId,
@@ -184,61 +195,6 @@ describe('Webserver', () => {
               }
             }, (err, res, data) => {
               assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
-              done();
-            });
-          });
-        });
-      });
-    });
-
-    describe('Plugins: onRenderEnd (change filename)', () => {
-      before((done) => {
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage2.js'), path.join(process.cwd(), 'plugin', 'storage.js'));
-        deleteRequiredFiles();
-        webserver = require('../lib/webserver');
-        webserver.handleParams(['--port', 4002], done);
-      });
-
-      after((done) => {
-        fs.unlinkSync(path.join(process.cwd(), 'plugin', 'storage.js'));
-        webserver.stopServer(done);
-      });
-
-      afterEach(() => {
-        for (let i = 0; i < toDelete.length; i++) {
-          if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
-            fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
-          }
-        }
-
-        toDelete = [];
-      });
-
-      it('should render a template using onRenderEnd (change filename)', (done) => {
-        let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
-
-        uploadFile(4002, token, () => {
-          get.concat({
-            url: 'http://localhost:4002/render/' + templateId,
-            method: 'POST',
-            json: true,
-            body: {
-              data: {
-                firstname: 'Johnn',
-                lastname: 'Doe'
-              },
-              complement: {},
-              enum: {}
-            }
-          }, (err, res, data) => {
-            assert.strictEqual(err, null);
-            assert.strictEqual(data.success, true);
-            assert.strictEqual(data.data.renderId.startsWith('tata'), true);
-
-            get.concat({
-              url: 'http://localhost:4002/render/' + data.data.renderId
-            }, (err, res, data) => {
-              assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM Johnn Doe</p> </html> ');
               done();
             });
           });

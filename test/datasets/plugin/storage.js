@@ -2,6 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+function generateOutputFilename (finalReportName, extension) {
+  return path.join(process.cwd(), 'render', 'REPORT_' + encodeURIComponent(`${finalReportName}.${extension}`));
+}
+
 function writeTemplate (stream, filename, callback) {
   const writeStream = fs.createWriteStream(path.join(os.tmpdir(), filename));
 
@@ -20,14 +24,16 @@ function readTemplate (templateName, callback) {
   return callback(null, path.join(os.tmpdir(), templateName));
 }
 
-function onRenderEnd (req, res, reportName, content, next) {
-  fs.writeFile(path.join(os.tmpdir(), 'titi' + reportName), content, () => {
+function onRenderEnd (req, res, reportName, reportPath, next) {
+  fs.readFile(reportPath, (err, content) => {
+    fs.writeFile(path.join(os.tmpdir(), 'titi' + reportName), content, () => {
 
-    return res.send({
-      success: true,
-      data: {
-        renderId: reportName
-      }
+      return res.send({
+        success: true,
+        data: {
+          renderId: reportName
+        }
+      });
     });
   });
 }
@@ -37,6 +43,7 @@ function readRender (req, res, renderName, next) {
 }
 
 module.exports = {
+  generateOutputFilename,
   writeTemplate,
   readTemplate,
   onRenderEnd,

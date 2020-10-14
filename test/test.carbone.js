@@ -9,6 +9,7 @@ var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
+var os = require('os');
 
 describe('Carbone', function () {
 
@@ -2194,6 +2195,41 @@ describe('Carbone', function () {
     });
     after(function () {
       carbone.reset();
+    });
+    it('should render a template and return a path instead of a buffer', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPath: os.tmpdir(),
+        renderPrefix: 'prefix'
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, result, reportName) {
+        assert.equal(err, null);
+        assert.strictEqual(result.startsWith('/'), true);
+        assert.strictEqual(result.endsWith('prefix_report.docx'), true);
+        done();
+      });
+    });
+    it('should render a template and return a path instead of a buffer (with conversion)', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPath: os.tmpdir(),
+        renderPrefix: 'prefix',
+        reportName: '{d.field1}test',
+        convertTo: 'pdf'
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, result, reportName) {
+        assert.equal(err, null);
+        console.log(result, reportName)
+        assert.strictEqual(result.startsWith('/'), true);
+        assert.strictEqual(result.endsWith('prefix_field_1test.pdf'), true);
+        done();
+      });
     });
     it('should render a template (docx) and give result with replacements', function (done) {
       var data = {

@@ -1,3 +1,6 @@
+### v2.x.x
+  - [EE] ODT New feature: Support HTML rich content, by adding the `:html()` formatter it is possible to render the following HTML tag: `<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`. The marker should be simple, for example: `<b>content</b>` or `<u><em>content</em></u>`
+
 ### v2.1.1
   - Release September 23rd 2020
   - Fixes `arrayJoin(\n):convCRLF`. Now it works in carbone v2.x.x like in v1.x.x.

@@ -233,17 +233,17 @@ describe.only('Dynamic HTML BOLD/ITALIC/UNDERLINED/STRIKED', function () {
           helper.assert(res.content, _expectedContent);
           helper.assert(res.styleList, _expectedStyleList);
         });
-        it.only('should parse the HTML tag, return the style list and the cleaned content [STRONG + BREAK LINE]', () => {
+        it('should parse the HTML tag, return the style list and the cleaned content [STRONG + BREAK LINE]', () => {
           const _content = '<strong>This is<br>a text</strong>';
-          const _expectedContent = 'This is<text:p/>a text';
+          const _expectedContent = 'This is<text:line-break/>a text';
           const _expectedStyleList = 'fo:font-weight="bold" ';
           const res = html.parseStyleAndGetStyleList(_content);
           helper.assert(res.content, _expectedContent);
           helper.assert(res.styleList, _expectedStyleList);
         });
-        it.only('should parse the HTML tag, return the style list and the cleaned content [MIXED + BREAK LINE]', () => {
+        it('should parse the HTML tag, return the style list and the cleaned content [MIXED + BREAK LINE]', () => {
           const _content = '<i><em><b><u><s>This<br>is<br/>a<br>text</s></u><b></em></i>';
-          const _expectedContent = 'This<text:p/>is<text:p/>a<text:p/>text';
+          const _expectedContent = 'This<text:line-break/>is<text:line-break/>a<text:line-break/>text';
           const _expectedStyleList = 'fo:font-style="italic" fo:font-weight="bold" style:text-underline-style="solid" style:text-line-through-style="solid" ';
           const res = html.parseStyleAndGetStyleList(_content);
           helper.assert(res.content, _expectedContent);

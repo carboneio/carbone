@@ -1,7 +1,12 @@
-### v2.x.x
-  - [EE] ODT New feature: Support HTML rich content, by adding the `:html()` formatter it is possible to render the following HTML tag: `<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`. The marker should be simple, for example: `<b>content</b>` or `<u><em>content</em></u>`
+### v2.1.1
+  - Release September 23rd 2020
+  - Fixes `arrayJoin(\n):convCRLF`. Now it works in carbone v2.x.x like in v1.x.x.
+  - Removes 'zipfile' dev dependency. Tests use unzip from the system instead.
+  - 8.1.3 mocha upgrade
+  - [EE] Fixes crash when images field in data contain an object instead of a string
 
 ### v2.1.0
+  - Release September 1st, 2020
   - Performance: huge gain from x11 to x30 for the compression of reports.
     Now, some huge reports takes 0.1s to render instead of 4s.
     It reduces also the blocking of Node's event loop.

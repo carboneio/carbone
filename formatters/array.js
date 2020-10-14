@@ -20,6 +20,13 @@ function arrayJoin (d, separator) {
   if (separator === undefined) {
     separator = ', ';
   }
+  if (separator === '\\n') {
+    separator = '\n';
+  }
+  if (separator === '\\r\\n') {
+    separator = '\r\n';
+  }
+
   if (d instanceof Array) {
     return d.join(separator);
   }

@@ -10,6 +10,7 @@ var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
 var pdfjsLib = require('pdfjs-dist/build/pdf.js');
+var os = require('os');
 
 describe('Carbone', function () {
 
@@ -2248,6 +2249,41 @@ describe('Carbone', function () {
     after(function () {
       carbone.reset();
     });
+    it('should render a template and return a path instead of a buffer', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPath: os.tmpdir(),
+        renderPrefix: 'prefix'
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, result, reportName) {
+        assert.equal(err, null);
+        assert.strictEqual(result.startsWith('/'), true);
+        assert.strictEqual(result.endsWith('prefix_report.docx'), true);
+        done();
+      });
+    });
+    it('should render a template and return a path instead of a buffer (with conversion)', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPath: os.tmpdir(),
+        renderPrefix: 'prefix',
+        reportName: '{d.field1}test',
+        convertTo: 'pdf'
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, result, reportName) {
+        assert.equal(err, null);
+        console.log(result, reportName)
+        assert.strictEqual(result.startsWith('/'), true);
+        assert.strictEqual(result.endsWith('prefix_field_1test.pdf'), true);
+        done();
+      });
+    });
     it('should render a template (docx) and give result with replacements', function (done) {
       var data = {
         field1 : 'field_1',
@@ -2678,6 +2714,26 @@ describe('Carbone', function () {
           assert.equal(result.slice(0, 4).toString(), '%PDF');
           assert.equal(result.slice(8, 50).toString(), expected.slice(8, 50).toString());
           done();
+        });
+      });
+    });
+    it('should render a template (docx), generate to PDF and give output', function (done) {
+      var _pdfExpectedPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2',
+      };
+      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf', isBufferOutput : false}, function (err, resultPath) {
+        assert.equal(err, null);
+        console.log(resultPath)
+        assert.equal(resultPath.endsWith('.pdf'), true);
+        fs.readFile(_pdfExpectedPath, function (err, expected) {
+          fs.readFile(resultPath, function (err, result) {
+            assert.equal(err+'', 'null');
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            assert.equal(result.slice(8, 50).toString(), expected.slice(8, 50).toString());
+            done();
+          });
         });
       });
     });

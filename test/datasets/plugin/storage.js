@@ -2,8 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-function generateOutputFilename (finalReportName, extension) {
-  return path.join(process.cwd(), 'render', 'REPORT_' + encodeURIComponent(`${finalReportName}.${extension}`));
+function generateOutputFile (finalReportName, extension) {
+  return {
+    renderPath: path.join(process.cwd(), 'render'),
+    renderPrefix: 'REPORT_'
+  }
 }
 
 function writeTemplate (stream, filename, callback) {
@@ -43,7 +46,7 @@ function readRender (req, res, renderName, next) {
 }
 
 module.exports = {
-  generateOutputFilename,
+  generateOutputFile,
   writeTemplate,
   readTemplate,
   onRenderEnd,

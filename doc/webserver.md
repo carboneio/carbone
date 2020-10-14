@@ -117,7 +117,7 @@ If you need to see the command usage, call
 
 ## Generate a JWT token for authentication
 
-You can generate a JWT token with the CLI to easily test the authentication
+You can generate a JWT token with the CLI to easily test the authentication. The generated token is valid for the next 40 years.
 
 ```bash
 ./carbone generate-token
@@ -209,12 +209,16 @@ When you launch for the first time carbone on premise, all folders will be creat
 
 ### Override render filename
 
-You can override and choose the filename you want for your render. To do this, add a function `generateOutputFilename` in the `storage.js` plugin and export it.
+You can override and choose the filename and the location you want for your render. To do this, add a function `generateOutputFile` in the `storage.js` plugin and export it. In this function, you can access the current request `req`.
+
+You have to return an object with two keys: `renderPath` and `renderPrefix`.
 
 ```js
-function generateOutputFilename (finalReportName, extension) {
-  // Return a complete path with the new render name
-  return path.join(process.cwd(), 'new', 'path', encodeURIComponent(`${finalReportName}.${extension}`));
+function generateOutputFile (req) {
+  return {
+    renderPath: path.join(process.cwd(), 'new', 'path'),
+    renderPrefix: 'myPrefix'
+  }
 }
 ```
 

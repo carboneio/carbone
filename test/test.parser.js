@@ -3,7 +3,7 @@ var parser  = require('../lib/parser');
 var helper  = require('../lib/helper');
 var count   = require('../formatters/array').count;
 
-describe.only('parser', function () {
+describe('parser', function () {
 
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\

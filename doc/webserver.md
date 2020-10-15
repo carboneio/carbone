@@ -3,15 +3,15 @@ Carbone On-Premise Draft doc
 
 # Installation
 
-Two installation methods : 
   - One self-contained binary executable + external LibreOffice (used for conversion)
-  - Docker [NOT IMPLEMENTED]
+  - As debian/ubuntu package (coming soon)
+  - Docker (coming soon)
 
-## Binary executable (method 1)
+## Binary executable
 
 ### Installation
 
-- 1 - Download Carbone On-premise binary for your server/OS: Mac, Linux or Windows (Coming soon) 
+- 1 - Download Carbone On-premise binary for your server/OS: Mac, Linux or Windows
 - 2 - Install LibreOffice (Optional). See instruction below.
 - 3 - Start Carbone web server
 
@@ -22,24 +22,22 @@ It creates directories in `--workdir` [-w]  (executable directory by default)
 
 - `template`  : where carbone keeps templates (cache)
 - `render`    : temp directory where report are generated 
-- `asset`     : internal are generated 
-- `config`    : config and licenses
+- `asset`     : internal used only
+- `config`    : config, licenses and ES512 keys for authentication
 - `logs`      : [NOT IMPLEMENTED] formatted output logs 
-- `plugin `   : where to put custom plugin 
+- `plugin `   : where to put custom plugin
 
 
 ### How to use it?
 
 Same HTTP API as https://carbone.io/api-reference.html#carbone-render-api
 
-Carbone On-Premise will be compatible with our SDK for Python, Go, JS, PHP, ...
+Carbone On-Premise is compatible with our SDK for Python, Go, JS, PHP, ...
 
 - Add a template    : POST /render.carbone.io/template
 - Generate a report : POST /render.carbone.io/render/:templateId
 - Get the result    : GET /render.carbone.io/render/:renderId
 
-
-[NOT IMPLEMENTED] You can also send an URL instead of a templateId. Carbone will download the template automatically.
 
 
 ### How and why install LibreOffice?
@@ -95,9 +93,6 @@ Carbone does a lot of thing for you behind the scene:
 
 
 
-## Docker (method 2)
-
-TODO
 
 # Carbone CLI
 
@@ -115,13 +110,32 @@ If you need to see the command usage, call
 ./carbone webserver --help
 ```
 
-## Generate a JWT token for authentication
+## Authentication
 
-You can generate a JWT token with the CLI to easily test the authentication. The generated token is valid for the next 40 years.
+By default, carbone-ee starts without authentication. 
+You must add `--authentication` or `-A` in CLI or set `authentication : true` in config file to activate authentication.
 
-```bash
-./carbone generate-token
+The authentication mechanism is based on `ES512` JWT tokens.
+
+The token must be passed in `Authorization` header exactly like the SaaS version https://carbone.io/api-reference.html#choose-carbone-version 
+
+### How to generate tokens ?
+  1) with Carbone CLI: `./carbone generate-token` generates 40-years valid tokens
+  2) programmatically and dynamically on client side to reduce Man-In-The-Middle attacks with short expiration dates. More information below.
+
+You can generate and renew tokens on client side using standard libraries in any programming languages https://jwt.io/ 
+
+Tokens must contain at least this payload. And it must be signed with the generated public key in `config/key.pub`.
 ```
+{
+  "iss": "carbone-user",
+  "aud": "carbone-ee",
+  "exp": 2864189447
+}
+```
+
+We recommend to generate tokens with an expiration date valid for at least 12 hours to avoid consuming to much computer resource on both side clients and Carbone servers. If your client is a NodeJS program, you can use https://github.com/Ideolys/kitten-jwt which does this automatically.
+
 
 # Launch and setup
 
@@ -163,7 +177,7 @@ To override with config file, copy/paste the following JSON data in `config/conf
   "factories": 4,
   "workdir": "/var/www/carbone",
   "attemps": 2,
-  "auth": true
+  "authentication": true
 }
 ```
 
@@ -182,7 +196,7 @@ export CARBONE_EE_AUTH=true
 
 ## Setup plugins
 
-You have the possibility to override a few things in carbone on premise. The allow you to choose where to save your templates for example.
+You have the possibility to override a few things in carbone on premise. It allows you to choose where to save your templates for example.
 
 Here is the list of what you can override:
 

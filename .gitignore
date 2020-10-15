@@ -37,6 +37,7 @@ temp
 
 ######## project-specific
 0perso/*
+config/*
 build/*
 render/*
 template/*

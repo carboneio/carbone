@@ -26,9 +26,12 @@ switch (_action) {
         process.exit();
       }
 
-      console.log('JWT token: ' + token)
+      console.log('Here is a JWT token, valid for 40 years. Place this token in the header like this:');
+      console.log('  - Authorization : Bearer your_token\n');
+      console.log(token);
+      console.log('\n');
       process.exit();
-    })
+    });
     break;
   default:
     usage();

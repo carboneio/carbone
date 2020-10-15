@@ -918,6 +918,42 @@ describe('Dynamic colors', function () {
         helper.assert(_template.files[0].data, _expectedXML);
       });
 
+      it('should replace a cell color with a color marker + formatter', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="FF0000" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        const _expectedXML = '<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="{d.color:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>';
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it('should replace mutliple cells color with color markers + formatters', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<w:document><w:body><w:tbl><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="FFFF00" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="FF0000" w:val="clear"/></w:tcPr></w:tc></w:tr><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="FF00FF" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="00FF00" w:val="clear"/></w:tcPr></w:tc></w:tr><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="00FFFF" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="0000FF" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#00ff00, #hexa)=d.color2}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#0000ff, #hexa)=d.color3}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#ffff00, #hexa)=d.color4}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#ff00ff, #hexa)=d.color5}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#00ffff, #hexa)=d.color6}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        const _expectedXML = '<w:document><w:body><w:tbl><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color4:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color5:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color2:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color6:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color3:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>';
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it('should replace a cell color, text color and text background color with color markers + formatters', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<w:document><w:body><w:tbl><w:tr><w:tc><w:tcPr><w:tcBorders><w:top w:val="single" w:sz="2" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="2" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="2" w:space="0" w:color="000000"/></w:tcBorders><w:shd w:fill="FF0000" w:val="clear"/></w:tcPr><w:p><w:pPr><w:pStyle w:val="TableContents"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:color w:val="00FF00"/><w:highlight w:val="yellow"/></w:rPr></w:pPr><w:r><w:rPr><w:color w:val="00FF00"/><w:highlight w:val="yellow"/></w:rPr><w:t>This is a text</w:t></w:r></w:p></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa) = d.color}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(yellow, color) = d.color2}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#00ff00, hsl) = d.color3}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        const _expectedXML = '<w:document><w:body><w:tbl><w:tr><w:tc><w:tcPr><w:tcBorders><w:top w:val="single" w:sz="2" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="2" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="2" w:space="0" w:color="000000"/></w:tcBorders><w:shd w:fill="{d.color:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr><w:p><w:pPr><w:pStyle w:val="TableContents"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:color w:val="{d.color3:getAndConvertColorDocx(hsl, textColor)}"/><w:highlight w:val="{d.color2:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:color w:val="{d.color3:getAndConvertColorDocx(hsl, textColor)}"/><w:highlight w:val="{d.color2:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t>This is a text</w:t></w:r></w:p></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>';
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
       it ('should replace a text background color with a marker + formatter', function () {
         const _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="{d.color3:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t></w:t></w:r></w:p></w:body></w:document>';
         const _template = {

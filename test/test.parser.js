@@ -3,7 +3,7 @@ var parser  = require('../lib/parser');
 var helper  = require('../lib/helper');
 var count   = require('../formatters/array').count;
 
-describe('parser', function () {
+describe.only('parser', function () {
 
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
@@ -22,6 +22,14 @@ describe('parser', function () {
         helper.assert(cleanedXml, '<xml>{toto \uFFFF</xml>');
         done();
       }, true);
+    });
+    it('should find a marker without cleaning the XML', function (done) {
+      parser.findMarkers('<xml><div>{d.<div/>to<br/>to}<div></xml>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [{pos : 11, name : '_root.d.<div/>to<br/>to'}]);
+        helper.assert(cleanedXml, '<xml><div>\uFFFF<div></xml>');
+        done();
+      });
     });
     it('should find multiple markers even if there are brackets before the markers', function (done) {
       parser.findMarkers('<xml>{d.tata} {to{c.menu} {to {d.toto}</xml>', function (err, cleanedXml, markers) {

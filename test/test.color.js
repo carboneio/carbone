@@ -631,6 +631,126 @@ describe('Dynamic colors', function () {
           helper.assert(_template.files[0].data, _expectedData);
           done();
         });
+        it('should replace 1 cell color with a colortype #hexa [ODT file]', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="Table1" style:family="table"><style:table-properties style:width="17.59cm" table:align="margins"/></style:style><style:style style:name="Table1.A" style:family="table-column"><style:table-column-properties style:column-width="17.59cm" style:rel-column-width="65535*"/></style:style><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ffff00" fo:padding="0.097cm" fo:border="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style></office:automatic-styles><office:body><office:text><office:forms form:automatic-focus="false" form:apply-design-mode="false"/><text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/><text:sequence-decl text:display-outline-level="0" text:name="Figure"/></text:sequence-decls><table:table table:name="Table1" table:style-name="Table1"><table:table-column table:style-name="Table1.A"/><table:table-row><table:table-cell table:style-name="CC0" office:value-type="string"><text:p text:style-name="Table_20_Contents"/></table:table-cell></table:table-row></table:table></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="Table1" style:family="table"><style:table-properties style:width="17.59cm" table:align="margins"/></style:style><style:style style:name="Table1.A" style:family="table-column"><style:table-column-properties style:column-width="17.59cm" style:rel-column-width="65535*"/></style:style><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ffff00" fo:padding="0.097cm" fo:border="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="CC0" style:family="table-cell"><style:table-cell-properties fo:background-color="#ff00ff" ><style:background-image/></style:table-cell-properties></style:style></office:automatic-styles><office:body><office:text><office:forms form:automatic-focus="false" form:apply-design-mode="false"/><text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/><text:sequence-decl text:display-outline-level="0" text:name="Figure"/></text:sequence-decls><table:table table:name="Table1" table:style-name="Table1"><table:table-column table:style-name="Table1.A"/><table:table-row><table:table-cell table:style-name="CC0" office:value-type="string"><text:p text:style-name="Table_20_Contents"/></table:table-cell></table:table-row></table:table></office:text></office:body></office:document-content>';
+          const _options = {
+            extension      : 'odt',
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              'Table1.A1' : {
+                file        : 'content.xml',
+                styleFamily : 'table-cell',
+                colors      : [
+                  {
+                    color     : '#ffff00',
+                    element   : 'textBackgroundColor',
+                    colorType : '#hexa'
+                  }
+                ]
+              }
+            }
+          };
+          _options.colorDatabase.set('#ff00ff#ffff00Table1.A', {
+            id        : 0,
+            styleName : 'Table1.A1',
+            colors    : [{
+              newColor : '#ff00ff',
+              oldColor : '#ffff00' }]
+          });
+          color.postProcessLo(_template, null, _options);
+          console.log(_template.files[0].data);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
+        it.only('should replace 2 cell color and texts colors with [ODT file]', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="Table1" style:family="table"><style:table-properties style:width="17.59cm" table:align="margins"/></style:style><style:style style:name="Table1.A" style:family="table-column"><style:table-column-properties style:column-width="8.795cm" style:rel-column-width="32767*"/></style:style><style:style style:name="Table1.B" style:family="table-column"><style:table-column-properties style:column-width="8.795cm" style:rel-column-width="32768*"/></style:style><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ffff00" fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="Table1.B1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ff0000" fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="0018fda1" officeooo:paragraph-rsid="0018fda1"/></style:style><style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="0019e3ac" officeooo:paragraph-rsid="0019e3ac"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Table_20_Contents"><style:text-properties officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Table_20_Contents"><style:text-properties fo:color="#0000ff" officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8" fo:background-color="#00ff00"/></style:style></office:automatic-styles><office:body><office:text><table:table table:name="Table1" table:style-name="Table1"><table:table-column table:style-name="Table1.A"/><table:table-column table:style-name="Table1.B"/><table:table-row><table:table-cell table:style-name="CC0" office:value-type="string"><text:p text:style-name="CC1">text1</text:p></table:table-cell><table:table-cell table:style-name="CC2" office:value-type="string"><text:p text:style-name="P4">text2</text:p></table:table-cell></table:table-row></table:table></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="Table1" style:family="table"><style:table-properties style:width="17.59cm" table:align="margins"/></style:style><style:style style:name="Table1.A" style:family="table-column"><style:table-column-properties style:column-width="8.795cm" style:rel-column-width="32767*"/></style:style><style:style style:name="Table1.B" style:family="table-column"><style:table-column-properties style:column-width="8.795cm" style:rel-column-width="32768*"/></style:style><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ffff00" fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="Table1.B1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ff0000" fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="0018fda1" officeooo:paragraph-rsid="0018fda1"/></style:style><style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="0019e3ac" officeooo:paragraph-rsid="0019e3ac"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Table_20_Contents"><style:text-properties officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Table_20_Contents"><style:text-properties fo:color="#0000ff" officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8" fo:background-color="#00ff00"/></style:style><style:style style:name="CC0" style:family="table-cell"><style:table-cell-properties fo:background-color="#ff00ff" ><style:background-image/></style:table-cell-properties></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#ff00ff" fo:background-color="#f0f0f0" /></style:style><style:style style:name="CC2" style:family="table-cell"><style:table-cell-properties fo:background-color="#00ffff" ><style:background-image/></style:table-cell-properties></style:style></office:automatic-styles><office:body><office:text><table:table table:name="Table1" table:style-name="Table1"><table:table-column table:style-name="Table1.A"/><table:table-column table:style-name="Table1.B"/><table:table-row><table:table-cell table:style-name="CC0" office:value-type="string"><text:p text:style-name="CC1">text1</text:p></table:table-cell><table:table-cell table:style-name="CC2" office:value-type="string"><text:p text:style-name="P4">text2</text:p></table:table-cell></table:table-row></table:table></office:text></office:body></office:document-content>';
+          const _options = {
+            extension      : 'odt',
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              'Table1.A1' : {
+                file        : 'content.xml',
+                styleFamily : 'table-cell',
+                colors      : [
+                  {
+                    color     : '#ffff00',
+                    element   : 'textBackgroundColor',
+                    colorType : '#hexa'
+                  }
+                ]
+              },
+              'Table1.B1' : {
+                file        : 'content.xml',
+                styleFamily : 'table-cell',
+                colors      : [
+                  {
+                    color     : '#ff0000',
+                    element   : 'textBackgroundColor',
+                    colorType : '#hexa'
+                  }
+                ]
+              },
+              P5 : {
+                file        : 'content.xml',
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color     : '#0000ff',
+                    element   : 'textColor',
+                    colorType : '#hexa'
+                  },
+                  {
+                    color     : '#00ff00',
+                    element   : 'textBackgroundColor',
+                    colorType : '#hexa'
+                  }
+                ]
+              }
+            }
+          };
+          _options.colorDatabase.set('#ff00ff#ffff00Table1.A1', {
+            id        : 0,
+            styleName : 'Table1.A1',
+            colors    : [{
+              newColor : '#ff00ff',
+              oldColor : '#ffff00' }]
+          });
+          _options.colorDatabase.set('#ff00ff#ffff00P5', {
+            id        : 1,
+            styleName : 'P5',
+            colors    : [{
+              newColor : '#ff00ff',
+              oldColor : '#0000ff'
+            },
+            {
+              newColor : '#f0f0f0',
+              oldColor : '#00ff00'
+            }]
+          });
+          _options.colorDatabase.set('#00ffff#ff0000Table1.B1', {
+            id        : 2,
+            styleName : 'Table1.B1',
+            colors    : [{
+              newColor : '#00ffff',
+              oldColor : '#ff0000' }]
+          });
+          color.postProcessLo(_template, null, _options);
+          console.log(_template.files[0].data);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
         it('replace 1 text + background color + static color [ODT file]', function (done) {
           const _template = {
             files : [{

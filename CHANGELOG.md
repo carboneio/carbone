@@ -1,3 +1,8 @@
+### v2.1.2
+  - Release ...
+  - Fix doc issue on carbone website
+  - Handle IDML file
+
 ### v2.1.1
   - Release September 23rd 2020
   - Fixes `arrayJoin(\n):convCRLF`. Now it works in carbone v2.x.x like in v1.x.x.

@@ -8,7 +8,6 @@ const carbone    = require('../lib/index');
 const sinon      = require('sinon');
 const os         = require('os');
 const { exec }   = require('child_process');
-const params     = require('../lib/params');
 
 function deleteRequiredFiles () {
   try {
@@ -79,14 +78,16 @@ describe('Webserver', () => {
     unlinkConfigFile();
   });
 
-  describe('With authentication with plugins', () => {
+  describe('With authentication with plugins / middlewares', () => {
     let token = null;
     let toDelete = [];
 
-    describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender', () => {
+    describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender and middlewares', () => {
       before((done) => {
         fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
         fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'middlewares.js'), path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
         deleteRequiredFiles();
         webserver = require('../lib/webserver');
         webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir()], () => {
@@ -100,6 +101,12 @@ describe('Webserver', () => {
       after((done) => {
         fs.unlinkSync(path.join(os.tmpdir(), 'plugin', 'authentication.js'));
         fs.unlinkSync(path.join(os.tmpdir(), 'plugin', 'storage.js'));
+        fs.unlinkSync(path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
+        fs.unlinkSync(path.join(os.tmpdir(), 'key.pub'));
+        fs.unlinkSync(path.join(os.tmpdir(), 'beforeFile'));
+        fs.unlinkSync(path.join(os.tmpdir(), 'beforeFile2'));
+        fs.unlinkSync(path.join(os.tmpdir(), 'afterFile'));
+        fs.unlinkSync(path.join(os.tmpdir(), 'afterFile2'));
         webserver.stopServer(done);
       });
 
@@ -134,7 +141,13 @@ describe('Webserver', () => {
           let exists = fs.existsSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           assert.strictEqual(exists, true);
           fs.unlinkSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
-          done();
+          setTimeout(() => {
+            assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'beforeFile')).toString(), 'BEFORE FILE');
+            assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'beforeFile2')).toString(), 'BEFORE FILE 2');
+            assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'afterFile')).toString(), 'AFTER FILE');
+            assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'afterFile2')).toString(), 'AFTER FILE 2');
+            done();
+          }, 100);
         });
       });
 

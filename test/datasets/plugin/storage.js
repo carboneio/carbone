@@ -2,17 +2,17 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-function generateOutputFile (finalReportName, extension) {
+function generateOutputFile () {
   return {
-    renderPath: path.join(process.cwd(), 'render'),
-    renderPrefix: 'REPORT_'
-  }
+    renderPath   : path.join(process.cwd(), 'render'),
+    renderPrefix : 'REPORT_'
+  };
 }
 
 function writeTemplate (stream, filename, callback) {
   const writeStream = fs.createWriteStream(path.join(os.tmpdir(), filename));
 
-  writeStream.on('error', (err) => {
+  writeStream.on('error', () => {
     return callback(new Error('Error when uploading file'));
   });
 
@@ -27,14 +27,14 @@ function readTemplate (templateName, callback) {
   return callback(null, path.join(os.tmpdir(), templateName));
 }
 
-function onRenderEnd (req, res, reportName, reportPath, next) {
+function onRenderEnd (req, res, reportName, reportPath) {
   fs.readFile(reportPath, (err, content) => {
     fs.writeFile(path.join(os.tmpdir(), 'titi' + reportName), content, () => {
 
       return res.send({
-        success: true,
-        data: {
-          renderId: reportName
+        success : true,
+        data    : {
+          renderId : reportName
         }
       });
     });
@@ -51,4 +51,4 @@ module.exports = {
   readTemplate,
   onRenderEnd,
   readRender
-}
+};

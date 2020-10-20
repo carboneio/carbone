@@ -50,7 +50,7 @@ describe('parser', function () {
     });
     it('3. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      callFindMarser('<xmlstart>{d.me<interxml>n<bullshit>u}</xmlend>', function (err, cleanedXml, markers) {
+      callFindMarkers('<xmlstart>{d.me<interxml>n<bullshit>u}</xmlend>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 11, name : '_root.d.menu'}]);
         helper.assert(cleanedXml, '<xmlstart>\uFFFF<interxml><bullshit></xmlend>');
@@ -59,7 +59,7 @@ describe('parser', function () {
     });
     it('4. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      callFindMarser('<div>{d.menu}<div>{d.city}', function (err, cleanedXml, markers) {
+      callFindMarkers('<div>{d.menu}<div>{d.city}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 6, name : '_root.d.menu'},{pos : 12, name : '_root.d.city'}]);
         helper.assert(cleanedXml, '<div>\uFFFF<div>\uFFFF');
@@ -68,7 +68,7 @@ describe('parser', function () {
     });
     it('5. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      callFindMarser('<xmlstart>{d.me<interxml>n<bullshit>u}</xmlend><tga>{d.ci<td>ty</td>}<tga><bla>{d.cars}</bla>', function (err, cleanedXml, markers) {
+      callFindMarkers('<xmlstart>{d.me<interxml>n<bullshit>u}</xmlend><tga>{d.ci<td>ty</td>}<tga><bla>{d.cars}</bla>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 11, name : '_root.d.menu'},{pos : 46, name : '_root.d.city'},{pos : 66, name : '_root.d.cars'}]);
         helper.assert(cleanedXml, '<xmlstart>\uFFFF<interxml><bullshit></xmlend><tga>\uFFFF<td></td><tga><bla>\uFFFF</bla>');
@@ -77,7 +77,7 @@ describe('parser', function () {
     });
     it('6. should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object.', function (done) {
-      callFindMarser('<xmlstart>{d.me<interxml>n<bullshit>u[i].city}</xmlend><tga>{d.ci<td>ty</td>}<tga><bla>{c.cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
+      callFindMarkers('<xmlstart>{d.me<interxml>n<bullshit>u[i].city}</xmlend><tga>{d.ci<td>ty</td>}<tga><bla>{c.cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 11, name : '_root.d.menu[i].city'},{pos : 46, name : '_root.d.city'},{pos : 66, name : '_root.c.cars[i].wheel'}]);
         helper.assert(cleanedXml, '<xmlstart>\uFFFF<interxml><bullshit></xmlend><tga>\uFFFF<td></td><tga><bla>\uFFFF</bla>');
@@ -85,7 +85,7 @@ describe('parser', function () {
       });
     });
     it('It should find marker which is in another marker', function (done) {
-      callFindMarser('<w:r><w:rPr><w:color /></w:rPr><w:t>{</w:t></w:r><w:r ><w:rPr><w:color w:val="{d.perso[i].color}" /></w:rPr><w:t>d.perso</w:t></w:r><w:r><w:rPr><w:color /></w:rPr><w:t>[i].nom}</w:t></w:r>', function (err, cleanedXml, markers) {
+      callFindMarkers('<w:r><w:rPr><w:color /></w:rPr><w:t>{</w:t></w:r><w:r ><w:rPr><w:color w:val="{d.perso[i].color}" /></w:rPr><w:t>d.perso</w:t></w:r><w:r><w:rPr><w:color /></w:rPr><w:t>[i].nom}</w:t></w:r>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 37, name : '_root.d.perso[i].nom'},{pos : 79, name : '_root.d.perso[i].color'}]);
         helper.assert(cleanedXml, '<w:r><w:rPr><w:color /></w:rPr><w:t>\uFFFF</w:t></w:r><w:r ><w:rPr><w:color w:val="\uFFFF" /></w:rPr><w:t></w:t></w:r><w:r><w:rPr><w:color /></w:rPr><w:t></w:t></w:r>');
@@ -93,7 +93,7 @@ describe('parser', function () {
       });
     });
     it('It should find multiple markers which are in another marker', function (done) {
-      callFindMarser('<w:r><w:color /><w:t>{</w:t></w:r><w:r ><w:color w:val="{d.perso[i].color}" /><w:t>d.perso</w:t></w:r><w:r><w:rPr test="{d.perso[i].test}"><w:color /></w:rPr><w:t>[i].nom}</w:t></w:r>', function (err, cleanedXml, markers) {
+      callFindMarkers('<w:r><w:color /><w:t>{</w:t></w:r><w:r ><w:color w:val="{d.perso[i].color}" /><w:t>d.perso</w:t></w:r><w:r><w:rPr test="{d.perso[i].test}"><w:color /></w:rPr><w:t>[i].nom}</w:t></w:r>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 22, name : '_root.d.perso[i].nom'},{pos : 57, name : '_root.d.perso[i].color'},{pos : 97, name : '_root.d.perso[i].test'}]);
         helper.assert(cleanedXml, '<w:r><w:color /><w:t>\uFFFF</w:t></w:r><w:r ><w:color w:val="\uFFFF" /><w:t></w:t></w:r><w:r><w:rPr test="\uFFFF"><w:color /></w:rPr><w:t></w:t></w:r>');
@@ -101,7 +101,7 @@ describe('parser', function () {
       });
     });
     it('It should find multiple markers inside tag which are themselves in other markers', function (done) {
-      callFindMarser('<xml><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i]</ha>.na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i+</ha>1].na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr></xml>', function (err, cleanedXml, markers) {
+      callFindMarkers('<xml><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i]</ha>.na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i+</ha>1].na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr></xml>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [
           {pos : 10, name : '_root.d.toto[i].name'},
@@ -124,7 +124,7 @@ describe('parser', function () {
       });
     });
     it('It should find multiple markers which are in another marker with others markers', function (done) {
-      callFindMarser('<w:r test="{d.lolo}">{d.color}<w:color /><w:t>{</w:t></w:r><w:r ><w:color w:val="{d.perso[i].color}" /><w:t>d.perso</w:t></w:r><w:r><w:rPr test="{d.perso[i].test}"><w:color /></w:rPr><w:t>[i].nom}</w:t class="{d.lala}">{d.test}</w:r>', function (err, cleanedXml, markers) {
+      callFindMarkers('<w:r test="{d.lolo}">{d.color}<w:color /><w:t>{</w:t></w:r><w:r ><w:color w:val="{d.perso[i].color}" /><w:t>d.perso</w:t></w:r><w:r><w:rPr test="{d.perso[i].test}"><w:color /></w:rPr><w:t>[i].nom}</w:t class="{d.lala}">{d.test}</w:r>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [
           {pos : 12, name : '_root.d.lolo'},
@@ -171,7 +171,7 @@ describe('parser', function () {
           '</td>' +
         '</tr>' +
       '</xml>';
-      callFindMarser(str, function (err, cleanedXml, markers) {
+      callFindMarkers(str, function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [ { pos : 27, name : '_root.d.perso[i].color' },
           { pos : 30, name : '_root.d.perso[i].nom' },
@@ -201,7 +201,7 @@ describe('parser', function () {
     });
 
     it('should remove unwanted characters', function (done) {
-      callFindMarser('<div>{d.menu}<div> \n   {d.city}', function (err, cleanedXml, markers) {
+      callFindMarkers('<div>{d.menu}<div> \n   {d.city}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 6, name : '_root.d.menu'},{pos : 17, name : '_root.d.city'}]);
         helper.assert(cleanedXml, '<div>\uFFFF<div>     \uFFFF');
@@ -209,14 +209,14 @@ describe('parser', function () {
       });
     });
     it('should convert conflicting characters', function (done) {
-      callFindMarser("<div>{d.menu}<div> it's \n   {d.city}", function (err, cleanedXml) {
+      callFindMarkers("<div>{d.menu}<div> it's \n   {d.city}", function (err, cleanedXml) {
         helper.assert(err, null);
         helper.assert(cleanedXml, "<div>\uFFFF<div> it's     \uFFFF");
         done();
       });
     });
     it('should keep whitespaces between simple quotes', function (done) {
-      callFindMarser("<div>{d.menu:test('hello, world is great')}<div>", function (err, cleanedXml, markers) {
+      callFindMarkers("<div>{d.menu:test('hello, world is great')}<div>", function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 6, name : '_root.d.menu:test(\'hello, world is great\')'}]);
         done();
@@ -230,11 +230,11 @@ describe('parser', function () {
       });
     });
     it('should remove whitespaces which are inside {} and not inside <>. It should not count them for the position', function (done) {
-      callFindMarser(' <div>   {  d.menu  }   <div>   {   d.city  } ', function (err, cleanedXml, markers) {
+      callFindMarkers(' <div>   {  d.menu  }   <div>   {   d.city  } ', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [{pos : 10, name : '_root.d.menu'},{pos : 22, name : '_root.d.city'}]);
         helper.assert(cleanedXml, ' <div>   \uFFFF   <div>   \uFFFF ');
-        callFindMarser(' <xmlstart> {  d.me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {d.ci  <td>  ty  </td>  } <tga><bla>{d.cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
+        callFindMarkers(' <xmlstart> {  d.me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {d.ci  <td>  ty  </td>  } <tga><bla>{d.cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
           helper.assert(err, null);
           helper.assert(markers, [{pos : 13, name : '_root.d.menu[i].city'},{pos : 54, name : '_root.d.city'},{pos : 75, name : '_root.d.cars[i].wheel'}]);
           helper.assert(cleanedXml, ' <xmlstart> \uFFFF<interxml><bull  sh it> </xmlend> <tga> \uFFFF<td></td> <tga><bla>\uFFFF</bla>');
@@ -244,19 +244,19 @@ describe('parser', function () {
     });
     it('should return the position of the last marker character when the markers ends with showEnd/hideEnd\
       it should not add special marker character for conditional block begin/end', function (done) {
-      callFindMarser('<div>{d.menu:<t>ifEQ(null):</t>showBegin}a<b>{d.menu:</b><r>ifEQ(null):showEnd</r><h>}</h><div>', function (err, cleanedXml, markers) {
+      callFindMarkers('<div>{d.menu:<t>ifEQ(null):</t>showBegin}a<b>{d.menu:</b><r>ifEQ(null):showEnd</r><h>}</h><div>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [
           {pos : 5, name : '_root.d.menu:ifEQ(null):showBegin'},
           {pos : 30, name : '_root.d.menu:ifEQ(null):showEnd'}
         ]);
-        callFindMarser('<div>{d.menu:<t>ifEQ(null):</t>hideBegin}a<b>{d.menu:</b><r>ifEQ(null):hideEnd</r><h>}</h><div>', function (err, cleanedXml, markers) {
+        callFindMarkers('<div>{d.menu:<t>ifEQ(null):</t>hideBegin}a<b>{d.menu:</b><r>ifEQ(null):hideEnd</r><h>}</h><div>', function (err, cleanedXml, markers) {
           helper.assert(err, null);
           helper.assert(markers, [
             {pos : 5, name : '_root.d.menu:ifEQ(null):hideBegin'},
             {pos : 30, name : '_root.d.menu:ifEQ(null):hideEnd'}
           ]);
-          callFindMarser('<div>{d.menu:<t>ifEQ(null):</t>hideBegin()}a<b>{d.menu:</b><r>ifEQ(null):hideEnd<i></i>()</r><h>}</h>{d.menu:ifEQ(null):showBegin}<b>{d.menu:</b><r>ifEQ(null):showEnd<i></i>()</r><h>}<div>', function (err, cleanedXml, markers) {
+          callFindMarkers('<div>{d.menu:<t>ifEQ(null):</t>hideBegin()}a<b>{d.menu:</b><r>ifEQ(null):hideEnd<i></i>()</r><h>}</h>{d.menu:ifEQ(null):showBegin}<b>{d.menu:</b><r>ifEQ(null):showEnd<i></i>()</r><h>}<div>', function (err, cleanedXml, markers) {
             helper.assert(err, null);
             helper.assert(markers, [
               {pos : 5, name : '_root.d.menu:ifEQ(null):hideBegin()'},
@@ -265,7 +265,7 @@ describe('parser', function () {
               {pos : 65, name : '_root.d.menu:ifEQ(null):showEnd()'}
             ]);
             // accept whitespaces and XML inside markers
-            callFindMarser('<div>{d.menu:<t>ifEQ(null):</t>hideBegin()}a<b>{d.menu:</b><r>ifEQ(null): hid <b> </b> eEnd <i></i> ( ) </r><h>  }</h>{d.menu:ifEQ(null): showBegin}<b>{d.menu:</b><r>ifEQ(null): show <b> </b> End <i></i>  (  )  </r><h>  } <div>', function (err, cleanedXml, markers) {
+            callFindMarkers('<div>{d.menu:<t>ifEQ(null):</t>hideBegin()}a<b>{d.menu:</b><r>ifEQ(null): hid <b> </b> eEnd <i></i> ( ) </r><h>  }</h>{d.menu:ifEQ(null): showBegin}<b>{d.menu:</b><r>ifEQ(null): show <b> </b> End <i></i>  (  )  </r><h>  } <div>', function (err, cleanedXml, markers) {
               helper.assert(err, null);
               helper.assert(markers, [
                 {pos : 5, name : '_root.d.menu:ifEQ(null):hideBegin()'},
@@ -280,19 +280,19 @@ describe('parser', function () {
       });
     });
     it('should not return the position of the last marker character if attributes contains showEnd/hideEnd (not a formatter)', function (done) {
-      callFindMarser('<div>{d.showBegin:<t>ifEQ(null)</t>}a<b>{d.showEnd:</b><r>ifEQ(null)</r><h>}</h><div>', function (err, cleanedXml, markers) {
+      callFindMarkers('<div>{d.showBegin:<t>ifEQ(null)</t>}a<b>{d.showEnd:</b><r>ifEQ(null)</r><h>}</h><div>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [
           {pos : 6, name : '_root.d.showBegin:ifEQ(null)'},
           {pos : 18, name : '_root.d.showEnd:ifEQ(null)'}
         ]);
-        callFindMarser('<div>{d.hideBegin:<t>ifEQ(null)</t>}a<b>{d.hideEnd:</b><r>ifEQ(null)</r><h>}</h><div>', function (err, cleanedXml, markers) {
+        callFindMarkers('<div>{d.hideBegin:<t>ifEQ(null)</t>}a<b>{d.hideEnd:</b><r>ifEQ(null)</r><h>}</h><div>', function (err, cleanedXml, markers) {
           helper.assert(err, null);
           helper.assert(markers, [
             {pos : 6, name : '_root.d.hideBegin:ifEQ(null)'},
             {pos : 18, name : '_root.d.hideEnd:ifEQ(null)'}
           ]);
-          callFindMarser('<div>{d.hideBegin<t></t>}a<b>{d.hideEnd</b><r><i></i></r><h>}</h>{d.showBegin}<b>{d.showEnd</b><r><i></i></r><h>}<div>', function (err, cleanedXml, markers) {
+          callFindMarkers('<div>{d.hideBegin<t></t>}a<b>{d.hideEnd</b><r><i></i></r><h>}</h>{d.showBegin}<b>{d.showEnd</b><r><i></i></r><h>}<div>', function (err, cleanedXml, markers) {
             helper.assert(err, null);
             helper.assert(markers, [
               {pos : 6, name : '_root.d.hideBegin'},
@@ -318,7 +318,7 @@ describe('parser', function () {
                + '{C.menu}' // not parsed
                + '{C.menu}' // not parsed
                + '{DZZDZD-DSDZD-1131}'; // not parsed
-      callFindMarser(_xml, function (err, cleanedXml, markers) {
+      callFindMarkers(_xml, function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [
           { pos : 6,  name : '_root.d.menu' },
@@ -1538,7 +1538,7 @@ function convXML (xml) {
  * @param {String} xml xml to parse
  * @param {Function} cb callback function
  */
-function callFindMarser(xml, cb) {
+function callFindMarkers(xml, cb) {
   xml = parser.removeXMLInsideMarkers(xml);
   return parser.findMarkers(xml, cb);
 }

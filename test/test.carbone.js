@@ -1162,6 +1162,19 @@ describe('Carbone', function () {
           done();
         });
       });
+      it.only('should work', function (done) {
+        var _xml = '{#myVar($a)=d.en:ifGT($a):showBegin} <br>{#myVarFin=d.en:showEnd}<xml> <t_row> {$myVar}  <br/>  {$myVarFin}</t_row> </xml>';
+        var _data = [
+          {brand : 'Lumeneo'     , id : 1},
+          {brand : 'Tesla motors', id : 2},
+          {brand : 'Toyota'      , id : 3}
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          // helper.assert(_xmlBuilt, '<xml> <t_row>  </t_row> </xml>');
+          done();
+        });
+      });
       it('should not crash if weird quotes are injected in formatter parameters', function (done) {
         var data = {};
         carbone.renderXML('<xml>{d:ifEmpty(\'\\\\\'yeah\')}</xml>', data, {complement : {}}, function (err, result) {

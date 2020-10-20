@@ -10,6 +10,16 @@ Carbone Render On-Premise CHANGELOG
 Carbone Enterprise-Edition CHANGELOG
 ====================================
 
+### v2.1.1
+  - Release ...
+  - Can override plugins (readTemplate, writeTemplate, generateOutputFile, readPublicKey, onRenderEnd, readRender)
+  - Fix workDir parameter
+  - Can access GET render without authentication
+  - Remove error message if no plugin exists
+  - Fix bug with environment variable
+  - Can add middlewares before and after route
+  - Add GET and DELETE route for template
+
 ### v2.1.0
   - Release September 1st, 2020
   - Performance: huge gain from x11 to x30 for the compression of reports.

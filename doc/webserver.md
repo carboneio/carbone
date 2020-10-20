@@ -35,6 +35,8 @@ Same HTTP API as https://carbone.io/api-reference.html#carbone-render-api
 Carbone On-Premise is compatible with our SDK for Python, Go, JS, PHP, ...
 
 - Add a template    : POST /render.carbone.io/template
+- Get a template    : GET /render.carbone.io/template/:templateId
+- Delete a template : DELETE /render.carbone.io/template/:templateId
 - Generate a report : POST /render.carbone.io/render/:templateId
 - Get the result    : GET /render.carbone.io/render/:renderId
 

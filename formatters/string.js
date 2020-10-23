@@ -194,6 +194,53 @@ function substr (d, begin, end) {
   return d;
 }
 
+/**
+ * The padl() function pads the current string with another string,
+ * (multiple times, if needed) until the resulting string reaches the given length.
+ * The padding is applied from the start of the current string.
+ *
+ * @example padl('abc', 10);          // "       abc"
+ * @example padl('abc', 10, "foo");   // "foofoofabc"
+ * @example padl('abc', 6, "123465"); // "123abc"
+ * @example padl('abc', 8, "0");      // "00000abc"
+ * @example padl('abc', 1);           // "abc"
+ *
+ * @param {String} d
+ * @param {number} targetLength
+ * @param {String} padString
+ * @return {String} return the padded left string
+ */
+function padl (d, targetLength, padString) {
+  var _padString = padString || ' ';
+  if (typeof d === 'string') {
+    return d.padStart(targetLength, _padString);
+  }
+  return d;
+}
+
+/**
+ * The padr() function pads the current string with a given string,
+ * (repeated, if needed) so that the resulting string reaches a given length.
+ * The padding is applied from the end of the current string.
+ *
+ * @example padr('abc', 10);          // "abc       "
+ * @example padr('abc', 10, "foo");   // "abcfoofoof"
+ * @example padr('abc', 6, "123456"); // "abc123"
+ * @example padr('abc', 1);           // "abc"
+ *
+ * @param {String} d
+ * @param {number} targetLength
+ * @param {String} padString
+ * @return {String} return the padded right string
+ */
+function padr (d, targetLength, padString) {
+  var _padString = padString || ' ';
+  if (typeof d === 'string') {
+    return d.padEnd(targetLength, _padString);
+  }
+  return d;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -204,5 +251,7 @@ module.exports = {
   unaccent  : unaccent,
   print     : print,
   substr    : substr,
-  slice     : substr
+  slice     : substr,
+  padl      : padl,
+  padr      : padr
 };

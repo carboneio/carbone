@@ -264,7 +264,7 @@ module.exports = {
   substr    : substr,
   slice     : substr,
   padl      : padl,
-  padr      : padr
+  padr      : padr,
   md5       : md5,
   prepend   : prepend
 };

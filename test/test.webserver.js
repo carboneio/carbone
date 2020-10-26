@@ -69,7 +69,7 @@ function unlinkConfigFile () {
   fs.rmdirSync(path.join(os.tmpdir(), 'plugin'));
 }
 
-describe('Webserver', () => {
+describe.only('Webserver', () => {
   before(() => {
     writeConfigFile();
   });
@@ -186,6 +186,40 @@ describe('Webserver', () => {
               assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
               done();
             });
+          });
+        });
+      });
+
+      it('should return template in the user location choice', (done) => {
+        exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'abcdefghi')}`, () => {
+          get.concat({
+            url     : 'http://localhost:4001/template/abcdefghi',
+            method  : 'GET',
+            headers : {
+              Authorization : 'Bearer ' + token
+            }
+          }, (err, res, data) => {
+            assert.strictEqual(res.headers['content-disposition'], 'filename="abcdefghi.html"');
+            assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+            fs.unlinkSync(path.join(os.tmpdir(), 'abcdefghi'));
+            done();
+          });
+        });
+      });
+
+      it('should delete a template in the user location choice', (done) => {
+        exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'abcdef')}`, () => {
+          get.concat({
+            url     : 'http://localhost:4001/template/abcdef',
+            method  : 'DELETE',
+            headers : {
+              Authorization : 'Bearer ' + token
+            }
+          }, (err, res, data) => {
+            data = JSON.parse(data.toString());
+            assert.strictEqual(data.success, true);
+            assert.strictEqual(data.message, 'Template deleted');
+            done();
           });
         });
       });
@@ -801,6 +835,70 @@ describe('Webserver', () => {
           data = JSON.parse(data);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Request Error: "template" field is empty');
+          done();
+        });
+      });
+    });
+
+    describe('Get template', () => {
+      let templatePath = path.join(os.tmpdir(), 'template', 'abcdef');
+      let templateFilePath = path.join(__dirname, 'datasets', 'template.html');
+
+      before(() => {
+        fs.copyFileSync(templateFilePath, templatePath);
+      });
+
+      after(() => {
+        fs.unlinkSync(path.join(templatePath));
+      });
+
+      it('should return template', (done) => {
+        get.concat({
+          url    : 'http://localhost:4000/template/abcdef',
+          method : 'GET'
+        }, (err, res, data) => {
+          assert.strictEqual(res.headers['content-disposition'], 'filename="abcdef.html"');
+          assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+          done();
+        });
+      });
+
+      it('should return an error if template does not exists', (done) => {
+        get.concat({
+          url    : 'http://localhost:4000/template/dontexists',
+          method : 'GET'
+        }, (err, res, data) => {
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Template not found');
+          done();
+        });
+      });
+    });
+
+    describe('Delete template', () => {
+      it('should delete a template', (done) => {
+        exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'template', 'abcdef')}`, () => {
+          get.concat({
+            url    : 'http://localhost:4000/template/abcdef',
+            method : 'DELETE'
+          }, (err, res, data) => {
+            data = JSON.parse(data.toString());
+            assert.strictEqual(data.success, true);
+            assert.strictEqual(data.message, 'Template deleted');
+            done();
+          });
+        });
+      });
+
+      it('should return an error if template does not exist', (done) => {
+        get.concat({
+          url    : 'http://localhost:4000/template/nopenopenope',
+          method : 'DELETE'
+        }, (err, res, data) => {
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
           done();
         });
       });

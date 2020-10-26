@@ -195,19 +195,19 @@ function substr (d, begin, end) {
 }
 
 /**
- * The padl() function pads the current string with another string,
- * (multiple times, if needed) until the resulting string reaches the given length.
- * The padding is applied from the start of the current string.
+ * Pad the string from the start with another string
  *
- * @example padl('abc', 10);          // "       abc"
- * @example padl('abc', 10, "foo");   // "foofoofabc"
- * @example padl('abc', 6, "123465"); // "123abc"
- * @example padl('abc', 8, "0");      // "00000abc"
- * @example padl('abc', 1);           // "abc"
+ * @example ["abc", 10         ]
+ * @example ["abc", 10, "foo"  ]
+ * @example ["abc", 6, "123465"]
+ * @example ["abc", 8, "0"     ]
+ * @example ["abc", 1          ]
  *
  * @param {String} d
- * @param {number} targetLength
- * @param {String} padString
+ * @param {number} targetLength  The length of the resulting string once the string has been padded.
+ *                               If the value is less than string length, then string is returned as-is.
+ * @param {String} padString     The string to pad the current str with. If padString is too long to stay
+ *                               within the targetLength, it will be truncated from the end. The default value is " "
  * @return {String} return the padded left string
  */
 function padl (d, targetLength, padString) {
@@ -219,18 +219,19 @@ function padl (d, targetLength, padString) {
 }
 
 /**
- * The padr() function pads the current string with a given string,
- * (repeated, if needed) so that the resulting string reaches a given length.
- * The padding is applied from the end of the current string.
+ * Pad the string from the end with another string
  *
- * @example padr('abc', 10);          // "abc       "
- * @example padr('abc', 10, "foo");   // "abcfoofoof"
- * @example padr('abc', 6, "123456"); // "abc123"
- * @example padr('abc', 1);           // "abc"
+ * @example ["abc", 10         ]
+ * @example ["abc", 10, "foo"  ]
+ * @example ["abc", 6, "123465"]
+ * @example ["abc", 8, "0"     ]
+ * @example ["abc", 1          ]
  *
  * @param {String} d
- * @param {number} targetLength
- * @param {String} padString
+ * @param {number} targetLength  The length of the resulting string once the string has been padded.
+ *                               If the value is less than string length, then string is returned as-is.
+ * @param {String} padString     The string to pad the current str with. If padString is too long to stay
+ *                               within the targetLength, it will be truncated from the end. The default value is " "
  * @return {String} return the padded right string
  */
 function padr (d, targetLength, padString) {

@@ -213,9 +213,15 @@ function substr (d, begin, end) {
  * @return {String} return the padded left string
  */
 function padl (d, targetLength, padString) {
-  var _padString = padString || ' ';
+  var _padString = ' ';
+  if (padString !== undefined) {
+    _padString = padString;
+  }
   if (typeof d === 'string') {
     return d.padStart(targetLength, _padString);
+  }
+  if (typeof d === 'number') {
+    return d.toString().padStart(targetLength, _padString);
   }
   return d;
 }
@@ -237,9 +243,15 @@ function padl (d, targetLength, padString) {
  * @return {String} return the padded right string
  */
 function padr (d, targetLength, padString) {
-  var _padString = padString || ' ';
+  var _padString = ' ';
+  if (padString !== undefined) {
+    _padString = padString;
+  }
   if (typeof d === 'string') {
     return d.padEnd(targetLength, _padString);
+  }
+  if (typeof d === 'number') {
+    return d.toString().padEnd(targetLength, _padString);
   }
   return d;
 }

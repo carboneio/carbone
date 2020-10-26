@@ -8,10 +8,10 @@ function getPublicKey (req, res, payload, callback) {
       return callback(new Error('Cannot read public key ' + err.toString()));
     }
 
-    return callback(content)
+    return callback(content);
   });
 }
 
 module.exports = {
   getPublicKey
-}
+};

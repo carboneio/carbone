@@ -376,3 +376,27 @@ module.exports = {
   getPublicKey
 }
 ```
+
+## Middlewares
+
+You can add your own middlewares before or after route. It can be usefull to log or get stats on your requests.
+
+To do it, add a `middlewares.js` file in the `plugin` folder and export two arrays:  
+- before
+- after
+
+```js
+function beforeMiddleware (req, res, next) {
+  console.log('I am executed before all route')
+  return next()
+}
+
+function afterMiddleware (req, res, next) {
+  console.log('I am executed after all route')
+}
+
+module.exports = {
+  before: [beforeMiddleware], // Middlewares in this array will be executed before routes
+  after: [afterMiddleware] // Middlewares in this array will be executed after routes
+}
+```

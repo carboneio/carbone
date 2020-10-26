@@ -5,6 +5,7 @@
   - Can access GET render without authentication
   - Remove error message if no plugin exists
   - Fix bug with environment variable
+  - Can add middlewares before and after route
 
 ### v2.1.1
   - Release September 23rd 2020

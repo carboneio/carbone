@@ -1,3 +1,12 @@
+### v2.2.0
+  - Can override plugins (readTemplate, writeTemplate, generateOutputFile, readPublicKey, onRenderEnd, readRender)
+  - Can access GET render without authentication
+  - Can add middlewares before and after route
+  - Add GET and DELETE route for template
+  - Fix workDir parameter
+  - Remove error message if no plugin exists
+  - Fix bug with environment variable
+
 ### v2.1.1
   - Release September 23rd 2020
   - Fixes `arrayJoin(\n):convCRLF`. Now it works in carbone v2.x.x like in v1.x.x.

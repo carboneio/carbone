@@ -194,6 +194,54 @@ function substr (d, begin, end) {
   return d;
 }
 
+/**
+ * Pad the string from the start with another string
+ *
+ * @example ["abc", 10         ]
+ * @example ["abc", 10, "foo"  ]
+ * @example ["abc", 6, "123465"]
+ * @example ["abc", 8, "0"     ]
+ * @example ["abc", 1          ]
+ *
+ * @param {String} d
+ * @param {number} targetLength  The length of the resulting string once the string has been padded.
+ *                               If the value is less than string length, then string is returned as-is.
+ * @param {String} padString     The string to pad the current str with. If padString is too long to stay
+ *                               within the targetLength, it will be truncated from the end. The default value is " "
+ * @return {String} return the padded left string
+ */
+function padl (d, targetLength, padString) {
+  var _padString = padString || ' ';
+  if (typeof d === 'string') {
+    return d.padStart(targetLength, _padString);
+  }
+  return d;
+}
+
+/**
+ * Pad the string from the end with another string
+ *
+ * @example ["abc", 10         ]
+ * @example ["abc", 10, "foo"  ]
+ * @example ["abc", 6, "123465"]
+ * @example ["abc", 8, "0"     ]
+ * @example ["abc", 1          ]
+ *
+ * @param {String} d
+ * @param {number} targetLength  The length of the resulting string once the string has been padded.
+ *                               If the value is less than string length, then string is returned as-is.
+ * @param {String} padString     The string to pad the current str with. If padString is too long to stay
+ *                               within the targetLength, it will be truncated from the end. The default value is " "
+ * @return {String} return the padded right string
+ */
+function padr (d, targetLength, padString) {
+  var _padString = padString || ' ';
+  if (typeof d === 'string') {
+    return d.padEnd(targetLength, _padString);
+  }
+  return d;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -204,5 +252,7 @@ module.exports = {
   unaccent  : unaccent,
   print     : print,
   substr    : substr,
-  slice     : substr
+  slice     : substr,
+  padl      : padl,
+  padr      : padr
 };

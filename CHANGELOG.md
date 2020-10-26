@@ -1,3 +1,6 @@
+### v2.2.0
+  - Adding `padl` and `padr` string formatter.
+
 ### v2.1.1
   - Release September 23rd 2020
   - Fixes `arrayJoin(\n):convCRLF`. Now it works in carbone v2.x.x like in v1.x.x.

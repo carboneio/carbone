@@ -149,7 +149,7 @@ function unaccent (d) {
 
 
 /**
- * Convert carriage return `\r\n` and line feed `\n` to XML-specific code in rendered document
+ * Convert carriage return `\\r\\n` and line feed `\\n` to XML-specific code in rendered document
  *
  * Compatible with odt, and docx (beta)
  *
@@ -196,6 +196,54 @@ function substr (d, begin, end) {
   return d;
 }
 
+/**
+ * Pad the string from the start with another string
+ *
+ * @example ["abc", 10         ]
+ * @example ["abc", 10, "foo"  ]
+ * @example ["abc", 6, "123465"]
+ * @example ["abc", 8, "0"     ]
+ * @example ["abc", 1          ]
+ *
+ * @param {String} d
+ * @param {number} targetLength  The length of the resulting string once the string has been padded.
+ *                               If the value is less than string length, then string is returned as-is.
+ * @param {String} padString     The string to pad the current str with. If padString is too long to stay
+ *                               within the targetLength, it will be truncated from the end. The default value is " "
+ * @return {String} return the padded left string
+ */
+function padl (d, targetLength, padString) {
+  var _padString = padString || ' ';
+  if (typeof d === 'string') {
+    return d.padStart(targetLength, _padString);
+  }
+  return d;
+}
+
+/**
+ * Pad the string from the end with another string
+ *
+ * @example ["abc", 10         ]
+ * @example ["abc", 10, "foo"  ]
+ * @example ["abc", 6, "123465"]
+ * @example ["abc", 8, "0"     ]
+ * @example ["abc", 1          ]
+ *
+ * @param {String} d
+ * @param {number} targetLength  The length of the resulting string once the string has been padded.
+ *                               If the value is less than string length, then string is returned as-is.
+ * @param {String} padString     The string to pad the current str with. If padString is too long to stay
+ *                               within the targetLength, it will be truncated from the end. The default value is " "
+ * @return {String} return the padded right string
+ */
+function padr (d, targetLength, padString) {
+  var _padString = padString || ' ';
+  if (typeof d === 'string') {
+    return d.padEnd(targetLength, _padString);
+  }
+  return d;
+}
+
 function md5 (d) {
   return toMd5(d);
 }
@@ -215,6 +263,8 @@ module.exports = {
   print     : print,
   substr    : substr,
   slice     : substr,
+  padl      : padl,
+  padr      : padr
   md5       : md5,
   prepend   : prepend
 };

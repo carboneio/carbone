@@ -9,10 +9,11 @@ assignees: ''
 ---
 
 **Environment**
-Carbone Version: [e.g. Node 8.16.1]
-Node Version: [e.g. chrome 22]
+Carbone Version: [e.g. Carbone 2.1.0]
+Node Version: [e.g. Node 8.16.1]
 Browsers: [e.g. chrome 22]
 Desktop OS: [e.g. Ubuntu 18, Mac Os, ...]
+Other: [e.g. LibreOffice: 6.1.5]
 
 **Expected Behaviour**
 A clear and concise description of what you expected to happen.
@@ -24,7 +25,7 @@ A clear and concise description of what the bug is.
 Steps to reproduce the bug:
 1. Go to '...'
 2. Click on '....'
-4. See error
+3. See error
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.

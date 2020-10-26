@@ -113,7 +113,7 @@ If you need to see the command usage, call
 ## Authentication
 
 By default, carbone-ee starts without authentication. 
-You must add `--authentication` or `-A` in CLI or set `authentication : true` in config file to activate authentication.
+You must add `--authentication` or `-A` in CLI or set `authentication : true` in config file to activate authentication. When activated, all APIs are protected by authentication except `GET /render.carbone.io/render/:renderId`.
 
 The authentication mechanism is based on `ES512` JWT tokens.
 
@@ -191,7 +191,7 @@ export CARBONE_EE_BIND=127.0.0.1
 export CARBONE_EE_FACTORIES=4
 export CARBONE_EE_WORKDIR=/var/www/carbone
 export CARBONE_EE_ATTEMPS=2
-export CARBONE_EE_AUTH=true
+export CARBONE_EE_AUTHENTICATION=true
 ```
 
 ## Setup plugins

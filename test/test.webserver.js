@@ -5,7 +5,6 @@ const path       = require('path');
 const FormData   = require('form-data');
 const assert     = require('assert');
 const carbone    = require('../lib/index');
-const { render } = require('../lib/index');
 const sinon      = require('sinon');
 const os         = require('os');
 const { exec }   = require('child_process');
@@ -14,71 +13,61 @@ const params     = require('../lib/params');
 function deleteRequiredFiles () {
   try {
     delete require.cache[require.resolve('../lib/webserver')];
-    delete require.cache[require.resolve(path.join(params.workDir, 'plugin', 'authentication.js'))];
-    delete require.cache[require.resolve(path.join(params.workDir, 'plugin', 'storage.js'))];
-  } catch (e) {}
+    delete require.cache[require.resolve(path.join(os.tmpdir(), 'plugin', 'authentication.js'))];
+    delete require.cache[require.resolve(path.join(os.tmpdir(), 'plugin', 'storage.js'))];
+  }
+  catch (e) {
+    console.log(e);
+  }
 }
 
 function uploadFile (port, token, callback) {
   let form = new FormData();
 
-  form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+  form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
   let headers = {
-    'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
+    'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary()
   };
 
   if (token !== null) {
-    headers.Authorization = 'Bearer ' + token
+    headers.Authorization = 'Bearer ' + token;
   }
 
   get.concat({
-    url: 'http://localhost:'+port+'/template',
-    method: 'POST',
+    url    : 'http://localhost:'+port+'/template',
+    method : 'POST',
     headers,
-    body: form
+    body   : form
   }, (err, res, data) => {
     assert.strictEqual(err, null);
     data = JSON.parse(data);
     assert.strictEqual(data.success, true);
-    callback()
-  })
+    callback();
+  });
 }
 
 function writeConfigFile () {
-  const pluginDir = path.join(process.cwd(), 'plugin');
-  const configDir = path.join(process.cwd(), 'config');
+  const pluginDir = path.join(os.tmpdir(), 'plugin');
+  const configDir = path.join(os.tmpdir(), 'config');
 
-  if (fs.existsSync(pluginDir)) {
-    fs.renameSync(pluginDir, path.join(process.cwd(), 'wait-plugin'))
+  if (fs.existsSync(configDir) === false) {
+    fs.mkdirSync(path.join(os.tmpdir(), 'config'));
   }
-  if (fs.existsSync(configDir)) {
-    fs.renameSync(configDir, path.join(process.cwd(), 'wait-config'))
+  if (fs.existsSync(pluginDir) === false) {
+    fs.mkdirSync(path.join(os.tmpdir(), 'plugin'));
   }
-
-  fs.mkdirSync(path.join(process.cwd(), 'config'));
-  fs.mkdirSync(path.join(process.cwd(), 'plugin'));
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'config.json'), path.join(process.cwd(), 'config', 'config.json'));
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pem'), path.join(process.cwd(), 'config', 'key.pem'));
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'config', 'key.pub'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'config.json'), path.join(os.tmpdir(), 'config', 'config.json'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pem'), path.join(os.tmpdir(), 'config', 'key.pem'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(os.tmpdir(), 'config', 'key.pub'));
 }
 
 function unlinkConfigFile () {
-  const pluginDir = path.join(process.cwd(), 'wait-plugin');
-  const configDir = path.join(process.cwd(), 'wait-config');
-
-  fs.unlinkSync(path.join(process.cwd(), 'config', 'config.json'));
-  fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pem'));
-  fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pub'));
-  fs.rmdirSync(path.join(process.cwd(), 'config'));
-  fs.rmdirSync(path.join(process.cwd(), 'plugin'));
-
-  if (fs.existsSync(pluginDir)) {
-    fs.renameSync(pluginDir, path.join(process.cwd(), 'plugin'))
-  }
-  if (fs.existsSync(configDir)) {
-    fs.renameSync(configDir, path.join(process.cwd(), 'config'))
-  }
+  fs.unlinkSync(path.join(os.tmpdir(), 'config', 'config.json'));
+  fs.unlinkSync(path.join(os.tmpdir(), 'config', 'key.pem'));
+  fs.unlinkSync(path.join(os.tmpdir(), 'config', 'key.pub'));
+  fs.rmdirSync(path.join(os.tmpdir(), 'config'));
+  fs.rmdirSync(path.join(os.tmpdir(), 'plugin'));
 }
 
 describe('Webserver', () => {
@@ -90,28 +79,17 @@ describe('Webserver', () => {
     unlinkConfigFile();
   });
 
-  describe('With authentication with plugins', () => {
+  describe('With authentication with plugins', () => {
     let token = null;
     let toDelete = [];
-    let oldGenerateOutputFilename = null;
-
-    before(() => {
-      oldGenerateOutputFilename = carbone.generateOutputFilename;
-    })
-
-    after(() => {
-      carbone.generateOutputFilename = oldGenerateOutputFilename;
-    })
 
     describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender', () => {
       before((done) => {
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'authentication.js'), path.join(process.cwd(), 'plugin', 'authentication.js'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage.js'), path.join(process.cwd(), 'plugin', 'storage.js'));
-        fs.unlinkSync(path.join(process.cwd(), 'config', 'key.pub'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'key.pub'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
         deleteRequiredFiles();
         webserver = require('../lib/webserver');
-        webserver.handleParams(['--auth', '--port', 4001], () => {
+        webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir()], () => {
           webserver.generateToken((_, newToken) => {
             token = newToken;
             done();
@@ -120,17 +98,15 @@ describe('Webserver', () => {
       });
 
       after((done) => {
-        fs.unlinkSync(path.join(process.cwd(), 'key.pub'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(process.cwd(), 'config', 'key.pub'));
-        fs.unlinkSync(path.join(process.cwd(), 'plugin', 'authentication.js'));
-        fs.unlinkSync(path.join(process.cwd(), 'plugin', 'storage.js'));
+        fs.unlinkSync(path.join(os.tmpdir(), 'plugin', 'authentication.js'));
+        fs.unlinkSync(path.join(os.tmpdir(), 'plugin', 'storage.js'));
         webserver.stopServer(done);
       });
 
       afterEach(() => {
         for (let i = 0; i < toDelete.length; i++) {
-          if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
-            fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+          if (fs.existsSync(path.join(os.tmpdir(), 'template', toDelete[i]))) {
+            fs.unlinkSync(path.join(os.tmpdir(), 'template', toDelete[i]));
           }
         }
 
@@ -140,16 +116,16 @@ describe('Webserver', () => {
       it('should upload the template and use authentication and storage plugin', (done) => {
         let form = new FormData();
 
-        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
         get.concat({
-          url: 'http://localhost:4001/template',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary(),
-            'Authorization': 'Bearer ' + token
+          url     : 'http://localhost:4001/template',
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary(),
+            Authorization  : 'Bearer ' + token
           },
-          body: form
+          body : form
         }, (err, res, data) => {
           assert.strictEqual(err, null);
           data = JSON.parse(data);
@@ -167,19 +143,19 @@ describe('Webserver', () => {
 
         uploadFile(4001, token, () => {
           get.concat({
-            url: 'http://localhost:4001/render/' + templateId,
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer ' + token
+            url     : 'http://localhost:4001/render/' + templateId,
+            method  : 'POST',
+            headers : {
+              Authorization : 'Bearer ' + token
             },
-            json: true,
-            body: {
-              data: {
-                firstname: 'John',
-                lastname: 'Doe'
+            json : true,
+            body : {
+              data : {
+                firstname : 'John',
+                lastname  : 'Doe'
               },
-              complement: {},
-              enum: {}
+              complement : {},
+              enum       : {}
             }
           }, (err, res, data) => {
             assert.strictEqual(err, null);
@@ -189,9 +165,9 @@ describe('Webserver', () => {
             assert.strictEqual(data.data.renderId.endsWith('.html'), true);
 
             get.concat({
-              url: 'http://localhost:4001/render/' + data.data.renderId,
-              headers: {
-                'Authorization': 'Bearer ' + token
+              url     : 'http://localhost:4001/render/' + data.data.renderId,
+              headers : {
+                Authorization : 'Bearer ' + token
               }
             }, (err, res, data) => {
               assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
@@ -211,7 +187,7 @@ describe('Webserver', () => {
       deleteRequiredFiles();
       webserver = require('../lib/webserver');
 
-      webserver.handleParams(['--auth', '--port', 4001], () => {
+      webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir()], () => {
         webserver.generateToken((_, newToken) => {
           token = newToken;
           done();
@@ -226,7 +202,7 @@ describe('Webserver', () => {
     afterEach(() => {
       for (let i = 0; i < toDelete.length; i++) {
         if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
-          fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+          fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]));
         }
       }
 
@@ -236,15 +212,15 @@ describe('Webserver', () => {
     it('should not upload template if user is not authenticated', (done) => {
       let form = new FormData();
 
-      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
       get.concat({
-        url: 'http://localhost:4001/template',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
+        url     : 'http://localhost:4001/template',
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary()
         },
-        body: form
+        body : form
       }, (err, res, data) => {
         assert.strictEqual(err, null);
         data = JSON.parse(data);
@@ -257,24 +233,72 @@ describe('Webserver', () => {
     it('should upload the template if user is authenticated', (done) => {
       let form = new FormData();
 
-      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
       get.concat({
-        url: 'http://localhost:4001/template',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary(),
-          'Authorization': 'Bearer ' + token
+        url     : 'http://localhost:4001/template',
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary(),
+          Authorization  : 'Bearer ' + token
         },
-        body: form
+        body : form
       }, (err, res, data) => {
         assert.strictEqual(err, null);
         data = JSON.parse(data);
         assert.strictEqual(data.success, true);
         assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
-        let exists = fs.existsSync(path.join(__dirname, '..', 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+        let exists = fs.existsSync(path.join(os.tmpdir(), 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
         assert.strictEqual(exists, true);
         toDelete.push('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        done();
+      });
+    });
+  });
+
+  describe('With authentication with environment variable', () => {
+    let toDelete = [];
+
+    before((done) => {
+      process.env.CARBONE_EE_AUTHENTICATION = true;
+      deleteRequiredFiles();
+      webserver = require('../lib/webserver');
+
+      webserver.handleParams(['--port', 4002, '--workdir', os.tmpdir()], done);
+    });
+
+    after((done) => {
+      delete process.env.CARBONE_EE_AUTHENTICATION;
+      webserver.stopServer(done);
+    });
+
+    afterEach(() => {
+      for (let i = 0; i < toDelete.length; i++) {
+        if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
+          fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]));
+        }
+      }
+
+      toDelete = [];
+    });
+
+    it('should not upload template if user is not authenticated', (done) => {
+      let form = new FormData();
+
+      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
+
+      get.concat({
+        url     : 'http://localhost:4002/template',
+        method  : 'POST',
+        headers : {
+          'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary()
+        },
+        body : form
+      }, (err, res, data) => {
+        assert.strictEqual(err, null);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.error, 'Error: No JSON Web Token detected in Authorization header or Cookie. Format is "Authorization: jwt" or "Cookie: access_token=jwt"');
         done();
       });
     });
@@ -287,11 +311,11 @@ describe('Webserver', () => {
       deleteRequiredFiles();
       webserver = require('../lib/webserver');
 
-      webserver.handleParams([], done)
+      webserver.handleParams(['--workdir', os.tmpdir()], done);
     });
 
     after((done) => {
-      webserver.stopServer(done)
+      webserver.stopServer(done);
     });
 
     describe('Render template', () => {
@@ -299,23 +323,23 @@ describe('Webserver', () => {
       let spyRender = null;
 
       before((done) => {
-        uploadFile(4000, null, done)
+        uploadFile(4000, null, done);
       });
 
       beforeEach(() => {
         spyRender = sinon.spy(carbone, 'render');
-      })
+      });
 
       afterEach(() => {
         spyRender.restore();
 
         for (let i = 0; i < toDelete.length; i++) {
-          if (fs.existsSync(path.join(__dirname, '..', 'render', toDelete[i]))) {
-            fs.unlinkSync(path.join(__dirname, '..', 'render', toDelete[i]))
+          if (fs.existsSync(path.join(os.tmpdir(), 'render', toDelete[i]))) {
+            fs.unlinkSync(path.join(os.tmpdir(), 'render', toDelete[i]));
           }
 
-          if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
-            fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+          if (fs.existsSync(path.join(os.tmpdir(), 'template', toDelete[i]))) {
+            fs.unlinkSync(path.join(os.tmpdir(), 'template', toDelete[i]));
           }
         }
 
@@ -323,8 +347,8 @@ describe('Webserver', () => {
       });
 
       after((done) => {
-        if (fs.existsSync(path.join(__dirname, '..', 'template', templateId))) {
-          fs.unlinkSync(path.join(__dirname, '..', 'template', templateId))
+        if (fs.existsSync(path.join(os.tmpdir(), 'template', templateId))) {
+          fs.unlinkSync(path.join(os.tmpdir(), 'template', templateId));
         }
 
         done();
@@ -332,72 +356,72 @@ describe('Webserver', () => {
 
       it('should render a template', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/' + templateId,
-          json: true,
-          method: 'POST',
-          body: {
-            data: {
-              firstname: 'John',
-              lastname: 'Doe'
+          url    : 'http://localhost:4000/render/' + templateId,
+          json   : true,
+          method : 'POST',
+          body   : {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
             },
-            complement: {},
-            enum: {}
+            complement : {},
+            enum       : {}
           }
         }, (err, res, data) => {
           assert.strictEqual(data.success, true);
-          const _renderedFile = fs.readFileSync(path.join(__dirname, '..', 'render', data.data.renderId)).toString();
+          const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
           toDelete.push(data.data.renderId);
-          done()
+          done();
         });
       });
 
       it('should not crash if data key does not exists', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/' + templateId,
-          json: true,
-          method: 'POST',
-          body: {
-            firstname: 'John',
-            lastname: 'Doe'
+          url    : 'http://localhost:4000/render/' + templateId,
+          json   : true,
+          method : 'POST',
+          body   : {
+            firstname : 'John',
+            lastname  : 'Doe'
           }
         }, (err, res, data) => {
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Missing data key in body');
-          done()
+          done();
         });
       });
 
       it('should render template and keep all user choice in a prod env', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/' + templateId,
-          json: true,
-          method: 'POST',
-          body: {
-            data: {
-              firstname: 'John',
-              lastname: 'Doe'
+          url    : 'http://localhost:4000/render/' + templateId,
+          json   : true,
+          method : 'POST',
+          body   : {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
             },
-            convertTo: {
-              formatName: 'pdf',
-              formatOptions: {
-                EncryptFile : false,
+            convertTo : {
+              formatName    : 'pdf',
+              formatOptions : {
+                EncryptFile          : false,
                 DocumentOpenPassword : 'Pass',
-                Watermark: 'My Watermark'
+                Watermark            : 'My Watermark'
               }
             },
-            complement: {},
-            enum: {}
+            complement : {},
+            enum       : {}
           }
         }, (err, res, data) => {
           assert.strictEqual(data.success, true);
           const renderOptions = spyRender.firstCall.args;
           assert.deepStrictEqual(renderOptions[2].convertTo, {
-            formatName: 'pdf',
-            formatOptions: {
-              EncryptFile : false,
+            formatName    : 'pdf',
+            formatOptions : {
+              EncryptFile          : false,
               DocumentOpenPassword : 'Pass',
-              Watermark: 'My Watermark'
+              Watermark            : 'My Watermark'
             }
           });
           toDelete.push(data.data.renderId);
@@ -407,16 +431,16 @@ describe('Webserver', () => {
 
       it('should return a 404 error if the template does not exists', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/nopeidontexists',
-          json: true,
-          method: 'POST',
-          body: {
-            data: {
-              firstname: 'John',
-              lastname: 'Doe'
+          url    : 'http://localhost:4000/render/nopeidontexists',
+          json   : true,
+          method : 'POST',
+          body   : {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
             },
-            complement: {},
-            enum: {}
+            complement : {},
+            enum       : {}
           }
         }, (err, res, data) => {
           assert.strictEqual(data.success, false);
@@ -428,135 +452,135 @@ describe('Webserver', () => {
 
       it('should render template and encode filename on disk', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/' + templateId,
-          json: true,
-          method: 'POST',
-          body: {
-            data: {
-              firstname: 'John',
-              lastname: 'Doe'
+          url    : 'http://localhost:4000/render/' + templateId,
+          json   : true,
+          method : 'POST',
+          body   : {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
             },
-            reportName: 'hello how are you?',
-            complement: {},
-            enum: {}
+            reportName : 'hello how are you?',
+            complement : {},
+            enum       : {}
           }
         }, (err, res, data) => {
           assert.strictEqual(data.success, true);
-          assert.strictEqual(data.data.renderId.endsWith('hello%20how%20are%20you%3F.html'), true)
-          const _renderedFile = fs.readFileSync(path.join(__dirname, '..', 'render', data.data.renderId)).toString();
+          assert.strictEqual(data.data.renderId.endsWith('hello%20how%20are%20you%3F.html'), true);
+          const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
           toDelete.push(data.data.renderId);
-          done()
+          done();
         });
       });
 
       it('should render template and format the renderId well', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/' + templateId,
-          json: true,
-          method: 'POST',
-          body: {
-            data: {
-              firstname: 'John',
-              lastname: 'Doe'
+          url    : 'http://localhost:4000/render/' + templateId,
+          json   : true,
+          method : 'POST',
+          body   : {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
             },
-            complement: {},
-            enum: {}
+            complement : {},
+            enum       : {}
           }
         }, (err, res, data) => {
           assert.strictEqual(data.success, true);
-          assert.strictEqual(data.data.renderId.endsWith('.html'), true)
+          assert.strictEqual(data.data.renderId.endsWith('.html'), true);
           toDelete.push(data.data.renderId);
-          done()
+          done();
         });
       });
 
       it('should render template with given filename', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/' + templateId,
-          json: true,
-          method: 'POST',
-          body: {
-            reportName: 'renderedReport',
-            data: {
-              firstname: 'John',
-              lastname: 'Doe'
+          url    : 'http://localhost:4000/render/' + templateId,
+          json   : true,
+          method : 'POST',
+          body   : {
+            reportName : 'renderedReport',
+            data       : {
+              firstname : 'John',
+              lastname  : 'Doe'
             },
-            complement: {},
-            enum: {}
+            complement : {},
+            enum       : {}
           }
         }, (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.renderId.includes('renderedReport.html'), true);
           toDelete.push(data.data.renderId);
-          done()
+          done();
         });
       });
 
       it('should render template with given filename processed by Carbone', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/' + templateId,
-          json: true,
-          method: 'POST',
-          body: {
-            reportName: '{d.title}.oui',
-            data: {
-              title: 'MyRender'
+          url    : 'http://localhost:4000/render/' + templateId,
+          json   : true,
+          method : 'POST',
+          body   : {
+            reportName : '{d.title}.oui',
+            data       : {
+              title : 'MyRender'
             },
-            complement: {},
-            enum: {}
+            complement : {},
+            enum       : {}
           }
         }, (err, res, data) => {
-          const _renderedFile = fs.readFileSync(path.join(__dirname, '..', 'render', data.data.renderId)).toString();
-          const _expect = `<!DOCTYPE html> <html> <p>I'm a Carbone template !</p> <p>I AM  </p> </html> `;
+          const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
+          const _expect = '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM  </p> </html> ';
 
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.renderId.includes('MyRender.oui.html'), true);
           assert.strictEqual(_renderedFile, _expect);
           toDelete.push(data.data.renderId);
-          done()
+          done();
         });
       });
 
       it('should not render template if the "content-type" is not set to "application/json"', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/' + templateId,
-          method: 'POST'
+          url    : 'http://localhost:4000/render/' + templateId,
+          method : 'POST'
         }, (err, res, data) => {
           data = JSON.parse(data.toString());
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, "Request Error: Content-Type header is not application/json.");
-          done()
+          assert.strictEqual(data.error, 'Request Error: Content-Type header is not application/json.');
+          done();
         });
       });
 
       it('should not render template (path injection)', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/..%2F..%2F..%2F..%2Fdatasets%2Ftemplate.html',
-          method: 'POST',
-          json: true,
-          body: {
-            data: {
-              firstname: 'John',
-              lastname: 'Doe'
+          url    : 'http://localhost:4000/render/..%2F..%2F..%2F..%2Fdatasets%2Ftemplate.html',
+          method : 'POST',
+          json   : true,
+          body   : {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
             },
-            complement: {},
-            enum: {}
+            complement : {},
+            enum       : {}
           }
         }, (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Template not found');
-          done()
+          done();
         });
       });
     });
 
     describe('Get render', () => {
-      let renderPath = path.join(__dirname, '..', 'render');
+      let renderPath = path.join(os.tmpdir(), 'render');
       let datasetsRenderPath = path.join(__dirname, 'datasets', 'renderedReport');
       let renderedFiles = [
         '0c7b6b9f8180e8206c0aa9a91d9c836fe5b271eed2a1d4cf5a1b05e4fd582fbarenderedReport.html',
@@ -565,41 +589,41 @@ describe('Webserver', () => {
       ];
 
       it('should retrieve the render file', (done) => {
-        exec(`cp ${datasetsRenderPath}/${renderedFiles[0]} ${renderPath}`, (err) => {
+        exec(`cp ${datasetsRenderPath}/${renderedFiles[0]} ${renderPath}`, () => {
           get.concat({
-            url: 'http://localhost:4000/render/' + renderedFiles[0],
-            method: 'GET'
+            url    : 'http://localhost:4000/render/' + renderedFiles[0],
+            method : 'GET'
           }, (err, res, data) => {
-            assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"')
-            assert.strictEqual(data.toString(), 'I have been rendered\n')
-            done()
+            assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
+            assert.strictEqual(data.toString(), 'I have been rendered\n');
+            done();
           });
         });
       });
 
       it('should retrieve the render file, get the filename and get the header "access-control-expose-headers" for CORS', (done) => {
-        exec(`cp ${datasetsRenderPath}/${renderedFiles[0]} ${renderPath}`, (err) => {
+        exec(`cp ${datasetsRenderPath}/${renderedFiles[0]} ${renderPath}`, () => {
           get.concat({
-            url: 'http://localhost:4000/render/' + renderedFiles[0],
-            method: 'GET'
+            url    : 'http://localhost:4000/render/' + renderedFiles[0],
+            method : 'GET'
           }, (err, res, data) => {
             assert.strictEqual(res.headers['access-control-expose-headers'], 'X-Request-URL,Content-Disposition');
             assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
             assert.strictEqual(data.toString(), 'I have been rendered\n');
-            done()
+            done();
           });
         });
       });
 
       it('should delete the rendered file after download it', (done) => {
-        exec(`cp ${datasetsRenderPath}/${renderedFiles[0]} ${renderPath}`, (err) => {
+        exec(`cp ${datasetsRenderPath}/${renderedFiles[0]} ${renderPath}`, () => {
           let exists = fs.existsSync(`${renderPath}/${renderedFiles[0]}`);
 
           assert.strictEqual(exists, true);
 
           get.concat({
-            url: 'http://localhost:4000/render/' + renderedFiles[0],
-            method: 'GET'
+            url    : 'http://localhost:4000/render/' + renderedFiles[0],
+            method : 'GET'
           }, (err, res, data) => {
             assert.strictEqual(res.headers['access-control-expose-headers'], 'X-Request-URL,Content-Disposition');
             assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
@@ -609,47 +633,47 @@ describe('Webserver', () => {
               let exists = fs.existsSync(`${renderPath}/${renderedFiles[0]}`);
 
               assert.strictEqual(exists, false);
-              done()
+              done();
             }, 10);
           });
         });
       });
 
       it('should retrieve the render file and have its name decoded', (done) => {
-        exec(`cp ${datasetsRenderPath}/${renderedFiles[1]} ${renderPath}`, (err) => {
+        exec(`cp ${datasetsRenderPath}/${renderedFiles[1]} ${renderPath}`, () => {
           get.concat({
-            url: 'http://localhost:4000/render/' + renderedFiles[1],
-            method: 'GET'
+            url    : 'http://localhost:4000/render/' + renderedFiles[1],
+            method : 'GET'
           }, (err, res, data) => {
             assert.strictEqual(res.headers['content-disposition'], 'filename="encoded filename.html"');
             assert.strictEqual(data.toString(), 'Oh yes it works\n');
-            done()
+            done();
           });
         });
       });
 
       it('should retrieve the rendered file with UUID as filename. And set access-control-allow-origin to allow fetch from another domain', (done) => {
-        exec(`cp ${datasetsRenderPath}/${renderedFiles[2]} ${renderPath}`, (err) => {
+        exec(`cp ${datasetsRenderPath}/${renderedFiles[2]} ${renderPath}`, () => {
           get.concat({
-            url: 'http://localhost:4000/render/' + renderedFiles[2],
-            method: 'GET'
+            url    : 'http://localhost:4000/render/' + renderedFiles[2],
+            method : 'GET'
           }, (err, res, data) => {
             assert.strictEqual(res.headers['access-control-allow-origin'], '*');
             assert.strictEqual(res.headers['x-request-url'], '/render/118f03dd2bc1f79219fc8fbbf76f6cd2de8e9ae23b8836279e4cdaa98f4e4943.html');
             assert.strictEqual(res.headers['content-disposition'], 'filename="118f03dd2bc1f79219fc8fbbf76f6cd2de8e9ae23b8836279e4cdaa98f4e4943.html"');
             assert.strictEqual(data.toString(), '<p>Hello</p>\n');
-            done()
+            done();
           });
         });
       });
 
       it('should not retrieve anything (does not exist)', (done) => {
         get.concat({
-          url: 'http://localhost:4000/render/nopeidontexists',
-          method: 'GET'
-        }, (err, res, data) => {
+          url    : 'http://localhost:4000/render/nopeidontexists',
+          method : 'GET'
+        }, (err, res) => {
           assert.strictEqual(res.statusCode, 404);
-          done()
+          done();
         });
       });
     });
@@ -660,7 +684,7 @@ describe('Webserver', () => {
       afterEach(() => {
         for (let i = 0; i < toDelete.length; i++) {
           if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
-            fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]))
+            fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]));
           }
         }
 
@@ -670,21 +694,21 @@ describe('Webserver', () => {
       it('should upload the template', (done) => {
         let form = new FormData();
 
-        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
         get.concat({
-          url: 'http://localhost:4000/template',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
+          url     : 'http://localhost:4000/template',
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary()
           },
-          body: form
+          body : form
         }, (err, res, data) => {
           assert.strictEqual(err, null);
           data = JSON.parse(data);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
-          let exists = fs.existsSync(path.join(__dirname, '..', 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+          let exists = fs.existsSync(path.join(os.tmpdir(), 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           assert.strictEqual(exists, true);
           toDelete.push('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
           done();
@@ -693,12 +717,12 @@ describe('Webserver', () => {
 
       it('should return an error if no form data is used', (done) => {
         get.concat({
-          url: 'http://localhost:4000/template',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data'
+          url     : 'http://localhost:4000/template',
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'multipart/form-data'
           },
-          body: fs.createReadStream(path.join(__dirname, 'datasets', 'template.html'))
+          body : fs.createReadStream(path.join(__dirname, 'datasets', 'template.html'))
         }, (err, res, data) => {
           assert.strictEqual(err, null);
           data = JSON.parse(data.toString());
@@ -710,11 +734,11 @@ describe('Webserver', () => {
 
       it('should return an error if content type is different than multipart/form-data', (done) => {
         get.concat({
-          url: 'http://localhost:4000/template',
-          method: 'POST',
-          json: true,
-          body: {
-            template: 'tete'
+          url    : 'http://localhost:4000/template',
+          method : 'POST',
+          json   : true,
+          body   : {
+            template : 'tete'
           }
         }, (err, res, data) => {
           assert.strictEqual(err, null);
@@ -728,21 +752,21 @@ describe('Webserver', () => {
         let form = new FormData();
 
         form.append('payload', 'unepayload');
-        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')))
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
         get.concat({
-          url: 'http://localhost:4000/template',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
+          url     : 'http://localhost:4000/template',
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary()
           },
-          body: form
+          body : form
         }, (err, res, data) => {
           assert.strictEqual(err, null);
           data = JSON.parse(data);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.templateId, '049f4454f4cd92f637965173cb90ddbfac22563d6711fc9fb0683fe8a46b5449');
-          let exists = fs.existsSync(path.join(__dirname, '..', 'template', '049f4454f4cd92f637965173cb90ddbfac22563d6711fc9fb0683fe8a46b5449'));
+          let exists = fs.existsSync(path.join(os.tmpdir(), 'template', '049f4454f4cd92f637965173cb90ddbfac22563d6711fc9fb0683fe8a46b5449'));
           assert.strictEqual(exists, true);
           toDelete.push('049f4454f4cd92f637965173cb90ddbfac22563d6711fc9fb0683fe8a46b5449');
           done();
@@ -753,12 +777,12 @@ describe('Webserver', () => {
         let form = new FormData();
 
         get.concat({
-          url: 'http://localhost:4000/template',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'multipart/form-data;boundary=' + form.getBoundary()
+          url     : 'http://localhost:4000/template',
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary()
           },
-          body: form
+          body : form
         }, (err, res, data) => {
           assert.strictEqual(err, null);
           data = JSON.parse(data);

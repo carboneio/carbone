@@ -9,22 +9,18 @@ function generateOutputFile () {
   };
 }
 
-function writeTemplate (stream, filename, callback) {
-  const writeStream = fs.createWriteStream(path.join(os.tmpdir(), filename));
-
-  writeStream.on('error', () => {
-    return callback(new Error('Error when uploading file'));
-  });
-
-  writeStream.on('finish', () => {
+function writeTemplate (req, res, localPath, filename, callback) {
+  fs.rename(localPath, path.join(os.tmpdir(), 'PREFIX_' + filename), () => {
     return callback(null);
   });
-
-  stream.pipe(writeStream);
 }
 
 function readTemplate (templateName, callback) {
-  return callback(null, path.join(os.tmpdir(), templateName));
+  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateName));
+}
+
+function deleteTemplate (req, res, templateName, callback) {
+  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateName));
 }
 
 function onRenderEnd (req, res, reportName, reportPath) {
@@ -50,5 +46,6 @@ module.exports = {
   writeTemplate,
   readTemplate,
   onRenderEnd,
+  deleteTemplate,
   readRender
 };

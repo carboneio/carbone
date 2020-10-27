@@ -1,5 +1,5 @@
 ### v2.2.0
-  - Can override plugins (readTemplate, writeTemplate, generateOutputFile, readPublicKey, onRenderEnd, readRender)
+  - Can override plugins (readTemplate, writeTemplate, deleteTemplate, generateOutputFile, readPublicKey, onRenderEnd, readRender)
   - Can access GET render without authentication
   - Can add middlewares before and after route
   - Add GET and DELETE route for template

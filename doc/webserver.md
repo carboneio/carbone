@@ -252,21 +252,14 @@ const os = require('os');
  * @param {String} filename : Template name
  * @param {Function} callback : Function to call at the end
  */
-function writeTemplate (stream, filename, callback) {
-  // We create a write stream which will write the template in the tmp dir of the os
-  const writeStream = fs.createWriteStream(path.join(os.tmpdir(), filename));
+function writeTemplate (req, res, localPath, filename, callback) {
+  fs.rename(localPath, path.join(os.tmpdir(), 'PREFIX_' + filename), (err) => {
+    if (err) {
+      return callback(err);
+    }
 
-  // Check errors
-  writeStream.on('error', (err) => {
-    return callback(new Error('Error when uploading file'));
-  });
-
-  // When it's finish, we call the callback without errors
-  writeStream.on('finish', () => {
     return callback(null);
   });
-
-  stream.pipe(writeStream);
 }
 
 // Export the writeTemplate function
@@ -280,7 +273,7 @@ module.exports = {
 To override template reading, always in the file `storage.js` in the `plugin` folder, you have to export the function `readTemplate` which is descibred as follow:
 
 ```js
-function readTemplate (templateName, callback) {
+function readTemplate (req, templateName, callback) {
   // Read your template and return a local path for carbone
 }
 
@@ -290,6 +283,23 @@ module.exports = {
 ```
 
 This function must return a local path to carbone so it can read it on the disk.
+
+### Override delete template
+
+To override template deleting, add a function `deleteTemplate` in the `storage.js` file in the `plugin` folder and export it.
+
+```js
+// You can access req and res.
+// For example, if you store your template on amazon S3, you could delete it and 
+function deleteTemplate (req, res, templateName, callback) {
+  // Delete the template and either return a local path to unlink it or just use res to return a response
+  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateName));
+}
+
+module.exports = {
+  deleteTemplate
+}
+```
 
 ### Override write render
 

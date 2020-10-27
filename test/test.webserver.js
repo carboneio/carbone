@@ -16,7 +16,9 @@ function deleteRequiredFiles () {
     delete require.cache[require.resolve(path.join(os.tmpdir(), 'plugin', 'storage.js'))];
   }
   catch (e) {
-    console.log(e);
+    if (e.code !== 'MODULE_NOT_FOUND') {
+      console.log(e);
+    }
   }
 }
 
@@ -138,9 +140,9 @@ describe.only('Webserver', () => {
           data = JSON.parse(data);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
-          let exists = fs.existsSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+          let exists = fs.existsSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           assert.strictEqual(exists, true);
-          fs.unlinkSync(path.join(os.tmpdir(), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+          fs.unlinkSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           setTimeout(() => {
             assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'beforeFile')).toString(), 'BEFORE FILE');
             assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'beforeFile2')).toString(), 'BEFORE FILE 2');
@@ -191,7 +193,7 @@ describe.only('Webserver', () => {
       });
 
       it('should return template in the user location choice', (done) => {
-        exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'abcdefghi')}`, () => {
+        exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'PREFIX_abcdefghi')}`, () => {
           get.concat({
             url     : 'http://localhost:4001/template/abcdefghi',
             method  : 'GET',
@@ -201,14 +203,14 @@ describe.only('Webserver', () => {
           }, (err, res, data) => {
             assert.strictEqual(res.headers['content-disposition'], 'filename="abcdefghi.html"');
             assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
-            fs.unlinkSync(path.join(os.tmpdir(), 'abcdefghi'));
+            fs.unlinkSync(path.join(os.tmpdir(), 'PREFIX_abcdefghi'));
             done();
           });
         });
       });
 
       it('should delete a template in the user location choice', (done) => {
-        exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'abcdef')}`, () => {
+        exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'PREFIX_abcdef')}`, () => {
           get.concat({
             url     : 'http://localhost:4001/template/abcdef',
             method  : 'DELETE',
@@ -758,6 +760,30 @@ describe.only('Webserver', () => {
           let exists = fs.existsSync(path.join(os.tmpdir(), 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           assert.strictEqual(exists, true);
           toDelete.push('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          done();
+        });
+      });
+
+      it('should upload a big template', (done) => {
+        let form = new FormData();
+
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'big_template.docx')));
+
+        get.concat({
+          url     : 'http://localhost:4000/template',
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary()
+          },
+          body : form
+        }, (err, res, data) => {
+          assert.strictEqual(err, null);
+          data = JSON.parse(data);
+          assert.strictEqual(data.success, true);
+          assert.strictEqual(data.data.templateId, 'df32a1905950a4c49c9ba5cc27ba2f4ad46845bcf29bbef6d3099f5dc5c0e99e');
+          let exists = fs.existsSync(path.join(os.tmpdir(), 'template', 'df32a1905950a4c49c9ba5cc27ba2f4ad46845bcf29bbef6d3099f5dc5c0e99e'));
+          assert.strictEqual(exists, true);
+          toDelete.push('df32a1905950a4c49c9ba5cc27ba2f4ad46845bcf29bbef6d3099f5dc5c0e99e');
           done();
         });
       });

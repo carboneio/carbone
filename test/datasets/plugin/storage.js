@@ -15,7 +15,7 @@ function writeTemplate (req, res, localPath, filename, callback) {
   });
 }
 
-function readTemplate (templateName, callback) {
+function readTemplate (req, templateName, callback) {
   return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateName));
 }
 

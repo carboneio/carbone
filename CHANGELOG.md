@@ -1,4 +1,7 @@
 ### v2.2.0
+  - Adding `padl` and `padr` string formatter.
+  - Fix doc issue on carbone website
+  - Accepts Adobe Indesign IDML file as a template
   - Can override plugins (readTemplate, writeTemplate, deleteTemplate, generateOutputFile, readPublicKey, onRenderEnd, readRender)
   - Can access GET render without authentication
   - Can add middlewares before and after route

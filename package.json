@@ -42,7 +42,9 @@
     "yazl": "=2.5.1"
   },
   "pkg": {
-    "assets": "lib/converter.py"
+    "assets": "lib/converter.py",
+    "assets": "bin/install.sh",
+    "assets": "bin/systemd"
   },
   "devDependencies": {
     "eslint": "=7.7.0",

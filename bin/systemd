@@ -1,0 +1,23 @@
+[Unit]
+Description=carbone-ee
+After=network.target
+
+[Service]
+WorkingDirectory=/var/www/carbone-ee
+User=carbone
+ExecStart=/var/www/carbone-ee/carbone-ee webserver
+Restart=always
+Environment=NODE_ENV=prod
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=full
+LockPersonality=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

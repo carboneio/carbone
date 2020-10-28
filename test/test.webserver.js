@@ -8,6 +8,7 @@ const carbone    = require('../lib/index');
 const sinon      = require('sinon');
 const os         = require('os');
 const { exec }   = require('child_process');
+const package    = require('../package.json');
 
 function deleteRequiredFiles () {
   try {
@@ -275,6 +276,20 @@ describe.only('Webserver', () => {
         data = JSON.parse(data);
         assert.strictEqual(data.success, false);
         assert.strictEqual(data.error, 'Error: No JSON Web Token detected in Authorization header or Cookie. Format is "Authorization: jwt" or "Cookie: access_token=jwt"');
+        done();
+      });
+    });
+
+    it('should access status route if user is not authenticated', (done) => {
+
+      get.concat({
+        url    : 'http://localhost:4001/status',
+        method : 'GET'
+      }, (err, res, data) => {
+        assert.strictEqual(err, null);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.version, package.version);
         done();
       });
     });

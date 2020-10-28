@@ -143,6 +143,8 @@ We recommend to generate tokens with an expiration date valid for at least 12 ho
 
 ## Launch Carbone on premise
 
+To launch Carbone on Premise, you must a valid license file. It must be place in the `workDir` folder and named `license.txt`. It can be found on https://account.carbone.io in your account under the on-premise menu.
+
 You can override default Carbone parameters with different ways.
 
 - CLI parameters

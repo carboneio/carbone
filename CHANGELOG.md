@@ -9,6 +9,7 @@
   - Fix workDir parameter
   - Remove error message if no plugin exists
   - Fix bug with environment variable
+  - Add license check
 
 ### v2.1.1
   - Release September 23rd 2020

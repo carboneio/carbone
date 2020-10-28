@@ -24,6 +24,7 @@
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
     "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
     "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
+    "build": "node lib/updateBuildDate.js set && pkg --out-path ./build . && node lib/updateBuildDate.js delete",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
@@ -42,8 +43,6 @@
     "yazl": "=2.5.1"
   },
   "pkg": {
-    "assets": "lib/converter.py",
-    "assets": "bin/install.sh",
     "assets": "bin/systemd"
   },
   "devDependencies": {

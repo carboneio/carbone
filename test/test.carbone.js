@@ -787,7 +787,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObjNoExist.textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObjNoExist not defined</xml>');
+          helper.assert(result, '<xml></xml>');
           done();
         });
       });
@@ -803,7 +803,23 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObjNoExist.textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObjNoExist not defined</xml>');
+          helper.assert(result, '<xml></xml>');
+          done();
+        });
+      });
+      it('should return an empty string if a path does not exist inside a conditional formatter', function (done) {
+        var data = {
+          obj : {
+            a : {
+              value : true
+            },
+            b : {}
+          },
+
+        };
+        carbone.renderXML('<xml>{d.obj.a.value:ifNEM():and(..b):ifNEM():show(oops):elseShow(success)}</xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>success</xml>');
           done();
         });
       });
@@ -819,8 +835,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObj[0].textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObj[0] not defined</xml>');
-          // helper.assert(result, '<xml>[[C_ERROR]] subArray not allowed (type Array)</xml>');
+          helper.assert(result, '<xml></xml>');
           done();
         });
       });

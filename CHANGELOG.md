@@ -1,3 +1,6 @@
+### v2.2.1
+  - Fix: if a path does not exist inside a formatter argument, it returns an empty string instead of the error "[[C_ERROR]] attribute_name not defined".
+
 ### v2.2.0
   - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`
   - Improve HTML type detection. Accepts html5 without doctype.

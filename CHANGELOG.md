@@ -1,3 +1,6 @@
+### v2.2.1
+  - Fix Carbone marker inside ODT text box
+
 ### v2.2.0
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website

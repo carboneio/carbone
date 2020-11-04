@@ -1,7 +1,6 @@
-### v2.2.1
-  - Fix Carbone marker inside ODT text box
 
 ### v2.2.0
+  - [EE] Fix Carbone marker inside ODT text box
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website
   - Accepts Adobe Indesign IDML file as a template

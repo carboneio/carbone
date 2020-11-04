@@ -147,7 +147,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
 
   describe('Methods for LO (ODT/ODS)', function () {
     describe('preProcessLo', function () {
-      it.only('should do nothing if the image tags are including a text box', function (done) {
+      it('should do nothing if the image tags are including a text box', function (done) {
         const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:body><office:text><text:p text:style-name="Standard"><draw:frame text:anchor-type="paragraph" draw:z-index="0" draw:name="Shape1" draw:style-name="gr2" draw:text-style-name="P1" svg:width="4.315cm" svg:height="2.585cm" svg:x="1.732cm" svg:y="0.714cm"><draw:text-box><text:p>{d.id}</text:p></draw:text-box></draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="1" draw:name="Shape2" draw:style-name="gr1" draw:text-style-name="P1" svg:width="3.197cm" svg:height="1.812cm" svg:x="8.326cm" svg:y="0.572cm"><draw:text-box><text:p>{d.missionId}</text:p></draw:text-box></draw:frame></text:p></office:text></office:body></office:document-content>';
         let template = {
           files : [
@@ -159,7 +159,6 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
         };
         image.preProcessLo(template);
         helper.assert(template.files[0].data, _expectedXML);
-        console.log(template.files[0].data);
         done();
       });
 

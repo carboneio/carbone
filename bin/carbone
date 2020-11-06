@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+// Force production mode with pkg
+process.env.NODE_ENV = process.pkg ? 'production' : process.env.NODE_ENV;
+
 var server = require('../lib/server');
 var webserver = require('../lib/webserver');
 var translator = require('../lib/translator');
@@ -47,36 +50,34 @@ function usage () {
   console.log('   carbone translate [--help]');
   console.log('   carbone find [--help]');
   console.log('   carbone webserver [--help]');
-  console.log('   carbone generate-token');
-  console.log('   carbone install          # daeamonize carbone webserver in systemd ');
+  console.log('   carbone generate-token               # generate key pair for authentication');
+  console.log('   carbone install && sudo ./install.sh # daemonize carbone webserver in systemd');
   process.exit();
 }
 
 /**
  * Install systemd service
  *
- * Only for Carbone Enterprise Edition
+ * Only for Carbone On-Premise Enterprise Edition
  */
 function installService () {
   if (process.platform !== 'linux') {
-    console.log('Automatic installation as a service not available yet for your OS');
+    console.log('Automatic installation as a service not available for your OS yet');
     process.exit();
   }
-  const spawn  = require('child_process');
-  const path   = require('path');
-  const fs     = require('fs');
-  const params = require('../lib/params');
-  const _pathScript = path.join(params.tempPath, './carbone_install.sh');
-  console.log('Copying script into tmp directory', process.argv[0]);
+  if (process.pkg === undefined) {
+    console.log('Automatic installation as a service available only for On-Premise Edition');
+    process.exit();
+  }
+  const path = require('path');
+  const fs   = require('fs');
+  console.log('Generate install script ', process.argv[0]);
   try {
-    // copy bash script to tmp directory to execute it outside of the package
-    fs.writeFileSync(_pathScript  , fs.readFileSync(path.join(__dirname, './install.sh')));
-    fs.chmodSync(_pathScript, '755');
-    fs.copyFileSync(path.join(__dirname, 'systemd'), ' /etc/systemd/system/carbone-ee.service', fs.constants.COPYFILE_FICLONE);
+    // copy bash script outside of On-Premise binary file
+    fs.writeFileSync(path.join(process.cwd(), 'install.sh'), fs.readFileSync(path.join(__dirname, 'install.sh')).toString().replace('__SOURCE_BINARY_FILE__', process.argv[0]), {mode : '0755'});
+    fs.writeFileSync(path.join(process.cwd(), 'systemd')   , fs.readFileSync(path.join(__dirname, 'systemd')));
   }
   catch (e) {
-    console.log('Cannot write bash script file in ' + params.tempPath);
+    console.log('Cannot write automatic installation scripts files in ' + process.cwd() + '\n' +  e);
   }
-  spawn.execFileSync(_pathScript, [process.argv[0]], { encoding : 'utf8', stdio : 'inherit' });
-  fs.unlinkSync(_pathScript);
 }

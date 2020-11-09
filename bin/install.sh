@@ -1,11 +1,40 @@
 #!/bin/bash
 
+# Accepts these external variables
+# NON_INTERACTIVE    : false by default. Set true to run this script without interaction
+# CARBONE_WORKDIR    : installation directory
+# CARBONE_USER       : carbone user
+
+reset=$(tput sgr0)
+red=$(tput setaf 9)
+green=$(tput setaf 76)
+gray=$(tput setaf 7)
+
+print_info() {
+  printf "${gray}%s${reset}" "$@"
+}
+print_success() {
+  printf "${green}✔ %s${reset}\n" "$@"
+}
+print_error() {
+  printf "${red}%s${reset}\n" "$@"
+}
+exit_on_command_error() {
+  if [ "$?" != "0" ]; then
+    print_error "ERROR:"
+    printf "${red}%s${reset}\n" "$@"
+    echo ""
+    echo "Installation stopped"
+    exit 1
+  fi
+}
+
 echo "Installing Carbone"
 echo "=================="
 
 if [ `whoami` != root ]; then
-  echo "Please run this script as root or using sudo"
-  exit
+  print_error "Please run this script as root or using sudo"
+  exit 1
 fi
 
 while (( $# )); do
@@ -22,17 +51,23 @@ done
 # The GNU version of sed allows you to use "-i" without an argument. The FreeBSD/Mac OS X does not.
 # Source: http://www.grymoire.com/Unix/Sed.html#uh-62h
 case $(sed --help 2>&1) in
-  *GNU*) sed_i () { sed -i "$@"; };;
-  *) sed_i () { sed -i '' "$@"; };;
+  *GNU*) sed_i () { 
+    sed -i "$@";
+    exit_on_command_error "Cannot execute sed with $@"
+  };;
+  *) sed_i () { 
+    sed -i '' "$@"; 
+    exit_on_command_error "Cannot execute sed with $@"
+  };;
 esac
 
-
+# Assign variables if not already defined
 CARBONE_USER=${CARBONE_USER:="carbone"}
 CARBONE_WORKDIR=${CARBONE_WORKDIR:="/var/www/carbone-ee"}
 
 if [ ! "$NON_INTERACTIVE" = true ]; then
   echo ""
-  echo "Carbone data and configuration storage directory"
+  echo "Carbone installation, data and configuration directory"
   read -p "CARBONE_WORKDIR [$CARBONE_WORKDIR]: "
   if [ ! -z "$REPLY" ]; then
     CARBONE_WORKDIR=$REPLY
@@ -51,7 +86,7 @@ BINARY_FILE="$(basename -- $BINARY_FILE_PATH)"
 CARBONE_BIN="carbone-ee"
 CARBONE_BIN_PATH="$CARBONE_WORKDIR/$CARBONE_BIN"
 CARBONE_SERVICE_NAME=$CARBONE_BIN
-SYSTEMD_TEMPLATE=$BINARY_FILE_PATH/systemd
+SYSTEMD_TEMPLATE="$(dirname "$BINARY_FILE_PATH")/systemd"
 
 echo ""
 echo "==================================="
@@ -66,62 +101,73 @@ echo ""
 
 if [ ! "$NON_INTERACTIVE" = true ]; then
   read -p "Confirm installation? (y, n=default) " -r
-  if [[ ! $REPLY =~ ^[Yy]$ ]]
-  then
-    echo 'Installation stopped!'
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Installation stopped!"
     exit 1
   fi
+  echo ""
 fi
 
 
-if [ ! -d $CARBONE_WORKDIR ]
-then
-  echo "Create Carbone directory..."
+if [ ! -d $CARBONE_WORKDIR ]; then
+  print_info "Create Carbone directory "
   mkdir $CARBONE_WORKDIR
-  echo "Create carbone directory...OK"
+  exit_on_command_error "Cannot create directory in $CARBONE_WORKDIR. Is parent directory exist?"
+  print_success "OK"
 fi
 
 if [ $BINARY_FILE_PATH != $CARBONE_BIN_PATH ]; then
-  echo "Copy binary in carbone directory..."
+  print_info "Copy binary in carbone directory "
   cp $BINARY_FILE_PATH $CARBONE_WORKDIR
+  exit_on_command_error "Cannot copy binary in $CARBONE_WORKDIR"
   cd $CARBONE_WORKDIR
   mv $BINARY_FILE $CARBONE_BIN
+  exit_on_command_error "Cannot rename binary $BINARY_FILE"
   chmod +x $CARBONE_BIN
-  echo "Copy binary in carbone directory...OK"
+  exit_on_command_error "Cannot make it executable"
+  print_success "OK"
 fi
 
 if id $CARBONE_USER &>/dev/null; then
-  echo "User $CARBONE_USER already exists"
+  print_info "User $CARBONE_USER already exists "
+  print_success "OK"
 else
-  echo "Create carbone user and chown..."
+  print_info "Create carbone user "
   adduser $CARBONE_USER --no-create-home --disabled-password --system --group
-  chown -R $CARBONE_USER:$CARBONE_USER $CARBONE_WORKDIR
-  echo "Create carbone user and chown...OK"
+  exit_on_command_error "Cannot create user $CARBONE_USER"
+  print_success "OK"
 fi
 
+print_info "Change owner of executable "
+chown $CARBONE_USER:$CARBONE_USER $CARBONE_BIN_PATH
+exit_on_command_error "Cannot chande owner of $CARBONE_BIN_PATH"
+print_success "OK"
 
 # Replace path in systemd template
-echo "Prepare $CARBONE_SERVICE_NAME systemd file..."
+print_info "Prepare $CARBONE_SERVICE_NAME systemd file "
 sed_i "s/CARBONE_SERVICE_NAME/$CARBONE_SERVICE_NAME/" "$SYSTEMD_TEMPLATE"
-sed_i "s/CARBONE_WORKDIR/$CARBONE_WORKDIR/" "$SYSTEMD_TEMPLATE"
+# Use "@" instead of "/"" because CARBONE_WORKDIR contains slashes
+sed_i "s@CARBONE_WORKDIR@$CARBONE_WORKDIR@" "$SYSTEMD_TEMPLATE"
 sed_i "s/CARBONE_USER/$CARBONE_USER/" "$SYSTEMD_TEMPLATE"
-sed_i "s/CARBONE_BIN_PATH/$CARBONE_BIN_PATH/" "$SYSTEMD_TEMPLATE"
-echo "Prepare $CARBONE_SERVICE_NAME systemd file...OK"
+sed_i "s@CARBONE_BIN_PATH@$CARBONE_BIN_PATH@" "$SYSTEMD_TEMPLATE"
+print_success "OK"
 
-echo "Create $CARBONE_SERVICE_NAME service file in /etc/systemd/system..."
-mv $BINARY_FILE_PATH/systemd /etc/systemd/system/${CARBONE_SERVICE_NAME}.service
-echo "Create $CARBONE_SERVICE_NAME service file in /etc/systemd/system...OK"
+print_info "Create $CARBONE_SERVICE_NAME service file in /etc/systemd/system "
+cp $SYSTEMD_TEMPLATE /etc/systemd/system/${CARBONE_SERVICE_NAME}.service
+exit_on_command_error "Cannot copy file in etc/systemd/system/${CARBONE_SERVICE_NAME}.service"
+print_success "OK"
 
-echo "Register service..."
+print_info "Register service "
 systemctl daemon-reload > /dev/null 2>&1
 systemctl enable $CARBONE_SERVICE_NAME
-echo "Register service...OK"
-echo "Starting service..."
+exit_on_command_error "Cannot reload or enable service $CARBONE_SERVICE_NAME"
+print_success "OK"
+print_info "Starting service "
 systemctl start $CARBONE_SERVICE_NAME
-echo "Starting service...OK"
+print_success "OK"
 
 echo ""
 echo "Installation done!"
 echo ""
 echo "Run sudo systemctl stop/start $CARBONE_SERVICE_NAME to start/stop Carbone"
-echo "Run sudo journalctl -u $CARBONE_SERVICE_NAME to see logs"
+echo "Run sudo journalctl -f -u $CARBONE_SERVICE_NAME to see logs"

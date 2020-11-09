@@ -1,6 +1,10 @@
 [Unit]
 Description=CARBONE_SERVICE_NAME
 After=network.target
+# Restart forever
+# StartLimitIntervalSec=0
+# Wait 1s before restarting
+# RestartSec=1
 
 [Service]
 WorkingDirectory=CARBONE_WORKDIR
@@ -20,8 +24,17 @@ SystemCallArchitectures=native
 NoNewPrivileges=true
 PrivateTmp=true
 PrivateDevices=true
-MemoryDenyWriteExecute=true
 CapabilityBoundingSet=
+
+# Kill after X seconds if soft stop does work
+# TimeoutStopSec=90 
+# ExecStop=
 
 [Install]
 WantedBy=multi-user.target
+
+# [Slice]
+# MemoryAccounting=true
+# MemoryLimit=100M
+# MemoryMax=100M
+# MemoryHigh=50M

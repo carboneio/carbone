@@ -129,7 +129,7 @@ function unlinkConfigFile () {
   fs.rmdirSync(path.join(os.tmpdir(), 'plugin'));
 }
 
-describe.only('Webserver', () => {
+describe('Webserver', () => {
   before(() => {
     writeConfigFile();
   });
@@ -597,7 +597,7 @@ describe.only('Webserver', () => {
           data = JSON.parse(data.toString());
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Request Error: Content-Type header is not application/json.');
+          assert.strictEqual(data.error, 'Content-Type header is not application/json');
           done();
         });
       });
@@ -774,7 +774,7 @@ describe.only('Webserver', () => {
         get.concat(getBody(4000, '/template', 'POST', body), (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Request Error: Content-Type header should be multipart/form-data');
+          assert.strictEqual(data.error, 'Content-Type header should be multipart/form-data');
           done();
         });
       });
@@ -804,7 +804,7 @@ describe.only('Webserver', () => {
           assert.strictEqual(err, null);
           data = JSON.parse(data);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Request Error: "template" field is empty');
+          assert.strictEqual(data.error, '"template" field is empty');
           done();
         });
       });

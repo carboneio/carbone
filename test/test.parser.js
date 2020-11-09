@@ -482,12 +482,22 @@ describe('parser', function () {
         done();
       });
     });
+    it('should do nothing if the xml is null or undefined without callback', function (done) {
+      const xmlTranslated = parser.translate('', {});
+      helper.assert(xmlTranslated, '');
+      done();
+    });
     it('should not crash if options is empty, and it should replace translation markers by the "not translated" text', function (done) {
       parser.translate('<xml> {t(yeah)} </xml>', {}, function (err, xmlTranslated) {
         helper.assert(err, null);
         helper.assert(xmlTranslated, '<xml> yeah </xml>');
         done();
       });
+    });
+    it('should replace translation markers by the "not translated" text without callback', function (done) {
+      const xmlTranslated = parser.translate('<xml> {t(yeah)} </xml>', {});
+      helper.assert(xmlTranslated, '<xml> yeah </xml>');
+      done();
     });
     it('should not consider marker which starts by "t" and which is not a translation marker', function (done) {
       parser.translate('<xml>{table}</xml>', {}, function (err, xmlTranslated) {

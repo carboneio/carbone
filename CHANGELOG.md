@@ -1,4 +1,8 @@
-### v2.1.2
+### v2.2.0
+  - Improve HTML type detection. Accepts html5 without doctype.
+  - Adding `padl` and `padr` string formatter.
+  - Fix doc issue on carbone website
+  - Accepts Adobe Indesign IDML file as a template
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
 
 ### v2.1.1

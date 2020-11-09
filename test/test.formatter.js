@@ -1038,6 +1038,81 @@ describe('formatter', function () {
     });
   });
 
+  describe('padl', function () {
+    it('should be up to the target length with padding string to complete', () => {
+      helper.assert(stringFormatter.padl('coucou', 6), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padl('coucou', 7), ' coucou', 'one more length, adding one space before');
+      helper.assert(stringFormatter.padl('coucou', 7, 'x'), 'xcoucou', 'one more length, adding one padding string "x" before');
+      helper.assert(stringFormatter.padl('coucou', '10', 'x'), 'xxxxcoucou', 'one more length, adding padding string "x" before');
+      helper.assert(stringFormatter.padl('coucou', 6, 'x'), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padl('coucou', 3), 'coucou', 'lower target length, no change');
+      helper.assert(stringFormatter.padl('coucou', 3, 'x'), 'coucou', 'lower target length with padding string defined, no change');
+    });
+    it('should accept numbers, strings for all parameters and accept 0 for the padding string', () => {
+      helper.assert(stringFormatter.padl(  1223,  8 ,  0 ), '00001223');
+      helper.assert(stringFormatter.padl(  1223,  8 , '0'), '00001223');
+      helper.assert(stringFormatter.padl(  1223, '8', '0'), '00001223');
+      helper.assert(stringFormatter.padl('1223', '8', '0'), '00001223');
+      helper.assert(stringFormatter.padl('1223', '8',  0 ), '00001223');
+      helper.assert(stringFormatter.padl('1223',  8 , '0'), '00001223');
+    });
+    it('should not crash if data is null or undefined', () => {
+      helper.assert(stringFormatter.padl(null, 0), null, 'if data is null, not a string so return null 1');
+      helper.assert(stringFormatter.padl(null, 4), null, 'if data is null, not a string so return null 2');
+      helper.assert(stringFormatter.padl(null, 5), null, 'if data is null, not a string so return null 3');
+      helper.assert(stringFormatter.padl(null, 0, 'x'), null, 'if data is null, not a string so return null 4');
+      helper.assert(stringFormatter.padl(null, 5, 'x'), null, 'if data is null, not a string so return null 5');
+      helper.assert(stringFormatter.padl(undefined, 0), undefined, 'if data is undefined, not a string so return undefined 1');
+      helper.assert(stringFormatter.padl(undefined, 9), undefined, 'if data is undefined, not a string so return undefined 2');
+      helper.assert(stringFormatter.padl(undefined, 10), undefined, 'if data is undefined, not a string so return undefined 3');
+      helper.assert(stringFormatter.padl(undefined, 9, 'x'), undefined, 'if data is undefined, not a string so return undefined 4');
+      helper.assert(stringFormatter.padl(undefined, 10, 'x'), undefined, 'if data is undefined, not a string so return undefined 5');
+    });
+    it('should not crash if data is object', () => {
+      helper.assert(stringFormatter.padl({id : 2}, 5), {id : 2}, 'if data is object, should return it with no change');
+    });
+    it('should not crash if data is array', () => {
+      helper.assert(stringFormatter.padl([{id : 1}], 5), [{id : 1}], 'if data is array, should return it with no change');
+    });
+  });
+  describe('padr', function () {
+    it('should be up to the target length with padding string to complete', () => {
+      helper.assert(stringFormatter.padr('coucou', 6), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padr('coucou', 7), 'coucou ', 'one more length, adding one space before');
+      helper.assert(stringFormatter.padr('coucou', 7, 'x'), 'coucoux', 'one more length, adding one padding string "x" before');
+      helper.assert(stringFormatter.padr('coucou', 10, 'x'), 'coucouxxxx', 'one more length, adding padding string "x" before');
+      helper.assert(stringFormatter.padr('coucou', 6, 'x'), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padr('coucou', 3), 'coucou', 'lower target length, no change');
+      helper.assert(stringFormatter.padr('coucou', 3, 'x'), 'coucou', 'lower target length with padding string defined, no change');
+    });
+    it('should accept numbers, strings for all parameters and accept 0 for the padding string', () => {
+      helper.assert(stringFormatter.padr(  1223,  8 ,  0 ), '12230000');
+      helper.assert(stringFormatter.padr(  1223,  8 , '0'), '12230000');
+      helper.assert(stringFormatter.padr(  1223, '8', '0'), '12230000');
+      helper.assert(stringFormatter.padr('1223', '8', '0'), '12230000');
+      helper.assert(stringFormatter.padr('1223', '8',  0 ), '12230000');
+      helper.assert(stringFormatter.padr('1223',  8 , '0'), '12230000');
+    });
+    it('should not crash if data is null or undefined', () => {
+      helper.assert(stringFormatter.padr(null, 0), null, 'if data is null, not a string so return null 1');
+      helper.assert(stringFormatter.padr(null, 4), null, 'if data is null, not a string so return null 2');
+      helper.assert(stringFormatter.padr(null, 5), null, 'if data is null, not a string so return null 3');
+      helper.assert(stringFormatter.padr(null, 0, 'x'), null, 'if data is null, not a string so return null 4');
+      helper.assert(stringFormatter.padr(null, 5, 'x'), null, 'if data is null, not a string so return null 5');
+      helper.assert(stringFormatter.padr(undefined, 0), undefined, 'if data is undefined, not a string so return undefined 1');
+      helper.assert(stringFormatter.padr(undefined, 9), undefined, 'if data is undefined, not a string so return undefined 2');
+      helper.assert(stringFormatter.padr(undefined, 10), undefined, 'if data is undefined, not a string so return undefined 3');
+      helper.assert(stringFormatter.padr(undefined, 9, 'x'), undefined, 'if data is undefined, not a string so return undefined 4');
+      helper.assert(stringFormatter.padr(undefined, 10, 'x'), undefined, 'if data is undefined, not a string so return undefined 5');
+    });
+    it('should not crash if data is object', () => {
+      helper.assert(stringFormatter.padr({id : 2}, 5), {id : 2}, 'if data is object, should return it with no change');
+    });
+    it('should not crash if data is array', () => {
+      helper.assert(stringFormatter.padr([{id : 1}], 5), [{id : 1}], 'if data is array, should return it with no change');
+    });
+  });
+
   describe('arrayMap', function () {
     it('should flatten the each object of the array (only the first level, ignoring sub arrays, sub objects,...)', function () {
       var _datas = [

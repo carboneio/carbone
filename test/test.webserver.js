@@ -834,7 +834,7 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/template/dontexists', 'GET'), (err, res, data) => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Template not found');
+          assert.strictEqual(data.error, 'Cannot find template extension, does it exists?');
           done();
         });
       });

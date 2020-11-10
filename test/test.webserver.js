@@ -95,9 +95,9 @@ function writeConfigFile () {
   if (fs.existsSync(pluginDir) === false) {
     fs.mkdirSync(path.join(os.tmpdir(), 'plugin'));
   }
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'config.json'), path.join(os.tmpdir(), 'config', 'config.json'));
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pem'), path.join(os.tmpdir(), 'config', 'key.pem'));
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(os.tmpdir(), 'config', 'key.pub'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'config.json'), path.join(os.tmpdir(), 'config', 'config.json'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pem'), path.join(os.tmpdir(), 'config', 'key.pem'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pub'), path.join(os.tmpdir(), 'config', 'key.pub'));
 }
 
 /**
@@ -144,10 +144,10 @@ describe('Webserver', () => {
 
     describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender and middlewares', () => {
       before((done) => {
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'middlewares.js'), path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'middlewares.js'), path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
         deleteRequiredFiles();
         webserver = require('../lib/webserver');
         webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir()], () => {
@@ -623,7 +623,7 @@ describe('Webserver', () => {
 
     describe('Get render', () => {
       let renderPath = path.join(os.tmpdir(), 'render');
-      let datasetsRenderPath = path.join(__dirname, 'datasets', 'renderedReport');
+      let datasetsRenderPath = path.join(__dirname, 'datasets', 'webserver', 'renderedReport');
       let renderedFiles = [
         '0c7b6b9f8180e8206c0aa9a91d9c836fe5b271eed2a1d4cf5a1b05e4fd582fbarenderedReport.html',
         '8cb863d0af717a1229a01d21aa28895770080ac99e70d47a29554ba977d46ab7encoded%20filename.html',

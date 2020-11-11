@@ -1,5 +1,6 @@
 
 ### v2.2.0
+  - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`
   - Improve HTML type detection. Accepts html5 without doctype.
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website

@@ -13,7 +13,7 @@ Carbone On-Premise Draft doc
 
 - 1 - Download Carbone On-premise binary for your server/OS: Mac, Linux or Windows
 - 2 - Install LibreOffice (Optional). See instruction below.
-- 3 - Start Carbone web server
+- 3 - Start Carbone web server or daemonize it with systemd 
 
 ```bash
   ./carbone webserver --port 4000 --workdir .
@@ -26,6 +26,22 @@ It creates directories in `--workdir` [-w]  (executable directory by default)
 - `config`    : config, licenses and ES512 keys for authentication
 - `logs`      : [NOT IMPLEMENTED] formatted output logs 
 - `plugin `   : where to put custom plugin
+
+
+#### Ubuntu/Debian (systemd)
+
+Carbone On-Premise contains automatic installation scripts to daemonize with systemd.
+We have carefully configured systemd to provide high level of security.
+
+
+```bash
+  # Generate installation scripts
+  ./carbone install
+  # Execute installation scripts
+  sudo ./install.sh
+```
+
+And follow instructions. You can change `CARBONE_USER`, `CARBONE_WORKDIR`.
 
 
 ### How to use it?

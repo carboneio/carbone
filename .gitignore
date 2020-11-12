@@ -37,5 +37,9 @@ temp
 
 ######## project-specific
 0perso/*
+build/*
+render/*
+template/*
+asset/*
 0formation/*
 

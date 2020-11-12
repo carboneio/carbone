@@ -30,9 +30,16 @@
 
 
 
-<p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...
+<p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using your JSON data as input !</p>
 
-... using your JSON data as input !</p>
+>  ⚡️ Breaking news :
+>
+> **Carbone v2.x 🚀 is here :**
+>
+>   - `npm i carbone@2.1.1`
+>   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
+
+README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
 
 ## Table of content
 
@@ -48,10 +55,11 @@
 - [More examples](#more-examples)
 - [API Reference](#api-reference)
 - [Command line tools](#command-line-tools)
+- [Issues](#issues)
+- [Roadmap](#roadmap)
 - [Performance](#performance)
 - [Licenses and editions](#licenses-and-editions)
 - [Philosophy](#philosophy)
-- [Roadmap](#roadmap)
 - [Contributors](#contributors)
 
 <!-- /MarkdownTOC -->
@@ -83,8 +91,8 @@ Carbone is working only on the server-side.
 
 ## Minimum Requirements
 
-- NodeJS 8.x+
-- Runs on OSX, Linux (servers and desktop), and coming soon on Windows
+- NodeJS 10.x+
+- Runs on OSX, Linux (servers and desktop), and Windows
 
 #### Optional
 
@@ -155,14 +163,14 @@ Carbone does a lot of thing for you behind the scene:
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/5.3.2.2/deb/x86_64/LibreOffice_5.3.2.2_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/6.4.5.2/deb/x86_64/LibreOffice_6.4.5.2_Linux_x86-64_deb.tar.gz
 
-  # Install required dependencies on ubuntu server for LibreOffice 5.0+
+  # Install required dependencies on ubuntu server for LibreOffice 6.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_5.3.2.2_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_5.3.2.2_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_6.4.5.2_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_6.4.5.2_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb
@@ -182,7 +190,7 @@ Carbone does a lot of thing for you behind the scene:
   sudo unzip LibreBarcode_v1.003-alpha.zip -d /usr/share/fonts/truetype/librebarcode
   sudo chmod 755 /usr/share/fonts/truetype/librebarcode
   sudo chmod -R 644 /usr/share/fonts/truetype/librebarcode/*
-  # refresh fonts, if the following command does not run, sudo apt install fontconfig 
+  # refresh fonts, if the following command does not run, sudo apt install fontconfig
   sudo fc-cache -fv
 
 ```
@@ -271,7 +279,7 @@ If you're facing any issues, search a similar issue to ensure it doesn't already
 
 ## Roadmap
 
-The roadmap is pinned on on the github issues list.
+The roadmap is pinned on the github issues list.
 
 ## Performance
 
@@ -281,8 +289,6 @@ Report generation speed (without network latency), using a basic one-page DOCX t
   - ~ `50 ms / report` with a PDF conversion (100 loops, 3 LibreOffice workers, without cold-start)
 
 On a MacBook Pro Mid-2015, 2,2 Ghz i7, 16Go.
-
-It could be even better when "code cache" will be activated. Coming soon...
 
 ## Licenses and editions
 

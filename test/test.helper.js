@@ -95,6 +95,23 @@ describe('helper', function () {
     });
   });
 
+  describe('removeQuote', function () {
+    it('should do nothing if it is not a string', function () {
+      helper.assert(helper.removeQuote(), undefined);
+      helper.assert(helper.removeQuote(null), null);
+      helper.assert(helper.removeQuote(22), 22);
+    });
+    it('should remove quote form string', function () {
+      helper.assert(helper.removeQuote('sdsd'), 'sdsd');
+      helper.assert(helper.removeQuote('\'sdsd\''), 'sdsd');
+      helper.assert(helper.removeQuote('"sdsd"'), 'sdsd');
+    });
+    it('should not remove quote inside string', function () {
+      helper.assert(helper.removeQuote('"sd \' sd"'), 'sd \' sd');
+      helper.assert(helper.removeQuote('\'sd " sd\''), 'sd " sd');
+    });
+  });
+
   describe('readFileDirSync', function () {
     beforeEach(function () {
       helper.rmDirRecursive(testPath);
@@ -425,5 +442,65 @@ describe('helper', function () {
     });
   });
 
+  describe('Get file extension from URL', function () {
+    it('should return a png/jpeg/gif/txt extension', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png'), 'png');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif'), 'gif');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg'), 'jpeg');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt'), 'txt');
+    });
+    it('should return a png/jpeg/gif/txt extension with query parameters', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png?fewfw=223&lala=few'), 'png');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif#fewfw=223?lala=few'), 'gif');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg&name=John'), 'jpeg');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt?name=john&age=2#lala'), 'txt');
+    });
+  });
+
+  describe('Find the relative path between 2 markers', function () {
+    it('should find the relative path between 2 markers', function () {
+      helper.assert(helper.getMarkerRelativePath('d.list[i].color', 'd.list[i].color2'), '.color2');
+    });
+    it('should find the relative path between a list and an object 1', function () {
+      helper.assert(helper.getMarkerRelativePath('d.list[i].color', 'd.color2'), '..color2');
+    });
+    it('should find the relative path between a list and an object 2', function () {
+      helper.assert(helper.getMarkerRelativePath('d.color', 'd.list2[i].color2'), '.list2[i].color2');
+    });
+    it('should find the relative path between a list and an object 3', function () {
+      helper.assert(helper.getMarkerRelativePath('d.list[i].color', 'd.element.color2'), '..element.color2');
+    });
+    it('should find the relative path between a list and an object 4', function () {
+      helper.assert(helper.getMarkerRelativePath('d.element.color2', 'd.list[i].color'), '..list[i].color');
+    });
+    it('should find the relative path between a list and an object 5', function () {
+      helper.assert(helper.getMarkerRelativePath('d.element.color2', 'd.element.list[i].color'), '.list[i].color');
+    });
+    it('should find the relative path between a list and an object 6', function () {
+      helper.assert(helper.getMarkerRelativePath('d.element.color2.object.apple.yellow', 'd.element.list[i].color'), '....list[i].color');
+    });
+    it('should find the relative path between two list 1', function () {
+      helper.assert(helper.getMarkerRelativePath('d.list[i].color', 'd.list[i].list[i].color2'), '.list[i].color2');
+    });
+    it('should find the relative path between two list 2', function () {
+      helper.assert(helper.getMarkerRelativePath('d.list[i].list[2].color', 'd.list[i].color2'), '..color2');
+    });
+    it('should find the relative path between two list 3', function () {
+      helper.assert(helper.getMarkerRelativePath('d.list[i].color', 'd.list2[i].color2'), '..list2[i].color2');
+    });
+    it('should find the relative path between two list 4 with similar object names', function () {
+      helper.assert(helper.getMarkerRelativePath('d.list[i].color.red', 'd.list2[i].color2.red.blue'), '...list2[i].color2.red.blue');
+    });
+    it('Test errors with invalid args', function () {
+      helper.assert(helper.getMarkerRelativePath('', 'd.list2[i].color2.red.blue'), '');
+      helper.assert(helper.getMarkerRelativePath('d.list', ''), '');
+      helper.assert(helper.getMarkerRelativePath(null, 'd.element'), '');
+      helper.assert(helper.getMarkerRelativePath('d.element', null), '');
+      helper.assert(helper.getMarkerRelativePath(undefined, 'd.element'), '');
+      helper.assert(helper.getMarkerRelativePath('d.element', undefined), '');
+      helper.assert(helper.getMarkerRelativePath(21, 'd.element'), '');
+      helper.assert(helper.getMarkerRelativePath('d.element', 32), '');
+    });
+  });
 
 });

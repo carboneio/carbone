@@ -206,6 +206,706 @@ describe('formatter', function () {
     });
   });
 
+  describe('New conditional system ifEQ, ifNE, ...', function () {
+
+    const _contextAndExpectedResultWhenConditionIsTrue = [
+      { isConditionTrue : false, isAndOperator : false, isConditionTrueExpected : true  }, // false || true = true
+      { isConditionTrue : false, isAndOperator : true , isConditionTrueExpected : false }, // false && true = false
+      { isConditionTrue : true , isAndOperator : false, isConditionTrueExpected : true  }, // true  || true = true
+      { isConditionTrue : true , isAndOperator : true , isConditionTrueExpected : true  }  // true  && true = true
+    ];
+    const _contextAndExpectedResultWhenConditionIsFalse = [
+      { isConditionTrue : false, isAndOperator : false, isConditionTrueExpected : false }, // false || false = false
+      { isConditionTrue : false, isAndOperator : true , isConditionTrueExpected : false }, // false && false = false
+      { isConditionTrue : true , isAndOperator : false, isConditionTrueExpected : true  }, // true  || false = true
+      { isConditionTrue : true , isAndOperator : true , isConditionTrueExpected : false }  // true  && false = false
+    ];
+
+    /**
+     * Generic function to test all combination of context + datasets and print error
+     *
+     * @param  {String} formatter           formatter to call
+     * @param  {Array}  data                dataset to test
+     * @param  {Array}  expectedResult      true or false
+     */
+    function testCondition (formatter, data, expectedResult) {
+      var _context = {};
+      for (let i = 0, n = data.length; i < n; i++) {
+        const el = data[i];
+        const expectedFromContext = (expectedResult === true) ? _contextAndExpectedResultWhenConditionIsTrue : _contextAndExpectedResultWhenConditionIsFalse;
+        for (let j = 0, len = expectedFromContext.length; j < len; j++) {
+          const _test = expectedFromContext[j];
+          _context.isConditionTrue = _test.isConditionTrue;
+          _context.isAndOperator   = _test.isAndOperator;
+          var _returnedValue = callWithContext(conditionFormatter[formatter], _context, el[0], el[1]);
+          try {
+            helper.assert(_context.isConditionTrue, _test.isConditionTrueExpected);
+            helper.assert(_context.isAndOperator  , _test.isAndOperator);
+            helper.assert(_returnedValue          , el[0]);
+            helper.assert(_context.stopPropagation, false);
+          }
+          catch (e) {
+            // Prints better error output for debugging
+            console.log('\x1b[31m');
+            console.log(`\nContext :\n  ${JSON.stringify(_context)}`);
+            console.log('\nFormatter called:');
+            console.log(`  ${formatter}(${JSON.stringify(el[0])}, ${JSON.stringify(el[1])})`);
+            console.log('\n\x1b[0m');
+            throw e;
+          }
+        }
+      }
+    }
+
+    describe('ifEQ', function () {
+      it('should turn the `isConditionTrue` to True if a data is equal to a variable', function () {
+        const _dataSet = [
+          [0, 0],
+          [0, '0'],
+          [23.232, 23.232],
+          [23.232, '23.232'],
+          ['23.232', 23.232],
+          [true, true],
+          ['true', 'true'],
+          [true, 'true'],
+          ['false', 'false'],
+          [false, 'false'],
+          [false, false],
+          ['titi', 'titi'],
+          [undefined, undefined],
+          [null, null],
+          // object identiques, it is comparing "[object Object]" === "[object Object]"
+          [{value : 10, name : 'john', address : { name : '123 street'} }, {value : 10, name : 'john', address : { name : '123 street'}}],
+          [{ name : '85 street'}, {value : 10, name : 'wick', address : { name : '321 street'}}],
+          [[1, 2, 3, 4, 6, 7, 8, 9], [1, 2, 3, 4, 6, 7, 8, 9]]
+        ];
+        testCondition('ifEQ', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if the data is not equal to a variable', function () {
+        const _dataSet = [
+          [0, 3],
+          [0, '1'],
+          [22.2222, 22.2223],
+          [22.2222, '22.2223'],
+          [true, false],
+          ['true', false],
+          ['false', 'true'],
+          [false, true],
+          ['titi', 'toto'],
+          [undefined, 'titi'],
+          ['titi', null],
+          [[1, 2, 3], [1, 3]],
+        ];
+        testCondition('ifEQ', _dataSet, false);
+      });
+    });
+
+    describe('ifNE', function () {
+      it('should turn the `isConditionTrue` to false if a data is equal to a variable', function () {
+        const _dataSet = [
+          [0, 0],
+          [0, '0'],
+          [22.2222, '22.2222'],
+          [22.2222, 22.2222],
+          ['22.2222', 22.2222],
+          [true, true],
+          ['true', 'true'],
+          [true, 'true'],
+          [false, 'false'],
+          ['false', 'false'],
+          [false, false],
+          [false, 'false'],
+          ['titi', 'titi'],
+          [undefined, undefined],
+          [null, null],
+          // Objects appear as "[object Object]"
+          [{value : 10, name : 'john', address : { name : '123 street'} }, {value : 10, name : 'john', address : { name : '123 street'}}],
+          [{value : 20, name : 'Eric', address : { name : '85 street'} }, {value : 10, name : 'wick', address : { name : '321 street'}}],
+          [[1, 2, 3, 4, 6, 7, 8, 9], [1, 2, 3, 4, 6, 7, 8, 9]],
+        ];
+        testCondition('ifNE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to false if the data is not equal to a variable', function () {
+        const _dataSet = [
+          [0, 3],
+          [0, '1'],
+          [true, false],
+          [22.2222, '22.2224'],
+          ['true', false],
+          ['false', 'true'],
+          [false, true],
+          ['titi', 'toto'],
+          [undefined, 'titi'],
+          ['titi', null],
+          [[1, 2, 3, 4, 6, 7, 8, 9], [1, 2, 3, 6, 7, 8, 9]],
+        ];
+        testCondition('ifNE', _dataSet, true);
+      });
+    });
+
+    describe('ifGT', function () {
+      it('should matches values, string.length, array.length or object.length that are greater than a specified value', function () {
+        const _dataSet = [
+          [50, -29],
+          [1290, 768],
+          ['1234', '1'],
+          [1.1223 , '1.12221'],
+          ['32q', '4q2'],
+          ['1234Hello', '1'],
+          ['1234Hello', 8],
+          [10, '8Hello1234'],
+          [[1, 2, 3, 4, 5].length, 3],
+          ['6', [1, 2, 3, 4, 5].length],
+          [['apple', 'banana', 'jackfruit'].length, ['tomato', 'cabbage'].length],
+          [Object.keys({id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}).length, Object.keys({id : 3, name : 'John'}).length],
+        ];
+        testCondition('ifGT', _dataSet, true);
+      });
+
+      it('should matches values, string.length, array.length or object.length that are NOT greater than a specified value', function () {
+        const _dataSet = [
+          [-23, 19],
+          [1, 768],
+          [0, 0],
+          [-2891, '33Hello'],
+          [1.1221 , '1.12221'],
+          ['1' , '1234'],
+          ['123dsf', '103123'],
+          ['13dsf21354t43534534543', '103123093fcce3'],
+          ['Short sentence', 'Hello, this is a long sentence'],
+          ['Short sentence', 'Hello, this is a long sentence'],
+          ['Hello1234', 10],
+          ['Hello1234', 9],
+          [2, 'Hello1234'],
+          [9, 'Hello1234'],
+          [['apple', 'banana'], ['tomato']],
+          [['apple', 'banana'].length, ['tomato', 'cabbage', 'jackfruit', 'berry']],
+          [{id : 2, name : 'John'}, {id : 3, name : 'John',  lastname : 'Wick', city : 'Paris'}],
+          [{id : 2, name : 'John'}, null],
+          [null, 'Lion and giraffe'],
+          ['Lion and giraffe',  null],
+          [null, null],
+          [{id : 2, name : 'John'}, undefined],
+          [undefined, 'Lion and giraffe'],
+          ['Lion and giraffe',  undefined],
+          [undefined, undefined],
+          [{id : 2, name : 'John'}, {id : 3, name : 'Wick'}]
+        ];
+        testCondition('ifGT', _dataSet, false);
+      });
+    });
+    describe('ifGTE', function () {
+      it('Matches values, string.length, array.length or object.length that are greater than or equal to a specified value', function () {
+        let _dataSet = [
+          [50, -29],
+          [0, 0],
+          [1290, 768],
+          [1.1222 , '1.1222'],
+          [1.1223 , '1.12221'],
+          ['1234', '1'],
+          ['1234Hello', '1'],
+          ['1234Hello'.length, 8],
+          ['Hello1234'.length, 9],
+          [10, 'Hello1234'.length],
+          [9, 'Hello1234'.length],
+          [[1, 2, 3, 4, 5].length, 3],
+          [[1, 2, 3, 4, 5].length, 5],
+          [6, [1, 2, 3, 4, 5].length],
+          [5, [1, 2, 3, 4, 5].length]
+        ];
+        testCondition('ifGTE', _dataSet, true);
+      });
+
+      it('should matches values, string.length, array.length or object.length that are NOT greater than a specified value', function () {
+        const _dataSet = [
+          [-23, 19],
+          [1, 768],
+          ['1' , '1234'],
+          ['1.1221' , '1.1222'],
+          [1.1221 , '1.1222'],
+          ['Short sentence', 'Hello, this is a long sentence'],
+          ['Hello1234', 10],
+          [2, '1234Hello'],
+          [[1, 2, 3, 4, 5].length, '10'],
+          ['3', [1, 2, 3, 4, 5].length],
+          [{id : 2, name : 'John'}, null],
+          [null, 'Lion and giraffe'],
+          ['Lion and giraffe',  null],
+          [null, null],
+          [{id : 2, name : 'John'}, undefined],
+          [undefined, 'Lion and giraffe'],
+          ['Lion and giraffe',  undefined],
+          [undefined, undefined],
+          [undefined, null]
+        ];
+        testCondition('ifGTE', _dataSet, false);
+      });
+    });
+    describe('ifLT', function () {
+      it ('should matches values, string.length, array.length or object.length that are less than a specified value', function () {
+        const _dataSet = [
+          [-23, 19],
+          [1, 768],
+          [1.12, 1.13],
+          [1.12, '1.13'],
+          ['1' , '1234'],
+          ['123dsf', '103123'],
+          [-1299283, '-2891feihuwf'],
+          ['Hello1234'.length, 10],
+          [2, 'Hello1234'.length],
+          [[1, 2, 3, 4, 5].length, 20],
+          [3, [1, 2, 3, 4, 5].length]
+        ];
+        testCondition('ifLT', _dataSet, true);
+      });
+
+      it('should matches values, string.length, array.length or object.length that are NOT less than a specified value', function () {
+        const _dataSet = [
+          [50, -29],
+          [0, 0],
+          [1290, 768],
+          ['1234', '1'],
+          [111, '30'],
+          ['32qdwq', '4q2'],
+          ['256sddwq', -202],
+          ['2This is a long string', '1Hello'],
+          ['1234Hello', '1'],
+          ['Hello1234'.length, 2],
+          ['Hello1234'.length, 9],
+          [10, 'Hello1234'.length],
+          [9, 'Hello1234'.length],
+          [[1, 2, 3, 4, 5].length, 2],
+          [6, [1, 2, 3, 4, 5].length],
+          [5, [1, 2, 3, 4, 5].length],
+          [['apple', 'banana'], ['tomato', 'cabbage']],
+          [{id : 2, name : 'John', lastname : 'Wick', city : 'Paris'}, {id : 3, name : 'John'}],
+          [{id : 2, name : 'John'}, {id : 3, name : 'Wick'}],
+          [{id : 2, name : 'John'}, null],
+          [null, 'Lion and giraffe'],
+          ['Lion and giraffe',  null],
+          [null, null],
+          [{id : 2, name : 'John'}, undefined],
+          [undefined, 'Lion and giraffe'],
+          ['Lion and giraffe',  undefined],
+          [undefined, undefined],
+          [undefined, null],
+        ];
+        testCondition('ifLT', _dataSet, false);
+      });
+    });
+    describe('ifLTE', function () {
+      it('should matches values, string.length, array.length or object.length that are less than or equal to a specified value', function () {
+        const _dataSet = [
+          [-23, 19],
+          [1, 768],
+          [0, 0],
+          ['1' , '1234'],
+          [22.233 , '22.233'],
+          ['54356fewfewf432', '54356HelloThere'],
+          ['23fwe', 123],
+          ['4Hello', 10],
+          ['Hello1234'.length, 9],
+          [2, 'Hello1234'.length],
+          [9, 'Hello1234'.length],
+          [[1, 2, 3, 4, 5].length, 10],
+          [[1, 2, 3, 4, 5].length, 5],
+          [3, [1, 2, 3, 4, 5].length],
+          [5, [1, 2, 3, 4, 5].length]
+        ];
+        testCondition('ifLTE', _dataSet, true);
+      });
+
+      it('should matches values, string.length, array.length or object.length that are NOT less than or equal to a specified value', function () {
+        const _dataSet = [
+          [50, -29],
+          [1290, 768],
+          ['1234', '1'],
+          [22.2331 , '22.233'],
+          ['1234ThisIsText', 1],
+          ['Hello1234', '1'],
+          ['Hello1234', 2],
+          [10, 'Hello1234'],
+          [[1, 2, 3, 4, 5].length, 2],
+          [6, [1, 2, 3, 4, 5].length],
+          [{id : 2, name : 'John'}, null],
+          [null, 'Lion and giraffe'],
+          ['Lion and giraffe',  null],
+          [null, null],
+          [{id : 2, name : 'John'}, undefined],
+          [undefined, 'Lion and giraffe'],
+          ['Lion and giraffe',  undefined],
+          [undefined, undefined],
+          [undefined, null],
+        ];
+        testCondition('ifLTE', _dataSet, false);
+      });
+    });
+    describe('ifIN', function () {
+      it('Matches any of the values specified in an array or string', function () {
+        const _dataSet = [
+          ['car is broken', 'is'],
+          ['car is broken', 'car is'],
+          [[1, 2, 'toto'], 'toto'],
+          [[1, 2, 'toto'], 2],
+        ];
+        testCondition('ifIN', _dataSet, true);
+      });
+      it('Matches none of the values specified in an array or string', function () {
+        const _dataSet = [
+          ['car is broken', 'are'],
+          ['car is broken',  'caris'],
+          [[1, 2, 'toto'], 'titi'],
+          [[], 3],
+          [null, 'titi'],
+          ['titi', null],
+          [null, null],
+          [undefined, null],
+          [undefined, 'titi'],
+          ['titi', undefined],
+          [undefined, undefined],
+          [12, 'titi'],
+          [{toto : 2 }, 3],
+        ];
+        testCondition('ifIN', _dataSet, false);
+      });
+    });
+    describe('ifNIN', function () {
+      it('should matches none of the values specified in an array or string', function () {
+        const _dataSet = [
+          ['car is broken', 'are'],
+          ['car is broken',  'caris'],
+          [[1, 2, 'toto'], 'titi'],
+          [[], 3],
+        ];
+        testCondition('ifNIN', _dataSet, true);
+      });
+
+      it('should matches any of the values specified in an array or string', function () {
+        const _dataSet = [
+          ['car is broken', 'is'],
+          ['car is broken', 'car is'],
+          [[1, 2, 'toto'], 'toto'],
+          [[1, 2, 'toto'], 2],
+          [null, 'titi'],
+          ['titi', null],
+          [null, null],
+          [undefined, null],
+          [undefined, 'titi'],
+          ['titi', undefined],
+          [undefined, undefined],
+          [12, 'titi'],
+          [{toto : 2 }, 3],
+        ];
+        testCondition('ifNIN', _dataSet, false);
+      });
+    });
+
+    describe('ifEM', function () {
+      it ('should matches empty values, string, arrays or objects', function () {
+        const _dataSet = [
+          [''],
+          [null],
+          [undefined],
+          [[]],
+          [NaN],
+          [{}],
+        ];
+        testCondition('ifEM', _dataSet, true);
+      });
+
+      it('should matches not empty values, string, arrays or objects', function () {
+        const _dataSet = [
+          [0],
+          [new Date()],
+          ['sdsd'],
+          [12.33],
+          [true],
+          [[12, 23]],
+          [{d : 'd'}],
+        ];
+        testCondition('ifEM', _dataSet, false);
+      });
+    });
+    describe('ifNEM', function () {
+      it('should matches not empty values, string, arrays or objects', function () {
+        const _dataSet = [
+          [0],
+          [new Date()],
+          ['sdsd'],
+          [12.33],
+          [true],
+          [[12, 23]],
+          [{d : 'd'}],
+        ];
+        testCondition('ifNEM', _dataSet, true);
+      });
+
+      it ('should matches empty values, string, arrays or objects', function () {
+        const _dataSet = [
+          [''],
+          [null],
+          [undefined],
+          [[]],
+          [NaN],
+          [{}],
+        ];
+        testCondition('ifNEM', _dataSet, false);
+      });
+    });
+
+    describe('ifBlocks - showBegin/showEnd/hideBegin/hideEnd + Combined conditions', function () {
+      it('should show the content', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'delorean');
+        callWithContext(conditionFormatter.showBegin, _context);
+        helper.assert(_context.isHidden, 0);
+        helper.assert(_context.stopPropagation, true);
+        helper.assert(_context.isConditionTrue, true);
+        callWithContext(conditionFormatter.showEnd, _context);
+        helper.assert(_context.isHidden, -1);
+      });
+      it('should not show the content', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'tesla');
+        callWithContext(conditionFormatter.showBegin, _context);
+        helper.assert(_context.isHidden, 1);
+        helper.assert(_context.stopPropagation, false);
+        helper.assert(_context.isConditionTrue, false);
+        callWithContext(conditionFormatter.showEnd, _context);
+        helper.assert(_context.isHidden, -1);
+      });
+      it('should hide the content', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'delorean');
+        callWithContext(conditionFormatter.hideBegin, _context);
+        helper.assert(_context.isHidden, 1);
+        helper.assert(_context.stopPropagation, true);
+        helper.assert(_context.isConditionTrue, true);
+        callWithContext(conditionFormatter.hideEnd, _context);
+        helper.assert(_context.isHidden, -1);
+      });
+      it('should not hide the content', function () {
+        let _context = {isConditionTrue : false};
+        callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'tesla');
+        callWithContext(conditionFormatter.hideBegin, _context);
+        helper.assert(_context.isHidden, 0);
+        helper.assert(_context.stopPropagation, false);
+        helper.assert(_context.isConditionTrue, false);
+        callWithContext(conditionFormatter.hideEnd, _context);
+        helper.assert(_context.isHidden, -1);
+      });
+    });
+
+    describe('Combined conditions', function () {
+      describe('AND', function () {
+        it('should be true | ifNE / ifEQ / ifGTE / ifGT / ifLT / ifLTE / ifIN / ifNIN / ifEM / ifNEM', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifNE, _context, 'delorean', 'tesla');
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifEQ, _context, 'dragon', 'dragon');
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifGT, _context, 20, 1);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifGTE, _context, -100, -100);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifLT, _context, -1000, 30);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifLTE, _context, 13987, 13987);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifIN, _context, ['potatoes', 'bananas', 'tomatoes'], 'tomatoes');
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifNIN, _context, ['potatoes', 'bananas', 'tomatoes'], 'grapes');
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifEM, _context, null);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifNEM, _context, new Date());
+          callWithContext(conditionFormatter.and, _context);
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, true);
+        });
+        it('should be false | ifNE / ifNIN', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifNE, _context, 'delorean', 'tesla');
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifNIN, _context, ['potatoes', 'bananas', 'tomatoes'], 'tomatoes');
+          helper.assert(_context.isConditionTrue, false);
+          helper.assert(_context.isAndOperator, true);
+        });
+        it('should be false | ifEQ / ifEM / ifNEM', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'delorean');
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifEM, _context, []);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifEM, _context, {id : '1'});
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifNEM, _context, 'Hey');
+          helper.assert(_context.isConditionTrue, false);
+          helper.assert(_context.isAndOperator, true);
+        });
+      });
+      describe('OR', function () {
+        it('should be true | ifNE / ifNIN', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifNE, _context, 'delorean', 'tesla');
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifNIN, _context, ['potatoes', 'bananas', 'tomatoes'], 'tomatoes');
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, false);
+        });
+
+        it('should be true | ifEQ / ifNEM / ifEM', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifEQ, _context, 'delorean', 'tesla');
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifNEM, _context, [1, 2, 3, 4, 5]);
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifEM, _context, {});
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifNEM, _context, 'Hey');
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, false);
+        });
+      });
+      describe('AND/OR/SHOW/ELSE SHOW', function () {
+        it('Should SHOW + or', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifGT, _context, 234, 2);
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifLTE, _context, 10, 2);
+          helper.assert(callWithContext(conditionFormatter.show, _context, null, 'space'), 'space');
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, false);
+          helper.assert(_context.stopPropagation, true);
+        });
+        it('Should NOT SHOW + or', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifGTE, _context, 2, 20);
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifLT, _context, 10, 2);
+          callWithContext(conditionFormatter.show, _context);
+          helper.assert(_context.isConditionTrue, false);
+          helper.assert(_context.isAndOperator, false);
+          helper.assert(_context.stopPropagation, false);
+        });
+        it('Should ELSESHOW + or', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifGTE, _context, 2, 20);
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifLT, _context, 10, 2);
+          callWithContext(conditionFormatter.show, _context);
+          helper.assert(_context.stopPropagation, false);
+          helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'space'), 'space');
+          helper.assert(_context.isConditionTrue, false);
+          helper.assert(_context.isAndOperator, false);
+          helper.assert(_context.stopPropagation, true);
+        });
+        it('Should SHOW + and', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifIN, _context, [2, 30, 'apple', -1], 'apple');
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifLT, _context, -199, 21);
+          helper.assert(callWithContext(conditionFormatter.show, _context, null, 'space'), 'space');
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, true);
+          helper.assert(_context.stopPropagation, true);
+        });
+        it('Should SHOW + multiple and', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifNIN, _context, 'This is a sentence 1234 hey', 'Hello');
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifLTE, _context, 200, 200);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifLT, _context, 0, 1);
+          helper.assert(callWithContext(conditionFormatter.show, _context, null, 'space'), 'space');
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, true);
+          helper.assert(_context.stopPropagation, true);
+        });
+        it('Should SHOW + multiple or', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifNIN, _context, 'This is a sentence 1234 hey', 'hey');
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifLTE, _context, 22333333, 2100);
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifEM, _context, null);
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifGTE, _context, -1, 0);
+          helper.assert(callWithContext(conditionFormatter.show, _context, null, 'space'), 'space');
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, false);
+          helper.assert(_context.stopPropagation, true);
+        });
+        it('Should elseShow + multiple or', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifNIN, _context, 'This is a sentence 1234 hey', 'hey');
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifLTE, _context, 22222222, 2100);
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifEM, _context, 'no empty');
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifGTE, _context, -1, 0);
+          callWithContext(conditionFormatter.show, _context);
+          helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'space'), 'space');
+          helper.assert(_context.isConditionTrue, false);
+          helper.assert(_context.isAndOperator, false);
+          helper.assert(_context.stopPropagation, true);
+        });
+        it('Should show + AND + len', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 1997);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifGT, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 10);
+          helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, true);
+          helper.assert(_context.stopPropagation, true);
+        });
+
+        it('Should elseShow + AND + len', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 10);
+          callWithContext(conditionFormatter.and, _context);
+          callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 41);
+          callWithContext(conditionFormatter.show, _context);
+          helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'Apple'), 'Apple');
+          helper.assert(_context.isConditionTrue, false);
+          helper.assert(_context.isAndOperator, true);
+          helper.assert(_context.stopPropagation, true);
+        });
+
+        it('Should show + OR + len', function () {
+          let _context = {isConditionTrue : false};
+          callWithContext(conditionFormatter.ifLT, _context, conditionFormatter.len(['car', 'train', 'plane']), 2);
+          callWithContext(conditionFormatter.or, _context);
+          callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('Hello12345'), 10);
+          helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
+          helper.assert(_context.isConditionTrue, true);
+          helper.assert(_context.isAndOperator, false);
+          helper.assert(_context.stopPropagation, true);
+        });
+      });
+    });
+  });
+
+  describe('LEN', function () {
+    it('should return the string length or array length', function () {
+      helper.assert(conditionFormatter.len('This is a string'), 16);
+      helper.assert(conditionFormatter.len(''), 0);
+      helper.assert(conditionFormatter.len('樂而不淫 建章曰'), 8);
+      helper.assert(conditionFormatter.len('This is a longer string lenght'), 30);
+      helper.assert(conditionFormatter.len([0, 1, 2, 3]), 4);
+      helper.assert(conditionFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
+      helper.assert(conditionFormatter.len([]), 0);
+      helper.assert(conditionFormatter.len({name : 'John'}), 0);
+      helper.assert(conditionFormatter.len(undefined), 0);
+      helper.assert(conditionFormatter.len(null), 0);
+      helper.assert(conditionFormatter.len(-1), 0);
+    });
+  });
+
   describe('print', function () {
     it('should print the message', function () {
       var _context = {};
@@ -339,6 +1039,81 @@ describe('formatter', function () {
     });
   });
 
+  describe('padl', function () {
+    it('should be up to the target length with padding string to complete', () => {
+      helper.assert(stringFormatter.padl('coucou', 6), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padl('coucou', 7), ' coucou', 'one more length, adding one space before');
+      helper.assert(stringFormatter.padl('coucou', 7, 'x'), 'xcoucou', 'one more length, adding one padding string "x" before');
+      helper.assert(stringFormatter.padl('coucou', '10', 'x'), 'xxxxcoucou', 'one more length, adding padding string "x" before');
+      helper.assert(stringFormatter.padl('coucou', 6, 'x'), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padl('coucou', 3), 'coucou', 'lower target length, no change');
+      helper.assert(stringFormatter.padl('coucou', 3, 'x'), 'coucou', 'lower target length with padding string defined, no change');
+    });
+    it('should accept numbers, strings for all parameters and accept 0 for the padding string', () => {
+      helper.assert(stringFormatter.padl(  1223,  8 ,  0 ), '00001223');
+      helper.assert(stringFormatter.padl(  1223,  8 , '0'), '00001223');
+      helper.assert(stringFormatter.padl(  1223, '8', '0'), '00001223');
+      helper.assert(stringFormatter.padl('1223', '8', '0'), '00001223');
+      helper.assert(stringFormatter.padl('1223', '8',  0 ), '00001223');
+      helper.assert(stringFormatter.padl('1223',  8 , '0'), '00001223');
+    });
+    it('should not crash if data is null or undefined', () => {
+      helper.assert(stringFormatter.padl(null, 0), null, 'if data is null, not a string so return null 1');
+      helper.assert(stringFormatter.padl(null, 4), null, 'if data is null, not a string so return null 2');
+      helper.assert(stringFormatter.padl(null, 5), null, 'if data is null, not a string so return null 3');
+      helper.assert(stringFormatter.padl(null, 0, 'x'), null, 'if data is null, not a string so return null 4');
+      helper.assert(stringFormatter.padl(null, 5, 'x'), null, 'if data is null, not a string so return null 5');
+      helper.assert(stringFormatter.padl(undefined, 0), undefined, 'if data is undefined, not a string so return undefined 1');
+      helper.assert(stringFormatter.padl(undefined, 9), undefined, 'if data is undefined, not a string so return undefined 2');
+      helper.assert(stringFormatter.padl(undefined, 10), undefined, 'if data is undefined, not a string so return undefined 3');
+      helper.assert(stringFormatter.padl(undefined, 9, 'x'), undefined, 'if data is undefined, not a string so return undefined 4');
+      helper.assert(stringFormatter.padl(undefined, 10, 'x'), undefined, 'if data is undefined, not a string so return undefined 5');
+    });
+    it('should not crash if data is object', () => {
+      helper.assert(stringFormatter.padl({id : 2}, 5), {id : 2}, 'if data is object, should return it with no change');
+    });
+    it('should not crash if data is array', () => {
+      helper.assert(stringFormatter.padl([{id : 1}], 5), [{id : 1}], 'if data is array, should return it with no change');
+    });
+  });
+  describe('padr', function () {
+    it('should be up to the target length with padding string to complete', () => {
+      helper.assert(stringFormatter.padr('coucou', 6), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padr('coucou', 7), 'coucou ', 'one more length, adding one space before');
+      helper.assert(stringFormatter.padr('coucou', 7, 'x'), 'coucoux', 'one more length, adding one padding string "x" before');
+      helper.assert(stringFormatter.padr('coucou', 10, 'x'), 'coucouxxxx', 'one more length, adding padding string "x" before');
+      helper.assert(stringFormatter.padr('coucou', 6, 'x'), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padr('coucou', 3), 'coucou', 'lower target length, no change');
+      helper.assert(stringFormatter.padr('coucou', 3, 'x'), 'coucou', 'lower target length with padding string defined, no change');
+    });
+    it('should accept numbers, strings for all parameters and accept 0 for the padding string', () => {
+      helper.assert(stringFormatter.padr(  1223,  8 ,  0 ), '12230000');
+      helper.assert(stringFormatter.padr(  1223,  8 , '0'), '12230000');
+      helper.assert(stringFormatter.padr(  1223, '8', '0'), '12230000');
+      helper.assert(stringFormatter.padr('1223', '8', '0'), '12230000');
+      helper.assert(stringFormatter.padr('1223', '8',  0 ), '12230000');
+      helper.assert(stringFormatter.padr('1223',  8 , '0'), '12230000');
+    });
+    it('should not crash if data is null or undefined', () => {
+      helper.assert(stringFormatter.padr(null, 0), null, 'if data is null, not a string so return null 1');
+      helper.assert(stringFormatter.padr(null, 4), null, 'if data is null, not a string so return null 2');
+      helper.assert(stringFormatter.padr(null, 5), null, 'if data is null, not a string so return null 3');
+      helper.assert(stringFormatter.padr(null, 0, 'x'), null, 'if data is null, not a string so return null 4');
+      helper.assert(stringFormatter.padr(null, 5, 'x'), null, 'if data is null, not a string so return null 5');
+      helper.assert(stringFormatter.padr(undefined, 0), undefined, 'if data is undefined, not a string so return undefined 1');
+      helper.assert(stringFormatter.padr(undefined, 9), undefined, 'if data is undefined, not a string so return undefined 2');
+      helper.assert(stringFormatter.padr(undefined, 10), undefined, 'if data is undefined, not a string so return undefined 3');
+      helper.assert(stringFormatter.padr(undefined, 9, 'x'), undefined, 'if data is undefined, not a string so return undefined 4');
+      helper.assert(stringFormatter.padr(undefined, 10, 'x'), undefined, 'if data is undefined, not a string so return undefined 5');
+    });
+    it('should not crash if data is object', () => {
+      helper.assert(stringFormatter.padr({id : 2}, 5), {id : 2}, 'if data is object, should return it with no change');
+    });
+    it('should not crash if data is array', () => {
+      helper.assert(stringFormatter.padr([{id : 1}], 5), [{id : 1}], 'if data is array, should return it with no change');
+    });
+  });
+
   describe('arrayMap', function () {
     it('should flatten the each object of the array (only the first level, ignoring sub arrays, sub objects,...)', function () {
       var _datas = [
@@ -391,6 +1166,7 @@ describe('formatter', function () {
       var _datas = ['1', '2', 'hey!'];
       helper.assert(arrayFormatter.arrayJoin(_datas, ''), '12hey!');
       helper.assert(arrayFormatter.arrayJoin(_datas, ' | '), '1 | 2 | hey!');
+      helper.assert(arrayFormatter.arrayJoin(_datas, '\\n'), '1\n2\nhey!');
     });
     it('should not crash if datas is null or undefined', function () {
       helper.assert(arrayFormatter.arrayMap(null), null);

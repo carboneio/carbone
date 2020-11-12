@@ -72,11 +72,11 @@ function convDate (d, patternIn, patternOut) {
 
 
 module.exports = {
-  formatD : formatD,
+  formatD  : formatD,
   convDate : convDate,
-  
+
   /* @deprecated and @private */
-  convert  : convDate,
+  convert : convDate,
 
   /**
    * Adds a number of days to the date

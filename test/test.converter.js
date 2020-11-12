@@ -2,10 +2,13 @@ var assert = require('assert');
 var carbone = require('../lib/index');
 var path  = require('path');
 var fs = require('fs');
+var os = require('os');
 var helper = require('../lib/helper');
 var converter = require('../lib/converter');
+var params = require('../lib/params');
 var exec = require('child_process').exec;
 var tempPath = path.join(__dirname, 'temp');
+var pdfjsLib = require('pdfjs-dist/build/pdf.js');
 
 var defaultOptions = {
   pipeNamePrefix : '_carbone',
@@ -23,6 +26,35 @@ describe('Converter', function () {
   after(function () {
     helper.rmDirRecursive(tempPath);
     carbone.reset();
+  });
+
+  describe('shouldTheFactoryBeRestarted', function () {
+    it('should return not restart LO if factoryMemoryFileSize = 0 or factoryMemoryThreshold = 0', function () {
+      var _params = {
+        factoryMemoryFileSize  : 0,
+        factoryMemoryThreshold : 0
+      };
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 1000, 100), false);
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 1   , 1000000), false);
+      _params.factoryMemoryFileSize = 10000;
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 1   , 100000000), false);
+      _params.factoryMemoryFileSize = 10000;
+      _params.factoryMemoryThreshold = 0;
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 1   , 100000000), false);
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 100000000, 100000000), false);
+    });
+    it('should restart LO if the threshold is reached', function () {
+      var _params = {
+        factoryMemoryFileSize  : 2,
+        factoryMemoryThreshold : 20
+      };
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 1000, 99), false);
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 1000, 100), true);
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 1000, 101), true);
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 10  , 101), true);
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 10  , 1  ), true);
+      helper.assert(converter.shouldTheFactoryBeRestarted(_params, 10  , 0  ), false);
+    });
   });
 
   describe('init', function () {
@@ -93,16 +125,91 @@ describe('Converter', function () {
       var _pdfResultPath = path.resolve('./test/datasets/test_odt_render_static.pdf');
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
-        var _buf = new Buffer(result);
-        assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-        var bufPDF = new Buffer(_buf.length);
-        fs.open(_pdfResultPath, 'r', function (status, fd) {
-          fs.read(fd, bufPDF, 0, _buf.length, 0, function (err, bytesRead, buffer) {
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
-            assert.equal(_buf.slice(8, 70).toString(), buffer.slice(8, 70).toString());
+        helper.assert(Buffer.isBuffer(result), true);
+        assert.equal(result.slice(0, 4).toString(), '%PDF');
+        fs.readFile(_pdfResultPath, function (err, content) {
+          helper.assert(err+'', 'null');
+          assert.equal(result.slice(8, 70).toString(), content.slice(8, 70).toString());
+          done();
+        });
+      });
+    });
+    it('should return a link to the output document', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      var _outputPath = path.join(tempPath, 'output.toto');
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(typeof(result) === 'string', true);
+        helper.assert(_outputPath, result);
+        fs.readFile(_outputPath, function (err, content) {
+          helper.assert(err+'', 'null');
+          assert.equal(content.slice(0, 4).toString(), '%PDF');
+          fs.unlink(_outputPath, function (err) {
+            helper.assert(err+'', 'null');
             done();
           });
         });
+      }, true, _outputPath);
+    });
+    it('should render and not open a pdf with a bad password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+        if (err) {
+          assert.equal(err, null);
+        }
+        var _buf = new Buffer.from(result);
+        assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : 'ThisIsABadPassWord' });
+        loadingTask.promise.then(() => {
+          done(new Error('The password is wrong and it is not possible to open the report'));
+        }, () => {
+          done();
+        });
+      }, null, null, {
+        EncryptFile          : true,
+        DocumentOpenPassword : 'Password1234'
+      });
+    });
+    it('should render and open a pdf with a password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      const _password = 'P4ssW0rd';
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+        if (err) {
+          assert.equal(err, null);
+        }
+        var _buf = new Buffer.from(result);
+        assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : _password });
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad Password'));
+        });
+      }, null, null, {
+        EncryptFile          : true,
+        DocumentOpenPassword : _password
+      });
+    });
+    it('should render and open a pdf with a number as password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      const _password = '1234533';
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+        if (err) {
+          assert.equal(err, null);
+        }
+        var _buf = new Buffer.from(result);
+        assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : _password });
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad Password'));
+        });
+      }, null, null, {
+        EncryptFile          : true,
+        DocumentOpenPassword : _password
       });
     });
     it('should restart automatically the conversion factory if it crashes', function (done) {
@@ -110,8 +217,8 @@ describe('Converter', function () {
       converter.init({factories : 1, startFactory : true, tempPath : tempPath}, function (factories) {
         converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
           helper.assert(err+'', 'null');
-          var _buf = new Buffer(result);
-          assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+          helper.assert(Buffer.isBuffer(result), true);
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
           // kill LibreOffice thread
           process.kill(factories['0'].pid);
           // try another conversion
@@ -119,8 +226,8 @@ describe('Converter', function () {
           setTimeout(function () {
             converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
               helper.assert(err+'', 'null');
-              var _buf = new Buffer(result);
-              assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+              helper.assert(Buffer.isBuffer(result), true);
+              assert.equal(result.slice(0, 4).toString(), '%PDF');
               done();
             });
           }, 200);
@@ -150,8 +257,8 @@ describe('Converter', function () {
           var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
           console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions (usally around 65ms) \n\n\n');
           for (var i = 0; i < _results.length; i++) {
-            var _buf = new Buffer(_results[i]);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            helper.assert(Buffer.isBuffer(_results[i]), true);
+            assert.equal(_results[i].slice(0, 4).toString(), '%PDF');
           }
           assert.equal((_elapsed < 350), true);
           done();
@@ -195,8 +302,8 @@ describe('Converter', function () {
           var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
           console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions with '+(_nbExecuted/_crashModulo).toFixed(0)+' crashes\n\n\n');
           for (var i = 0; i < _results.length; i++) {
-            var _buf = new Buffer(_results[i]);
-            assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+            helper.assert(Buffer.isBuffer(_results[i]), true);
+            assert.equal(_results[i].slice(0, 4).toString(), '%PDF');
           }
           assert.equal((_elapsed < 400), true);
           done();
@@ -208,7 +315,7 @@ describe('Converter', function () {
       converter.init({factories : 1, startFactory : true, tempPath : tempPath}, function (factories) {
         var _officePID = factories['0'].pid;
         converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err) {
-          assert.equal(err, 'Could not open document');
+          assert.equal(err+'', 'Error: Could not open document');
           assert.equal(factories['0'].pid, _officePID);
           done();
         });
@@ -219,7 +326,7 @@ describe('Converter', function () {
       converter.init({factories : 1, startFactory : true, tempPath : tempPath}, function (factories) {
         var _officePID = factories['0'].pid;
         converter.convertFile(_filePath, 'MS Word 97', '', function (err) {
-          assert.equal(err, 'Could not convert document');
+          assert.equal(err+'', 'Error: Could not convert document');
           assert.equal(factories['0'].pid, _officePID);
           done();
         });
@@ -244,8 +351,8 @@ describe('Converter', function () {
                 var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
                 converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
                   assert.equal(err, null);
-                  var _buf = new Buffer(result);
-                  assert.equal(_buf.slice(0, 4).toString(), '%PDF');
+                  helper.assert(Buffer.isBuffer(result), true);
+                  assert.equal(result.slice(0, 4).toString(), '%PDF');
                   done();
                 });
               });
@@ -278,6 +385,154 @@ describe('Converter', function () {
             }
           });
         }
+      });
+    });
+  });
+
+  describe('LO Memory monitoring and report timeout', function () {
+    const totatMemoryAvailableMB     = os.totalmem() / 1024 / 1024;
+    const factoryMemoryThreshold     = 8; // 8 %
+    const nbConversionBoundary       = 5; // below it os ok, above it restarts LO
+    const nbConversionForRestart     = nbConversionBoundary + 1;
+    const nbConversionWithoutRestart = nbConversionBoundary - 1;
+    // adapt factoryMemoryFileSize according to the system memory to make the test machine-independant
+    const factoryMemoryFileSize      = totatMemoryAvailableMB * factoryMemoryThreshold / (nbConversionBoundary * 100);
+    const memoryOptions = {
+      factories              : 1,
+      startFactory           : true,
+      tempPath               : tempPath,
+      factoryMemoryFileSize  : factoryMemoryFileSize,
+      factoryMemoryThreshold : factoryMemoryThreshold
+    };
+
+    afterEach(function (done) {
+      converter.exit(done);
+      carbone.reset();
+    });
+
+    it('should not reach the memory threshold and the factory process shouldn\'t be killed', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.init(memoryOptions, function (factories) {
+        const _officePID = factories['0'].pid;
+        for (let i = 0; i <= nbConversionWithoutRestart; i++) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(Buffer.isBuffer(result), true);
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            assert.equal(factories['0'].pid, _officePID);
+            if (i === nbConversionWithoutRestart) {
+              done();
+            }
+          });
+        }
+      });
+    });
+
+    it('should reach the memory threshold  and the factory process should be killed', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.init(memoryOptions, function (factories) {
+        const _officePID = factories['0'].pid;
+        for (let i = 0; i <= nbConversionForRestart; i++) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(Buffer.isBuffer(result), true);
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            if (i === nbConversionForRestart) {
+              assert.notEqual(factories['0'].pid, _officePID);
+              done();
+            }
+          });
+        }
+      });
+    });
+
+    it('should reach the memory threshold and 4 factories should be killed', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      memoryOptions.factories = 4;
+      converter.init(memoryOptions, function (factories) {
+        const _officePIDs = [factories['0'].pid, factories['1'].pid, factories['2'].pid, factories['3'].pid];
+        const _maxLoops = nbConversionForRestart * memoryOptions.factories;
+        for (let i = 0; i <= _maxLoops; i++) {
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(Buffer.isBuffer(result), true);
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            if (i === _maxLoops) {
+              for (let i = 0; i < _officePIDs.length; i++) {
+                assert.notEqual(factories[i+''].pid, _officePIDs[i]);
+              }
+              done();
+            }
+          });
+        }
+      });
+    });
+
+    it('should not timeout and should not kill the factory process. (timeout disabled)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      memoryOptions.converterFactoryTimeout = 0;
+      converter.init(memoryOptions, function (factories) {
+        const _officePID = factories['0'].pid;
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(Buffer.isBuffer(result), true);
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
+          assert.equal(factories['0'].pid, _officePID);
+          done();
+        });
+      });
+    });
+
+    it('should timeout if the report is too long to convert, return an error and should be able to convert again after', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      memoryOptions.converterFactoryTimeout = 5;
+      converter.init(memoryOptions, function (factories) {
+        const _officePID = factories['0'].pid;
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+          helper.assert(err instanceof Error, true);
+          helper.assert(err+'', 'Error: Document conversion timeout reached ('+params.converterFactoryTimeout+' ms)');
+          helper.assert(result+'', 'undefined');
+          params.converterFactoryTimeout = 10000;
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+            const _newOfficePIDAfter = factories['0'].pid;
+            helper.assert(_officePID !== _newOfficePIDAfter, true);
+            helper.assert(err+'', 'null');
+            helper.assert(Buffer.isBuffer(result), true);
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            done();
+          });
+        });
+      });
+    });
+
+    it('should convert one file, another with timeout, and another without timeout', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      memoryOptions.converterFactoryTimeout = 5;
+      converter.init(memoryOptions, function (factories) {
+        const _officePID = factories['0'].pid;
+        params.converterFactoryTimeout = 10000;
+        converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+          const _newOfficePID = factories['0'].pid;
+          helper.assert(_officePID, _newOfficePID);
+          helper.assert(err+'', 'null');
+          helper.assert(Buffer.isBuffer(result), true);
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
+          params.converterFactoryTimeout = 2;
+          converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+            helper.assert(err instanceof Error, true);
+            helper.assert(err+'', 'Error: Document conversion timeout reached ('+params.converterFactoryTimeout+' ms)');
+            helper.assert(result+'', 'undefined');
+            params.converterFactoryTimeout = 10000;
+            converter.convertFile(_filePath, 'writer_pdf_Export', '', function (err, result) {
+              const _newOfficePIDAfter = factories['0'].pid;
+              helper.assert(_officePID !== _newOfficePIDAfter, true);
+              helper.assert(err+'', 'null');
+              helper.assert(Buffer.isBuffer(result), true);
+              assert.equal(result.slice(0, 4).toString(), '%PDF');
+              done();
+            });
+          });
+        });
       });
     });
   });

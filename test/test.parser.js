@@ -7,27 +7,27 @@ describe('parser', function () {
 
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
-        it should add the root object.', function (done) {
+        it should add the root object. It should replace the marker by a reserved character', function (done) {
       parser.findMarkers('{d.menu}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 0, name : '_root.d.menu'}]);
-        helper.assert(cleanedXml, '');
+        helper.assert(markers, [{pos : 1, name : '_root.d.menu'}]);
+        helper.assert(cleanedXml, '\uFFFF');
         done();
       });
     });
     it('should find marker even if there is a bracket before the markers', function (done) {
       parser.findMarkers('<xml>{toto {d.toto}</xml>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 11, name : '_root.d.toto'}]);
-        helper.assert(cleanedXml, '<xml>{toto </xml>');
+        helper.assert(markers, [{pos : 12, name : '_root.d.toto'}]);
+        helper.assert(cleanedXml, '<xml>{toto \uFFFF</xml>');
         done();
       });
     });
     it('should find multiple markers even if there are brackets before the markers', function (done) {
       parser.findMarkers('<xml>{d.tata} {to{c.menu} {to {d.toto}</xml>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.d.tata'}, {pos : 9, name : '_root.c.menu'}, {pos : 14, name : '_root.d.toto'}]);
-        helper.assert(cleanedXml, '<xml> {to {to </xml>');
+        helper.assert(markers, [{pos : 6, name : '_root.d.tata'}, {pos : 11, name : '_root.c.menu'}, {pos : 17, name : '_root.d.toto'}]);
+        helper.assert(cleanedXml, '<xml>\uFFFF {to\uFFFF {to \uFFFF</xml>');
         done();
       });
     });
@@ -35,8 +35,8 @@ describe('parser', function () {
         it should add the root object.', function (done) {
       parser.findMarkers('<div>{c.menu}<div>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.c.menu'}]);
-        helper.assert(cleanedXml, '<div><div>');
+        helper.assert(markers, [{pos : 6, name : '_root.c.menu'}]);
+        helper.assert(cleanedXml, '<div>\uFFFF<div>');
         done();
       });
     });
@@ -44,8 +44,8 @@ describe('parser', function () {
         it should add the root object.', function (done) {
       parser.findMarkers('<xmlstart>{d.me<interxml>n<bullshit>u}</xmlend>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 10, name : '_root.d.menu'}]);
-        helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend>');
+        helper.assert(markers, [{pos : 11, name : '_root.d.menu'}]);
+        helper.assert(cleanedXml, '<xmlstart>\uFFFF<interxml><bullshit></xmlend>');
         done();
       });
     });
@@ -53,8 +53,8 @@ describe('parser', function () {
         it should add the root object.', function (done) {
       parser.findMarkers('<div>{d.menu}<div>{d.city}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.d.menu'},{pos : 10, name : '_root.d.city'}]);
-        helper.assert(cleanedXml, '<div><div>');
+        helper.assert(markers, [{pos : 6, name : '_root.d.menu'},{pos : 12, name : '_root.d.city'}]);
+        helper.assert(cleanedXml, '<div>\uFFFF<div>\uFFFF');
         done();
       });
     });
@@ -62,8 +62,8 @@ describe('parser', function () {
         it should add the root object.', function (done) {
       parser.findMarkers('<xmlstart>{d.me<interxml>n<bullshit>u}</xmlend><tga>{d.ci<td>ty</td>}<tga><bla>{d.cars}</bla>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 10, name : '_root.d.menu'},{pos : 44, name : '_root.d.city'},{pos : 63, name : '_root.d.cars'}]);
-        helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>');
+        helper.assert(markers, [{pos : 11, name : '_root.d.menu'},{pos : 46, name : '_root.d.city'},{pos : 66, name : '_root.d.cars'}]);
+        helper.assert(cleanedXml, '<xmlstart>\uFFFF<interxml><bullshit></xmlend><tga>\uFFFF<td></td><tga><bla>\uFFFF</bla>');
         done();
       });
     });
@@ -71,24 +71,24 @@ describe('parser', function () {
         it should add the root object.', function (done) {
       parser.findMarkers('<xmlstart>{d.me<interxml>n<bullshit>u[i].city}</xmlend><tga>{d.ci<td>ty</td>}<tga><bla>{c.cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 10, name : '_root.d.menu[i].city'},{pos : 44, name : '_root.d.city'},{pos : 63, name : '_root.c.cars[i].wheel'}]);
-        helper.assert(cleanedXml, '<xmlstart><interxml><bullshit></xmlend><tga><td></td><tga><bla></bla>');
+        helper.assert(markers, [{pos : 11, name : '_root.d.menu[i].city'},{pos : 46, name : '_root.d.city'},{pos : 66, name : '_root.c.cars[i].wheel'}]);
+        helper.assert(cleanedXml, '<xmlstart>\uFFFF<interxml><bullshit></xmlend><tga>\uFFFF<td></td><tga><bla>\uFFFF</bla>');
         done();
       });
     });
     it('It should find marker which is in another marker', function (done) {
       parser.findMarkers('<w:r><w:rPr><w:color /></w:rPr><w:t>{</w:t></w:r><w:r ><w:rPr><w:color w:val="{d.perso[i].color}" /></w:rPr><w:t>d.perso</w:t></w:r><w:r><w:rPr><w:color /></w:rPr><w:t>[i].nom}</w:t></w:r>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 36, name : '_root.d.perso[i].nom'},{pos : 77, name : '_root.d.perso[i].color'}]);
-        helper.assert(cleanedXml, '<w:r><w:rPr><w:color /></w:rPr><w:t></w:t></w:r><w:r ><w:rPr><w:color w:val="" /></w:rPr><w:t></w:t></w:r><w:r><w:rPr><w:color /></w:rPr><w:t></w:t></w:r>');
+        helper.assert(markers, [{pos : 37, name : '_root.d.perso[i].nom'},{pos : 79, name : '_root.d.perso[i].color'}]);
+        helper.assert(cleanedXml, '<w:r><w:rPr><w:color /></w:rPr><w:t>\uFFFF</w:t></w:r><w:r ><w:rPr><w:color w:val="\uFFFF" /></w:rPr><w:t></w:t></w:r><w:r><w:rPr><w:color /></w:rPr><w:t></w:t></w:r>');
         done();
       });
     });
     it('It should find multiple markers which are in another marker', function (done) {
       parser.findMarkers('<w:r><w:color /><w:t>{</w:t></w:r><w:r ><w:color w:val="{d.perso[i].color}" /><w:t>d.perso</w:t></w:r><w:r><w:rPr test="{d.perso[i].test}"><w:color /></w:rPr><w:t>[i].nom}</w:t></w:r>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 21, name : '_root.d.perso[i].nom'},{pos : 55, name : '_root.d.perso[i].color'},{pos : 94, name : '_root.d.perso[i].test'}]);
-        helper.assert(cleanedXml, '<w:r><w:color /><w:t></w:t></w:r><w:r ><w:color w:val="" /><w:t></w:t></w:r><w:r><w:rPr test=""><w:color /></w:rPr><w:t></w:t></w:r>');
+        helper.assert(markers, [{pos : 22, name : '_root.d.perso[i].nom'},{pos : 57, name : '_root.d.perso[i].color'},{pos : 97, name : '_root.d.perso[i].test'}]);
+        helper.assert(cleanedXml, '<w:r><w:color /><w:t>\uFFFF</w:t></w:r><w:r ><w:color w:val="\uFFFF" /><w:t></w:t></w:r><w:r><w:rPr test="\uFFFF"><w:color /></w:rPr><w:t></w:t></w:r>');
         done();
       });
     });
@@ -96,22 +96,22 @@ describe('parser', function () {
       parser.findMarkers('<xml><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i]</ha>.na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr><tr>{d.to<ha a="{d.toto}" b="{d.tata}" c="{d.titi}">to[i+</ha>1].na<he a="{d.toto}" b="{d.tata}" c="{d.titi}">me</he>}</tr></xml>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [
-          {pos : 9, name : '_root.d.toto[i].name'},
-          {pos : 16, name : '_root.d.toto'},
-          {pos : 21, name : '_root.d.tata'},
-          {pos : 26, name : '_root.d.titi'},
-          {pos : 40, name : '_root.d.toto'},
-          {pos : 45, name : '_root.d.tata'},
-          {pos : 50, name : '_root.d.titi'},
-          {pos : 66, name : '_root.d.toto[i+1].name'},
-          {pos : 73, name : '_root.d.toto'},
-          {pos : 78, name : '_root.d.tata'},
-          {pos : 83, name : '_root.d.titi'},
-          {pos : 97, name : '_root.d.toto'},
-          {pos : 102, name : '_root.d.tata'},
-          {pos : 107, name : '_root.d.titi'},
+          {pos : 10, name : '_root.d.toto[i].name'},
+          {pos : 18, name : '_root.d.toto'},
+          {pos : 24, name : '_root.d.tata'},
+          {pos : 30, name : '_root.d.titi'},
+          {pos : 45, name : '_root.d.toto'},
+          {pos : 51, name : '_root.d.tata'},
+          {pos : 57, name : '_root.d.titi'},
+          {pos : 74, name : '_root.d.toto[i+1].name'},
+          {pos : 82, name : '_root.d.toto'},
+          {pos : 88, name : '_root.d.tata'},
+          {pos : 94, name : '_root.d.titi'},
+          {pos : 109, name : '_root.d.toto'},
+          {pos : 115, name : '_root.d.tata'},
+          {pos : 121, name : '_root.d.titi'},
         ]);
-        helper.assert(cleanedXml, '<xml><tr><ha a="" b="" c=""></ha><he a="" b="" c=""></he></tr><tr><ha a="" b="" c=""></ha><he a="" b="" c=""></he></tr></xml>');
+        helper.assert(cleanedXml, '<xml><tr>\uFFFF<ha a="\uFFFF" b="\uFFFF" c="\uFFFF"></ha><he a="\uFFFF" b="\uFFFF" c="\uFFFF"></he></tr><tr>\uFFFF<ha a="\uFFFF" b="\uFFFF" c="\uFFFF"></ha><he a="\uFFFF" b="\uFFFF" c="\uFFFF"></he></tr></xml>');
         done();
       });
     });
@@ -119,15 +119,15 @@ describe('parser', function () {
       parser.findMarkers('<w:r test="{d.lolo}">{d.color}<w:color /><w:t>{</w:t></w:r><w:r ><w:color w:val="{d.perso[i].color}" /><w:t>d.perso</w:t></w:r><w:r><w:rPr test="{d.perso[i].test}"><w:color /></w:rPr><w:t>[i].nom}</w:t class="{d.lala}">{d.test}</w:r>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [
-          {pos : 11, name : '_root.d.lolo'},
-          {pos : 13, name : '_root.d.color'},
-          {pos : 29, name : '_root.d.perso[i].nom'},
-          {pos : 63, name : '_root.d.perso[i].color'},
-          {pos : 102, name : '_root.d.perso[i].test'},
-          {pos : 141, name : '_root.d.lala'},
-          {pos : 143, name : '_root.d.test'}
+          {pos : 12, name : '_root.d.lolo'},
+          {pos : 15, name : '_root.d.color'},
+          {pos : 32, name : '_root.d.perso[i].nom'},
+          {pos : 67, name : '_root.d.perso[i].color'},
+          {pos : 107, name : '_root.d.perso[i].test'},
+          {pos : 147, name : '_root.d.lala'},
+          {pos : 150, name : '_root.d.test'}
         ]);
-        helper.assert(cleanedXml, '<w:r test=""><w:color /><w:t></w:t></w:r><w:r ><w:color w:val="" /><w:t></w:t></w:r><w:r><w:rPr test=""><w:color /></w:rPr><w:t></w:t class=""></w:r>');
+        helper.assert(cleanedXml, '<w:r test="\uFFFF">\uFFFF<w:color /><w:t>\uFFFF</w:t></w:r><w:r ><w:color w:val="\uFFFF" /><w:t></w:t></w:r><w:r><w:rPr test="\uFFFF"><w:color /></w:rPr><w:t></w:t class="\uFFFF">\uFFFF</w:r>');
         done();
       });
     });
@@ -165,29 +165,29 @@ describe('parser', function () {
       '</xml>';
       parser.findMarkers(str, function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [ { pos : 26, name : '_root.d.perso[i].color' },
-          { pos : 28, name : '_root.d.perso[i].nom' },
-          { pos : 48, name : '_root.d.perso[i].color' },
-          { pos : 70, name : '_root.d.perso[i].color' },
-          { pos : 92, name : '_root.d.perso[i].color' },
-          { pos : 123, name : '_root.d.perso[i].color' },
-          { pos : 125, name : '_root.d.perso[i].prenom' },
-          { pos : 145, name : '_root.d.perso[i].color' },
-          { pos : 167, name : '_root.d.perso[i].color' },
-          { pos : 189, name : '_root.d.perso[i].color' },
-          { pos : 229, name : '_root.d.perso[i+1].color' },
-          { pos : 231, name : '_root.d.perso[i+1].nom' },
-          { pos : 251, name : '_root.d.perso[i+1].color' },
-          { pos : 273, name : '_root.d.perso[i+1].color' },
-          { pos : 295, name : '_root.d.perso[i+1].color' },
-          { pos : 326, name : '_root.d.perso[i+1].color' },
-          { pos : 328, name : '_root.d.perso[i+1].prenom' },
-          { pos : 348, name : '_root.d.perso[i+1].color' },
-          { pos : 370, name : '_root.d.perso[i+1].color' },
-          { pos : 392, name : '_root.d.perso[i+1].color' }  ]);
-        helper.assert(cleanedXml, '<xml><tr><td><span class=""></span><span class=""></span><span class=""></span><span class=""></span></td><td><span class=""></span><span class=""></span>' +
-          '<span class=""></span><span class=""></span></td></tr><tr><td><span class=""></span><span class=""></span><span class=""></span><span class=""></span></td><td>' +
-          '<span class=""></span><span class=""></span><span class=""></span><span class=""></span></td></tr></xml>');
+        helper.assert(markers, [ { pos : 27, name : '_root.d.perso[i].color' },
+          { pos : 30, name : '_root.d.perso[i].nom' },
+          { pos : 51, name : '_root.d.perso[i].color' },
+          { pos : 74, name : '_root.d.perso[i].color' },
+          { pos : 97, name : '_root.d.perso[i].color' },
+          { pos : 129, name : '_root.d.perso[i].color' },
+          { pos : 132, name : '_root.d.perso[i].prenom' },
+          { pos : 153, name : '_root.d.perso[i].color' },
+          { pos : 176, name : '_root.d.perso[i].color' },
+          { pos : 199, name : '_root.d.perso[i].color' },
+          { pos : 240, name : '_root.d.perso[i+1].color' },
+          { pos : 243, name : '_root.d.perso[i+1].nom' },
+          { pos : 264, name : '_root.d.perso[i+1].color' },
+          { pos : 287, name : '_root.d.perso[i+1].color' },
+          { pos : 310, name : '_root.d.perso[i+1].color' },
+          { pos : 342, name : '_root.d.perso[i+1].color' },
+          { pos : 345, name : '_root.d.perso[i+1].prenom' },
+          { pos : 366, name : '_root.d.perso[i+1].color' },
+          { pos : 389, name : '_root.d.perso[i+1].color' },
+          { pos : 412, name : '_root.d.perso[i+1].color' }  ]);
+        helper.assert(cleanedXml, '<xml><tr><td><span class="\uFFFF">\uFFFF</span><span class="\uFFFF"></span><span class="\uFFFF"></span><span class="\uFFFF"></span></td><td><span class="\uFFFF">\uFFFF</span><span class="\uFFFF"></span>' +
+          '<span class="\uFFFF"></span><span class="\uFFFF"></span></td></tr><tr><td><span class="\uFFFF">\uFFFF</span><span class="\uFFFF"></span><span class="\uFFFF"></span><span class="\uFFFF"></span></td><td>' +
+          '<span class="\uFFFF">\uFFFF</span><span class="\uFFFF"></span><span class="\uFFFF"></span><span class="\uFFFF"></span></td></tr></xml>');
         done();
       });
     });
@@ -195,52 +195,117 @@ describe('parser', function () {
     it('should remove unwanted characters', function (done) {
       parser.findMarkers('<div>{d.menu}<div> \n   {d.city}', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.d.menu'},{pos : 15, name : '_root.d.city'}]);
-        helper.assert(cleanedXml, '<div><div>     ');
+        helper.assert(markers, [{pos : 6, name : '_root.d.menu'},{pos : 17, name : '_root.d.city'}]);
+        helper.assert(cleanedXml, '<div>\uFFFF<div>     \uFFFF');
         done();
       });
     });
     it('should convert conflicting characters', function (done) {
       parser.findMarkers("<div>{d.menu}<div> it's \n   {d.city}", function (err, cleanedXml) {
         helper.assert(err, null);
-        helper.assert(cleanedXml, "<div><div> it\\'s     ");
+        helper.assert(cleanedXml, "<div>\uFFFF<div> it's     \uFFFF");
         done();
       });
     });
     it('should keep whitespaces between simple quotes', function (done) {
       parser.findMarkers("<div>{d.menu:test('hello, world is great')}<div>", function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.d.menu:test(\'hello, world is great\')'}]);
+        helper.assert(markers, [{pos : 6, name : '_root.d.menu:test(\'hello, world is great\')'}]);
         done();
       });
     });
     it('should keep whitespaces between encoded simple quotes, and it should convert encoded quotes', function (done) {
       parser.findMarkers('<div>{d.menu:test(&apos;hello, world is great&apos;)}<div>', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 5, name : '_root.d.menu:test(\'hello, world is great\')'}]);
+        helper.assert(markers, [{pos : 6, name : '_root.d.menu:test(\'hello, world is great\')'}]);
         done();
       });
     });
     it('should remove whitespaces which are inside {} and not inside <>. It should not count them for the position', function (done) {
       parser.findMarkers(' <div>   {  d.menu  }   <div>   {   d.city  } ', function (err, cleanedXml, markers) {
         helper.assert(err, null);
-        helper.assert(markers, [{pos : 9, name : '_root.d.menu'},{pos : 20, name : '_root.d.city'}]);
-        helper.assert(cleanedXml, ' <div>      <div>    ');
+        helper.assert(markers, [{pos : 10, name : '_root.d.menu'},{pos : 22, name : '_root.d.city'}]);
+        helper.assert(cleanedXml, ' <div>   \uFFFF   <div>   \uFFFF ');
         parser.findMarkers(' <xmlstart> {  d.me  <interxml> n <bull  sh it> u [ i ] . city } </xmlend> <tga> {d.ci  <td>  ty  </td>  } <tga><bla>{d.cars[i].wheel}</bla>', function (err, cleanedXml, markers) {
           helper.assert(err, null);
-          helper.assert(markers, [{pos : 12, name : '_root.d.menu[i].city'},{pos : 52, name : '_root.d.city'},{pos : 72, name : '_root.d.cars[i].wheel'}]);
-          helper.assert(cleanedXml, ' <xmlstart> <interxml><bull  sh it> </xmlend> <tga> <td></td> <tga><bla></bla>');
+          helper.assert(markers, [{pos : 13, name : '_root.d.menu[i].city'},{pos : 54, name : '_root.d.city'},{pos : 75, name : '_root.d.cars[i].wheel'}]);
+          helper.assert(cleanedXml, ' <xmlstart> \uFFFF<interxml><bull  sh it> </xmlend> <tga> \uFFFF<td></td> <tga><bla>\uFFFF</bla>');
           done();
         });
       });
     });
-    it('should not extract marker if it does not start by {d. {d[ {c. {c[ {$', function (done) {
+    it('should return the position of the last marker character when the markers ends with showEnd/hideEnd\
+      it should not add special marker character for conditional block begin/end', function (done) {
+      parser.findMarkers('<div>{d.menu:<t>ifEQ(null):</t>showBegin}a<b>{d.menu:</b><r>ifEQ(null):showEnd</r><h>}</h><div>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [
+          {pos : 5, name : '_root.d.menu:ifEQ(null):showBegin'},
+          {pos : 30, name : '_root.d.menu:ifEQ(null):showEnd'}
+        ]);
+        parser.findMarkers('<div>{d.menu:<t>ifEQ(null):</t>hideBegin}a<b>{d.menu:</b><r>ifEQ(null):hideEnd</r><h>}</h><div>', function (err, cleanedXml, markers) {
+          helper.assert(err, null);
+          helper.assert(markers, [
+            {pos : 5, name : '_root.d.menu:ifEQ(null):hideBegin'},
+            {pos : 30, name : '_root.d.menu:ifEQ(null):hideEnd'}
+          ]);
+          parser.findMarkers('<div>{d.menu:<t>ifEQ(null):</t>hideBegin()}a<b>{d.menu:</b><r>ifEQ(null):hideEnd<i></i>()</r><h>}</h>{d.menu:ifEQ(null):showBegin}<b>{d.menu:</b><r>ifEQ(null):showEnd<i></i>()</r><h>}<div>', function (err, cleanedXml, markers) {
+            helper.assert(err, null);
+            helper.assert(markers, [
+              {pos : 5, name : '_root.d.menu:ifEQ(null):hideBegin()'},
+              {pos : 37, name : '_root.d.menu:ifEQ(null):hideEnd()'},
+              {pos : 41, name : '_root.d.menu:ifEQ(null):showBegin'},
+              {pos : 65, name : '_root.d.menu:ifEQ(null):showEnd()'}
+            ]);
+            // accept whitespaces and XML inside markers
+            parser.findMarkers('<div>{d.menu:<t>ifEQ(null):</t>hideBegin()}a<b>{d.menu:</b><r>ifEQ(null): hid <b> </b> eEnd <i></i> ( ) </r><h>  }</h>{d.menu:ifEQ(null): showBegin}<b>{d.menu:</b><r>ifEQ(null): show <b> </b> End <i></i>  (  )  </r><h>  } <div>', function (err, cleanedXml, markers) {
+              helper.assert(err, null);
+              helper.assert(markers, [
+                {pos : 5, name : '_root.d.menu:ifEQ(null):hideBegin()'},
+                {pos : 44, name : '_root.d.menu:ifEQ(null):hideEnd()'},
+                {pos : 48, name : '_root.d.menu:ifEQ(null):showBegin'},
+                {pos : 79, name : '_root.d.menu:ifEQ(null):showEnd()'}
+              ]);
+              done();
+            });
+          });
+        });
+      });
+    });
+    it('should not return the position of the last marker character if attributes contains showEnd/hideEnd (not a formatter)', function (done) {
+      parser.findMarkers('<div>{d.showBegin:<t>ifEQ(null)</t>}a<b>{d.showEnd:</b><r>ifEQ(null)</r><h>}</h><div>', function (err, cleanedXml, markers) {
+        helper.assert(err, null);
+        helper.assert(markers, [
+          {pos : 6, name : '_root.d.showBegin:ifEQ(null)'},
+          {pos : 18, name : '_root.d.showEnd:ifEQ(null)'}
+        ]);
+        parser.findMarkers('<div>{d.hideBegin:<t>ifEQ(null)</t>}a<b>{d.hideEnd:</b><r>ifEQ(null)</r><h>}</h><div>', function (err, cleanedXml, markers) {
+          helper.assert(err, null);
+          helper.assert(markers, [
+            {pos : 6, name : '_root.d.hideBegin:ifEQ(null)'},
+            {pos : 18, name : '_root.d.hideEnd:ifEQ(null)'}
+          ]);
+          parser.findMarkers('<div>{d.hideBegin<t></t>}a<b>{d.hideEnd</b><r><i></i></r><h>}</h>{d.showBegin}<b>{d.showEnd</b><r><i></i></r><h>}<div>', function (err, cleanedXml, markers) {
+            helper.assert(err, null);
+            helper.assert(markers, [
+              {pos : 6, name : '_root.d.hideBegin'},
+              {pos : 18, name : '_root.d.hideEnd'},
+              {pos : 44, name : '_root.d.showBegin'},
+              {pos : 48, name : '_root.d.showEnd'}
+            ]);
+            done();
+          });
+        });
+      });
+    });
+    it('should not extract marker if it does not start by {d. {d[ {c. {c[ {$\
+      should add float number if marker are at the same position', function (done) {
       var _xml = '<xml>{<td>d<td>.<td>menu</td></td></td>}</xml>'
                + '{d.menu}'
-               + '{d[i].menu}'
-               + '{c.memu}'
-               + '{c[i].menu}'
-               + '{$menu}'
+               + '{d[i].menu:ifNEM : showBegin}'
+               + '{c.memu: showEnd}'
+               + '{c[i].menu:ifEM : hideBegin ( ) }'
+               + '{$menu: hideEnd ( ) }'
+               + '{d.menu}' // not parsed
                + '{D.menu}' // not parsed
                + '{C.menu}' // not parsed
                + '{C.menu}' // not parsed
@@ -248,14 +313,15 @@ describe('parser', function () {
       parser.findMarkers(_xml, function (err, cleanedXml, markers) {
         helper.assert(err, null);
         helper.assert(markers, [
-          { pos : 5,  name : '_root.d.menu' },
-          { pos : 38, name : '_root.d.menu' },
-          { pos : 38, name : '_root.d[i].menu' },
-          { pos : 38, name : '_root.c.memu' },
-          { pos : 38, name : '_root.c[i].menu' },
-          { pos : 38, name : '_root.$menu' }
+          { pos : 6,  name : '_root.d.menu' },
+          { pos : 40, name : '_root.d.menu' },
+          { pos : 40.015625, name : '_root.d[i].menu:ifNEM:showBegin' },
+          { pos : 40.03125, name : '_root.c.memu:showEnd' },
+          { pos : 40.046875, name : '_root.c[i].menu:ifEM:hideBegin()' },
+          { pos : 40.0625, name : '_root.$menu:hideEnd()' },
+          { pos : 41, name : '_root.d.menu' }
         ]);
-        helper.assert(cleanedXml, '<xml><td><td><td></td></td></td></xml>{D.menu}{C.menu}{C.menu}{DZZDZD-DSDZD-1131}');
+        helper.assert(cleanedXml, '<xml>\uFFFF<td><td><td></td></td></td></xml>\uFFFF\uFFFF{D.menu}{C.menu}{C.menu}{DZZDZD-DSDZD-1131}');
         done();
       });
     });
@@ -282,6 +348,46 @@ describe('parser', function () {
       assert.equal(parser.cleanMarker(' menu &lt; &lt; ')      , ' menu < < ');
       assert.equal(parser.cleanMarker(' menu &gt; &gt; ')      , ' menu > > ');
       assert.equal(parser.cleanMarker(' menu &apos; &apos; ')      , ' menu \' \' ');
+    });
+  });
+
+  describe('flattenXML', function () {
+    it('should transform XML into an array of object and find the corresponding XML tag (match)', function () {
+      helper.assert(parser.flattenXML('<xml></xml>'), [
+        { id : 0, index : 0, lastIndex : 5 , depth : 0, match : 1 },
+        { id : 1, index : 5, lastIndex : 11, depth : 1, match : 0 }
+      ]);
+    });
+    it('should not crash if XML is null or undefined', function () {
+      helper.assert(parser.flattenXML(null), []);
+      helper.assert(parser.flattenXML(), []);
+      helper.assert(parser.flattenXML(''), [
+        { id : 0, index : 0, lastIndex : 0, depth : 0 }
+      ]);
+    });
+    it('should keep non-XML part', function () {
+      helper.assert(parser.flattenXML('<xml>a</xml>'), [
+        { id : 0, index : 0, lastIndex : 5 , depth : 0, match : 2 },
+        { id : 1, index : 5, lastIndex : 6 , depth : 1            },
+        { id : 2, index : 6, lastIndex : 12, depth : 1, match : 0 }
+      ]);
+    });
+    it('should consider self-closing tag as non-XML part', function () {
+      helper.assert(parser.flattenXML('<xml><br/></xml>'), [
+        { id : 0, index : 0 , lastIndex : 5 , depth : 0, match : 2 },
+        { id : 1, index : 5 , lastIndex : 10, depth : 1            },
+        { id : 2, index : 10, lastIndex : 16, depth : 1, match : 0 }
+      ]);
+    });
+    it('should compute XML depth and works with multiple XML tag', function () {
+      helper.assert(parser.flattenXML('<xml>a<td>b</td></xml>'), [
+        { id : 0, index : 0 , lastIndex : 5 , depth : 0, match : 5 },
+        { id : 1, index : 5 , lastIndex : 6 , depth : 1            },
+        { id : 2, index : 6 , lastIndex : 10, depth : 1, match : 4 },
+        { id : 3, index : 10, lastIndex : 11, depth : 2            },
+        { id : 4, index : 11, lastIndex : 16, depth : 2, match : 2 },
+        { id : 5, index : 16, lastIndex : 22, depth : 1, match : 0 }
+      ]);
     });
   });
 
@@ -748,6 +854,10 @@ describe('parser', function () {
     it('should accept variable in xml', function () {
       assert.equal(parser.findOpeningTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p><p></p>',48), 24);
     });
+    it('should work even if XML contain http link with slashes', function () {
+      assert.equal(parser.findOpeningTagPosition('<body> <tr><pic a="aa"></pic></tr>'), 7);
+      assert.equal(parser.findOpeningTagPosition('<body> <tr><pic a="http://"></pic></tr>'), 7);
+    });
   });
 
   describe('findClosingTagPosition', function () {
@@ -785,6 +895,10 @@ describe('parser', function () {
     });
     it('should accept variable in xml', function () {
       assert.equal(parser.findClosingTagPosition('<p color="dd" bold=true><p><p bold=true></p></p><br color="dd" bold=true /> <p color="aa" ><p></p></p></p></p></p>'), 106);
+    });
+    it('should work even if XML contain http link with slashes', function () {
+      assert.equal(parser.findClosingTagPosition('<tr><pic a="aa"></pic></tr><b>'), 27);
+      assert.equal(parser.findClosingTagPosition('<tr><pic a="http://"></pic></tr><b>'), 32);
     });
   });
 
@@ -968,6 +1082,15 @@ describe('parser', function () {
       var _expectedRange = {startEven : 7,  endEven : 52, startOdd : 52, endOdd : 102};
       helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
     });
+    it('detect repetition section even if XML contains slashes (http link)', function () {
+      var _xml = '<body> <tr><w></w><pic a="http://"></pic></tr><tr><w></w><pic a="http://"></pic></tr></body>';
+      var _pivot = {
+        part1End   : { tag : 'p', pos : 46 },
+        part2Start : { tag : 'p', pos : 46 }
+      };
+      var _expectedRange = {startEven : 7,  endEven : 46, startOdd : 46, endOdd : 85};
+      helper.assert(parser.findRepetitionPosition(_xml, _pivot), _expectedRange);
+    });
     it('should detect the repetition even if the start tag contains some meta data', function () {
       var _xml = 'qsjh k <tr w:blue color=test> menu <r/><p> bla </p><p> foot </p> </tr><tr w:blue color=test> <p> basket </p><p> tennis </p>    balle </tr> dqd';
       var _pivot = {
@@ -1085,50 +1208,158 @@ describe('parser', function () {
 
   describe('findSafeConditionalBlockPosition', function () {
     it('should return an array that contains a beginning and ending position of a conditional block which does not break XML', function () {
-      helper.assert(parser.findSafeConditionalBlockPosition('<p><h1></h1>', 0, 12), [3, 12]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<p><h1></h1>'), 0, 12), [[3, 12]]);
     });
     it('should parse xml only at the provided positions', function () {
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1></h1></p></xml>', 5, 17), [8, 17]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1></h1></p></xml>', 8, 17), [8, 17]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1></h1></p> </xml>', 8, 21), [8, 17]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><h1></h1>a</p></xml>'), 5, 17), [[8, 17]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><h1></h1></p></xml>'), 8, 17), [[8, 17]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><p>a<h1></h1></p> </xm>'), 8, 21), [[8, 17]]);
     });
     it('beginning and ending position should be the same if it not possible to find a valid conditional position', function () {
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><a><a><a><a></a></a></a></a></xml>', 5, 17), [17, 17]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><a><a><a><a></a></a></a></a></xml>', 17, 33), [33, 33]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>a</a></a></a></a></xml>'), 5, 17), [[17, 17]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>a</a></a></a></a></xml>'), 18, 34), [[34, 34]]);
+    });
+    it('should throw an error if XML is not valid', function () {
+      assert.throws(
+        () => {
+          parser.findSafeConditionalBlockPosition(convXML('<xml></b><a><a><a><a>a</a></a></a></a></xml>'), 5, 17);
+        },
+        (err) => {
+          helper.assert(err.message, 'XML not valid');
+          return true;
+        }
+      );
     });
     it('should include self-closing tags', function () {
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1><br/><br/><br/></h1></p></xml>', 5, 32), [8, 32]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1><br/><br/><br/></h1><br/></p></xml>', 5, 37), [8, 37]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><h1><br/><br/><br/></h1>a</p></xml>'), 5, 32), [[8, 32]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 37), [[8, 37]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><b>a</b><br/>ab<b>a</b></xm>'), 8, 22), [[12, 19]]);
     });
     it('should include non-XML part', function () {
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><a><a><a><a>  </a></a></a></a></xml>', 5, 19), [17, 19]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><a><a><a><a> <br/> </a></a></a></a></xml>', 5, 24), [17, 24]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab</xml>', 5, 7), [5, 7]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab</xml>', 0, 13), [0, 13]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab</xml>', 5, 13), [5, 7]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab</xml><div>', 5, 13), [5, 7]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab<br/><div>', 5, 12), [5, 12]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml>ab<br/> <div>', 5, 13), [5, 13]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><a>ab<br/>', 5, 10), [8, 10]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><a>ab<br/><br/><br/>', 5, 20), [8, 20]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><a><a>ab<br/><br/><br/>', 5, 23), [11, 23]);
-      helper.assert(parser.findSafeConditionalBlockPosition('ab', 0, 2), [0, 2]);
-      helper.assert(parser.findSafeConditionalBlockPosition('abcd', 1, 3), [1, 3]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1><br/><br/><br/></h1><br/>a</p></xml>', 5, 38), [8, 38]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p><h1><br/><br/><br/></h1><br/>a </p></xml>', 5, 38), [8, 38]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p>a<h1><br/><br/><br/></h1><br/>a</p></xml>', 5, 39), [8, 39]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p> a<h1><br/><br/><br/></h1><br/>a</p></xml>', 5, 39), [8, 39]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p>a <h1><br/><br/><br/></h1><br/>a</p></xml>', 5, 40), [8, 40]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml><p>a<h1><br/><br/><br/></h1><br/></p></xml>', 5, 38), [8, 38]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a> <br/> b</a></a></a></a></xml>'), 5, 24), [[17, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml>ab</xml>'), 0, 13), [[0, 13]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><b>a</b>ab<b>a</b></xml>'), 8, 17), [[12, 14]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm>bab</xm><div>'), 5, 12), [[5, 7]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml>ab<br/><div>'), 5, 12), [[5, 12]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml>ab<br/> <div>'), 5, 13), [[5, 13]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a>ab<br/><br/><br/>'), 5, 20), [[8, 20]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a>ab<br/><br/><br/>'), 5, 23), [[11, 23]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><h1><br/><br/><br/></h1><br/>aa</p></xml>'), 5, 38), [[8, 38]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><h1><br/><br/><br/></h1><br/>a </p></xml>'), 5, 38), [[8, 38]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><p>aa<h1><br/><br/><br/></h1><br/>aa</p></xm>'), 4, 39), [[7, 39]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p> a<h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 39), [[8, 39]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p>a <h1><br/><br/><br/></h1><br/>aa</p></xml>'), 5, 40), [[8, 40]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p>a<h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 38), [[8, 38]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  a</a></a></a></a></xml>'), 5, 19), [[17, 19]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml>ab</xml>'), 5, 7), [[5, 7]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm>xab</xm>'), 5, 12), [[5, 7]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a>ab<br/>'), 5, 10), [[8, 10]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('ab'), 0, 2), [[0, 2]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('abcd'), 1, 3), [[1, 3]]);
     });
-    it('should select first valid part', function () {
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml> <a>b</a> </p></p></p></p> <br/><br/><br/> </xml>', 5, 48), [5, 15]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml>', 5, 53), [5, 20]);
+    it('should select multiple valid XML parts', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><b>x</b>ab<b><br/>a</b></xm>'), 8, 22), [[12, 14], [17, 22]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b>x<c></c> </b><d> textD <e>e</e> </d><f>  <g></g>'), 4, 51), [[4, 12], [16, 39], [42, 51]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><p><p><p><p>x <a>b</a> </p></p></p></p> <br/><br/><br/> </xm>'), 17, 60), [[17, 27], [43, 60]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><p><p><p><p>x <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xm>'), 17, 65), [[17, 32], [48, 65]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><b><br/><br/></b><br/>ab<br/><b><br/><br/></b></xml>'), 13, 42), [[13, 18], [22, 34], [37, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b>x<c></c> </b><d> textD <e>e</e> </d><f>  <g>a</g>'), 4, 47), [[4, 12], [16, 39], [42, 44]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b>x<c></c> </b><d> textD <e>e</e> </d> <br/><d> textD <e>e</e> </d><f>  <g>a</g>'), 4, 76), [[4, 12], [16, 68], [71, 73]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b>w<c></c> </b><d> textD <e>e</e> </d> <br/> <d> textD <e>e</e> </d><f>  <g>a</g>'), 4, 77), [[4, 12], [16, 69], [72, 74]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml> <p><br/><br/><br/>x</p></xml>'), 5, 24), [[5, 6], [9, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml> <p><br/><br/><br/> w</p></xml>'), 5, 25), [[5, 6], [9, 25]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><p><p><p><p>x </p></p></p></p> <br/><br/><br/> </xm>'), 17, 51), [[17, 18], [34, 51]]);
     });
-    it('should select the valid part after the last ending tag', function () {
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml> </p><br/><br/><br/></xml>', 5, 25), [10, 25]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml> </p><br/><br/><br/> </xml>', 5, 26), [10, 26]);
-      helper.assert(parser.findSafeConditionalBlockPosition('<xml> </p></p></p></p> <br/><br/><br/> </xml>', 5, 39), [22, 39]);
+    it('should include trailing characters', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<div><if>aa</if><if>bb</if></div>'), 10, 21), [[10, 11], [20, 21]]);
+    });
+    it('should accept tag with URLs and slashes', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<div><if url="https://">a<br></br>abb</if><if>sssss</if></div>'), 5, 49), [[5, 42], [46, 49]]);
+    });
+    it('should include non-XML part at the beginning and ending of condition', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a>xtext</a><b></b><c></c><d>texta</d><br/>'), 4, 33), [[4, 8], [12, 26], [29,33]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a>x</a><b></b><c></c><d>texta</d><br/>'), 4, 29), [[8, 22], [25, 29]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a>xtext</a><b></b><c></c><d>a</d><br/>'), 4, 29), [[4, 8], [12, 26]]);
+    });
+    it('should create only one if-block section even if there are multiple opening and closing tags', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm>x<table><tr><td><p></p></td></tr><tr><td><p></p></td></tr></table></xm>'), 5, 79), [[5, 70]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><table> <tr> <td><p></p></td> </tr>   <tr> <td><p></p></td> </tr> </table></xml>'), 5, 79), [[5, 79]]);
+    });
+    it('should accept float position if markers are next to each over in XML', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a></a></a></a></a></xml>'), 17, 17.1), [[17, 17]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>'), 24, 24.03125), [[24, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>'), 24.03125, 24.8), [[24, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>'), 24, 24), [[24, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xm><p><p><p><p>x <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xm>'), 17.9, 65.9), [[17, 32], [48, 65]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a>xtext</a><b></b><c></c><d>x</d><br/>'), 4.9, 29.1), [[4, 8], [12, 26]]);
+    });
+    it('should move if start/end before or after original start/end if there is only opening tag before, or ending tag after', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<body><a></a><p></p><p></p><n></n></body> '), 9, 30), [[6, 34]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a></a></a></a></a></xml>'), 5, 17), [[5, 33]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a></a></a></a></a></xml>'), 17, 33), [[5, 33]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a> <br/> </a></a></a></a></xml>'), 5, 24), [[5, 40]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a></xml>'), 5, 19), [[5, 35]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a></xml>'), 8, 19), [[8, 31]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a></xml>'), 11, 19), [[11, 27]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a></xml>'), 14, 19), [[14, 23]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a></xml>'), 17, 23), [[14, 23]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a></xml>'), 17, 27), [[11, 27]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a></xml>'), 17, 31), [[8, 31]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a></xml>'), 17, 35), [[5, 35]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a>a<a><a><a><a>  </a></a></a></a></xml>'), 35, 48), [[35, 36]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a>a<a><a><a><a>  </a></a></a></a></xml>'), 35, 58), [[35, 66]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a></a></a></a>a<a><a><a><a>  </a></a>b</a></a></xml>'), 35, 58), [[35, 36], [42, 58]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<body><p>a</p><g></g><g></g><p></p></body>'), 10, 31), [[14, 35]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a><p></p></a></a></a></xml>'), 5, 19), [[14, 23]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a><p></p></a></a></a></xml>'), 17, 42), [[5, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><p><p></p></p><a><p></p><a>  </a></a></a></a></xml>'), 5, 40), [[5, 56]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a>za<a>zd<p><p>dza</p></p><a><p></p><a>  </a></a></a></a></xml>'), 5, 47), [[5, 63]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><p></p><a>  </a></a></a></a></xml>'), 5, 26), [[5, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><p></p><a>  </a></a></a></a></xml>'), 24, 42), [[21, 30]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a>x<a>  </a></a></a></a></xml>'), 18, 36), [[15, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a>x<a><a>  </a></a></a></a></xml>'), 18, 36), [[12, 28]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a>  </a><p>z</p></a><p>z</p></a></a></xml>'), 17, 51), [[5, 51]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a><p>qs</p></a></a></a></a></xml>'), 17, 26), [[17, 26]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><a><a><a><a> ed<br/><p>qs</p>qs </a></a></a></a></xml>'), 17, 37), [[17, 37]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml> <tr></tr>a<tr></tr> </xml>'), 10, 20), [[6, 25]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><b></b>ab<b></b></p></xml>'), 11, 20), [[8, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p>ab<b></b>ab<b></b></p></xml>'), 13, 26), [[10, 26]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><b></b>ab<b></b>ab</p></xml>'), 11, 20), [[8, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 38), [[5, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p>a<h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 39), [[5, 43]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p>a <h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 40), [[5, 44]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p>a<h1><br/><br/><br/></h1><br/></p></xml>'), 5, 38), [[5, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml>ab</xml><div>'), 5, 13), [[0, 13]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml>ab</xml>'), 5, 13), [[0, 13]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><b></b>ab<b><br/>a</b></xml>'), 8, 22), [[5, 14], [17, 22]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><b></b>ab<b><br/></b></xml>'), 8, 22), [[5, 26]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b><c></c> </b><d> textD <e>e</e> </d><f>  <g></g>'), 3, 50), [[0, 38], [41, 50]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><p><p><p> <a>b</a> </p></p></p></p> <br/><br/><br/> </xml>'), 17, 60), [[5, 60]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><p><p><p> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml>'), 17, 65), [[5, 65]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a><xml><p><p><p><p> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml></a>'), 20, 68), [[8, 68]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b><c></c> </b><d> textD <e>e</e> </d><f>  <g>a</g>'), 3, 46), [[0, 38], [41, 43]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b><c></c> </b><d> textD <e>e</e> </d><f>  <g></g>'), 3, 46), [[0, 38], [41, 50]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b><c></c> </b><d> textD <e>e</e> </d> <br/><d> textD <e>e</e> </d><f>  <g>a</g>'), 3, 75), [[0, 67], [70, 72]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b><c></c> </b><d> textD <e>e</e> </d> <br/><d> textD <e>e</e> </d><f>  <g></g>'), 3, 75), [[0, 67], [70, 79]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b><c></c> </b><d> textD <e>e</e> </d> <br/> <d> textD <e>e</e> </d><f>  <g>a</g>'), 3, 76), [[0, 68], [71, 73]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<b><c></c> </b><d> textD <e>e</e> </d> <br/> <d> textD <e>e</e> </d><f>  <g></g>'), 3, 76), [[0, 68], [71, 80]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml> <p><br/><br/><br/></p> </xml>'), 5, 29), [[5, 29]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><p><p><p> </p></p></p></p> <br/><br/><br/> </xml>'), 17, 51), [[5, 51]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a>text</a><b></b><c></c><d>text</d><br/>'), 3, 32), [[0, 36]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a></a><b></b><c></c><d>text</d><br/>'), 3, 28), [[0, 32]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a>text</a><b></b><c></c><d></d><br/>'), 3, 28), [[0, 32]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><table><tr><td><p></p></td></tr><tr><td><p></p></td></tr></table></xml>'), 5, 79), [[0, 76]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><p><p><p> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml>'), 17.9, 65.9), [[5, 65]]);
+      helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a>text</a><b></b><c></c><d>x</d><br/>'), 3.9, 28.1), [[0, 25]]);
     });
   });
 
@@ -1149,7 +1380,7 @@ describe('parser', function () {
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)');
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(09)');
             done();
           });
         });
@@ -1168,7 +1399,7 @@ describe('parser', function () {
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08)');
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(09)');
             done();
           });
         });
@@ -1186,7 +1417,7 @@ describe('parser', function () {
 
         parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
           parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)');
+            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(09, 42)');
             done();
           });
         });
@@ -1243,4 +1474,15 @@ describe('parser', function () {
 
 });
 
+/**
+ * Convert XML to flattened XML.
+ *
+ * It is easier to work with XML in tests
+ *
+ * @param  {String} xml xml to parser
+ * @return {Array}      xml array
+ */
+function convXML (xml) {
+  return parser.flattenXML(xml);
+}
 

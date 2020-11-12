@@ -17,6 +17,7 @@ describe('builder.buildXML', function () {
     var _xml = '<xml> {d.title} </xml>';
     var _data = {title : 'boo'};
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'null');
       helper.assert(_xmlBuilt, '<xml> boo </xml>');
       done();
     });
@@ -70,6 +71,15 @@ describe('builder.buildXML', function () {
     var _complement = {date : 'today'};
     builder.buildXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
       helper.assert(_xmlBuilt, '<xml> boo today </xml>');
+      done();
+    });
+  });
+  it('should accept a second marker next to the first one', function (done) {
+    var _xml = '<xml> {d.title}{c.date} </xml>';
+    var _data = {title : 'boo'};
+    var _complement = {date : 'today'};
+    builder.buildXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> bootoday </xml>');
       done();
     });
   });
@@ -140,6 +150,18 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should not crash if a parent object/array is null or undefined', function (done) {
+    var _xml = '<xml> {d.title.sub.id} a {d.other.sub.id} b {d.nonArray[i=0].sub.id} c {d.nonArray[i=0].sub.id} d {d.myArr[i=0].sub.id} </xml>';
+    var _data = {
+      title : null,
+      myArr : null
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'null');
+      helper.assert(_xmlBuilt, '<xml>  a  b  c  d  </xml>');
+      done();
+    });
+  });
   it('should automatically repeat the xml if the root is an array of objects', function (done) {
     var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1].brand} </t_row></xml>';
     var _data = [
@@ -149,6 +171,21 @@ describe('builder.buildXML', function () {
     ];
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Tesla motors </t_row><t_row> Toyota </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept markers next to other loop markers (without whitespaces)', function (done) {
+    var _xml = '<xml> {d.id}<t_row>{d.id}{d.cars[i].brand}{d.id}</t_row>{d.id}<t_row>{d.id}{d.cars[i+1].brand}{d.id}</t_row>{d.id}</xml>';
+    var _data = {
+      id   : 3,
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> 3<t_row>3Lumeneo3</t_row>3<t_row>3Tesla motors3</t_row>3<t_row>3Toyota3</t_row>33</xml>');
       done();
     });
   });
@@ -574,6 +611,60 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should work with two independant arrays in sub objects', function (done) {
+    var _xml =
+        '<table>'
+      + '  <row>'
+      + '    {d.cars.bills[i].name}'
+      + '    a: {d.cars.bills[i].range.dist}'
+      + '  </row>'
+      + '  <row>'
+      + '    {d.cars.bills[i+1].name}'
+      + '  </row>'
+      + '</table>'
+      + '<table>'
+      + '  <row>'
+      + '    {d.fruit.vitamins[i].name}'
+      + '  </row>'
+      + '  <row>'
+      + '    {d.fruit.vitamins[i+1].name}'
+      + '  </row>'
+      + '</table>'
+    ;
+    var _data = {
+      cars : {
+        bills : [
+          { name : 'Tesla'   , range : { dist : 1000 } },
+          { name : 'Delorean', range : { dist : 1200 } }
+        ]
+      },
+      fruit : {
+        vitamins : [{ name : 'B1', }]
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      var _expectedResult =
+          '<table>'
+        + '  <row>'
+        + '    Tesla'
+        + '    a: 1000'
+        + '  </row>'
+        + '  <row>'
+        + '    Delorean'
+        + '    a: 1200'
+        + '  </row>  '
+        + '</table>'
+        + '<table>'
+        + '  <row>'
+        + '    B1'
+        + '  </row>  '
+        + '</table>'
+      ;
+      assert.equal(_xmlBuilt, _expectedResult);
+      done();
+    });
+  });
   it('should repeat automatically all markers which are on the same row of a deeper array (third level here). It will flatten the JSON', function (done) {
     var _xml =
        '<xml>'
@@ -763,6 +854,7 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err, null);
       assert.equal(_xmlBuilt, '<xml><t_row><td>C</td><td>D</td><td>E</td></t_row><t_row><td>A</td><td>B</td></t_row></xml>');
       done();
     });
@@ -904,6 +996,7 @@ describe('builder.buildXML', function () {
       {brand : 'Toyota'      , speed : {high : 44, low : 20}}
     ];
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err, null);
       helper.assert(_xmlBuilt, '<xml> <tr> Lumeneo    Lumeneo </tr></xml>');
       done();
     });
@@ -1006,7 +1099,19 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it('should accept conditionnal arrays on string', function (done) {
+  it('should accept conditionnal arrays on string (simple quotes)', function (done) {
+    var _xml = '<xml> <t_row> {d[brand=\'Tesla\'].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Toyota' , id : 1},
+      {brand : 'Tesla'  , id : 2},
+      {brand : 'Toyota' , id : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept conditionnal arrays on string (double quotes)', function (done) {
     var _xml = '<xml> <t_row> {d[brand="Tesla"].brand} </t_row></xml>';
     var _data = [
       {brand : 'Toyota' , id : 1},
@@ -1056,6 +1161,18 @@ describe('builder.buildXML', function () {
   });
   it('should accept conditions on the main iterators "i"', function (done) {
     var _xml = '<xml> <t_row> {d[i=2].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : 1},
+      {brand : 'Tesla motors', id : 2},
+      {brand : 'Toyota'      , id : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept direct access without writing i=10', function (done) {
+    var _xml = '<xml> <t_row> {d[2].brand} </t_row><t_row> {d[1].brand} </t_row></xml>';
     var _data = [
       {brand : 'Lumeneo'     , id : 1},
       {brand : 'Tesla motors', id : 2},
@@ -1124,7 +1241,7 @@ describe('builder.buildXML', function () {
       });
     });
   });
-  it('should accept xml tags with URLs between loop start and end', function(done) {
+  it('should accept xml tags with URLs between loop start and end', function (done) {
     var _data = {
       list : [
         {name : 'Lumeneo'},
@@ -1133,7 +1250,7 @@ describe('builder.buildXML', function () {
       ]
     };
     var _xml = '<document><p><w>{d.list[i].name}</w></p><a url="http://sdsd/"></a><p><w>{d.list[i+1].name}</w></p></document>';
-    builder.buildXML(_xml, _data, function(err, _xmlBuilt) {
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       helper.assert(err+'', 'null');
       helper.assert(_xmlBuilt,  '<document><p><w>Lumeneo</w></p><a url="http://sdsd/"></a><p><w>Tesla motors</w></p><a url="http://sdsd/"></a><p><w>Toyota</w></p><a url="http://sdsd/"></a></document>');
       done();
@@ -1305,6 +1422,44 @@ describe('builder.buildXML', function () {
       assert.equal((_elapsed < 50), true);
       done();
     }
+  });
+  it('should direct access to a property in a loop inside a table', function (done) {
+    var _xml = ''
+      + '<table>'
+      + '  <tr>'
+      + '    {d.modules[i].id} : {d.modules[i].observations[i=0].url}'
+      + '  </tr>'
+      + '  <tr>'
+      + '    {d.modules[i+1].id}'
+      + '  </tr>'
+      + '</table>';
+
+    var _res = ''
+      + '<table>'
+      + '  <tr>'
+      + '    1 : '
+      + '  </tr>'
+      + '  <tr>'
+      + '    2 : foo'
+      + '  </tr>'
+      + '  <tr>'
+      + '    3 : '
+      + '  </tr>  '
+      + '</table>';
+    var _data = {
+      modules : [
+        { id : '1' },
+        {
+          id           : '2',
+          observations : [ { url : 'foo' } ],
+        },
+        { id : '3' }
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, _res);
+      done();
+    });
   });
   it('should accept to increment two nested arrays in the same time. Thus, the nested array is flattened', function (done) {
     var _xml =
@@ -1640,6 +1795,32 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(_xmlBuilt, '<xml><tr> test </tr></xml>');
+      done();
+    });
+  });
+  it('should repeat section even if the XML contains http links', function (done) {
+    var _xml = ''
+     + '<body>'
+     + '  <p>'
+     + '    <w id="{d.list[i].id}"></w>'
+     + '    <pic a="http://ee"></pic>'
+     + '  </p>'
+     + '  <p>'
+     + '    <w id="{d.list[i+1].id}"></w>'
+     + '    <pic a="http://ee"></pic>'
+     + '  </p>'
+     + '</body>'
+    ;
+    var _data = {
+      list : [
+        {id : 100},
+        {id : 200},
+        {id : 300}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt.match(/body/g).length, 2);
+      assert.equal(_xmlBuilt, '<body>  <p>    <w id="100"></w>    <pic a="http://ee"></pic>  </p>  <p>    <w id="200"></w>    <pic a="http://ee"></pic>  </p>  <p>    <w id="300"></w>    <pic a="http://ee"></pic>  </p>  </body>');
       done();
     });
   });

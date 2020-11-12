@@ -1,7 +1,6 @@
 var extracter = require('../lib/extracter');
 var helper = require('../lib/helper');
 var assert = require('assert');
-const should = require('should');
 
 describe('extracter', function () {
 
@@ -22,7 +21,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
           ]
         }
       });
@@ -39,8 +38,8 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20},
-            {attr : 'name', formatters : [], obj : 'd', pos : 30}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'name', formatters : [], obj : 'd', pos : 30, posOrigin : 30}
           ]
         }
       });
@@ -63,7 +62,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'name', formatters : [], obj : 'dsite', pos : 20},
+            {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20},
           ]
         }
       });
@@ -75,7 +74,7 @@ describe('extracter', function () {
       helper.assert(extracter.splitMarkers(_markers), {
         d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
         dsite : { name     : 'site' , type     : 'object', parent   : 'd', parents  : ['d'],  xmlParts : [
-          {attr : 'name', formatters : [], obj : 'd', pos : 20},
+          {attr : 'name', formatters : [], obj : 'd', pos : 20, posOrigin : 20},
         ]
         }
       });
@@ -87,7 +86,7 @@ describe('extracter', function () {
       helper.assert(extracter.splitMarkers(_markers), {
         d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
         dsite : { name     : 'site' , type     : 'object', parent   : 'd', parents  : ['d'],  xmlParts : [
-          {attr : 'name', formatters : [], obj : 'dothersub', pos : 20},
+          {attr : 'name', formatters : [], obj : 'dothersub', pos : 20, posOrigin : 20},
         ]
         },
         dother    : { name : 'other', type : 'object', parent : 'd'      , parents : ['d']           ,  xmlParts : [] },
@@ -104,7 +103,7 @@ describe('extracter', function () {
       helper.assert(_result.dsitecar.xmlParts, []);
       helper.assert(_result.dsitecarwheel.xmlParts, []);
       helper.assert(_result.dsitecarwheeltyre.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'dsite', pos : 20}
+        {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
       ]);
     });
     it('should go up in hierarchy even with an array', function () {
@@ -116,7 +115,7 @@ describe('extracter', function () {
       helper.assert(_result.d.xmlParts, []);
       helper.assert(_result.dsite.xmlParts, []);
       helper.assert(_result.dsitecar.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'dsite', pos : 20}
+        {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
       ]);
     });
     it('should go up in hierarchy, and set parents of rootdsub', function () {
@@ -129,7 +128,7 @@ describe('extracter', function () {
       helper.assert(_result.root.xmlParts, []);
       helper.assert(_result.rootd.xmlParts, []);
       helper.assert(_result.rootdcar.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'rootdsub', pos : 20}
+        {attr : 'name', formatters : [], obj : 'rootdsub', pos : 20, posOrigin : 20}
       ]);
       helper.assert(_result.rootdsub.xmlParts, []);
       helper.assert(_result.rootdsub.parent, 'rootd');
@@ -145,7 +144,7 @@ describe('extracter', function () {
       helper.assert(_result.dsite.xmlParts, []);
       helper.assert(_result.dsitecar.xmlParts, []);
       helper.assert(_result.dsitecarwheel.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'dsitecar', pos : 20}
+        {attr : 'name', formatters : [], obj : 'dsitecar', pos : 20, posOrigin : 20}
       ]);
     });
     it('should go up in hierarchy up to the root, even with two arrays', function () {
@@ -158,7 +157,7 @@ describe('extracter', function () {
       helper.assert(_result.dsite.xmlParts, []);
       helper.assert(_result.dsitecar.xmlParts, []);
       helper.assert(_result.dsitecarwheel.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'd', pos : 20}
+        {attr : 'name', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
       ]);
     });
     it('should go up in hierarchy up to the root, even with two arrays, and go down', function () {
@@ -171,7 +170,7 @@ describe('extracter', function () {
       helper.assert(_result.dsite.xmlParts, []);
       helper.assert(_result.dsitecar.xmlParts, []);
       helper.assert(_result.dsitecarwheel.xmlParts, [
-        {attr : 'id', formatters : [], obj : 'dsitenamesub', pos : 20}
+        {attr : 'id', formatters : [], obj : 'dsitenamesub', pos : 20, posOrigin : 20}
       ]);
       helper.assert(_result.dsitename.xmlParts, []);
       helper.assert(_result.dsitename.parent, 'dsite');
@@ -187,8 +186,8 @@ describe('extracter', function () {
           extracter.splitMarkers(_markers);
         },
         (err) => {
-          should(err).be.an.instanceOf(Error);
-          should(err.message).containEql('Cannot access parent object in "d.site...name" (too high)');
+          helper.assert(err instanceof Error, true);
+          helper.assert(err.toString(), 'Error: Cannot access parent object in "d.site...name" (too high)');
           return true;
         }
       );
@@ -206,7 +205,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'movie', formatters : [], obj : 'd', pos : 10}
+            {attr : 'movie', formatters : [], obj : 'd', pos : 10, posOrigin : 10}
           ]
         },
         dsite : {
@@ -215,8 +214,8 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'name', formatters : [], obj : 'dsite', pos : 20},
-            {attr : 'id'  , formatters : [], obj : 'dsite', pos : 30}
+            {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20},
+            {attr : 'id'  , formatters : [], obj : 'dsite', pos : 30, posOrigin : 30}
           ]
         }
       });
@@ -235,7 +234,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
           ]
         }
       });
@@ -254,7 +253,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'sort' }],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
           ]
         }
       });
@@ -273,7 +272,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{attr : 'i'}],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
           ]
         }
       });
@@ -292,7 +291,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{attr : 'i'},{attr : 'sort'}],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
           ]
         }
       });
@@ -312,7 +311,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{obj : 'movie', attr : 'sort'}],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
           ],
         }
       });
@@ -333,7 +332,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'movie', formatters : [], obj : 'd', pos : 25}
+            {attr : 'movie', formatters : [], obj : 'd', pos : 25, posOrigin : 25}
           ]
         },
         dsite : {
@@ -342,7 +341,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
           ]
         }
       });
@@ -368,7 +367,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
           ]
         }
       });
@@ -395,7 +394,7 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__1', pos : 20 }
+            { attr : 'id', formatters : [], obj : 'dsitei__1', pos : 20, posOrigin : 20 }
           ],
           conditions : [
             { left : { parent : 'dsitei__1',  attr : 'i' }, operator : '==', right : '1' }
@@ -410,7 +409,52 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30 }
+            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, posOrigin : 30 }
+          ],
+          conditions : [
+            { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
+          ]
+        }
+      });
+    });
+    it('should manage arrays with conditions and accept direct access [0] [1]', function () {
+      var _markers = [
+        {pos : 20, name : 'd.site[ 1303 ].id'},
+        {pos : 30, name : 'd.site[0].id'}
+      ];
+      helper.assert(extracter.splitMarkers(_markers), {
+        d : {
+          name     : 'd',
+          type     : 'object',
+          parent   : '',
+          parents  : [],
+          xmlParts : []
+        },
+        // eslint-disable-next-line
+        dsitei__1303 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [
+            { attr : 'id', formatters : [], obj : 'dsitei__1303', pos : 20, posOrigin : 20 }
+          ],
+          conditions : [
+            { left : { parent : 'dsitei__1303',  attr : 'i' }, operator : '==', right : '1303' }
+          ]
+        },
+        // eslint-disable-next-line
+        dsitei__0 : {
+          name      : 'site',
+          type      : 'objectInArray',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [
+            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, posOrigin : 30 }
           ],
           conditions : [
             { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
@@ -443,7 +487,8 @@ describe('extracter', function () {
             attr       : 'id',
             formatters : [],
             obj        : 'dsitesort__310i__1',
-            pos        : 20
+            pos        : 20,
+            posOrigin  : 20
           }],
           conditions : [{
             left : {
@@ -473,7 +518,8 @@ describe('extracter', function () {
             attr       : 'id',
             formatters : [],
             obj        : 'dsitelang__enbank__54i__0',
-            pos        : 30
+            pos        : 30,
+            posOrigin  : 30
           }],
           conditions : [{
             left : {
@@ -521,7 +567,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, conditions : [{left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '10'}]}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '10'}]}
           ]
         }
       });
@@ -547,7 +593,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, conditions : [{left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '10'}]}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '10'}]}
           ]
         }
       });
@@ -577,7 +623,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 25 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, conditions : [{left : {parent : 'd', attr : 'sort'}, operator : '>', right : '10'}]}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'd', attr : 'sort'}, operator : '>', right : '10'}]}
           ]
         }
       });
@@ -607,7 +653,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 25 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'd_', pos : 20, conditions : [{left : {parent : 'd_', attr : 'sort'}, operator : '>', right : '10'}]}
+            {attr : 'id', formatters : [], obj : 'd_', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'd_', attr : 'sort'}, operator : '>', right : '10'}]}
           ]
         }
       });
@@ -633,7 +679,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr       : 'id', formatters : [], obj        : 'dsite', pos        : 20,
+            {attr       : 'id', formatters : [], obj        : 'dsite', pos        : 20, posOrigin  : 20,
               conditions : [
                 {
                   left     : {parent : 'dsite', attr : 'sort', formatters : ['int']},
@@ -673,8 +719,8 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20},
-            {attr : 'val', formatters : [], obj : 'dsite', pos : 21}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20},
+            {attr : 'val', formatters : [], obj : 'dsite', pos : 21, posOrigin : 21}
           ]
         },
         dsite$ : {
@@ -685,8 +731,8 @@ describe('extracter', function () {
           position  : { start : 40, end : 50 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40},
-            {attr : 'val', formatters : [], obj : 'dsite$', pos : 41}
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40},
+            {attr : 'val', formatters : [], obj : 'dsite$', pos : 41, posOrigin : 41}
           ]
         }
       });
@@ -716,7 +762,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
           ]
         },
         dsite$ : {
@@ -727,7 +773,7 @@ describe('extracter', function () {
           position  : { start : 40, end : 50 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40}
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40}
           ]
         },
         dsite$$ : {
@@ -738,7 +784,7 @@ describe('extracter', function () {
           position  : { start : 60, end : 70 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$$', pos : 60}
+            {attr : 'id', formatters : [], obj : 'dsite$$', pos : 60, posOrigin : 60}
           ]
         }
       });
@@ -766,7 +812,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
           ]
         },
         dsite$ : {
@@ -777,7 +823,7 @@ describe('extracter', function () {
           position  : { start : 40, end : 50 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
           ]
         }
       });
@@ -812,7 +858,7 @@ describe('extracter', function () {
           parent   : 'dsite',
           parents  : ['d', 'dsite'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dsiteobj', pos : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
+            {attr : 'id', formatters : [], obj : 'dsiteobj', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
           ]
         },
         dsite$ : {
@@ -830,7 +876,7 @@ describe('extracter', function () {
           parent   : 'dsite$',
           parents  : ['d', 'dsite$'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dsite$obj', pos : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
+            {attr : 'id', formatters : [], obj : 'dsite$obj', pos : 40, posOrigin : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
           ]
         },
       });
@@ -858,7 +904,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
           ]
         },
         dsite$ : {
@@ -869,7 +915,7 @@ describe('extracter', function () {
           position  : { start : 40, end : 50 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
           ]
         }
       });
@@ -901,8 +947,8 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20},
-            {attr : 'val', formatters : [], obj : 'dsite', pos : 21}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20},
+            {attr : 'val', formatters : [], obj : 'dsite', pos : 21, posOrigin : 21}
           ]
         },
         dsite$ : {
@@ -913,8 +959,8 @@ describe('extracter', function () {
           position  : { start : 40, end : 50 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40},
-            {attr : 'val', formatters : [], obj : 'dsite$', pos : 41}
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40},
+            {attr : 'val', formatters : [], obj : 'dsite$', pos : 41, posOrigin : 41}
           ]
         }
       });
@@ -932,7 +978,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'movie', formatters : [], obj : 'd', pos : 28}
+            {attr : 'movie', formatters : [], obj : 'd', pos : 28, posOrigin : 28}
           ]
         },
         dsite : {
@@ -943,7 +989,7 @@ describe('extracter', function () {
           position  : { start : 20, end : 30 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
           ]
         }
       });
@@ -968,7 +1014,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 80}
+            {attr : 'site', formatters : [], obj : 'd', pos : 80, posOrigin : 80}
           ]
         },
         dmenu : {
@@ -979,8 +1025,8 @@ describe('extracter', function () {
           position  : {start : 1, end : 40},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dmenu', pos : 1},
-            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10}
+            {attr : 'id', formatters : [], obj : 'dmenu', pos : 1, posOrigin : 1},
+            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10, posOrigin : 10}
           ]
         },
         dmenumenuElement : {
@@ -991,7 +1037,7 @@ describe('extracter', function () {
           position  : {start : 20, end : 30},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dmenumenuElement', pos : 20}
+            {attr : 'id', formatters : [], obj : 'dmenumenuElement', pos : 20, posOrigin : 20}
           ]
         },
         dproduct : {
@@ -1000,7 +1046,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dproduct', pos : 90}
+            {attr : 'id', formatters : [], obj : 'dproduct', pos : 90, posOrigin : 90}
           ]
         }
       });
@@ -1037,7 +1083,7 @@ describe('extracter', function () {
           position  : {start : 10, end : 30},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dmenumenuElement', pos : 10}
+            {attr : 'id', formatters : [], obj : 'dmenumenuElement', pos : 10, posOrigin : 10}
           ]
         }
       });
@@ -1058,7 +1104,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
           ]
         },
         dmenu : {
@@ -1069,8 +1115,8 @@ describe('extracter', function () {
           position  : { start : 1, end : 50 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id'  , formatters : [], obj : 'dmenu', pos : 1},
-            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10}
+            {attr : 'id'  , formatters : [], obj : 'dmenu', pos : 1, posOrigin : 1},
+            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10, posOrigin : 10}
           ]
         },
         dproduct : {
@@ -1079,7 +1125,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dproduct', pos : 30}
+            {attr : 'id', formatters : [], obj : 'dproduct', pos : 30, posOrigin : 30}
           ]
         },
         // eslint-disable-next-line
@@ -1094,7 +1140,8 @@ describe('extracter', function () {
             attr       : 'id',
             formatters : [],
             obj        : 'dmenumenuElementi__0',
-            pos        : 40
+            pos        : 40,
+            posOrigin  : 40
           }],
           conditions : [
             { left : { parent : 'dmenumenuElementi__0', attr : 'i' }, operator : '==', right : '0' }
@@ -1137,7 +1184,7 @@ describe('extracter', function () {
           position  : {start : 1, end : 2 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dmenu_', pos : 1}
+            {attr : 'id', formatters : [], obj : 'dmenu_', pos : 1, posOrigin : 1}
           ]
         },
         dproduct : {
@@ -1146,7 +1193,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dproduct', pos : 5}
+            {attr : 'id', formatters : [], obj : 'dproduct', pos : 5, posOrigin : 5}
           ]
         },
         ddays : {
@@ -1157,7 +1204,7 @@ describe('extracter', function () {
           position  : {start : 6, end : 7 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'name', formatters : [], obj : 'ddays', pos : 6}
+            {attr : 'name', formatters : [], obj : 'ddays', pos : 6, posOrigin : 6}
           ]
         }
       });
@@ -1210,7 +1257,7 @@ describe('extracter', function () {
           parent   : 'product4',
           parents  : ['d', 'menu1', 'menu2', 'menu3', 'product4'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'site5', pos : 1}
+            {attr : 'id', formatters : [], obj : 'site5', pos : 1, posOrigin : 1}
           ]
         },
         product6 : {
@@ -1219,7 +1266,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'product6', pos : 2}
+            {attr : 'id', formatters : [], obj : 'product6', pos : 2, posOrigin : 2}
           ]
         },
         cars7 : {
@@ -1235,7 +1282,7 @@ describe('extracter', function () {
           parent   : 'cars7',
           parents  : ['d', 'cars7'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'product8', pos : 3}
+            {attr : 'id', formatters : [], obj : 'product8', pos : 3, posOrigin : 3}
           ]
         }
       });
@@ -1251,7 +1298,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'int' ], obj : 'd', pos : 20},
+            {attr : 'number', formatters : [ 'int' ], obj : 'd', pos : 20, posOrigin : 20},
           ]
         }
       });
@@ -1267,7 +1314,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'int' ,'float', 'decimal' ], obj : 'd', pos : 20},
+            {attr : 'number', formatters : [ 'int' ,'float', 'decimal' ], obj : 'd', pos : 20, posOrigin : 20},
           ]
         }
       });
@@ -1283,7 +1330,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'int' ,'float', 'decimal' ], obj : 'd', pos : 20},
+            {attr : 'number', formatters : [ 'int' ,'float', 'decimal' ], obj : 'd', pos : 20, posOrigin : 20},
           ]
         }
       });
@@ -1299,7 +1346,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'parse(YYYYMMDD)'], obj : 'd', pos : 20},
+            {attr : 'number', formatters : [ 'parse(YYYYMMDD)'], obj : 'd', pos : 20, posOrigin : 20},
           ]
         }
       });
@@ -1318,10 +1365,10 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site'  , formatters : []                                         , obj : 'd', pos : 10},
-            {attr : 'number', formatters : [ 'int' ]                                  , obj : 'd', pos : 20},
-            {attr : 'date'  , formatters : [ 'parse(Y)' ]                             , obj : 'd', pos : 30},
-            {attr : 'date'  , formatters : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], obj : 'd', pos : 40}
+            {attr : 'site'  , formatters : []                                         , obj : 'd', pos : 10, posOrigin : 10},
+            {attr : 'number', formatters : [ 'int' ]                                  , obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'date'  , formatters : [ 'parse(Y)' ]                             , obj : 'd', pos : 30, posOrigin : 30},
+            {attr : 'date'  , formatters : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], obj : 'd', pos : 40, posOrigin : 40}
           ]
         }
       });
@@ -1337,7 +1384,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'parse(YY,YY:MM:D.ZZ[Z]menu[i+1][i]d.bla,i=0)'], obj : 'd', pos : 20},
+            {attr : 'number', formatters : [ 'parse(YY,YY:MM:D.ZZ[Z]menu[i+1][i]d.bla,i=0)'], obj : 'd', pos : 20, posOrigin : 20},
           ]
         }
       });
@@ -1353,7 +1400,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'meteo', formatters : [ 'weekday=1'], obj : 'd', pos : 20},
+            {attr : 'meteo', formatters : [ 'weekday=1'], obj : 'd', pos : 20, posOrigin : 20},
           ]
         }
       });
@@ -1372,10 +1419,10 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 10},
-            {attr : 'number', formatters : [ 'int' ], obj : 'd', pos : 20},
-            {attr : 'date', formatters : [ 'parse(Y)' ], obj : 'd', pos : 30},
-            {attr : 'date', formatters : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], obj : 'd', pos : 40}
+            {attr : 'site', formatters : [], obj : 'd', pos : 10, posOrigin : 10},
+            {attr : 'number', formatters : [ 'int' ], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'date', formatters : [ 'parse(Y)' ], obj : 'd', pos : 30, posOrigin : 30},
+            {attr : 'date', formatters : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], obj : 'd', pos : 40, posOrigin : 40}
           ]
         }
       });
@@ -1391,7 +1438,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'parse(\'YYYY MM DD\')'], obj : 'd', pos : 20},
+            {attr : 'number', formatters : [ 'parse(\'YYYY MM DD\')'], obj : 'd', pos : 20, posOrigin : 20},
           ]
         }
       });
@@ -1434,7 +1481,7 @@ describe('extracter', function () {
             type     : 'object',
             parent   : '_rootd',
             parents  : [ '_root', '_rootd' ],
-            xmlParts : [ { attr : 'label', formatters : [], obj : '_rootdsite', pos : 13 } ]
+            xmlParts : [ { attr : 'label', formatters : [], obj : '_rootdsite', pos : 13, posOrigin : 13 } ]
           },
           _rootdcars : {
             name      : 'cars',
@@ -1444,8 +1491,8 @@ describe('extracter', function () {
             position  : { start : 22, end : 69 },
             iterators : [ { attr : 'i' } ],
             xmlParts  : [
-              { attr : 'name', formatters : [], obj : '_rootdcars', pos : 22 },
-              { attr : 'autonomy', formatters : [], obj : '_rootdcars', pos : 23 }
+              { attr : 'name', formatters : [], obj : '_rootdcars', pos : 22, posOrigin : 22 },
+              { attr : 'autonomy', formatters : [], obj : '_rootdcars', pos : 23, posOrigin : 23 }
             ]
           },
           _rootdcarsspec : {
@@ -1454,7 +1501,7 @@ describe('extracter', function () {
             parent   : '_rootdcars',
             parents  : [ '_root', '_rootd', '_rootdcars' ],
             xmlParts : [
-              { attr : 'weight', formatters : [], obj : '_rootdcarsspec', pos : 32 }
+              { attr : 'weight', formatters : [], obj : '_rootdcarsspec', pos : 32, posOrigin : 32 }
             ]
           },
           _rootdcarswheels : {
@@ -1465,7 +1512,7 @@ describe('extracter', function () {
             position  : { start : 41, end : 88 },
             iterators : [ { attr : 'i' } ],
             xmlParts  : [
-              { attr : 'strengh', formatters : [], obj : '_rootdcarswheels', pos : 41 }
+              { attr : 'strengh', formatters : [], obj : '_rootdcarswheels', pos : 41, posOrigin : 41 }
             ]
           },
           _rootdcarswheelstire : {
@@ -1474,7 +1521,7 @@ describe('extracter', function () {
             parent   : '_rootdcarswheels',
             parents  : [ '_root', '_rootd', '_rootdcars', '_rootdcarswheels' ],
             xmlParts : [
-              { attr : 'brand', formatters : [], obj : '_rootdcarswheelstire', pos : 42 }
+              { attr : 'brand', formatters : [], obj : '_rootdcarswheelstire', pos : 42, posOrigin : 42 }
             ]
           }
         }
@@ -1578,8 +1625,154 @@ describe('extracter', function () {
         }
       });
     });
-    it('conditional blocks', function () {
-      var _xml = '<div><p><h1></h1></p></div>';
+    it('XML parts of conditional blocks should be detected\
+      It should also detect the condition with "showBegin" and "showEnd" formatters', function () {
+      var _xml = '<div><x><tr></tr><tr></tr></x><p><h1></h1>p</p><th></th><th></th></div>';
+      var _descriptor = {
+        d0 : {
+          name     : '',
+          type     : 'object',
+          parent   : '',
+          parents  : [],
+          xmlParts : []
+        },
+        element1 : {
+          name      : 'element',
+          type      : 'array',
+          parent    : 'd0',
+          parents   : ['d0'],
+          position  : {start : 12, end : 21}, /* Approximative position */
+          iterators : [{ attr : 'i' }],
+          xmlParts  : [
+            {obj : 'element1', attr : 'id', pos : 12, posOrigin : 12}
+          ]
+        },
+        info1 : {
+          name     : 'info',
+          type     : 'object',
+          parent   : 'd0',
+          parents  : ['d0'],
+          xmlParts : [
+            {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 30, posOrigin : 30}, // if start
+            {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33, posOrigin : 30},
+            {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42, posOrigin : 42} // if end
+          ]
+        },
+        menus2 : {
+          name      : 'menus',
+          type      : 'array',
+          parent    : 'd0',
+          parents   : ['d0'],
+          position  : {start : 51, end : 60}, /* Approximative position */
+          iterators : [{ attr : 'i' }],
+          xmlParts  : [
+            {obj : 'menus2', attr : 'id', pos : 51, posOrigin : 51}
+          ]
+        }
+      };
+      helper.assert(extracter.splitXml(_xml, _descriptor), {
+        staticData : {
+          before : '<div><x>',
+          after  : '</div>'
+        },
+        dynamicData : {
+          d0 : {
+            name     : '',
+            type     : 'object',
+            parent   : '',
+            parents  : [],
+            xmlParts : []
+          },
+          element1 : {
+            name      : 'element',
+            type      : 'array',
+            parent    : 'd0',
+            parents   : ['d0'],
+            position  : {start : 8, end : 17, endOdd : 26},
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : 'element1', attr : 'id'    , pos : 12, posOrigin : 12, depth : 1},
+              {obj : 'element1', array : 'start', pos : 8 , posOrigin : 12 , depth : 1, after : '<tr>'},
+              {obj : 'element1', array : 'end'  , pos : 17, posOrigin : 21, depth : 1, before : '</tr>'}
+            ],
+            depth : 1
+          },
+          info1 : {
+            name     : 'info',
+            type     : 'object',
+            parent   : 'd0',
+            parents  : ['d0'],
+            xmlParts : [
+              {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 33       , posOrigin : 30 , depth : 0 , before : '</x><p>', after : ''}, // if start
+              {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33.015625, posOrigin : 30 , depth : 0 , after : '<h1></h1>'},
+              {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42       , posOrigin : 42 , depth : 0 , after : 'p</p>'  } // if end
+            ]
+          },
+          menus2 : {
+            name      : 'menus',
+            type      : 'array',
+            parent    : 'd0',
+            parents   : ['d0'],
+            position  : {start : 47, end : 56, endOdd : 65},
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : 'menus2', attr : 'id'    , pos : 51, posOrigin : 51, depth : 1},
+              {obj : 'menus2', array : 'start', pos : 47, posOrigin : 51,  depth : 1, after : '<th>'},
+              {obj : 'menus2', array : 'end'  , pos : 56, posOrigin : 60, depth : 1, before : '</th>'}
+            ],
+            depth : 1
+          },
+        }
+      });
+    });
+    it('should generate new if-block (and keep array conditions) to remove everything without breaking XML', function () {
+      var _xml = '<div><p></p><if>aa</if><if>bb</if><br/></div>';
+      var _condition = [{left : {parent : 'd0', attr : 'menu'}, operator : '>', right : '10'}];
+      var _descriptor = {
+        d0 : {
+          name      : '',
+          type      : 'array',
+          parent    : '',
+          parents   : [],
+          position  : {start : 16, end : 39},
+          iterators : [{ attr : 'i' }],
+          xmlParts  : [
+            {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 17, posOrigin : 17, conditions : _condition},
+            {obj : 'd0', attr : 'menu', pos : 18, posOrigin : 18, conditions : _condition},
+            {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 28, posOrigin : 28, conditions : _condition}
+          ]
+        }
+      };
+      helper.assert(extracter.splitXml(_xml, _descriptor), {
+        staticData : {
+          before : '<div><p></p>',
+          after  : '</div>'
+        },
+        dynamicData : {
+          d0 : {
+            name      : '',
+            type      : 'array',
+            parent    : '',
+            parents   : [],
+            position  : {start : 12, end : 34, endOdd : 39 },
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 17,        posOrigin : 17, conditions : _condition, depth : 1, after : 'a'},
+              {obj : 'd0'                                         , attr : 'menu', pos : 18,        posOrigin : 18, conditions : _condition, depth : 1, after : '' },
+              {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 18.015625, posOrigin : 28, conditions : _condition, depth : 1, after : '</if><if>'},
+              {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 27,        posOrigin : 17, conditions : _condition, depth : 1, after : 'b'},
+              {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 28,        posOrigin : 28, conditions : _condition, depth : 1},
+              {obj : 'd0', array : 'start'                                       , pos : 12,        posOrigin : 16, depth : 1,  after : '<if>a'},
+              {obj : 'd0', array : 'end'                                         , pos : 34,        posOrigin : 39, depth : 1, before : 'b</if>'},
+            ],
+            depth : 1
+          }
+        }
+      });
+    });
+
+    it('should detect conditional blocks with hideBegin and hideEnd', function () {
+      var _xml = '<div><p><h1></h1>p</p></div>';
       var _descriptor = {
         d0 : {
           name     : '',
@@ -1587,16 +1780,16 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {obj : 'd0', formatters : ['hideBegin'], attr : 'test', pos : 5}, // if start
-            {obj : 'd0', formatters : []           , attr : 'val' , pos : 8},
-            {obj : 'd0', formatters : ['hideEnd']  , attr : 'test', pos : 17} // if end
+            {obj : 'd0', formatters : ['hideBegin'], attr : 'test', pos : 5 , posOrigin : 5}, // if start
+            {obj : 'd0', formatters : []           , attr : 'val' , pos : 8 , posOrigin : 8},
+            {obj : 'd0', formatters : ['hideEnd']  , attr : 'test', pos : 17, posOrigin : 17} // if end
           ]
         }
       };
       helper.assert(extracter.splitXml(_xml, _descriptor), {
         staticData : {
           before : '<div><p>',
-          after  : '</p></div>'
+          after  : 'p</p></div>'
         },
         dynamicData : {
           d0 : {
@@ -1605,9 +1798,9 @@ describe('extracter', function () {
             parent   : '',
             parents  : [],
             xmlParts : [
-              {obj : 'd0' , formatters : ['hideBegin'], attr : 'test' , pos : 7.9  , depth : 0 , after : ''},
-              {obj : 'd0' , formatters : []           , attr : 'val'  , pos : 8    , depth : 0 , after : '<h1></h1>'},
-              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 16.9 , depth : 0}
+              {obj : 'd0' , formatters : ['hideBegin'], attr : 'test' , pos : 8        , posOrigin : 5 , depth : 0 , after : ''},
+              {obj : 'd0' , formatters : []           , attr : 'val'  , pos : 8.015625 , posOrigin : 8 , depth : 0 , after : '<h1></h1>'},
+              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 17       , posOrigin : 17, depth : 0 }
             ]
           }
         }
@@ -1625,7 +1818,7 @@ describe('extracter', function () {
           position  : {start : 12, end : 17}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'd0', attr : 'menu', pos : 12},
+            {obj : 'd0', attr : 'menu', pos : 12, posOrigin : 12},
           ]
         }
       };
@@ -1643,9 +1836,9 @@ describe('extracter', function () {
             position  : {start : 12, end : 17, endOdd : 17 }, /* exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'd0', attr : 'menu'   , pos : 12, depth : 1},
-              {obj : 'd0', array : 'start' , pos : 12, depth : 1,  after : ''},
-              {obj : 'd0', array : 'end'   , pos : 17, depth : 1, before : '<br/>'}
+              {obj : 'd0', attr : 'menu'   , pos : 12.015625, posOrigin : 12, depth : 1},
+              {obj : 'd0', array : 'start' , pos : 12       , posOrigin : 12, depth : 1,  after : ''},
+              {obj : 'd0', array : 'end'   , pos : 17       , posOrigin : 17, depth : 1, before : '<br/>'}
             ],
             depth : 1
           }
@@ -1664,9 +1857,9 @@ describe('extracter', function () {
           position  : {start : 9, end : 30}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'd0', attr : 'menu', pos : 9},
-            {obj : 'd0', attr : 'val' , pos : 14},
-            {obj : 'd0', attr : 'test', pos : 20}
+            {obj : 'd0', attr : 'menu', pos : 9 , posOrigin : 9},
+            {obj : 'd0', attr : 'val' , pos : 14, posOrigin : 14},
+            {obj : 'd0', attr : 'test', pos : 20, posOrigin : 20}
           ]
         }
       };
@@ -1684,11 +1877,11 @@ describe('extracter', function () {
             position  : {start : 5, end : 26, endOdd : 47}, /* exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'd0', attr : 'menu' , pos : 9,  depth : 1,  after : ' <h1>'},
-              {obj : 'd0', attr : 'val'  , pos : 14, depth : 1,  after : ' </h1>'},
-              {obj : 'd0', attr : 'test' , pos : 20, depth : 1},
-              {obj : 'd0', array : 'start' , pos : 5, depth : 1,  after : '<tr>'},
-              {obj : 'd0', array : 'end'   , pos : 26, depth : 1, before : ' </tr>'}
+              {obj : 'd0', attr : 'menu'   , pos : 9 , posOrigin : 9 ,  depth : 1,  after : ' <h1>'},
+              {obj : 'd0', attr : 'val'    , pos : 14, posOrigin : 14, depth : 1,  after : ' </h1>'},
+              {obj : 'd0', attr : 'test'   , pos : 20, posOrigin : 20, depth : 1},
+              {obj : 'd0', array : 'start' , pos : 5 , posOrigin : 9 , depth : 1,  after : '<tr>'},
+              {obj : 'd0', array : 'end'   , pos : 26, posOrigin : 30, depth : 1, before : ' </tr>'}
             ],
             depth : 1
           }
@@ -1705,7 +1898,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {obj : 'd0', attr : 'info', pos : 50}
+            {obj : 'd0', attr : 'info', pos : 50, posOrigin : 50}
           ]
         },
         menu1 : {
@@ -1716,9 +1909,9 @@ describe('extracter', function () {
           position  : {start : 9, end : 30}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'menu1', attr : 'menu', pos : 9},
-            {obj : 'menu1', attr : 'val' , pos : 14},
-            {obj : 'menu1', attr : 'test', pos : 20}
+            {obj : 'menu1', attr : 'menu', pos : 9, posOrigin : 9},
+            {obj : 'menu1', attr : 'val' , pos : 14, posOrigin : 14},
+            {obj : 'menu1', attr : 'test', pos : 20, posOrigin : 20}
           ]
         }
       };
@@ -1734,7 +1927,7 @@ describe('extracter', function () {
             parent   : '',
             parents  : [],
             xmlParts : [
-              {obj : 'd0', attr : 'info', pos : 50, depth : 0, before : '<p>'}
+              {obj : 'd0', attr : 'info', pos : 50, posOrigin : 50, depth : 0, before : '<p>'}
             ]
           },
           menu1 : {
@@ -1745,11 +1938,11 @@ describe('extracter', function () {
             position  : {start : 5, end : 26, endOdd : 47}, /* exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'menu1', attr : 'menu' , pos : 9,  depth : 1,  after : ' <h1>'},
-              {obj : 'menu1', attr : 'val'  , pos : 14, depth : 1,  after : ' </h1>'},
-              {obj : 'menu1', attr : 'test' , pos : 20, depth : 1},
-              {obj : 'menu1', array : 'start' , pos : 5, depth : 1,  after : '<tr>'},
-              {obj : 'menu1', array : 'end'   , pos : 26, depth : 1, before : ' </tr>'}
+              {obj : 'menu1', attr : 'menu'   , pos : 9 , posOrigin : 9 ,  depth : 1,  after : ' <h1>'},
+              {obj : 'menu1', attr : 'val'    , pos : 14, posOrigin : 14, depth : 1,  after : ' </h1>'},
+              {obj : 'menu1', attr : 'test'   , pos : 20, posOrigin : 20, depth : 1},
+              {obj : 'menu1', array : 'start' , pos : 5 , posOrigin : 9 , depth : 1,  after : '<tr>'},
+              {obj : 'menu1', array : 'end'   , pos : 26, posOrigin : 30, depth : 1, before : ' </tr>'}
             ],
             depth : 1
           }
@@ -1768,9 +1961,9 @@ describe('extracter', function () {
           position  : {start : 9, end : 38}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'd0', attr : 'menu', pos : 9},
-            {obj : 'd0', attr : 'val', pos : 14},
-            {obj : 'd0', attr : 'test', pos : 20}
+            {obj : 'd0', attr : 'menu', pos : 9 , posOrigin : 9},
+            {obj : 'd0', attr : 'val' , pos : 14, posOrigin : 14},
+            {obj : 'd0', attr : 'test', pos : 20, posOrigin : 20}
           ]
         },
         info1 : {
@@ -1779,7 +1972,7 @@ describe('extracter', function () {
           parent   : 'd0',
           parents  : ['d0'],
           xmlParts : [
-            {obj : 'info1', attr : 'id', pos : 24}
+            {obj : 'info1', attr : 'id', pos : 24, posOrigin : 24}
           ]
         }
       };
@@ -1797,11 +1990,11 @@ describe('extracter', function () {
             position  : {start : 5, end : 34, endOdd : 63}, /* exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'd0', attr : 'menu' , pos : 9,  depth : 1,  after : ' <h1>'},
-              {obj : 'd0', attr : 'val'  , pos : 14, depth : 1,  after : ' </h1>'},
-              {obj : 'd0', attr : 'test' , pos : 20, depth : 1,  after : ' <p>'},
-              {obj : 'd0', array : 'start', pos : 5,  depth : 1, after : '<tr>'},
-              {obj : 'd0', array : 'end'  , pos : 34, depth : 1, before : '</p> </tr>'}
+              {obj : 'd0', attr : 'menu'  , pos : 9 , posOrigin : 9 ,  depth : 1,  after : ' <h1>'},
+              {obj : 'd0', attr : 'val'   , pos : 14, posOrigin : 14, depth : 1,  after : ' </h1>'},
+              {obj : 'd0', attr : 'test'  , pos : 20, posOrigin : 20, depth : 1,  after : ' <p>'},
+              {obj : 'd0', array : 'start', pos : 5 , posOrigin : 9 ,  depth : 1, after : '<tr>'},
+              {obj : 'd0', array : 'end'  , pos : 34, posOrigin : 38, depth : 1, before : '</p> </tr>'}
             ],
             depth : 1
           },
@@ -1811,7 +2004,7 @@ describe('extracter', function () {
             parent   : 'd0',
             parents  : ['d0'],
             xmlParts : [
-              {obj : 'info1', attr : 'id', pos : 24, depth : 1}
+              {obj : 'info1', attr : 'id', pos : 24, posOrigin : 24, depth : 1}
             ]
           }
         }
@@ -1837,7 +2030,7 @@ describe('extracter', function () {
           position  : {start : 10, end : 22}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'movies1', attr : 'title', pos : 11, depth : 1 }
+            {obj : 'movies1', attr : 'title', pos : 11, posOrigin : 11, depth : 1 }
           ]
         },
         cars2 : {
@@ -1849,7 +2042,7 @@ describe('extracter', function () {
           position  : {start : 35, end : 48},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'cars2', attr : 'brand', pos : 36, depth : 1 }
+            {obj : 'cars2', attr : 'brand', pos : 36, posOrigin : 36, depth : 1 }
           ]
         }
       };
@@ -1875,9 +2068,9 @@ describe('extracter', function () {
             position  : {start : 5, end : 17, endOdd : 29},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'movies1',  attr : 'title', pos : 11, depth : 1 },
-              {obj : 'movies1', array : 'start', pos : 5 , depth : 1,after : '<tr1> ' },
-              {obj : 'movies1', array : 'end'  , pos : 17, depth : 1,before : '</tr1>' }
+              {obj : 'movies1',  attr : 'title', pos : 11, posOrigin : 11, depth : 1 },
+              {obj : 'movies1', array : 'start', pos : 5 , posOrigin : 10, depth : 1,after : '<tr1> ' },
+              {obj : 'movies1', array : 'end'  , pos : 17, posOrigin : 22, depth : 1,before : '</tr1>' }
             ]
           },
           cars2 : {
@@ -1889,9 +2082,9 @@ describe('extracter', function () {
             position  : {start : 30, end : 42, endOdd : 54},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'cars2',  attr : 'brand', pos : 36,depth : 1 },
-              {obj : 'cars2', array : 'start', pos : 30,depth : 1,after : '<tr2> ' },
-              {obj : 'cars2', array : 'end'  , pos : 42,depth : 1,before : '</tr2>' }
+              {obj : 'cars2',  attr : 'brand', pos : 36, posOrigin : 36, depth : 1 },
+              {obj : 'cars2', array : 'start', pos : 30, posOrigin : 35, depth : 1,after : '<tr2> ' },
+              {obj : 'cars2', array : 'end'  , pos : 42, posOrigin : 48, depth : 1,before : '</tr2>' }
             ],
             before : ' '
           }
@@ -1918,7 +2111,7 @@ describe('extracter', function () {
           position  : {start : 10, end : 22}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'movies1', attr : 'title', pos : 11, depth : 1 }
+            {obj : 'movies1', attr : 'title', pos : 11, posOrigin : 11, depth : 1 }
           ]
         },
         cars2 : {
@@ -1930,7 +2123,7 @@ describe('extracter', function () {
           position  : {start : 39, end : 52},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'cars2', attr : 'brand', pos : 40, depth : 1 }
+            {obj : 'cars2', attr : 'brand', pos : 40, posOrigin : 40, depth : 1 }
           ]
         }
       };
@@ -1956,9 +2149,9 @@ describe('extracter', function () {
             position  : {start : 5, end : 17, endOdd : 29},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'movies1',  attr : 'title', pos : 11, depth : 1 },
-              {obj : 'movies1', array : 'start', pos : 5 , depth : 1,after : '<tr1> ' },
-              {obj : 'movies1', array : 'end'  , pos : 17, depth : 1,before : '</tr1>' }
+              {obj : 'movies1',  attr : 'title', pos : 11, posOrigin : 11, depth : 1 },
+              {obj : 'movies1', array : 'start', pos : 5 , posOrigin : 10, depth : 1,after : '<tr1> ' },
+              {obj : 'movies1', array : 'end'  , pos : 17, posOrigin : 22, depth : 1,before : '</tr1>' }
             ]
           },
           cars2 : {
@@ -1970,9 +2163,9 @@ describe('extracter', function () {
             position  : {start : 34, end : 46, endOdd : 58},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'cars2',  attr : 'brand', pos : 40,depth : 1 },
-              {obj : 'cars2', array : 'start', pos : 34,depth : 1,after : '<tr2> ' },
-              {obj : 'cars2', array : 'end'  , pos : 46,depth : 1,before : '</tr2>' }
+              {obj : 'cars2',  attr : 'brand', pos : 40, posOrigin : 40, depth : 1 },
+              {obj : 'cars2', array : 'start', pos : 34, posOrigin : 39, depth : 1,after : '<tr2> ' },
+              {obj : 'cars2', array : 'end'  , pos : 46, posOrigin : 52, depth : 1,before : '</tr2>' }
             ],
             before : ' <b> '
           }
@@ -1991,7 +2184,7 @@ describe('extracter', function () {
           position  : {start : 11, end : 75}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'd0', attr : 'menu', pos : 11},
+            {obj : 'd0', attr : 'menu', pos : 11, posOrigin : 11},
           ]
         },
         element1 : {
@@ -2002,7 +2195,7 @@ describe('extracter', function () {
           position  : {start : 26, end : 46}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'element1', attr : 'id', pos : 26}
+            {obj : 'element1', attr : 'id', pos : 26, posOrigin : 26}
           ]
         },
         info1 : {
@@ -2011,7 +2204,7 @@ describe('extracter', function () {
           parent   : 'd0',
           parents  : ['d0'],
           xmlParts : [
-            {obj : 'info1', attr : 'id', pos : 56}
+            {obj : 'info1', attr : 'id', pos : 56, posOrigin : 56}
           ]
         }
       };
@@ -2029,9 +2222,9 @@ describe('extracter', function () {
             position  : {start : 5, end : 68, endOdd : 130}, /* exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'd0', attr : 'menu'   , pos : 11, depth : 1, after : ' <h1>'},
-              {obj : 'd0', array : 'start' , pos : 5,  depth : 1, after : '<tr A>'},
-              {obj : 'd0', array : 'end'   , pos : 68, depth : 1, before : '</h1> </tr> '},
+              {obj : 'd0', attr : 'menu'   , pos : 11, posOrigin : 11, depth : 1, after : ' <h1>'},
+              {obj : 'd0', array : 'start' , pos : 5 , posOrigin : 11,  depth : 1, after : '<tr A>'},
+              {obj : 'd0', array : 'end'   , pos : 68, posOrigin : 75, depth : 1, before : '</h1> </tr> '},
             ],
             depth : 1
           },
@@ -2043,9 +2236,9 @@ describe('extracter', function () {
             position  : {start : 16, end : 36, endOdd : 56}, /* exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'element1', attr : 'id', pos : 26, depth : 2},
-              {obj : 'element1', array : 'start', pos : 16, depth : 2, after : '<tr B> <p>'},
-              {obj : 'element1', array : 'end'  , pos : 36, depth : 2, before : '</p> </tr>'}
+              {obj : 'element1', attr : 'id'    , pos : 26, posOrigin : 26, depth : 2},
+              {obj : 'element1', array : 'start', pos : 16, posOrigin : 26, depth : 2, after : '<tr B> <p>'},
+              {obj : 'element1', array : 'end'  , pos : 36, posOrigin : 46, depth : 2, before : '</p> </tr>'}
             ],
             depth : 2
           },
@@ -2055,7 +2248,7 @@ describe('extracter', function () {
             parent   : 'd0',
             parents  : ['d0'],
             xmlParts : [
-              {obj : 'info1', attr : 'id', pos : 56, depth : 1}
+              {obj : 'info1', attr : 'id', pos : 56, posOrigin : 56, depth : 1}
             ]
           }
         }
@@ -2073,8 +2266,8 @@ describe('extracter', function () {
           position  : {start : 11, end : 75}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'd0', attr : 'menu', pos : 11},
-            {obj : 'd0', attr : 'val', pos : 56}
+            {obj : 'd0', attr : 'menu', pos : 11, posOrigin : 11},
+            {obj : 'd0', attr : 'val', pos : 56, posOrigin : 56}
           ]
         },
         element1 : {
@@ -2085,7 +2278,7 @@ describe('extracter', function () {
           position  : {start : 26, end : 46}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'element1', attr : 'id', pos : 26}
+            {obj : 'element1', attr : 'id', pos : 26, posOrigin : 26}
           ]
         }
       };
@@ -2103,10 +2296,10 @@ describe('extracter', function () {
             position  : {start : 5, end : 68, endOdd : 130}, /* exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'd0', attr : 'menu'  , pos : 11, depth : 1, after : ' <h1>' },
-              {obj : 'd0', attr : 'val'   , pos : 56, depth : 1, },
-              {obj : 'd0', array : 'start', pos : 5,  depth : 1,  after : '<tr A>'},
-              {obj : 'd0', array : 'end'  , pos : 68, depth : 1,  before : '</h1> </tr> '}
+              {obj : 'd0', attr : 'menu'  , pos : 11, posOrigin : 11, depth : 1, after : ' <h1>' },
+              {obj : 'd0', attr : 'val'   , pos : 56, posOrigin : 56, depth : 1, },
+              {obj : 'd0', array : 'start', pos : 5 , posOrigin : 11,  depth : 1,  after : '<tr A>'},
+              {obj : 'd0', array : 'end'  , pos : 68, posOrigin : 75, depth : 1,  before : '</h1> </tr> '}
             ],
             depth : 1
           },
@@ -2118,9 +2311,9 @@ describe('extracter', function () {
             position  : {start : 16, end : 36, endOdd : 56}, /* exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'element1', attr : 'id'    , pos : 26, depth : 2},
-              {obj : 'element1', array : 'start', pos : 16, depth : 2, after : '<tr B> <p>'},
-              {obj : 'element1', array : 'end'  , pos : 36, depth : 2, before : '</p> </tr>'}
+              {obj : 'element1', attr : 'id'    , pos : 26, posOrigin : 26, depth : 2},
+              {obj : 'element1', array : 'start', pos : 16, posOrigin : 26, depth : 2, after : '<tr B> <p>'},
+              {obj : 'element1', array : 'end'  , pos : 36, posOrigin : 46, depth : 2, before : '</p> </tr>'}
             ],
             depth : 2
           }
@@ -2148,7 +2341,7 @@ describe('extracter', function () {
           position  : {start : 11, end : 75}, /* Approximative position */
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : 'element1', attr : 'id', pos : 26}
+            {obj : 'element1', attr : 'id', pos : 26, posOrigin : 26}
           ]
         }
       };
@@ -2166,8 +2359,8 @@ describe('extracter', function () {
             position  : {start : 16 , end : 36, endOdd : 56 }, /* Exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'd0', array : 'start', pos : 16, depth : 2, moveTo : 'element1', after : '<tr B> <p>' },
-              {obj : 'd0', array : 'end'  , pos : 36, depth : 2, before : '</p> </tr>', moveTo : 'element1'},
+              {obj : 'd0', array : 'start', pos : 16, posOrigin : 16, depth : 2, moveTo : 'element1', after : '<tr B> <p>' },
+              {obj : 'd0', array : 'end'  , pos : 36, posOrigin : 36, depth : 2, before : '</p> </tr>', moveTo : 'element1'},
             ],
             depth : 2
           },
@@ -2179,9 +2372,9 @@ describe('extracter', function () {
             position  : {start : 5, end : 68, endOdd : 130}, /* Exact position */
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : 'element1', attr : 'id'    , pos : 26, depth : 2},
-              {obj : 'element1', array : 'start', pos : 5,  depth : 1, after : '<tr A> <h1>'},
-              {obj : 'element1', array : 'end'  , pos : 68, depth : 1, before : '</h1> </tr> '}
+              {obj : 'element1', attr : 'id'    , pos : 26, posOrigin : 26, depth : 2},
+              {obj : 'element1', array : 'start', pos : 5 , posOrigin : 11,  depth : 1, after : '<tr A> <h1>'},
+              {obj : 'element1', array : 'end'  , pos : 68, posOrigin : 75, depth : 1, before : '</h1> </tr> '}
             ],
             depth : 1
           }
@@ -2205,8 +2398,8 @@ describe('extracter', function () {
           parent   : '_root',
           parents  : ['_root'],
           xmlParts : [
-            {obj : '_rootd', attr : 'root', pos : 12},
-            {obj : '_rootd', attr : 'root', pos : 30}
+            {obj : '_rootd', attr : 'root', pos : 12, posOrigin : 12},
+            {obj : '_rootd', attr : 'root', pos : 30, posOrigin : 30}
           ]
         },
         _rootdcars : {
@@ -2217,7 +2410,7 @@ describe('extracter', function () {
           position  : {start : 12,end : 29},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : '_rootdcars', attr : 'brand', pos : 13}
+            {obj : '_rootdcars', attr : 'brand', pos : 13, posOrigin : 13}
           ]
         }
       };
@@ -2240,8 +2433,8 @@ describe('extracter', function () {
             parent   : '_root',
             parents  : ['_root'],
             xmlParts : [
-              {obj : '_rootd', attr : 'root', pos : 12, depth : 1, moveTo : '_rootdcars', after : ' '  },
-              {obj : '_rootd', attr : 'root', pos : 30, depth : 0, toDelete : true, before : ''        }
+              {obj : '_rootd', attr : 'root', pos : 12, posOrigin : 12, depth : 1, moveTo : '_rootdcars', after : ' '  },
+              {obj : '_rootd', attr : 'root', pos : 30, posOrigin : 30, depth : 0, toDelete : true, before : ''        }
             ]
           },
           _rootdcars : {
@@ -2252,9 +2445,9 @@ describe('extracter', function () {
             position  : {start : 5,end : 22, endOdd : 40},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : '_rootdcars', attr : 'brand' , pos : 13, depth : 1                                 },
-              {obj : '_rootdcars', array : 'start', pos : 5 , depth : 1, after : '<t_row>'             },
-              {obj : '_rootdcars', array : 'end'  , pos : 22, depth : 1, before : ' </t_row>'          }
+              {obj : '_rootdcars', attr : 'brand' , pos : 13, posOrigin : 13, depth : 1                                 },
+              {obj : '_rootdcars', array : 'start', pos : 5 , posOrigin : 12, depth : 1, after : '<t_row>'             },
+              {obj : '_rootdcars', array : 'end'  , pos : 22, posOrigin : 29, depth : 1, before : ' </t_row>'          }
             ],
             depth : 1
           }
@@ -2278,8 +2471,8 @@ describe('extracter', function () {
           parent   : '_root',
           parents  : ['_root'],
           xmlParts : [
-            {obj : '_rootd', attr : 'root', pos : 15},
-            {obj : '_rootd', attr : 'root', pos : 34},
+            {obj : '_rootd', attr : 'root', pos : 15, posOrigin : 15},
+            {obj : '_rootd', attr : 'root', pos : 34, posOrigin : 34},
           ]
         },
         _rootdcars : {
@@ -2290,8 +2483,8 @@ describe('extracter', function () {
           position  : {start : 12,end : 32},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : '_rootdcars', attr : 'brand', pos : 13},
-            {obj : '_rootdcars', attr : 'brand', pos : 32},
+            {obj : '_rootdcars', attr : 'brand', pos : 13, posOrigin : 13},
+            {obj : '_rootdcars', attr : 'brand', pos : 32, posOrigin : 32},
           ]
         },
         _rootdcarswheels : {
@@ -2302,8 +2495,8 @@ describe('extracter', function () {
           position  : {start : 12,end : 32},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {obj : '_rootdcarswheels', attr : 'size', pos : 14},
-            {obj : '_rootdcarswheels', attr : 'size', pos : 33},
+            {obj : '_rootdcarswheels', attr : 'size', pos : 14, posOrigin : 14},
+            {obj : '_rootdcarswheels', attr : 'size', pos : 33, posOrigin : 33},
           ]
         }
       };
@@ -2326,8 +2519,8 @@ describe('extracter', function () {
             parent   : '_root',
             parents  : ['_root'],
             xmlParts : [
-              {obj : '_rootd', attr : 'root', pos : 15, depth : 2, moveTo : '_rootdcarswheels' },
-              {obj : '_rootd', attr : 'root', pos : 34, depth : 0, toDelete : true        },
+              {obj : '_rootd', attr : 'root', pos : 15, posOrigin : 15, depth : 2, moveTo : '_rootdcarswheels' },
+              {obj : '_rootd', attr : 'root', pos : 34, posOrigin : 34, depth : 0, toDelete : true        },
             ]
           },
           _rootdcars : {
@@ -2335,13 +2528,13 @@ describe('extracter', function () {
             type      : 'array',
             parent    : '_rootd',
             parents   : ['_root', '_rootd'],
-            position  : {start : 5,end : 25, endOdd : 43},
+            position  : {start : 5,end : 25.015625, endOdd : 43},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : '_rootdcars', attr : 'brand' , pos : 13, depth : 2, moveTo : '_rootdcarswheels' , after : ' '   },
-              {obj : '_rootdcars', attr : 'brand' , pos : 32, depth : 0, toDelete : true, before : '', after : ''    }, // we do not care of depth because this part is in the odd section
-              {obj : '_rootdcars', array : 'start', pos : 5 , depth : 1, after : ''           },
-              {obj : '_rootdcars', array : 'end'  , pos : 25, depth : 1, before : ''          }
+              {obj : '_rootdcars', attr : 'brand' , pos : 13, posOrigin : 13, depth : 2, moveTo : '_rootdcarswheels' , after : ' '   },
+              {obj : '_rootdcars', attr : 'brand' , pos : 32, posOrigin : 32, depth : 0, toDelete : true, before : '', after : ''    }, // we do not care of depth because this part is in the odd section
+              {obj : '_rootdcars', array : 'start', pos : 5 , posOrigin : 12, depth : 1, after : ''           },
+              {obj : '_rootdcars', array : 'end'  , pos : 25.015625, posOrigin : 32, depth : 1, before : ''          }
             ],
             depth : 1
           },
@@ -2350,13 +2543,13 @@ describe('extracter', function () {
             type      : 'array',
             parent    : '_rootdcars',
             parents   : ['_root', '_rootd', '_rootdcars'],
-            position  : {start : 5,end : 25, endOdd : 43},
+            position  : {start : 5.015625, end : 25, endOdd : 43},
             iterators : [{ attr : 'i' }],
             xmlParts  : [
-              {obj : '_rootdcarswheels', attr : 'size' , pos : 14, depth : 2, after : ' '},
-              {obj : '_rootdcarswheels', attr : 'size' , pos : 33, depth : 0, toDelete : true, after : ''},
-              {obj : '_rootdcarswheels', array : 'start', pos : 5 , depth : 2, after : '<t_row> ' },
-              {obj : '_rootdcarswheels', array : 'end'  , pos : 25, depth : 2, before : '  </t_row>' }
+              {obj : '_rootdcarswheels', attr : 'size'  , pos : 14       , posOrigin : 14, depth : 2, after : ' '},
+              {obj : '_rootdcarswheels', attr : 'size'  , pos : 33       , posOrigin : 33, depth : 0, toDelete : true, after : ''},
+              {obj : '_rootdcarswheels', array : 'start', pos : 5.015625 , posOrigin : 12, depth : 2, after : '<t_row> ' },
+              {obj : '_rootdcarswheels', array : 'end'  , pos : 25       , posOrigin : 32, depth : 2, before : '  </t_row>' }
             ],
             depth : 2
           }

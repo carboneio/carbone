@@ -4,7 +4,7 @@
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website
   - Accepts Adobe Indesign IDML file as a template
-  - Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Select and right click an element, click on "hyperlinks", insert the marker and validate. It is working properly with ODS, ODT, and DOCX. The compatibility is limited for XLSX files: It is not possible to create a list of hyperlinks and the marker should not be written with curly braces, example: `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it will work.
+  - Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Right click an element, select "hyperlinks", insert the marker and validate. It is working with ODS, ODT, and DOCX reports. The compatibility is limited for XLSX documents: It is not possible to create a list of hyperlinks and the marker should not be written with curly braces, example: a typical `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it is also valid.
 
 ### v2.1.1
   - Release September 23rd 2020

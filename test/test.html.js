@@ -2,7 +2,7 @@ const html = require('../lib/html');
 const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 
-describe.only('Dynamic HTML BOLD/ITALIC/UNDERLINED/STRIKED', function () {
+describe('Dynamic HTML BOLD/ITALIC/UNDERLINED/STRIKED', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {

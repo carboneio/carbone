@@ -2,6 +2,56 @@ var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
 
 describe('preprocessor', function () {
+  describe('preParse', function () {
+    it('should do nothing if the file is empty', function () {
+      let _xml = preprocessor.preParseXML('', {});
+      helper.assert(_xml, '');
+    });
+    it('should remove XML inside multiple markers', function () {
+      let _xml = '<xml>{d.t<td>his</td>Is<td>A</td>Car<td>bo<br/>ne</td><td>Ma</td>rker}</xml>';
+      let _expectedXML = '<xml>{d.thisIsACarboneMarker}<td></td><td></td><td><br/></td><td></td></xml>';
+      helper.assert(preprocessor.preParseXML(_xml, {}), _expectedXML);
+    });
+    it('should remove XML inside multiple markers and translate markers', function () {
+      let _xml = '<xmlstart>{me<interxml>n<bullshit>u}<div>{t(Mond</interxml>ay)}</div><div>{#def = id=2  }</div><div>{t(Tuesday is <bullshit>the second day of the week!)}</div></xmlend>';
+      let _expectedXML = '<xmlstart>{me<interxml>n<bullshit>u}<div>Lundi</interxml></div><div>{#def = id=2  }</div><div>Tuesday is the second day of the week!<bullshit></div></xmlend>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            Monday : 'Lundi'
+          }
+        }
+      };
+      helper.assert(preprocessor.preParseXML(_xml, _options), _expectedXML);
+    });
+    it('should translate markers which are inside other markers', function () {
+      let _xml = '<xml>{d.if:ifEqual(2, {t(Monday)})  }</xml>';
+      let _expectedXML = '<xml>{d.if:ifEqual(2, Lundi)  }</xml>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            Monday : 'Lundi'
+          }
+        }
+      };
+      helper.assert(preprocessor.preParseXML(_xml, _options), _expectedXML);
+    });
+    it('should translate markers which are inside other markers and remove XML inside', function () {
+      let _xml = '<xml>{<t>d</t>.if:if<tag>Eq</tag>ual(2, {<b>t</b>(on <br>Monday) }</br>) }</xml>';
+      let _expectedXML = '<xml>{d.if:ifEqual(2, le Lundi) }<t></t><tag></tag><b></b><br></br></xml>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'on Monday' : 'le Lundi'
+          }
+        }
+      };
+      helper.assert(preprocessor.preParseXML(_xml, _options), _expectedXML);
+    });
+  });
   describe('execute', function () {
     it('should do nothing if the file is an empty object', function (done) {
       preprocessor.execute({}, function (err, tmpl) {

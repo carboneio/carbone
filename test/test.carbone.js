@@ -528,6 +528,22 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should translate markers which are inside other markers and remove XML inside', function () {
+      let _xml = '<xml>{<t>d</t>.id:if<tag>Eq</tag>ual(2, \'{<b>t</b>(on <br>Monday) }\'</br>) }</xml>';
+      let _expectedXML = '<xml>le Lundi<t></t><tag></tag><b></b><br></br></xml>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'on Monday' : 'le Lundi'
+          }
+        }
+      };
+      carbone.renderXML(_xml, {id : 2}, _options, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, _expectedXML);
+      });
+    });
     it('options.lang should dynamically force the lang of translation markers {t()} and use translations of carbone', function (done) {
       var data = {
         param : '20160131'

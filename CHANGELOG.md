@@ -4,6 +4,7 @@
   - Fix doc issue on carbone website
   - Accepts Adobe Indesign IDML file as a template
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
+  - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
 
 ### v2.1.1
   - Release September 23rd 2020

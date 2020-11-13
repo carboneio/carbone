@@ -1840,7 +1840,7 @@ describe('builder.buildXML', function () {
       dog  : 'https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg',
       toto : 'toto'
     };
-    builder.buildXML(_xml, _data, _options, function (err, _xmlBuilt) {
+    builder.buildXML(parser.removeXMLInsideMarkers(_xml), _data, _options, function (err, _xmlBuilt) {
       console.log(_xmlBuilt);
       assert.equal(_xmlBuilt, _expect);
       done();

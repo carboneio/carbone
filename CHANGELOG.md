@@ -1,9 +1,13 @@
 
 ### v2.2.0
+  - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`
+  - Improve HTML type detection. Accepts html5 without doctype.
   - [EE] Fix Carbone marker inside ODT text box
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website
   - Accepts Adobe Indesign IDML file as a template
+  - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
+  - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
 
 ### v2.1.1
   - Release September 23rd 2020

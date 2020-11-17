@@ -1,4 +1,6 @@
 ### v2.2.0
+  - Feature: cells colors on ODT/DOCX report can be changed dynamically with the "bindColor" marker.
+  - ODT Improvement: the "bindColor" marker will not remove other styles than colors.
   - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`
   - Improve HTML type detection. Accepts html5 without doctype.
   - [EE] Fix Carbone marker inside ODT text box

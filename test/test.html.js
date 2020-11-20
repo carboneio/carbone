@@ -2,7 +2,7 @@ const html = require('../lib/html');
 const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 
-describe('Dynamic HTML BOLD/ITALIC/UNDERLINED/STRIKED', function () {
+describe.only('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -249,6 +249,20 @@ describe('Dynamic HTML BOLD/ITALIC/UNDERLINED/STRIKED', function () {
           helper.assert(res.content, _expectedContent);
           helper.assert(res.styleList, _expectedStyleList);
         });
+      });
+    });
+  });
+  describe('Docx Documents', function () {
+
+  });
+  describe.only('Utils', function () {
+    describe('parseHTML', function () {
+      it('should parse HTML content and return a descriptor', function () {
+        helper.assert(html.parseHTML('This is a simple text'), [ { content : 'This is a simple text', styles : [] } ]);
+        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', styles : ['b'] } ]);
+        // helper.assert(html.parseHTML('<i>Italic content</i>'), [ { content : 'Italic content', style : ['i'] } ]);
+        // helper.assert(html.parseHTML('<s>Striked content</s>'), [ { content : 'Striked content', style : ['s'] } ]);
+        // helper.assert(html.parseHTML('<u>Underlined content</u>'), [ { content : 'Underlined content', style : ['u'] } ]);
       });
     });
   });

@@ -350,7 +350,7 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it.only('should parse HTML content with break lines tags <br> [MIX]', function () {
+      it('should parse HTML content with break lines tags <br> [MIX]', function () {
         helper.assert(html.parseHTML('This is a<br>simple text.'),
           [
             { content : 'This is a', styles : [] },

@@ -95,9 +95,9 @@ function writeConfigFile () {
   if (fs.existsSync(pluginDir) === false) {
     fs.mkdirSync(path.join(os.tmpdir(), 'plugin'));
   }
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'config.json'), path.join(os.tmpdir(), 'config', 'config.json'));
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pem'), path.join(os.tmpdir(), 'config', 'key.pem'));
-  fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(os.tmpdir(), 'config', 'key.pub'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'config.json'), path.join(os.tmpdir(), 'config', 'config.json'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pem'), path.join(os.tmpdir(), 'config', 'key.pem'));
+  fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pub'), path.join(os.tmpdir(), 'config', 'key.pub'));
 }
 
 /**
@@ -129,7 +129,7 @@ function unlinkConfigFile () {
   fs.rmdirSync(path.join(os.tmpdir(), 'plugin'));
 }
 
-describe.only('Webserver', () => {
+describe('Webserver', () => {
   before(() => {
     writeConfigFile();
   });
@@ -144,10 +144,10 @@ describe.only('Webserver', () => {
 
     describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender and middlewares', () => {
       before((done) => {
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'plugin', 'middlewares.js'), path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
-        fs.copyFileSync(path.join(__dirname, 'datasets', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'middlewares.js'), path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
         deleteRequiredFiles();
         webserver = require('../lib/webserver');
         webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir()], () => {
@@ -597,7 +597,7 @@ describe.only('Webserver', () => {
           data = JSON.parse(data.toString());
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Request Error: Content-Type header is not application/json.');
+          assert.strictEqual(data.error, 'Content-Type header is not application/json');
           done();
         });
       });
@@ -623,7 +623,7 @@ describe.only('Webserver', () => {
 
     describe('Get render', () => {
       let renderPath = path.join(os.tmpdir(), 'render');
-      let datasetsRenderPath = path.join(__dirname, 'datasets', 'renderedReport');
+      let datasetsRenderPath = path.join(__dirname, 'datasets', 'webserver', 'renderedReport');
       let renderedFiles = [
         '0c7b6b9f8180e8206c0aa9a91d9c836fe5b271eed2a1d4cf5a1b05e4fd582fbarenderedReport.html',
         '8cb863d0af717a1229a01d21aa28895770080ac99e70d47a29554ba977d46ab7encoded%20filename.html',
@@ -774,7 +774,7 @@ describe.only('Webserver', () => {
         get.concat(getBody(4000, '/template', 'POST', body), (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Request Error: Content-Type header should be multipart/form-data');
+          assert.strictEqual(data.error, 'Content-Type header should be multipart/form-data');
           done();
         });
       });
@@ -804,7 +804,7 @@ describe.only('Webserver', () => {
           assert.strictEqual(err, null);
           data = JSON.parse(data);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Request Error: "template" field is empty');
+          assert.strictEqual(data.error, '"template" field is empty');
           done();
         });
       });
@@ -834,7 +834,7 @@ describe.only('Webserver', () => {
         get.concat(getBody(4000, '/template/dontexists', 'GET'), (err, res, data) => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Template not found');
+          assert.strictEqual(data.error, 'Cannot find template extension, does it exists?');
           done();
         });
       });

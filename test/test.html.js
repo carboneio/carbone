@@ -286,7 +286,7 @@ describe.only('Dynamic HTML', function () {
         assert.throws(() => html.parseHTML('<b>Bold</>b>'), new Error('Invalid HTML tag'));
       });
 
-      it('should parse HTML content and return a descriptors [MIX]', function () {
+      it('should parse HTML content and return a descriptors [MIX without break line]', function () {
         helper.assert(html.parseHTML('<b><em>this is a bold and italic text</em></b>'), [ { content : 'this is a bold and italic text', tags : ['b', 'em'] } ]);
         helper.assert(html.parseHTML('<b><u><s><em>this is a bold and italic text</em></s></u></b>'), [ { content : 'this is a bold and italic text', tags : ['b', 'u', 's', 'em'] } ]);
         helper.assert(html.parseHTML('<li style="color:red;padding: 10px 2px 4px">This is a <a href="">LINK</a></li>'),
@@ -355,7 +355,7 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it('should parse HTML content with break lines tags <br> [MIX]', function () {
+      it('should parse HTML content with BREAK LINES tags <br> [MIX]', function () {
 
         helper.assert(html.parseHTML('This is <br><i>a tree</i>'),
           [

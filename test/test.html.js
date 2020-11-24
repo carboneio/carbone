@@ -356,26 +356,64 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should parse HTML content with break lines tags <br> [MIX]', function () {
+
+        helper.assert(html.parseHTML('This is <br><i>a tree</i>'),
+          [
+            { content : 'This is ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a tree', tags : ['i'] },
+          ]
+        );
+
+        helper.assert(html.parseHTML('This is </br><i>a tree</i>'),
+          [
+            { content : 'This is ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a tree', tags : ['i'] },
+          ]
+        );
+
         helper.assert(html.parseHTML('This is a<br>simple text.'),
           [
             { content : 'This is a', tags : [] },
-            { content : '', tags : ['br'] } ,
+            { content : '#break#', tags : [] } ,
             { content : 'simple text.', tags : [] }
           ]
         );
+
         helper.assert(html.parseHTML('This <br /> is</br>a<br>simple</br> text<br/>.'),
           [
             { content : 'This ', tags : [] },
-            { content : '', tags : ['br'] } ,
+            { content : '#break#', tags : [] },
             { content : ' is', tags : [] },
-            { content : '', tags : ['br'] } ,
+            { content : '#break#', tags : [] },
             { content : 'a', tags : [] },
-            { content : '', tags : ['br'] } ,
+            { content : '#break#', tags : [] },
             { content : 'simple', tags : [] },
-            { content : '', tags : ['br'] },
+            { content : '#break#', tags : [] },
             { content : ' text', tags : [] },
-            { content : '', tags : ['br'] },
+            { content : '#break#', tags : [] },
             { content : '.', tags : [] }
+          ]
+        );
+
+        helper.assert(html.parseHTML('<br/>This<br/>is</br><br>a<br>sim<br/>ple<br/></br>text.<br>'),
+          [
+            { content : '#break#', tags : [] } ,
+            { content : 'This', tags : [] },
+            { content : '#break#', tags : [] } ,
+            { content : 'is', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : '#break#', tags : [] } ,
+            { content : 'a', tags : [] },
+            { content : '#break#', tags : [] } ,
+            { content : 'sim', tags : [] },
+            { content : '#break#', tags : [] } ,
+            { content : 'ple', tags : [] },
+            { content : '#break#', tags : [] } ,
+            { content : '#break#', tags : [] } ,
+            { content : 'text.', tags : [] },
+            { content : '#break#', tags : [] } ,
           ]
         );
 
@@ -384,19 +422,37 @@ describe.only('Dynamic HTML', function () {
             { content : 'Although the term ', tags : ['u'] },
             { content : '"alpinism"', tags : ['u', 'b'] },
             { content : ' ', tags : ['u'] },
-            { content : '', tags : ['br'] } ,
+            { content : '#break#', tags : [] },
             { content : 'has become synonymous with ', tags : ['u'] },
             { content : 'sporting ', tags : ['u', 'b'] },
-            { content : '', tags : ['br'] },
+            { content : '#break#', tags : [] },
             { content : ' achievement', tags : ['u', 'b'] },
             { content : ',', tags : ['u'] },
-            { content : '', tags : ['br'] },
+            { content : '#break#', tags : [] },
             { content : 'pyreneism', tags : ['u', 'em'] },
             { content : ',', tags : ['u'] },
-            { content : '', tags : ['br'] },
+            { content : '#break#', tags : [] },
             { content : 'appearing in the ', tags : ['u'] },
             { content : '20th', tags : ['u', 'em', 's'] },
             { content : ' 19th century', tags : ['u'] }
+          ]
+        );
+
+        helper.assert(html.parseHTML('This is </br><b><i>a tree</i> with lot of <br/>fruits inside!</b></br> I really like it <u>and this <br/>is <s>wonderful</s></u>.'),
+          [
+            { content : 'This is ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a tree', tags : ['b', 'i'] },
+            { content : ' with lot of ', tags : ['b'] },
+            { content : '#break#', tags : [] },
+            { content : 'fruits inside!', tags : ['b'] },
+            { content : '#break#', tags : [] },
+            { content : ' I really like it ', tags : [] },
+            { content : 'and this ', tags : ['u'] },
+            { content : '#break#', tags : [] },
+            { content : 'is ', tags : ['u'] },
+            { content : 'wonderful', tags : ['u', 's'] },
+            { content : '.', tags : [] }
           ]
         );
       });

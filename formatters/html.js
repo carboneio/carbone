@@ -62,40 +62,32 @@ const getHtmlStyleNamePostProcess = function (contentId) {
  * @param  {String} htmlContent string with html tags
  */
 function addHtmlDatabaseDOCX (options, htmlContent) {
-  // var _htmlDatabaseProperties = null;
+  var _htmlDatabaseProperties = null;
 
   if (!options.htmlDatabase.has(htmlContent)) {
-    // const { styleList, content } = html.parseStyleAndGetStyleList(htmlContent);
+    const descriptor = html.parseHTML(htmlContent);
     // console.log(content, styleList);
-    // _htmlDatabaseProperties = {
-    //   id : options.htmlDatabase.size,
-    //   content,
-    //   styleList
-    // };
-    // options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
+    _htmlDatabaseProperties = {
+      id          : options.htmlDatabase.size,
+      mainContent : descriptor[0].content,
+      mainStyle   : html.buildXMLStyle('docx', descriptor[0].tags),
+      subContent  : html.buildSubContentDOCX(descriptor)
+    };
+    options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
   }
 }
 
 const getHTMLSubContentDocx = function (htmlContent) {
   addHtmlDatabaseDOCX(this, htmlContent);
-
   return {
     fn   : getHTMLSubContentDocxPostProcess,
-    args : []
+    args : [htmlContent]
   };
 };
 
-const getHTMLSubContentDocxPostProcess = function () {
-  /**
-   * `<w:br/>
-  <w:r>
-  <w:rPr>
-    <w:lang w:val="en-US"/>
-  </w:rPr>
-  <w:t xml:space="preserve"> Pouette pouette </w:t>
-  </w:r>`
-   */
-  return '';
+const getHTMLSubContentDocxPostProcess = function (contentId) {
+  const _htmlProperties = this.htmlDatabase.get(contentId);
+  return _htmlProperties.subContent;
 };
 
 const getHTMLContentDocx = function (htmlContent) {
@@ -108,7 +100,7 @@ const getHTMLContentDocx = function (htmlContent) {
 
 const getHTMLContentDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.content;
+  return _htmlProperties.mainContent;
 };
 
 const getHTMLContentStyleDocx = function (htmlContent) {
@@ -121,7 +113,7 @@ const getHTMLContentStyleDocx = function (htmlContent) {
 
 const getHTMLContentStyleDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.styleList;
+  return _htmlProperties.mainStyle;
 };
 
 module.exports = {

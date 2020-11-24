@@ -259,16 +259,16 @@ describe.only('Dynamic HTML', function () {
   describe.only('Utils', function () {
     describe('parseHTML', function () {
       it('should parse HTML content and return a descriptors [SIMPLE]', function () {
-        helper.assert(html.parseHTML('This is a simple text'), [ { content : 'This is a simple text', styles : [] } ]);
-        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', styles : ['b'] } ]);
-        helper.assert(html.parseHTML('<b>Bold</b> content'), [ { content : 'Bold', styles : ['b'] }, { content : ' content', styles : [] } ]);
-        helper.assert(html.parseHTML('Bold <b>content</b>'), [ { content : 'Bold ', styles : [] }, { content : 'content', styles : ['b'] } ]);
-        helper.assert(html.parseHTML('Bold <b title="value1">content</b>'), [ { content : 'Bold ', styles : [] }, { content : 'content', styles : ['b'] } ]);
-        helper.assert(html.parseHTML('<b style="color:red;margin:10px 20px" title="value2">Bold content</b>'), [ { content : 'Bold content', styles : ['b'] } ]);
-        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', styles : ['b'] } ]);
-        helper.assert(html.parseHTML('<i>Italic content</i>'), [ { content : 'Italic content', styles : ['i'] } ]);
-        helper.assert(html.parseHTML('<s>Striked content</s>'), [ { content : 'Striked content', styles : ['s'] } ]);
-        helper.assert(html.parseHTML('<p id="1234"> simple text </p>'), [ { content : ' simple text ', styles : ['p'] } ]);
+        helper.assert(html.parseHTML('This is a simple text'), [ { content : 'This is a simple text', tags : [] } ]);
+        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold</b> content'), [ { content : 'Bold', tags : ['b'] }, { content : ' content', tags : [] } ]);
+        helper.assert(html.parseHTML('Bold <b>content</b>'), [ { content : 'Bold ', tags : [] }, { content : 'content', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('Bold <b title="value1">content</b>'), [ { content : 'Bold ', tags : [] }, { content : 'content', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b style="color:red;margin:10px 20px" title="value2">Bold content</b>'), [ { content : 'Bold content', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<i>Italic content</i>'), [ { content : 'Italic content', tags : ['i'] } ]);
+        helper.assert(html.parseHTML('<s>Striked content</s>'), [ { content : 'Striked content', tags : ['s'] } ]);
+        helper.assert(html.parseHTML('<p id="1234"> simple text </p>'), [ { content : ' simple text ', tags : ['p'] } ]);
       });
 
       it('should detect errors, starting or ending tag missing', function () {
@@ -279,73 +279,78 @@ describe.only('Dynamic HTML', function () {
         assert.throws(() => html.parseHTML('<em><bold>Underlined </i> content</em>'), new Error('Invalid HTML tags: <bold> <i>'));
         // the HTML tag is missing a closing mark
         assert.throws(() => html.parseHTML('<btest content'), new Error('Invalid HTML tag: btest'));
-        assert.throws(() => html.parseHTML('<   test'), new Error('Invalid HTML tag: '));
+        assert.throws(() => html.parseHTML('<   test'), new Error('Invalid HTML tag'));
+        assert.throws(() => html.parseHTML('<<b>Bold</b>'), new Error('Invalid HTML tag: b'));
+        assert.throws(() => html.parseHTML('<b>Bold</b<>'), new Error('Invalid HTML tag: b'));
+        assert.throws(() => html.parseHTML('<b>Bold</<b>'), new Error('Invalid HTML tag: b'));
+        assert.throws(() => html.parseHTML('<b>Bold</>b>'), new Error('Invalid HTML tag'));
       });
 
       it('should parse HTML content and return a descriptors [MIX]', function () {
-        helper.assert(html.parseHTML('<b><em>this is a bold and italic text</em></b>'), [ { content : 'this is a bold and italic text', styles : ['b', 'em'] } ]);
+        helper.assert(html.parseHTML('<b><em>this is a bold and italic text</em></b>'), [ { content : 'this is a bold and italic text', tags : ['b', 'em'] } ]);
+        helper.assert(html.parseHTML('<b><u><s><em>this is a bold and italic text</em></s></u></b>'), [ { content : 'this is a bold and italic text', tags : ['b', 'u', 's', 'em'] } ]);
         helper.assert(html.parseHTML('<li style="color:red;padding: 10px 2px 4px">This is a <a href="">LINK</a></li>'),
           [
-            { content : 'This is a ', styles : ['li'] },
-            { content : 'LINK', styles : ['li', 'a'] }
+            { content : 'This is a ', tags : ['li'] },
+            { content : 'LINK', tags : ['li', 'a'] }
           ]
         );
         helper.assert(html.parseHTML('<b>bold</b><em>and italic</em>'),
           [
-            { content : 'bold', styles : ['b'] },
-            { content : 'and italic', styles : ['em'] }
+            { content : 'bold', tags : ['b'] },
+            { content : 'and italic', tags : ['em'] }
           ]
         );
 
         helper.assert(html.parseHTML('this<b> is a bold</b><em>and italic</em> text'),
           [
-            { content : 'this', styles : [] },
-            { content : ' is a bold', styles : ['b'] },
-            { content : 'and italic', styles : ['em'] },
-            { content : ' text', styles : [] },
+            { content : 'this', tags : [] },
+            { content : ' is a bold', tags : ['b'] },
+            { content : 'and italic', tags : ['em'] },
+            { content : ' text', tags : [] },
           ]
         );
 
         helper.assert(html.parseHTML('this <b> is a bold </b> and <u><em>italic</em></u> text '),
           [
-            { content : 'this ', styles : [] },
-            { content : ' is a bold ', styles : ['b'] },
-            { content : ' and ', styles : [] },
-            { content : 'italic', styles : ['u', 'em'] },
-            { content : ' text ', styles : [] },
+            { content : 'this ', tags : [] },
+            { content : ' is a bold ', tags : ['b'] },
+            { content : ' and ', tags : [] },
+            { content : 'italic', tags : ['u', 'em'] },
+            { content : ' text ', tags : [] },
           ]
         );
 
         helper.assert(html.parseHTML('<b>this is a bold<em>and italic</em> text</b>'),
           [
-            { content : 'this is a bold', styles : ['b'] },
-            { content : 'and italic', styles : ['b', 'em'] },
-            { content : ' text', styles : ['b'] },
+            { content : 'this is a bold', tags : ['b'] },
+            { content : 'and italic', tags : ['b', 'em'] },
+            { content : ' text', tags : ['b'] },
           ]
         );
 
         helper.assert(html.parseHTML('<b>this <u> is a bold<em> text </u>and <s>italic </em>text</b></s>.'),
           [
-            { content : 'this ', styles : ['b'] },
-            { content : ' is a bold', styles : ['b', 'u'] },
-            { content : ' text ', styles : ['b', 'u', 'em'] },
-            { content : 'and ', styles : ['b', 'em'] },
-            { content : 'italic ', styles : ['b', 'em', 's'] },
-            { content : 'text', styles : ['b', 's'] },
-            { content : '.', styles : [] },
+            { content : 'this ', tags : ['b'] },
+            { content : ' is a bold', tags : ['b', 'u'] },
+            { content : ' text ', tags : ['b', 'u', 'em'] },
+            { content : 'and ', tags : ['b', 'em'] },
+            { content : 'italic ', tags : ['b', 'em', 's'] },
+            { content : 'text', tags : ['b', 's'] },
+            { content : '.', tags : [] },
           ]
         );
 
         helper.assert(html.parseHTML('<div id="content"><em>This is a <strong>tree</strong> with a lot of fruits inside! <s>I really <strong>like</strong></s> and this is <b>wonderful</b>.</em></div>'),
           [
-            { content : 'This is a ', styles : ['div', 'em'] },
-            { content : 'tree', styles : ['div', 'em', 'strong'] },
-            { content : ' with a lot of fruits inside! ', styles : ['div', 'em'] },
-            { content : 'I really ', styles : ['div', 'em', 's'] },
-            { content : 'like', styles : ['div', 'em', 's', 'strong'] },
-            { content : ' and this is ', styles : ['div', 'em'] },
-            { content : 'wonderful', styles : ['div', 'em', 'b'] },
-            { content : '.', styles : ['div', 'em'] },
+            { content : 'This is a ', tags : ['div', 'em'] },
+            { content : 'tree', tags : ['div', 'em', 'strong'] },
+            { content : ' with a lot of fruits inside! ', tags : ['div', 'em'] },
+            { content : 'I really ', tags : ['div', 'em', 's'] },
+            { content : 'like', tags : ['div', 'em', 's', 'strong'] },
+            { content : ' and this is ', tags : ['div', 'em'] },
+            { content : 'wonderful', tags : ['div', 'em', 'b'] },
+            { content : '.', tags : ['div', 'em'] },
           ]
         );
       });
@@ -353,45 +358,45 @@ describe.only('Dynamic HTML', function () {
       it('should parse HTML content with break lines tags <br> [MIX]', function () {
         helper.assert(html.parseHTML('This is a<br>simple text.'),
           [
-            { content : 'This is a', styles : [] },
-            { content : '', styles : ['br'] } ,
-            { content : 'simple text.', styles : [] }
+            { content : 'This is a', tags : [] },
+            { content : '', tags : ['br'] } ,
+            { content : 'simple text.', tags : [] }
           ]
         );
         helper.assert(html.parseHTML('This <br /> is</br>a<br>simple</br> text<br/>.'),
           [
-            { content : 'This ', styles : [] },
-            { content : '', styles : ['br'] } ,
-            { content : ' is', styles : [] },
-            { content : '', styles : ['br'] } ,
-            { content : 'a', styles : [] },
-            { content : '', styles : ['br'] } ,
-            { content : 'simple', styles : [] },
-            { content : '', styles : ['br'] },
-            { content : ' text', styles : [] },
-            { content : '', styles : ['br'] },
-            { content : '.', styles : [] }
+            { content : 'This ', tags : [] },
+            { content : '', tags : ['br'] } ,
+            { content : ' is', tags : [] },
+            { content : '', tags : ['br'] } ,
+            { content : 'a', tags : [] },
+            { content : '', tags : ['br'] } ,
+            { content : 'simple', tags : [] },
+            { content : '', tags : ['br'] },
+            { content : ' text', tags : [] },
+            { content : '', tags : ['br'] },
+            { content : '.', tags : [] }
           ]
         );
 
         helper.assert(html.parseHTML('<u>Although the term <b>"alpinism"</b> </br>has become synonymous with <b>sporting <br> achievement</b>,<br/><em>pyreneism</em>,<br/>appearing in the <em><s>20th</s></em> 19th century</u>'),
           [
-            { content : 'Although the term ', styles : ['u'] },
-            { content : '"alpinism"', styles : ['u', 'b'] },
-            { content : ' ', styles : ['u'] },
-            { content : '', styles : ['br'] } ,
-            { content : 'has become synonymous with ', styles : ['u'] },
-            { content : 'sporting ', styles : ['u', 'b'] },
-            { content : '', styles : ['br'] },
-            { content : ' achievement', styles : ['u', 'b'] },
-            { content : ',', styles : ['u'] },
-            { content : '', styles : ['br'] },
-            { content : 'pyreneism', styles : ['u', 'em'] },
-            { content : ',', styles : ['u'] },
-            { content : '', styles : ['br'] },
-            { content : 'appearing in the ', styles : ['u'] },
-            { content : '20th', styles : ['u', 'em', 's'] },
-            { content : ' 19th century', styles : ['u'] }
+            { content : 'Although the term ', tags : ['u'] },
+            { content : '"alpinism"', tags : ['u', 'b'] },
+            { content : ' ', tags : ['u'] },
+            { content : '', tags : ['br'] } ,
+            { content : 'has become synonymous with ', tags : ['u'] },
+            { content : 'sporting ', tags : ['u', 'b'] },
+            { content : '', tags : ['br'] },
+            { content : ' achievement', tags : ['u', 'b'] },
+            { content : ',', tags : ['u'] },
+            { content : '', tags : ['br'] },
+            { content : 'pyreneism', tags : ['u', 'em'] },
+            { content : ',', tags : ['u'] },
+            { content : '', tags : ['br'] },
+            { content : 'appearing in the ', tags : ['u'] },
+            { content : '20th', tags : ['u', 'em', 's'] },
+            { content : ' 19th century', tags : ['u'] }
           ]
         );
       });

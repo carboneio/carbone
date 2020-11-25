@@ -44,7 +44,8 @@
   "pkg": {
     "assets": "lib/converter.py",
     "assets": "bin/install.sh",
-    "assets": "bin/systemd"
+    "assets": "bin/systemd",
+    "assets": "health.docx"
   },
   "devDependencies": {
     "eslint": "=7.7.0",

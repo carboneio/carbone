@@ -212,6 +212,14 @@ export CARBONE_EE_ATTEMPS=2
 export CARBONE_EE_AUTHENTICATION=true
 ```
 
+## How it works?
+
+With this on-premise version, the API is the same than the public one. You can find the documentation here https://carbone.io/api-reference.html.
+
+**Note** When you get a render, the file is automatically deleted from the server.
+
+**Note** A job will be executed every 24 hours to clean render older than 7 days and template older than 60 days.
+
 ## Setup plugins
 
 You have the possibility to override a few things in carbone on premise. It allows you to choose where to save your templates for example.

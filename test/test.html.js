@@ -24,7 +24,7 @@ describe.only('Dynamic HTML', function () {
             data : '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>'
           }]
         };
-        const _expectedContent = '<office:body><office:text><text:p text:style-name="P5"><text:span text:style-name="{d.content:getHtmlStyleName()}">{d.content:getHtmlContent()}</text:span></text:p></office:text></office:body>';
+        const _expectedContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:getHTMLContentOdt}</text:p></office:text></office:body>';
         html.preprocessODT(_template);
         helper.assert(_template.files[0].data, _expectedContent);
       });
@@ -45,14 +45,141 @@ describe.only('Dynamic HTML', function () {
         };
         const _expectedContent = '' +
                       '<office:body>' +
-                      '<text:p text:style-name="P5"><text:span text:style-name="{d.value1:getHtmlStyleName()}">{d.value1:getHtmlContent()}</text:span> {d.element} <text:span text:style-name="{d.value2:getHtmlStyleName()}">{d.value2:getHtmlContent()}</text:span></text:p>' +
+                      '<text:p text:style-name="P5">{d.value1:getHTMLContentOdt} {d.element} {d.value2:getHTMLContentOdt}</text:p>' +
                       '<text:p text:style-name="P1"/>' +
                       '<text:p text:style-name="P5">This is some content</text:p>' +
                       '<text:p text:style-name="P1"/>' +
-                      '<text:p text:style-name="P3"><text:span text:style-name="{d.value3:getHtmlStyleName()}">{d.value3:getHtmlContent()}</text:span></text:p>' +
+                      '<text:p text:style-name="P3">{d.value3:getHTMLContentOdt}</text:p>' +
                       '</office:body>';
         html.preprocessODT(_template);
         helper.assert(_template.files[0].data, _expectedContent);
+      });
+    });
+
+    describe('buildXMLContentOdt', function () {
+      const _uniqueID = 'C01';
+      it('should do nothing if the descriptor is empty', function () {
+        const res = html.buildXMLContentOdt(_uniqueID, []);
+        helper.assert(res.content, '');
+        helper.assert(res.style, '');
+      });
+
+      it('should create the content and style from an HTML descriptor', function () {
+        helper.assert(html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'bold', tags : ['b'] },
+            { content : 'and italic', tags : ['em'] }
+          ]
+        ),
+        {
+          content : '' +
+            '<text:span text:style-name="C010">bold</text:span>' +
+            '<text:span text:style-name="C011">and italic</text:span>',
+          style : '' +
+          '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
+          '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
+        });
+
+        helper.assert(html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'this', tags : [] },
+            { content : ' is a bold', tags : ['b'] },
+            { content : 'and italic', tags : ['em'] },
+            { content : ' text', tags : [] },
+          ]
+        ),
+        {
+          content : '' +
+            '<text:span text:style-name="C010">this</text:span>' +
+            '<text:span text:style-name="C011"> is a bold</text:span>' +
+            '<text:span text:style-name="C012">and italic</text:span>' +
+            '<text:span text:style-name="C013"> text</text:span>',
+          style : '' +
+            '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
+            '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
+        });
+      });
+
+      it('should create the content and style from an HTML descriptor that contains unknown tags', function () {
+        helper.assert(html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'this ', tags : ['div', 'b'] },
+            { content : ' is a bold', tags : ['div', 'b', 'u'] },
+            { content : ' text ', tags : ['div', 'b', 'u',  'p', 'em'] },
+            { content : 'and ', tags : ['div', 'b', 'p', 'em'] },
+            { content : 'italic ', tags : ['div', 'b', 'p', 'em', 's'] },
+            { content : 'text', tags : ['div', 'b', 's'] },
+            { content : '.', tags : [] },
+          ]
+        ),
+        {
+          content : '' +
+            '<text:span text:style-name="C010">this </text:span>' +
+            '<text:span text:style-name="C011"> is a bold</text:span>' +
+            '<text:span text:style-name="C012"> text </text:span>' +
+            '<text:span text:style-name="C013">and </text:span>' +
+            '<text:span text:style-name="C014">italic </text:span>' +
+            '<text:span text:style-name="C015">text</text:span>' +
+            '<text:span text:style-name="C016">.</text:span>',
+          style : '' +
+            '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
+            '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-weight="bold" style:text-underline-style="solid"/></style:style>' +
+            '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-weight="bold" style:text-underline-style="solid" fo:font-style="italic"/></style:style>' +
+            '<style:style style:name="C013" style:family="text"><style:text-properties fo:font-weight="bold" fo:font-style="italic"/></style:style>' +
+            '<style:style style:name="C014" style:family="text"><style:text-properties fo:font-weight="bold" fo:font-style="italic" style:text-line-through-style="solid"/></style:style>' +
+            '<style:style style:name="C015" style:family="text"><style:text-properties fo:font-weight="bold" style:text-line-through-style="solid"/></style:style>'
+        });
+      });
+
+      it('should create the content and style from an HTML descriptor that contains BREAK LINE', function () {
+
+        helper.assert(html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'This is ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a tree', tags : ['i'] },
+          ]
+        ),
+        {
+          content : '' +
+            '<text:span text:style-name="C010">This is </text:span>' +
+            '<text:line-break/>' +
+            '<text:span text:style-name="C012">a tree</text:span>',
+          style : '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
+        });
+
+        helper.assert(html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'This ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : ' is', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'simple', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : ' text', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : '.', tags : [] }
+          ]
+        ),
+        {
+          content : '' +
+            '<text:span text:style-name="C010">This </text:span>' +
+            '<text:line-break/>' +
+            '<text:span text:style-name="C012"> is</text:span>' +
+            '<text:line-break/>' +
+            '<text:span text:style-name="C014">a</text:span>' +
+            '<text:line-break/>' +
+            '<text:span text:style-name="C016">simple</text:span>' +
+            '<text:line-break/>' +
+            '<text:line-break/>' +
+            '<text:span text:style-name="C019"> text</text:span>' +
+            '<text:line-break/>' +
+            '<text:span text:style-name="C0111">.</text:span>',
+          style : ''
+        });
       });
     });
 
@@ -75,10 +202,10 @@ describe.only('Dynamic HTML', function () {
         const _options = {
           htmlDatabase : new Map()
         };
-        _options.htmlDatabase.set('<b>contentFromTheMarker</b>', {
-          id        : 0,
-          content   : 'contentFromTheMarker',
-          styleList : 'fo:font-weight="bold" '
+        _options.htmlDatabase.set('<b>Text content</b>', {
+          id      : 'C01',
+          content : '<text:span text:style-name="C010">Text content</text:span>',
+          style   : '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
         });
         const _template = {
           files : [{
@@ -86,7 +213,7 @@ describe.only('Dynamic HTML', function () {
             data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>'
           }]
         };
-        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="TC0" style:family="text"><style:text-properties fo:font-weight="bold" /></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>';
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>';
         html.postProcessODT(_template, null, _options);
         helper.assert(_template.files[0].data, _expectedContent);
       });
@@ -94,54 +221,20 @@ describe.only('Dynamic HTML', function () {
         const _options = {
           htmlDatabase : new Map()
         };
-        _options.htmlDatabase.set('<i><u>contentFromTheMarker1</u></i>', {
-          id        : 0,
-          content   : 'contentFromTheMarker1',
-          styleList : 'fo:font-style="italic" style:text-underline-style="solid" '
+        _options.htmlDatabase.set('<i><u>This is a </u></i>', {
+          id      : 'C01',
+          content : 'This is a ',
+          style   : '<style:style style:name="C010" style:family="text"><style:text-properties style:text-underline-style="solid" fo:font-style="italic"/></style:style>'
         });
-        _options.htmlDatabase.set('<strong>contentFromTheMarker3</strong>text', {
-          id        : 1,
-          content   : 'contentFromTheMarker3',
-          styleList : 'fo:font-weight="bold" '
+        _options.htmlDatabase.set('<strong>strong text</strong>text', {
+          id      : 'C02',
+          content : 'strong text',
+          style   : '<style:style style:name="C020" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
         });
-        const _template = {
-          files : [{
-            name : 'content.xml',
-            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>'
-          }]
-        };
-        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="TC0" style:family="text"><style:text-properties fo:font-style="italic" style:text-underline-style="solid" /></style:style><style:style style:name="TC1" style:family="text"><style:text-properties fo:font-weight="bold" /></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>';
-        html.postProcessODT(_template, null, _options);
-        helper.assert(_template.files[0].data, _expectedContent);
-      });
-      it('should add styles [MIX]', () => {
-        const _options = {
-          htmlDatabase : new Map()
-        };
-        _options.htmlDatabase.set('<i><u><del><b>contentFromTheMarker1</b></del></u></i>', {
-          id        : 0,
-          content   : 'contentFromTheMarker1',
-          styleList : 'fo:font-style="italic" style:text-underline-style="solid" style:text-line-through-style="solid" fo:font-weight="bold" '
-        });
-        _options.htmlDatabase.set('<em>content</em>', {
-          id        : 1,
-          content   : 'content',
-          styleList : 'fo:font-style="italic" '
-        });
-        _options.htmlDatabase.set('<strong>content</strong>', {
-          id        : 2,
-          content   : 'content',
-          styleList : 'fo:font-weight="bold" '
-        });
-        _options.htmlDatabase.set('<u>content</u>', {
-          id        : 3,
-          content   : 'content',
-          styleList : 'style:text-underline-style="solid" '
-        });
-        _options.htmlDatabase.set('<s>content</s>', {
-          id        : 4,
-          content   : 'content',
-          styleList : 'style:text-line-through-style="solid" '
+        _options.htmlDatabase.set('<s>striked text</s>', {
+          id      : 'C03',
+          content : 'content',
+          style   : '<style:style style:name="C015" style:family="text"><style:text-properties style:text-line-through-style="solid"/></style:style>'
         });
         const _template = {
           files : [{
@@ -149,26 +242,25 @@ describe.only('Dynamic HTML', function () {
             data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>'
           }]
         };
-        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="TC0" style:family="text"><style:text-properties fo:font-style="italic" style:text-underline-style="solid" style:text-line-through-style="solid" fo:font-weight="bold" /></style:style><style:style style:name="TC1" style:family="text"><style:text-properties fo:font-style="italic" /></style:style><style:style style:name="TC2" style:family="text"><style:text-properties fo:font-weight="bold" /></style:style><style:style style:name="TC3" style:family="text"><style:text-properties style:text-underline-style="solid" /></style:style><style:style style:name="TC4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>';
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="C010" style:family="text"><style:text-properties style:text-underline-style="solid" fo:font-style="italic"/></style:style><style:style style:name="C020" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style><style:style style:name="C015" style:family="text"><style:text-properties style:text-line-through-style="solid"/></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>';
         html.postProcessODT(_template, null, _options);
         helper.assert(_template.files[0].data, _expectedContent);
       });
     });
 
     describe('formatters/postProcessFormatters ODT', function () {
-      it('getHtmlContent - should add style element to htmlDatabase + get clean content without HTML', () => {
+      it('getHtmlContent - should add content and style element to htmlDatabase', () => {
         const _options = {
           htmlDatabase : new Map()
         };
         const _content = '<strong>This is some content</strong>';
-        const _postProcess = htmlFormatters.getHtmlContent.call(_options, _content);
+        const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_properties, {
-          id        : 0,
-          content   : 'This is some content',
-          styleList : 'fo:font-weight="bold" '
+          content : '<text:span text:style-name="TC00">This is some content</text:span>',
+          style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
         });
-        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), 'This is some content');
+        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), '<text:span text:style-name="TC00">This is some content</text:span>');
       });
 
       it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name', () => {
@@ -176,14 +268,13 @@ describe.only('Dynamic HTML', function () {
           htmlDatabase : new Map()
         };
         const _content = '<em><b>This is some content</b></em>';
-        const _postProcess = htmlFormatters.getHtmlStyleName.call(_options, _content);
+        const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_properties, {
-          id        : 0,
-          content   : 'This is some content',
-          styleList : 'fo:font-style="italic" fo:font-weight="bold" '
+          content : '<text:span text:style-name="TC00">This is some content</text:span>',
+          style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>'
         });
-        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), 'TC0');
+        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), '<text:span text:style-name="TC00">This is some content</text:span>');
       });
 
       it('getHtmlStyleName + getHtmlContent - should not add the same HTML content to htmlDatabase', () => {
@@ -191,64 +282,13 @@ describe.only('Dynamic HTML', function () {
           htmlDatabase : new Map()
         };
         const _content = '<em><b>This is some content</b></em>';
-        htmlFormatters.getHtmlContent.call(_options, _content);
-        htmlFormatters.getHtmlStyleName.call(_options, _content);
+        htmlFormatters.getHTMLContentOdt.call(_options, _content);
+        htmlFormatters.getHTMLContentOdt.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_properties, {
-          id        : 0,
-          content   : 'This is some content',
-          styleList : 'fo:font-style="italic" fo:font-weight="bold" '
-        });
-      });
-    });
-    describe('utils', function () {
-      describe('parseStyleAndGetStyleList', () => {
-        it('should do nothing if the content does not have HTML tag', () => {
-          const _content = 'This is a text';
-          const res = html.parseStyleAndGetStyleList(_content);
-          helper.assert(res.content, _content);
-          helper.assert(res.styleList, '');
-        });
-        it('should parse the HTML tag, return the style list and the cleaned content [STRONG]', () => {
-          const _content = '<strong>This is a text</strong>';
-          const _expectedContent = 'This is a text';
-          const _expectedStyleList = 'fo:font-weight="bold" ';
-          const res = html.parseStyleAndGetStyleList(_content);
-          helper.assert(res.content, _expectedContent);
-          helper.assert(res.styleList, _expectedStyleList);
-        });
-        it('should parse the HTML tag, return the style list and the cleaned content [ITALIC <em> and <i>]', () => {
-          const _content = '<i><em>This is a text</em></i>';
-          const _expectedContent = 'This is a text';
-          const _expectedStyleList = 'fo:font-style="italic" ';
-          const res = html.parseStyleAndGetStyleList(_content);
-          helper.assert(res.content, _expectedContent);
-          helper.assert(res.styleList, _expectedStyleList);
-        });
-        it('should parse the HTML tag, return the style list and the cleaned content [MIXED: strong italic underlined striked]', () => {
-          const _content = '<i><em><b><u><s>This is a text</s></u><b></em></i>';
-          const _expectedContent = 'This is a text';
-          const _expectedStyleList = 'fo:font-style="italic" fo:font-weight="bold" style:text-underline-style="solid" style:text-line-through-style="solid" ';
-          const res = html.parseStyleAndGetStyleList(_content);
-          helper.assert(res.content, _expectedContent);
-          helper.assert(res.styleList, _expectedStyleList);
-        });
-        it('should parse the HTML tag, return the style list and the cleaned content [STRONG + BREAK LINE]', () => {
-          const _content = '<strong>This is<br>a text</strong>';
-          const _expectedContent = 'This is<text:line-break/>a text';
-          const _expectedStyleList = 'fo:font-weight="bold" ';
-          const res = html.parseStyleAndGetStyleList(_content);
-          helper.assert(res.content, _expectedContent);
-          helper.assert(res.styleList, _expectedStyleList);
-        });
-        it('should parse the HTML tag, return the style list and the cleaned content [MIXED + BREAK LINE]', () => {
-          const _content = '<i><em><b><u><s>This<br>is<br/>a<br>text</s></u><b></em></i>';
-          const _expectedContent = 'This<text:line-break/>is<text:line-break/>a<text:line-break/>text';
-          const _expectedStyleList = 'fo:font-style="italic" fo:font-weight="bold" style:text-underline-style="solid" style:text-line-through-style="solid" ';
-          const res = html.parseStyleAndGetStyleList(_content);
-          helper.assert(res.content, _expectedContent);
-          helper.assert(res.styleList, _expectedStyleList);
+          content : '<text:span text:style-name="TC00">This is some content</text:span>',
+          style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>'
         });
       });
     });

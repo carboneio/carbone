@@ -14,41 +14,30 @@ function addHtmlDatabase (options, htmlContent) {
   var _htmlDatabaseProperties = null;
 
   if (!options.htmlDatabase.has(htmlContent)) {
-    const { styleList, content } = html.parseStyleAndGetStyleList(htmlContent);
+    const descriptor = html.parseHTML(htmlContent);
+    const id = html.generateStyleID(options.htmlDatabase.size);
+    const { content, style } = html.buildXMLContentOdt(id, descriptor);
+
     _htmlDatabaseProperties = {
-      id : options.htmlDatabase.size,
       content,
-      styleList
+      style
     };
     options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
   }
 }
 
 
-const getHtmlContent = function (htmlContent) {
+const getHTMLContentOdt = function (htmlContent) {
   addHtmlDatabase(this, htmlContent);
   return {
-    fn   : getHtmlContentPostProcess,
+    fn   : getHTMLContentOdtPostProcess,
     args : [htmlContent]
   };
 };
 
-const getHtmlContentPostProcess = function (contentId) {
+const getHTMLContentOdtPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
   return _htmlProperties.content;
-};
-
-const getHtmlStyleName = function (htmlContent) {
-  addHtmlDatabase(this, htmlContent);
-  return {
-    fn   : getHtmlStyleNamePostProcess,
-    args : [htmlContent]
-  };
-};
-
-const getHtmlStyleNamePostProcess = function (contentId) {
-  const _htmlProperties = this.htmlDatabase.get(contentId);
-  return html.generateStyleName(_htmlProperties.id);
 };
 
 /** ======================= DOCX ======================== */
@@ -117,14 +106,10 @@ const getHTMLContentStyleDocxPostProcess = function (contentId) {
 };
 
 module.exports = {
-  getHtmlContent,
-  getHtmlContentPostProcess,
-  getHtmlStyleName,
-  getHtmlStyleNamePostProcess,
-  html : function () {
-    return '';
-  },
-  getHTMLSubContentDocx,
+  getHTMLContentOdt,
+  getHTMLContentOdtPostProcess,
   getHTMLContentDocx,
-  getHTMLContentStyleDocx
+  getHTMLContentStyleDocx,
+  getHTMLSubContentDocx,
+  html : () => ''
 };

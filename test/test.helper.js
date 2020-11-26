@@ -503,4 +503,28 @@ describe('helper', function () {
     });
   });
 
+  describe.only('insertAt', function () {
+    it('should insert text inside a content at a specific position', function () {
+      const _content = 'Western robin (Eopsaltria griseogularis).';
+      helper.assert(helper.insertAt(_content, 7, ' yellow'), 'Western yellow robin (Eopsaltria griseogularis).');
+      helper.assert(helper.insertAt(_content, 0, 'yellow '), 'yellow Western robin (Eopsaltria griseogularis).');
+      helper.assert(helper.insertAt(_content, _content.length, ' yellow'), 'Western robin (Eopsaltria griseogularis). yellow');
+      helper.assert(helper.insertAt('', 0, 'yellow'), 'yellow');
+    });
+
+    it('should throw errors if the arguments are invalid', function () {
+      // Null arguments
+      assert.throws(() => helper.insertAt(null, 7, ' yellow'), new Error('The arguments are invalid (null or undefined).'));
+      assert.throws(() => helper.insertAt('text', null, ' yellow'), new Error('The arguments are invalid (null or undefined).'));
+      assert.throws(() => helper.insertAt('text', 8, null), new Error('The arguments are invalid (null or undefined).'));
+      // position out of the range
+      assert.throws(() => helper.insertAt('text', -1, 'yellow'), new Error('The index is outside of the text length range.'));
+      assert.throws(() => helper.insertAt('text', 10, 'yellow'), new Error('The index is outside of the text length range.'));
+      assert.throws(() => helper.insertAt('', 1, 'yellow'), new Error('The index is outside of the text length range.'));
+    });
+  });
+
+  describe('', function () {
+
+  });
 });

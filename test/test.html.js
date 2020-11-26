@@ -3,7 +3,7 @@ const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 const assert = require('assert');
 
-describe.only('Dynamic HTML', function () {
+describe('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -253,7 +253,7 @@ describe.only('Dynamic HTML', function () {
       });
     });
   });
-  describe.only('Docx Documents', function () {
+  describe('Docx Documents', function () {
     describe('preProcessDocx', function () {
       it('should do nothing is the content does not contain HTML markers', function () {
         const _expectedContent = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t>Some text 12345</w:t></w:r></w:p><w:sectPr w:rsidR="002B2418" w:rsidRPr="00ED3CF0"><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/><w:cols w:space="708"/><w:docGrid w:linePitch="360"/></w:sectPr></w:body></w:document>';

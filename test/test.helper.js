@@ -503,7 +503,7 @@ describe('helper', function () {
     });
   });
 
-  describe.only('insertAt', function () {
+  describe('insertAt', function () {
     it('should insert text inside a content at a specific position', function () {
       const _content = 'Western robin (Eopsaltria griseogularis).';
       helper.assert(helper.insertAt(_content, 7, ' yellow'), 'Western yellow robin (Eopsaltria griseogularis).');
@@ -524,7 +524,32 @@ describe('helper', function () {
     });
   });
 
-  describe('', function () {
+  describe('compareStringFromPosition', function () {
+    it('Should find the text searched on the content at a specific position.', function () {
+      const _content = 'Western yellow robin (Eopsaltria griseogularis).';
+      helper.assert(helper.compareStringFromPosition('yellow', _content, 8), true);
+      helper.assert(helper.compareStringFromPosition(' robin ', _content, 14), true);
+      helper.assert(helper.compareStringFromPosition('opsaltr', _content, 23), true);
+      helper.assert(helper.compareStringFromPosition('griseogularis).', _content, 33), true);
+    });
 
+    it('Should NOT find the text searched on the content at a specific position.', function () {
+      const _content = 'Western yellow robin (Eopsaltria griseogularis).';
+      helper.assert(helper.compareStringFromPosition('yelow', _content, 8), false);
+      helper.assert(helper.compareStringFromPosition('robin ', _content, 14), false);
+      helper.assert(helper.compareStringFromPosition('opsaltr', _content, 24), false);
+      helper.assert(helper.compareStringFromPosition('griseogularis).', _content, 1), false);
+      helper.assert(helper.compareStringFromPosition('yellow', 'yel', 1), false);
+    });
+
+    it('Should throw an error if an argument is invalid', function () {
+      // arguments undefined or null
+      assert.throws(() => helper.compareStringFromPosition(null, 'text', 1), new Error('The arguments are invalid (null or undefined).'));
+      assert.throws(() => helper.compareStringFromPosition('text', null, 1), new Error('The arguments are invalid (null or undefined).'));
+      assert.throws(() => helper.compareStringFromPosition('text', 'text 1234', undefined), new Error('The arguments are invalid (null or undefined).'));
+      // the index is out of the text range
+      assert.throws(() => helper.compareStringFromPosition('blue', 'blue', -1), new Error('The index is outside of the text length range.'));
+      assert.throws(() => helper.compareStringFromPosition('blue', 'blue', 10), new Error('The index is outside of the text length range.'));
+    });
   });
 });

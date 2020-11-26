@@ -708,6 +708,36 @@ describe('Dynamic HTML', function () {
         );
       });
     });
+
+    describe('identifyTag', function () {
+      it('should identify HTML tags inside a content at a specific position (with or without attributes)', function () {
+        helper.assert(html.identifyTag('the sky <b>is blue</b>', 8), { pos : 10, name : 'b', type : 'begin'});
+        helper.assert(html.identifyTag('the <i>sky is </i>blue', 14), { pos : 17, name : 'i', type : 'end'});
+        helper.assert(html.identifyTag('<strong>the sky is </strong>blue', 0), { pos : 7, name : 'strong', type : 'begin'});
+        helper.assert(html.identifyTag('<em>the sky is blue</em>', 19), { pos : 23, name : 'em', type : 'end'});
+        helper.assert(html.identifyTag('the sky is<br>blue', 10), { pos : 13, name : 'br', type : 'begin'});
+        helper.assert(html.identifyTag('the sky is<br/>blue', 10), { pos : 14, name : 'br', type : 'begin'});
+        helper.assert(html.identifyTag('the sky is</br>blue', 10), { pos : 14, name : 'br', type : 'end'});
+        helper.assert(html.identifyTag('<div><p><b>hello</b></p></div>', 5), { pos : 7, name : 'p', type : 'begin'});
+        helper.assert(html.identifyTag('<div><p><b>hello</b></p></div>', 20), { pos : 23, name : 'p', type : 'end'});
+        helper.assert(html.identifyTag('the <p style="color:red;margin:10px 10px;">sky is blue</p>', 4), { pos : 42, name : 'p', type : 'begin'});
+        helper.assert(html.identifyTag('This image: <img src="img.jpg" alt="some text" width="5" height="60"/> text', 12), { pos : 69, name : 'img', type : 'begin'});
+      });
+
+      it('should throw en error if the tag is invalid', function () {
+        // missing tag at the given position
+        assert.throws(() => html.identifyTag('the sky is blue', 5), new Error('Invalid HTML tag: the first character is not a left arrow key.'));
+        assert.throws(() => html.identifyTag('the sky is blue', 20), new Error('The index is outside of the text length range.'));
+        assert.throws(() => html.identifyTag('the sky is blue', -3), new Error('The index is outside of the text length range.'));
+        // missing ending arrow
+        assert.throws(() => html.identifyTag('<   test', 0), new Error('Invalid HTML tag'));
+        assert.throws(() => html.identifyTag('the sky is</b blue', 10), new Error('Invalid HTML tag: b'));
+        assert.throws(() => html.identifyTag('the </bsky is blue', 4), new Error('Invalid HTML tag: bsky'));
+        // unvalid tags
+        assert.throws(() => html.identifyTag('the sky <<em>is blue', 8), new Error('Invalid HTML tag: em'));
+        assert.throws(() => html.identifyTag('the</> sky is blue', 3), new Error('Invalid HTML tag'));
+      });
+    });
   });
 });
 

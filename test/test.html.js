@@ -3,7 +3,7 @@ const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 const assert = require('assert');
 
-describe('Dynamic HTML', function () {
+describe.only('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -506,6 +506,171 @@ describe('Dynamic HTML', function () {
         helper.assert(_template.files[2].data, _expectedXMLheader);
       });
     });
+
+    describe('buildSubContentDOCX', function () {
+      it('should return nothing if the descriptor is empty/undefined/null', function () {
+        helper.assert(html.buildSubContentDOCX([]), '');
+        helper.assert(html.buildSubContentDOCX(), '');
+        helper.assert(html.buildSubContentDOCX(undefined), '');
+        helper.assert(html.buildSubContentDOCX(null), '');
+      });
+
+      it('should return nothing if the descriptor has only 1 element', function () {
+        helper.assert(html.buildSubContentDOCX([{ content : 'text', tags : ['b'] }]), '');
+      });
+
+      it('should return the DOCX xml content based on the descriptor', function () {
+        helper.assert(html.buildSubContentDOCX(
+          [
+            { content : 'bold', tags : ['b'] },
+            { content : 'and italic', tags : ['em'] }
+          ]
+        ), '<w:r>' +
+              '<w:rPr>' +
+                '<w:i/><w:iCs/>' +
+              '</w:rPr>' +
+              '<w:t xml:space="preserve">and italic</w:t>' +
+            '</w:r>'
+        );
+
+        helper.assert(html.buildSubContentDOCX(
+          [
+            { content : 'this', tags : [] },
+            { content : ' is a bold', tags : ['b'] },
+            { content : 'and italic', tags : ['em'] },
+            { content : ' text', tags : [] },
+          ]
+        ), '<w:r>' +
+              '<w:rPr>' +
+                '<w:b/><w:bCs/>' +
+              '</w:rPr>' +
+              '<w:t xml:space="preserve"> is a bold</w:t>' +
+            '</w:r>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:i/><w:iCs/>' +
+              '</w:rPr>' +
+              '<w:t xml:space="preserve">and italic</w:t>' +
+            '</w:r>' +
+            '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve"> text</w:t>' +
+            '</w:r>'
+        );
+      });
+
+      it('should return the DOCX XML content based on a descriptor and should skip unknown tags', function () {
+        helper.assert(html.buildSubContentDOCX(
+          [
+            { content : 'this ', tags : ['div', 'b'] },
+            { content : ' is a bold', tags : ['div', 'b', 'u'] },
+            { content : ' text ', tags : ['div', 'b', 'u',  'p', 'em'] },
+            { content : 'and ', tags : ['div', 'b', 'p', 'em'] },
+            { content : 'italic ', tags : ['div', 'b', 'p', 'em', 's'] },
+            { content : 'text', tags : ['div', 'b', 's'] },
+            { content : '.', tags : [] },
+          ]
+        ), '<w:r>'+
+              '<w:rPr>'+
+                '<w:b/><w:bCs/>'+
+                '<w:u w:val="single"/>'+
+              '</w:rPr>'+
+              '<w:t xml:space="preserve"> is a bold</w:t>'+
+            '</w:r>'+
+            '<w:r>'+
+              '<w:rPr>'+
+                '<w:b/><w:bCs/>'+
+                '<w:u w:val="single"/>'+
+                '<w:i/><w:iCs/>'+
+              '</w:rPr>'+
+              '<w:t xml:space="preserve"> text </w:t>'+
+            '</w:r>'+
+            '<w:r>'+
+              '<w:rPr>'+
+                '<w:b/><w:bCs/><w:i/><w:iCs/>'+
+              '</w:rPr>'+
+              '<w:t xml:space="preserve">and </w:t>'+
+            '</w:r>'+
+            '<w:r>'+
+              '<w:rPr>'+
+                '<w:b/><w:bCs/><w:i/><w:iCs/><w:strike/>'+
+              '</w:rPr>'+
+              '<w:t xml:space="preserve">italic </w:t>'+
+            '</w:r>'+
+            '<w:r>'+
+              '<w:rPr>'+
+                '<w:b/><w:bCs/><w:strike/>'+
+              '</w:rPr>'+
+              '<w:t xml:space="preserve">text</w:t>'+
+            '</w:r>'+
+            '<w:r>'+
+              '<w:rPr></w:rPr>'+
+              '<w:t xml:space="preserve">.</w:t>'+
+            '</w:r>'
+        );
+      });
+
+      it('should insert break line in the new content', function () {
+        helper.assert(html.buildSubContentDOCX(
+          [
+            { content : 'This is ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a tree', tags : ['i'] },
+          ]
+        ), '<w:br/>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:i/><w:iCs/>' +
+              '</w:rPr>' +
+              '<w:t xml:space="preserve">a tree</w:t>' +
+            '</w:r>'
+        );
+
+        helper.assert(html.buildSubContentDOCX(
+          [
+            { content : 'This ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : ' is', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'simple', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : ' text', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : '.', tags : [] }
+          ]
+        ), '<w:br/>' +
+            '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve"> is</w:t>' +
+            '</w:r>' +
+            '<w:br/>' +
+            '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve">a</w:t>' +
+            '</w:r>' +
+            '<w:br/>' +
+            '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve">simple</w:t>' +
+            '</w:r>' +
+            '<w:br/>' +
+            '<w:br/>' +
+            '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve"> text</w:t>' +
+            '</w:r>' +
+            '<w:br/>' +
+            '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve">.</w:t>' +
+            '</w:r>'
+        );
+
+      });
+    });
   });
   describe('Utils', function () {
     describe('parseHTML', function () {
@@ -736,6 +901,26 @@ describe('Dynamic HTML', function () {
         // unvalid tags
         assert.throws(() => html.identifyTag('the sky <<em>is blue', 8), new Error('Invalid HTML tag: em'));
         assert.throws(() => html.identifyTag('the</> sky is blue', 3), new Error('Invalid HTML tag'));
+      });
+    });
+
+    describe('buildXMLStyle', function () {
+      it('should throw an error if the file type is not supported', function () {
+        assert.throws(() => helper.assert(html.buildXMLStyle('pptx', ['em']), new Error('HTML error: the file type is not supported.')));
+      });
+
+      it('should do nothing if the list of tag is empty', function () {
+        helper.assert(html.buildXMLStyle('docx', []), '');
+      });
+
+      it('should create the list of style for DOCX reports', function () {
+        helper.assert(html.buildXMLStyle('docx', ['em']), '<w:i/><w:iCs/>');
+        helper.assert(html.buildXMLStyle('docx', ['b', 'i', 's']), '<w:b/><w:bCs/><w:i/><w:iCs/><w:strike/>');
+      });
+
+      it('should do nothing if the list of tag provided is not recognized', function () {
+        helper.assert(html.buildXMLStyle('docx', ['footer', 'header', 'div']), '');
+        helper.assert(html.buildXMLStyle('docx', ['s', 'em', 'b', 'p', 'div', 'u']), '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>');
       });
     });
   });

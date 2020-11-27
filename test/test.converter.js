@@ -191,6 +191,77 @@ describe('Converter', function () {
         DocumentOpenPassword : _password
       });
     });
+    it('should render JPG images at different pixel size', function (done) {
+      const _magicNumberJPG = 'ffd8ff';
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.convertFile(_filePath, 'writer_jpg_Export', '', function (err, bufferSmallImage) {
+        if (err) {
+          assert.strictEqual(err, null);
+        }
+        assert(bufferSmallImage.slice(0, 3).toString('hex'), _magicNumberJPG);
+        converter.convertFile(_filePath, 'writer_jpg_Export', '', function (err, bufferBigImage) {
+          if (err) {
+            assert.strictEqual(err, null);
+          }
+          assert(bufferBigImage.slice(0, 3).toString('hex'), _magicNumberJPG);
+          assert(bufferSmallImage.length < bufferBigImage.length);
+          done();
+        }, null, null, {
+          PixelWidth  : 500,
+          PixelHeight : 500
+        });
+      }, null, null, {
+        PixelWidth  : 100,
+        PixelHeight : 100
+      });
+    });
+
+    it('should render JPG images with 2 different quality', function (done) {
+      const _magicNumberJPG = 'ffd8ff';
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.convertFile(_filePath, 'writer_jpg_Export', '', function (err, bufferLowQuality) {
+        if (err) {
+          assert.strictEqual(err, null);
+        }
+        assert(bufferLowQuality.slice(0, 3).toString('hex'), _magicNumberJPG);
+        converter.convertFile(_filePath, 'writer_jpg_Export', '', function (err, bufferMaxQuality) {
+          if (err) {
+            assert.strictEqual(err, null);
+          }
+          assert(bufferMaxQuality.slice(0, 3).toString('hex'), _magicNumberJPG);
+          assert(bufferLowQuality.length < bufferMaxQuality.length);
+          done();
+        }, null, null, {
+          Quality : 100
+        });
+      }, null, null, {
+        Quality : 25
+      });
+    });
+
+    it('should render a PNG image at different compression', function (done) {
+      var _magicNumberPNG = '89504E470D0A1A0A';
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      converter.convertFile(_filePath, 'writer_png_Export', '', function (err, bufferNotCompressed) {
+        if (err) {
+          assert.strictEqual(err, null);
+        }
+        assert(bufferNotCompressed.slice(0, 8).toString('hex'), _magicNumberPNG);
+        converter.convertFile(_filePath, 'writer_png_Export', '', function (err, bufferCompressed) {
+          if (err) {
+            assert.strictEqual(err, null);
+          }
+          assert(bufferCompressed.slice(0, 8).toString('hex'), _magicNumberPNG);
+          assert(bufferCompressed.length < bufferNotCompressed.length);
+          done();
+        }, null, null, {
+          Compression : 9,
+        });
+      }, null, null, {
+        Compression : 0,
+      });
+    });
+
     it('should render and open a pdf with a number as password  (it takes 5000ms on average to finish)', function (done) {
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       const _password = '1234533';

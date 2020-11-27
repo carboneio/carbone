@@ -57,10 +57,10 @@ function addHtmlDatabaseDOCX (options, htmlContent) {
     const descriptor = html.parseHTML(htmlContent);
     // console.log(content, styleList);
     _htmlDatabaseProperties = {
-      id          : options.htmlDatabase.size,
-      mainContent : descriptor[0].content,
-      mainStyle   : html.buildXMLStyle('docx', descriptor[0].tags),
-      subContent  : html.buildSubContentDOCX(descriptor)
+      id         : options.htmlDatabase.size,
+      content    : descriptor[0].content,
+      style      : html.buildXMLStyle('docx', descriptor[0].tags),
+      subContent : html.buildSubContentDOCX(descriptor)
     };
     options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
   }
@@ -89,7 +89,7 @@ const getHTMLContentDocx = function (htmlContent) {
 
 const getHTMLContentDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.mainContent;
+  return _htmlProperties.content;
 };
 
 const getHTMLContentStyleDocx = function (htmlContent) {
@@ -102,7 +102,7 @@ const getHTMLContentStyleDocx = function (htmlContent) {
 
 const getHTMLContentStyleDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.mainStyle;
+  return _htmlProperties.style;
 };
 
 module.exports = {

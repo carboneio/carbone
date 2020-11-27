@@ -711,6 +711,52 @@ describe('Dynamic HTML', function () {
 
       });
     });
+
+    describe('formatters/postProcessFormatters DOCX', function () {
+      it('should add content and style element to htmlDatabase', () => {
+        const _expected =  {
+          id         : 0,
+          content    : 'This is some content',
+          style      : '<w:b/><w:bCs/>',
+          subContent : ''
+        };
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = '<strong>This is some content</strong>';
+        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
+        const _postProcessStyle = htmlFormatters.getHTMLContentStyleDocx.call(_options, _content);
+        const _postProcessSubContent = htmlFormatters.getHTMLSubContentDocx.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
+        helper.assert(_postProcessStyle.fn.call(_options, _postProcessContent.args[0]), _expected.style);
+        helper.assert(_postProcessSubContent.fn.call(_options, _postProcessContent.args[0]), _expected.subContent);
+      });
+
+      it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name', () => {
+        const _content = '<em><b>Apples are red</b></em><br><u> hello </u>';
+        const _expected = {
+          id         : 0,
+          content    : 'Apples are red',
+          style      : '<w:i/><w:iCs/><w:b/><w:bCs/>',
+          subContent : '<w:br/><w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve"> hello </w:t></w:r>'
+        };
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
+        const _postProcessStyle = htmlFormatters.getHTMLContentStyleDocx.call(_options, _content);
+        const _postProcessSubContent = htmlFormatters.getHTMLSubContentDocx.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
+        helper.assert(_postProcessStyle.fn.call(_options, _postProcessContent.args[0]), _expected.style);
+        helper.assert(_postProcessSubContent.fn.call(_options, _postProcessContent.args[0]), _expected.subContent);
+      });
+    });
   });
   describe('Utils', function () {
     describe('parseHTML', function () {

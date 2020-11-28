@@ -19,6 +19,9 @@ describe('Carbone', function () {
     after(function (done) {
       helper.rmDirRecursive(_tempPath);
       helper.rmDirRecursive(_templatePath);
+      done();
+    });
+    afterEach(function (done) {
       carbone.reset();
       done();
     });
@@ -50,14 +53,79 @@ describe('Carbone', function () {
       });
       done();
     });
-    it('should change the lang of of date formatter', function (done) {
+    it('should return friday for 20140131 even if no timezone is set', function (done) {
       carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
-      carbone.set({lang : 'en'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'Friday');
+      carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 23:45:00'},  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> vendredi </xml>');
+        carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> vendredi </xml>');
+          carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 00:10:00'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> vendredi </xml>');
+            done();
+          });
+        });
+      });
+    });
+    it('should change the lang globally of date formatter', function (done) {
       carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
-      done();
+      carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 23:45:00'},  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> vendredi </xml>');
+        carbone.set({lang : 'en'});
+        carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> Friday </xml>');
+          carbone.set({lang : 'fr'});
+          carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> vendredi </xml>');
+            // Should overwrite global lang with options
+            carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, {lang : 'en'}, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml> Friday </xml>');
+              done();
+            });
+          });
+        });
+      });
+    });
+    it('should change the timezone globally', function (done) {
+      carbone.set({timezone : 'Europe/Paris'});
+      carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        // By defaut, Carbone consider the input timezone is Europe/Paris if not specified
+        helper.assert(result, '<xml> 2:00:00 PM </xml>');
+        carbone.set({timezone : 'America/New_York'});
+        carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> 8:00:00 AM </xml>');
+          // If the input timezone is defined with UTC-X, it takes this into account
+          carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> 2:00:00 PM </xml>');
+            // Should overwrite global timezone with options
+            carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {timezone : 'Europe/Paris'}, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml> 8:00:00 PM </xml>');
+              done();
+            });
+          });
+        });
+      });
+    });
+    it('should not crash it the wrong timezone or wrong lang is passed during rendering', function (done) {
+      carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {timezone : 'BULLSHIT'}, function (err, result) {
+        helper.assert(err+'', 'RangeError: Expected Area/Location(/Location)* for time zone, got BULLSHIT');
+        helper.assert(result, null);
+        carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {lang : 'BULLSHIT'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> 8:00:00 PM </xml>');
+          done();
+        });
+      });
     });
   });
 

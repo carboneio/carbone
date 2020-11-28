@@ -7,45 +7,60 @@ var helper = require('../lib/helper');
 
 describe('formatter', function () {
   describe('convDate', function () {
+    var _tz = 'Europe/Paris';
     it('should accept use this.lang to set convert date', function () {
-      helper.assert(dateFormatter.convDate.call({lang : 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
-      helper.assert(dateFormatter.convDate.call({lang : 'fr'}, '20101201', 'YYYYMMDD', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.convDate.call({lang : 'en', timezone : _tz}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.convDate.call({lang : 'fr', timezone : _tz}, '20101201', 'YYYYMMDD', 'L'), '01/12/2010');
     });
     it('should return null or undefined if value is null or undefined', function () {
-      helper.assert(dateFormatter.convDate.call({lang : 'en'}, undefined, 'YYYYMMDD', 'L'), undefined);
-      helper.assert(dateFormatter.convDate.call({lang : 'fr'}, null, 'YYYYMMDD', 'L'), null);
+      helper.assert(dateFormatter.convDate.call({lang : 'en', timezone : _tz}, undefined, 'YYYYMMDD', 'L'), undefined);
+      helper.assert(dateFormatter.convDate.call({lang : 'fr', timezone : _tz}, null, 'YYYYMMDD', 'L'), null);
     });
     it('should convert unix timestamp', function () {
-      helper.assert(dateFormatter.convDate.call({lang : 'en'}, 1318781876, 'X', 'LLLL'), 'Sunday, October 16, 2011 6:17 PM');
-      helper.assert(dateFormatter.convDate.call({lang : 'fr'}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
+      helper.assert(dateFormatter.convDate.call({lang : 'en', timezone : _tz}, 1318781876, 'X', 'LLLL'), 'Sunday, October 16, 2011 6:17 PM');
+      helper.assert(dateFormatter.convDate.call({lang : 'fr', timezone : _tz}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
+      helper.assert(dateFormatter.convDate.call({lang : 'fr', timezone : _tz}, 1318781876000, 'x', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
     });
   });
   describe('formatD', function () {
+    var _tz = 'Europe/Paris';
     it('should accept use this.lang to set convert date', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '20101201', 'L', 'YYYYMMDD'), '12/01/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, '20101201', 'L', 'YYYYMMDD'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '20101201', 'L', 'YYYYMMDD'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, '20101201', 'L', 'YYYYMMDD'), '01/12/2010');
     });
     it('should return null or undefined if value is null or undefined', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, undefined, 'L', 'YYYYMMDD'), undefined);
-      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, null, 'L',  'YYYYMMDD'), null);
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, undefined, 'L', 'YYYYMMDD'), undefined);
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, null, 'L',  'YYYYMMDD'), null);
     });
     it('should convert unix timestamp', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, 1318781876, 'LLLL', 'X'), 'Sunday, October 16, 2011 6:17 PM');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, 1318781876, 'LLLL', 'X'), 'dimanche 16 octobre 2011 18:17');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, 1318781876, 'LLLL', 'X'), 'Sunday, October 16, 2011 6:17 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, 1318781876, 'LLLL', 'X'), 'dimanche 16 octobre 2011 18:17');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, 1318781876000, 'LLLL', 'x'), 'dimanche 16 octobre 2011 18:17');
     });
     it('should consider input format is ISO 8601 by default if not provided', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '20101201', 'L'), '12/01/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, '20101201', 'L'), '01/12/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '2017-05-10T15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '1997-12-17 07:37:16-08', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '2017-05-10T15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
     });
     it('should accepts real locales', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en-GB'}, '20101201', 'L'), '01/12/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'en-gb'}, '20101201', 'L'), '01/12/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'en-US'}, '20101201', 'L'), '12/01/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr-CA'}, '20101201', 'L'), '2010-12-01');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr-FR'}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en-gb', timezone : _tz}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en'   , timezone : _tz}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr-ca', timezone : _tz}, '20101201', 'L'), '2010-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'   , timezone : _tz}, '20101201', 'L'), '01/12/2010');
+    });
+    it('should manage timezone', function () {
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/Paris' }, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM'
+      );
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'America/New_York' }, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 10:37 AM'
+      );
+      // By default if no timezone in date, it considers the timezone is Europe/Paris
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'America/New_York' }, '1997-12-17 18:32:16', 'LLLL'), 'Wednesday, December 17, 1997 12:32 PM'
+      );
     });
   });
   describe('convCRLF', function () {

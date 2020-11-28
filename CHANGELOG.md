@@ -1,5 +1,20 @@
 
 ### v2.2.0
+  - ⚡️ **Manage timezone + new date formatters + switch from MomentJS to DayJS**
+    - [BREAKING CHANGE]: remove old date formatter which were not documented: `format`, `parse`, `addDays` and `convert`.
+      You should use `formatD` instead and new formatters below. It was very old formatters, the chance you use them is low because you had to 
+      look in the code to know their existance.
+    - [BREAKING CHANGE]: We try to stay as close as possible as the previous parsing algorithm. But we have noticed some changement:
+      - `1997-12-17 07:37:16-08:00` ✅ accepted, same as previous version
+      - `1997-12-17 07:37:16Z`      ✅ accepted, same as previous version
+      - `1997-12-17 07:37:16-08`    ❌ not accepted anymore without specifying an input pattern
+    - Manage timezone: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    - TODO show a complete example 
+    ```js
+      options = {
+        timezone: 'Europe/Paris'
+      }
+    ```
   - Fix: if a path does not exist inside a formatter argument, it returns an empty string instead of the error "[[C_ERROR]] attribute_name not defined".
     It fixes some weird behaviour with ifEM formatters
   - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`

@@ -198,13 +198,13 @@ describe('Converter', function () {
         if (err) {
           assert.strictEqual(err, null);
         }
-        assert(bufferSmallImage.slice(0, 3).toString('hex'), _magicNumberJPG);
+        helper.assert(bufferSmallImage.slice(0, 3).toString('hex'), _magicNumberJPG);
         converter.convertFile(_filePath, 'writer_jpg_Export', '', function (err, bufferBigImage) {
           if (err) {
             assert.strictEqual(err, null);
           }
-          assert(bufferBigImage.slice(0, 3).toString('hex'), _magicNumberJPG);
-          assert(bufferSmallImage.length < bufferBigImage.length);
+          helper.assert(bufferBigImage.slice(0, 3).toString('hex'), _magicNumberJPG);
+          helper.assert(bufferSmallImage.length < bufferBigImage.length, true);
           done();
         }, null, null, {
           PixelWidth  : 500,
@@ -223,13 +223,13 @@ describe('Converter', function () {
         if (err) {
           assert.strictEqual(err, null);
         }
-        assert(bufferLowQuality.slice(0, 3).toString('hex'), _magicNumberJPG);
+        helper.assert(bufferLowQuality.slice(0, 3).toString('hex'), _magicNumberJPG);
         converter.convertFile(_filePath, 'writer_jpg_Export', '', function (err, bufferMaxQuality) {
           if (err) {
             assert.strictEqual(err, null);
           }
-          assert(bufferMaxQuality.slice(0, 3).toString('hex'), _magicNumberJPG);
-          assert(bufferLowQuality.length < bufferMaxQuality.length);
+          helper.assert(bufferMaxQuality.slice(0, 3).toString('hex'), _magicNumberJPG);
+          helper.assert(bufferLowQuality.length < bufferMaxQuality.length, true);
           done();
         }, null, null, {
           Quality : 100
@@ -240,19 +240,19 @@ describe('Converter', function () {
     });
 
     it('should render a PNG image at different compression', function (done) {
-      var _magicNumberPNG = '89504E470D0A1A0A';
+      var _magicNumberPNG = '89504e470d0a1a0a';
       var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
       converter.convertFile(_filePath, 'writer_png_Export', '', function (err, bufferNotCompressed) {
         if (err) {
           assert.strictEqual(err, null);
         }
-        assert(bufferNotCompressed.slice(0, 8).toString('hex'), _magicNumberPNG);
+        helper.assert(bufferNotCompressed.slice(0, 8).toString('hex'), _magicNumberPNG);
         converter.convertFile(_filePath, 'writer_png_Export', '', function (err, bufferCompressed) {
           if (err) {
             assert.strictEqual(err, null);
           }
-          assert(bufferCompressed.slice(0, 8).toString('hex'), _magicNumberPNG);
-          assert(bufferCompressed.length < bufferNotCompressed.length);
+          helper.assert(bufferCompressed.slice(0, 8).toString('hex'), _magicNumberPNG);
+          helper.assert(bufferCompressed.length < bufferNotCompressed.length, true);
           done();
         }, null, null, {
           Compression : 9,

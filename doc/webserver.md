@@ -76,14 +76,14 @@ Carbone On-Premise is compatible with our SDK for Python, Go, JS, PHP, ...
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/6.4.4.2/deb/x86_64/LibreOffice_6.4.4.2_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.0.3.1/deb/x86_64/LibreOffice_7.0.3.1_Linux_x86-64_deb.tar.gz
 
   # Install required dependencies on ubuntu server for LibreOffice 6.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_6.4.4.2_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_6.4.4.2_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_7.0.3.1_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_7.0.3.1_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb

@@ -10,6 +10,7 @@
   - Accepts Adobe Indesign IDML file as a template
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
   - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
+  - [EE] Fix some PDF options. Integer values were not taken into account.
   - [EE] Add the possibilty to generate JPG or PNG of the first page of a document
     Available options for `jpg/png`: 
     ```js

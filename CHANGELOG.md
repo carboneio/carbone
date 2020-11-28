@@ -9,6 +9,23 @@
   - Accepts Adobe Indesign IDML file as a template
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
   - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
+  - [EE] Returns errors when Carbone cannot dynamically replaces images (ex. images with absolute positions) instead of generating a bad report
+  - [EE] Fix some PDF options. Integer values were not taken into account.
+  - [EE] Add the possibilty to generate JPG or PNG of the first page of a document
+    Available options for `jpg/png`: 
+    ```js
+        convertTo : {
+          formatName    : 'jpg', // or png
+          formatOptions : {
+            Quality     : 90,  // [JPG ONLY] From 1 (low quality, high compression, low size) to 100 (high quality, low compression, high size
+            PixelWidth  : 100, // Image width as pixels
+            PixelHeight : 100, // Image height as pixels
+            Compression : 90,  // [PNG ONLY] From 0 (compression disabled) to 9 (high compression, low size)
+            Interlaced  : 0,   // [PNG ONLY] 0 not interlaced, 1 enterlaced (higher size)
+            ColorMode   : 0    // 0 Colors, 1 Greyscale 
+          }
+        }
+    ```
   - [EE] DOCX/ODT New feature: Support HTML rich content, by adding the `:html` formatter, it is possible to render the following HTML tag: `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`. Unsupported tags and tags attributes are skipped and not rendered. An error is thrown if HTML tags are unvalid.
 
 ### v2.1.1

@@ -3004,27 +3004,26 @@ describe('Carbone', function () {
           formatOptions : {
             Quality     : 90,
             PixelWidth  : 100,
-            PixelHeight : 100
-            // ColorMode   : 0 does not work
+            PixelHeight : 100,
+            ColorMode   : 0
           }
         }
       };
-      carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+      carbone.render('test_odt_render_static.odt', data, _options, (err, image) => {
         helper.assert(err, null);
-        helper.assert(result.slice(0, 3).toString('hex'), 'ffd8ff');
-        helper.assert(result.length, 920);
+        helper.assert(image.slice(0, 3).toString('hex'), 'ffd8ff');
 
         _options.convertTo.formatOptions.PixelWidth = 50;
-        carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+        carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerRes) => {
           helper.assert(err, null);
-          helper.assert(result.slice(0, 3).toString('hex'), 'ffd8ff');
-          helper.assert(result.length, 691);
+          helper.assert(imageLowerRes.slice(0, 3).toString('hex'), 'ffd8ff');
+          helper.assert(imageLowerRes.length < image.length, true);
 
           _options.convertTo.formatOptions.Quality = 50;
-          carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+          carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerQuality) => {
             helper.assert(err, null);
-            helper.assert(result.slice(0, 3).toString('hex'), 'ffd8ff');
-            helper.assert(result.length, 519);
+            helper.assert(imageLowerQuality.slice(0, 3).toString('hex'), 'ffd8ff');
+            helper.assert(imageLowerQuality.length < imageLowerRes.length, true);
             done();
           });
         });
@@ -3047,23 +3046,29 @@ describe('Carbone', function () {
           }
         }
       };
-      carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+      carbone.render('test_odt_render_static.odt', data, _options, (err, image) => {
         helper.assert(err, null);
-        helper.assert(result.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
-        helper.assert(result.length, 2043);
+        helper.assert(image.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
 
         _options.convertTo.formatOptions.PixelWidth = 50;
-        carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+        carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerRes) => {
           helper.assert(err, null);
-          helper.assert(result.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
-          helper.assert(result.length, 1215);
+          helper.assert(imageLowerRes.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+          helper.assert(imageLowerRes.length < image.length, true);
 
           _options.convertTo.formatOptions.Interlaced = 1;
-          carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+          carbone.render('test_odt_render_static.odt', data, _options, (err, imageInterlaced) => {
             helper.assert(err, null);
-            helper.assert(result.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
-            helper.assert(result.length, 1513);
-            done();
+            helper.assert(imageInterlaced.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+            helper.assert(imageInterlaced.length > imageLowerRes.length, true);
+
+            _options.convertTo.formatOptions.Compression = 9;
+            carbone.render('test_odt_render_static.odt', data, _options, (err, imageCompressed) => {
+              helper.assert(err, null);
+              helper.assert(imageCompressed.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+              helper.assert(imageCompressed.length < imageInterlaced.length, true);
+              done();
+            });
           });
         });
       });

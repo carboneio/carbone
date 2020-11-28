@@ -20,7 +20,8 @@
             PixelWidth  : 100, // Image width as pixels
             PixelHeight : 100, // Image height as pixels
             Compression : 90,  // [PNG ONLY] From 0 (compression disabled) to 9 (high compression, low size)
-            Interlaced  : 0    // [PNG ONLY] 0 not interlaced, 1 enterlaced (higher size)
+            Interlaced  : 0,   // [PNG ONLY] 0 not interlaced, 1 enterlaced (higher size)
+            ColorMode   : 0    // 0 Colors, 1 Greyscale 
           }
         }
     ```

@@ -57,7 +57,7 @@ function formatD (d, patternOut, patternIn) {
  * @return {String}            return formatted date
  */
 function convDate (d, patternIn, patternOut) {
-  return formatD(d, patternOut, patternIn);
+  return formatD.call(this, d, patternOut, patternIn);
 }
 
 /**

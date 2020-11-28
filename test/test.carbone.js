@@ -5,7 +5,6 @@ var fs = require('fs');
 var helper = require('../lib/helper');
 var params = require('../lib/params');
 var converter = require('../lib/converter');
-var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
@@ -53,6 +52,13 @@ describe('Carbone', function () {
       });
       done();
     });
+  });
+
+  describe('format date', function () {
+    afterEach(function (done) {
+      carbone.reset();
+      done();
+    });
     it('should return friday for 20140131 even if no timezone is set', function (done) {
       carbone.set({lang : 'fr'});
       carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 23:45:00'},  function (err, result) {
@@ -92,7 +98,7 @@ describe('Carbone', function () {
         });
       });
     });
-    it('should change the timezone globally', function (done) {
+    it('should change the timezone globally and localy', function (done) {
       carbone.set({timezone : 'Europe/Paris'});
       carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {
         helper.assert(err+'', 'null');
@@ -123,6 +129,50 @@ describe('Carbone', function () {
         carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {lang : 'BULLSHIT'}, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml> 8:00:00 PM </xml>');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `addD` on dates + formatD', function (done) {
+      carbone.renderXML('{d.date:addD(1, day):formatD(YYYY-MM-DD)}', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-02');
+        carbone.renderXML('{d.date:addD(1, day, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-01-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-02');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `addD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:subD(1, day):formatD(YYYY-MM-DD)}', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-05-31');
+        carbone.renderXML('{d.date:subD(1, day, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-01-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-05-31');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `startOfD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:startOfD(month):formatD(YYYY-MM-DD)}', { date : '2014-06-11 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-01');
+        carbone.renderXML('{d.date:startOfD(month, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-11-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-01');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `endOfD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:endOfD(month):formatD(YYYY-MM-DD)}', { date : '2014-06-11 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-30');
+        carbone.renderXML('{d.date:endOfD(month, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-11-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-30');
           done();
         });
       });
@@ -395,6 +445,21 @@ describe('Carbone', function () {
       carbone.renderXML('<xml>{d.param}</xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml>field_1</xml>');
+        done();
+      });
+    });
+    it('should return the current timestamp in UTC with c.now', function (done) {
+      carbone.renderXML('{c.now}', {}, function (err, result) {
+        helper.assert(err+'', 'null');
+        var _parseDate = new Date(result);
+        helper.assert(((Date.now()/1000) - _parseDate.getTime()) < 1, true) ;
+        done();
+      });
+    });
+    it('should not overwrite c.now if already defined the current timestamp in UTC with c.now', function (done) {
+      carbone.renderXML('{c.now}', {}, { complement : {now : 'aa'} }, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, 'aa');
         done();
       });
     });

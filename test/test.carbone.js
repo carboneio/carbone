@@ -2992,6 +2992,82 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should render a jpg wih specific resolutions and quality', function (done) {
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'jpg',
+          formatOptions : {
+            Quality     : 90,
+            PixelWidth  : 100,
+            PixelHeight : 100
+            // ColorMode   : 0 does not work
+          }
+        }
+      };
+      carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+        helper.assert(err, null);
+        helper.assert(result.slice(0, 3).toString('hex'), 'ffd8ff');
+        helper.assert(result.length, 920);
+
+        _options.convertTo.formatOptions.PixelWidth = 50;
+        carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+          helper.assert(err, null);
+          helper.assert(result.slice(0, 3).toString('hex'), 'ffd8ff');
+          helper.assert(result.length, 691);
+
+          _options.convertTo.formatOptions.Quality = 50;
+          carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+            helper.assert(err, null);
+            helper.assert(result.slice(0, 3).toString('hex'), 'ffd8ff');
+            helper.assert(result.length, 519);
+            done();
+          });
+        });
+      });
+    });
+    it('should render a png wih specific resolution and compression', function (done) {
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'png',
+          formatOptions : {
+            Compression : 1,
+            PixelWidth  : 100,
+            PixelHeight : 100,
+            Interlaced  : 0
+          }
+        }
+      };
+      carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+        helper.assert(err, null);
+        helper.assert(result.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+        helper.assert(result.length, 2043);
+
+        _options.convertTo.formatOptions.PixelWidth = 50;
+        carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+          helper.assert(err, null);
+          helper.assert(result.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+          helper.assert(result.length, 1215);
+
+          _options.convertTo.formatOptions.Interlaced = 1;
+          carbone.render('test_odt_render_static.odt', data, _options, (err, result) => {
+            helper.assert(err, null);
+            helper.assert(result.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+            helper.assert(result.length, 1513);
+            done();
+          });
+        });
+      });
+    });
   });
 });
 

@@ -129,8 +129,8 @@ function ifNEM (d) {
  * @exampleContextFormatter [ null     , null    ] true
  * @exampleContextFormatter [ 0        , 100     ] false
  *
- * @param {String|Array|Integer} d
- * @param {String|Array|Integer} value value to test
+ * @param {String|Integer} d
+ * @param {String|Integer} value value to test
  * @returns It returns the initial value `d`. The state of the condition is not returned.
  */
 function ifEQ (d, value) {
@@ -156,8 +156,8 @@ function ifEQ (d, value) {
  * @exampleContextFormatter [ null     , null    ] false
  * @exampleContextFormatter [ 0        , 100     ] true
  *
- * @param {String|Array|Integer} d
- * @param {String|Array|Integer} value value to test
+ * @param {String|Integer} d
+ * @param {String|Integer} value value to test
  * @returns It returns the initial value `d`. The state of the condition is not returned.
  */
 function ifNE (d, value) {

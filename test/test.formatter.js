@@ -7,45 +7,60 @@ var helper = require('../lib/helper');
 
 describe('formatter', function () {
   describe('convDate', function () {
+    var _tz = 'Europe/Paris';
     it('should accept use this.lang to set convert date', function () {
-      helper.assert(dateFormatter.convDate.call({lang : 'en'}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
-      helper.assert(dateFormatter.convDate.call({lang : 'fr'}, '20101201', 'YYYYMMDD', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.convDate.call({lang : 'en', timezone : _tz}, '20101201', 'YYYYMMDD', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.convDate.call({lang : 'fr', timezone : _tz}, '20101201', 'YYYYMMDD', 'L'), '01/12/2010');
     });
     it('should return null or undefined if value is null or undefined', function () {
-      helper.assert(dateFormatter.convDate.call({lang : 'en'}, undefined, 'YYYYMMDD', 'L'), undefined);
-      helper.assert(dateFormatter.convDate.call({lang : 'fr'}, null, 'YYYYMMDD', 'L'), null);
+      helper.assert(dateFormatter.convDate.call({lang : 'en', timezone : _tz}, undefined, 'YYYYMMDD', 'L'), undefined);
+      helper.assert(dateFormatter.convDate.call({lang : 'fr', timezone : _tz}, null, 'YYYYMMDD', 'L'), null);
     });
     it('should convert unix timestamp', function () {
-      helper.assert(dateFormatter.convDate.call({lang : 'en'}, 1318781876, 'X', 'LLLL'), 'Sunday, October 16, 2011 6:17 PM');
-      helper.assert(dateFormatter.convDate.call({lang : 'fr'}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
+      helper.assert(dateFormatter.convDate.call({lang : 'en', timezone : _tz}, 1318781876, 'X', 'LLLL'), 'Sunday, October 16, 2011 6:17 PM');
+      helper.assert(dateFormatter.convDate.call({lang : 'fr', timezone : _tz}, 1318781876, 'X', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
+      helper.assert(dateFormatter.convDate.call({lang : 'fr', timezone : _tz}, 1318781876000, 'x', 'LLLL'), 'dimanche 16 octobre 2011 18:17');
     });
   });
   describe('formatD', function () {
+    var _tz = 'Europe/Paris';
     it('should accept use this.lang to set convert date', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '20101201', 'L', 'YYYYMMDD'), '12/01/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, '20101201', 'L', 'YYYYMMDD'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '20101201', 'L', 'YYYYMMDD'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, '20101201', 'L', 'YYYYMMDD'), '01/12/2010');
     });
     it('should return null or undefined if value is null or undefined', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, undefined, 'L', 'YYYYMMDD'), undefined);
-      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, null, 'L',  'YYYYMMDD'), null);
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, undefined, 'L', 'YYYYMMDD'), undefined);
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, null, 'L',  'YYYYMMDD'), null);
     });
     it('should convert unix timestamp', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, 1318781876, 'LLLL', 'X'), 'Sunday, October 16, 2011 6:17 PM');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, 1318781876, 'LLLL', 'X'), 'dimanche 16 octobre 2011 18:17');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, 1318781876, 'LLLL', 'X'), 'Sunday, October 16, 2011 6:17 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, 1318781876, 'LLLL', 'X'), 'dimanche 16 octobre 2011 18:17');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, 1318781876000, 'LLLL', 'x'), 'dimanche 16 octobre 2011 18:17');
     });
     it('should consider input format is ISO 8601 by default if not provided', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '20101201', 'L'), '12/01/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr'}, '20101201', 'L'), '01/12/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '2017-05-10T15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
-      helper.assert(dateFormatter.formatD.call({lang : 'en'}, '1997-12-17 07:37:16-08', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '2017-05-10T15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
     });
     it('should accepts real locales', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en-GB'}, '20101201', 'L'), '01/12/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'en-gb'}, '20101201', 'L'), '01/12/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'en-US'}, '20101201', 'L'), '12/01/2010');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr-CA'}, '20101201', 'L'), '2010-12-01');
-      helper.assert(dateFormatter.formatD.call({lang : 'fr-FR'}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en-gb', timezone : _tz}, '20101201', 'L'), '01/12/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en'   , timezone : _tz}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr-ca', timezone : _tz}, '20101201', 'L'), '2010-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'fr'   , timezone : _tz}, '20101201', 'L'), '01/12/2010');
+    });
+    it('should manage timezone', function () {
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/Paris' }, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM'
+      );
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'America/New_York' }, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 10:37 AM'
+      );
+      // By default if no timezone in date, it considers the timezone is Europe/Paris
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'America/New_York' }, '1997-12-17 18:32:16', 'LLLL'), 'Wednesday, December 17, 1997 12:32 PM'
+      );
     });
   });
   describe('convCRLF', function () {
@@ -1035,6 +1050,81 @@ describe('formatter', function () {
     it('should not crash if data is null or undefined', function () {
       helper.assert(stringFormatter.substr(null, 0, 3), null);
       helper.assert(stringFormatter.substr(undefined, 0, 3), undefined);
+    });
+  });
+
+  describe('padl', function () {
+    it('should be up to the target length with padding string to complete', () => {
+      helper.assert(stringFormatter.padl('coucou', 6), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padl('coucou', 7), ' coucou', 'one more length, adding one space before');
+      helper.assert(stringFormatter.padl('coucou', 7, 'x'), 'xcoucou', 'one more length, adding one padding string "x" before');
+      helper.assert(stringFormatter.padl('coucou', '10', 'x'), 'xxxxcoucou', 'one more length, adding padding string "x" before');
+      helper.assert(stringFormatter.padl('coucou', 6, 'x'), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padl('coucou', 3), 'coucou', 'lower target length, no change');
+      helper.assert(stringFormatter.padl('coucou', 3, 'x'), 'coucou', 'lower target length with padding string defined, no change');
+    });
+    it('should accept numbers, strings for all parameters and accept 0 for the padding string', () => {
+      helper.assert(stringFormatter.padl(  1223,  8 ,  0 ), '00001223');
+      helper.assert(stringFormatter.padl(  1223,  8 , '0'), '00001223');
+      helper.assert(stringFormatter.padl(  1223, '8', '0'), '00001223');
+      helper.assert(stringFormatter.padl('1223', '8', '0'), '00001223');
+      helper.assert(stringFormatter.padl('1223', '8',  0 ), '00001223');
+      helper.assert(stringFormatter.padl('1223',  8 , '0'), '00001223');
+    });
+    it('should not crash if data is null or undefined', () => {
+      helper.assert(stringFormatter.padl(null, 0), null, 'if data is null, not a string so return null 1');
+      helper.assert(stringFormatter.padl(null, 4), null, 'if data is null, not a string so return null 2');
+      helper.assert(stringFormatter.padl(null, 5), null, 'if data is null, not a string so return null 3');
+      helper.assert(stringFormatter.padl(null, 0, 'x'), null, 'if data is null, not a string so return null 4');
+      helper.assert(stringFormatter.padl(null, 5, 'x'), null, 'if data is null, not a string so return null 5');
+      helper.assert(stringFormatter.padl(undefined, 0), undefined, 'if data is undefined, not a string so return undefined 1');
+      helper.assert(stringFormatter.padl(undefined, 9), undefined, 'if data is undefined, not a string so return undefined 2');
+      helper.assert(stringFormatter.padl(undefined, 10), undefined, 'if data is undefined, not a string so return undefined 3');
+      helper.assert(stringFormatter.padl(undefined, 9, 'x'), undefined, 'if data is undefined, not a string so return undefined 4');
+      helper.assert(stringFormatter.padl(undefined, 10, 'x'), undefined, 'if data is undefined, not a string so return undefined 5');
+    });
+    it('should not crash if data is object', () => {
+      helper.assert(stringFormatter.padl({id : 2}, 5), {id : 2}, 'if data is object, should return it with no change');
+    });
+    it('should not crash if data is array', () => {
+      helper.assert(stringFormatter.padl([{id : 1}], 5), [{id : 1}], 'if data is array, should return it with no change');
+    });
+  });
+  describe('padr', function () {
+    it('should be up to the target length with padding string to complete', () => {
+      helper.assert(stringFormatter.padr('coucou', 6), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padr('coucou', 7), 'coucou ', 'one more length, adding one space before');
+      helper.assert(stringFormatter.padr('coucou', 7, 'x'), 'coucoux', 'one more length, adding one padding string "x" before');
+      helper.assert(stringFormatter.padr('coucou', 10, 'x'), 'coucouxxxx', 'one more length, adding padding string "x" before');
+      helper.assert(stringFormatter.padr('coucou', 6, 'x'), 'coucou', 'same length, no change');
+      helper.assert(stringFormatter.padr('coucou', 3), 'coucou', 'lower target length, no change');
+      helper.assert(stringFormatter.padr('coucou', 3, 'x'), 'coucou', 'lower target length with padding string defined, no change');
+    });
+    it('should accept numbers, strings for all parameters and accept 0 for the padding string', () => {
+      helper.assert(stringFormatter.padr(  1223,  8 ,  0 ), '12230000');
+      helper.assert(stringFormatter.padr(  1223,  8 , '0'), '12230000');
+      helper.assert(stringFormatter.padr(  1223, '8', '0'), '12230000');
+      helper.assert(stringFormatter.padr('1223', '8', '0'), '12230000');
+      helper.assert(stringFormatter.padr('1223', '8',  0 ), '12230000');
+      helper.assert(stringFormatter.padr('1223',  8 , '0'), '12230000');
+    });
+    it('should not crash if data is null or undefined', () => {
+      helper.assert(stringFormatter.padr(null, 0), null, 'if data is null, not a string so return null 1');
+      helper.assert(stringFormatter.padr(null, 4), null, 'if data is null, not a string so return null 2');
+      helper.assert(stringFormatter.padr(null, 5), null, 'if data is null, not a string so return null 3');
+      helper.assert(stringFormatter.padr(null, 0, 'x'), null, 'if data is null, not a string so return null 4');
+      helper.assert(stringFormatter.padr(null, 5, 'x'), null, 'if data is null, not a string so return null 5');
+      helper.assert(stringFormatter.padr(undefined, 0), undefined, 'if data is undefined, not a string so return undefined 1');
+      helper.assert(stringFormatter.padr(undefined, 9), undefined, 'if data is undefined, not a string so return undefined 2');
+      helper.assert(stringFormatter.padr(undefined, 10), undefined, 'if data is undefined, not a string so return undefined 3');
+      helper.assert(stringFormatter.padr(undefined, 9, 'x'), undefined, 'if data is undefined, not a string so return undefined 4');
+      helper.assert(stringFormatter.padr(undefined, 10, 'x'), undefined, 'if data is undefined, not a string so return undefined 5');
+    });
+    it('should not crash if data is object', () => {
+      helper.assert(stringFormatter.padr({id : 2}, 5), {id : 2}, 'if data is object, should return it with no change');
+    });
+    it('should not crash if data is array', () => {
+      helper.assert(stringFormatter.padr([{id : 1}], 5), [{id : 1}], 'if data is array, should return it with no change');
     });
   });
 

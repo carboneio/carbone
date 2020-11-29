@@ -734,7 +734,7 @@ describe('preprocessor', function () {
             embeddings : [],
             extension  : 'odt',
             files      : [
-              { name : 'content.xml'    , parent : '', data : _xml }
+              { name : 'content.xml' , parent : '', data : _xml }
             ]
           };
           preprocessor.execute(_report, function (err, tmpl) {

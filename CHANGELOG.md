@@ -1,4 +1,3 @@
-
 ### v2.2.0
   - ⚡️ **Manage timezone + new date formatters + switch from MomentJS to DayJS**
     - If not defined by you in `options.complement`, `{c.now}` returns the current date in UTC.
@@ -70,6 +69,7 @@
           }
         }
     ```
+  - [EE] DOCX/ODT New feature: Support HTML rich content, by adding the `:html` formatter, it is possible to render the following HTML tag: `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`. Unsupported tags and tags attributes are skipped and not rendered. An error is thrown if HTML tags are unvalid.
 
 ### v2.1.1
   - Release September 23rd 2020

@@ -1,4 +1,4 @@
-### v2.2.0
+### v3.0.0
   - ⚡️ **Manage timezone + new date formatters + switch from MomentJS to DayJS**
     - If not defined by you in `options.complement`, `{c.now}` returns the current date in UTC.
     - [BREAKING CHANGE]: remove old date formatter which were not documented: `format`, `parse`, `addDays` and `convert`.

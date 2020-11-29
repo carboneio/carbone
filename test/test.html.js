@@ -801,21 +801,6 @@ describe('Dynamic HTML', function () {
         helper.assert(html.parseHTML('<b>Bold <brie/><brie>content<brie/></b>'), [ { content : 'Bold ', tags : ['b'] }, { content : 'content', tags : ['b', 'brie'] } ]);
       });
 
-      // it('should detect errors, starting or ending tag missing', function () {
-      //   // Missing ending marker
-      //   assert.throws(() => html.parseHTML('<b>Underlined content'), new Error('Invalid HTML tags: <b>'));
-      //   assert.throws(() => html.parseHTML('<b>Underlined content</bold>'), new Error('Invalid HTML tags: <b> <bold>'));
-      //   assert.throws(() => html.parseHTML('<bold>Underlined</b> content'), new Error('Invalid HTML tags: <bold> <b>'));
-      //   assert.throws(() => html.parseHTML('<em><bold>Underlined </i> content</em>'), new Error('Invalid HTML tags: <bold> <i>'));
-      //   // the HTML tag is missing a closing mark
-      //   assert.throws(() => html.parseHTML('<btest content'), new Error('Invalid HTML tag: btest'));
-      //   assert.throws(() => html.parseHTML('<   test'), new Error('Invalid HTML tag'));
-      //   assert.throws(() => html.parseHTML('<<b>Bold</b>'), new Error('Invalid HTML tag: b'));
-      //   assert.throws(() => html.parseHTML('<b>Bold</b<>'), new Error('Invalid HTML tag: b'));
-      //   assert.throws(() => html.parseHTML('<b>Bold</<b>'), new Error('Invalid HTML tag: b'));
-      //   assert.throws(() => html.parseHTML('<b>Bold</>b>'), new Error('Invalid HTML tag'));
-      // });
-
       it('should accepts some weird HTML to always return a result in production', function () {
         // Missing ending marker
         helper.assert(html.parseHTML('<b>Underlined content'), [ { content : 'Underlined content', tags : [] } ]);
@@ -878,7 +863,6 @@ describe('Dynamic HTML', function () {
           ]
         );
 
-        // helper.assert(html.parseHTML('<b>this <u> is a bold<em> text </u>and <s>italic </em>text</b></s>.'), INVALID HTML
         helper.assert(html.parseHTML('<b>this <u> is a bold<em> text </em></u><em>and </em><s><em>italic </em>text</s></b>.'),
           [
             { content : 'this ', tags : ['b'] },
@@ -906,7 +890,6 @@ describe('Dynamic HTML', function () {
       });
 
       it('should parse HTML content with BREAK LINES tags <br> [MIX]', function () {
-
         helper.assert(html.parseHTML('This is <br><i>a tree</i>'),
           [
             { content : 'This is ', tags : [] },
@@ -914,8 +897,6 @@ describe('Dynamic HTML', function () {
             { content : 'a tree', tags : ['i'] },
           ]
         );
-
-        // helper.assert(html.parseHTML('This is </br><i>a tree</i>'), INVALID HTML
         helper.assert(html.parseHTML('This is <br/><i>a tree</i>'),
           [
             { content : 'This is ', tags : [] },
@@ -923,7 +904,6 @@ describe('Dynamic HTML', function () {
             { content : 'a tree', tags : ['i'] },
           ]
         );
-
         helper.assert(html.parseHTML('This is a<br>simple text.'),
           [
             { content : 'This is a', tags : [] },
@@ -931,8 +911,6 @@ describe('Dynamic HTML', function () {
             { content : 'simple text.', tags : [] }
           ]
         );
-
-        // helper.assert(html.parseHTML('This <br /> is</br>a<br>simple</br> text<br/>.'), INVALID HTML
         helper.assert(html.parseHTML('This <br /> is<br/>a<br>simple<br/> text<br/>.'),
           [
             { content : 'This ', tags : [] },
@@ -948,8 +926,6 @@ describe('Dynamic HTML', function () {
             { content : '.', tags : [] }
           ]
         );
-
-        // helper.assert(html.parseHTML('<br/>This<br/>is</br><br>a<br>sim<br/>ple<br/></br>text.<br>'), INVALID HTML
         helper.assert(html.parseHTML('<br/>This<br/>is<br/><br>a<br>sim<br/>ple<br/><br/>text.<br>'),
           [
             { content : '#break#', tags : [] } ,
@@ -969,8 +945,6 @@ describe('Dynamic HTML', function () {
             { content : '#break#', tags : [] } ,
           ]
         );
-
-        // helper.assert(html.parseHTML('<u>Although the term <b>"alpinism"</b> </br>has become synonymous with <b>sporting <br> achievement</b>,<br/><em>pyreneism</em>,<br/>appearing in the <em><s>20th</s></em> 19th century</u>'), INVALID HTML
         helper.assert(html.parseHTML('<u>Although the term <b>"alpinism"</b> <br/>has become synonymous with <b>sporting <br> achievement</b>,<br/><em>pyreneism</em>,<br/>appearing in the <em><s>20th</s></em> 19th century</u>'),
           [
             { content : 'Although the term ', tags : ['u'] },
@@ -991,7 +965,6 @@ describe('Dynamic HTML', function () {
             { content : ' 19th century', tags : ['u'] }
           ]
         );
-        // helper.assert(html.parseHTML('This is </br><b><i>a tree</i> with lot of <br/>fruits inside!</b></br> I really like it <u>and this <br/>is <s>wonderful</s></u>.'), INVALID HTML
         helper.assert(html.parseHTML('This is <br/><b><i>a tree</i> with lot of <br/>fruits inside!</b><br/> I really like it <u>and this <br/>is <s>wonderful</s></u>.'),
           [
             { content : 'This is ', tags : [] },
@@ -1009,36 +982,6 @@ describe('Dynamic HTML', function () {
             { content : '.', tags : [] }
           ]
         );
-      });
-    });
-
-    describe('identifyTag', function () {
-      it('should identify HTML tags inside a content at a specific position (with or without attributes)', function () {
-        helper.assert(html.identifyTag('the sky <b>is blue</b>', 8), { pos : 10, name : 'b', type : 'begin'});
-        helper.assert(html.identifyTag('the <i>sky is </i>blue', 14), { pos : 17, name : 'i', type : 'end'});
-        helper.assert(html.identifyTag('<strong>the sky is </strong>blue', 0), { pos : 7, name : 'strong', type : 'begin'});
-        helper.assert(html.identifyTag('<em>the sky is blue</em>', 19), { pos : 23, name : 'em', type : 'end'});
-        helper.assert(html.identifyTag('the sky is<br>blue', 10), { pos : 13, name : 'br', type : 'begin'});
-        helper.assert(html.identifyTag('the sky is<br/>blue', 10), { pos : 14, name : 'br', type : 'begin'});
-        helper.assert(html.identifyTag('the sky is</br>blue', 10), { pos : 14, name : 'br', type : 'end'});
-        helper.assert(html.identifyTag('<div><p><b>hello</b></p></div>', 5), { pos : 7, name : 'p', type : 'begin'});
-        helper.assert(html.identifyTag('<div><p><b>hello</b></p></div>', 20), { pos : 23, name : 'p', type : 'end'});
-        helper.assert(html.identifyTag('the <p style="color:red;margin:10px 10px;">sky is blue</p>', 4), { pos : 42, name : 'p', type : 'begin'});
-        helper.assert(html.identifyTag('This image: <img src="img.jpg" alt="some text" width="5" height="60"/> text', 12), { pos : 69, name : 'img', type : 'begin'});
-      });
-
-      it('should throw en error if the tag is invalid', function () {
-        // missing tag at the given position
-        assert.throws(() => html.identifyTag('the sky is blue', 5), new Error('Invalid HTML tag: the first character is not a left arrow key.'));
-        assert.throws(() => html.identifyTag('the sky is blue', 20), new Error('The index is outside of the text length range.'));
-        assert.throws(() => html.identifyTag('the sky is blue', -3), new Error('The index is outside of the text length range.'));
-        // missing ending arrow
-        assert.throws(() => html.identifyTag('<   test', 0), new Error('Invalid HTML tag'));
-        assert.throws(() => html.identifyTag('the sky is</b blue', 10), new Error('Invalid HTML tag: b'));
-        assert.throws(() => html.identifyTag('the </bsky is blue', 4), new Error('Invalid HTML tag: bsky'));
-        // unvalid tags
-        assert.throws(() => html.identifyTag('the sky <<em>is blue', 8), new Error('Invalid HTML tag: em'));
-        assert.throws(() => html.identifyTag('the</> sky is blue', 3), new Error('Invalid HTML tag'));
       });
     });
 

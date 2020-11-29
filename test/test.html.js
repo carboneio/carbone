@@ -760,6 +760,30 @@ describe('Dynamic HTML', function () {
   });
   describe('Utils', function () {
     describe('parseHTML', function () {
+      it('should be fast to parse HTML', function () {
+        var _sample = '<u>Although the term <b>"alpinism"</b> <br/>has become synonymous with <b>sporting <br> achievement</b>,<br/><em>pyreneism</em>,<br/>appearing in the <em><s>20th</s></em> 19th century</u>';
+        var _html = '';
+        var _nbTag = 0;
+        var _nbHtmlRepetition = 300;
+        var _nbLoop = 10;
+        for (let i = 0; i < _nbHtmlRepetition; i++) {
+          _html += _sample;
+        }
+        var _start = process.hrtime();
+        for (let i = 0; i < _nbLoop; i++) {
+          _html  += 'a'; // change html a little bit to avoid V8 optimization
+          _nbTag += html.parseHTML(_html).length;
+        }
+        var _diff = process.hrtime(_start);
+        helper.assert(_nbTag, _nbHtmlRepetition * 16 * _nbLoop + _nbLoop /* a */);
+        var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+        console.log('\n parseHTML speed : ' + (_elapsed / _nbLoop) + ' ms (around 1.5ms) \n');
+        helper.assert((_elapsed / _nbLoop)  > 10, false, 'parseHTML is too slow');
+      });
+      it('should parse HTML without error if the string empty', function () {
+        helper.assert(html.parseHTML(''), []);
+        helper.assert(html.parseHTML(null), []);
+      });
       it('should parse HTML content and return a descriptors [SIMPLE]', function () {
         helper.assert(html.parseHTML('This is a simple text'), [ { content : 'This is a simple text', tags : [] } ]);
         helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', tags : ['b'] } ]);
@@ -773,19 +797,42 @@ describe('Dynamic HTML', function () {
         helper.assert(html.parseHTML('<p id="1234"> simple text </p>'), [ { content : ' simple text ', tags : ['p'] } ]);
       });
 
-      it('should detect errors, starting or ending tag missing', function () {
+      it('should not consider a tag "brie" is a carriage return', function () {
+        helper.assert(html.parseHTML('<b>Bold <brie/><brie>content<brie/></b>'), [ { content : 'Bold ', tags : ['b'] }, { content : 'content', tags : ['b', 'brie'] } ]);
+      });
+
+      // it('should detect errors, starting or ending tag missing', function () {
+      //   // Missing ending marker
+      //   assert.throws(() => html.parseHTML('<b>Underlined content'), new Error('Invalid HTML tags: <b>'));
+      //   assert.throws(() => html.parseHTML('<b>Underlined content</bold>'), new Error('Invalid HTML tags: <b> <bold>'));
+      //   assert.throws(() => html.parseHTML('<bold>Underlined</b> content'), new Error('Invalid HTML tags: <bold> <b>'));
+      //   assert.throws(() => html.parseHTML('<em><bold>Underlined </i> content</em>'), new Error('Invalid HTML tags: <bold> <i>'));
+      //   // the HTML tag is missing a closing mark
+      //   assert.throws(() => html.parseHTML('<btest content'), new Error('Invalid HTML tag: btest'));
+      //   assert.throws(() => html.parseHTML('<   test'), new Error('Invalid HTML tag'));
+      //   assert.throws(() => html.parseHTML('<<b>Bold</b>'), new Error('Invalid HTML tag: b'));
+      //   assert.throws(() => html.parseHTML('<b>Bold</b<>'), new Error('Invalid HTML tag: b'));
+      //   assert.throws(() => html.parseHTML('<b>Bold</<b>'), new Error('Invalid HTML tag: b'));
+      //   assert.throws(() => html.parseHTML('<b>Bold</>b>'), new Error('Invalid HTML tag'));
+      // });
+
+      it('should accepts some weird HTML to always return a result in production', function () {
         // Missing ending marker
-        assert.throws(() => html.parseHTML('<b>Underlined content'), new Error('Invalid HTML tags: <b>'));
-        assert.throws(() => html.parseHTML('<b>Underlined content</bold>'), new Error('Invalid HTML tags: <b> <bold>'));
-        assert.throws(() => html.parseHTML('<bold>Underlined</b> content'), new Error('Invalid HTML tags: <bold> <b>'));
-        assert.throws(() => html.parseHTML('<em><bold>Underlined </i> content</em>'), new Error('Invalid HTML tags: <bold> <i>'));
+        helper.assert(html.parseHTML('<b>Underlined content'), [ { content : 'Underlined content', tags : [] } ]);
+        helper.assert(html.parseHTML('<b>Underlined content</bold>'), [ { content : 'Underlined content', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<bold>Underlined</b> content'), [ { content : 'Underlined', tags : ['bold'] }, { content : ' content', tags : [] } ]);
+        helper.assert(html.parseHTML('<em><bold>Underlined </i> content</em>'), [ { content : 'Underlined ', tags : ['em', 'bold'] }, { content : ' content', tags : ['em'] } ]);
+
         // the HTML tag is missing a closing mark
-        assert.throws(() => html.parseHTML('<btest content'), new Error('Invalid HTML tag: btest'));
-        assert.throws(() => html.parseHTML('<   test'), new Error('Invalid HTML tag'));
-        assert.throws(() => html.parseHTML('<<b>Bold</b>'), new Error('Invalid HTML tag: b'));
-        assert.throws(() => html.parseHTML('<b>Bold</b<>'), new Error('Invalid HTML tag: b'));
-        assert.throws(() => html.parseHTML('<b>Bold</<b>'), new Error('Invalid HTML tag: b'));
-        assert.throws(() => html.parseHTML('<b>Bold</>b>'), new Error('Invalid HTML tag'));
+        helper.assert(html.parseHTML('<btest content'), [ { content : '<btest content', tags : [] } ]);
+        helper.assert(html.parseHTML('<   test')      , [ { content : '<   test', tags : [] } ]);
+        helper.assert(html.parseHTML('<<b>Bold</b>')  , [ { content : 'Bold', tags : ['<b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold</b<>')  , [ { content : 'Bold', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold</<b>')  , [ { content : 'Bold', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold</>b>')  , [ { content : 'Bold' , tags : ['b'] }, { content : 'b>', tags : [] } ]);
+
+        // missing opening tag
+        helper.assert(html.parseHTML('test</b>content'), [ { content : 'test', tags : [] }, { content : 'content', tags : [] } ]);
       });
 
       it('should parse HTML content and return a descriptors [MIX without break line]', function () {
@@ -831,13 +878,14 @@ describe('Dynamic HTML', function () {
           ]
         );
 
-        helper.assert(html.parseHTML('<b>this <u> is a bold<em> text </u>and <s>italic </em>text</b></s>.'),
+        // helper.assert(html.parseHTML('<b>this <u> is a bold<em> text </u>and <s>italic </em>text</b></s>.'), INVALID HTML
+        helper.assert(html.parseHTML('<b>this <u> is a bold<em> text </em></u><em>and </em><s><em>italic </em>text</s></b>.'),
           [
             { content : 'this ', tags : ['b'] },
             { content : ' is a bold', tags : ['b', 'u'] },
             { content : ' text ', tags : ['b', 'u', 'em'] },
             { content : 'and ', tags : ['b', 'em'] },
-            { content : 'italic ', tags : ['b', 'em', 's'] },
+            { content : 'italic ', tags : ['b', 's', 'em'] },
             { content : 'text', tags : ['b', 's'] },
             { content : '.', tags : [] },
           ]
@@ -867,7 +915,8 @@ describe('Dynamic HTML', function () {
           ]
         );
 
-        helper.assert(html.parseHTML('This is </br><i>a tree</i>'),
+        // helper.assert(html.parseHTML('This is </br><i>a tree</i>'), INVALID HTML
+        helper.assert(html.parseHTML('This is <br/><i>a tree</i>'),
           [
             { content : 'This is ', tags : [] },
             { content : '#break#', tags : [] },
@@ -883,7 +932,8 @@ describe('Dynamic HTML', function () {
           ]
         );
 
-        helper.assert(html.parseHTML('This <br /> is</br>a<br>simple</br> text<br/>.'),
+        // helper.assert(html.parseHTML('This <br /> is</br>a<br>simple</br> text<br/>.'), INVALID HTML
+        helper.assert(html.parseHTML('This <br /> is<br/>a<br>simple<br/> text<br/>.'),
           [
             { content : 'This ', tags : [] },
             { content : '#break#', tags : [] },
@@ -899,7 +949,8 @@ describe('Dynamic HTML', function () {
           ]
         );
 
-        helper.assert(html.parseHTML('<br/>This<br/>is</br><br>a<br>sim<br/>ple<br/></br>text.<br>'),
+        // helper.assert(html.parseHTML('<br/>This<br/>is</br><br>a<br>sim<br/>ple<br/></br>text.<br>'), INVALID HTML
+        helper.assert(html.parseHTML('<br/>This<br/>is<br/><br>a<br>sim<br/>ple<br/><br/>text.<br>'),
           [
             { content : '#break#', tags : [] } ,
             { content : 'This', tags : [] },
@@ -919,7 +970,8 @@ describe('Dynamic HTML', function () {
           ]
         );
 
-        helper.assert(html.parseHTML('<u>Although the term <b>"alpinism"</b> </br>has become synonymous with <b>sporting <br> achievement</b>,<br/><em>pyreneism</em>,<br/>appearing in the <em><s>20th</s></em> 19th century</u>'),
+        // helper.assert(html.parseHTML('<u>Although the term <b>"alpinism"</b> </br>has become synonymous with <b>sporting <br> achievement</b>,<br/><em>pyreneism</em>,<br/>appearing in the <em><s>20th</s></em> 19th century</u>'), INVALID HTML
+        helper.assert(html.parseHTML('<u>Although the term <b>"alpinism"</b> <br/>has become synonymous with <b>sporting <br> achievement</b>,<br/><em>pyreneism</em>,<br/>appearing in the <em><s>20th</s></em> 19th century</u>'),
           [
             { content : 'Although the term ', tags : ['u'] },
             { content : '"alpinism"', tags : ['u', 'b'] },
@@ -939,8 +991,8 @@ describe('Dynamic HTML', function () {
             { content : ' 19th century', tags : ['u'] }
           ]
         );
-
-        helper.assert(html.parseHTML('This is </br><b><i>a tree</i> with lot of <br/>fruits inside!</b></br> I really like it <u>and this <br/>is <s>wonderful</s></u>.'),
+        // helper.assert(html.parseHTML('This is </br><b><i>a tree</i> with lot of <br/>fruits inside!</b></br> I really like it <u>and this <br/>is <s>wonderful</s></u>.'), INVALID HTML
+        helper.assert(html.parseHTML('This is <br/><b><i>a tree</i> with lot of <br/>fruits inside!</b><br/> I really like it <u>and this <br/>is <s>wonderful</s></u>.'),
           [
             { content : 'This is ', tags : [] },
             { content : '#break#', tags : [] },

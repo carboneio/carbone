@@ -18,7 +18,16 @@ describe('Dynamic colors', function () {
           const _options = {
 
           };
-          const _expectedOptions = { colorStyleList : { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' }] } } };
+          const _expectedOptions = {
+            colorStyleList : {
+              P3 : {
+                file        : 'content.xml',
+                styleFamily : 'paragraph',
+                colors      : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' }],
+                attributes  : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"'
+              }
+            }
+          };
           color.preProcessLo(_template, _options);
           helper.assert(_template.files[0].data, _expectedXML);
           helper.assert(_options, _expectedOptions);
@@ -40,7 +49,8 @@ describe('Dynamic colors', function () {
               ce1 : {
                 file        : 'content.xml',
                 styleFamily : 'table-cell',
-                colors      : [{ color : '#ff0000', element : 'textColor', marker : 'd.color2', colorType : '#hexa' }]
+                colors      : [{ color : '#ff0000', element : 'textColor', marker : 'd.color2', colorType : '#hexa' }],
+                attributes  : ''
               }
             }};
           color.preProcessLo(_template, _options);
@@ -59,8 +69,8 @@ describe('Dynamic colors', function () {
           const _options = {};
           const _expectedOptions = { colorStyleList :
             {
-              P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : '#hexa' }] },
-              P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#0000ff', element : 'textColor', marker : 'd.list[i].element', colorType : '#hexa' }, { color : 'transparent', element : 'textBackgroundColor' } ] }
+              P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : '#hexa' }], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' },
+              P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#0000ff', element : 'textColor', marker : 'd.list[i].element', colorType : '#hexa' }, { color : 'transparent', element : 'textBackgroundColor' } ], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"' }
             }
           };
           color.preProcessLo(_template, _options);
@@ -105,7 +115,8 @@ describe('Dynamic colors', function () {
                   element   : 'textBackgroundColor',
                   marker    : 'd.color2',
                   colorType : '#hexa'
-                }]
+                }],
+                attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"'
               },
               P4 : {
                 file        : 'content.xml',
@@ -118,7 +129,8 @@ describe('Dynamic colors', function () {
                 }, {
                   color   : 'transparent',
                   element : 'textBackgroundColor'
-                }]
+                }],
+                attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'
               },
               MP1 : {
                 file        : 'style.xml',
@@ -133,7 +145,8 @@ describe('Dynamic colors', function () {
                   element   : 'textBackgroundColor',
                   marker    : 'd.color2',
                   colorType : '#hexa'
-                }]
+                }],
+                attributes : ' style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0042d46d" style:font-size-asian="12pt" style:font-size-complex="12pt"'
               },
               MP3 : {
                 file        : 'style.xml',
@@ -146,7 +159,8 @@ describe('Dynamic colors', function () {
                 }, {
                   color   : 'transparent',
                   element : 'textBackgroundColor'
-                }]
+                }],
+                attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0042d46d"'
               },
               MP4 : {
                 file        : 'style.xml',
@@ -159,7 +173,8 @@ describe('Dynamic colors', function () {
                 }, {
                   color   : 'transparent',
                   element : 'textBackgroundColor'
-                }]
+                }],
+                attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="00443bac"'
               }
             }
           };
@@ -233,7 +248,7 @@ describe('Dynamic colors', function () {
             data : '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>'
           };
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
-          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ] } };
+          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' } };
 
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -245,7 +260,7 @@ describe('Dynamic colors', function () {
             data : '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>'
           };
           const _bindColorList = [{ referenceColor : 'FF0000', colorType : '#hexa', marker : 'd.color1' }];
-          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ] } };
+          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textColor', marker : 'd.color1', colorType : '#hexa' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' } };
 
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -257,7 +272,7 @@ describe('Dynamic colors', function () {
             data : '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:background-color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>'
           };
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }];
-          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa' } ] } };
+          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [ { color : '#ff0000',element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' } };
 
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -270,7 +285,7 @@ describe('Dynamic colors', function () {
             data : '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>'
           };
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#ffff00', colorType : 'color', marker : 'd.color2' }];
-          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : 'color' } ] } };
+          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : 'color' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' } };
 
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -288,9 +303,9 @@ describe('Dynamic colors', function () {
             { referenceColor : 'transparent', colorType : 'hsl', marker : 'd.list[i].color'}
           ];
           const _expectedColorListElement = {
-            P2 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#000000', element : 'textColor', marker : 'd.color2', colorType : 'color' }]},
-            P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' } ] },
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : 'transparent', element : 'textBackgroundColor', marker : 'd.list[i].color', colorType : 'hsl' }, {color : '#0000ff', element : 'textColor' }]},
+            P2 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#000000', element : 'textColor', marker : 'd.color2', colorType : 'color' }], attributes : ' officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"'},
+            P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { color : '#ffff00', element : 'textBackgroundColor' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' },
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ color : 'transparent', element : 'textBackgroundColor', marker : 'd.list[i].color', colorType : 'hsl' }, {color : '#0000ff', element : 'textColor' }], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'},
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -304,7 +319,7 @@ describe('Dynamic colors', function () {
           };
           const _bindColorList = [{ referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = {
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {color : '#0000ff', element : 'textColor'}]}
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -318,7 +333,7 @@ describe('Dynamic colors', function () {
           };
           const _bindColorList = [{ referenceColor : '#0000ff', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.list[i].element' }];
           const _expectedColorListElement = {
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{color : '#92AF11', element : 'textBackgroundColor', marker : 'd.list[i].element', colorType : '#hexa'}, {color : '#0000ff', element : 'textColor', marker : 'd.color1', colorType : '#hexa'}]}
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{color : '#92AF11', element : 'textBackgroundColor', marker : 'd.list[i].element', colorType : '#hexa'}, {color : '#0000ff', element : 'textColor', marker : 'd.color1', colorType : '#hexa'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -528,7 +543,7 @@ describe('Dynamic colors', function () {
               data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
             }]
           };
-          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff00ff" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff00ff"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
           const _options = {
             extension      : 'odt',
             colorDatabase  : new Map(),
@@ -542,7 +557,8 @@ describe('Dynamic colors', function () {
                     element   : 'textColor',
                     colorType : 'rgb'
                   }
-                ]
+                ],
+                attributes : ''
               }
             }
           };
@@ -565,7 +581,7 @@ describe('Dynamic colors', function () {
               data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
             }]
           };
-          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff0000" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#ff0000"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
           const _options = {
             extension      : 'odt',
             colorDatabase  : new Map(),
@@ -579,7 +595,8 @@ describe('Dynamic colors', function () {
                     element   : 'textColor',
                     colorType : 'rgb'
                   }
-                ]
+                ],
+                attributes : ''
               }
             }
           };
@@ -602,7 +619,7 @@ describe('Dynamic colors', function () {
               data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>'
             }]
           };
-          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:background-color="#537326" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="T6" style:family="text"><style:text-properties officeooo:rsid="002be796"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:background-color="#537326"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="CC0"/></office:text></office:body></office:document-content>';
           const _options = {
             extension      : 'odt',
             colorDatabase  : new Map(),
@@ -616,7 +633,8 @@ describe('Dynamic colors', function () {
                     element   : 'textBackgroundColor',
                     colorType : 'hsl'
                   }
-                ]
+                ],
+                attributes : ''
               }
             }
           };
@@ -631,6 +649,129 @@ describe('Dynamic colors', function () {
           helper.assert(_template.files[0].data, _expectedData);
           done();
         });
+        it('should replace 1 cell color with a colortype #hexa [ODT file]', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="Table1" style:family="table"><style:table-properties style:width="17.59cm" table:align="margins"/></style:style><style:style style:name="Table1.A" style:family="table-column"><style:table-column-properties style:column-width="17.59cm" style:rel-column-width="65535*"/></style:style><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ffff00" fo:padding="0.097cm" fo:border="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style></office:automatic-styles><office:body><office:text><office:forms form:automatic-focus="false" form:apply-design-mode="false"/><text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/><text:sequence-decl text:display-outline-level="0" text:name="Figure"/></text:sequence-decls><table:table table:name="Table1" table:style-name="Table1"><table:table-column table:style-name="Table1.A"/><table:table-row><table:table-cell table:style-name="CC0" office:value-type="string"><text:p text:style-name="Table_20_Contents"/></table:table-cell></table:table-row></table:table></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="Table1" style:family="table"><style:table-properties style:width="17.59cm" table:align="margins"/></style:style><style:style style:name="Table1.A" style:family="table-column"><style:table-column-properties style:column-width="17.59cm" style:rel-column-width="65535*"/></style:style><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ffff00" fo:padding="0.097cm" fo:border="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="CC0" style:family="table-cell"><style:table-cell-properties fo:background-color="#ff00ff" fo:padding="0.097cm" fo:border="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style></office:automatic-styles><office:body><office:text><office:forms form:automatic-focus="false" form:apply-design-mode="false"/><text:sequence-decls><text:sequence-decl text:display-outline-level="0" text:name="Illustration"/><text:sequence-decl text:display-outline-level="0" text:name="Table"/><text:sequence-decl text:display-outline-level="0" text:name="Text"/><text:sequence-decl text:display-outline-level="0" text:name="Drawing"/><text:sequence-decl text:display-outline-level="0" text:name="Figure"/></text:sequence-decls><table:table table:name="Table1" table:style-name="Table1"><table:table-column table:style-name="Table1.A"/><table:table-row><table:table-cell table:style-name="CC0" office:value-type="string"><text:p text:style-name="Table_20_Contents"/></table:table-cell></table:table-row></table:table></office:text></office:body></office:document-content>';
+          const _options = {
+            extension      : 'odt',
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              'Table1.A1' : {
+                file        : 'content.xml',
+                styleFamily : 'table-cell',
+                colors      : [
+                  {
+                    color     : '#ffff00',
+                    element   : 'textBackgroundColor',
+                    colorType : '#hexa'
+                  }
+                ],
+                attributes : ' fo:padding="0.097cm" fo:border="0.05pt solid #000000"'
+              }
+            }
+          };
+          _options.colorDatabase.set('#ff00ff#ffff00Table1.A', {
+            id        : 0,
+            styleName : 'Table1.A1',
+            colors    : [{
+              newColor : '#ff00ff',
+              oldColor : '#ffff00' }],
+          });
+          color.postProcessLo(_template, null, _options);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
+        it('should replace 2 cell color and texts colors [ODT file]', function (done) {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="Table1" style:family="table"><style:table-properties style:width="17.59cm" table:align="margins"/></style:style><style:style style:name="Table1.A" style:family="table-column"><style:table-column-properties style:column-width="8.795cm" style:rel-column-width="32767*"/></style:style><style:style style:name="Table1.B" style:family="table-column"><style:table-column-properties style:column-width="8.795cm" style:rel-column-width="32768*"/></style:style><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ffff00" fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="Table1.B1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ff0000" fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="0018fda1" officeooo:paragraph-rsid="0018fda1"/></style:style><style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="0019e3ac" officeooo:paragraph-rsid="0019e3ac"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Table_20_Contents"><style:text-properties officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Table_20_Contents"><style:text-properties fo:color="#0000ff" officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8" fo:background-color="#00ff00"/></style:style></office:automatic-styles><office:body><office:text><table:table table:name="Table1" table:style-name="Table1"><table:table-column table:style-name="Table1.A"/><table:table-column table:style-name="Table1.B"/><table:table-row><table:table-cell table:style-name="CC0" office:value-type="string"><text:p text:style-name="CC1">text1</text:p></table:table-cell><table:table-cell table:style-name="CC2" office:value-type="string"><text:p text:style-name="P4">text2</text:p></table:table-cell></table:table-row></table:table></office:text></office:body></office:document-content>'
+            }]
+          };
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="Table1" style:family="table"><style:table-properties style:width="17.59cm" table:align="margins"/></style:style><style:style style:name="Table1.A" style:family="table-column"><style:table-column-properties style:column-width="8.795cm" style:rel-column-width="32767*"/></style:style><style:style style:name="Table1.B" style:family="table-column"><style:table-column-properties style:column-width="8.795cm" style:rel-column-width="32768*"/></style:style><style:style style:name="Table1.A1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ffff00" fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="Table1.B1" style:family="table-cell"><style:table-cell-properties fo:background-color="#ff0000" fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="0018fda1" officeooo:paragraph-rsid="0018fda1"/></style:style><style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties officeooo:rsid="0019e3ac" officeooo:paragraph-rsid="0019e3ac"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Table_20_Contents"><style:text-properties officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Table_20_Contents"><style:text-properties fo:color="#0000ff" officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8" fo:background-color="#00ff00"/></style:style><style:style style:name="CC0" style:family="table-cell"><style:table-cell-properties fo:background-color="#ff00ff" fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#ff00ff" fo:background-color="#f0f0f0" officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"/></style:style><style:style style:name="CC2" style:family="table-cell"><style:table-cell-properties fo:background-color="#00ffff" fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"><style:background-image/></style:table-cell-properties></style:style></office:automatic-styles><office:body><office:text><table:table table:name="Table1" table:style-name="Table1"><table:table-column table:style-name="Table1.A"/><table:table-column table:style-name="Table1.B"/><table:table-row><table:table-cell table:style-name="CC0" office:value-type="string"><text:p text:style-name="CC1">text1</text:p></table:table-cell><table:table-cell table:style-name="CC2" office:value-type="string"><text:p text:style-name="P4">text2</text:p></table:table-cell></table:table-row></table:table></office:text></office:body></office:document-content>';
+          const _options = {
+            extension      : 'odt',
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              'Table1.A1' : {
+                file        : 'content.xml',
+                styleFamily : 'table-cell',
+                colors      : [
+                  {
+                    color     : '#ffff00',
+                    element   : 'textBackgroundColor',
+                    colorType : '#hexa'
+                  }
+                ],
+                attributes : ' fo:padding="0.097cm" fo:border-left="0.05pt solid #000000" fo:border-right="none" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"'
+              },
+              'Table1.B1' : {
+                file        : 'content.xml',
+                styleFamily : 'table-cell',
+                colors      : [
+                  {
+                    color     : '#ff0000',
+                    element   : 'textBackgroundColor',
+                    colorType : '#hexa'
+                  }
+                ],
+                attributes : ' fo:padding="0.097cm" fo:border-left="none" fo:border-right="0.05pt solid #000000" fo:border-top="0.05pt solid #000000" fo:border-bottom="0.05pt solid #000000"'
+              },
+              P5 : {
+                file        : 'content.xml',
+                styleFamily : 'paragraph',
+                colors      : [
+                  {
+                    color     : '#0000ff',
+                    element   : 'textColor',
+                    colorType : '#hexa'
+                  },
+                  {
+                    color     : '#00ff00',
+                    element   : 'textBackgroundColor',
+                    colorType : '#hexa'
+                  }
+                ],
+                attributes : ' officeooo:rsid="001987e8" officeooo:paragraph-rsid="001987e8"'
+              }
+            }
+          };
+          _options.colorDatabase.set('#ff00ff#ffff00Table1.A1', {
+            id        : 0,
+            styleName : 'Table1.A1',
+            colors    : [{
+              newColor : '#ff00ff',
+              oldColor : '#ffff00' }]
+          });
+          _options.colorDatabase.set('#ff00ff#ffff00P5', {
+            id        : 1,
+            styleName : 'P5',
+            colors    : [{
+              newColor : '#ff00ff',
+              oldColor : '#0000ff'
+            },
+            {
+              newColor : '#f0f0f0',
+              oldColor : '#00ff00'
+            }]
+          });
+          _options.colorDatabase.set('#00ffff#ff0000Table1.B1', {
+            id        : 2,
+            styleName : 'Table1.B1',
+            colors    : [{
+              newColor : '#00ffff',
+              oldColor : '#ff0000' }]
+          });
+          color.postProcessLo(_template, null, _options);
+          console.log(_template.files[0].data);
+          helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
         it('replace 1 text + background color + static color [ODT file]', function (done) {
           const _template = {
             files : [{
@@ -638,7 +779,7 @@ describe('Dynamic colors', function () {
               data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style><style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="CC1"/><text:p text:style-name="CC1">Onduleur TMTC</text:p></office:text></office:body></office:document-content>'
             }]
           };
-          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style><style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#654321" fo:background-color="#00ffff" /></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#537326" fo:background-color="transparent" /></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="CC1"/><text:p text:style-name="CC1">Onduleur TMTC</text:p></office:text></office:body></office:document-content>';
+          const _expectedData = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style><style:style style:name="P6" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#654321" fo:background-color="#00ffff"/></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#537326" fo:background-color="transparent"/></style:style></office:automatic-styles><office:body><office:text><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="CC1"/><text:p text:style-name="CC1">Onduleur TMTC</text:p></office:text></office:body></office:document-content>';
           const _options = {
             extension      : 'odt',
             colorDatabase  : new Map(),
@@ -700,7 +841,8 @@ describe('Dynamic colors', function () {
                 colors      : [
                   { color : '#ff0000', element : 'textColor', marker : 'd.color2', colorType : '#hexa' },
                   { color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color4', colorType : 'color' }
-                ]
+                ],
+                attributes : ''
               },
               MP3 : {
                 file        : 'styles.xml',
@@ -708,7 +850,8 @@ describe('Dynamic colors', function () {
                 colors      : [
                   { color : '#0000ff', element : 'textColor', marker : 'd.color5', colorType : 'rgb' },
                   { color : 'transparent', element : 'textBackgroundColor' }
-                ]
+                ],
+                attributes : ''
               }
             }
           };
@@ -723,7 +866,7 @@ describe('Dynamic colors', function () {
             colors    : [ { newColor : {r : 255, g : 0, b : 255}, oldColor : '#0000ff' }, { newColor : 'null', oldColor : 'transparent' } ]
           });
           const _expectedTemplateXml = '<office:document-content><office:automatic-styles><style:style style:name="T2" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="0025a382"/></style:style><style:style style:name="T3" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="0038d1ca"/></style:style><style:style style:name="T4" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="003783b3"/></style:style></office:automatic-styles><office:body><office:text></office:text></office:body></office:document-content>';
-          const _expectedStyleXml = '<office:document-styles><office:automatic-styles><style:style style:name="MT2" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="0025a382" fo:background-color="transparent" loext:char-shading-value="0"/></style:style><style:style style:name="MT3" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="003783b3" fo:background-color="transparent" loext:char-shading-value="0"/></style:style><style:style style:name="MT4" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="00497cc0" fo:background-color="transparent" loext:char-shading-value="0"/></style:style><style:style style:name="MT5" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="003fb021" fo:background-color="transparent" loext:char-shading-value="0"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#00ffff" fo:background-color="#ff0000" /></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#ff00ff" fo:background-color="transparent" /></style:style></office:automatic-styles><office:master-styles><style:master-page style:name="Standard" style:page-layout-name="Mpm1"><style:header><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="MP2"></text:p></style:header><style:footer><text:p text:style-name="CC1">Onduleur TMTC</text:p><text:p text:style-name="CC1"/><text:p text:style-name="MP4"><text:span text:style-name="MT2"></text:span></text:p></style:footer></style:master-page></office:master-styles></office:document-styles>';
+          const _expectedStyleXml = '<office:document-styles><office:automatic-styles><style:style style:name="MT2" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="0025a382" fo:background-color="transparent" loext:char-shading-value="0"/></style:style><style:style style:name="MT3" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="003783b3" fo:background-color="transparent" loext:char-shading-value="0"/></style:style><style:style style:name="MT4" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="00497cc0" fo:background-color="transparent" loext:char-shading-value="0"/></style:style><style:style style:name="MT5" style:family="text"><style:text-properties fo:color="#000000" officeooo:rsid="003fb021" fo:background-color="transparent" loext:char-shading-value="0"/></style:style><style:style style:name="CC0" style:family="paragraph"><style:text-properties fo:color="#00ffff" fo:background-color="#ff0000"/></style:style><style:style style:name="CC1" style:family="paragraph"><style:text-properties fo:color="#ff00ff" fo:background-color="transparent"/></style:style></office:automatic-styles><office:master-styles><style:master-page style:name="Standard" style:page-layout-name="Mpm1"><style:header><text:p text:style-name="CC0">John Wick</text:p><text:p text:style-name="MP2"></text:p></style:header><style:footer><text:p text:style-name="CC1">Onduleur TMTC</text:p><text:p text:style-name="CC1"/><text:p text:style-name="MP4"><text:span text:style-name="MT2"></text:span></text:p></style:footer></style:master-page></office:master-styles></office:document-styles>';
           const _template = {
             files : [{
               name : 'content.xml',
@@ -737,7 +880,6 @@ describe('Dynamic colors', function () {
           color.postProcessLo(_template, null, _options);
           helper.assert(_template.files[0].data, _expectedTemplateXml);
           helper.assert(_template.files[1].data, _expectedStyleXml);
-          // console.log(_template.files[1].data);
         });
       });
 
@@ -914,6 +1056,42 @@ describe('Dynamic colors', function () {
             data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:rFonts w:ascii="Liberation Serif" w:hAnsi="Liberation Serif"/><w:b w:val="false"/><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{bindColor(</w:t></w:r><w:r><w:rPr><w:rFonts w:eastAsia="Songti SC" w:cs="Arial Unicode MS"/><w:b w:val="false"/><w:color w:val="000000"/><w:kern w:val="2"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="en-GB" w:eastAsia="zh-CN" w:bidi="hi-IN"/></w:rPr><w:t>yellow</w:t></w:r><w:r><w:rPr><w:b w:val="false"/><w:color w:val="000000"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>, color) = d.color3}</w:t></w:r></w:p></w:body></w:document>'
           }]
         };
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it('should replace a cell color with a color marker + formatter', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="FF0000" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        const _expectedXML = '<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="{d.color:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>';
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it('should replace mutliple cells color with color markers + formatters', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<w:document><w:body><w:tbl><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="FFFF00" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="FF0000" w:val="clear"/></w:tcPr></w:tc></w:tr><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="FF00FF" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="00FF00" w:val="clear"/></w:tcPr></w:tc></w:tr><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="00FFFF" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="0000FF" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#00ff00, #hexa)=d.color2}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#0000ff, #hexa)=d.color3}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#ffff00, #hexa)=d.color4}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#ff00ff, #hexa)=d.color5}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#00ffff, #hexa)=d.color6}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        const _expectedXML = '<w:document><w:body><w:tbl><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color4:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color5:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color2:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr><w:tr><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color6:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc><w:tc><w:tcPr><w:tcW w:w="4986" w:type="dxa"/><w:shd w:fill="{d.color3:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>';
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+      });
+
+      it('should replace a cell color, text color and text background color with color markers + formatters', function () {
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : '<w:document><w:body><w:tbl><w:tr><w:tc><w:tcPr><w:tcBorders><w:top w:val="single" w:sz="2" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="2" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="2" w:space="0" w:color="000000"/></w:tcBorders><w:shd w:fill="FF0000" w:val="clear"/></w:tcPr><w:p><w:pPr><w:pStyle w:val="TableContents"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:color w:val="00FF00"/><w:highlight w:val="yellow"/></w:rPr></w:pPr><w:r><w:rPr><w:color w:val="00FF00"/><w:highlight w:val="yellow"/></w:rPr><w:t>This is a text</w:t></w:r></w:p></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa) = d.color}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(yellow, color) = d.color2}</w:t></w:r></w:p><w:p><w:r><w:t>{bindColor(#00ff00, hsl) = d.color3}</w:t></w:r></w:p></w:body></w:document>'
+          }]
+        };
+        const _expectedXML = '<w:document><w:body><w:tbl><w:tr><w:tc><w:tcPr><w:tcBorders><w:top w:val="single" w:sz="2" w:space="0" w:color="000000"/><w:left w:val="single" w:sz="2" w:space="0" w:color="000000"/><w:right w:val="single" w:sz="2" w:space="0" w:color="000000"/></w:tcBorders><w:shd w:fill="{d.color:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr><w:p><w:pPr><w:pStyle w:val="TableContents"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr><w:color w:val="{d.color3:getAndConvertColorDocx(hsl, textColor)}"/><w:highlight w:val="{d.color2:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:color w:val="{d.color3:getAndConvertColorDocx(hsl, textColor)}"/><w:highlight w:val="{d.color2:getAndConvertColorDocx(color, textBackgroundColor)}"/></w:rPr><w:t>This is a text</w:t></w:r></w:p></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>';
         color.preProcessDocx(_template);
         helper.assert(_template.files[0].data, _expectedXML);
       });

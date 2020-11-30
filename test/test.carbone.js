@@ -5,7 +5,6 @@ var fs = require('fs');
 var helper = require('../lib/helper');
 var params = require('../lib/params');
 var converter = require('../lib/converter');
-var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
@@ -20,6 +19,9 @@ describe('Carbone', function () {
     after(function (done) {
       helper.rmDirRecursive(_tempPath);
       helper.rmDirRecursive(_templatePath);
+      done();
+    });
+    afterEach(function (done) {
       carbone.reset();
       done();
     });
@@ -51,14 +53,130 @@ describe('Carbone', function () {
       });
       done();
     });
-    it('should change the lang of of date formatter', function (done) {
-      carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
-      carbone.set({lang : 'en'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'Friday');
-      carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
+  });
+
+  describe('format date', function () {
+    afterEach(function (done) {
+      carbone.reset();
       done();
+    });
+    it('should return friday for 20140131 even if no timezone is set', function (done) {
+      carbone.set({lang : 'fr'});
+      carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 23:45:00'},  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> vendredi </xml>');
+        carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> vendredi </xml>');
+          carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 00:10:00'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> vendredi </xml>');
+            done();
+          });
+        });
+      });
+    });
+    it('should change the lang globally of date formatter', function (done) {
+      carbone.set({lang : 'fr'});
+      carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 23:45:00'},  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> vendredi </xml>');
+        carbone.set({lang : 'en'});
+        carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> Friday </xml>');
+          carbone.set({lang : 'fr'});
+          carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> vendredi </xml>');
+            // Should overwrite global lang with options
+            carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, {lang : 'en'}, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml> Friday </xml>');
+              done();
+            });
+          });
+        });
+      });
+    });
+    it('should change the timezone globally and localy', function (done) {
+      carbone.set({timezone : 'Europe/Paris'});
+      carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        // By defaut, Carbone consider the input timezone is Europe/Paris if not specified
+        helper.assert(result, '<xml> 2:00:00 PM </xml>');
+        carbone.set({timezone : 'America/New_York'});
+        carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> 8:00:00 AM </xml>');
+          // If the input timezone is defined with UTC-X, it takes this into account
+          carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> 2:00:00 PM </xml>');
+            // Should overwrite global timezone with options
+            carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {timezone : 'Europe/Paris'}, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml> 8:00:00 PM </xml>');
+              done();
+            });
+          });
+        });
+      });
+    });
+    it('should not crash it the wrong timezone or wrong lang is passed during rendering', function (done) {
+      carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {timezone : 'BULLSHIT'}, function (err, result) {
+        helper.assert(err+'', 'RangeError: Expected Area/Location(/Location)* for time zone, got BULLSHIT');
+        helper.assert(result, null);
+        carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {lang : 'BULLSHIT'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> 8:00:00 PM </xml>');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `addD` on dates + formatD', function (done) {
+      carbone.renderXML('{d.date:addD(1, day):formatD(YYYY-MM-DD)}', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-02');
+        carbone.renderXML('{d.date:addD(1, day, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-01-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-02');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `addD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:subD(1, day):formatD(YYYY-MM-DD)}', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-05-31');
+        carbone.renderXML('{d.date:subD(1, day, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-01-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-05-31');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `startOfD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:startOfD(month):formatD(YYYY-MM-DD)}', { date : '2014-06-11 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-01');
+        carbone.renderXML('{d.date:startOfD(month, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-11-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-01');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `endOfD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:endOfD(month):formatD(YYYY-MM-DD)}', { date : '2014-06-11 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-30');
+        carbone.renderXML('{d.date:endOfD(month, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-11-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-30');
+          done();
+        });
+      });
     });
   });
 
@@ -383,6 +501,21 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should return the current timestamp in UTC with c.now', function (done) {
+      carbone.renderXML('{c.now}', {}, function (err, result) {
+        helper.assert(err+'', 'null');
+        var _parseDate = new Date(result);
+        helper.assert(((Date.now()/1000) - _parseDate.getTime()) < 1, true) ;
+        done();
+      });
+    });
+    it('should not overwrite c.now if already defined the current timestamp in UTC with c.now', function (done) {
+      carbone.renderXML('{c.now}', {}, { complement : {now : 'aa'} }, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, 'aa');
+        done();
+      });
+    });
     it('should execute formatter if the data object is empty with the formatter ifEmpty', function (done) {
       var data = {};
       carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : {}}, function (err, result) {
@@ -579,6 +712,22 @@ describe('Carbone', function () {
           helper.assert(result, '<xml>cocina</xml>');
           done();
         });
+      });
+    });
+    it('should translate markers which are inside other markers and remove XML inside', function () {
+      let _xml = '<xml>{<t>d</t>.id:if<tag>Eq</tag>ual(2, \'{<b>t</b>(on <br>Monday) }\'</br>) }</xml>';
+      let _expectedXML = '<xml>le Lundi<t></t><tag></tag><b></b><br></br></xml>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'on Monday' : 'le Lundi'
+          }
+        }
+      };
+      carbone.renderXML(_xml, {id : 2}, _options, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, _expectedXML);
       });
     });
     it('options.lang should dynamically force the lang of translation markers {t()} and use translations of carbone', function (done) {
@@ -824,7 +973,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObjNoExist.textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObjNoExist not defined</xml>');
+          helper.assert(result, '<xml></xml>');
           done();
         });
       });
@@ -840,7 +989,23 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObjNoExist.textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObjNoExist not defined</xml>');
+          helper.assert(result, '<xml></xml>');
+          done();
+        });
+      });
+      it('should return an empty string if a path does not exist inside a conditional formatter', function (done) {
+        var data = {
+          obj : {
+            a : {
+              value : true
+            },
+            b : {}
+          },
+
+        };
+        carbone.renderXML('<xml>{d.obj.a.value:ifNEM():and(..b):ifNEM():show(oops):elseShow(success)}</xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>success</xml>');
           done();
         });
       });
@@ -856,8 +1021,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObj[0].textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObj[0] not defined</xml>');
-          // helper.assert(result, '<xml>[[C_ERROR]] subArray not allowed (type Array)</xml>');
+          helper.assert(result, '<xml></xml>');
           done();
         });
       });
@@ -2973,6 +3137,87 @@ describe('Carbone', function () {
           done();
         }, () => {
           done(new Error('Bad password.'));
+        });
+      });
+    });
+    it('should render a jpg wih specific resolutions and quality', function (done) {
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'jpg',
+          formatOptions : {
+            Quality     : 90,
+            PixelWidth  : 100,
+            PixelHeight : 100,
+            ColorMode   : 0
+          }
+        }
+      };
+      carbone.render('test_odt_render_static.odt', data, _options, (err, image) => {
+        helper.assert(err, null);
+        helper.assert(image.slice(0, 3).toString('hex'), 'ffd8ff');
+
+        _options.convertTo.formatOptions.PixelWidth = 50;
+        carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerRes) => {
+          helper.assert(err, null);
+          helper.assert(imageLowerRes.slice(0, 3).toString('hex'), 'ffd8ff');
+          helper.assert(imageLowerRes.length < image.length, true);
+
+          _options.convertTo.formatOptions.Quality = 50;
+          carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerQuality) => {
+            helper.assert(err, null);
+            helper.assert(imageLowerQuality.slice(0, 3).toString('hex'), 'ffd8ff');
+            helper.assert(imageLowerQuality.length < imageLowerRes.length, true);
+            done();
+          });
+        });
+      });
+    });
+    it('should render a png wih specific resolution and compression', function (done) {
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'png',
+          formatOptions : {
+            Compression : 1,
+            PixelWidth  : 100,
+            PixelHeight : 100,
+            Interlaced  : 0
+          }
+        }
+      };
+      carbone.render('test_odt_render_static.odt', data, _options, (err, image) => {
+        helper.assert(err, null);
+        helper.assert(image.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+
+        _options.convertTo.formatOptions.PixelWidth = 50;
+        carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerRes) => {
+          helper.assert(err, null);
+          helper.assert(imageLowerRes.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+          helper.assert(imageLowerRes.length < image.length, true);
+
+          _options.convertTo.formatOptions.Interlaced = 1;
+          carbone.render('test_odt_render_static.odt', data, _options, (err, imageInterlaced) => {
+            helper.assert(err, null);
+            helper.assert(imageInterlaced.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+            helper.assert(imageInterlaced.length > imageLowerRes.length, true);
+
+            _options.convertTo.formatOptions.Compression = 9;
+            carbone.render('test_odt_render_static.odt', data, _options, (err, imageCompressed) => {
+              helper.assert(err, null);
+              helper.assert(imageCompressed.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+              helper.assert(imageCompressed.length < imageInterlaced.length, true);
+              done();
+            });
+          });
         });
       });
     });

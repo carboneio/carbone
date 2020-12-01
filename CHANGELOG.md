@@ -2,10 +2,10 @@
   - ⚡️ **Manage timezone + new date formatters + switch from MomentJS to DayJS**
     - If not defined by you in `options.complement`, `{c.now}` returns the current date in UTC.
     - [BREAKING CHANGE]: remove old date formatter which were not documented: `format`, `parse`, `addDays` and `convert`.
-      You should use `formatD` instead and new formatters below. They were very old formatters, the chance you use them is low because you had to 
+      You should use `formatD` instead and new formatters below. They were very old formatters, the chance you use them is low because you had to
       look into the source code to know their existance.
     - New formatters:
-      - `addD(amount, unit [, patternIn])`     : add days, month to a date. `formatD` can be used after without specifying  patternIn 
+      - `addD(amount, unit [, patternIn])`     : add days, month to a date. `formatD` can be used after without specifying  patternIn
       - `subD(amount, unit [, patternIn])`     : subtract days, month to a date. `formatD` can be used after without specifying  patternIn
       - `startOfD(amount, unit [, patternIn])` : Set a date to the start of a unit of time. `formatD` can be used after without specifying  patternIn
       - `endOfD(amount, unit [, patternIn])`   : Set a date to the end of a unit of time. `formatD` can be used after without specifying  patternIn
@@ -31,13 +31,13 @@
         - `{d.dateTZ:formatD(LLLL)}`      => `Sunday  , November 29, 2020 2:54 AM`
         - `{d.dateUnix:formatD(LLLL, X)}` => `Saturday, November 28, 2020 10:54 PM`
 
-      if `options.timezone = 'America/New_York'` 
+      if `options.timezone = 'America/New_York'`
         - `{d.date:formatD(LLLL)}`        => `Saturday, November 28, 2020 4:54 PM`
         - `{d.dateWTZ:formatD(LLLL)}`     => `Saturday, November 28, 2020 3:54 PM`
         - `{d.dateTZ:formatD(LLLL)}`      => `Saturday, November 28, 2020 8:54 PM`
         - `{d.dateUnix:formatD(LLLL, X)}` => `Saturday, November 28, 2020 4:54 PM`
 
-      List of timezone:  https://en.wikipedia.org/wiki/List_of_tz_database_time_zones 
+      List of timezone:  https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
   - Fix: if a path does not exist inside a formatter argument, it returns an empty string instead of the error "[[C_ERROR]] attribute_name not defined".
@@ -55,7 +55,7 @@
   - [EE] Returns errors when Carbone cannot dynamically replaces images (ex. images with absolute positions) instead of generating a bad report
   - [EE] Fix some PDF options. Integer values were not taken into account.
   - [EE] Add the possibilty to generate JPG or PNG of the first page of a document
-    Available options for `jpg/png`: 
+    Available options for `jpg/png`:
     ```js
         convertTo : {
           formatName    : 'jpg', // or png
@@ -65,11 +65,11 @@
             PixelHeight : 100, // Image height as pixels
             Compression : 90,  // [PNG ONLY] From 0 (compression disabled) to 9 (high compression, low size)
             Interlaced  : 0,   // [PNG ONLY] 0 not interlaced, 1 enterlaced (higher size)
-            ColorMode   : 0    // 0 Colors, 1 Greyscale 
+            ColorMode   : 0    // 0 Colors, 1 Greyscale
           }
         }
     ```
-  - [EE] DOCX/ODT New feature: Support HTML rich content, by adding the `:html` formatter, it is possible to render the following HTML tag: `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`. Unsupported tags and tags attributes are skipped and not rendered. An error is thrown if HTML tags are unvalid.
+  - [EE] DOCX/ODT New feature: Support HTML rich content, by adding the `:html` formatter, it is possible to render the following HTML tag: `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`. Unsupported tags and tags attributes are skipped and not rendered. An error is thrown if HTML tags are unvalid. HTML entities are accepted.
 
 ### v2.1.1
   - Release September 23rd 2020

@@ -330,7 +330,7 @@ module.exports = {
 To override render writing, you have to add the function `onRenderEnd` in the `storage.js` file and export it.
 
 ```js
-function onRenderEnd (req, res, reportName, reportPath, next) {
+function onRenderEnd (req, res, reportName, reportPath, statsObject, next) {
   // Write or rename your render
 
   return next(null)

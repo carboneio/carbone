@@ -1,5 +1,7 @@
 
-### v2.2.0
+### v3.0.0
+  - 👋🏻 NOTE: This version contains breaking changes of undocumented features.
+    So if you use only documented features so far, you should not be concerned by these breaking changes.
   - ⚡️ **Manage timezone + new date formatters + switch from MomentJS to DayJS**
     - If not defined by you in `options.complement`, `{c.now}` returns the current date in UTC.
     - [BREAKING CHANGE]: remove old date formatter which were not documented: `format`, `parse`, `addDays` and `convert`.
@@ -50,6 +52,34 @@
   - Accepts Adobe Indesign IDML file as a template
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
   - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
+  - Performance: reduce disk IO when converting document
+  - Performance: deactivate image compression by default to speed up PDF conversion
+  - [BREAKING CHANGE]: remove the possibility to use `convertTo.formatOptionsRaw` for CSV export. This feature was not documented
+    and can lead to security issues. Use `convertTo.formatOptions` instead.
+  - new paramater in `Carbone.set` 
+     - `renderPath`   : `Carbone.set` can changes the default path where rendered files are temporary saved.
+                        By default, it creates the directory `carbone_render` in Operating System temp directory.
+                        It creates the path automatically
+  - new paramater in `Carbone.render` 
+     - `renderPrefix` : If defined in `options` object. `Carbone.render` returns a file path instead of a buffer, and it adds this prefix in the rendered filename
+                        The generated filename contains three parts:
+                          - the prefix
+                          - a secure Pseudo-Random part of 22 characters
+                          - the report name, encoded in specific base64 to generate safe POSIX compatible filename on disk
+                        `/renderpath/<prefix><22-random-chars><encodedReportName.extension>`
+                        This filename can be decoded with the function `Carbone.decodeOuputFilename(pathOrFilename)`.
+                        It is the user responsability to delete the file or not.
+  - New function `decodeOuputFilename()`: when `renderPrefix` is used, the returned filename can be parsed with this function.
+                        It decodes filename an returns an object with two parameters
+                        ```js
+                        {
+                          extension  : 'pdf',                // output file extension
+                          reportName : 'decoded report name' // reportName
+                        }
+                        ```
+  - [BREAKING CHANGE]: `Carbone.convert` function signature has changed. Now, it accepts the same `options` as Carbone.renders:
+    You must use `Carbone.convert(fileBuffer, options, callback)` instead of `Carbone.convert(fileBuffer, convertTo, options, callback)`
+
 
 ### v2.1.1
   - Release September 23rd 2020

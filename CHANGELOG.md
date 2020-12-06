@@ -53,6 +53,7 @@
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
   - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
   - Performance: reduce disk IO when converting document
+  - Performance: deactivate image compression by default to speed up PDF conversion
   - [BREAKING CHANGE]: remove the possibility to use `convertTo.formatOptionsRaw` for CSV export. This feature was not documented
     and can lead to security issues. Use `convertTo.formatOptions` instead.
   - new paramater in `Carbone.set` 

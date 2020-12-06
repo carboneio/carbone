@@ -4,8 +4,8 @@ var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
 var params = require('../lib/params');
+var input = require('../lib/input');
 var converter = require('../lib/converter');
-var dateFormatter = require('../formatters/date');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
@@ -21,6 +21,9 @@ describe('Carbone', function () {
     after(function (done) {
       helper.rmDirRecursive(_tempPath);
       helper.rmDirRecursive(_templatePath);
+      done();
+    });
+    afterEach(function (done) {
       carbone.reset();
       done();
     });
@@ -52,14 +55,130 @@ describe('Carbone', function () {
       });
       done();
     });
-    it('should change the lang of of date formatter', function (done) {
-      carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
-      carbone.set({lang : 'en'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'Friday');
-      carbone.set({lang : 'fr'});
-      helper.assert(dateFormatter.convDate('20140131','YYYYMMDD','dddd'), 'vendredi');
+  });
+
+  describe('format date', function () {
+    afterEach(function (done) {
+      carbone.reset();
       done();
+    });
+    it('should return friday for 20140131 even if no timezone is set', function (done) {
+      carbone.set({lang : 'fr'});
+      carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 23:45:00'},  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> vendredi </xml>');
+        carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> vendredi </xml>');
+          carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 00:10:00'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> vendredi </xml>');
+            done();
+          });
+        });
+      });
+    });
+    it('should change the lang globally of date formatter', function (done) {
+      carbone.set({lang : 'fr'});
+      carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131 23:45:00'},  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> vendredi </xml>');
+        carbone.set({lang : 'en'});
+        carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> Friday </xml>');
+          carbone.set({lang : 'fr'});
+          carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> vendredi </xml>');
+            // Should overwrite global lang with options
+            carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, {lang : 'en'}, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml> Friday </xml>');
+              done();
+            });
+          });
+        });
+      });
+    });
+    it('should change the timezone globally and localy', function (done) {
+      carbone.set({timezone : 'Europe/Paris'});
+      carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        // By defaut, Carbone consider the input timezone is Europe/Paris if not specified
+        helper.assert(result, '<xml> 2:00:00 PM </xml>');
+        carbone.set({timezone : 'America/New_York'});
+        carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> 8:00:00 AM </xml>');
+          // If the input timezone is defined with UTC-X, it takes this into account
+          carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> 2:00:00 PM </xml>');
+            // Should overwrite global timezone with options
+            carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {timezone : 'Europe/Paris'}, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml> 8:00:00 PM </xml>');
+              done();
+            });
+          });
+        });
+      });
+    });
+    it('should not crash it the wrong timezone or wrong lang is passed during rendering', function (done) {
+      carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {timezone : 'BULLSHIT'}, function (err, result) {
+        helper.assert(err+'', 'RangeError: Expected Area/Location(/Location)* for time zone, got BULLSHIT');
+        helper.assert(result, null);
+        carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {lang : 'BULLSHIT'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> 8:00:00 PM </xml>');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `addD` on dates + formatD', function (done) {
+      carbone.renderXML('{d.date:addD(1, day):formatD(YYYY-MM-DD)}', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-02');
+        carbone.renderXML('{d.date:addD(1, day, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-01-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-02');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `addD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:subD(1, day):formatD(YYYY-MM-DD)}', { date : '2014-06-01 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-05-31');
+        carbone.renderXML('{d.date:subD(1, day, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-01-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-05-31');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `startOfD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:startOfD(month):formatD(YYYY-MM-DD)}', { date : '2014-06-11 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-01');
+        carbone.renderXML('{d.date:startOfD(month, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-11-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-01');
+          done();
+        });
+      });
+    });
+    it('should accept combination of operations `endOfD` on dates + format', function (done) {
+      carbone.renderXML('{d.date:endOfD(month):formatD(YYYY-MM-DD)}', { date : '2014-06-11 14:00:00'}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '2014-06-30');
+        carbone.renderXML('{d.date:endOfD(month, MM-DD-YYYY):formatD(YYYY-MM-DD)}', { date : '06-11-2014'}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '2014-06-30');
+          done();
+        });
+      });
     });
   });
 
@@ -108,8 +227,8 @@ describe('Carbone', function () {
           return d === true ? 'yes' : 'no';
         }
       });
-      assert.notEqual(typeof carbone.formatters.yesOrNo, 'undefined');
-      assert.equal(carbone.formatters.yesOrNo(true), 'yes');
+      assert.notEqual(typeof input.formatters.yesOrNo, 'undefined');
+      assert.equal(input.formatters.yesOrNo(true), 'yes');
     });
   });
 
@@ -384,6 +503,21 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should return the current timestamp in UTC with c.now', function (done) {
+      carbone.renderXML('{c.now}', {}, function (err, result) {
+        helper.assert(err+'', 'null');
+        var _parseDate = new Date(result);
+        helper.assert(((Date.now()/1000) - _parseDate.getTime()) < 1, true) ;
+        done();
+      });
+    });
+    it('should not overwrite c.now if already defined the current timestamp in UTC with c.now', function (done) {
+      carbone.renderXML('{c.now}', {}, { complement : {now : 'aa'} }, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, 'aa');
+        done();
+      });
+    });
     it('should execute formatter if the data object is empty with the formatter ifEmpty', function (done) {
       var data = {};
       carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : {}}, function (err, result) {
@@ -580,6 +714,22 @@ describe('Carbone', function () {
           helper.assert(result, '<xml>cocina</xml>');
           done();
         });
+      });
+    });
+    it('should translate markers which are inside other markers and remove XML inside', function () {
+      let _xml = '<xml>{<t>d</t>.id:if<tag>Eq</tag>ual(2, \'{<b>t</b>(on <br>Monday) }\'</br>) }</xml>';
+      let _expectedXML = '<xml>le Lundi<t></t><tag></tag><b></b><br></br></xml>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'on Monday' : 'le Lundi'
+          }
+        }
+      };
+      carbone.renderXML(_xml, {id : 2}, _options, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, _expectedXML);
       });
     });
     it('options.lang should dynamically force the lang of translation markers {t()} and use translations of carbone', function (done) {
@@ -825,7 +975,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObjNoExist.textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObjNoExist not defined</xml>');
+          helper.assert(result, '<xml></xml>');
           done();
         });
       });
@@ -841,7 +991,23 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObjNoExist.textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObjNoExist not defined</xml>');
+          helper.assert(result, '<xml></xml>');
+          done();
+        });
+      });
+      it('should return an empty string if a path does not exist inside a conditional formatter', function (done) {
+        var data = {
+          obj : {
+            a : {
+              value : true
+            },
+            b : {}
+          },
+
+        };
+        carbone.renderXML('<xml>{d.obj.a.value:ifNEM():and(..b):ifNEM():show(oops):elseShow(success)}</xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>success</xml>');
           done();
         });
       });
@@ -857,8 +1023,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObj[0].textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml>[[C_ERROR]] otherObj[0] not defined</xml>');
-          // helper.assert(result, '<xml>[[C_ERROR]] subArray not allowed (type Array)</xml>');
+          helper.assert(result, '<xml></xml>');
           done();
         });
       });
@@ -2249,38 +2414,89 @@ describe('Carbone', function () {
     after(function () {
       carbone.reset();
     });
-    it('should render a template and return a path instead of a buffer', function (done) {
+    it('should render a template and return a path instead of a buffer if renderPrefix is defined', function (done) {
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
       var opt = {
-        renderPath: os.tmpdir(),
-        renderPrefix: 'prefix'
+        renderPrefix : 'prefix-'
       };
-      carbone.render('test_word_render_A.docx', data, opt, function (err, result, reportName) {
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName) {
         assert.equal(err, null);
-        assert.strictEqual(result.startsWith('/'), true);
-        assert.strictEqual(result.endsWith('prefix_report.docx'), true);
+        var _filename = path.basename(resultFilePath);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        assert.strictEqual(reportName, undefined);
+        assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(_filename), true);
+        fs.unlinkSync(resultFilePath);
         done();
       });
     });
-    it('should render a template and return a path instead of a buffer (with conversion)', function (done) {
+    it('should return a path instead of a buffer if renderPrefix is defined with reportName\
+      it should encode reportName to write POSIX compatible filename\
+      decodeRenderedFilename can be used to decode the filename', function (done) {
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
       var opt = {
-        renderPath: os.tmpdir(),
-        renderPrefix: 'prefix',
-        reportName: '{d.field1}test',
-        convertTo: 'pdf'
+        renderPrefix : 'aa',
+        reportName   : '报道yéà?e|ah/../{d.field1}(")\''
       };
-      carbone.render('test_word_render_A.docx', data, opt, function (err, result, reportName) {
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName) {
         assert.equal(err, null);
-        console.log(result, reportName)
-        assert.strictEqual(result.startsWith('/'), true);
-        assert.strictEqual(result.endsWith('prefix_field_1test.pdf'), true);
+        var _filename = path.basename(resultFilePath);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        assert.strictEqual(reportName, '报道yéà?e|ah/../field_1(")\'');
+        assert.strictEqual(/^[a-z0-9-_]+\.docx$/i.test(_filename), true);
+        var _onlyReportName = _filename.slice(2+22, -5);
+        assert.strictEqual(helper.decodeSafeFilename(_onlyReportName), '报道yéà?e|ah/../field_1(")\'');
+        helper.assert(carbone.decodeRenderedFilename(resultFilePath, 2), {
+          reportName : '报道yéà?e|ah/../field_1(")\'',
+          extension  : 'docx'
+        });
+        fs.unlinkSync(resultFilePath);
+        done();
+      });
+    });
+    it('should accept only alphanumeric characters in renderPrefix', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPrefix : '报道yéà?e|ah/../{d.field1}(")'
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath) {
+        assert.equal(err, null);
+        var _filename = path.basename(resultFilePath);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        var _onlyReportName = _filename.slice(11+22, -5);
+        assert.strictEqual(helper.decodeSafeFilename(_onlyReportName), 'report');
+        assert.strictEqual(/yeahdfield1[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(_filename), true);
+        fs.unlinkSync(resultFilePath);
+        done();
+      });
+    });
+    it('should render a template and return a path instead of a buffer (with conversion).\
+      it should trim and lower case convertTo extension', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPrefix : 'prefix',
+        reportName   : '{d.field1}test',
+        convertTo    : ' PDF  '
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath) {
+        assert.equal(err, null);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        var _filename = path.basename(resultFilePath);
+        var _onlyReportName = _filename.slice(opt.renderPrefix.length + 22, -4);
+        assert.strictEqual(helper.decodeSafeFilename(_onlyReportName), 'field_1test');
+        assert.strictEqual(/prefix[A-Za-z0-9-_]{22}ZmllbGRfMXRlc3Q\.pdf/.test(_filename), true);
+        fs.unlinkSync(resultFilePath);
         done();
       });
     });
@@ -2357,10 +2573,22 @@ describe('Carbone', function () {
         field2 : 'field_2'
       };
       carbone.render('test_word_render_2003_XML.xml', data, function (err, result) {
+        helper.assert(err+'', 'null');
         assert.equal(result.indexOf('field1'), -1);
         assert.equal(result.indexOf('field2'), -1);
         assert.notEqual(result.indexOf('field_1'), -1);
         assert.notEqual(result.indexOf('field_2'), -1);
+        done();
+      });
+    });
+    it('should return an error if hardRefresh is set to true on unknown files for LibreOffice', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      carbone.render('test_word_render_2003_XML.xml', data, { hardRefresh : true }, function (err, result) {
+        helper.assert(err+'', 'Format "xml" can\'t be converted to "xml".');
+        assert.equal(result, null);
         done();
       });
     });
@@ -2717,21 +2945,21 @@ describe('Carbone', function () {
         });
       });
     });
-    it('should render a template (docx), generate to PDF and give output', function (done) {
+    it('should render a template (docx), generate to PDF and give a path instead of a buffer if renderPrefix is defined', function (done) {
       var _pdfExpectedPath = path.resolve('./test/datasets/test_word_render_A.pdf');
       var data = {
         field1 : 'field_1',
         field2 : 'field_2',
       };
-      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf', isBufferOutput : false}, function (err, resultPath) {
+      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf', renderPrefix : ''}, function (err, resultPath) {
         assert.equal(err, null);
-        console.log(resultPath)
         assert.equal(resultPath.endsWith('.pdf'), true);
         fs.readFile(_pdfExpectedPath, function (err, expected) {
           fs.readFile(resultPath, function (err, result) {
             assert.equal(err+'', 'null');
             assert.equal(result.slice(0, 4).toString(), '%PDF');
             assert.equal(result.slice(8, 50).toString(), expected.slice(8, 50).toString());
+            fs.unlinkSync(resultPath);
             done();
           });
         });
@@ -2780,7 +3008,7 @@ describe('Carbone', function () {
         var _nbExecuted = 100;
         var _results = [];
         var _waitedResponse = _nbExecuted;
-        var _start = new Date();
+        var _start = process.hrtime();
         for (var i = 0; i < _nbExecuted; i++) {
           carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
             _waitedResponse--;
@@ -2791,8 +3019,8 @@ describe('Carbone', function () {
           });
         }
         function theEnd () {
-          var _end = new Date();
-          var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
+          var _diff = process.hrtime(_start);
+          var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6) / _nbExecuted;
           console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions (usally around 65ms) \n\n\n');
           for (var i = 0; i < _results.length; i++) {
             assert.equal(Buffer.isBuffer(_results[i]), true);
@@ -2811,7 +3039,7 @@ describe('Carbone', function () {
       pipeNamePrefix : '_carbone',
       factories      : 1,
       startFactory   : false,
-      attempts       : 2
+      attempts       : 1
     };
     afterEach(function (done) {
       converter.exit(function () {
@@ -2822,36 +3050,32 @@ describe('Carbone', function () {
     beforeEach(function () {
       carbone.set({templatePath : _templatePath});
     });
-    it('should convert a file to another format', function (done) {
-      var _options = {
-        fieldSeparator : ',',
-        textDelimiter  : '"',
-        characterSet   : '76',
-        extension      : 'ods'
-      };
-      var _fileData = fs.readFileSync(path.join(__dirname, 'datasets', 'test_spreadsheet.ods'));
-      carbone.convert(_fileData, 'csv', _options, function (err, data) {
-        helper.assert(err, null);
-        helper.assert(data.toString(), ',,\n,{d[i].id},{d[i].name}\n,{d[i+1].id},{d[i+1].name}\n');
-        done();
+    it('should convert a document', function (done) {
+      var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+      fs.readFile(path.join(_templatePath, 'test_word_render_A.docx'), function (err, buffer) {
+        helper.assert(err+'', 'null');
+        carbone.convert(buffer, {convertTo : 'pdf', extension : 'docx'}, function (err, result) {
+          assert.equal(err, null);
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
+          fs.readFile(_pdfResultPath, function (err, expected) {
+            assert.equal(err+'', 'null');
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            assert.equal(result.slice(8, 50).toString(), expected.slice(8, 50).toString());
+            done();
+          });
+        });
       });
     });
-    it('should return an error if the file input type is not defined', function (done) {
-      var _options = {
-        fieldSeparator : ',',
-        textDelimiter  : '"',
-        characterSet   : '76'
-      };
-      var _fileData = fs.readFileSync(path.join(__dirname, 'datasets', 'test_spreadsheet.ods'));
-      carbone.convert(_fileData, 'csv', _options, function (err, data) {
-        helper.assert(err, 'options.extension must be set to detect input file type');
-        helper.assert(data, null);
-        done();
+    it('should return an error if the input extension is not passed', function (done) {
+      fs.readFile(path.join(_templatePath, 'test_word_render_A.docx'), function (err, buffer) {
+        helper.assert(err+'', 'null');
+        carbone.convert(buffer, {convertTo : 'pdf'}, function (err) {
+          assert.equal(err, 'options.extension must be set to detect input file type');
+          done();
+        });
       });
     });
   });
-
-
   describe('render and convert CSV with options', function () {
     var _templatePath = path.join(__dirname, 'datasets');
     var defaultOptions = {
@@ -2904,13 +3128,15 @@ describe('Carbone', function () {
         done();
       });
     });
-    it('should render spreadsheet with raw options (complete)', function (done) {
+    it('should render spreadsheet with only a different fieldSeparator', function (done) {
       var data = [{ id : 1, name : 'field_1' },
         { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : {
-          formatName       : 'csv',
-          formatOptionsRaw : '124,34,0'
+          formatName    : 'csv',
+          formatOptions : {
+            fieldSeparator : '|'
+          },
         }
       };
       carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
@@ -2920,7 +3146,7 @@ describe('Carbone', function () {
         done();
       });
     });
-    it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function (done) {
+    it('should not crash if formatName is passed without formatOptions', function (done) {
       var data = [{ id : 1, name : 'field_1' },
         { id : 2, name : 'field_2' }];
       var _options = {
@@ -2931,22 +3157,6 @@ describe('Carbone', function () {
       carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = ',,\n,1,field_1\n,2,field_2\n';
-        helper.assert(result.toString(), _expected);
-        done();
-      });
-    });
-    it('should render spreadsheet with raw options (incomplete)', function (done) {
-      var data = [{ id : 1, name : 'field_1' },
-        { id : 2, name : 'field_2' }];
-      var _options = {
-        convertTo : {
-          formatName       : 'csv',
-          formatOptionsRaw : '124'
-        }
-      };
-      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
-        helper.assert(err, null);
-        var _expected = '||\n|1|field_1\n|2|field_2\n';
         helper.assert(result.toString(), _expected);
         done();
       });
@@ -3029,6 +3239,87 @@ describe('Carbone', function () {
           done();
         }, () => {
           done(new Error('Bad password.'));
+        });
+      });
+    });
+    it('should render a jpg wih specific resolutions and quality', function (done) {
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'jpg',
+          formatOptions : {
+            Quality     : 90,
+            PixelWidth  : 100,
+            PixelHeight : 100,
+            ColorMode   : 0
+          }
+        }
+      };
+      carbone.render('test_odt_render_static.odt', data, _options, (err, image) => {
+        helper.assert(err, null);
+        helper.assert(image.slice(0, 3).toString('hex'), 'ffd8ff');
+
+        _options.convertTo.formatOptions.PixelWidth = 50;
+        carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerRes) => {
+          helper.assert(err, null);
+          helper.assert(imageLowerRes.slice(0, 3).toString('hex'), 'ffd8ff');
+          helper.assert(imageLowerRes.length < image.length, true);
+
+          _options.convertTo.formatOptions.Quality = 50;
+          carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerQuality) => {
+            helper.assert(err, null);
+            helper.assert(imageLowerQuality.slice(0, 3).toString('hex'), 'ffd8ff');
+            helper.assert(imageLowerQuality.length < imageLowerRes.length, true);
+            done();
+          });
+        });
+      });
+    });
+    it('should render a png wih specific resolution and compression', function (done) {
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'png',
+          formatOptions : {
+            Compression : 1,
+            PixelWidth  : 100,
+            PixelHeight : 100,
+            Interlaced  : 0
+          }
+        }
+      };
+      carbone.render('test_odt_render_static.odt', data, _options, (err, image) => {
+        helper.assert(err, null);
+        helper.assert(image.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+
+        _options.convertTo.formatOptions.PixelWidth = 50;
+        carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerRes) => {
+          helper.assert(err, null);
+          helper.assert(imageLowerRes.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+          helper.assert(imageLowerRes.length < image.length, true);
+
+          _options.convertTo.formatOptions.Interlaced = 1;
+          carbone.render('test_odt_render_static.odt', data, _options, (err, imageInterlaced) => {
+            helper.assert(err, null);
+            helper.assert(imageInterlaced.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+            helper.assert(imageInterlaced.length > imageLowerRes.length, true);
+
+            _options.convertTo.formatOptions.Compression = 9;
+            carbone.render('test_odt_render_static.odt', data, _options, (err, imageCompressed) => {
+              helper.assert(err, null);
+              helper.assert(imageCompressed.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+              helper.assert(imageCompressed.length < imageInterlaced.length, true);
+              done();
+            });
+          });
         });
       });
     });

@@ -22,6 +22,54 @@ describe('helper', function () {
       helper.assert(_uid.length, 22);
       helper.assert((_uid!==_uid2), true);
     });
+    it('should be fast and random', function () {
+      var _loops = 1000;
+      var _res = [];
+      var _start = process.hrtime();
+      for (let i = 0; i < _loops; i++) {
+        _res.push(helper.getRandomString());
+      }
+      var _diff = process.hrtime(_start);
+      helper.assert(_res.length, _loops);
+      _res.sort();
+      for (let i = 0; i < _loops - 1; i++) {
+        if (_res[i] === _res[i+1]) {
+          assert(false, 'Random string should be different');
+        }
+      }
+      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n getRandomString : ' + _elapsed + ' ms (around 1.3ms for 1000) \n');
+      helper.assert(_elapsed > 5, false, 'getRandomString is too slow');
+    });
+  });
+
+  describe('encodeSafeFilename|decodeSafeFilename', function () {
+    it('should not crash if string is undefined or null', function () {
+      helper.assert(helper.encodeSafeFilename(), '');
+      helper.assert(helper.encodeSafeFilename(null), '');
+    });
+    it('should generate a safe filename from any string, and should be able to decode it', function () {
+      helper.assert(helper.encodeSafeFilename('azertyuioopqsdfghjklmwxcvbn'), 'YXplcnR5dWlvb3Bxc2RmZ2hqa2xtd3hjdmJu');
+      helper.assert(helper.decodeSafeFilename('YXplcnR5dWlvb3Bxc2RmZ2hqa2xtd3hjdmJu'), 'azertyuioopqsdfghjklmwxcvbn');
+
+      // base64 character ends with =
+      helper.assert(helper.encodeSafeFilename('01234567890'), 'MDEyMzQ1Njc4OTA');
+      helper.assert(helper.decodeSafeFilename('MDEyMzQ1Njc4OTA'), '01234567890');
+
+      // base64 character ends with ==
+      helper.assert(helper.encodeSafeFilename('0123456789'), 'MDEyMzQ1Njc4OQ');
+      helper.assert(helper.decodeSafeFilename('MDEyMzQ1Njc4OQ'), '0123456789');
+
+      helper.assert(helper.encodeSafeFilename('n?./+£%*¨^../\\&éé"\'(§è!çà)-)'), 'bj8uLyvCoyUqwqheLi4vXCbDqcOpIicowqfDqCHDp8OgKS0p');
+      helper.assert(helper.decodeSafeFilename('bj8uLyvCoyUqwqheLi4vXCbDqcOpIicowqfDqCHDp8OgKS0p'), 'n?./+£%*¨^../\\&éé"\'(§è!çà)-)');
+
+      helper.assert(helper.encodeSafeFilename('报道'), '5oql6YGT');
+      helper.assert(helper.decodeSafeFilename('5oql6YGT'), '报道');
+
+      helper.assert(helper.encodeSafeFilename('k�'), 'a__-vQ');
+      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
+      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
+    });
   });
 
   describe('cleanJavascriptVariable', function () {
@@ -512,4 +560,53 @@ describe('helper', function () {
     });
   });
 
+  describe('insertAt', function () {
+    it('should insert text inside a content at a specific position', function () {
+      const _content = 'Western robin (Eopsaltria griseogularis).';
+      helper.assert(helper.insertAt(_content, 7, ' yellow'), 'Western yellow robin (Eopsaltria griseogularis).');
+      helper.assert(helper.insertAt(_content, 0, 'yellow '), 'yellow Western robin (Eopsaltria griseogularis).');
+      helper.assert(helper.insertAt(_content, _content.length, ' yellow'), 'Western robin (Eopsaltria griseogularis). yellow');
+      helper.assert(helper.insertAt('', 0, 'yellow'), 'yellow');
+    });
+
+    it('should throw errors if the arguments are invalid', function () {
+      // Null arguments
+      assert.throws(() => helper.insertAt(null, 7, ' yellow'), new Error('The arguments are invalid (null or undefined).'));
+      assert.throws(() => helper.insertAt('text', null, ' yellow'), new Error('The arguments are invalid (null or undefined).'));
+      assert.throws(() => helper.insertAt('text', 8, null), new Error('The arguments are invalid (null or undefined).'));
+      // position out of the range
+      assert.throws(() => helper.insertAt('text', -1, 'yellow'), new Error('The index is outside of the text length range.'));
+      assert.throws(() => helper.insertAt('text', 10, 'yellow'), new Error('The index is outside of the text length range.'));
+      assert.throws(() => helper.insertAt('', 1, 'yellow'), new Error('The index is outside of the text length range.'));
+    });
+  });
+
+  describe('compareStringFromPosition', function () {
+    it('Should find the text searched on the content at a specific position.', function () {
+      const _content = 'Western yellow robin (Eopsaltria griseogularis).';
+      helper.assert(helper.compareStringFromPosition('yellow', _content, 8), true);
+      helper.assert(helper.compareStringFromPosition(' robin ', _content, 14), true);
+      helper.assert(helper.compareStringFromPosition('opsaltr', _content, 23), true);
+      helper.assert(helper.compareStringFromPosition('griseogularis).', _content, 33), true);
+    });
+
+    it('Should NOT find the text searched on the content at a specific position.', function () {
+      const _content = 'Western yellow robin (Eopsaltria griseogularis).';
+      helper.assert(helper.compareStringFromPosition('yelow', _content, 8), false);
+      helper.assert(helper.compareStringFromPosition('robin ', _content, 14), false);
+      helper.assert(helper.compareStringFromPosition('opsaltr', _content, 24), false);
+      helper.assert(helper.compareStringFromPosition('griseogularis).', _content, 1), false);
+      helper.assert(helper.compareStringFromPosition('yellow', 'yel', 1), false);
+    });
+
+    it('Should throw an error if an argument is invalid', function () {
+      // arguments undefined or null
+      assert.throws(() => helper.compareStringFromPosition(null, 'text', 1), new Error('The arguments are invalid (null or undefined).'));
+      assert.throws(() => helper.compareStringFromPosition('text', null, 1), new Error('The arguments are invalid (null or undefined).'));
+      assert.throws(() => helper.compareStringFromPosition('text', 'text 1234', undefined), new Error('The arguments are invalid (null or undefined).'));
+      // the index is out of the text range
+      assert.throws(() => helper.compareStringFromPosition('blue', 'blue', -1), new Error('The index is outside of the text length range.'));
+      assert.throws(() => helper.compareStringFromPosition('blue', 'blue', 10), new Error('The index is outside of the text length range.'));
+    });
+  });
 });

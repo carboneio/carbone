@@ -3,16 +3,12 @@
 // Force production mode with pkg
 process.env.NODE_ENV = process.pkg ? 'production' : process.env.NODE_ENV;
 
-var server = require('../lib/server');
 var webserver = require('../lib/webserver');
 var translator = require('../lib/translator');
 var tool = require('../lib/tool');
 var _action = process.argv[2];
 
 switch (_action) {
-  case 'server':
-    server(process.argv.slice(3));
-    break;
   case 'translate':
     translator.handleCLI(process.argv.slice(3));
     break;
@@ -46,7 +42,6 @@ switch (_action) {
 function usage () {
   console.log('*************************************');
   console.log('Carbone usage:');
-  console.log('   carbone server [--help]');
   console.log('   carbone translate [--help]');
   console.log('   carbone find [--help]');
   console.log('   carbone webserver [--help]');

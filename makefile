@@ -1,4 +1,4 @@
 test:
-	./node_modules/.bin/mocha --growl -u bdd -t 100000 -w -b
+	./node_modules/.bin/mocha -u bdd -t 100000 -w -b
 
 .PHONY: test

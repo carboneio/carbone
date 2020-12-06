@@ -2,6 +2,56 @@ var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
 
 describe('preprocessor', function () {
+  describe('preParse', function () {
+    it('should do nothing if the file is empty', function () {
+      let _xml = preprocessor.preParseXML('', {});
+      helper.assert(_xml, '');
+    });
+    it('should remove XML inside multiple markers', function () {
+      let _xml = '<xml>{d.t<td>his</td>Is<td>A</td>Car<td>bo<br/>ne</td><td>Ma</td>rker}</xml>';
+      let _expectedXML = '<xml>{d.thisIsACarboneMarker}<td></td><td></td><td><br/></td><td></td></xml>';
+      helper.assert(preprocessor.preParseXML(_xml, {}), _expectedXML);
+    });
+    it('should remove XML inside multiple markers and translate markers', function () {
+      let _xml = '<xmlstart>{me<interxml>n<bullshit>u}<div>{t(Mond</interxml>ay)}</div><div>{#def = id=2  }</div><div>{t(Tuesday is <bullshit>the second day of the week!)}</div></xmlend>';
+      let _expectedXML = '<xmlstart>{me<interxml>n<bullshit>u}<div>Lundi</interxml></div><div>{#def = id=2  }</div><div>Tuesday is the second day of the week!<bullshit></div></xmlend>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            Monday : 'Lundi'
+          }
+        }
+      };
+      helper.assert(preprocessor.preParseXML(_xml, _options), _expectedXML);
+    });
+    it('should translate markers which are inside other markers', function () {
+      let _xml = '<xml>{d.if:ifEqual(2, {t(Monday)})  }</xml>';
+      let _expectedXML = '<xml>{d.if:ifEqual(2, Lundi)  }</xml>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            Monday : 'Lundi'
+          }
+        }
+      };
+      helper.assert(preprocessor.preParseXML(_xml, _options), _expectedXML);
+    });
+    it('should translate markers which are inside other markers and remove XML inside', function () {
+      let _xml = '<xml>{<t>d</t>.if:if<tag>Eq</tag>ual(2, {<b>t</b>(on <br>Monday) }</br>) }</xml>';
+      let _expectedXML = '<xml>{d.if:ifEqual(2, le Lundi) }<t></t><tag></tag><b></b><br></br></xml>';
+      let _options = {
+        lang         : 'fr',
+        translations : {
+          fr : {
+            'on Monday' : 'le Lundi'
+          }
+        }
+      };
+      helper.assert(preprocessor.preParseXML(_xml, _options), _expectedXML);
+    });
+  });
   describe('execute', function () {
     it('should do nothing if the file is an empty object', function (done) {
       preprocessor.execute({}, function (err, tmpl) {
@@ -64,15 +114,15 @@ describe('preprocessor', function () {
                               + '<t>{d.name}</t></si><si><t>{d.id}</t></si></sst>';
       // var _sharedStringAfter  = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
       //                        + '<t></t></si><si><t></t></si></sst>';
-      var _sheetBefore  = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac"><dimension ref="A1:C3"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="C3" sqref="C3"/></sheetView></sheetViews><sheetFormatPr baseColWidth="10" defaultRowHeight="15" x14ac:dyDescent="0"/><sheetData>\n'
-                        + '<row r="1" spans="1:3"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c><c r="C1" t="s"><v>2</v></c></row>\n'
-                        + '<row r="2" spans="1:3"><c r="A2" t="s"><v>3</v></c><c r="B2"><v>100</v></c><c r="C2"><f>B2*100</f><v>10000</v></c></row>\n'
-                        + '<row r="3" spans="1:3"><c r="A3" t="s"><v>4</v></c><c r="B3" t="s"><v>5</v></c><c r="C3" t="e"><f>B3*100</f><v>#VALUE!</v></c></row>\n'
+      var _sheetBefore  = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac"><dimension ref="A1:C3"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="C3" sqref="C3"/></sheetView></sheetViews><sheetFormatPr baseColWidth="10" defaultRowHeight="15" x14ac:dyDescent="0"/><sheetData>'
+                        + '<row r="1" spans="1:3"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c><c r="C1" t="s"><v>2</v></c></row>'
+                        + '<row r="2" spans="1:3"><c r="A2" t="s"><v>3</v></c><c r="B2"><v>100</v></c><c r="C2"><f>B2*100</f><v>10000</v></c></row>'
+                        + '<row r="3" spans="1:3"><c r="A3" t="s"><v>4</v></c><c r="B3" t="s"><v>5</v></c><c r="C3" t="e"><f>B3*100</f><v>#VALUE!</v></c></row>'
                         + '</sheetData><pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/><extLst><ext uri="{64002731-A6B0-56B0-2670-7721B7C09600}" xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main"><mx:PLV Mode="0" OnePage="0" WScale="0"/></ext></extLst></worksheet>';
-      var _sheetAfter   = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac"><dimension ref="A1:C3"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="C3" sqref="C3"/></sheetView></sheetViews><sheetFormatPr baseColWidth="10" defaultRowHeight="15" x14ac:dyDescent="0"/><sheetData>\n'
-                        + '<row  ><c  t="inlineStr"><is><t>Nom</t></is></c><c  t="inlineStr"><is><t xml:space="preserve">Id </t></is></c><c  t="inlineStr"><is><t>TOTAL</t></is></c></row>\n'
-                        + '<row  ><c  t="inlineStr"><is><t>tata</t></is></c><c ><v>100</v></c><c ><f>B2*100</f><v>10000</v></c></row>\n'
-                        + '<row  ><c  t="inlineStr"><is><t>{d.name}</t></is></c><c  t="inlineStr"><is><t>{d.id}</t></is></c><c  t="e"><f>B3*100</f><v>#VALUE!</v></c></row>\n'
+      var _sheetAfter   = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac"><dimension ref="A1:C3"/><sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="C3" sqref="C3"/></sheetView></sheetViews><sheetFormatPr baseColWidth="10" defaultRowHeight="15" x14ac:dyDescent="0"/><sheetData>'
+                        + '<row  ><c  t="inlineStr"><is><t>Nom</t></is></c><c  t="inlineStr"><is><t xml:space="preserve">Id </t></is></c><c  t="inlineStr"><is><t>TOTAL</t></is></c></row>'
+                        + '<row  ><c  t="inlineStr"><is><t>tata</t></is></c><c ><v>100</v></c><c ><f>B2*100</f><v>10000</v></c></row>'
+                        + '<row  ><c  t="inlineStr"><is><t>{d.name}</t></is></c><c  t="inlineStr"><is><t>{d.id}</t></is></c><c  t="e"><f>B3*100</f><v>#VALUE!</v></c></row>'
                         + '</sheetData><pageMargins left="0.75" right="0.75" top="1" bottom="1" header="0.5" footer="0.5"/><extLst><ext uri="{64002731-A6B0-56B0-2670-7721B7C09600}" xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main"><mx:PLV Mode="0" OnePage="0" WScale="0"/></ext></extLst></worksheet>';
       var _sharedStringBefore2 = _sharedStringBefore.replace('{d.id}', '{d.type}');
       //  var _sharedStringAfter2 = _sharedStringAfter.replace('{d.id}', '{d.type}');
@@ -662,7 +712,7 @@ describe('preprocessor', function () {
 
         it('should replace pictures alt text marker on all images and it should not modify other markers', function (done) {
           var _xml = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.dog}</svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="5.87cm" svg:height="3.302cm" draw:z-index="0"><draw:image xlink:href="OLD_LINK" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title>{d.cat}</svg:title></draw:frame></text:p></xml>';
-          var _expected = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logo<text:span text:style-name="T1">Title</text:span>}</text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.dog:scaleImage(width, 5.87, cm)}cm" svg:height="{d.dog:scaleImage(height, 3.302, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.cat:scaleImage(width, 5.87, cm)}cm" svg:height="{d.cat:scaleImage(height, 3.302, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.cat:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
+          var _expected = '<xml><text:p text:style-name="P1"><text:span text:style-name="T1">Title</text:span> : {d.logoTitle}<text:span text:style-name="T1"></text:span></text:p><text:p text:style-name="P1"/><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.dog:scaleImage(width, 5.87, cm)}cm" svg:height="{d.dog:scaleImage(height, 3.302, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.dog:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p><text:p text:style-name="P1"><draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="paragraph" svg:x="0.03cm" svg:y="0.007cm" svg:width="{d.cat:scaleImage(width, 5.87, cm)}cm" svg:height="{d.cat:scaleImage(height, 3.302, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.cat:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title></svg:title></draw:frame></text:p></xml>';
           var _report = {
             embeddings : [],
             extension  : 'odt',
@@ -684,7 +734,7 @@ describe('preprocessor', function () {
             embeddings : [],
             extension  : 'odt',
             files      : [
-              { name : 'content.xml'    , parent : '', data : _xml }
+              { name : 'content.xml' , parent : '', data : _xml }
             ]
           };
           preprocessor.execute(_report, function (err, tmpl) {

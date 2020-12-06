@@ -15,6 +15,63 @@ describe('helper', function () {
     });
   });
 
+  describe('getRandomString', function () {
+    it('should return a random id', function () {
+      var _uid = helper.getRandomString();
+      var _uid2 = helper.getRandomString();
+      helper.assert(_uid.length, 22);
+      helper.assert((_uid!==_uid2), true);
+    });
+    it('should be fast and random', function () {
+      var _loops = 1000;
+      var _res = [];
+      var _start = process.hrtime();
+      for (let i = 0; i < _loops; i++) {
+        _res.push(helper.getRandomString());
+      }
+      var _diff = process.hrtime(_start);
+      helper.assert(_res.length, _loops);
+      _res.sort();
+      for (let i = 0; i < _loops - 1; i++) {
+        if (_res[i] === _res[i+1]) {
+          assert(false, 'Random string should be different');
+        }
+      }
+      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+      console.log('\n getRandomString : ' + _elapsed + ' ms (around 1.3ms for 1000) \n');
+      helper.assert(_elapsed > 5, false, 'getRandomString is too slow');
+    });
+  });
+
+  describe('encodeSafeFilename|decodeSafeFilename', function () {
+    it('should not crash if string is undefined or null', function () {
+      helper.assert(helper.encodeSafeFilename(), '');
+      helper.assert(helper.encodeSafeFilename(null), '');
+    });
+    it('should generate a safe filename from any string, and should be able to decode it', function () {
+      helper.assert(helper.encodeSafeFilename('azertyuioopqsdfghjklmwxcvbn'), 'YXplcnR5dWlvb3Bxc2RmZ2hqa2xtd3hjdmJu');
+      helper.assert(helper.decodeSafeFilename('YXplcnR5dWlvb3Bxc2RmZ2hqa2xtd3hjdmJu'), 'azertyuioopqsdfghjklmwxcvbn');
+
+      // base64 character ends with =
+      helper.assert(helper.encodeSafeFilename('01234567890'), 'MDEyMzQ1Njc4OTA');
+      helper.assert(helper.decodeSafeFilename('MDEyMzQ1Njc4OTA'), '01234567890');
+
+      // base64 character ends with ==
+      helper.assert(helper.encodeSafeFilename('0123456789'), 'MDEyMzQ1Njc4OQ');
+      helper.assert(helper.decodeSafeFilename('MDEyMzQ1Njc4OQ'), '0123456789');
+
+      helper.assert(helper.encodeSafeFilename('n?./+£%*¨^../\\&éé"\'(§è!çà)-)'), 'bj8uLyvCoyUqwqheLi4vXCbDqcOpIicowqfDqCHDp8OgKS0p');
+      helper.assert(helper.decodeSafeFilename('bj8uLyvCoyUqwqheLi4vXCbDqcOpIicowqfDqCHDp8OgKS0p'), 'n?./+£%*¨^../\\&éé"\'(§è!çà)-)');
+
+      helper.assert(helper.encodeSafeFilename('报道'), '5oql6YGT');
+      helper.assert(helper.decodeSafeFilename('5oql6YGT'), '报道');
+
+      helper.assert(helper.encodeSafeFilename('k�'), 'a__-vQ');
+      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
+      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
+    });
+  });
+
   describe('cleanJavascriptVariable', function () {
     it('should return the same attribute name if there is no forbidden character in it', function () {
       helper.assert(helper.cleanJavascriptVariable('aa'), 'aa');

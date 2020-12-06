@@ -1,5 +1,6 @@
 var assert = require('assert');
 var carbone = require('../lib/index');
+var input = require('../lib/input');
 var builder = require('../lib/builder');
 var helper = require('../lib/helper');
 
@@ -785,8 +786,8 @@ describe('builder', function () {
       var _data = {
         number : 24.55
       };
-      var _fn = builder.getBuilderFunction(_desc, carbone.formatters);
-      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {formatters : carbone.formatters}, helper, _fn.builderDictionary)), [
+      var _fn = builder.getBuilderFunction(_desc, input.formatters);
+      helper.assert(simplify(_fn.builderDictionary, _fn(_data, {formatters : input.formatters}, helper, _fn.builderDictionary)), [
         {pos : [5 ],str : '<xml>24', rowShow : true},
         {pos : [6 ],str : '</xml>'}
       ]);

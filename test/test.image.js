@@ -446,7 +446,7 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
     });
 
     describe('DOCX preprocess XML', function () {
-      it.only('should replace the main document tag attributes with image markers and formatters (common DOCX xml from LO or MS)', function (done) {
+      it('should replace the main document tag attributes with image markers and formatters (common DOCX xml from LO or MS)', function (done) {
         let template = {
           files : [
             {

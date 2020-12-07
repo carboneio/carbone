@@ -4,6 +4,7 @@ var path  = require('path');
 var fs = require('fs');
 var helper = require('../lib/helper');
 var params = require('../lib/params');
+var input = require('../lib/input');
 var converter = require('../lib/converter');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
@@ -225,8 +226,8 @@ describe('Carbone', function () {
           return d === true ? 'yes' : 'no';
         }
       });
-      assert.notEqual(typeof carbone.formatters.yesOrNo, 'undefined');
-      assert.equal(carbone.formatters.yesOrNo(true), 'yes');
+      assert.notEqual(typeof input.formatters.yesOrNo, 'undefined');
+      assert.equal(input.formatters.yesOrNo(true), 'yes');
     });
   });
 
@@ -2412,6 +2413,92 @@ describe('Carbone', function () {
     after(function () {
       carbone.reset();
     });
+    it('should render a template and return a path instead of a buffer if renderPrefix is defined', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPrefix : 'prefix-'
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName) {
+        assert.equal(err, null);
+        var _filename = path.basename(resultFilePath);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        assert.strictEqual(reportName, undefined);
+        assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(_filename), true);
+        fs.unlinkSync(resultFilePath);
+        done();
+      });
+    });
+    it('should return a path instead of a buffer if renderPrefix is defined with reportName\
+      it should encode reportName to write POSIX compatible filename\
+      decodeRenderedFilename can be used to decode the filename', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPrefix : 'aa',
+        reportName   : '报道yéà?e|ah/../{d.field1}(")\''
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName) {
+        assert.equal(err, null);
+        var _filename = path.basename(resultFilePath);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        assert.strictEqual(reportName, '报道yéà?e|ah/../field_1(")\'');
+        assert.strictEqual(/^[a-z0-9-_]+\.docx$/i.test(_filename), true);
+        var _onlyReportName = _filename.slice(2+22, -5);
+        assert.strictEqual(helper.decodeSafeFilename(_onlyReportName), '报道yéà?e|ah/../field_1(")\'');
+        helper.assert(carbone.decodeRenderedFilename(resultFilePath, 2), {
+          reportName : '报道yéà?e|ah/../field_1(")\'',
+          extension  : 'docx'
+        });
+        fs.unlinkSync(resultFilePath);
+        done();
+      });
+    });
+    it('should accept only alphanumeric characters in renderPrefix', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPrefix : '报道yéà?e|ah/../{d.field1}(")'
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath) {
+        assert.equal(err, null);
+        var _filename = path.basename(resultFilePath);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        var _onlyReportName = _filename.slice(11+22, -5);
+        assert.strictEqual(helper.decodeSafeFilename(_onlyReportName), 'report');
+        assert.strictEqual(/yeahdfield1[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(_filename), true);
+        fs.unlinkSync(resultFilePath);
+        done();
+      });
+    });
+    it('should render a template and return a path instead of a buffer (with conversion).\
+      it should trim and lower case convertTo extension', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPrefix : 'prefix',
+        reportName   : '{d.field1}test',
+        convertTo    : ' PDF  '
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath) {
+        assert.equal(err, null);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        var _filename = path.basename(resultFilePath);
+        var _onlyReportName = _filename.slice(opt.renderPrefix.length + 22, -4);
+        assert.strictEqual(helper.decodeSafeFilename(_onlyReportName), 'field_1test');
+        assert.strictEqual(/prefix[A-Za-z0-9-_]{22}ZmllbGRfMXRlc3Q\.pdf/.test(_filename), true);
+        fs.unlinkSync(resultFilePath);
+        done();
+      });
+    });
     it('should render a template (docx) and give result with replacements', function (done) {
       var data = {
         field1 : 'field_1',
@@ -2485,10 +2572,22 @@ describe('Carbone', function () {
         field2 : 'field_2'
       };
       carbone.render('test_word_render_2003_XML.xml', data, function (err, result) {
+        helper.assert(err+'', 'null');
         assert.equal(result.indexOf('field1'), -1);
         assert.equal(result.indexOf('field2'), -1);
         assert.notEqual(result.indexOf('field_1'), -1);
         assert.notEqual(result.indexOf('field_2'), -1);
+        done();
+      });
+    });
+    it('should return an error if hardRefresh is set to true on unknown files for LibreOffice', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      carbone.render('test_word_render_2003_XML.xml', data, { hardRefresh : true }, function (err, result) {
+        helper.assert(err+'', 'Format "xml" can\'t be converted to "xml".');
+        assert.equal(result, null);
         done();
       });
     });
@@ -2845,6 +2944,26 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should render a template (docx), generate to PDF and give a path instead of a buffer if renderPrefix is defined', function (done) {
+      var _pdfExpectedPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2',
+      };
+      carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf', renderPrefix : ''}, function (err, resultPath) {
+        assert.equal(err, null);
+        assert.equal(resultPath.endsWith('.pdf'), true);
+        fs.readFile(_pdfExpectedPath, function (err, expected) {
+          fs.readFile(resultPath, function (err, result) {
+            assert.equal(err+'', 'null');
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            assert.equal(result.slice(8, 50).toString(), expected.slice(8, 50).toString());
+            fs.unlinkSync(resultPath);
+            done();
+          });
+        });
+      });
+    });
     it('should not crash if datas contain XML-incompatible control code', function (done) {
       // eslint-disable-next-line no-unused-vars
       var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
@@ -2888,7 +3007,7 @@ describe('Carbone', function () {
         var _nbExecuted = 100;
         var _results = [];
         var _waitedResponse = _nbExecuted;
-        var _start = new Date();
+        var _start = process.hrtime();
         for (var i = 0; i < _nbExecuted; i++) {
           carbone.render('test_word_render_A.docx', data, {convertTo : 'pdf'}, function (err, result) {
             _waitedResponse--;
@@ -2899,8 +3018,8 @@ describe('Carbone', function () {
           });
         }
         function theEnd () {
-          var _end = new Date();
-          var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
+          var _diff = process.hrtime(_start);
+          var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6) / _nbExecuted;
           console.log('\n\n Conversion to PDF Time Elapsed : '+_elapsed + ' ms per pdf for '+_nbExecuted+' conversions (usally around 65ms) \n\n\n');
           for (var i = 0; i < _results.length; i++) {
             assert.equal(Buffer.isBuffer(_results[i]), true);
@@ -2919,7 +3038,7 @@ describe('Carbone', function () {
       pipeNamePrefix : '_carbone',
       factories      : 1,
       startFactory   : false,
-      attempts       : 2
+      attempts       : 1
     };
     afterEach(function (done) {
       converter.exit(function () {
@@ -2930,36 +3049,32 @@ describe('Carbone', function () {
     beforeEach(function () {
       carbone.set({templatePath : _templatePath});
     });
-    it('should convert a file to another format', function (done) {
-      var _options = {
-        fieldSeparator : ',',
-        textDelimiter  : '"',
-        characterSet   : '76',
-        extension      : 'ods'
-      };
-      var _fileData = fs.readFileSync(path.join(__dirname, 'datasets', 'test_spreadsheet.ods'));
-      carbone.convert(_fileData, 'csv', _options, function (err, data) {
-        helper.assert(err, null);
-        helper.assert(data.toString(), ',,\n,{d[i].id},{d[i].name}\n,{d[i+1].id},{d[i+1].name}\n');
-        done();
+    it('should convert a document', function (done) {
+      var _pdfResultPath = path.resolve('./test/datasets/test_word_render_A.pdf');
+      fs.readFile(path.join(_templatePath, 'test_word_render_A.docx'), function (err, buffer) {
+        helper.assert(err+'', 'null');
+        carbone.convert(buffer, {convertTo : 'pdf', extension : 'docx'}, function (err, result) {
+          assert.equal(err, null);
+          assert.equal(result.slice(0, 4).toString(), '%PDF');
+          fs.readFile(_pdfResultPath, function (err, expected) {
+            assert.equal(err+'', 'null');
+            assert.equal(result.slice(0, 4).toString(), '%PDF');
+            assert.equal(result.slice(8, 50).toString(), expected.slice(8, 50).toString());
+            done();
+          });
+        });
       });
     });
-    it('should return an error if the file input type is not defined', function (done) {
-      var _options = {
-        fieldSeparator : ',',
-        textDelimiter  : '"',
-        characterSet   : '76'
-      };
-      var _fileData = fs.readFileSync(path.join(__dirname, 'datasets', 'test_spreadsheet.ods'));
-      carbone.convert(_fileData, 'csv', _options, function (err, data) {
-        helper.assert(err, 'options.extension must be set to detect input file type');
-        helper.assert(data, null);
-        done();
+    it('should return an error if the input extension is not passed', function (done) {
+      fs.readFile(path.join(_templatePath, 'test_word_render_A.docx'), function (err, buffer) {
+        helper.assert(err+'', 'null');
+        carbone.convert(buffer, {convertTo : 'pdf'}, function (err) {
+          assert.equal(err, 'options.extension must be set to detect input file type');
+          done();
+        });
       });
     });
   });
-
-
   describe('render and convert CSV with options', function () {
     var _templatePath = path.join(__dirname, 'datasets');
     var defaultOptions = {
@@ -3012,13 +3127,15 @@ describe('Carbone', function () {
         done();
       });
     });
-    it('should render spreadsheet with raw options (complete)', function (done) {
+    it('should render spreadsheet with only a different fieldSeparator', function (done) {
       var data = [{ id : 1, name : 'field_1' },
         { id : 2, name : 'field_2' }];
       var _options = {
         convertTo : {
-          formatName       : 'csv',
-          formatOptionsRaw : '124,34,0'
+          formatName    : 'csv',
+          formatOptions : {
+            fieldSeparator : '|'
+          },
         }
       };
       carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
@@ -3028,7 +3145,7 @@ describe('Carbone', function () {
         done();
       });
     });
-    it('should not crash if formatName is passed without formatOptionsRaw and formatOptions', function (done) {
+    it('should not crash if formatName is passed without formatOptions', function (done) {
       var data = [{ id : 1, name : 'field_1' },
         { id : 2, name : 'field_2' }];
       var _options = {
@@ -3039,22 +3156,6 @@ describe('Carbone', function () {
       carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
         helper.assert(err, null);
         var _expected = ',,\n,1,field_1\n,2,field_2\n';
-        helper.assert(result.toString(), _expected);
-        done();
-      });
-    });
-    it('should render spreadsheet with raw options (incomplete)', function (done) {
-      var data = [{ id : 1, name : 'field_1' },
-        { id : 2, name : 'field_2' }];
-      var _options = {
-        convertTo : {
-          formatName       : 'csv',
-          formatOptionsRaw : '124'
-        }
-      };
-      carbone.render('test_spreadsheet.ods', data, _options, function (err, result) {
-        helper.assert(err, null);
-        var _expected = '||\n|1|field_1\n|2|field_2\n';
         helper.assert(result.toString(), _expected);
         done();
       });

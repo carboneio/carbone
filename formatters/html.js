@@ -14,7 +14,7 @@ function addHtmlDatabase (options, htmlContent) {
   var _htmlDatabaseProperties = null;
 
   if (!options.htmlDatabase.has(htmlContent)) {
-    const descriptor = html.parseHTML(htmlContent);
+    const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     const id = html.generateStyleID(options.htmlDatabase.size);
     const { content, style } = html.buildXMLContentOdt(id, descriptor);
 
@@ -54,7 +54,7 @@ function addHtmlDatabaseDOCX (options, htmlContent) {
   var _htmlDatabaseProperties = null;
 
   if (!options.htmlDatabase.has(htmlContent)) {
-    const descriptor = html.parseHTML(htmlContent);
+    const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     // console.log(content, styleList);
     _htmlDatabaseProperties = {
       id         : options.htmlDatabase.size,

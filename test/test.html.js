@@ -263,6 +263,30 @@ describe('Dynamic HTML', function () {
         helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), '<text:span text:style-name="TC00">This is some content</text:span>');
       });
 
+
+      it('should add content and style element to htmlDatabase with HTML entities', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = 'I have&nbsp;to creates bills in euro <i>&euro;</i>, Yen <i>&yen;</i> and Pound <b>&pound;</b>.';
+        const _expected =  {
+          content : '<text:span text:style-name="TC00">I have&#160;to creates bills in euro </text:span>' +
+                    '<text:span text:style-name="TC01">€</text:span>' +
+                    '<text:span text:style-name="TC02">, Yen </text:span>' +
+                    '<text:span text:style-name="TC03">¥</text:span>' +
+                    '<text:span text:style-name="TC04"> and Pound </text:span>' +
+                    '<text:span text:style-name="TC05">£</text:span>' +
+                    '<text:span text:style-name="TC06">.</text:span>',
+          style : '<style:style style:name="TC01" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>' +
+                  '<style:style style:name="TC03" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>' +
+                  '<style:style style:name="TC05" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
+        };
+        htmlFormatters.getHTMLContentOdt.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 1);
+      });
+
       it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name', () => {
         const _options = {
           htmlDatabase : new Map()
@@ -735,6 +759,28 @@ describe('Dynamic HTML', function () {
         helper.assert(_postProcessSubContent.fn.call(_options, _postProcessContent.args[0]), _expected.subContent);
       });
 
+      it('should add content and style element to htmlDatabase with HTML entities', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = 'I have&nbsp;to creates bills in euro <i>&euro;</i>, Yen <i>&yen;</i> and Pound <b>&pound;</b>.';
+        const _expected =  {
+          id         : 0,
+          content    : 'I have&#160;to creates bills in euro ',
+          style      : '',
+          subContent : '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">€</w:t></w:r>' +
+                       '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">, Yen </w:t></w:r>' +
+                       '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r>' +
+                       '<w:r><w:rPr></w:rPr><w:t xml:space="preserve"> and Pound </w:t></w:r>' +
+                       '<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">£</w:t></w:r>' +
+                       '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">.</w:t></w:r>'
+        };
+        htmlFormatters.getHTMLContentDocx.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 1);
+      });
+
       it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name', () => {
         const _content = '<em><b>Apples are red</b></em><br><u> hello </u>';
         const _expected = {
@@ -1002,6 +1048,25 @@ describe('Dynamic HTML', function () {
       it('should do nothing if the list of tag provided is not recognized', function () {
         helper.assert(html.buildXMLStyle('docx', ['footer', 'header', 'div']), '');
         helper.assert(html.buildXMLStyle('docx', ['s', 'em', 'b', 'p', 'div', 'u']), '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>');
+      });
+    });
+
+    describe('convertHTMLEntities', function () {
+      it('should do nothing if the HTML content does not contain HTML entities', function () {
+        const _content = '<div>This is an <b>apple</b> and <i>strawberry</i>.</div>';
+        helper.assert(html.convertHTMLEntities(_content), _content);
+      });
+
+      it('should convert unsupported HTML entities into valid HTML entities [non-breaking space]', function () {
+        const _content = '<div>This&nbsp;is an&nbsp;<b>apple</b>&nbsp;and&nbsp;<i>strawberry</i>.</div>';
+        const _expected = '<div>This&#160;is an&#160;<b>apple</b>&#160;and&#160;<i>strawberry</i>.</div>';
+        helper.assert(html.convertHTMLEntities(_content), _expected);
+      });
+
+      it('should convert unsupported HTML entities into valid HTML entities [special characters]', function () {
+        const _content = '<div>This &cent; is &pound; an &yen; <b>apple &euro;</b> &copy; and &reg; <i>strawberry</i>.</div>';
+        const _expected = '<div>This ¢ is £ an ¥ <b>apple €</b> © and ® <i>strawberry</i>.</div>';
+        helper.assert(html.convertHTMLEntities(_content), _expected);
       });
     });
   });

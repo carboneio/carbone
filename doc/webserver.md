@@ -159,20 +159,18 @@ We recommend to generate tokens with an expiration date valid for at least 12 ho
 
 ## Launch Carbone on premise
 
-You can override default Carbone parameters with different ways.
+You can override default Carbone parameters with different ways:
 
-- CLI parameters
+- CLI parameters (highest priority)
 - With environment variable
-- With the config file
-
-*Note: Parameters priority is first the CLI, than environment variable and in last the config file.*
+- With the config file (lowest priority)
 
 You can override following parameters:
 
 - port
 - bind
 - factories
-- workdir
+- workdir  (only in CLI and environment variable)
 - attempts
 - auth
 
@@ -193,7 +191,6 @@ To override with config file, copy/paste the following JSON data in `config/conf
   "port": 4001,
   "bind": "127.0.0.1",
   "factories": 4,
-  "workdir": "/var/www/carbone",
   "attemps": 2,
   "authentication": true
 }
@@ -247,20 +244,7 @@ mv /path/to/carbone/binary ./carbone
 
 When you launch for the first time carbone on premise, all folders will be created, included the `plugin` folder.
 
-### Override render filename
 
-You can override and choose the filename and the location you want for your render. To do this, add a function `generateOutputFile` in the `storage.js` plugin and export it. In this function, you can access the current request `req`.
-
-You have to return an object with two keys: `renderPath` and `renderPrefix`.
-
-```js
-function generateOutputFile (req) {
-  return {
-    renderPath: path.join(process.cwd(), 'new', 'path'),
-    renderPrefix: 'myPrefix'
-  }
-}
-```
 
 ### Override write template
 
@@ -325,12 +309,28 @@ module.exports = {
 }
 ```
 
+### Add custom prefix to rendered filename
+
+You can add a prefix to the rendered filename. 
+To do this, add a function `onRenderStart` in the `storage.js` plugin and export it. In this function, you can access the current request `req`.
+
+You have to return an object with two keys: `renderPath` and `renderPrefix`.
+
+```js
+function beforeRender (req, res, carboneData, carboneOptions, next) {
+  // add a prefix to rendered filename
+  carboneOptions.renderPrefix = 'myPrefix';
+  next(null);
+}
+```
+
 ### Override write render
 
 To override render writing, you have to add the function `onRenderEnd` in the `storage.js` file and export it.
 
 ```js
-function onRenderEnd (req, res, reportName, reportPath, statsObject, next) {
+// afterRender function onRenderEnd (req, res, reportPath, reportName, statistics, next) {
+function onRenderEnd (req, res, reportName, reportPath, statistics, next) {
   // Write or rename your render
 
   return next(null)

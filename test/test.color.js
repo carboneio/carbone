@@ -1315,7 +1315,8 @@ describe('Dynamic colors', function () {
         let res = color.getBindColorMarkers(_file);
         var _diff = process.hrtime(_start);
         var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
-        helper.assert(_elapsed < 1000, true);
+        console.log('\n\n bindColor parsing : '+_elapsed + ' ms (usally around 900ms) \n\n\n');
+        helper.assert(_elapsed < 2000, true);
         helper.assert(res.length, 15251);
       });
     });

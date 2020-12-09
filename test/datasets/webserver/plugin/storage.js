@@ -2,28 +2,26 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-function generateOutputFile () {
-  return {
-    renderPath   : path.join(process.cwd(), 'render'),
-    renderPrefix : 'REPORT_'
-  };
+function beforeRender (req, res, data, options, next) {
+  options.renderPrefix = 'REPORT_';
+  next();
 }
 
-function writeTemplate (req, res, localPath, filename, callback) {
-  fs.rename(localPath, path.join(os.tmpdir(), 'PREFIX_' + filename), () => {
+function writeTemplate (req, res, templateId, templatePathTemp, callback) {
+  fs.rename(templatePathTemp, path.join(os.tmpdir(), 'PREFIX_' + templateId), () => {
     return callback(null);
   });
 }
 
-function readTemplate (req, templateName, callback) {
-  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateName));
+function readTemplate (req, res, templateId, callback) {
+  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
 }
 
-function deleteTemplate (req, res, templateName, callback) {
-  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateName));
+function deleteTemplate (req, res, templateId, callback) {
+  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
 }
 
-function onRenderEnd (req, res, reportName, reportPath) {
+function afterRender (req, res, err, reportPath, reportName) {
   fs.readFile(reportPath, (err, content) => {
     fs.writeFile(path.join(os.tmpdir(), 'titi' + reportName), content, () => {
 
@@ -37,15 +35,15 @@ function onRenderEnd (req, res, reportName, reportPath) {
   });
 }
 
-function readRender (req, res, renderName, next) {
-  return next(null, 'titi' + renderName, os.tmpdir());
+function readRender (req, res, renderId, next) {
+  return next(null, 'titi' + renderId, os.tmpdir());
 }
 
 module.exports = {
-  generateOutputFile,
+  beforeRender,
   writeTemplate,
   readTemplate,
-  onRenderEnd,
+  afterRender,
   deleteTemplate,
   readRender
 };

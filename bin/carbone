@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 // Force production mode with pkg
+// To avoid having stack trace in errors
 process.env.NODE_ENV = process.pkg ? 'production' : process.env.NODE_ENV;
 
 var webserver = require('../lib/webserver');
@@ -69,7 +70,7 @@ function installService () {
   console.log('Generate install script ', process.argv[0]);
   try {
     // copy bash script outside of On-Premise binary file
-    fs.writeFileSync(path.join(process.cwd(), 'install.sh'), fs.readFileSync(path.join(__dirname, 'install.sh')).toString().replace('__SOURCE_BINARY_FILE__', process.argv[0]), {mode : '0755'});
+    fs.writeFileSync(path.join(process.cwd(), 'install.sh'), fs.readFileSync(path.join(__dirname, 'install.sh'), 'utf8').replace(/__SOURCE_BINARY_FILE__/g, process.argv[0]), {mode : '0755'});
     fs.writeFileSync(path.join(process.cwd(), 'systemd')   , fs.readFileSync(path.join(__dirname, 'systemd')));
   }
   catch (e) {

@@ -1420,6 +1420,57 @@ describe('parser', function () {
     });
   });
 
+  describe('isCarboneMarker', function () {
+    it('should not find a marker', function () {
+      helper.assert(parser.isCarboneMarker(''), false);
+      helper.assert(parser.isCarboneMarker('{}'), false);
+      helper.assert(parser.isCarboneMarker('   {   c   .value}'), false);
+      helper.assert(parser.isCarboneMarker('<text:span text:style-name="T3">{}</text:span>{d.<text:span text:style-name="T3">text}</text:span>'), false);
+      helper.assert(parser.isCarboneMarker('<text:span text:style-name="T3">{c.element</text:span>}'), false);
+      helper.assert(parser.isCarboneMarker('  {d.value}'), false);
+      helper.assert(parser.isCarboneMarker('  {   $  mealOf(2)}'), false);
+
+    });
+
+    it('should not find Carbone markers', function () {
+      // normal
+      helper.assert(parser.isCarboneMarker('{d.value}'), true);
+      helper.assert(parser.isCarboneMarker('{d.el.value.table}'), true);
+      helper.assert(parser.isCarboneMarker('{   d    .  value}'), true);
+      helper.assert(parser.isCarboneMarker('{c.value}'), true);
+      helper.assert(parser.isCarboneMarker('{   c   .value}'), true);
+      // formatters
+      helper.assert(parser.isCarboneMarker('{d.value:add(2):div(10)}'), true);
+      helper.assert(parser.isCarboneMarker('{d.value:ifEQ(\'This is a text\'):show(\'Hello there\'):elseShow(\'34\')}'), true);
+      helper.assert(parser.isCarboneMarker('{d.birthday:convDate(YYYY-MM-DD, LL)}'), true);
+      helper.assert(parser.isCarboneMarker('{d.subObject.qtyB:add(.qtyC):add(..qtyA)}'), true);
+      // Loops
+      helper.assert(parser.isCarboneMarker('{d[i=1].movie}'), true);
+      helper.assert(parser.isCarboneMarker('{d.cars[i].brand}'), true);
+      helper.assert(parser.isCarboneMarker('{d.cars[i+1].brand}'), true);
+      helper.assert(parser.isCarboneMarker('{d[i+1].models[i+1].size }'), true);
+      // Loops + filters
+      helper.assert(parser.isCarboneMarker('{d[i+1, age > 19, age < 30].name}'), true);
+      helper.assert(parser.isCarboneMarker('{d[i+1, type=\'rocket\'].name}'), true);
+      // alias
+      helper.assert(parser.isCarboneMarker('{#mealOf($weekday) = d[weekday = $weekday].name}'), true);
+      helper.assert(parser.isCarboneMarker('{ #   mealOf($weekday) = d[weekday = $weekday].name}'), true);
+      helper.assert(parser.isCarboneMarker('{ #   mealOf($weekday) = d[weekday = $weekday].name}'), true);
+      helper.assert(parser.isCarboneMarker('{ #   mealOf($weekday) = d[weekday = $weekday].name}'), true);
+      helper.assert(parser.isCarboneMarker('{$mealOf(2)}'), true);
+      helper.assert(parser.isCarboneMarker('{   $  mealOf(2)}'), true);
+      // Translation
+      helper.assert(parser.isCarboneMarker('{t(\'name\')}'), true);
+      helper.assert(parser.isCarboneMarker('{t(\'apples\')}'), true);
+      helper.assert(parser.isCarboneMarker('{   t    (\'apples\')}'), true);
+      // BindColor
+      helper.assert(parser.isCarboneMarker('{bindColor(#FF0000,#hexa)=d.color}'), true);
+      helper.assert(parser.isCarboneMarker('{bindColor(red,color)=d.list[0].color}'), true);
+      helper.assert(parser.isCarboneMarker('{   bindColor(#00fa19, hsl) = d.color2}'), true);
+      helper.assert(parser.isCarboneMarker('{   bindColor(#00fa19, hsl) = d.color2}'), true);
+    });
+  });
+
   describe('count formatter', function () {
 
     describe('Preprocess', function () {

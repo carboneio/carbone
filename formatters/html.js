@@ -55,29 +55,13 @@ function addHtmlDatabaseDOCX (options, htmlContent) {
 
   if (!options.htmlDatabase.has(htmlContent)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
-    // console.log(content, styleList);
     _htmlDatabaseProperties = {
-      id         : options.htmlDatabase.size,
-      content    : descriptor[0].content,
-      style      : html.buildXMLStyle('docx', descriptor[0].tags),
-      subContent : html.buildSubContentDOCX(descriptor)
+      id      : options.htmlDatabase.size,
+      content : html.buildContentDOCX(descriptor)
     };
     options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
   }
 }
-
-const getHTMLSubContentDocx = function (htmlContent) {
-  addHtmlDatabaseDOCX(this, htmlContent);
-  return {
-    fn   : getHTMLSubContentDocxPostProcess,
-    args : [htmlContent]
-  };
-};
-
-const getHTMLSubContentDocxPostProcess = function (contentId) {
-  const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.subContent;
-};
 
 const getHTMLContentDocx = function (htmlContent) {
   addHtmlDatabaseDOCX(this, htmlContent);
@@ -92,24 +76,8 @@ const getHTMLContentDocxPostProcess = function (contentId) {
   return _htmlProperties.content;
 };
 
-const getHTMLContentStyleDocx = function (htmlContent) {
-  addHtmlDatabaseDOCX(this, htmlContent);
-  return {
-    fn   : getHTMLContentStyleDocxPostProcess,
-    args : [htmlContent]
-  };
-};
-
-const getHTMLContentStyleDocxPostProcess = function (contentId) {
-  const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.style;
-};
-
 module.exports = {
   getHTMLContentOdt,
-  getHTMLContentOdtPostProcess,
   getHTMLContentDocx,
-  getHTMLContentStyleDocx,
-  getHTMLSubContentDocx,
   html : () => ''
 };

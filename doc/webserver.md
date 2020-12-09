@@ -159,20 +159,18 @@ We recommend to generate tokens with an expiration date valid for at least 12 ho
 
 ## Launch Carbone on premise
 
-You can override default Carbone parameters with different ways.
+You can override default Carbone parameters with different ways:
 
-- CLI parameters
+- CLI parameters (highest priority)
 - With environment variable
-- With the config file
-
-*Note: Parameters priority is first the CLI, than environment variable and in last the config file.*
+- With the config file (lowest priority)
 
 You can override following parameters:
 
 - port
 - bind
 - factories
-- workdir
+- workdir  (only in CLI and environment variable)
 - attempts
 - auth
 
@@ -193,7 +191,6 @@ To override with config file, copy/paste the following JSON data in `config/conf
   "port": 4001,
   "bind": "127.0.0.1",
   "factories": 4,
-  "workdir": "/var/www/carbone",
   "attemps": 2,
   "authentication": true
 }
@@ -247,20 +244,7 @@ mv /path/to/carbone/binary ./carbone
 
 When you launch for the first time carbone on premise, all folders will be created, included the `plugin` folder.
 
-### Override render filename
 
-You can override and choose the filename and the location you want for your render. To do this, add a function `generateOutputFile` in the `storage.js` plugin and export it. In this function, you can access the current request `req`.
-
-You have to return an object with two keys: `renderPath` and `renderPrefix`.
-
-```js
-function generateOutputFile (req) {
-  return {
-    renderPath: path.join(process.cwd(), 'new', 'path'),
-    renderPrefix: 'myPrefix'
-  }
-}
-```
 
 ### Override write template
 
@@ -271,13 +255,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-/**
- * @param {Stream} stream : File stream
- * @param {String} filename : Template name
- * @param {Function} callback : Function to call at the end
- */
-function writeTemplate (req, res, localPath, filename, callback) {
-  fs.rename(localPath, path.join(os.tmpdir(), 'PREFIX_' + filename), (err) => {
+function writeTemplate (req, res, templateId, templatePathTemp, callback) {
+  fs.rename(templatePathTemp, path.join(os.tmpdir(), 'PREFIX_' + templateId), (err) => {
     if (err) {
       return callback(err);
     }
@@ -297,7 +276,7 @@ module.exports = {
 To override template reading, always in the file `storage.js` in the `plugin` folder, you have to export the function `readTemplate` which is descibred as follow:
 
 ```js
-function readTemplate (req, templateName, callback) {
+function readTemplate (req, templateId, callback) {
   // Read your template and return a local path for carbone
 }
 
@@ -315,9 +294,9 @@ To override template deleting, add a function `deleteTemplate` in the `storage.j
 ```js
 // You can access req and res.
 // For example, if you store your template on amazon S3, you could delete it and 
-function deleteTemplate (req, res, templateName, callback) {
+function deleteTemplate (req, res, templateId, callback) {
   // Delete the template and either return a local path to unlink it or just use res to return a response
-  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateName));
+  return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
 }
 
 module.exports = {
@@ -325,19 +304,35 @@ module.exports = {
 }
 ```
 
-### Override write render
+### Add custom prefix to rendered filename
 
-To override render writing, you have to add the function `onRenderEnd` in the `storage.js` file and export it.
+You can add a prefix to the rendered filename. 
+To do this, add a function `beforeRender` in the `storage.js` plugin and export it.
+In this function, you can access the current request `req`.
+
+You can alter options passed to Carbone:
 
 ```js
-function onRenderEnd (req, res, reportName, reportPath, statsObject, next) {
+function beforeRender (req, res, carboneData, carboneOptions, next) {
+  // add a prefix to rendered filename
+  carboneOptions.renderPrefix = 'myPrefix';
+  next(null);
+}
+```
+
+### Override write render
+
+To override render writing, you have to add the function `afterRender` in the `storage.js` file and export it.
+
+```js
+function afterRender (req, res, err, reportPath, reportName, statistics, next) {
   // Write or rename your render
 
   return next(null)
 }
 
 module.exports = {
-  onRenderEnd
+  afterRender
 }
 ```
 
@@ -364,7 +359,7 @@ function readRender (req, res, renderName, next) {
 }
 ```
 
-With this function you can either return directly the file using res or return the new render name or path you choose with `onRenderEnd` function.
+With this function you can either return directly the file using res or return the new render name or path you choose with `afterRender` function.
 
 ```js
 // Return the new render name

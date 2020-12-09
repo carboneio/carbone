@@ -46,7 +46,7 @@
     "assets": "lib/converter.py",
     "assets": "bin/install.sh",
     "assets": "bin/systemd",
-    "assets": "health.docx"
+    "assets": "examples/healthCheck.odt"
   },
   "devDependencies": {
     "eslint": "=7.7.0",

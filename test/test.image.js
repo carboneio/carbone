@@ -165,7 +165,11 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
           files : [
             {
               name : 'content.xml',
-              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image}</svg:desc></draw:frame>'
+              data : '' +
+              '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0">' +
+                '<draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/>' +
+                '<svg:desc>{d.image}</svg:desc>' +
+              '</draw:frame>'
             }
           ]
         };
@@ -447,7 +451,36 @@ describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
           files : [
             {
               name : 'word/document.xml',
-              data : '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="952500" cy="590550"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="1" name="Image1" descr="{d.image}"></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="Image1" descr="{d.image}"></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId2"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="952500" cy="590550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>'
+              data : ''+
+              '<w:drawing>' +
+                '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
+                  '<wp:extent cx="952500" cy="590550"/>' +
+                  '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                  '<wp:docPr id="1" name="Image1" descr="{d.image}"></wp:docPr>' +
+                  '<wp:cNvGraphicFramePr>' +
+                    '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                  '</wp:cNvGraphicFramePr>' +
+                  '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                    '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                      '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                        '<pic:nvPicPr>' +
+                          '<pic:cNvPr id="1" name="Image1" descr="{d.image}"></pic:cNvPr>' +
+                        '<pic:cNvPicPr>' +
+                        '<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>' +
+                          '</pic:cNvPicPr>' +
+                        '</pic:nvPicPr>' +
+                        '<pic:blipFill>' +
+                          '<a:blip r:embed="rId2"></a:blip>' +
+                          '<a:stretch><a:fillRect/></a:stretch>' +
+                        '</pic:blipFill>' +
+                        '<pic:spPr bwMode="auto">' +
+                          '<a:xfrm><a:off x="0" y="0"/><a:ext cx="952500" cy="590550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom>' +
+                        '</pic:spPr>' +
+                      '</pic:pic>' +
+                    '</a:graphicData>' +
+                  '</a:graphic>' +
+                '</wp:inline>' +
+              '</w:drawing>'
             }
           ]
         };

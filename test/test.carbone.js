@@ -9,7 +9,7 @@ var converter = require('../lib/converter');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
-var pdfjsLib = require('pdfjs-dist/build/pdf.js');
+var pdfjsLib = require('pdfjs-dist/es5/build/pdf.js');
 
 describe('Carbone', function () {
 

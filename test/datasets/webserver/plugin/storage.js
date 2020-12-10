@@ -3,13 +3,18 @@ const path = require('path');
 const os = require('os');
 
 function beforeRender (req, res, data, options, next) {
-  options.renderPrefix = 'REPORT_';
+  options.renderPrefix = 'REPORT';
   next();
 }
 
-function writeTemplate (req, res, templateId, templatePathTemp, callback) {
+function writeTemplate (req, res, templateId, templatePathTemp) {
   fs.rename(templatePathTemp, path.join(os.tmpdir(), 'PREFIX_' + templateId), () => {
-    return callback(null);
+    return res.send({
+      success : true,
+      data    : {
+        templateId : templateId
+      }
+    });
   });
 }
 
@@ -21,7 +26,11 @@ function deleteTemplate (req, res, templateId, callback) {
   return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
 }
 
-function afterRender (req, res, err, reportPath, reportName) {
+function afterRender (req, res, err, reportPath, reportName, callback) {
+  if (err) {
+    return callback(err);
+  }
+
   fs.readFile(reportPath, (err, content) => {
     fs.writeFile(path.join(os.tmpdir(), 'titi' + reportName), content, () => {
 
@@ -36,7 +45,7 @@ function afterRender (req, res, err, reportPath, reportName) {
 }
 
 function readRender (req, res, renderId, next) {
-  return next(null, 'titi' + renderId, os.tmpdir());
+  return next(null, path.join(os.tmpdir(), 'titi' + renderId));
 }
 
 module.exports = {

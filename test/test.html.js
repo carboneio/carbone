@@ -351,7 +351,7 @@ describe('Dynamic HTML', function () {
         helper.assert(_template.files[3].data, _expectedRels);
       });
 
-      it('should find one HTML formatter and inject HTML formatters for: style, content, subContent and spacePreserve', function () {
+      it('should find one HTML formatter and inject HTML formatters for the new content', function () {
         const _XMLtemplate = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
@@ -374,9 +374,9 @@ describe('Dynamic HTML', function () {
                 '<w:r>' +
                   '<w:rPr>' +
                     '<w:lang w:val="en-US"/>' +
-                  '{d.mix1:getHTMLContentStyleDocx}</w:rPr>' +
-                  '<w:t xml:space="preserve">{d.mix1:getHTMLContentDocx}</w:t>' +
-                '</w:r>{d.mix1:getHTMLSubContentDocx}' +
+                  '</w:rPr>' +
+                  '<w:t></w:t>' +
+                '</w:r>{d.mix1:getHTMLContentDocx}' +
               '</w:p>' +
             '</w:body>' +
           '</w:document>';
@@ -392,7 +392,7 @@ describe('Dynamic HTML', function () {
         helper.assert(_template.files[0].data, _XMLexpected);
       });
 
-      it('should find 3 HTML formatter and inject HTML formatters for: style, content, subContent and spacePreserve', function () {
+      it('should find 3 HTML formatter and inject HTML formatters for the new content', function () {
         const _XMLtemplate = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
@@ -427,21 +427,21 @@ describe('Dynamic HTML', function () {
                 '<w:r>' +
                   '<w:rPr>' +
                     '<w:lang w:val="en-US"/>' +
-                  '{d.mix1:getHTMLContentStyleDocx}</w:rPr>' +
-                  '<w:t xml:space="preserve">{d.mix1:getHTMLContentDocx}</w:t>' +
-                '</w:r>{d.mix1:getHTMLSubContentDocx}' +
+                  '</w:rPr>' +
+                  '<w:t></w:t>' +
+                '</w:r>{d.mix1:getHTMLContentDocx}' +
                 '<w:r>' +
                   '<w:rPr>' +
                     '<w:lang w:val="en-US"/>' +
-                  '{d.strong:getHTMLContentStyleDocx}</w:rPr>' +
-                  '<w:t xml:space="preserve">{d.strong:getHTMLContentDocx}</w:t>' +
-                '</w:r>{d.strong:getHTMLSubContentDocx}' +
+                  '</w:rPr>' +
+                  '<w:t></w:t>' +
+                '</w:r>{d.strong:getHTMLContentDocx}' +
                 '<w:r>' +
                   '<w:rPr>' +
                     '<w:lang w:val="en-US"/>' +
-                  '{d.italic:getHTMLContentStyleDocx}</w:rPr>' +
-                  '<w:t xml:space="preserve">{d.italic:getHTMLContentDocx}</w:t>' +
-                '</w:r>{d.italic:getHTMLSubContentDocx}' +
+                  '</w:rPr>' +
+                  '<w:t></w:t>' +
+                '</w:r>{d.italic:getHTMLContentDocx}' +
               '</w:p>' +
             '</w:body>' +
           '</w:document>';
@@ -457,7 +457,7 @@ describe('Dynamic HTML', function () {
         helper.assert(_template.files[0].data, _XMLexpected);
       });
 
-      it('should find one HTML formatter and inject HTML formatters for: style, content, subContent and WITHOUT spacePreserve (already inserted)', function () {
+      it('should find one HTML formatter and inject HTML formatters for the new content and WITHOUT spacePreserve (already inserted)', function () {
         const _XMLtemplate = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
@@ -480,9 +480,9 @@ describe('Dynamic HTML', function () {
                 '<w:r>' +
                   '<w:rPr>' +
                     '<w:lang w:val="en-US"/>' +
-                  '{d.strongContent:getHTMLContentStyleDocx}</w:rPr>' +
-                  '<w:t xml:space="preserve">{d.strongContent:getHTMLContentDocx}</w:t>' +
-                '</w:r>{d.strongContent:getHTMLSubContentDocx}' +
+                  '</w:rPr>' +
+                  '<w:t xml:space="preserve"></w:t>' +
+                '</w:r>{d.strongContent:getHTMLContentDocx}' +
               '</w:p>' +
             '</w:body>' +
           '</w:document>';
@@ -519,9 +519,9 @@ describe('Dynamic HTML', function () {
               '<w:r>' +
                 '<w:rPr>' +
                   '<w:lang w:val="en-US"/>' +
-                '{d.strikedel:getHTMLContentStyleDocx}</w:rPr>' +
-                '<w:t xml:space="preserve">{d.strikedel:getHTMLContentDocx}</w:t>' +
-              '</w:r>{d.strikedel:getHTMLSubContentDocx}' +
+                '</w:rPr>' +
+                '<w:t></w:t>' +
+              '</w:r>{d.strikedel:getHTMLContentDocx}' +
             '</w:p>' +
           '</w:ftr>';
         const _XMLheader = '' +
@@ -543,9 +543,9 @@ describe('Dynamic HTML', function () {
               '<w:r>' +
                 '<w:rPr>' +
                   '<w:lang w:val="en-US"/>' +
-                '{d.italic:getHTMLContentStyleDocx}</w:rPr>' +
-                '<w:t xml:space="preserve">{d.italic:getHTMLContentDocx}</w:t>' +
-              '</w:r>{d.italic:getHTMLSubContentDocx}' +
+                '</w:rPr>' +
+                '<w:t></w:t>' +
+              '</w:r>{d.italic:getHTMLContentDocx}' +
             '</w:p>' +
           '</w:hdr>';
         const _template = {
@@ -571,25 +571,37 @@ describe('Dynamic HTML', function () {
       });
     });
 
-    describe('buildSubContentDOCX', function () {
+    describe('buildContentDOCX', function () {
       it('should return nothing if the descriptor is empty/undefined/null', function () {
-        helper.assert(html.buildSubContentDOCX([]), '');
-        helper.assert(html.buildSubContentDOCX(), '');
-        helper.assert(html.buildSubContentDOCX(undefined), '');
-        helper.assert(html.buildSubContentDOCX(null), '');
+        helper.assert(html.buildContentDOCX([]), '');
+        helper.assert(html.buildContentDOCX(), '');
+        helper.assert(html.buildContentDOCX(undefined), '');
+        helper.assert(html.buildContentDOCX(null), '');
       });
 
       it('should return nothing if the descriptor has only 1 element', function () {
-        helper.assert(html.buildSubContentDOCX([{ content : 'text', tags : ['b'] }]), '');
+        helper.assert(html.buildContentDOCX([{ content : 'text', tags : ['b'] }]), '' +
+        '<w:r>' +
+          '<w:rPr>' +
+            '<w:b/><w:bCs/>' +
+          '</w:rPr>' +
+          '<w:t xml:space="preserve">text</w:t>' +
+        '</w:r>');
       });
 
       it('should return the DOCX xml content based on the descriptor', function () {
-        helper.assert(html.buildSubContentDOCX(
+        helper.assert(html.buildContentDOCX(
           [
             { content : 'bold', tags : ['b'] },
             { content : 'and italic', tags : ['em'] }
           ]
         ), '<w:r>' +
+              '<w:rPr>' +
+                '<w:b/><w:bCs/>' +
+              '</w:rPr>' +
+              '<w:t xml:space="preserve">bold</w:t>' +
+            '</w:r>' +
+            '<w:r>' +
               '<w:rPr>' +
                 '<w:i/><w:iCs/>' +
               '</w:rPr>' +
@@ -597,7 +609,7 @@ describe('Dynamic HTML', function () {
             '</w:r>'
         );
 
-        helper.assert(html.buildSubContentDOCX(
+        helper.assert(html.buildContentDOCX(
           [
             { content : 'this', tags : [] },
             { content : ' is a bold', tags : ['b'] },
@@ -605,6 +617,10 @@ describe('Dynamic HTML', function () {
             { content : ' text', tags : [] },
           ]
         ), '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve">this</w:t>' +
+            '</w:r>' +
+            '<w:r>' +
               '<w:rPr>' +
                 '<w:b/><w:bCs/>' +
               '</w:rPr>' +
@@ -624,7 +640,7 @@ describe('Dynamic HTML', function () {
       });
 
       it('should return the DOCX XML content based on a descriptor and should skip unknown tags', function () {
-        helper.assert(html.buildSubContentDOCX(
+        helper.assert(html.buildContentDOCX(
           [
             { content : 'this ', tags : ['div', 'b'] },
             { content : ' is a bold', tags : ['div', 'b', 'u'] },
@@ -635,6 +651,12 @@ describe('Dynamic HTML', function () {
             { content : '.', tags : [] },
           ]
         ), '<w:r>'+
+              '<w:rPr>'+
+                '<w:b/><w:bCs/>'+
+              '</w:rPr>'+
+              '<w:t xml:space="preserve">this </w:t>'+
+            '</w:r>'+
+            '<w:r>'+
               '<w:rPr>'+
                 '<w:b/><w:bCs/>'+
                 '<w:u w:val="single"/>'+
@@ -675,13 +697,17 @@ describe('Dynamic HTML', function () {
       });
 
       it('should insert break line in the new content', function () {
-        helper.assert(html.buildSubContentDOCX(
+        helper.assert(html.buildContentDOCX(
           [
             { content : 'This is ', tags : [] },
             { content : '#break#', tags : [] },
             { content : 'a tree', tags : ['i'] },
           ]
-        ), '<w:br/>' +
+        ), '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve">This is </w:t>' +
+            '</w:r>' +
+            '<w:br/>' +
             '<w:r>' +
               '<w:rPr>' +
                 '<w:i/><w:iCs/>' +
@@ -690,7 +716,7 @@ describe('Dynamic HTML', function () {
             '</w:r>'
         );
 
-        helper.assert(html.buildSubContentDOCX(
+        helper.assert(html.buildContentDOCX(
           [
             { content : 'This ', tags : [] },
             { content : '#break#', tags : [] },
@@ -705,7 +731,11 @@ describe('Dynamic HTML', function () {
             { content : '#break#', tags : [] },
             { content : '.', tags : [] }
           ]
-        ), '<w:br/>' +
+        ), '<w:r>' +
+              '<w:rPr></w:rPr>' +
+              '<w:t xml:space="preserve">This </w:t>' +
+            '</w:r>' +
+            '<w:br/>' +
             '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve"> is</w:t>' +
@@ -737,43 +767,36 @@ describe('Dynamic HTML', function () {
     });
 
     describe('formatters/postProcessFormatters DOCX', function () {
-      it('should add content and style element to htmlDatabase', () => {
+      it('should add content element to htmlDatabase', () => {
         const _expected =  {
-          id         : 0,
-          content    : 'This is some content',
-          style      : '<w:b/><w:bCs/>',
-          subContent : ''
+          id      : 0,
+          content : '<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r>'
         };
         const _options = {
           htmlDatabase : new Map()
         };
         const _content = '<strong>This is some content</strong>';
         const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
-        const _postProcessStyle = htmlFormatters.getHTMLContentStyleDocx.call(_options, _content);
-        const _postProcessSubContent = htmlFormatters.getHTMLSubContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_properties, _expected);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
-        helper.assert(_postProcessStyle.fn.call(_options, _postProcessContent.args[0]), _expected.style);
-        helper.assert(_postProcessSubContent.fn.call(_options, _postProcessContent.args[0]), _expected.subContent);
       });
 
-      it('should add content and style element to htmlDatabase with HTML entities', () => {
+      it('should add content element to htmlDatabase with HTML entities', () => {
         const _options = {
           htmlDatabase : new Map()
         };
         const _content = 'I have&nbsp;to creates bills in euro <i>&euro;</i>, Yen <i>&yen;</i> and Pound <b>&pound;</b>.';
         const _expected =  {
-          id         : 0,
-          content    : 'I have&#160;to creates bills in euro ',
-          style      : '',
-          subContent : '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">€</w:t></w:r>' +
-                       '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">, Yen </w:t></w:r>' +
-                       '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r>' +
-                       '<w:r><w:rPr></w:rPr><w:t xml:space="preserve"> and Pound </w:t></w:r>' +
-                       '<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">£</w:t></w:r>' +
-                       '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">.</w:t></w:r>'
+          id      : 0,
+          content : '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">I have&#160;to creates bills in euro </w:t></w:r>' +
+                    '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">€</w:t></w:r>' +
+                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">, Yen </w:t></w:r>' +
+                    '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r>' +
+                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve"> and Pound </w:t></w:r>' +
+                    '<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">£</w:t></w:r>' +
+                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">.</w:t></w:r>'
         };
         htmlFormatters.getHTMLContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
@@ -784,23 +807,17 @@ describe('Dynamic HTML', function () {
       it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name', () => {
         const _content = '<em><b>Apples are red</b></em><br><u> hello </u>';
         const _expected = {
-          id         : 0,
-          content    : 'Apples are red',
-          style      : '<w:i/><w:iCs/><w:b/><w:bCs/>',
-          subContent : '<w:br/><w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve"> hello </w:t></w:r>'
+          id      : 0,
+          content : '<w:r><w:rPr><w:i/><w:iCs/><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">Apples are red</w:t></w:r><w:br/><w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve"> hello </w:t></w:r>',
         };
         const _options = {
           htmlDatabase : new Map()
         };
         const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
-        const _postProcessStyle = htmlFormatters.getHTMLContentStyleDocx.call(_options, _content);
-        const _postProcessSubContent = htmlFormatters.getHTMLSubContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_properties, _expected);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
-        helper.assert(_postProcessStyle.fn.call(_options, _postProcessContent.args[0]), _expected.style);
-        helper.assert(_postProcessSubContent.fn.call(_options, _postProcessContent.args[0]), _expected.subContent);
       });
     });
   });

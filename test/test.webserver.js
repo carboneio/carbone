@@ -10,6 +10,7 @@ const os         = require('os');
 const { exec }   = require('child_process');
 const package    = require('../package.json');
 const params     = require('../lib/params');
+const helper     = require('../lib/helper');
 
 function deleteRequiredFiles () {
   try {
@@ -137,6 +138,57 @@ describe('Webserver', () => {
 
   after(() => {
     unlinkConfigFile();
+  });
+
+  describe('WebServer Initialisations', () => {
+    describe('handleParams', () => {
+      it('should change the default values (port, factories, workdir, attempts, authentication, bind)', (done) => {
+        const _port = 4321;
+        const _workdir = path.join(os.tmpdir(), 'test');
+        const _factories = 2;
+        const _attempts = 3;
+        const _bind = '127.0.0.2';
+        webserver = require('../lib/webserver');
+        //
+        webserver.handleParams(['--port', _port, '--workdir', _workdir, '--factories', _factories, '--attempts', _attempts,'--bind', _bind, '--authentication'], () => {
+          assert.strictEqual(params.port, _port);
+          assert.strictEqual(fs.existsSync(_workdir), true);
+          helper.rmDirRecursive(_workdir);
+          assert.strictEqual(params.factories, _factories);
+          assert.strictEqual(params.attempts, _attempts);
+          assert.strictEqual(params.bind, _bind);
+          webserver.stopServer(done);
+        });
+      });
+    });
+
+    describe('initWorkingDirectory (handleParams is calling the function)', () => {
+      it('should create nested workdir with sub directories if it does not exist and \
+          the asset folder should contain the converter.py and \
+          the config folder should contain the config files (keys + config.json)', (done) => {
+        const _listDir = ['template', 'render', 'asset', 'config', 'plugin'];
+        const _workdir = path.join(os.tmpdir(), '/this/is/a/special/dir/1/2/3/');
+        webserver = require('../lib/webserver');
+        webserver.handleParams(['--port', 4000, '--workdir', _workdir], () => {
+          assert.strictEqual(fs.existsSync(_workdir), true);
+          _listDir.forEach(subdir => {
+            const _subPath = path.join(_workdir, subdir);
+            assert.strictEqual(fs.existsSync(_subPath), true);
+            if (subdir === 'asset') {
+              assert.strictEqual(fs.existsSync(path.join(_subPath, 'converter.py')), true);
+            }
+            if (subdir === 'config') {
+              assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'config', 'config.json')), true);
+              assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'config', 'key.pem')), true);
+              assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'config', 'key.pub')), true);
+            }
+          });
+          helper.rmDirRecursive(_workdir);
+          assert.strictEqual(fs.existsSync(_workdir), false);
+          webserver.stopServer(done);
+        });
+      });
+    });
   });
 
   describe('With authentication with plugins / middlewares', () => {

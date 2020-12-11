@@ -39,6 +39,31 @@ describe('Image processing in ODG, ODT, ODS, DOCX, and XSLX', function () {
     });
   });
 
+  describe('[Full test] ODP', function () {
+    it('should do nothing if there is no marker inside XML', function (done) {
+      const _testedReport = 'odp-simple-without-marker';
+      carbone.render(openTemplate(_testedReport), {}, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should inject 3 images inside the ODG document with no imageFit, with imageFit contain and imageFit fill', function (done) {
+      const _testedReport = 'odp-simple';
+      const _data = {
+        image  : _imageDEBase64jpg,
+        image2 : _imageLogoBase64jpg,
+        image3 : _imageLogoBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+  });
+
   describe('[Full test] ODT', function () {
     it('should do nothing if there is no marker inside XML', function (done) {
       const _testedReport = 'odt-simple-without-marker';

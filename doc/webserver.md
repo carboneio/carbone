@@ -13,7 +13,7 @@ Carbone On-Premise Draft doc
 
 - 1 - Download Carbone On-premise binary for your server/OS: Mac, Linux or Windows
 - 2 - Install LibreOffice (Optional). See instruction below.
-- 3 - Start Carbone web server or daemonize it with systemd 
+- 3 - Start Carbone web server or daemonize it with systemd
 
 ```bash
   ./carbone webserver --port 4000 --workdir .
@@ -21,10 +21,10 @@ Carbone On-Premise Draft doc
 It creates directories in `--workdir` [-w]  (executable directory by default)
 
 - `template`  : where carbone keeps templates (cache)
-- `render`    : temp directory where report are generated 
+- `render`    : temp directory where report are generated
 - `asset`     : internal used only
 - `config`    : config, licenses and ES512 keys for authentication
-- `logs`      : [NOT IMPLEMENTED] formatted output logs 
+- `logs`      : [NOT IMPLEMENTED] formatted output logs
 - `plugin `   : where to put custom plugin
 
 
@@ -130,18 +130,18 @@ If you need to see the command usage, call
 
 ## Authentication
 
-By default, carbone-ee starts without authentication. 
+By default, carbone-ee starts without authentication.
 You must add `--authentication` or `-A` in CLI or set `authentication : true` in config file to activate authentication. When activated, all APIs are protected by authentication except `GET /render.carbone.io/render/:renderId`.
 
 The authentication mechanism is based on `ES512` JWT tokens.
 
-The token must be passed in `Authorization` header exactly like the SaaS version https://carbone.io/api-reference.html#choose-carbone-version 
+The token must be passed in `Authorization` header exactly like the SaaS version https://carbone.io/api-reference.html#choose-carbone-version
 
 ### How to generate tokens ?
   1) with Carbone CLI: `./carbone generate-token` generates 40-years valid tokens
   2) programmatically and dynamically on client side to reduce Man-In-The-Middle attacks with short expiration dates. More information below.
 
-You can generate and renew tokens on client side using standard libraries in any programming languages https://jwt.io/ 
+You can generate and renew tokens on client side using standard libraries in any programming languages https://jwt.io/
 
 Tokens must contain at least this payload. And it must be signed with the generated public key in `config/key.pub`.
 ```
@@ -191,7 +191,7 @@ To override with config file, copy/paste the following JSON data in `config/conf
   "port": 4001,
   "bind": "127.0.0.1",
   "factories": 4,
-  "attemps": 2,
+  "attempts": 2,
   "authentication": true
 }
 ```
@@ -205,7 +205,7 @@ export CARBONE_EE_PORT=3600
 export CARBONE_EE_BIND=127.0.0.1
 export CARBONE_EE_FACTORIES=4
 export CARBONE_EE_WORKDIR=/var/www/carbone
-export CARBONE_EE_ATTEMPS=2
+export CARBONE_EE_ATTEMPTS=2
 export CARBONE_EE_AUTHENTICATION=true
 ```
 
@@ -293,7 +293,7 @@ To override template deleting, add a function `deleteTemplate` in the `storage.j
 
 ```js
 // You can access req and res.
-// For example, if you store your template on amazon S3, you could delete it and 
+// For example, if you store your template on amazon S3, you could delete it and
 function deleteTemplate (req, res, templateId, callback) {
   // Delete the template and either return a local path to unlink it or just use res to return a response
   return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
@@ -306,7 +306,7 @@ module.exports = {
 
 ### Add custom prefix to rendered filename
 
-You can add a prefix to the rendered filename. 
+You can add a prefix to the rendered filename.
 To do this, add a function `beforeRender` in the `storage.js` plugin and export it.
 In this function, you can access the current request `req`.
 
@@ -412,7 +412,7 @@ module.exports = {
 
 You can add your own middlewares before or after route. It can be usefull to log or get stats on your requests.
 
-To do it, add a `middlewares.js` file in the `plugin` folder and export two arrays:  
+To do it, add a `middlewares.js` file in the `plugin` folder and export two arrays:
 - before
 - after
 

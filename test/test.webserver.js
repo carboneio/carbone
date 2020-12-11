@@ -142,14 +142,13 @@ describe('Webserver', () => {
 
   describe('WebServer Initialisations', () => {
     describe('handleParams', () => {
-      it('should change the default values (port, factories, workdir, attempts, authentication, bind)', (done) => {
-        const _port = 4321;
-        const _workdir = path.join(os.tmpdir(), 'test');
-        const _factories = 2;
-        const _attempts = 3;
+      it('should change the default configurations from the CLI', (done) => {
+        const _port = '4321';
+        const _workdir = path.join(os.tmpdir(), 'testCLI');
+        const _factories = '2';
+        const _attempts = '3';
         const _bind = '127.0.0.2';
         webserver = require('../lib/webserver');
-        //
         webserver.handleParams(['--port', _port, '--workdir', _workdir, '--factories', _factories, '--attempts', _attempts,'--bind', _bind, '--authentication'], () => {
           assert.strictEqual(params.port, _port);
           assert.strictEqual(fs.existsSync(_workdir), true);
@@ -157,6 +156,94 @@ describe('Webserver', () => {
           assert.strictEqual(params.factories, _factories);
           assert.strictEqual(params.attempts, _attempts);
           assert.strictEqual(params.bind, _bind);
+          assert.strictEqual(params.authentication, true);
+          webserver.stopServer(done);
+        });
+      });
+
+      it('should change the default configurations from the ENV', (done) => {
+        process.env.CARBONE_EE_PORT = 4006;
+        process.env.CARBONE_EE_WORKDIR = path.join(os.tmpdir(), 'testENV');
+        process.env.CARBONE_EE_FACTORIES = 2;
+        process.env.CARBONE_EE_ATTEMPTS = 2;
+        process.env.CARBONE_EE_BIND = '127.0.0.3';
+        process.env.CARBONE_EE_AUTHENTICATION = 'true';
+        webserver = require('../lib/webserver');
+        webserver.handleParams([], () => {
+          assert.strictEqual(params.port, process.env.CARBONE_EE_PORT + '');
+          assert.strictEqual(fs.existsSync(process.env.CARBONE_EE_WORKDIR), true);
+          assert.strictEqual(params.factories, process.env.CARBONE_EE_FACTORIES + '');
+          assert.strictEqual(params.attempts, process.env.CARBONE_EE_ATTEMPTS + '');
+          assert.strictEqual(params.bind, process.env.CARBONE_EE_BIND);
+          assert.strictEqual(params.authentication + '', process.env.CARBONE_EE_AUTHENTICATION);
+          // clean
+          helper.rmDirRecursive(process.env.CARBONE_EE_WORKDIR);
+          delete process.env.CARBONE_EE_PORT;
+          delete process.env.CARBONE_EE_WORKDIR;
+          delete process.env.CARBONE_EE_FACTORIES;
+          delete process.env.CARBONE_EE_ATTEMPTS;
+          delete process.env.CARBONE_EE_BIND;
+          delete process.env.CARBONE_EE_AUTHENTICATION;
+          webserver.stopServer(done);
+        });
+      });
+
+      it('should change the default configurations from the config.json file', (done) => {
+        const _workdir = path.join(os.tmpdir(), 'testConfig');
+        const _workdirConfig = path.join(_workdir, 'config');
+        const _configContent = {
+          port           : 4008,
+          bind           : '127.0.0.2',
+          factories      : 4,
+          attempts       : 2,
+          authentication : true
+        };
+        fs.mkdirSync(_workdirConfig, { recursive : true });
+        fs.writeFileSync(path.join(_workdirConfig, 'config.json'), JSON.stringify(_configContent));
+        webserver = require('../lib/webserver');
+        webserver.handleParams(['--workdir', _workdir], () => {
+          assert.strictEqual(params.port, _configContent.port);
+          assert.strictEqual(params.factories, _configContent.factories);
+          assert.strictEqual(params.attempts, _configContent.attempts);
+          assert.strictEqual(params.bind, _configContent.bind);
+          assert.strictEqual(params.authentication, _configContent.authentication);
+          helper.rmDirRecursive(_workdir);
+          webserver.stopServer(done);
+        });
+      });
+
+      it('should configure with this priority order: CLI > ENV > config.json', function (done) {
+        const _expectedPort = 4011;
+        const _expectedFactories = 2;
+        const _expectedAttempts = 5;
+        const _expectedBind = '127.0.0.2';
+        const _workdir = path.join(os.tmpdir(), 'testPriority');
+        const _workdirConfig = path.join(_workdir, 'config');
+        // INIT ENV
+        process.env.CARBONE_EE_PORT = 4010;
+        process.env.CARBONE_EE_FACTORIES = 2;
+        // INIT CONFIG FILE
+        const _configContent = {
+          port           : 4008,
+          bind           : '127.0.0.5',
+          factories      : 5,
+          attempts       : _expectedAttempts,
+          authentication : false
+        };
+        fs.mkdirSync(_workdirConfig, { recursive : true });
+        fs.writeFileSync(path.join(_workdirConfig, 'config.json'), JSON.stringify(_configContent));
+        // RUN SERVER
+        webserver = require('../lib/webserver');
+        webserver.handleParams(['--bind', _expectedBind, '--port', _expectedPort ,'--workdir', _workdir, '--authentication'], () => {
+          assert.strictEqual(params.port, _expectedPort);
+          assert.strictEqual(params.factories, _expectedFactories);
+          assert.strictEqual(params.attempts, _expectedAttempts);
+          assert.strictEqual(params.bind, _expectedBind);
+          assert.strictEqual(params.authentication, true);
+          // clean
+          helper.rmDirRecursive(_workdir);
+          delete process.env.CARBONE_EE_PORT;
+          delete process.env.CARBONE_EE_FACTORIES;
           webserver.stopServer(done);
         });
       });

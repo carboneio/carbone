@@ -104,7 +104,7 @@
     `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`.
     Unsupported tags and tags attributes are skipped and not rendered.
     HTML entities are accepted.
-  - [EE] New feature: Dynamic pictures is supported for ODG files. It is not possible to create loops.
+  - [EE] New feature: Dynamic pictures are supported on ODG and ODP files. It is not possible to create loops.
 
 ### v2.1.1
   - Release September 23rd 2020

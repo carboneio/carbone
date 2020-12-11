@@ -7,7 +7,7 @@ const fs        = require('fs');
 const image     = require('../lib/image');
 const nock      = require('nock');
 
-describe('Image processing in ODG, ODT, ODS, DOCX, and XSLX', function () {
+describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');

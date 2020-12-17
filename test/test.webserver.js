@@ -405,6 +405,21 @@ describe('Webserver', () => {
           });
         });
       });
+
+      it('should delete a template in the user location choice with the header Expect:100-continue', (done) => {
+        exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'PREFIX_abcdef')}`, () => {
+          const _request = getBody(4001, '/template/abcdef', 'DELETE', null, token)
+          _request.headers.Expect = '100-continue';
+          get.concat(_request, (err, res, data) => {
+            data = JSON.parse(data.toString());
+            assert.strictEqual(res.headers.checkcontinue, 'done');
+            assert.strictEqual(data.success, true);
+            assert.strictEqual(data.message, 'Template deleted');
+            done();
+          });
+        });
+      });
+
     });
   });
 
@@ -469,6 +484,26 @@ describe('Webserver', () => {
       form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
       get.concat(getBody(4001, '/template', 'POST', form, token), (err, res, data) => {
+        assert.strictEqual(err, null);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        let exists = fs.existsSync(path.join(os.tmpdir(), 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+        assert.strictEqual(exists, true);
+        toDelete.push('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        done();
+      });
+    });
+
+    it('should upload the template if user is authenticated with the header Expect:100-continue', (done) => {
+      let form = new FormData();
+
+      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
+
+      const _request = getBody(4001, '/template', 'POST', form, token);
+      _request.headers.Expect = '100-continue';
+      get.concat(_request, (err, res, data) => {
+        assert.strictEqual(res.headers.checkcontinue, 'done');
         assert.strictEqual(err, null);
         data = JSON.parse(data);
         assert.strictEqual(data.success, true);
@@ -586,6 +621,24 @@ describe('Webserver', () => {
         };
 
         get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          assert.strictEqual(data.success, true);
+          const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
+          assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+          toDelete.push(data.data.renderId);
+          done();
+        });
+      });
+
+      it('should render a template with the 100-continue header', (done) => {
+        const _body = getBody(4000, `/render/${templateId}`, 'POST', {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          }
+        });
+        _body.headers.Expect = '100-continue';
+        get.concat(_body, (err, res, data) => {
+          assert.strictEqual(res.headers.checkcontinue, 'done');
           assert.strictEqual(data.success, true);
           const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');

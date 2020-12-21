@@ -34,7 +34,7 @@
 
 >  ⚡️ Breaking news :
 > 
-> **Carbone v3.x 🚀 is comming :**
+> **Carbone v3.x 🚀 is coming :**
 >   
 >   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
 

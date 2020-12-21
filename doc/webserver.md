@@ -4,7 +4,7 @@ Carbone On-Premise Draft doc
 # Installation
 
   - One self-contained binary executable + external LibreOffice (used for conversion)
-  - As debian/ubuntu package (coming soon)
+  - As debian/ubuntu package 
   - Docker (coming soon)
 
 ## Binary executable

@@ -41,5 +41,6 @@ config/*
 build/*
 render/*
 template/*
+coverage/*
 asset/*
 0formation/*

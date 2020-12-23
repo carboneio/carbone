@@ -1,11 +1,15 @@
 [Unit]
-Description=carbone-ee
+Description=CARBONE_SERVICE_NAME
 After=network.target
+# Restart forever
+# StartLimitIntervalSec=0
+# Wait 1s before restarting
+# RestartSec=1
 
 [Service]
-WorkingDirectory=/var/www/carbone-ee
-User=carbone
-ExecStart=/var/www/carbone-ee/carbone-ee webserver
+WorkingDirectory=CARBONE_WORKDIR
+User=CARBONE_USER
+ExecStart=CARBONE_BIN_PATH webserver
 Restart=always
 Environment=NODE_ENV=prod
 ProtectControlGroups=true
@@ -18,6 +22,19 @@ LockPersonality=true
 RestrictSUIDSGID=true
 SystemCallArchitectures=native
 NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+CapabilityBoundingSet=
+
+# Kill after X seconds if soft stop does work
+# TimeoutStopSec=90 
+# ExecStop=
 
 [Install]
 WantedBy=multi-user.target
+
+# [Slice]
+# MemoryAccounting=true
+# MemoryLimit=100M
+# MemoryMax=100M
+# MemoryHigh=50M

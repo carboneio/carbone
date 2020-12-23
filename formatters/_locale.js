@@ -1881,7 +1881,7 @@ const locales = {
   }
 };
 
-// for compatibility with older versions
+// for compatibility with main language
 locales.fr = locales['fr-fr'];
 locales.nl = locales['nl-nl'];
 locales.en = JSON.parse(JSON.stringify(locales['en-us']));

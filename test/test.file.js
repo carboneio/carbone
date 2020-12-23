@@ -72,8 +72,29 @@ describe('file', function () {
         done();
       });
     });
+    it('should detect a html type without doctype', function (done) {
+      carbone.getFileExtension('test_html_without_doctype.html', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'html');
+        done();
+      });
+    });
+    it('should detect a html type even if HTML is upper case', function (done) {
+      carbone.getFileExtension('test_html_without_doctype.html', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'html');
+        done();
+      });
+    });
     it('should detect a xhtml type', function (done) {
       carbone.getFileExtension('test_xhtml.xhtml', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'xhtml');
+        done();
+      });
+    });
+    it('should detect a xhtml type', function (done) {
+      carbone.getFileExtension('test_xhtml_case_insensitive_whitespace.xhtml', function (err, extension) {
         helper.assert(err, null);
         assert.strictEqual(extension, 'xhtml');
         done();

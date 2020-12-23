@@ -815,7 +815,7 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/render/..%2F..%2F..%2F..%2Fdatasets%2Ftemplate.html', 'POST', body), (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Template not found');
+          assert.strictEqual(data.error, 'Unvalid ID');
           done();
         });
       });
@@ -961,6 +961,17 @@ describe('Webserver', () => {
           done();
         });
       });
+
+      it('should not retrieve anything if the template ID is invalid', (done) => {
+        get.concat(getBody(4000, '/render/thisIsASpecialFile.php.js', 'GET'), (err, res, data) => {
+          const _resp = JSON.parse(data.toString());
+          assert.strictEqual(res.statusCode, 400);
+          assert.strictEqual(_resp.success, false);
+          assert.strictEqual(_resp.error, 'Unvalid ID');
+          assert.strictEqual(_resp.code, 'w115');
+          done();
+        });
+      });
     });
 
     describe('Add template', () => {
@@ -1099,6 +1110,15 @@ describe('Webserver', () => {
           done();
         });
       });
+
+      it('should return an error if template ID is invalid (windows reserved filename)', (done) => {
+        get.concat(getBody(4000, '/template/CON', 'GET'), (err, res, data) => {
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Unvalid ID');
+          done();
+        });
+      });
     });
 
     describe('Delete template', () => {
@@ -1120,6 +1140,107 @@ describe('Webserver', () => {
           assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
           done();
         });
+      });
+
+      it('should return an error if the template ID is invalid with more than 255 characters', (done) => {
+        let filename = '';
+        for (let i = 0; i < 255; i++) {
+          filename += 'i';
+        }
+        get.concat(getBody(4000, '/template/' + filename + '.pdf', 'DELETE'), (err, res, data) => {
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Unvalid ID');
+          done();
+        });
+      });
+    });
+  });
+
+  describe('sanitizeValidateId', function () {
+    webserver = require('../lib/webserver');
+    describe('sanitize', function () {
+      it('Should remove illegal characters', function () {
+        helper.assert(webserver.sanitizeValidateId('This/Is/An/Id'), 'ThisIsAnId');
+        helper.assert(webserver.sanitizeValidateId('This?Is?An?Id'), 'ThisIsAnId');
+        helper.assert(webserver.sanitizeValidateId('This<Is<An>I<d>>'), 'ThisIsAnId');
+        helper.assert(webserver.sanitizeValidateId('This\\Is\\An\\Id'), 'ThisIsAnId');
+        helper.assert(webserver.sanitizeValidateId('This:Is:An:Id'), 'ThisIsAnId');
+        helper.assert(webserver.sanitizeValidateId('This*Is*An*Id'), 'ThisIsAnId');
+        helper.assert(webserver.sanitizeValidateId('This|Is|An|Id'), 'ThisIsAnId');
+        helper.assert(webserver.sanitizeValidateId('Th"is"Is"An"Id'), 'ThisIsAnId');
+        helper.assert(webserver.sanitizeValidateId('Th/i?s<I>s\\A:n*I|d"'), 'ThisIsAnId');
+      });
+      it('Should remove control codes (non printable characters)', function () {
+        let nonPrintableCharacters = 'start';
+        for (let i = 0, j = 28; i < j; i++) {
+          nonPrintableCharacters += String.fromCharCode(i);
+        }
+        for (let i = 128, j = 159; i < j; i++) {
+          nonPrintableCharacters += String.fromCharCode(i);
+        }
+        nonPrintableCharacters += 'end';
+        helper.assert(nonPrintableCharacters.length, 67);
+        helper.assert(webserver.sanitizeValidateId(nonPrintableCharacters), 'startend');
+      });
+      it('Should remove lunix paths', function () {
+        helper.assert(webserver.sanitizeValidateId('./bill.pdf'), 'bill.pdf');
+        helper.assert(webserver.sanitizeValidateId('../bill.pdf'), 'bill.pdf');
+        helper.assert(webserver.sanitizeValidateId('../../../bill.pdf'), 'bill.pdf');
+        helper.assert(webserver.sanitizeValidateId('..../bill.pdf'), 'bill.pdf');
+        helper.assert(webserver.sanitizeValidateId('./././bill.pdf'), 'bill.pdf');
+      });
+
+      it('Should remove trailing spaces or dots', function () {
+        helper.assert(webserver.sanitizeValidateId('bill.pdf  '), 'bill.pdf');
+        helper.assert(webserver.sanitizeValidateId('bill.pdf.'), 'bill.pdf');
+        helper.assert(webserver.sanitizeValidateId('bill.pdf.  '), 'bill.pdf');
+      });
+
+      it('Should remove a mix of unauthorized elements', function () {
+        helper.assert(webserver.sanitizeValidateId('../../this<Is?My' + String.fromCharCode(2) + '|F"il"e"N' + String.fromCharCode(130) + 'ame.docx.  '), 'thisIsMyFileName.docx');
+      });
+    });
+    describe('validate - errors', function () {
+      it('Should not accept windows reserved filenames', function () {
+        const _disallowed = ['CON', 'PRN', 'AUX', 'NUL', 'COM1', 'COM2', 'COM3', 'COM4', 'COM5', 'COM6', 'COM7', 'COM8', 'COM9', 'COM0', 'LPT1', 'LPT2', 'LPT3', 'LPT4', 'LPT5', 'LPT6', 'LPT7', 'LPT8', 'LPT9', 'LPT0'];
+        _disallowed.forEach(filename => {
+          helper.assert(webserver.sanitizeValidateId(filename), null);
+          helper.assert(webserver.sanitizeValidateId(filename.toLowerCase()), null);
+        });
+      });
+      it('should not allow a filename with more than 255 characters', function () {
+        let _filename = '';
+        for (let i = 0, j = 255; i < j; i++) {
+          _filename += 'a';
+        }
+        _filename += '.pdf';
+        helper.assert(_filename.length, 259);
+        helper.assert(webserver.sanitizeValidateId(_filename), null);
+      });
+      it('should not allow a filename with illegal characters (like %)', function () {
+        helper.assert(webserver.sanitizeValidateId(''), null);
+        helper.assert(webserver.sanitizeValidateId('fi\'le_name-123.html'), null);
+        helper.assert(webserver.sanitizeValidateId('..%2Fdatasets%2Ftemplate.html'), null);
+        helper.assert(webserver.sanitizeValidateId('..%2F..%2F..%2F..%2Fdatasets%2Ftemplate.html'), null);
+      });
+
+      it('should not allow multiple extensions', function () {
+        helper.assert(webserver.sanitizeValidateId('file_name.php.html'), null);
+        helper.assert(webserver.sanitizeValidateId('file_name.pdf.js'), null);
+      });
+    });
+    describe('sanitize + validate', function () {
+      it('should successfully sanitize and validate', function () {
+        helper.assert(webserver.sanitizeValidateId('filename.docx'), 'filename.docx');
+        helper.assert(webserver.sanitizeValidateId('filename1234.docx'), 'filename1234.docx');
+        helper.assert(webserver.sanitizeValidateId('file_name-1234.docx'), 'file_name-1234.docx');
+        helper.assert(webserver.sanitizeValidateId('file_name-1234docx'), 'file_name-1234docx');
+        helper.assert(webserver.sanitizeValidateId('./file_name-1234.docx '), 'file_name-1234.docx');
+        helper.assert(webserver.sanitizeValidateId('../../file<_n|am>e-"1234".docx..'), 'file_name-1234.docx');
+        // templateID / renderID
+        helper.assert(webserver.sanitizeValidateId('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        helper.assert(webserver.sanitizeValidateId('9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html'), '9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html');
       });
     });
   });

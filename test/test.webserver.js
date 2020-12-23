@@ -414,7 +414,7 @@ describe('Webserver', () => {
 
       it('should delete a template in the user location choice with the header Expect:100-continue', (done) => {
         exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'PREFIX_abcdef')}`, () => {
-          const _request = getBody(4001, '/template/abcdef', 'DELETE', null, token)
+          const _request = getBody(4001, '/template/abcdef', 'DELETE', null, token);
           _request.headers.Expect = '100-continue';
           get.concat(_request, (err, res, data) => {
             data = JSON.parse(data.toString());

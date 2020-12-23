@@ -59,11 +59,11 @@
   - Performance: deactivate image compression by default to speed up PDF conversion
   - [BREAKING CHANGE]: remove the possibility to use `convertTo.formatOptionsRaw` for CSV export. This feature was not documented
     and can lead to security issues. Use `convertTo.formatOptions` instead.
-  - new paramater in `Carbone.set` 
+  - new paramater in `Carbone.set`
      - `renderPath`   : `Carbone.set` can changes the default path where rendered files are temporary saved.
                         By default, it creates the directory `carbone_render` in Operating System temp directory.
                         It creates the path automatically
-  - new paramater in `Carbone.render` 
+  - new paramater in `Carbone.render`
      - `renderPrefix` : If defined in `options` object. `Carbone.render` returns a file path instead of a buffer, and it adds this prefix in the rendered filename
                         The generated filename contains three parts:
                           - the prefix
@@ -104,6 +104,7 @@
     `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`.
     Unsupported tags and tags attributes are skipped and not rendered.
     HTML entities are accepted.
+  - [EE] New feature: Dynamic pictures are supported on ODG and ODP files. It is not possible to create loops.
 
 ### v2.1.1
   - Release September 23rd 2020

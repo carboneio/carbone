@@ -7,12 +7,62 @@ const fs        = require('fs');
 const image     = require('../lib/image');
 const nock      = require('nock');
 
-describe('Image processing in ODT, DOCX, ODS, ODP, XSLX, ...', function () {
+describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
   const _imageITBase64png            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageIT_base64_html_png.txt'  ), 'utf8');
   const _imageLogoBase64jpg          = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageLogo_base64_html_jpg.txt'), 'utf8');
+
+  describe('[Full test] ODG', function () {
+    it('should do nothing if there is no marker inside XML', function (done) {
+      const _testedReport = 'odg-simple-without-marker';
+      carbone.render(openTemplate(_testedReport), {}, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should inject 3 images inside the ODG document with no imageFit, with imageFit contain and imageFit fill', function (done) {
+      const _testedReport = 'odg-simple';
+      const _data = {
+        image  : _imageDEBase64jpg,
+        image2 : _imageLogoBase64jpg,
+        image3 : _imageLogoBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+  });
+
+  describe('[Full test] ODP', function () {
+    it('should do nothing if there is no marker inside XML', function (done) {
+      const _testedReport = 'odp-simple-without-marker';
+      carbone.render(openTemplate(_testedReport), {}, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should inject 3 images inside the ODG document with no imageFit, with imageFit contain and imageFit fill', function (done) {
+      const _testedReport = 'odp-simple';
+      const _data = {
+        image  : _imageDEBase64jpg,
+        image2 : _imageLogoBase64jpg,
+        image3 : _imageLogoBase64jpg
+      };
+      carbone.render(openTemplate(_testedReport), _data, (err, res) => {
+        helper.assert(err+'', 'null');
+        assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+  });
 
   describe('[Full test] ODT', function () {
     it('should do nothing if there is no marker inside XML', function (done) {

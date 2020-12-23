@@ -28,14 +28,15 @@
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
-    "dayjs": "=1.9.6",
     "body-parser": "=1.19.0",
     "cors": "=2.8.5",
+    "dayjs": "=1.9.6",
     "debug": "=4.1.1",
     "formidable": "=1.2.2",
     "image-size": "=0.7.4",
     "kitten-jwt": "^1.0.0",
     "restana": "=4.6.1",
+    "serve-static": "^1.14.1",
     "simple-get": "=4.0.0",
     "timsort": "=0.3.0",
     "which": "=2.0.2",
@@ -43,10 +44,7 @@
     "yazl": "=2.5.1"
   },
   "pkg": {
-    "assets": "lib/converter.py",
-    "assets": "bin/install.sh",
-    "assets": "bin/systemd",
-    "assets": "examples/healthCheck.odt"
+    "assets": ["examples/healthCheck.odt", "studio/**/*"]
   },
   "devDependencies": {
     "eslint": "=7.7.0",

@@ -1,0 +1,131 @@
+.right {
+  background-color: green;
+  width: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.relative {
+  position: relative;
+}
+
+.template-input {
+  margin-left: 20px;
+}
+
+#template {
+  width: 100px;
+}
+
+.logo {
+  color: white;
+  font-weight: 500;
+  font-size: 1.2em;
+}
+
+.up-block {
+  background-color: #82369d;
+  padding: 0px 10px;
+  height: 50px;
+  display: flex;
+  box-shadow: 0px 3px 10px #0000004d;
+  z-index: 10;
+}
+
+.filename {
+  color: white;
+  font-family: Roboto;
+  font-size: 1.1em;
+  font-weight: 500;
+}
+
+.col-4 {
+  width: 33%;
+}
+
+.col-3 {
+  width: 25%;
+}
+
+.container-height {
+  height: calc(100% - 80px);
+}
+
+.console {
+  height: 30px;
+  padding: 0px 10px;
+  box-shadow: 0px 0px 10px #0000004d;
+  position: relative;
+}
+
+#console-title {
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+#console-content {
+  color: #353535;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+#jsoneditor {
+  height: 95%;
+}
+
+#carbone-options {
+  height: 5%;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button:hover {
+  background-color: #dedede;
+  cursor: pointer;
+}
+
+div.jsoneditor-menu a.jsoneditor-poweredBy {
+  display: none;
+}
+
+div.jsoneditor,
+div.jsoneditor-menu {
+  border-color: #fee1fe;
+}
+div.jsoneditor-menu {
+  background-color: #fee1fe;
+}
+
+input[type='file'] {
+  color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto;
+  height: 100%;
+}

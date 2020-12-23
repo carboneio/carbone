@@ -1,0 +1,43 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="jsoneditor/jsoneditor.min.css">
+  <script src="jsoneditor/jsoneditor.min.js"></script>
+  <title>Carbone Studio</title>
+</head>
+<body>
+  <div class="up-block flex align-center relative">
+    <div class="col-4 logo">
+      Carbone
+    </div>
+    <div class="col-4 flex justify-center">
+      <span id="filename" class="filename"></span>
+    </div>
+    <div class="col-4 flex justify-end">
+      <input type="file" id="template" name="template">
+    </div>
+  </div>
+  <div class="flex container-height relative">
+    <div class="full-width">
+      <div id="jsoneditor"></div>
+      <div id="carbone-options" class="flex">
+        <div id="data" class="button col-3">Data</div>
+        <div id="complement" class="button col-3">Complement</div>
+        <div id="enum" class="button col-3">Enum</div>
+        <div id="translations" class="button col-3">Translations</div>
+      </div>
+    </div>
+    <div class="full-width">
+      <object type="application/pdf" id="pdfviewerobject" class="pdfviewer-size" style="height: 100%; width: 100%"></object>
+    </div>
+  </div>
+  <div class="console flex align-center">
+    <span id="console-title"></span>
+    <span id="console-content"></span>
+  </div>
+  <script src="index.js"></script>
+</body>
+</html>

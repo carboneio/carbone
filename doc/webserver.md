@@ -116,7 +116,7 @@ If an option is reported in different places, CLI options are picked in priority
 | Port  |  4000 | Service PORT |
 | workdir  | Actual directory  | Define the place to store elements,  it creates 6 directories: `template`  : where carbone keeps templates (cache) `render`    : temp directory where report are generated, `asset`     : internal used only, `config`    : config, licenses and ES512 keys for authentication, `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and `plugin `   : where to put custom plugin  |
 | factories  | 1 | Number of LibreOffice + Python factory to start.  |
-| attempts  | 1  |   If LibreOffice fails to convert one document, how many times we re-try to convert this file?  |
+| attempts  | 1  |  If LibreOffice fails to convert one document, `attempts` options set the number of re-try  |
 | authentification  | false  |  [Authentification documentation at the following link](#authentication-option) |
 |Carbone Studio Light| false | Web interface to preview reports |
 ||||
@@ -133,7 +133,7 @@ To list available options, run the help command, such as:
 Here is an example of passing options to the service:
 
 ```bash
-./carbone webserver --port 4001 --bind 127.0.0.1 --factories 4 --workdir /var/www/carbone --attemps 2 --auth --studio
+./carbone webserver --port 4001 --bind 127.0.0.1 --factories 4 --workdir /var/www/carbone --attemps 2 --authentication --studio
 ```
 
 ### Configuration file options

@@ -17,7 +17,7 @@ Carbone On-Premise Documentation
 
 ## Installations
 
-Carbone On-premise can be installed through different way:
+Carbone On-premise can be installed in different ways:
 
   - Self-contained binary executable + external LibreOffice (used for conversion)
   - Debian/Ubuntu package (coming soon)
@@ -35,7 +35,7 @@ It is possible to [edit default options](#Carbone-Options-overview) passed to Ca
 
 ### Installation from systemd (Ubuntu/Debian ONLY)
 
-Carbone On-Premise contains automatic installation scripts to daemonize with systemd. It has been carefully configured to provide high level of security.
+Carbone On-Premise contains automatic installation scripts to daemonize with systemd. It has been carefully configured to provide a high level of security.
 
 
 ```bash
@@ -100,13 +100,13 @@ Carbone does a lot of thing behind the scene:
 
 ## Carbone Options overview
 
-Carbone default parameters can be overwrited through:
+Carbone default parameters can be overwritten through:
 
 - [CLI options](#CLI-options) (highest priority)
 - [Environment variable](#Environment-variable-options)
 - [Configuration file](#Configuration-file-options) (lowest priority)
 
-If an option is reported in different places, CLI options are picked in priority, then environment variables in second place and finally the configuration file.
+If an option is reported in different places, CLI options are picked in priority, then environment variables in second place, and finally the configuration file.
 
 ### Options list
 
@@ -137,7 +137,7 @@ Here is an example of passing options to the service:
 ```
 
 ### Configuration file options
-To use a configuration file, `config.json` must be created in the `config` folder. Here is an example of configuration:
+To use a configuration file, `config.json` must be created in the `config` folder. Here is an example of a configuration:
 ```json
 {
   "port": 4001,
@@ -166,7 +166,7 @@ export CARBONE_EE_AUTHENTICATION=true
 ### Authentication option
 
 By default, carbone-ee starts without authentication.
-To activate it, the option `--authentication` must be added through the CLI or set `authentication : true` in configuration file. When activated, all APIs are protected by authentication except `GET /render.carbone.io/render/:renderId` and `GET /status`.
+To activate it, the option `--authentication` must be added through the CLI or set `authentication : true` in a configuration file. When activated, all APIs are protected by authentication except `GET /render.carbone.io/render/:renderId` and `GET /status`.
 
 The authentication mechanism is based on `ES512` JWT tokens.
 
@@ -191,11 +191,12 @@ We recommend to generate tokens with an expiration date valid for at least 12 ho
 ## How to use Carbone On-premise?
 
 Carbone On-Premise works the same way as Carbone Render API, the endpoints list:
-- Add a template    : POST /render.carbone.io/template
-- Get a template    : GET /render.carbone.io/template/:templateId
-- Delete a template : DELETE /render.carbone.io/template/:templateId
-- Generate a report : POST /render.carbone.io/render/:templateId
-- Get the result    : GET /render.carbone.io/render/:renderId
+- Add a template    : POST /127.0.0.1:4000/template
+- Get a template    : GET /127.0.0.1:4000/template/:templateId
+- Delete a template : DELETE /127.0.0.1:4000/template/:templateId
+- Generate a report : POST /127.0.0.1:4000/render/:templateId
+- Get the result    : GET /127.0.0.1:4000/render/:renderId
+- Get status        : GET /127.0.0.1:4000/status
 
 [Click here to learn more about the API.](https://carbone.io/api-reference.html#carbone-render-api.)
 
@@ -205,8 +206,8 @@ Carbone Render SDKs [on Github](https://github.com/Ideolys?q=sdk) can be used to
 ## Customise Carbone On-premise
 
 Carbone On-premise gives the possibility to override functions at specific moments to add custom features, such as adding analytics, store data on a specific storage provider, custom authentication, etc... It is possible through:
-- [**Plugins**](#Plugins): Functions to manage file storage, authentication, analytics, logs, or a custom behavior.
-- [**Middlewares**](#Middlewares): Functions that are fired before or after HTTP requests. It can be usefull for logging, statistics, or a custom behavior.
+- [**Plugins**](#Plugins): Functions to manage file storage, authentication, analytics, logs, or custom behaviors.
+- [**Middlewares**](#Middlewares): Functions that are fired before or after HTTP requests. It can be useful for logging, statistics, or custom behaviors.
 
 
 For a better understanding, here is the Carbone On-premise lifecycle:
@@ -217,6 +218,7 @@ Last important **requirement**, plugins and middlewares can be only written usin
 ### Plugins
 
 Following elements can be overrided:
+
 - [Write template](#Override-write-template)
 - [Read template](#Override-read-template)
 - [Delete template](#Override-delete-template)
@@ -225,7 +227,7 @@ Following elements can be overrided:
 - [Before/After render](#Before/After-Render)
 - [Authentication (Get Public Key)](#Authentication-(Get-Public-Key))
 
-To override them, it is recommanded to create a seperate NodeJS repository.
+To override them, it is recommended to create a separate NodeJS repository.
 
 ```bash
 # Create a separate folder
@@ -238,11 +240,11 @@ npm init
 mv /path/to/carbone/binary ./carbone
 ```
 
-When Carbone On-premise is executed for the first time, default folders are created automatically ([explanation here](#Carbone-Options-overview)). Custom plugins should be inserting in the `plugin` folder.
+When Carbone On-premise is executed for the first time, default folders are created automatically ([explanation here](#Carbone-Options-overview)). Custom plugins should be inserted in the `plugin` folder.
 
 ### Override write template
 
-To override template writing, the file `storage.js` in the `plugin` folder have to be created. The function to export is `writeTemplate` and is described as follow:
+To override template writing, the file `storage.js` in the `plugin` folder has to be created. The function to export is `writeTemplate` and is described as follow:
 
 ```js
 const fs = require('fs');
@@ -266,7 +268,7 @@ module.exports = {
 
 ### Override read template
 
-To override template reading, the file `storage.js` in the `plugin` folder have to be created. The function to explort is `readTemplate` which is descibred as follow:
+To override template reading, the file `storage.js` in the `plugin` folder has to be created. The function to explort is `readTemplate` which is described as follow:
 
 ```js
 function readTemplate (req, templateId, callback) {
@@ -278,11 +280,11 @@ module.exports = {
 }
 ```
 
-This function must return a local path to Carbone so it can read it on the disk.
+The function must return a local path because Carbone needs to read the file from a disk.
 
 ### Override delete template
 
-To override template deletion, add then function `deleteTemplate` in the `storage.js` file in the `plugin` folder and export it, for instance:
+To override template deletion, add the function `deleteTemplate` in the `storage.js` file in the `plugin` folder and export it, for instance:
 
 ```js
 // You can access req and res.
@@ -313,7 +315,7 @@ module.exports = {
 }
 ```
 
-For example, this function can be used to move the render on AWS Bucket, or it is also possible to change the response object:
+For example, this function can be used to move the render on Buckets, or it is also possible to change the response object:
 
 ```js
 res.send({
@@ -326,7 +328,7 @@ res.send({
 
 ### Override read render
 
-The function `readRender` have to be exported in the `storage.js` located in the `plugin` folder.
+The function `readRender` has to be exported in the `storage.js` located in the `plugin` folder.
 
 ```js
 function readRender (req, res, renderName, next) {
@@ -364,7 +366,7 @@ function beforeRender (req, res, carboneData, carboneOptions, next) {
 
 ### Authentication (Get Public Key)
 
-For the authentication checking, it is possible to define a new location to store public keys. The file `authentication.js` have to be created in the `plugin` folder. The function to export is `getPublicKey` and is described as follow:
+For the authentication checking, it is possible to define a new location to store public keys. The file `authentication.js` has to be created in the `plugin` folder. Export the function `getPublicKey` described as follow:
 
 ```js
 const fs = require('fs');
@@ -398,7 +400,7 @@ module.exports = {
 ### Middlewares
 
 
-Middlewares can be added before or after route. It can be usefull to log or get stats about requests. Add a `middlewares.js` file in the `plugin` folder and export two arrays:
+Middlewares can be added before or after route. It can be useful to log or get stats about requests. Add a `middlewares.js` file in the `plugin` folder and export two arrays:
 - before
 - after
 

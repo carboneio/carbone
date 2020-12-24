@@ -114,10 +114,10 @@ div.jsoneditor-menu a.jsoneditor-poweredBy {
 
 div.jsoneditor,
 div.jsoneditor-menu {
-  border-color: #fee1fe;
+  border-color: #b5b5b5;
 }
 div.jsoneditor-menu {
-  background-color: #fee1fe;
+  background-color: #b5b5b5;
 }
 
 input[type='file'] {

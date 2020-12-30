@@ -108,10 +108,17 @@ if [ ! "$NON_INTERACTIVE" = true ]; then
   echo ""
 fi
 
+if systemctl is-active --quiet $CARBONE_SERVICE_NAME; then
+  print_info "Stopping current Carbone service "
+  systemctl stop $CARBONE_SERVICE_NAME
+  exit_on_command_error "Cannot stop current Carbone service"
+  print_success "OK"
+fi
 
 if [ ! -d $CARBONE_WORKDIR ]; then
   print_info "Create Carbone directory "
   mkdir $CARBONE_WORKDIR
+  chown -R $CARBONE_USER:$CARBONE_USER $CARBONE_WORKDIR
   exit_on_command_error "Cannot create directory in $CARBONE_WORKDIR. Is parent directory exist?"
   print_success "OK"
 fi
@@ -121,9 +128,12 @@ if [ $BINARY_FILE_PATH != $CARBONE_BIN_PATH ]; then
   cp $BINARY_FILE_PATH $CARBONE_WORKDIR
   exit_on_command_error "Cannot copy binary in $CARBONE_WORKDIR"
   cd $CARBONE_WORKDIR
-  mv $BINARY_FILE $CARBONE_BIN
-  exit_on_command_error "Cannot rename binary $BINARY_FILE"
-  chmod +x $CARBONE_BIN
+  # mv crash if filename are the same
+  if [ $BINARY_FILE != $CARBONE_BIN ]; then
+    mv $BINARY_FILE $CARBONE_BIN
+    exit_on_command_error "Cannot rename binary $BINARY_FILE"
+  fi
+  chmod 700 $CARBONE_BIN
   exit_on_command_error "Cannot make it executable"
   print_success "OK"
 fi

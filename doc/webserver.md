@@ -1,37 +1,41 @@
-Carbone On-Premise Draft doc
+Carbone On-Premise Documentation
 ============================
+## Table of content
 
-# Installation
+- [Installations](#Installations)
+  - [Basic install](#Basic-Installation)
+  - [Systemd install](#Installation-from-systemd-(Ubuntu/Debian-ONLY))
+  - [Install LibreOffice and why?](#How-and-why-install-LibreOffice?)
+- [Carbone Options overview](#Carbone-Options-overview)
+  - [CLI](#CLI-options)
+  - [Environment variable](#Environment-variable-options)
+  - [Configuration file](#Configuration-file-options)
+- [How to use Carbone On-premise?](#How-to-use-Carbone-On-premise?)
+- [Customise Carbone On-premise](#Customise-Carbone-On-premise)
+  - [Plugins](#Plugins)
+  - [Middlewares](#Middlewares)
 
-  - One self-contained binary executable + external LibreOffice (used for conversion)
-  - As debian/ubuntu package 
-  - Docker (coming soon)
+## Installations
 
-## Binary executable
+Carbone On-premise can be installed in different ways:
 
-### Installation
+  - Self-contained binary executable + external LibreOffice (used for conversion)
+  - Debian/Ubuntu package (coming soon)
+  - Docker Container (coming soon)
+### Basic Installation
 
-- 1 - Download Carbone On-premise binary for your server/OS: Mac, Linux or Windows
-- 2 - Install LibreOffice (Optional). See instruction below.
-- 3 - Start Carbone web server or daemonize it with systemd
+- 1 - Download Carbone On-premise binary for server/OS: Mac, Linux or Windows
+- 2 - Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
+- 3 - Start Carbone web server or [daemonize it with systemd](#Installation-from-systemd-(Ubuntu/Debian-ONLY))
 
 ```bash
   ./carbone webserver --port 4000 --workdir .
 ```
-It creates directories in `--workdir` [-w]  (executable directory by default)
+It is possible to [edit default options](#Carbone-Options-overview) passed to Carbone On Premise.
 
-- `template`  : where carbone keeps templates (cache)
-- `render`    : temp directory where report are generated
-- `asset`     : internal used only
-- `config`    : config, licenses and ES512 keys for authentication
-- `logs`      : [NOT IMPLEMENTED] formatted output logs
-- `plugin `   : where to put custom plugin
+### Installation from systemd (Ubuntu/Debian ONLY)
 
-
-#### Ubuntu/Debian (systemd)
-
-Carbone On-Premise contains automatic installation scripts to daemonize with systemd.
-We have carefully configured systemd to provide high level of security.
+Carbone On-Premise contains automatic installation scripts to daemonize with systemd. It has been carefully configured to provide a high level of security.
 
 
 ```bash
@@ -41,24 +45,9 @@ We have carefully configured systemd to provide high level of security.
   sudo ./install.sh
 ```
 
-And follow instructions. You can change `CARBONE_USER`, `CARBONE_WORKDIR`.
+The service is configured to run by "carbone" user in the "/var/www/carbone-ee" directory. It is possible to overwrite values through environment variables `CARBONE_USER` and `CARBONE_WORKDIR`.
 
-
-### How to use it?
-
-Same HTTP API as https://carbone.io/api-reference.html#carbone-render-api
-
-Carbone On-Premise is compatible with our SDK for Python, Go, JS, PHP, ...
-
-- Add a template    : POST /render.carbone.io/template
-- Get a template    : GET /render.carbone.io/template/:templateId
-- Delete a template : DELETE /render.carbone.io/template/:templateId
-- Generate a report : POST /render.carbone.io/render/:templateId
-- Get the result    : GET /render.carbone.io/render/:renderId
-
-
-
-### How and why install LibreOffice?
+## How and why install LibreOffice?
 
 #### on OSX
 
@@ -102,42 +91,88 @@ Carbone On-Premise is compatible with our SDK for Python, Go, JS, PHP, ...
 
 Carbone uses efficiently LibreOffice to convert documents. Among all tested solutions, it is the most reliable and stable one in production for now.
 
-Carbone does a lot of thing for you behind the scene:
+Carbone does a lot of thing behind the scene:
 
 - starts LibreOffice in "server-mode": headless, no User Interface loaded
 - manages multiple LibreOffice workers to maximize performance (configurable number of workers)
 - automatically restarts LibreOffice worker if it crashes or does not respond
 - job queue, re-try conversion three times if something bad happen
 
+## Carbone Options overview
+
+Carbone default parameters can be overwritten through:
+
+- [CLI options](#CLI-options) (highest priority)
+- [Environment variable](#Environment-variable-options)
+- [Configuration file](#Configuration-file-options) (lowest priority)
+
+If an option is reported in different places, CLI options are picked in priority, then environment variables in second place, and finally the configuration file.
+
+### Options list
+
+| Parameter  | Default  |  Description |
+|---|---|---|
+| bind  | 127.0.0.1  |  Service HOST |
+| Port  |  4000 | Service PORT |
+| workdir  | Actual directory  | Define the place to store elements,  it creates 6 directories: `template`  : where carbone keeps templates (cache) `render`    : temp directory where report are generated, `asset`     : internal used only, `config`    : config, licenses and ES512 keys for authentication, `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and `plugin `   : where to put custom plugin  |
+| factories  | 1 | Number of LibreOffice + Python factory to start.  |
+| attempts  | 1  |  If LibreOffice fails to convert one document, `attempts` options set the number of re-try  |
+| authentification  | false  |  [Authentification documentation at the following link](#authentication-option) |
+|Carbone Studio Light| false | Web interface to preview reports |
+||||
 
 
+### CLI options
 
-# Carbone CLI
-
-## Run the webserver
-
-To run the Carbone server, you have to call the binary with `webserver` as argument:
-
-```bash
-./carbone webserver
-```
-
-If you need to see the command usage, call
+To list available options, run the help command, such as:
 
 ```bash
 ./carbone webserver --help
 ```
 
-## Authentication
+Here is an example of passing options to the service:
+
+```bash
+./carbone webserver --port 4001 --bind 127.0.0.1 --factories 4 --workdir /var/www/carbone --attemps 2 --authentication --studio
+```
+
+### Configuration file options
+To use a configuration file, `config.json` must be created in the `config` folder. Here is an example of a configuration:
+```json
+{
+  "port": 4001,
+  "bind": "127.0.0.1",
+  "factories": 4,
+  "attempts": 2,
+  "authentication": true
+}
+```
+
+### Environment variable options
+
+Environment variables can be used to define options, the name has to be uppercased and has to start with the prefix "`CARBONE_EE_`", such as:
+
+```bash
+export CARBONE_EE_PORT=3600
+export CARBONE_EE_BIND=127.0.0.1
+export CARBONE_EE_FACTORIES=4
+export CARBONE_EE_WORKDIR=/var/www/carbone
+export CARBONE_EE_ATTEMPTS=2
+export CARBONE_EE_AUTHENTICATION=true
+```
+
+
+
+### Authentication option
 
 By default, carbone-ee starts without authentication.
-You must add `--authentication` or `-A` in CLI or set `authentication : true` in config file to activate authentication. When activated, all APIs are protected by authentication except `GET /render.carbone.io/render/:renderId`.
+To activate it, the option `--authentication` must be added through the CLI or set `authentication : true` in a configuration file. When activated, all APIs are protected by authentication except `GET /render.carbone.io/render/:renderId` and `GET /status`.
 
 The authentication mechanism is based on `ES512` JWT tokens.
 
 The token must be passed in `Authorization` header exactly like the SaaS version https://carbone.io/api-reference.html#choose-carbone-version
 
-### How to generate tokens ?
+#### How to generate tokens ?
   1) with Carbone CLI: `./carbone generate-token` generates 40-years valid tokens
   2) programmatically and dynamically on client side to reduce Man-In-The-Middle attacks with short expiration dates. More information below.
 
@@ -152,85 +187,47 @@ Tokens must contain at least this payload. And it must be signed with the genera
 }
 ```
 
-We recommend to generate tokens with an expiration date valid for at least 12 hours to avoid consuming to much computer resource on both side clients and Carbone servers. If your client is a NodeJS program, you can use https://github.com/Ideolys/kitten-jwt which does this automatically.
+We recommend to generate tokens with an expiration date valid for at least 12 hours to avoid consuming to much computer resource on both side clients and Carbone servers. If the client is a NodeJS program, [Kitten JWT](https://github.com/Ideolys/kitten-jwt) can be used which does the token renew automatically.
+## How to use Carbone On-premise?
+
+Carbone On-Premise works the same way as Carbone Render API, the endpoints list:
+- Add a template    : POST /127.0.0.1:4000/template
+- Get a template    : GET /127.0.0.1:4000/template/:templateId
+- Delete a template : DELETE /127.0.0.1:4000/template/:templateId
+- Generate a report : POST /127.0.0.1:4000/render/:templateId
+- Get the result    : GET /127.0.0.1:4000/render/:renderId
+- Get status        : GET /127.0.0.1:4000/status
+
+[Click here to learn more about the API.](https://carbone.io/api-reference.html#carbone-render-api.)
+
+Carbone Render SDKs [on Github](https://github.com/Ideolys?q=sdk) can be used to request Carbone On-Premise easily in multiple languages (Node, Go, Python, PHP, ...).
 
 
-# Launch and setup
+## Customise Carbone On-premise
 
-## Launch Carbone on premise
+Carbone On-premise gives the possibility to override functions at specific moments to add custom features, such as adding analytics, store data on a specific storage provider, custom authentication, etc... It is possible through:
+- [**Plugins**](#Plugins): Functions to manage file storage, authentication, analytics, logs, or custom behaviors.
+- [**Middlewares**](#Middlewares): Functions that are fired before or after HTTP requests. It can be useful for logging, statistics, or custom behaviors.
 
-To launch Carbone on Premise, you must a valid license file. It must be place in the `workDir` folder and named `license.txt`. It can be found on https://account.carbone.io in your account under the on-premise menu.
-You can override default Carbone parameters with different ways:
 
-- CLI parameters (highest priority)
-- With environment variable
-- With the config file (lowest priority)
+For a better understanding, here is the Carbone On-premise lifecycle:
 
-You can override following parameters:
+![image](./CarboneOnPremiseLifecycle.png)
 
-- port
-- bind
-- factories
-- workdir  (only in CLI and environment variable)
-- attempts
-- auth
+Last important **requirement**, plugins and middlewares can be only written using NodeJS.
+### Plugins
 
-### Override with CLI
+Following elements can be overrided:
 
-You can override with Carbone CLI as follow
+- [Write template](#Override-write-template)
+- [Read template](#Override-read-template)
+- [Delete template](#Override-delete-template)
+- [Write render](#Override-write-render)
+- [Read render](#Override-read-render)
+- [Before/After render](#Before/After-Render)
+- [Authentication (Get Public Key)](#Authentication-(Get-Public-Key))
 
-```bash
-./carbone webserver --port 4001 --bind 127.0.0.1 --factories 4 --workdir /var/www/carbone --attemps 2 --auth
-```
-
-### Override with config file
-
-To override with config file, copy/paste the following JSON data in `config/config.json`
-
-```json
-{
-  "port": 4001,
-  "bind": "127.0.0.1",
-  "factories": 4,
-  "attempts": 2,
-  "authentication": true
-}
-```
-
-### Override with environment variable
-
-To override with environment variable, you have to uppercase the name and prefix it with `CARBONE_EE_`. For example:
-
-```bash
-export CARBONE_EE_PORT=3600
-export CARBONE_EE_BIND=127.0.0.1
-export CARBONE_EE_FACTORIES=4
-export CARBONE_EE_WORKDIR=/var/www/carbone
-export CARBONE_EE_ATTEMPTS=2
-export CARBONE_EE_AUTHENTICATION=true
-```
-
-## How it works?
-
-With this on-premise version, the API is the same than the public one. You can find the documentation here https://carbone.io/api-reference.html.
-
-**Note** When you get a render, the file is automatically deleted from the server.
-
-**Note** A job will be executed every 24 hours to clean render older than 7 days and template older than 60 days.
-
-## Setup plugins
-
-You have the possibility to override a few things in carbone on premise. It allows you to choose where to save your templates for example.
-
-Here is the list of what you can override:
-
-- Write template
-- Key.pub location (for authentication)
-- Read template
-- Write render
-- Read render
-
-To override them, we recommand you to create a node repository. So if you want to use for example a module to use amazon s3 to store your template for example, you can do it easily.
+To override them, it is recommended to create a separate NodeJS repository.
 
 ```bash
 # Create a separate folder
@@ -243,13 +240,11 @@ npm init
 mv /path/to/carbone/binary ./carbone
 ```
 
-When you launch for the first time carbone on premise, all folders will be created, included the `plugin` folder.
-
-
+When Carbone On-premise is executed for the first time, default folders are created automatically ([explanation here](#Carbone-Options-overview)). Custom plugins should be inserted in the `plugin` folder.
 
 ### Override write template
 
-To override template writing, you have to create the file `storage.js` in the `plugin` folder. The function to export is `writeTemplate` and is described as follow
+To override template writing, the file `storage.js` in the `plugin` folder has to be created. The function to export is `writeTemplate` and is described as follow:
 
 ```js
 const fs = require('fs');
@@ -261,7 +256,6 @@ function writeTemplate (req, res, templateId, templatePathTemp, callback) {
     if (err) {
       return callback(err);
     }
-
     return callback(null);
   });
 }
@@ -274,7 +268,7 @@ module.exports = {
 
 ### Override read template
 
-To override template reading, always in the file `storage.js` in the `plugin` folder, you have to export the function `readTemplate` which is descibred as follow:
+To override template reading, the file `storage.js` in the `plugin` folder has to be created. The function to explort is `readTemplate` which is described as follow:
 
 ```js
 function readTemplate (req, templateId, callback) {
@@ -286,15 +280,15 @@ module.exports = {
 }
 ```
 
-This function must return a local path to carbone so it can read it on the disk.
+The function must return a local path because Carbone needs to read the file from a disk.
 
 ### Override delete template
 
-To override template deleting, add a function `deleteTemplate` in the `storage.js` file in the `plugin` folder and export it.
+To override template deletion, add the function `deleteTemplate` in the `storage.js` file in the `plugin` folder and export it, for instance:
 
 ```js
 // You can access req and res.
-// For example, if you store your template on amazon S3, you could delete it and
+// For example, if you store your template on amazon S3, you could delete it
 function deleteTemplate (req, res, templateId, callback) {
   // Delete the template and either return a local path to unlink it or just use res to return a response
   return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
@@ -305,25 +299,9 @@ module.exports = {
 }
 ```
 
-### Add custom prefix to rendered filename
-
-You can add a prefix to the rendered filename.
-To do this, add a function `beforeRender` in the `storage.js` plugin and export it.
-In this function, you can access the current request `req`.
-
-You can alter options passed to Carbone:
-
-```js
-function beforeRender (req, res, carboneData, carboneOptions, next) {
-  // add a prefix to rendered filename
-  carboneOptions.renderPrefix = 'myPrefix';
-  next(null);
-}
-```
-
 ### Override write render
 
-To override render writing, you have to add the function `afterRender` in the `storage.js` file and export it.
+To override render writing, add the function `afterRender` in the `storage.js` file in the `plugin` folder and export it.
 
 ```js
 function afterRender (req, res, err, reportPath, reportName, statistics, next) {
@@ -337,9 +315,7 @@ module.exports = {
 }
 ```
 
-This function can be used to move the render on AWS for example.
-
-With this function you can totally override the response and choose the one you want. For example:
+For example, this function can be used to move the render on Buckets, or it is also possible to change the response object:
 
 ```js
 res.send({
@@ -352,15 +328,14 @@ res.send({
 
 ### Override read render
 
-To override render reading, you have to add the function `readRender` in the `storage.js` file and export it.
+The function `readRender` has to be exported in the `storage.js` located in the `plugin` folder.
 
 ```js
 function readRender (req, res, renderName, next) {
   // Return the directly render or a local path
 }
 ```
-
-With this function you can either return directly the file using res or return the new render name or path you choose with `afterRender` function.
+This function can be used to return directly the file using `res` , it is also possible to return the new render name, or return a path from the `afterRender` function.
 
 ```js
 // Return the new render name
@@ -376,9 +351,22 @@ function (req, res, renderName, next) {
 }
 ```
 
-### Override get key.pub for authentication
+### Before/After Render
 
-To override the get key.pub location, you have to create the file `authentication.js` in the `plugin` folder. The function to export is `getPublicKey` and is described as follow:
+Before or after render plugin can be used to add pre or post rendering behavior, such as adding a prefix to the rendered filename. To do this, add a function `beforeRender` and/or `afterRender` in the `storage.js` plugin and export it.
+In these functions, the `req` request variable is available and options can be altered.
+
+```js
+function beforeRender (req, res, carboneData, carboneOptions, next) {
+  // add a prefix to rendered filename
+  carboneOptions.renderPrefix = 'myPrefix';
+  next(null);
+}
+```
+
+### Authentication (Get Public Key)
+
+For the authentication checking, it is possible to define a new location to store public keys. The file `authentication.js` has to be created in the `plugin` folder. Export the function `getPublicKey` described as follow:
 
 ```js
 const fs = require('fs');
@@ -392,7 +380,7 @@ const path = require('path');
  * @return (publicKeyContent)
  */
 function getPublicKey (req, res, payload, callback) {
-  // Read the public key on disk or wherever you want
+  // Read the public key on disk or somewhere else
   fs.readFile(path.join(__dirname, '..', 'config', 'key.pub'), 'utf8', (err, content) => {
     if (err) {
       return callback(new Error('Cannot read public key ' + err.toString()));
@@ -409,11 +397,10 @@ module.exports = {
 }
 ```
 
-## Middlewares
+### Middlewares
 
-You can add your own middlewares before or after route. It can be usefull to log or get stats on your requests.
 
-To do it, add a `middlewares.js` file in the `plugin` folder and export two arrays:
+Middlewares can be added before or after route. It can be useful to log or get stats about requests. Add a `middlewares.js` file in the `plugin` folder and export two arrays:
 - before
 - after
 

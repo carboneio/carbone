@@ -59,6 +59,15 @@ const pdfviewer = document.getElementById('pdfviewerobject');
 
 pdfviewer.data = '';
 
+// Drag and drop
+const holder = document.getElementById('dropContainer');
+holder.ondragover = function (e) {  e.preventDefault(); };
+holder.ondragend = function (e) { e.preventDefault(); };
+holder.ondrop = function (e) {
+  e.preventDefault();
+  addTemplateAndRender(e.dataTransfer.files[0]);
+}
+
 // Template input
 const fileInput = document.getElementById('template');
 

@@ -9,6 +9,7 @@
   },
   "author": "David Grelaud",
   "private": true,
+  "carbonePublicationDate": "2020-12-29T15:47:12.636Z",
   "license": "Carbone-Enterprise-Edition",
   "homepage": "https://carbone.io",
   "keywords": [
@@ -25,6 +26,8 @@
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
     "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
     "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
+    "build": "pkg -o ./build/carbone-ee .",
+    "publishBuild": "script/publishBuild.sh",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
@@ -34,7 +37,7 @@
     "debug": "=4.1.1",
     "formidable": "=1.2.2",
     "image-size": "=0.7.4",
-    "kitten-jwt": "^1.0.0",
+    "kitten-jwt": "=1.1.1",
     "restana": "=4.6.1",
     "simple-get": "=4.0.0",
     "timsort": "=0.3.0",
@@ -44,6 +47,9 @@
   },
   "pkg": {
     "assets": [
+      "lib/converter.py",
+      "bin/install.sh",
+      "bin/systemd",
       "examples/healthCheck.odt",
       "studio/**/*"
     ]

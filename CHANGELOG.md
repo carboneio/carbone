@@ -111,6 +111,7 @@
   - [EE] Fix workDir parameter
   - [EE] Remove error message if no plugin exists
   - [EE] Fix bug with environment variable
+  - [EE] Add licensing system
 
 ### v2.1.1
   - Release September 23rd 2020

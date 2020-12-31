@@ -6,6 +6,7 @@ process.env.NODE_ENV = process.pkg ? 'production' : process.env.NODE_ENV;
 
 var webserver = require('../lib/webserver');
 var translator = require('../lib/translator');
+var helper = require('../lib/helper');
 var tool = require('../lib/tool');
 var _action = process.argv[2];
 
@@ -21,6 +22,11 @@ switch (_action) {
     break;
   case 'install':
     installService();
+    break;
+  case '-v':
+  case '--version':
+    console.log(helper.printVersion());
+    process.exit();
     break;
   case 'generate-token':
     webserver.generateToken((err, token) => {
@@ -43,6 +49,7 @@ switch (_action) {
 function usage () {
   console.log('*************************************');
   console.log('Carbone usage:');
+  console.log('   carbone --version or -v');
   console.log('   carbone translate [--help]');
   console.log('   carbone find [--help]');
   console.log('   carbone webserver [--help]');

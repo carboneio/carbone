@@ -36,7 +36,6 @@
     "image-size": "=0.7.4",
     "kitten-jwt": "^1.0.0",
     "restana": "=4.6.1",
-    "serve-static": "^1.14.1",
     "simple-get": "=4.0.0",
     "timsort": "=0.3.0",
     "which": "=2.0.2",
@@ -44,7 +43,10 @@
     "yazl": "=2.5.1"
   },
   "pkg": {
-    "assets": ["examples/healthCheck.odt", "studio/**/*"]
+    "assets": [
+      "examples/healthCheck.odt",
+      "studio/**/*"
+    ]
   },
   "devDependencies": {
     "eslint": "=7.7.0",

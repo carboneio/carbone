@@ -3,9 +3,13 @@
   <meta charset="UTF-8">
   <meta name="robots" content="noindex">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="index.css">
-  <link rel="stylesheet" href="jsoneditor/jsoneditor.min.css">
-  <script src="jsoneditor/jsoneditor.min.js"></script>
+  <style>
+    INJECT_STUDIO_CSS
+    INJECT_JSON_EDITOR_CSS
+  </style>
+  <script>
+    INJECT_JSON_EDITOR_JS
+  </script>
   <title>Carbone Studio</title>
 </head>
 <body id="dropContainer">
@@ -38,6 +42,8 @@
     <span id="console-title"></span>
     <span id="console-content"></span>
   </div>
-  <script src="index.js"></script>
+  <script>
+    INJECT_STUDIO_JS
+  </script>
 </body>
 </html>

@@ -12,12 +12,18 @@ let filename = '';
 let interval = null;
 let lastModifiedFile = null;
 let timeoutJsonChange = null;
-let dataJson = {}
-let complementJson = {}
-let enumJson = {}
-let translationJson = {}
-let editorPan = -1
+
 const nativeFileSystemIsActive = 'showOpenFilePicker' in window;
+
+let activeEditorPan = 'data';
+let prevEditorPanNode = document.getElementById('data');
+let json = {
+  data         : {},
+  complement   : {},
+  enum         : {},
+  translations : {},
+  convertTo    : 'pdf'
+};
 
 // JSON Editor
 const container = document.getElementById('jsoneditor');
@@ -26,21 +32,10 @@ const options = {
     if (isJsonValid() === false) {
       return
     }
-
-    if (editorPan === 0) {
-      dataJson = editor.get()
-    } else if (editorPan === 1) {
-      complementJson = editor.get()
-    } else if (editorPan === 2) {
-      enumJson = editor.get()
-    } else if (editorPan === 3) {
-      translationJson = editor.get()
-    }
-
+    json[activeEditorPan] = editor.get();
     if (timeoutJsonChange !== null) {
       clearTimeout(timeoutJsonChange)
     }
-
     timeoutJsonChange = setTimeout(() => {
       refreshRender()
     }, 2000)
@@ -101,62 +96,24 @@ fileInput.addEventListener('change', () => {
   addTemplateAndRender(fileInput.files[0])
 });
 
-const dataButton = document.getElementById('data')
-const complementButton = document.getElementById('complement')
-const enumButton = document.getElementById('enum')
-const translationButton = document.getElementById('translations')
 
-dataButton.addEventListener('click', () => {
-  changePan(0)
-})
-complementButton.addEventListener('click', () => {
-  changePan(1)
-})
-enumButton.addEventListener('click', () => {
-  changePan(2)
-})
-translationButton.addEventListener('click', () => {
-  changePan(3)
-})
-
-function changePan (pan) {
-  if (pan === editorPan) {
+function changePan (newPanNode, newActiveEditorPan) {
+  if (activeEditorPan === newActiveEditorPan) {
     return
   }
-
   if (isJsonValid() === false) {
-    setConsoleMessage('error', 'Fix JSON to change pan')
+    setConsoleMessage('error', 'Fix JSON to change pan');
     return
   }
 
-  if (editorPan === 0) {
-    dataJson = editor.get()
-    dataButton.style.color = '#000000'
-  } else if (editorPan === 1) {
-    complementJson = editor.get()
-    complementButton.style.color = '#000000'
-  } else if (editorPan === 2) {
-    enumJson = editor.get()
-    enumButton.style.color = '#000000'
-  } else if (editorPan === 3) {
-    translationJson = editor.get()
-    translationButton.style.color = '#000000'
-  }
+  json[activeEditorPan] = editor.get();
+  prevEditorPanNode.classList.remove('active');
 
-  if (pan === 0) {
-    editor.set(dataJson)
-    dataButton.style.color = '#82369d'
-  } else if (pan === 1) {
-    editor.set(complementJson)
-    complementButton.style.color = '#82369d'
-  } else if (pan === 2) {
-    editor.set(enumJson)
-    enumButton.style.color = '#82369d'
-  } else if (pan === 3) {
-    editor.set(translationJson)
-    translationButton.style.color = '#82369d'
-  }
-  editorPan = pan
+  editor.set(json[newActiveEditorPan]);
+  newPanNode.classList.add('active');
+
+  prevEditorPanNode = newPanNode;
+  activeEditorPan = newActiveEditorPan;
 }
 
 async function addTemplateAndRender (file) {
@@ -179,16 +136,8 @@ async function refreshRender () {
     return
   }
 
-  const data = {
-    data: dataJson,
-    complement: complementJson,
-    enum: enumJson,
-    translations: translationJson,
-    convertTo: 'pdf'
-  }
-  console.log('LALA', data)
   setConsoleMessage('info', 'Rendering template...')
-  const result = await renderReport(templateId, data);
+  const result = await renderReport(templateId, json);
 
   if (result.success) {
     pdfviewer.data = `${carboneConfig.apiUrl}/render/${result.data.renderId}`
@@ -257,7 +206,6 @@ function setConsoleMessage (type, message) {
     document.getElementById('console-title').innerHTML = 'Error';
     document.getElementById('console-title').style.color = '#fb4d4d';
   }
-
   document.getElementById('console-content').innerHTML = message;
 }
 
@@ -275,5 +223,4 @@ function isJsonValid () {
   }
 }
 
-changePan(0)
 setConsoleMessage('info', 'Upload a template to start using the studio')

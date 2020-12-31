@@ -32,10 +32,10 @@
     <div class="full-width">
       <div id="jsoneditor"></div>
       <div id="carbone-options" class="flex">
-        <div id="data" class="button col-3">Data</div>
-        <div id="complement" class="button col-3">Complement</div>
-        <div id="enum" class="button col-3">Enum</div>
-        <div id="translations" class="button col-3">Translations</div>
+        <div id="data" class="button col-3 active" onclick="changePan(this, 'data')">Data&nbsp;<code>{d.</code></div>
+        <div           class="button col-3"        onclick="changePan(this, 'complement')">Complement&nbsp;<code>{c.</code></div>
+        <div           class="button col-3"        onclick="changePan(this, 'enum')">Enum&nbsp;<code>:convEnum()</code></div>
+        <div           class="button col-3"        onclick="changePan(this, 'translations')">Translations&nbsp;<code>{t()}</code></div>
       </div>
     </div>
     <div id="preview" class="full-width">

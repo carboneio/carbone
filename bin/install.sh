@@ -115,6 +115,16 @@ if systemctl is-active --quiet $CARBONE_SERVICE_NAME; then
   print_success "OK"
 fi
 
+if id $CARBONE_USER &>/dev/null; then
+  print_info "User $CARBONE_USER already exists "
+  print_success "OK"
+else
+  print_info "Create carbone user "
+  adduser $CARBONE_USER --no-create-home --disabled-password --system --group
+  exit_on_command_error "Cannot create user $CARBONE_USER"
+  print_success "OK"
+fi
+
 if [ ! -d $CARBONE_WORKDIR ]; then
   print_info "Create Carbone directory "
   mkdir $CARBONE_WORKDIR
@@ -135,16 +145,6 @@ if [ $BINARY_FILE_PATH != $CARBONE_BIN_PATH ]; then
   fi
   chmod 700 $CARBONE_BIN
   exit_on_command_error "Cannot make it executable"
-  print_success "OK"
-fi
-
-if id $CARBONE_USER &>/dev/null; then
-  print_info "User $CARBONE_USER already exists "
-  print_success "OK"
-else
-  print_info "Create carbone user "
-  adduser $CARBONE_USER --no-create-home --disabled-password --system --group
-  exit_on_command_error "Cannot create user $CARBONE_USER"
   print_success "OK"
 fi
 

@@ -31,9 +31,9 @@
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
-    "dayjs": "=1.9.6",
     "body-parser": "=1.19.0",
     "cors": "=2.8.5",
+    "dayjs": "=1.9.6",
     "debug": "=4.1.1",
     "formidable": "=1.2.2",
     "image-size": "=0.7.4",
@@ -50,7 +50,8 @@
       "lib/converter.py",
       "bin/install.sh",
       "bin/systemd",
-      "examples/healthCheck.odt"
+      "examples/healthCheck.odt",
+      "studio/**/*"
     ]
   },
   "devDependencies": {

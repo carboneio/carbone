@@ -217,9 +217,9 @@ describe('helper', function () {
       helper.assert(helper.encodeSafeFilename('报道'), '5oql6YGT');
       helper.assert(helper.decodeSafeFilename('5oql6YGT'), '报道');
 
-      helper.assert(helper.encodeSafeFilename('k�'), 'a__-vQ');
-      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
-      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
+      helper.assert(helper.encodeSafeFilename('k�'), 'a--_vQ');
+      helper.assert(helper.decodeSafeFilename('a--_vQ'), 'k�');
+      helper.assert(helper.decodeSafeFilename('a--_vQ'), 'k�');
     });
   });
 

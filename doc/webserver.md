@@ -168,6 +168,12 @@ export CARBONE_EE_AUTHENTICATION=true
 By default, carbone-ee starts without authentication.
 To activate it, the option `--authentication` must be added through the CLI or set `authentication : true` in a configuration file. When activated, all APIs are protected by authentication except `GET /render.carbone.io/render/:renderId` and `GET /status`.
 
+
+Why `GET /render.carbone.io/render/:renderId` is not protected?
+  - `:renderId` contains the custom report name in base64, concatenated with a 22-characters-long Cryptographically Secure Pseudo-Random Number with unbiased (ie secure) tranformation. It is somehow a unique password for each rendered report. It is better than any authentication mechanism.
+  - `:renderId` is ephemeral, the resource becomes inaccessible once the file is downloaded.
+  - The report can be easily downloaded in any browsers / reverse-proxy / application without complex authentication mechanisms
+
 The authentication mechanism is based on `ES512` JWT tokens.
 
 The token must be passed in `Authorization` header exactly like the SaaS version https://carbone.io/api-reference.html#choose-carbone-version
@@ -178,16 +184,17 @@ The token must be passed in `Authorization` header exactly like the SaaS version
 
 You can generate and renew tokens on client side using standard libraries in any programming languages https://jwt.io/
 
-Tokens must contain at least this payload. And it must be signed with the generated public key in `config/key.pub`.
+Tokens must contain at least this payload. And it must be signed with the generated public key in `config/key.pub` (ES512)
 ```
 {
-  "iss": "carbone-user",
+  "iss": "your-carbone-user",
   "aud": "carbone-ee",
   "exp": 2864189447
 }
 ```
 
 We recommend to generate tokens with an expiration date valid for at least 12 hours to avoid consuming to much computer resource on both side clients and Carbone servers. If the client is a NodeJS program, [Kitten JWT](https://github.com/Ideolys/kitten-jwt) can be used which does the token renew automatically.
+
 ## How to use Carbone On-premise?
 
 Carbone On-Premise works the same way as Carbone Render API, the endpoints list:
@@ -215,6 +222,7 @@ For a better understanding, here is the Carbone On-premise lifecycle:
 ![image](./CarboneOnPremiseLifecycle.png)
 
 Last important **requirement**, plugins and middlewares can be only written using NodeJS.
+
 ### Plugins
 
 Following elements can be overrided:

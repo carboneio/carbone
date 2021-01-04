@@ -33,10 +33,9 @@
 <p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using your JSON data as input !</p>
 
 >  ⚡️ Breaking news :
->
-> **Carbone v2.x 🚀 is here :**
->
->   - `npm i carbone@2.1.1`
+> 
+> **Carbone v3.x 🚀 is coming :**
+>   
 >   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
 
 README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)

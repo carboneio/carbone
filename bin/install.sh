@@ -87,6 +87,7 @@ CARBONE_BIN="carbone-ee"
 CARBONE_BIN_PATH="$CARBONE_WORKDIR/$CARBONE_BIN"
 CARBONE_SERVICE_NAME=$CARBONE_BIN
 SYSTEMD_TEMPLATE="$(dirname "$BINARY_FILE_PATH")/systemd"
+SYSTEMD_SERVICE_PATH="/etc/systemd/system/${CARBONE_SERVICE_NAME}.service"
 
 echo ""
 echo "==================================="
@@ -128,8 +129,12 @@ fi
 if [ ! -d $CARBONE_WORKDIR ]; then
   print_info "Create Carbone directory "
   mkdir $CARBONE_WORKDIR
-  chown -R $CARBONE_USER:$CARBONE_USER $CARBONE_WORKDIR
   exit_on_command_error "Cannot create directory in $CARBONE_WORKDIR. Is parent directory exist?"
+  print_success "OK"
+
+  print_info "Set directory owner to carbone "
+  chown -R $CARBONE_USER:$CARBONE_USER $CARBONE_WORKDIR
+  exit_on_command_error "Cannot change owner of directory $CARBONE_WORKDIR"
   print_success "OK"
 fi
 
@@ -150,21 +155,21 @@ fi
 
 print_info "Change owner of executable "
 chown $CARBONE_USER:$CARBONE_USER $CARBONE_BIN_PATH
-exit_on_command_error "Cannot chande owner of $CARBONE_BIN_PATH"
+exit_on_command_error "Cannot change owner of $CARBONE_BIN_PATH"
 print_success "OK"
 
-# Replace path in systemd template
-print_info "Prepare $CARBONE_SERVICE_NAME systemd file "
-sed_i "s/CARBONE_SERVICE_NAME/$CARBONE_SERVICE_NAME/" "$SYSTEMD_TEMPLATE"
+print_info "Create $CARBONE_SERVICE_NAME systemd service"
+cp $SYSTEMD_TEMPLATE $SYSTEMD_SERVICE_PATH
+exit_on_command_error "Cannot copy ${SYSTEMD_TEMPLATE} to ${SYSTEMD_SERVICE_PATH}. Execute 'carbone-ee install' again if ${SYSTEMD_TEMPLATE} does not exit."
+print_success "OK"
+
+# Replace path in systemd
+print_info "Update $CARBONE_SERVICE_NAME systemd file "
+sed_i "s/CARBONE_SERVICE_NAME/$CARBONE_SERVICE_NAME/" "$SYSTEMD_SERVICE_PATH"
 # Use "@" instead of "/"" because CARBONE_WORKDIR contains slashes
-sed_i "s@CARBONE_WORKDIR@$CARBONE_WORKDIR@" "$SYSTEMD_TEMPLATE"
-sed_i "s/CARBONE_USER/$CARBONE_USER/" "$SYSTEMD_TEMPLATE"
-sed_i "s@CARBONE_BIN_PATH@$CARBONE_BIN_PATH@" "$SYSTEMD_TEMPLATE"
-print_success "OK"
-
-print_info "Create $CARBONE_SERVICE_NAME service file in /etc/systemd/system "
-cp $SYSTEMD_TEMPLATE /etc/systemd/system/${CARBONE_SERVICE_NAME}.service
-exit_on_command_error "Cannot copy file in etc/systemd/system/${CARBONE_SERVICE_NAME}.service"
+sed_i "s@CARBONE_WORKDIR@$CARBONE_WORKDIR@" "$SYSTEMD_SERVICE_PATH"
+sed_i "s/CARBONE_USER/$CARBONE_USER/" "$SYSTEMD_SERVICE_PATH"
+sed_i "s@CARBONE_BIN_PATH@$CARBONE_BIN_PATH@" "$SYSTEMD_SERVICE_PATH"
 print_success "OK"
 
 print_info "Register service "
@@ -179,5 +184,5 @@ print_success "OK"
 echo ""
 echo "Installation done!"
 echo ""
-echo "Run sudo systemctl stop/start $CARBONE_SERVICE_NAME to start/stop Carbone"
-echo "Run sudo journalctl -f -u $CARBONE_SERVICE_NAME to see logs"
+echo "Run sudo 'systemctl stop/start $CARBONE_SERVICE_NAME' to start/stop Carbone"
+echo "Run sudo 'journalctl -f -u $CARBONE_SERVICE_NAME' to see logs"

@@ -65,6 +65,10 @@ function updateColorAndGetReferenceLo () {
   };
 }
 
+/**
+ * @private
+ * @param {String} colorId
+ */
 function getNewColorReferencePostProcessingLo (colorId) {
   const _colorData = this.colorDatabase.get(colorId);
   return  color.getColorReference(_colorData.id);
@@ -72,6 +76,14 @@ function getNewColorReferencePostProcessingLo (colorId) {
 
 /** ==================================== DOCX FORMATTERS ========================================= */
 
+/**
+ * @private
+ *
+ * @description Color format converter for DOCX reports
+ * @param {String} colorName
+ * @param {String} colorType
+ * @param {String} elementType
+ */
 function getAndConvertColorDocx (colorName, colorType, elementType) {
   // check if colorName exist, the element is probably null or undefined on the JSON dataset
   if (colorName && colorType && elementType) {

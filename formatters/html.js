@@ -26,7 +26,13 @@ function addHtmlDatabase (options, htmlContent) {
   }
 }
 
-
+/**
+ * @private
+ *
+ * @description Add the htmlContent to the database and return a post process formatter
+ * @param {String} htmlContent
+ * @returns {Function} Return a post process formatter
+ */
 const getHTMLContentOdt = function (htmlContent) {
   addHtmlDatabase(this, htmlContent);
   return {
@@ -35,6 +41,12 @@ const getHTMLContentOdt = function (htmlContent) {
   };
 };
 
+/**
+ * @private
+ *
+ * @description return the HTML as an ODT XML content
+ * @param {*} contentId
+ */
 const getHTMLContentOdtPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
   return _htmlProperties.content;
@@ -63,6 +75,12 @@ function addHtmlDatabaseDOCX (options, htmlContent) {
   }
 }
 
+/**
+ * @private
+ *
+ * @description Add the new HTML content and return a post process formatter
+ * @param {String} htmlContent New HTML content to inject
+ */
 const getHTMLContentDocx = function (htmlContent) {
   addHtmlDatabaseDOCX(this, htmlContent);
   return {
@@ -71,6 +89,12 @@ const getHTMLContentDocx = function (htmlContent) {
   };
 };
 
+/**
+ * @private
+ *
+ * @description Post process formatter that returns the new DOCX content based on the contentID
+ * @param {String} contentId html content
+ */
 const getHTMLContentDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
   return _htmlProperties.content;

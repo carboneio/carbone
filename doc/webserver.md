@@ -21,7 +21,6 @@ Carbone On-premise can be installed in different ways:
 
   - Self-contained binary executable + external LibreOffice (used for conversion)
   - Debian/Ubuntu package (coming soon)
-  - Docker Container (coming soon)
 ### Basic Installation
 
 - 1 - Download Carbone On-premise binary for server/OS: Mac, Linux or Windows
@@ -41,7 +40,7 @@ Carbone On-Premise contains automatic installation scripts to daemonize with sys
 ```bash
   # Generate installation scripts
   ./carbone install
-  # Execute installation scripts
+  # Execute installation scripts and follow instructions
   sudo ./install.sh
 ```
 
@@ -110,16 +109,14 @@ If an option is reported in different places, CLI options are picked in priority
 
 ### Options list
 
-| Parameter  | Default  |  Description |
-|---|---|---|
-| bind  | 127.0.0.1  |  Service HOST |
-| Port  |  4000 | Service PORT |
-| workdir  | Actual directory  | Define the place to store elements,  it creates 6 directories: `template`  : where carbone keeps templates (cache) `render`    : temp directory where report are generated, `asset`     : internal used only, `config`    : config, licenses and ES512 keys for authentication, `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and `plugin `   : where to put custom plugin  |
-| factories  | 1 | Number of LibreOffice + Python factory to start.  |
-| attempts  | 1  |  If LibreOffice fails to convert one document, `attempts` options set the number of re-try  |
-| authentification  | false  |  [Authentification documentation at the following link](#authentication-option) |
-|Carbone Studio Light| false | Web interface to preview reports |
-||||
+| Parameter      | Default          | Description                                                  |
+| -------------- | ---------------- | ------------------------------------------------------------ |
+| port           | 4000             | Service PORT                                                 |
+| workdir        | Actual directory | Define the place to store elements,  it creates 6 directories:<br />- `template`  : where carbone keeps templates (cache)<br />- `render`    : temp directory where report are generated,<br />- `asset`     : internal used only, <br />- `config`    : config, licenses and ES512 keys for authentication,<br />- `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and<br />- `plugin `   : where to put custom plugin |
+| factories      | 1                | Multithread parameter, number of LibreOffice converter       |
+| attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try |
+| authentication | false            | [Authentification documentation at the following link](#authentication-option) |
+| studio         | false            | Web interface to preview reports                             |
 
 
 ### CLI options
@@ -133,7 +130,7 @@ To list available options, run the help command, such as:
 Here is an example of passing options to the service:
 
 ```bash
-./carbone webserver --port 4001 --bind 127.0.0.1 --factories 4 --workdir /var/www/carbone --attemps 2 --authentication --studio
+./carbone webserver --port 4001 --factories 4 --workdir /var/www/carbone --attemps 2 --authentication --studio
 ```
 
 ### Configuration file options
@@ -144,7 +141,9 @@ To use a configuration file, `config.json` must be created in the `config` folde
   "bind": "127.0.0.1",
   "factories": 4,
   "attempts": 2,
-  "authentication": true
+  "authentication": true,
+  "studio" : true,
+  "studioUser" : "admin:pass" // login:password if authentication is active
 }
 ```
 
@@ -198,12 +197,12 @@ We recommend to generate tokens with an expiration date valid for at least 12 ho
 ## How to use Carbone On-premise?
 
 Carbone On-Premise works the same way as Carbone Render API, the endpoints list:
-- Add a template    : POST /127.0.0.1:4000/template
-- Get a template    : GET /127.0.0.1:4000/template/:templateId
-- Delete a template : DELETE /127.0.0.1:4000/template/:templateId
-- Generate a report : POST /127.0.0.1:4000/render/:templateId
-- Get the result    : GET /127.0.0.1:4000/render/:renderId
-- Get status        : GET /127.0.0.1:4000/status
+- Add a template    : POST /template
+- Get a template    : GET /template/:templateId
+- Delete a template : DELETE /template/:templateId
+- Generate a report : POST /render/:templateId
+- Get the result    : GET /render/:renderId
+- Get status        : GET /status
 
 [Click here to learn more about the API.](https://carbone.io/api-reference.html#carbone-render-api.)
 

@@ -127,7 +127,7 @@ describe('Carbone', function () {
     });
     it('should not crash it the wrong timezone or wrong lang is passed during rendering', function (done) {
       carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {timezone : 'BULLSHIT'}, function (err, result) {
-        helper.assert(err+'', 'RangeError: Expected Area/Location(/Location)* for time zone, got BULLSHIT');
+        helper.assert(/BULLSHIT/.test(err), true);
         helper.assert(result, null);
         carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {lang : 'BULLSHIT'}, function (err, result) {
           helper.assert(err+'', 'null');

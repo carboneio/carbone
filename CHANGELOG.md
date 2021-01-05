@@ -53,6 +53,7 @@
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website
   - Accepts Adobe Indesign IDML file as a template
+  - Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Right click an element, select "hyperlinks", insert the marker and validate. It is working with ODS, ODT, and DOCX reports. The compatibility is limited for XLSX documents: It is not possible to create a list of hyperlinks and the marker should not be written with curly braces, example: a typical `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it is also valid.
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
   - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
   - Performance: reduce disk IO when converting document
@@ -104,6 +105,14 @@
     `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`.
     Unsupported tags and tags attributes are skipped and not rendered.
     HTML entities are accepted.
+  - [EE] Can override plugins (readTemplate, writeTemplate, deleteTemplate, generateOutputFile, readPublicKey, onRenderEnd, readRender)
+  - [EE] Can access GET render without authentication
+  - [EE] Can add middlewares before and after route
+  - [EE] Add GET and DELETE route for template
+  - [EE] Fix workDir parameter
+  - [EE] Remove error message if no plugin exists
+  - [EE] Fix bug with environment variable
+  - [EE] Add licensing system
   - [EE] New feature: Dynamic pictures are supported on ODG and ODP files. It is not possible to create loops.
 
 ### v2.1.1

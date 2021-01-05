@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 
+// Force production mode with pkg
+// To avoid having stack trace in errors
+process.env.NODE_ENV = process.pkg ? 'production' : process.env.NODE_ENV;
+
+var webserver = require('../lib/webserver');
 var translator = require('../lib/translator');
+var helper = require('../lib/helper');
 var tool = require('../lib/tool');
 var _action = process.argv[2];
 
@@ -11,6 +17,31 @@ switch (_action) {
   case 'find':
     tool.findMarkers(process.argv.slice(3));
     break;
+  case 'webserver':
+    webserver.handleParams(process.argv.slice(3));
+    break;
+  case 'install':
+    installService();
+    break;
+  case '-v':
+  case '--version':
+    console.log(helper.printVersion());
+    process.exit();
+    break;
+  case 'generate-token':
+    webserver.generateToken((err, token) => {
+      if (err) {
+        console.log(err.toString());
+        process.exit();
+      }
+
+      console.log('Here is a JWT token, valid for 40 years. Place this token in the header like this:');
+      console.log('  - Authorization : Bearer your_token\n');
+      console.log(token);
+      console.log('\n');
+      process.exit();
+    });
+    break;
   default:
     usage();
 }
@@ -18,7 +49,38 @@ switch (_action) {
 function usage () {
   console.log('*************************************');
   console.log('Carbone usage:');
+  console.log('   carbone --version or -v');
   console.log('   carbone translate [--help]');
   console.log('   carbone find [--help]');
+  console.log('   carbone webserver [--help]');
+  console.log('   carbone generate-token               # generate key pair for authentication');
+  console.log('   carbone install && sudo ./install.sh # daemonize carbone webserver in systemd');
   process.exit();
+}
+
+/**
+ * Install systemd service
+ *
+ * Only for Carbone On-Premise Enterprise Edition
+ */
+function installService () {
+  if (process.platform !== 'linux') {
+    console.log('Automatic installation as a service not available for your OS yet');
+    process.exit();
+  }
+  if (process.pkg === undefined) {
+    console.log('Automatic installation as a service available only for On-Premise Edition');
+    process.exit();
+  }
+  const path = require('path');
+  const fs   = require('fs');
+  console.log('Generate install script ', process.argv[0]);
+  try {
+    // copy bash script outside of On-Premise binary file
+    fs.writeFileSync(path.join(process.cwd(), 'install.sh'), fs.readFileSync(path.join(__dirname, 'install.sh'), 'utf8').replace(/__SOURCE_BINARY_FILE__/g, process.argv[0]), {mode : '0755'});
+    fs.writeFileSync(path.join(process.cwd(), 'systemd')   , fs.readFileSync(path.join(__dirname, 'systemd')));
+  }
+  catch (e) {
+    console.log('Cannot write automatic installation scripts files in ' + process.cwd() + '\n' +  e);
+  }
 }

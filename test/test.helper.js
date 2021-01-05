@@ -4,6 +4,7 @@ var path  = require('path');
 var fs  = require('fs');
 var rootPath = process.cwd(); // where "make test" is called
 var testPath = rootPath+'/test/test/';
+var jwt = require('kitten-jwt');
 
 describe('helper', function () {
 
@@ -14,6 +15,156 @@ describe('helper', function () {
       helper.assert((_uid!==_uid2), true);
     });
   });
+
+  describe('readEnvironmentVariable', function () {
+    it('should do nothing', function () {
+      helper.readEnvironmentVariable();
+    });
+    it('should return updated params object if there are matching env variable', function () {
+      var _params = {
+        isActive   : true,
+        nbAttempt  : 4,
+        path       : '/blabla/',
+        doNotTouch : 55
+      };
+      var _env = {
+        CARBONE_EE_ISACTIVE  : 'false',
+        CARBONE_EE_NBATTEMPT : '1222',
+        CARBONE_EE_PATH      : '/yeah/',
+        OTHER_STUFF          : 'matrix'
+      };
+      let _valuesToUpdate = helper.readEnvironmentVariable(_env, _params);
+      helper.assert(_params.nbAttempt, 4);
+      helper.assert(_valuesToUpdate, {
+        isActive  : false,
+        nbAttempt : 1222,
+        path      : '/yeah/'
+      });
+    });
+    it('should return an empty object if there is no matching env variable', function () {
+      var _params = {
+        isActive   : true,
+        nbAttempt  : 4,
+        path       : '/blabla/',
+        doNotTouch : 55
+      };
+      var _env = {
+        OTHER_STUFF : 'matrix'
+      };
+      let _valuesToUpdate = helper.readEnvironmentVariable(_env, _params);
+      helper.assert(_params.nbAttempt, 4);
+      helper.assert(_valuesToUpdate, {});
+    });
+  });
+
+  describe('isSafeFilename', function () {
+    it('should do nothing', function () {
+      helper.assert(helper.isSafeFilename(), false);
+    });
+    it('should detect unsafe filename', function () {
+      helper.assert(helper.isSafeFilename('/../../id.txt'), false);
+      helper.assert(helper.isSafeFilename('COM2'), false);
+      helper.assert(helper.isSafeFilename(null), false);
+      helper.assert(helper.isSafeFilename(undefined), false);
+      helper.assert(helper.isSafeFilename('LPT4'), false);
+      helper.assert(helper.isSafeFilename('NUL'), false);
+      helper.assert(helper.isSafeFilename('../qsdssdDDFdqsdqsd'), false);
+      helper.assert(helper.isSafeFilename('..abqsdqsdqsdqsdqsd'), false);
+      helper.assert(helper.isSafeFilename('dqsdq'), false); // too short
+      helper.assert(helper.isSafeFilename('💎qsdqsdqs233dqsd'), false);
+      helper.assert(helper.isSafeFilename('iq-s1d_5R-TDd_kAOqsdqsdqdDHDZI8408-_P3d..docx'), false);
+      helper.assert(helper.isSafeFilename('.qqadazsdssd'), false);
+      helper.assert(helper.isSafeFilename('qqads?zads.sd'), false);
+      helper.assert(helper.isSafeFilename('qq/\\ad?az/szads.sd'), false);
+      helper.assert(helper.isSafeFilename('qq\\adszads.sd'), false);
+      helper.assert(helper.isSafeFilename('qq/adszads.sd'), false);
+      helper.assert(helper.isSafeFilename('qqad%az:sds.sd'), false);
+      helper.assert(helper.isSafeFilename('qqad*.sd'), false);
+    });
+    it('should detect safe filename', function () {
+      helper.assert(helper.isSafeFilename('iqsdd.txt'), true);
+      helper.assert(helper.isSafeFilename('iq-s1d_5R-TDd_kAOP3d.docx'), true);
+      helper.assert(helper.isSafeFilename('iq-s1d_5R-TDd_kAOqsdqsdqdDHDZI8408-_P3d.docx'), true);
+      helper.assert(helper.isSafeFilename('iq-s1d_5R-TDd_kAOqsdqsd.qdDHDZI8408-_P3d'), true);
+    });
+  });
+
+
+  describe('assignObjectIfAttributesExist', function () {
+    it('should do nothing', function () {
+      helper.assignObjectIfAttributesExist();
+    });
+    it('should assign value of target, only if it exists, and return messages for unknown attributes', function () {
+      var _target = {
+        isActive   : true,
+        nbAttempt  : 4,
+        path       : '/blabla/',
+        doNotTouch : 55
+      };
+      var _source = {
+        isActive   : false,
+        nbAttempt  : 1222,
+        nbAttempt2 : 4,
+        path       : '/yeah/',
+        unkown     : 'sds'
+      };
+
+      var _messages = helper.assignObjectIfAttributesExist(_target, _source);
+      helper.assert(_target, {
+        isActive   : false,
+        nbAttempt  : 1222,
+        path       : '/yeah/',
+        doNotTouch : 55
+      });
+      helper.assert(_messages, 'Unknown parameter(s): nbAttempt2, unkown');
+    });
+    it('should assign value of target, and return an empty message if all parameters are known', function () {
+      var _target = {
+        isActive   : true,
+        nbAttempt  : 4,
+        path       : '/blabla/',
+        doNotTouch : 55
+      };
+      var _source = {
+        isActive : false,
+        path     : '/yeah/',
+      };
+
+      var _messages = helper.assignObjectIfAttributesExist(_target, _source);
+      helper.assert(_target, {
+        isActive   : false,
+        nbAttempt  : 4,
+        path       : '/yeah/',
+        doNotTouch : 55
+      });
+      helper.assert(_messages, '');
+    });
+    it('should return no error if target is null or undefined', function () {
+      var _source = {
+        isActive : false,
+        path     : '/yeah/',
+      };
+      helper.assert(helper.assignObjectIfAttributesExist(null, _source), '');
+      helper.assert(helper.assignObjectIfAttributesExist(undefined, _source), '');
+    });
+    it('should not crash if source is null or undefined', function () {
+      var _target = {
+        isActive   : true,
+        nbAttempt  : 4,
+        path       : '/blabla/',
+        doNotTouch : 55
+      };
+      helper.assert(helper.assignObjectIfAttributesExist(_target, null), '');
+      helper.assert(helper.assignObjectIfAttributesExist(_target, undefined), '');
+      helper.assert(_target, {
+        isActive   : true,
+        nbAttempt  : 4,
+        path       : '/blabla/',
+        doNotTouch : 55
+      });
+    });
+  });
+
 
   describe('getRandomString', function () {
     it('should return a random id', function () {
@@ -66,9 +217,9 @@ describe('helper', function () {
       helper.assert(helper.encodeSafeFilename('报道'), '5oql6YGT');
       helper.assert(helper.decodeSafeFilename('5oql6YGT'), '报道');
 
-      helper.assert(helper.encodeSafeFilename('k�'), 'a__-vQ');
-      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
-      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
+      helper.assert(helper.encodeSafeFilename('k�'), 'a--_vQ');
+      helper.assert(helper.decodeSafeFilename('a--_vQ'), 'k�');
+      helper.assert(helper.decodeSafeFilename('a--_vQ'), 'k�');
     });
   });
 
@@ -209,6 +360,207 @@ describe('helper', function () {
       _expectedResult[_allFiles[0]] = 'file 1';
       helper.assert(helper.readFileDirSync(testPath, 'sql'), _expectedResult);
       done();
+    });
+  });
+
+  describe('printVersion', function () {
+    it('should print info', function () {
+      let _text = helper.printVersion();
+      helper.assert(/Carbone Render On-Premise Enterprise Edition/.test(_text), true);
+    });
+    it('should print license info', function () {
+      let _licenseObj = {
+        exp  : Date.now(),
+        data : {
+          name      : 'Acme',
+          address   : 'FR',
+          email     : 'client@email.com',
+          startedAt : Date.now() / 1000,
+          plan      : 'eternity'
+        }
+      };
+      let _text = helper.printVersion(_licenseObj);
+      helper.assert(/Carbone Render On-Premise Enterprise Edition/.test(_text), true);
+      helper.assert(/Acme/.test(_text), true);
+      helper.assert(/FR/.test(_text), true);
+      helper.assert(/client@email\.com/.test(_text), true);
+      helper.assert(/eternity/.test(_text), true);
+    });
+  });
+
+  describe('findCheckLicense', function () {
+    const _testDir = path.join(__dirname, 'licenseTest');
+    const privKey = '-----BEGIN EC PRIVATE KEY-----\n'
+      +'MIHcAgEBBEIBRhN047ucYKhfv1OpX+KGrdouwGAOLVLeBpRhzAmJHp9TC2b6lcyW\n'
+      +'IGV6r7VHPlAEOGzA+kF9pCy0DYkVj4Usz1ugBwYFK4EEACOhgYkDgYYABAETL1OP\n'
+      +'PY8KAduLmA19YahowjKjlO/JjWPWvn77uACakR8/25dD9scyYdYMchrBm6nqHvWO\n'
+      +'1LNMlplBqyTFL/LCbACAuqyRUp/G7JPxkuRKZpMCrKUNrHbGBP6rsjUq6cVZJqOT\n'
+      +'Jye4hyhtrUhrsE2dMjhDICxrNk9aAH3EAWZtznOPiQ==\n'
+      +'-----END EC PRIVATE KEY-----\n';
+    const pubKey = '-----BEGIN PUBLIC KEY-----\n'
+      + 'MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQBEy9Tjz2PCgHbi5gNfWGoaMIyo5Tv\n'
+      + 'yY1j1r5++7gAmpEfP9uXQ/bHMmHWDHIawZup6h71jtSzTJaZQaskxS/ywmwAgLqs\n'
+      + 'kVKfxuyT8ZLkSmaTAqylDax2xgT+q7I1KunFWSajkycnuIcoba1Ia7BNnTI4QyAs\n'
+      + 'azZPWgB9xAFmbc5zj4k=\n'
+      + '-----END PUBLIC KEY-----\n';
+    const badPrivKey = '-----BEGIN EC PRIVATE KEY-----\n'
+      + 'MIHcAgEBBEIBEfrcY6EOraHxV/4dyq2mrbFGy+6Z0U7ZlLQHIBM1Jh85r10o5qm/\n'
+      + 'mbEww9OORJaN32s3355CEegAchkYUz0RxHOgBwYFK4EEACOhgYkDgYYABADXEndW\n'
+      + 'J2TsG7WCkj/YaZXgqcyZCsgUVi+jAWlFvYqkeBmCESRxhJQVZsNGBMiV3j5Eg+Xr\n'
+      + 'A4J9xkl7X+BYzcKl8wH3jRIXfqPOgvL/2w1deiR19twIL/tQ2+nfEmYLhzBeH11H\n'
+      + 'xIOSBHq2z7MJRzd63QgyDvukm1n7DjqrFv5dyUANug==\n'
+      + '-----END EC PRIVATE KEY-----\n';
+    const _createAt = parseInt(Date.now() / 1000, 10);
+
+    beforeEach(function () {
+      helper.rmDirRecursive(_testDir);
+      fs.mkdirSync(_testDir);
+    });
+    after(function () {
+      helper.rmDirRecursive(_testDir);
+    });
+    it('should read a directory and check if the license is valid', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, privKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, true);
+        helper.assert(message, 'Valid license acme_2020-10-10.carbone-license');
+        helper.assert(payload.data.plan, 'eternity');
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+    it('should be an invalid license if the publication date of Carbone is more recent than license expiration date\
+        even if this expiration date is in the future. It happens if the client cheat system clock', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 100, privKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(message, 'Invalid license. Check system clock. acme_2020-10-10.carbone-license');
+        helper.assert(payload.data.plan, 'eternity');
+        done();
+      }, '2040-01-29T15:47:12.000Z');
+    });
+    it('should be a valid license (eternity plan) if the publication date of Carbone is older than license expiration date, even if expiration date is in the past', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', -1000, privKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, true);
+        helper.assert(message, 'WARNING: Your license acme_2020-10-10.carbone-license has expired. Carbone-ee sill works but without support & updates');
+        helper.assert(payload.data.plan, 'eternity');
+        done();
+      }, '2010-12-29T15:47:12.636Z');
+    });
+    it('should be an invalid license (eternity plan) if the publication date of Carbone is newer than license expiration date', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', -1000, privKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
+        helper.assert(payload.data.plan, 'eternity');
+        done();
+      }, '2040-12-29T15:47:12.636Z');
+    });
+    it('should be an invalid license (not eternity plan) if expiration date is in the past', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'other' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', -1000, privKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
+        helper.assert(payload, undefined);
+        done();
+      }, '2010-12-29T15:47:12.636Z');
+    });
+    it('should be a valid trial license', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'trial' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, privKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, true);
+        helper.assert(message, 'Trial license acme_2020-10-10.carbone-license');
+        helper.assert(payload.data.plan, 'trial');
+        done();
+      }, '2010-12-29T15:47:12.636Z');
+    });
+    it('should be a invalid trial license if the signature is incorrect', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'trial' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
+        helper.assert(payload, undefined);
+        done();
+      }, '2010-12-29T15:47:12.636Z');
+    });
+    it('should be a invalid trial license if the audience is incorrect', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'trial' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee', 1000, privKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(message, 'Invalid license (not for carbone-ee-on-premise) acme_2020-10-10.carbone-license');
+        helper.assert(payload, undefined);
+        done();
+      }, '2010-12-29T15:47:12.636Z');
+    });
+    it('should be an invalid license if the signature is not correct even if the plan is eternity and the license expiration date is before carbone package date', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', -1000, badPrivKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
+        helper.assert(payload, undefined);
+        done();
+      }, '2010-12-29T15:47:12.636Z');
+    });
+    it('should be an invalid license if the signature is not correct even if the plan is eternity and the expiration date is after carbone package date', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
+        helper.assert(payload, undefined);
+        done();
+      }, '2010-12-29T15:47:12.636Z');
+    });
+    it('should read a directory and select the most recent *.carbone-license file (valid)', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acm.otherfile')                  , 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 1000, privKey   , _data);
+      generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 1000, badPrivKey   , _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, true);
+        helper.assert(message, 'Valid license file.carbone-license');
+        helper.assert(payload.data.plan, 'eternity');
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+    it('should read a directory and select the most recent *.carbone-license file (invalid)', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acm.otherfile')                  , 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 1000, privKey   , _data);
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
+        helper.assert(payload, undefined);
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+    it('should return an error if the directory does not contain a license', function (done) {
+      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(/No/.test(message), true);
+        helper.assert(payload, undefined);
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+    it('should return an error if the directory does exists', function (done) {
+      helper.findCheckLicense(path.join(__dirname, 'sdqdazlzedz'), pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(/Cannot/.test(message), true);
+        helper.assert(payload, undefined);
+        done();
+      }, '2020-12-29T15:47:12.636Z');
     });
   });
 
@@ -610,3 +962,8 @@ describe('helper', function () {
     });
   });
 });
+
+
+function generateLicense (licensePath, clientId, serverId, expireInSecond, privKey, infoClient) {
+  fs.writeFileSync(licensePath, jwt.generate(clientId, serverId, expireInSecond, privKey, infoClient), 'utf8');
+}

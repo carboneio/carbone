@@ -10,6 +10,7 @@ var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
 var pdfjsLib = require('pdfjs-dist/es5/build/pdf.js');
+var os = require('os');
 
 describe('Carbone', function () {
 
@@ -2425,7 +2426,7 @@ describe('Carbone', function () {
         assert.equal(err, null);
         var _filename = path.basename(resultFilePath);
         assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
-        assert.strictEqual(reportName, undefined);
+        assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(reportName), true);
         assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(_filename), true);
         fs.unlinkSync(resultFilePath);
         done();

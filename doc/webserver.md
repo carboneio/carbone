@@ -121,7 +121,7 @@ If an option is reported in different places, CLI options are picked in priority
 | attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try | --attemps | CARBONE_EE_ATTEMPTS  |
 | authentication | false            | [Authentification documentation at the following link](#authentication-option) | --authentication |  CARBONE_EE_AUTHENTICATION |
 | studio         | false            | Web interface to preview reports. [Learn more.](#carbone-studio-light)                             | --studio | CARBONE_EE_STUDIO |
-| studioUser         | admin:pass  | If the authentication option is enabled, the browser requests an authentication to access the web page. The value have to be with the format `[username]:[password]`.                             | --studioUser | CARBONE_EE_STUDIOUSER |
+| studioUser         | admin:pass  | If the authentication option is enabled, the browser requests an authentication to access the web page. Credentials have to be formated, such as: `[username]:[password]`.                             | --studioUser | CARBONE_EE_STUDIOUSER |
 | templatePathRetention         | 0            | Template path retention in days. 0 means infinite retention. | --templatePathRetention | CARBONE_EE_TEMPLATEPATHRETENTION |
 
 

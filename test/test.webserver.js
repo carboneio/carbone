@@ -149,8 +149,11 @@ describe('Webserver', () => {
         const _factories = '2';
         const _attempts = '3';
         const _bind = '127.0.0.1';
+        const _studio = true;
+        const _studioUser = 'root:1234';
+        const _templatePathRetention = "30";
         webserver = require('../lib/webserver');
-        webserver.handleParams(['--port', _port, '--workdir', _workdir, '--factories', _factories, '--attempts', _attempts,'--bind', _bind, '--authentication'], () => {
+        webserver.handleParams(['--port', _port, '--workdir', _workdir, '--factories', _factories, '--attempts', _attempts,'--bind', _bind, '--templatePathRetention', _templatePathRetention, '--studioUser', _studioUser, '--studio', '--authentication'], () => {
           assert.strictEqual(params.port, _port);
           assert.strictEqual(fs.existsSync(_workdir), true);
           helper.rmDirRecursive(_workdir);
@@ -159,6 +162,9 @@ describe('Webserver', () => {
           assert.strictEqual(params.bind, _bind);
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication, true);
+          assert.strictEqual(params.studio, _studio);
+          assert.strictEqual(params.studioUser, _studioUser);
+          assert.strictEqual(params.templatePathRetention, _templatePathRetention);
           webserver.stopServer(done);
         });
       });

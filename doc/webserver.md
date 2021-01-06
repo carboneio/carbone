@@ -14,6 +14,7 @@ Carbone On-Premise Documentation
 - [Customise Carbone On-premise](#Customise-Carbone-On-premise)
   - [Plugins](#Plugins)
   - [Middlewares](#Middlewares)
+- [Carbone Studio Light](#Carbone-studio-light)
 
 ## Installations
 
@@ -23,15 +24,18 @@ Carbone On-premise can be installed in different ways:
   - Debian/Ubuntu package (coming soon)
 ### Basic Installation
 
-- 1 - Download Carbone On-premise binary for server/OS: Mac, Linux or Windows
-- 2 - Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
-- 3 - Start Carbone web server or [daemonize it with systemd](#Installation-from-systemd-(Ubuntu/Debian-ONLY))
+1. Download the license and the Carbone On-premise binary for server/OS: Mac, Linux or Windows
+2. Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
+3. Insert the **license** in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is picked. The binary can't start if the license is outdated or invalid.
+3. Start Carbone web server or [daemonize it with systemd](#Installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#Carbone-Options-overview) to Carbone On-Premise through the CLI:
 
 ```bash
   ./carbone webserver --port 4000 --workdir .
 ```
-It is possible to [edit default options](#Carbone-Options-overview) passed to Carbone On Premise.
 
+If an error appears during the start up, you must verify:
+- if your license is valid
+- if CLI options and values are valid
 ### Installation from systemd (Ubuntu/Debian ONLY)
 
 Carbone On-Premise contains automatic installation scripts to daemonize with systemd. It has been carefully configured to provide a high level of security.
@@ -109,14 +113,16 @@ If an option is reported in different places, CLI options are picked in priority
 
 ### Options list
 
-| Parameter      | Default          | Description                                                  |
-| -------------- | ---------------- | ------------------------------------------------------------ |
-| port           | 4000             | Service PORT                                                 |
-| workdir        | Actual directory | Define the place to store elements,  it creates 6 directories:<br />- `template`  : where carbone keeps templates (cache)<br />- `render`    : temp directory where report are generated,<br />- `asset`     : internal used only, <br />- `config`    : config, licenses and ES512 keys for authentication,<br />- `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and<br />- `plugin `   : where to put custom plugin |
-| factories      | 1                | Multithread parameter, number of LibreOffice converter       |
-| attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try |
-| authentication | false            | [Authentification documentation at the following link](#authentication-option) |
-| studio         | false            | Web interface to preview reports                             |
+| Options        | Default          | Description                                                  |  CLI options |  ENV |
+| -------------- | ---------------- | ------------------------------------------------------------ | ------------ | ---- |
+| port           | 4000             | Service PORT                                                 | --port / -p  | CARBONE_EE_PORT |
+| workdir        | Actual directory | Define the place to store elements,  it creates 6 directories:<br />- `template`  : where carbone keeps templates (cache)<br />- `render`    : temp directory where report are generated,<br />- `asset`     : internal used only, <br />- `config`    : config, licenses and ES512 keys for authentication,<br />- `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and<br />- `plugin `   : where to put custom plugin | --workdir | CARBONE_EE_WORKDIR  |
+| factories      | 1                | Multithread parameter, number of LibreOffice converter       | --factories |  CARBONE_EE_FACTORIES |
+| attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try | --attemps | CARBONE_EE_ATTEMPTS  |
+| authentication | false            | [Authentification documentation at the following link](#authentication-option) | --authentication |  CARBONE_EE_AUTHENTICATION |
+| studio         | false            | Web interface to preview reports. [Learn more.](#carbone-studio-light)                             | --studio | CARBONE_EE_STUDIO |
+| studioUser         | admin:pass  | If the authentication option is enabled, the browser requests an authentication to access the web page. Credentials have to be formated, such as: `[username]:[password]`.                             | --studioUser | CARBONE_EE_STUDIOUSER |
+| templatePathRetention         | 0            | Template path retention in days. 0 means infinite retention. | --templatePathRetention | CARBONE_EE_TEMPLATEPATHRETENTION |
 
 
 ### CLI options
@@ -426,3 +432,15 @@ module.exports = {
   after: [afterMiddleware] // Middlewares in this array will be executed after routes
 }
 ```
+
+## Carbone Studio Light
+
+Carbone Studio Light is a web interface to preview reports with a JSON editor.
+It is a "light" version of [https://studio.carbone.io](https://studio.carbone.io) without files and version management.
+To enable the Carbone Studio Light, the option `--studio` has to be passed to the binary, such as:
+```
+$ ./carbone webserver --studio
+```
+Then visit the URL `http://127.0.0.1:4000` and enjoy!
+
+If the authentication option is enabled, the browser requests an authentication to access the web page.

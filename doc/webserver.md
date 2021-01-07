@@ -113,20 +113,20 @@ If an option is reported in different places, CLI options are picked in priority
 
 ### Options list
 
-| Options        | Default Value    | Description                                                  |  CLI options |  ENV |
+| Options        | Default Values    | Description                                                  |  CLI options |  ENV |
 | -------------- | ---------------- | ------------------------------------------------------------ | ------------ | ---- |
 | port           | 4000             | Service PORT                                                 | --port / -p  | CARBONE_EE_PORT |
-| workdir        | Actual directory | Define the place to store elements,  it creates 6 directories:<br />- `template`  : where carbone keeps templates (cache)<br />- `render`    : temp directory where report are generated,<br />- `asset`     : internal used only, <br />- `config`    : config, licenses and ES512 keys for authentication,<br />- `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and<br />- `plugin `   : where to put custom plugin | --workdir | CARBONE_EE_WORKDIR  |
-| factories      | 1                | Multithread parameter, number of LibreOffice converter       | --factories |  CARBONE_EE_FACTORIES |
-| attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try | --attemps | CARBONE_EE_ATTEMPTS  |
-| authentication | false            | [Authentification documentation at the following link](#authentication-option) | --authentication |  CARBONE_EE_AUTHENTICATION |
-| studio         | false            | Web interface to preview reports. [Learn more.](#carbone-studio-light)                             | --studio | CARBONE_EE_STUDIO |
-| studioUser         | admin:pass  | If the authentication option is enabled, the browser requests an authentication to access the web page. Credentials have to be formated, such as: `[username]:[password]`.                             | --studioUser | CARBONE_EE_STUDIOUSER |
-| templatePathRetention         | 0            | Template path retention in days. 0 means infinite retention. | --templatePathRetention | CARBONE_EE_TEMPLATEPATHRETENTION |
-| lang         | en            | Locale language used by Carbone | --en | CARBONE_EE_EN |
-| timezone         | Europe/Paris  |  Timezone for managing dates | --timezone | CARBONE_EE_TIMEZONE |
-| currencySource         |   |  Currency source for money conversion. If empty, it depends on the locale. | --currencySource | CARBONE_EE_CURRENCYSOURCE |
-| currencyTarget         |   |  Currency target for money conversion. If empty, it depends on the locale. | --currencyTarget | CARBONE_EE_CURRENCYTARGET |
+| workdir        | Actual directory | Define the place to store elements,  it creates 6 directories:<br />- `template`  : where carbone keeps templates (cache)<br />- `render`    : temp directory where report are generated,<br />- `asset`     : internal used only, <br />- `config`    : config, licenses and ES512 keys for authentication,<br />- `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and<br />- `plugin `   : where to put custom plugin | --workdir / -w | CARBONE_EE_WORKDIR  |
+| factories      | 1                | Multithread parameter, number of LibreOffice converter       | --factories / -f |  CARBONE_EE_FACTORIES |
+| attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try | --attemps / -a | CARBONE_EE_ATTEMPTS  |
+| authentication | false            | [Authentification documentation at the following link](#authentication-option) | --authentication / -A |  CARBONE_EE_AUTHENTICATION |
+| studio         | false            | Web interface to preview reports. [Learn more.](#carbone-studio-light)                             | --studio / -s | CARBONE_EE_STUDIO |
+| studioUser         | admin:pass  | If the authentication option is enabled, the browser requests an authentication to access the web page. Credentials have to be formated, such as: `[username]:[password]`.                             | --studioUser / -S | CARBONE_EE_STUDIOUSER |
+| templatePathRetention         | 0            | Template path retention in days. 0 means infinite retention. | --templatePathRetention / -r | CARBONE_EE_TEMPLATEPATHRETENTION |
+| lang         | en            | Locale language used by Carbone | --lang / -l  | CARBONE_EE_EN |
+| timezone         | Europe/Paris  |  Timezone for managing dates | --timezone / -t | CARBONE_EE_TIMEZONE |
+| currencySource         |   |  Currency source for money conversion. If empty, it depends on the locale. | --currencySource / -cs | CARBONE_EE_CURRENCYSOURCE |
+| currencyTarget         |   |  Currency target for money conversion. If empty, it depends on the locale. | --currencyTarget / -ct | CARBONE_EE_CURRENCYTARGET |
 | currencyRates          | `{ EUR : 1, USD : 1.14, ... }` | Currency rates, it is based on EUR which should be equals to "1". The option can only be set on the `config/config.json` file. |  | |
 | translations          | `{}` | Translation object loaded at startup. It can be overwritten by rendering requests. The option can only be set on the `config/config.json` file.  |  | |
 

@@ -152,8 +152,12 @@ describe('Webserver', () => {
         const _studio = true;
         const _studioUser = 'root:1234';
         const _templatePathRetention = "30";
+        const _lang = 'zh-tw';
+        const _timezone = 'Asia/Singapore';
+        const _currencySource = 'CNY';
+        const _currencyTarget = 'EUR';
         webserver = require('../lib/webserver');
-        webserver.handleParams(['--port', _port, '--workdir', _workdir, '--factories', _factories, '--attempts', _attempts,'--bind', _bind, '--templatePathRetention', _templatePathRetention, '--studioUser', _studioUser, '--studio', '--authentication'], () => {
+        webserver.handleParams(['--port', _port, '--workdir', _workdir, '--factories', _factories, '--attempts', _attempts,'--bind', _bind, '--templatePathRetention', _templatePathRetention, '--studioUser', _studioUser, '--studio', '--authentication', '--lang', _lang, '--timezone', _timezone, '--currencySource', _currencySource, '--currencyTarget', _currencyTarget], () => {
           assert.strictEqual(params.port, _port);
           assert.strictEqual(fs.existsSync(_workdir), true);
           helper.rmDirRecursive(_workdir);
@@ -165,6 +169,14 @@ describe('Webserver', () => {
           assert.strictEqual(params.studio, _studio);
           assert.strictEqual(params.studioUser, _studioUser);
           assert.strictEqual(params.templatePathRetention, _templatePathRetention);
+          assert.strictEqual(params.lang, _lang);
+          params.lang = 'en';
+          assert.strictEqual(params.timezone, _timezone);
+          params.lang = 'Europe/Paris';
+          assert.strictEqual(params.currencySource, _currencySource);
+          params.currencySource = '';
+          assert.strictEqual(params.currencyTarget, _currencyTarget);
+          params.currencyTarget = '';
           webserver.stopServer(done);
         });
       });

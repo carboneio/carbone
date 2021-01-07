@@ -1,3 +1,86 @@
+
+### v3.0.0
+  - 👋🏻 NOTE: This version contains breaking changes of undocumented features.
+    So if you use only documented features so far, you should not be concerned by these breaking changes.
+  - ⚡️ **Manage timezone + new date formatters + switch from MomentJS to DayJS**
+    - If not defined by you in `options.complement`, `{c.now}` returns the current date in UTC.
+    - [BREAKING CHANGE]: remove old date formatter which were not documented: `format`, `parse`, `addDays` and `convert`.
+      You should use `formatD` instead and new formatters below. They were very old formatters, the chance you use them is low because you had to 
+      look into the source code to know their existance.
+    - New formatters:
+      - `addD(amount, unit [, patternIn])`     : add days, month to a date. `formatD` can be used after without specifying  patternIn 
+      - `subD(amount, unit [, patternIn])`     : subtract days, month to a date. `formatD` can be used after without specifying  patternIn
+      - `startOfD(amount, unit [, patternIn])` : Set a date to the start of a unit of time. `formatD` can be used after without specifying  patternIn
+      - `endOfD(amount, unit [, patternIn])`   : Set a date to the end of a unit of time. `formatD` can be used after without specifying  patternIn
+    - [BREAKING CHANGE]: We try to stay as close as possible as the previous parsing algorithm.
+      But `1997-12-17 07:37:16-08` is not accepted anymore without specifying an input pattern or writing `1997-12-17 07:37:16-08:00`
+    - Accept a new options to set the `timezone` of `formatD`. Examples:
+
+      *Data*
+      ```js
+        {
+          date     : '2020-11-28T21:54:00.000Z',  // ISO 8601 UTC
+          dateWTZ  : '2020-11-28T21:54:00',       // without timezone
+          dateTZ   : '2020-11-28T21:54:00-04:00', // with America/New_York timezone offset
+          dateUnix : 1606600440                   // UNIX timestamp in seconds UTC of 2020-11-28T21:54:00.000Z
+        }
+      ```
+
+      *Template => Result*
+
+      if `options.timezone = 'Europe/Paris'` (default)
+        - `{d.date:formatD(LLLL)}`        => `Saturday, November 28, 2020 10:54 PM`
+        - `{d.dateWTZ:formatD(LLLL)}`     => `Saturday, November 28, 2020 9:54 PM`
+        - `{d.dateTZ:formatD(LLLL)}`      => `Sunday  , November 29, 2020 2:54 AM`
+        - `{d.dateUnix:formatD(LLLL, X)}` => `Saturday, November 28, 2020 10:54 PM`
+
+      if `options.timezone = 'America/New_York'` 
+        - `{d.date:formatD(LLLL)}`        => `Saturday, November 28, 2020 4:54 PM`
+        - `{d.dateWTZ:formatD(LLLL)}`     => `Saturday, November 28, 2020 3:54 PM`
+        - `{d.dateTZ:formatD(LLLL)}`      => `Saturday, November 28, 2020 8:54 PM`
+        - `{d.dateUnix:formatD(LLLL, X)}` => `Saturday, November 28, 2020 4:54 PM`
+
+      List of timezone:  https://en.wikipedia.org/wiki/List_of_tz_database_time_zones 
+
+
+  - Fix: if a path does not exist inside a formatter argument, it returns an empty string instead of the error "[[C_ERROR]] attribute_name not defined".
+    It fixes some weird behaviour with ifEM formatters
+  - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`
+  - Improve HTML type detection. Accepts html5 without doctype.
+  - Adding `padl` and `padr` string formatter.
+  - Fix doc issue on carbone website
+  - Accepts Adobe Indesign IDML file as a template
+  - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
+  - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
+  - Performance: reduce disk IO when converting document
+  - Performance: deactivate image compression by default to speed up PDF conversion
+  - [BREAKING CHANGE]: remove the possibility to use `convertTo.formatOptionsRaw` for CSV export. This feature was not documented
+    and can lead to security issues. Use `convertTo.formatOptions` instead.
+  - new paramater in `Carbone.set` 
+     - `renderPath`   : `Carbone.set` can changes the default path where rendered files are temporary saved.
+                        By default, it creates the directory `carbone_render` in Operating System temp directory.
+                        It creates the path automatically
+  - new paramater in `Carbone.render` 
+     - `renderPrefix` : If defined in `options` object. `Carbone.render` returns a file path instead of a buffer, and it adds this prefix in the rendered filename
+                        The generated filename contains three parts:
+                          - the prefix
+                          - a secure Pseudo-Random part of 22 characters
+                          - the report name, encoded in specific base64 to generate safe POSIX compatible filename on disk
+                        `/renderpath/<prefix><22-random-chars><encodedReportName.extension>`
+                        This filename can be decoded with the function `Carbone.decodeOuputFilename(pathOrFilename)`.
+                        It is the user responsability to delete the file or not.
+  - New function `decodeOuputFilename()`: when `renderPrefix` is used, the returned filename can be parsed with this function.
+                        It decodes filename an returns an object with two parameters
+                        ```js
+                        {
+                          extension  : 'pdf',                // output file extension
+                          reportName : 'decoded report name' // reportName
+                        }
+                        ```
+  - [BREAKING CHANGE]: `Carbone.convert` function signature has changed. Now, it accepts the same `options` as Carbone.renders:
+    You must use `Carbone.convert(fileBuffer, options, callback)` instead of `Carbone.convert(fileBuffer, convertTo, options, callback)`
+
+
 ### v2.1.1
   - Release September 23rd 2020
   - Fixes `arrayJoin(\n):convCRLF`. Now it works in carbone v2.x.x like in v1.x.x.

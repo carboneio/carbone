@@ -1,6 +1,7 @@
 var assert = require('assert');
 var builder = require('../lib/builder');
 var helper = require('../lib/helper');
+const parser = require('../lib/parser');
 
 describe('builder.buildXML', function () {
 
@@ -379,8 +380,9 @@ describe('builder.buildXML', function () {
         {brand : 'Toyota'}
       ]
     };
+    _xml = parser.removeXMLInsideMarkers(_xml);
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      assert.equal(_xmlBuilt,''
+      assert.strictEqual(_xmlBuilt,''
         + '<xml> '
         +   '<tr>car'
         +     '<t_row bla=Lumeneo>'

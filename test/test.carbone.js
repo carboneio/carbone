@@ -830,6 +830,31 @@ describe('Carbone', function () {
         done();
       });
     });
+
+    it('Should insert the correct values even if aliases are beginning with the same name', function (done) {
+      var _xml = '{#myVar=d.name}{#myVarSecond=d.age}<xml><t_row>{$myVar}<br/>{$myVarSecond}</t_row></xml>';
+      var _xml2 = '{#a = d.report.contact.methods}{#ao = d.report.postal}<xml><div>{$a}</div><div>{$ao}</div></xml>'
+      var _data = {
+        name: "John",
+        age: 20,
+        report: {
+          contact: {
+            methods: 'blue'
+          },
+          postal: 94000
+        }
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml><t_row>John<br/>20</t_row></xml>');
+        carbone.renderXML(_xml2, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<xml><div>blue</div><div>94000</div></xml>');
+          done();
+        });
+      });
+    });
+
     describe('Dynamic variables in formatters', function () {
       it('should use variable in object if the variable starts with a point', function (done) {
         var data = {
@@ -1324,19 +1349,6 @@ describe('Carbone', function () {
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           helper.assert(err+'', 'null');
           helper.assert(_xmlBuilt, '<xml> <t_row>  </t_row> </xml>');
-          done();
-        });
-      });
-      it.only('should work', function (done) {
-        var _xml = '{#myVar($a)=d.en:ifGT($a):showBegin} <br>{#myVarFin=d.en:showEnd}<xml> <t_row> {$myVar}  <br/>  {$myVarFin}</t_row> </xml>';
-        var _data = [
-          {brand : 'Lumeneo'     , id : 1},
-          {brand : 'Tesla motors', id : 2},
-          {brand : 'Toyota'      , id : 3}
-        ];
-        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
-          helper.assert(err+'', 'null');
-          // helper.assert(_xmlBuilt, '<xml> <t_row>  </t_row> </xml>');
           done();
         });
       });

@@ -156,8 +156,22 @@ describe('Webserver', () => {
         const _timezone = 'Asia/Singapore';
         const _currencySource = 'CNY';
         const _currencyTarget = 'EUR';
+        const _licenseDir = "/var/tmp/test/"
+        const _licenseDirPrev = params.licenseDir;
         webserver = require('../lib/webserver');
-        webserver.handleParams(['--port', _port, '--workdir', _workdir, '--factories', _factories, '--attempts', _attempts,'--bind', _bind, '--templatePathRetention', _templatePathRetention, '--studioUser', _studioUser, '--studio', '--authentication', '--lang', _lang, '--timezone', _timezone, '--currencySource', _currencySource, '--currencyTarget', _currencyTarget], () => {
+        webserver.handleParams(['--port', _port,
+                                '--workdir', _workdir,
+                                '--factories', _factories,
+                                '--attempts', _attempts,
+                                '--bind', _bind,
+                                '--templatePathRetention', _templatePathRetention,
+                                '--studioUser', _studioUser,
+                                '--studio', '--authentication',
+                                '--lang', _lang,
+                                '--timezone', _timezone,
+                                '--currencySource', _currencySource,
+                                '--currencyTarget', _currencyTarget,
+                                '--licenseDir', _licenseDir], () => {
           assert.strictEqual(params.port, _port);
           assert.strictEqual(fs.existsSync(_workdir), true);
           helper.rmDirRecursive(_workdir);
@@ -177,6 +191,8 @@ describe('Webserver', () => {
           params.currencySource = '';
           assert.strictEqual(params.currencyTarget, _currencyTarget);
           params.currencyTarget = '';
+          assert.strictEqual(params.licenseDir, _licenseDir);
+          params.licenseDir = _licenseDirPrev;
           webserver.stopServer(done);
         });
       });

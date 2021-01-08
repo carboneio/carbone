@@ -117,6 +117,7 @@ If an option is reported in different places, CLI options are picked in priority
 | -------------- | ---------------- | ------------------------------------------------------------ | ------------ | ---- |
 | port           | 4000             | Service PORT                                                 | --port / -p  | CARBONE_EE_PORT |
 | workdir        | Actual directory | Define the place to store elements,  it creates 6 directories:<br />- `template`  : where carbone keeps templates (cache)<br />- `render`    : temp directory where report are generated,<br />- `asset`     : internal used only, <br />- `config`    : config, licenses and ES512 keys for authentication,<br />- `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and<br />- `plugin `   : where to put custom plugin | --workdir / -w | CARBONE_EE_WORKDIR  |
+| licenseDir     | "config/"        | Absolute directory path to licenses | --licenseDir / -L |  CARBONE_EE_LICENSEDIR |
 | factories      | 1                | Multithread parameter, number of LibreOffice converter       | --factories / -f |  CARBONE_EE_FACTORIES |
 | attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try | --attemps / -a | CARBONE_EE_ATTEMPTS  |
 | authentication | false            | [Authentification documentation at the following link](#authentication-option) | --authentication / -A |  CARBONE_EE_AUTHENTICATION |

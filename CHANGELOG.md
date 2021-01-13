@@ -1,3 +1,5 @@
+### v3.0.1
+  - Fix: aliases beginning with same prefix names are properly rendered in the generated reports instead of not being skip.
 
 ### v3.0.0
   - 👋🏻 NOTE: This version contains breaking changes of undocumented features.

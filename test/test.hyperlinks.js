@@ -1,4 +1,5 @@
-const helper    = require('./helper');
+const carbone    = require('../lib/index');
+const helper     = require('./helper');
 const hyperlinks = require('../lib/hyperlinks');
 
 describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {

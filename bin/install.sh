@@ -39,8 +39,8 @@ fi
 
 while (( $# )); do
   case "$1" in
-    --non-interactive)
-      NON_INTERACTIVE=true ;;
+    --non-interactive) NON_INTERACTIVE=true ;;
+    --no-start) NO_START=true ;;
     *)
     break ;;
   esac
@@ -177,9 +177,11 @@ systemctl daemon-reload > /dev/null 2>&1
 systemctl enable $CARBONE_SERVICE_NAME
 exit_on_command_error "Cannot reload or enable service $CARBONE_SERVICE_NAME"
 print_success "OK"
-print_info "Starting service "
-systemctl start $CARBONE_SERVICE_NAME
-print_success "OK"
+if [ ! "$NO_START" = true ]; then
+  print_info "Starting service "
+  systemctl start $CARBONE_SERVICE_NAME
+  print_success "OK"
+fi
 
 echo ""
 echo "Installation done!"

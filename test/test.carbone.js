@@ -346,6 +346,45 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should render an XML string with boolean (true) in filter keys', function (done) {
+      var data = {
+        'param-dash' : [{
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val'
+        }, {
+          'filter-val'          : false,
+          'new-param-with-dash' : 'val1'
+        }, {
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val2'
+        }]
+      };
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=true].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=true].new-param-with-dash}</t></xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml><t>val</t><t>val2</t></xml>');
+        done();
+      });
+    });
+    it('should render an XML string with boolean (false) in filter keys', function (done) {
+      var data = {
+        'param-dash' : [{
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val'
+        }, {
+          'filter-val'          : false,
+          'new-param-with-dash' : 'val1'
+        }, {
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val2'
+        }]
+      };
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=false].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=false].new-param-with-dash}</t></xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml><t>val1</t></xml>');
+        done();
+      });
+    });
+
     it('should render XML with dahs in array kes and filter keys', function (done) {
       var _xml = '<xml><t_row> {d.cars-dash[sort-dash-s,i].brand-dash-v:count()} {d.cars-dash[sort-dash-s,i].brand-dash-v} </t_row><t_row> {d.cars-dash[sort-dash-s+1,i+1].brand-dash-v} </t_row></xml>';
       var _data = {

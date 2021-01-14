@@ -1,4 +1,4 @@
-const helper    = require('../lib/helper');
+const helper    = require('./helper');
 const hyperlinks = require('../lib/hyperlinks');
 
 describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
@@ -153,6 +153,37 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       + '</draw:a>';
     hyperlinks.insertHyperlinksLO(_template);
     helper.assert(_template.files[0].data, _expectedResult);
+  });
+
+  it('[DOCX - Full test] should inject hyperlinks (text/list in table) inside the report', function (done) {
+    const _testedReport = 'hyperlink/docx-mix';
+    const _data = {
+      url1: 'https://carbone.io/',
+      url2: 'https://carbone.io/documentation.html',
+      list: [
+        {
+          name: 'main',
+          url: 'https://carbone.io/'
+        },
+        {
+          name: 'documentation',
+          url: 'https://carbone.io/documentation.html'
+        },
+        {
+          name: 'api reference',
+          url: 'https://carbone.io/api-reference.html#carbone-set-options-'
+        },
+        {
+          name: 'examples',
+          url: 'https://carbone.io/templates-examples.html'
+        }
+      ]
+    };
+    carbone.render(helper.openTemplate(_testedReport), _data, (err, res) => {
+      helper.assert(err+'', 'null');
+      helper.assertFullReport(res, _testedReport);
+      done();
+    });
   });
 
   it('[DOCX - preprocess] should remove an hyperlink marker from the rels file and move it to the document.xml file', function () {

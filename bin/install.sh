@@ -148,7 +148,7 @@ if [ $BINARY_FILE_PATH != $CARBONE_BIN_PATH ]; then
     mv $BINARY_FILE $CARBONE_BIN
     exit_on_command_error "Cannot rename binary $BINARY_FILE"
   fi
-  chmod 700 $CARBONE_BIN
+  chmod 750 $CARBONE_BIN
   exit_on_command_error "Cannot make it executable"
   print_success "OK"
 fi

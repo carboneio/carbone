@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas"
+  xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex"
+  xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex"
+  xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex"
+  xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex"
+  xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex"
+  xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex"
+  xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex"
+  xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex"
+  xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink"
+  xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:w10="urn:schemas-microsoft-com:office:word"
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml"
+  xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml"
+  xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex"
+  xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid"
+  xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml"
+  xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex"
+  xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"
+  xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk"
+  xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml"
+  xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" mc:Ignorable="w14 w15 w16se w16cid w16 w16cex wp14">
+  <w:body>
+    <w:p w14:paraId="0C20A95C" w14:textId="1BF36ADB" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+      <w:pPr>
+        <w:rPr>
+          <w:lang w:val="en-US"/>
+        </w:rPr>
+      </w:pPr>
+      <w:hyperlink r:id="CarboneHyperlinkId0" w:history="1">
+        <w:r w:rsidR="008D30EF" w:rsidRPr="002A589F">
+          <w:rPr>
+            <w:rStyle w:val="Hyperlink"/>
+            <w:lang w:val="en-US"/>
+          </w:rPr>
+          <w:t>Website Home Page</w:t>
+        </w:r>
+      </w:hyperlink>
+    </w:p>
+    <w:p w14:paraId="4DFE1429" w14:textId="7810EBA4" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+      <w:pPr>
+        <w:rPr>
+          <w:lang w:val="en-US"/>
+        </w:rPr>
+      </w:pPr>
+      <w:hyperlink r:id="CarboneHyperlinkId1" w:history="1">
+        <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+          <w:rPr>
+            <w:rStyle w:val="Hyperlink"/>
+            <w:lang w:val="en-US"/>
+          </w:rPr>
+          <w:t>Website Documentation</w:t>
+        </w:r>
+      </w:hyperlink>
+    </w:p>
+    <w:p w14:paraId="439E397D" w14:textId="28103A71" w:rsidR="008D30EF" w:rsidRDefault="008D30EF">
+      <w:pPr>
+        <w:rPr>
+          <w:lang w:val="en-US"/>
+        </w:rPr>
+      </w:pPr>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="TableGrid"/>
+        <w:tblW w:w="0" w:type="auto"/>
+        <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
+      </w:tblPr>
+      <w:tblGrid>
+        <w:gridCol w:w="4508"/>
+        <w:gridCol w:w="4508"/>
+      </w:tblGrid>
+      <w:tr w:rsidR="008D30EF" w14:paraId="72E3E7E7" w14:textId="77777777" w:rsidTr="008D30EF">
+        <w:tc>
+          <w:tcPr>
+            <w:tcW w:w="4508" w:type="dxa"/>
+          </w:tcPr>
+          <w:p w14:paraId="54EF2A17" w14:textId="4F4A8DBD" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+            <w:pPr>
+              <w:rPr>
+                <w:lang w:val="en-US"/>
+              </w:rPr>
+            </w:pPr>
+            <w:hyperlink r:id="CarboneHyperlinkId0" w:history="1">
+              <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+                <w:rPr>
+                  <w:rStyle w:val="Hyperlink"/>
+                  <w:lang w:val="en-US"/>
+                </w:rPr>
+                <w:t>main</w:t>
+              </w:r>
+            </w:hyperlink>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:tcPr>
+            <w:tcW w:w="4508" w:type="dxa"/>
+          </w:tcPr>
+          <w:p w14:paraId="762E8CFE" w14:textId="797C8939" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+            <w:pPr>
+              <w:rPr>
+                <w:lang w:val="en-US"/>
+              </w:rPr>
+            </w:pPr>
+            <w:hyperlink r:id="CarboneHyperlinkId0" w:history="1">
+              <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+                <w:rPr>
+                  <w:rStyle w:val="Hyperlink"/>
+                  <w:lang w:val="en-US"/>
+                </w:rPr>
+                <w:t>https://carbone.io/</w:t>
+              </w:r>
+            </w:hyperlink>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr w:rsidR="008D30EF" w14:paraId="72E3E7E7" w14:textId="77777777" w:rsidTr="008D30EF">
+        <w:tc>
+          <w:tcPr>
+            <w:tcW w:w="4508" w:type="dxa"/>
+          </w:tcPr>
+          <w:p w14:paraId="54EF2A17" w14:textId="4F4A8DBD" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+            <w:pPr>
+              <w:rPr>
+                <w:lang w:val="en-US"/>
+              </w:rPr>
+            </w:pPr>
+            <w:hyperlink r:id="CarboneHyperlinkId1" w:history="1">
+              <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+                <w:rPr>
+                  <w:rStyle w:val="Hyperlink"/>
+                  <w:lang w:val="en-US"/>
+                </w:rPr>
+                <w:t>documentation</w:t>
+              </w:r>
+            </w:hyperlink>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:tcPr>
+            <w:tcW w:w="4508" w:type="dxa"/>
+          </w:tcPr>
+          <w:p w14:paraId="762E8CFE" w14:textId="797C8939" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+            <w:pPr>
+              <w:rPr>
+                <w:lang w:val="en-US"/>
+              </w:rPr>
+            </w:pPr>
+            <w:hyperlink r:id="CarboneHyperlinkId1" w:history="1">
+              <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+                <w:rPr>
+                  <w:rStyle w:val="Hyperlink"/>
+                  <w:lang w:val="en-US"/>
+                </w:rPr>
+                <w:t>https://carbone.io/documentation.html</w:t>
+              </w:r>
+            </w:hyperlink>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr w:rsidR="008D30EF" w14:paraId="72E3E7E7" w14:textId="77777777" w:rsidTr="008D30EF">
+        <w:tc>
+          <w:tcPr>
+            <w:tcW w:w="4508" w:type="dxa"/>
+          </w:tcPr>
+          <w:p w14:paraId="54EF2A17" w14:textId="4F4A8DBD" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+            <w:pPr>
+              <w:rPr>
+                <w:lang w:val="en-US"/>
+              </w:rPr>
+            </w:pPr>
+            <w:hyperlink r:id="CarboneHyperlinkId2" w:history="1">
+              <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+                <w:rPr>
+                  <w:rStyle w:val="Hyperlink"/>
+                  <w:lang w:val="en-US"/>
+                </w:rPr>
+                <w:t>api reference</w:t>
+              </w:r>
+            </w:hyperlink>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:tcPr>
+            <w:tcW w:w="4508" w:type="dxa"/>
+          </w:tcPr>
+          <w:p w14:paraId="762E8CFE" w14:textId="797C8939" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+            <w:pPr>
+              <w:rPr>
+                <w:lang w:val="en-US"/>
+              </w:rPr>
+            </w:pPr>
+            <w:hyperlink r:id="CarboneHyperlinkId2" w:history="1">
+              <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+                <w:rPr>
+                  <w:rStyle w:val="Hyperlink"/>
+                  <w:lang w:val="en-US"/>
+                </w:rPr>
+                <w:t>https://carbone.io/api-reference.html#carbone-set-options-</w:t>
+              </w:r>
+            </w:hyperlink>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr w:rsidR="008D30EF" w14:paraId="72E3E7E7" w14:textId="77777777" w:rsidTr="008D30EF">
+        <w:tc>
+          <w:tcPr>
+            <w:tcW w:w="4508" w:type="dxa"/>
+          </w:tcPr>
+          <w:p w14:paraId="54EF2A17" w14:textId="4F4A8DBD" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+            <w:pPr>
+              <w:rPr>
+                <w:lang w:val="en-US"/>
+              </w:rPr>
+            </w:pPr>
+            <w:hyperlink r:id="CarboneHyperlinkId3" w:history="1">
+              <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+                <w:rPr>
+                  <w:rStyle w:val="Hyperlink"/>
+                  <w:lang w:val="en-US"/>
+                </w:rPr>
+                <w:t>examples</w:t>
+              </w:r>
+            </w:hyperlink>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:tcPr>
+            <w:tcW w:w="4508" w:type="dxa"/>
+          </w:tcPr>
+          <w:p w14:paraId="762E8CFE" w14:textId="797C8939" w:rsidR="008D30EF" w:rsidRDefault="002A589F">
+            <w:pPr>
+              <w:rPr>
+                <w:lang w:val="en-US"/>
+              </w:rPr>
+            </w:pPr>
+            <w:hyperlink r:id="CarboneHyperlinkId3" w:history="1">
+              <w:r w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+                <w:rPr>
+                  <w:rStyle w:val="Hyperlink"/>
+                  <w:lang w:val="en-US"/>
+                </w:rPr>
+                <w:t>https://carbone.io/templates-examples.html</w:t>
+              </w:r>
+            </w:hyperlink>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p w14:paraId="119EC636" w14:textId="77777777" w:rsidR="008D30EF" w:rsidRPr="008D30EF" w:rsidRDefault="008D30EF">
+      <w:pPr>
+        <w:rPr>
+          <w:lang w:val="en-US"/>
+        </w:rPr>
+      </w:pPr>
+    </w:p>
+    <w:sectPr w:rsidR="008D30EF" w:rsidRPr="008D30EF">
+      <w:pgSz w:w="11906" w:h="16838"/>
+      <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/>
+      <w:cols w:space="708"/>
+      <w:docGrid w:linePitch="360"/>
+    </w:sectPr>
+  </w:body>
+</w:document>

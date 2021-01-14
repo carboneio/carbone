@@ -1,4 +1,5 @@
-const helper    = require('../lib/helper');
+const carbone    = require('../lib/index');
+const helper     = require('./helper');
 const hyperlinks = require('../lib/hyperlinks');
 
 describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
@@ -155,6 +156,37 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[0].data, _expectedResult);
   });
 
+  it('[DOCX - Full test] should inject hyperlinks (text/list in table) inside the report', function (done) {
+    const _testedReport = 'hyperlink/docx-mix';
+    const _data = {
+      url1: 'https://carbone.io/',
+      url2: 'https://carbone.io/documentation.html',
+      list: [
+        {
+          name: 'main',
+          url: 'https://carbone.io/'
+        },
+        {
+          name: 'documentation',
+          url: 'https://carbone.io/documentation.html'
+        },
+        {
+          name: 'api reference',
+          url: 'https://carbone.io/api-reference.html#carbone-set-options-'
+        },
+        {
+          name: 'examples',
+          url: 'https://carbone.io/templates-examples.html'
+        }
+      ]
+    };
+    carbone.render(helper.openTemplate(_testedReport), _data, (err, res) => {
+      helper.assert(err+'', 'null');
+      helper.assertFullReport(res, _testedReport);
+      done();
+    });
+  });
+
   it('[DOCX - preprocess] should remove an hyperlink marker from the rels file and move it to the document.xml file', function () {
     const _template = {
       files : [{
@@ -167,11 +199,11 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
           + '</Relationships>'
       },{
         name : 'word/document.xml',
-        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="rId2"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>'
+        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="rId2" w:history="1"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>'
       }]
     };
     const _expectedRelsResult = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
-    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="{d.url:generateHyperlinkReference()}"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>';
+    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="{d.url:generateHyperlinkReference()}" w:history="1"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>';
     hyperlinks.preProcesstHyperlinksDocx(_template);
     helper.assert(_template.files[0].data, _expectedRelsResult);
     helper.assert(_template.files[1].data, _expectedDocumentResult);

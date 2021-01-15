@@ -1,8 +1,8 @@
 ### v3.0.1
-  - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)` 
+  - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`
   - Fix: aliases beginning with same prefix names are properly rendered in the generated reports instead of not being skip.
   - Fix: license detection in Docker
-  - Fix dynamic HTML links DOCX
+  - Fix dynamic hyperlinks for DOCX reports
   - Improve documentation
 
 ### v3.0.0

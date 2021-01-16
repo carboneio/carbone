@@ -9,8 +9,6 @@ const currency = require('./_currency.js');
  *
  * `convCurr()`  without parameters converts automatically from `options.currencySource` to `options.currencyTarget`.
  *
- * @version 1.2.0
- *
  * @exampleContext {"currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 }} }
  * @example [10                  ]
  * @example [1000                ]
@@ -39,8 +37,6 @@ function convCurr (d, target, source) {
  * Round a number
  *
  * Same as toFixed(2) but it rounds number correclty `round(1.05, 1) = 1.1`
- *
- * @version 1.2.0
  *
  * @example [10.05123  , 2  ]
  * @example [1.05      , 1  ]
@@ -98,8 +94,6 @@ function _format (value, format, precision = 3) {
  * - For ODS/XLSX, the number of decimals has to be formatted based on the text editor.
  * - For the other type of files, the number of decimals depends on the `precision` parameter passed to the formatter.
  *
- * @version 1.2.0
- *
  * @exampleContext {"lang":"en-us"}
  * @example ["10"          ]
  * @example ["1000.456"    ]
@@ -117,9 +111,6 @@ function formatN (d, precision) {
 }
 
 /**
- *
- * @version 1.2.0
- *
  * Format currency numbers
  *
  * Currencies are defined by the locale (`options.lang`). It can be overwritten by
@@ -187,8 +178,6 @@ function formatC (d, precisionOrFormat) {
 /**
  * Add two numbers
  *
- * @version 1.2.0
- *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
  *
@@ -204,8 +193,6 @@ function add (d, value) {
 
 /**
  * Substract two numbers
- *
- * @version 1.2.0
  *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
@@ -223,8 +210,6 @@ function sub (d, value) {
 /**
  * Multiply two numbers
  *
- * @version 1.2.0
- *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
  *
@@ -240,8 +225,6 @@ function mul (d, value) {
 
 /**
  * Divide two numbers
- *
- * @version 1.2.0
  *
  * @example [1000.4   ,  2  ]
  * @example ["1000.4" , "2" ]
@@ -269,7 +252,6 @@ module.exports = {
   /**
    * Converts a number to an INT
    * @deprecated
-   * @version 1.0.0 deprecated
    *
    * @return {Number}
    */
@@ -280,7 +262,6 @@ module.exports = {
   /**
    * Converts a number with English specifications (decimal separator is '.')
    * @deprecated
-   * @version 1.0.0 deprecated
    *
    * @return {String}
    */
@@ -291,7 +272,6 @@ module.exports = {
   /**
    * Converts a number into string, keeping only <nb> decimals
    * @deprecated
-   * @version 1.0.0 deprecated
    *
    * @param  {Number} nb
    * @return {String}
@@ -303,7 +283,6 @@ module.exports = {
   /**
    * Converts a number with French specifications (decimal separator is ',')
    * @deprecated
-   * @version 1.0.0 deprecated
    *
    * @return {String}
    */

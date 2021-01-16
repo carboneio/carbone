@@ -7,6 +7,8 @@ const LINEBREAK = {
 /**
  * Lower case all letters
  *
+ * @version 0.12.5
+ *
  * @example [ "My Car" ]
  * @example [ "my car" ]
  * @example [ null ]
@@ -24,6 +26,8 @@ function lowerCase (d) {
 
 /**
  * Upper case all letters
+ *
+ * @version 0.12.5
  *
  * @example [ "My Car" ]
  * @example [ "my car" ]
@@ -43,6 +47,8 @@ function upperCase (d) {
 /**
  * Upper case first letter
  *
+ * @version 0.12.5
+ *
  * @example [ "My Car" ]
  * @example [ "my car" ]
  * @example [ null ]
@@ -61,6 +67,8 @@ function ucFirst (d) {
 
 /**
  * Upper case the first letter of all words
+ *
+ * @version 0.12.5
  *
  * @example [ "my car" ]
  * @example [ "My cAR" ]
@@ -83,6 +91,8 @@ function ucWords (d) {
 /**
  * Always return the same message if called (sort of "catch all" formatter)
  *
+ * @version 0.13.0
+ *
  * @example [ "My Car", "hello!" ]
  * @example [ "my car", "hello!" ]
  * @example [ null    , "hello!" ]
@@ -100,6 +110,8 @@ function print (d, message) {
  * Convert user-defined enums to human readable values
  *
  * User-defined enums must be passed in `options` of `carbone.render`.
+ *
+ * @version 0.13.0
  *
  * @exampleContext { "enum" : { "ORDER_STATUS"  : ["pending", "sent", "delivered"] } }
  * @example [ 0    , "ORDER_STATUS" ]
@@ -130,6 +142,8 @@ function convEnum (d, type) {
 /**
  * Removes accents from text
  *
+ * @version 1.1.0
+ *
  * @example [ "crème brulée" ]
  * @example [ "CRÈME BRULÉE" ]
  * @example [ "être"         ]
@@ -150,6 +164,8 @@ function unaccent (d) {
  * Convert carriage return `\\r\\n` and line feed `\\n` to XML-specific code in rendered document
  *
  * Compatible with odt, and docx (beta)
+ *
+ * @version 1.1.0
  *
  * @exampleContext { "extension" : "odt" }
  * @example [ "my blue \\n car"   ]
@@ -177,6 +193,8 @@ convCRLF.canInjectXML = true;
 /**
  * Slice a string with a begin and an end
  *
+ * @version 1.2.0
+ *
  * @example ["foobar" , 0  , 3 ]
  * @example ["foobar" , 1      ]
  * @example ["foobar" , -2     ]
@@ -196,6 +214,8 @@ function substr (d, begin, end) {
 
 /**
  * Pad the string from the start with another string
+ *
+ * @version 3.0.0 new
  *
  * @example ["abc", 10         ]
  * @example ["abc", 10, "foo"  ]
@@ -226,6 +246,8 @@ function padl (d, targetLength, padString) {
 
 /**
  * Pad the string from the end with another string
+ *
+ * @version 3.0.0 new
  *
  * @example ["abc", 10         ]
  * @example ["abc", 10, "foo"  ]

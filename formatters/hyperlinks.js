@@ -22,6 +22,9 @@ function addLinkDatabase (options, hyperlink) {
  * @returns {Function} Post process formatter
  */
 function generateHyperlinkReference (hyperlink) {
+  hyperlink = encodeURI(hyperlink).replace(/&/g, () => {
+    return '&amp;';
+  });
   addLinkDatabase(this, hyperlink);
   return {
     fn   : generateHyperkinReferencePostProcessing,

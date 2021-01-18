@@ -1,3 +1,8 @@
+### v3.0.2
+  - Fix: accepts hyperlinks with &
+  - Fix: do not crash if hyperlink is undefined
+  - Fix: support random way of managing hyperlinks in MS Word
+
 ### v3.0.1
   - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`
   - Fix: aliases beginning with same prefix names are properly rendered in the generated reports instead of not being skip.

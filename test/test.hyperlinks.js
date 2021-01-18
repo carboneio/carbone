@@ -1,6 +1,7 @@
 const carbone    = require('../lib/index');
 const helper     = require('./helper');
 const hyperlinks = require('../lib/hyperlinks');
+const hyperlinksFormatters = require('../formatters/hyperlinks');
 
 describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
 
@@ -310,7 +311,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
-  it('[DOCX post-process] should fill the relation file from the hyperlinkDatabase', function () {
+  it('[DOCX - post-process] should fill the relation file from the hyperlinkDatabase', function () {
     const _template = {
       files : [{
         name : 'word/_rels/document.xml.rels',
@@ -340,6 +341,44 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[0].data, _expectedResult);
   });
 
+  it('[DOCX - formatter] generateHyperlinkReference - Add encoded and not encoded', function () {
+    const _options = {
+      hyperlinkDatabase : new Map()
+    };
+    // ENCODED
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "https://carbone.io?name=john&lastname=wick");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&f=1&nofb=1`);
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B");
+
+    // NOT ENCODED
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `https://carbone.io/?x=шеллые`);
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://carbone.io/page?arg=12&arg1="value"&arg2>=23&arg3<=23&arg4='valu2'`);
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://my_test.asp?name=ståle&car=saab`);
+
+    const _it = _options.hyperlinkDatabase.keys();
+    helper.assert(_it.next().value, "https://carbone.io?name=john&amp;lastname=wick");
+    helper.assert(_it.next().value, "https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1");
+    helper.assert(_it.next().value, "https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B");
+    helper.assert(_it.next().value, "https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B%D0%B5");
+    helper.assert(_it.next().value, "http://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'");
+    helper.assert(_it.next().value, "http://my_test.asp?name=st%C3%A5le&amp;car=saab");
+  });
+
+  it('[DOCX - formatter] generateHyperlinkReference - should set by default "https://." if the URL is invalid', function () {
+    const _options = {
+      hyperlinkDatabase : new Map()
+    };
+
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "carbone.io?name=john&lastname=wick");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "javascript:void(0)");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "dfdsfdsfdfdsfsdf");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "magnet:?xt=urn:btih:123");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://my test.asp`);
+
+    const _it = _options.hyperlinkDatabase.keys();
+    helper.assert(_it.next().value, "https://.");
+    helper.assert(_it.next().value, undefined);
+  });
 
   it('[XLSX] should make a single hyperlink marker valid on a single sheet ("http://d.url" to "{d.url}")', function () {
     const _template = {

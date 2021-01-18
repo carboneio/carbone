@@ -21,7 +21,23 @@ function addLinkDatabase (options, hyperlink) {
  * @param {String} hyperlink New hyperlink
  * @returns {Function} Post process formatter
  */
-function generateHyperlinkReference (hyperlink) {
+function generateHyperlinkReference (hyperlink = '') {
+
+  /** 1 - Check if the URL is not encoded to encode, it protects Libre Office from crashing */
+  const _decodedLink = decodeURIComponent(hyperlink);
+  if (_decodedLink == hyperlink) {
+    hyperlink = encodeURI(hyperlink)
+  }
+  /** 2 - Replace everytime & characters by an encoded '&amp;', it protects Libre Office from crashing */
+  hyperlink = hyperlink.replace(/&/g, () => {
+    return '&amp;';
+  });
+
+  /** 3 - Verify if the URL is valid with a protocol, it protects libre office to include server local paths */
+  if (hyperlinks.isValidHttpUrl(hyperlink) === false) {
+    hyperlink = 'https://.';
+  }
+
   addLinkDatabase(this, hyperlink);
   return {
     fn   : generateHyperkinReferencePostProcessing,

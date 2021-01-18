@@ -2,6 +2,7 @@
   - Fix: accepts hyperlinks with &
   - Fix: do not crash if hyperlink is undefined
   - Fix: support random way of managing hyperlinks in MS Word
+  - Fix: set Content-Type when downloading the report
 
 ### v3.0.1
   - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`

@@ -151,12 +151,12 @@ describe('Webserver', () => {
         const _bind = '127.0.0.1';
         const _studio = true;
         const _studioUser = 'root:1234';
-        const _templatePathRetention = "30";
+        const _templatePathRetention = '30';
         const _lang = 'zh-tw';
         const _timezone = 'Asia/Singapore';
         const _currencySource = 'CNY';
         const _currencyTarget = 'EUR';
-        const _licenseDir = "/var/tmp/test/"
+        const _licenseDir = '/var/tmp/test/';
         const _licenseDirPrev = params.licenseDir;
         webserver = require('../lib/webserver');
         webserver.handleParams(['--port', _port,

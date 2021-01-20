@@ -2450,7 +2450,7 @@ describe('Carbone', function () {
       });
     });
     it('should render a template and return a path instead of a buffer (with conversion).\
-      it should trim and lower case convertTo extension', function (done) {
+      it should trim and lower case convertTo extension and return a stat object', function (done) {
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
@@ -2460,13 +2460,21 @@ describe('Carbone', function () {
         reportName   : '{d.field1}test',
         convertTo    : ' PDF  '
       };
-      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath) {
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, fileName, stat) {
         assert.equal(err, null);
         assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
         var _filename = path.basename(resultFilePath);
         var _onlyReportName = _filename.slice(opt.renderPrefix.length + 22, -4);
         assert.strictEqual(helper.decodeSafeFilename(_onlyReportName), 'field_1test');
         assert.strictEqual(/prefix[A-Za-z0-9-_]{22}ZmllbGRfMXRlc3Q\.pdf/.test(_filename), true);
+        assert.notStrictEqual(stat.templateSize, undefined);
+        assert.notStrictEqual(stat.preProcessingTime, undefined);
+        assert.notStrictEqual(stat.planningTime, undefined);
+        assert.notStrictEqual(stat.injectionTime, undefined);
+        assert.notStrictEqual(stat.assemblyTime, undefined);
+        assert.notStrictEqual(stat.renderSizeBeforeConversion, undefined);
+        assert.notStrictEqual(stat.convertTime, undefined);
+        assert.notStrictEqual(stat.executionTime, undefined);
         fs.unlinkSync(resultFilePath);
         done();
       });

@@ -33,10 +33,13 @@ function generateHyperlinkReference (hyperlink = '') {
     return '&amp;';
   });
 
+  /** 3 - Check the URL */
+  hyperlinks = hyperlinks.validateURL(hyperlinks);
+
   /** 3 - Verify if the URL is valid with a protocol, it protects libre office to include server local paths */
-  if (hyperlinks.isValidHttpUrl(hyperlink) === false) {
-    hyperlink = 'https://.';
-  }
+  // if (hyperlinks.isValidHttpUrl(hyperlink) === false) {
+  //   hyperlink = 'https://.';
+  // }
 
   addLinkDatabase(this, hyperlink);
   return {

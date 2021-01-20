@@ -380,6 +380,27 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_it.next().value, undefined);
   });
 
+  it.only('[DOCX - utils] validateURL - should return the URL or correct the URL', () => {
+    helper.assert(hyperlinks.validateURL("carbone.io/"), 'https://carbone.io/');
+    helper.assert(hyperlinks.validateURL("www.carbone.com.au/"), 'https://www.carbone.com.au/');
+
+    // helper.assert(hyperlinks.validateURL("javascript:void(0)"), hyperlinks.URL_ON_ERROR);
+    // helper.assert(hyperlinks.validateURL("dfdsfdsfdfdsfsdf"), hyperlinks.URL_ON_ERROR);
+    // helper.assert(hyperlinks.validateURL("magnet:?xt=urn:btih:123"), hyperlinks.URL_ON_ERROR);
+    // helper.assert(hyperlinks.validateURL(`http://my test.asp`), hyperlinks.URL_ON_ERROR);
+    // example.com:3000
+  });
+
+  it('[DOCX - utils] validateURL - should return the Carbone URL if the hyperlink is not valid', () => {
+    helper.assert(hyperlinks.validateURL("carbone.io?name=john&lastname=wick"), hyperlinks.URL_ON_ERROR);
+    helper.assert(hyperlinks.validateURL("javascript:void(0)"), hyperlinks.URL_ON_ERROR);
+    helper.assert(hyperlinks.validateURL("dfdsfdsfdfdsfsdf"), hyperlinks.URL_ON_ERROR);
+    helper.assert(hyperlinks.validateURL("magnet:?xt=urn:btih:123"), hyperlinks.URL_ON_ERROR);
+    helper.assert(hyperlinks.validateURL(`http://my test.asp`), hyperlinks.URL_ON_ERROR);
+    helper.assert(hyperlinks.validateURL(`https://carbone.io?quer=23`), hyperlinks.URL_ON_ERROR);
+
+  });
+
   it('[XLSX] should make a single hyperlink marker valid on a single sheet ("http://d.url" to "{d.url}")', function () {
     const _template = {
       files : [{

@@ -3,7 +3,7 @@ const helper     = require('./helper');
 const hyperlinks = require('../lib/hyperlinks');
 const hyperlinksFormatters = require('../formatters/hyperlinks');
 
-describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
+describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
 
   it('[ODT/ODS] should correct a xlink:href unicode to ascii and remove incorrect text before with only one Carbone marker', function () {
     const _template = {

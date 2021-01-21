@@ -22,13 +22,7 @@ function addLinkDatabase (options, hyperlink) {
  * @returns {Function} Post process formatter
  */
 function generateHyperlinkReference (hyperlink = '') {
-
-  /** 1 - Check if the URL is not encoded to encode, it protects Libre Office from crashing */
-  const _decodedLink = decodeURIComponent(hyperlink);
-  if (_decodedLink == hyperlink) {
-    hyperlink = encodeURI(hyperlink)
-  }
-  /** 2 - Replace everytime & characters by an encoded '&amp;', it protects Libre Office from crashing */
+  /** Encode & character to avoid libre office crash*/
   hyperlink = hyperlink.replace(/&/g, () => {
     return '&amp;';
   });
@@ -57,6 +51,18 @@ function generateHyperkinReferencePostProcessing (hyperlink) {
   return '';
 }
 
+
+/**
+ * Validate and correct dynamic hyperlinks, or return a carbone URL with a special error URL
+ *
+ * @private
+ * @param {String} hyperlink
+ */
+function validateURL(hyperlink = '') {
+  return hyperlinks.validateURL(hyperlink);
+}
+
 module.exports = {
-  generateHyperlinkReference
+  generateHyperlinkReference,
+  validateURL
 };

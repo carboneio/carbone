@@ -356,12 +356,12 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://my_test.asp?name=ståle&car=saab`);
 
     const _it = _options.hyperlinkDatabase.keys();
-    helper.assert(_it.next().value, "https://carbone.io?name=john&amp;lastname=wick");
+    helper.assert(_it.next().value, "https://carbone.io/?name=john&amp;lastname=wick");
     helper.assert(_it.next().value, "https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1");
     helper.assert(_it.next().value, "https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B");
     helper.assert(_it.next().value, "https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B%D0%B5");
-    helper.assert(_it.next().value, "http://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'");
-    helper.assert(_it.next().value, "http://my_test.asp?name=st%C3%A5le&amp;car=saab");
+    helper.assert(_it.next().value, "http://carbone.io/page/?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'");
+    helper.assert(_it.next().value, "http://my_test.asp/?name=st%C3%A5le&amp;car=saab");
   });
 
   it('[DOCX - formatter] generateHyperlinkReference - should set by default "https://." if the URL is invalid', function () {
@@ -369,36 +369,38 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       hyperlinkDatabase : new Map()
     };
 
-    hyperlinksFormatters.generateHyperlinkReference.call(_options, "carbone.io?name=john&lastname=wick");
     hyperlinksFormatters.generateHyperlinkReference.call(_options, "javascript:void(0)");
     hyperlinksFormatters.generateHyperlinkReference.call(_options, "dfdsfdsfdfdsfsdf");
     hyperlinksFormatters.generateHyperlinkReference.call(_options, "magnet:?xt=urn:btih:123");
     hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://my test.asp`);
 
     const _it = _options.hyperlinkDatabase.keys();
-    helper.assert(_it.next().value, "https://.");
+    helper.assert(_it.next().value, hyperlinks.URL_ON_ERROR);
     helper.assert(_it.next().value, undefined);
   });
 
-  it.only('[DOCX - utils] validateURL - should return the URL or correct the URL', () => {
-    helper.assert(hyperlinks.validateURL("carbone.io/"), 'https://carbone.io/');
-    helper.assert(hyperlinks.validateURL("www.carbone.com.au/"), 'https://www.carbone.com.au/');
-
-    // helper.assert(hyperlinks.validateURL("javascript:void(0)"), hyperlinks.URL_ON_ERROR);
-    // helper.assert(hyperlinks.validateURL("dfdsfdsfdfdsfsdf"), hyperlinks.URL_ON_ERROR);
-    // helper.assert(hyperlinks.validateURL("magnet:?xt=urn:btih:123"), hyperlinks.URL_ON_ERROR);
-    // helper.assert(hyperlinks.validateURL(`http://my test.asp`), hyperlinks.URL_ON_ERROR);
-    // example.com:3000
+  it('[DOCX - utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
+    helper.assert(hyperlinks.validateURL("carbone.io"), 'https://carbone.io');
+    helper.assert(hyperlinks.validateURL(`carbone.io?quer=23`), 'https://carbone.io/?quer=23');
+    helper.assert(hyperlinks.validateURL("www.carbone.com.au"), 'https://www.carbone.com.au');
+    helper.assert(hyperlinks.validateURL("www.carbone.com.au?key=value&name=john"), 'https://www.carbone.com.au/?key=value&name=john');
+    helper.assert(hyperlinks.validateURL("http://carbone.io?name=john&lastname=wick"), 'http://carbone.io/?name=john&lastname=wick');
+    helper.assert(hyperlinks.validateURL("https://carbone.io?name=john&lastname=wick"), 'https://carbone.io/?name=john&lastname=wick');
+    helper.assert(hyperlinks.validateURL("example.com:3000"), 'https://example.com:3000');
+    helper.assert(hyperlinks.validateURL("example.com:3000?key=value&name=john"), 'https://example.com:3000/?key=value&name=john');
+    helper.assert(hyperlinks.validateURL("my_test.asp?name=st%C3%A5le&amp;car=saab"), 'https://my_test.asp/?name=st%C3%A5le&amp;car=saab');
+    helper.assert(hyperlinks.validateURL("http://my_test.asp/?name=st%C3%A5le&amp;car=saab"), 'http://my_test.asp/?name=st%C3%A5le&amp;car=saab');
+    helper.assert(hyperlinks.validateURL("https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B"), 'https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
+    helper.assert(hyperlinks.validateURL("https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1"), 'https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1');
+    helper.assert(hyperlinks.validateURL(`carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`), `https://carbone.io/page/?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`);
+    helper.assert(hyperlinks.validateURL(`https://carbone.io/page/?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`), `https://carbone.io/page/?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`);
   });
 
-  it('[DOCX - utils] validateURL - should return the Carbone URL if the hyperlink is not valid', () => {
-    helper.assert(hyperlinks.validateURL("carbone.io?name=john&lastname=wick"), hyperlinks.URL_ON_ERROR);
+  it('[DOCX - utils] validateURL - should return an error URL when the URL is invalid', () => {
     helper.assert(hyperlinks.validateURL("javascript:void(0)"), hyperlinks.URL_ON_ERROR);
     helper.assert(hyperlinks.validateURL("dfdsfdsfdfdsfsdf"), hyperlinks.URL_ON_ERROR);
     helper.assert(hyperlinks.validateURL("magnet:?xt=urn:btih:123"), hyperlinks.URL_ON_ERROR);
     helper.assert(hyperlinks.validateURL(`http://my test.asp`), hyperlinks.URL_ON_ERROR);
-    helper.assert(hyperlinks.validateURL(`https://carbone.io?quer=23`), hyperlinks.URL_ON_ERROR);
-
   });
 
   it('[XLSX] should make a single hyperlink marker valid on a single sheet ("http://d.url" to "{d.url}")', function () {

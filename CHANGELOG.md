@@ -1,3 +1,6 @@
+### v3.0.3
+  - Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
+
 ### v3.0.2
   - Fix: accepts hyperlinks with &
   - Fix: do not crash if hyperlink is undefined

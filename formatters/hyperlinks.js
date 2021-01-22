@@ -33,6 +33,10 @@ function generateHyperlinkReference (hyperlink = '') {
     return '&amp;';
   });
 
+  if (/^https?:\/\//.test(hyperlink) === false) {
+    hyperlink = 'https://' + hyperlink;
+  }
+
   /** 3 - Verify if the URL is valid with a protocol, it protects libre office to include server local paths */
   if (hyperlinks.isValidHttpUrl(hyperlink) === false) {
     hyperlink = 'https://.';

@@ -376,8 +376,8 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://my test.asp`);
 
     const _it = _options.hyperlinkDatabase.keys();
+    helper.assert(_it.next().value, "https://carbone.io?name=john&amp;lastname=wick");
     helper.assert(_it.next().value, "https://.");
-    helper.assert(_it.next().value, undefined);
   });
 
   it('[XLSX] should make a single hyperlink marker valid on a single sheet ("http://d.url" to "{d.url}")', function () {

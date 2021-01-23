@@ -292,6 +292,8 @@ function _code39 (data) {
  * @example [ "GSJ-220097"    ,  "code39"  ]
  * @example [ "ASDFGH-.$/+% " ,  "code39"  ]
  *
+ * @version 2.0.0
+ *
  * @param   {String} data Barcode numbers
  * @param   {String} type Barcode type: `ean13`, `ean8`, `ean128` or `code39`
  * @returns {String}      translated  to EAN13.TTF font code or empty string

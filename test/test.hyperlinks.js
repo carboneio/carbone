@@ -1,6 +1,7 @@
 const carbone    = require('../lib/index');
 const helper     = require('./helper');
 const hyperlinks = require('../lib/hyperlinks');
+const hyperlinksFormatters = require('../formatters/hyperlinks');
 
 describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
 
@@ -209,6 +210,40 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
+  it('[DOCX - preprocess] should inject the special hyperlink inside the tag `w:instrText` at the top of the document.xml', function () {
+    const _template = {
+      files : [{
+        name : '_rels/document.xml.rels',
+        data : ''
+          + '<?xml version="1.0" encoding="UTF-8"?>'
+          + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+          + '<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="%7Bd.url%7D" TargetMode="External"/>'
+          + '</Relationships>'
+      },{
+        name : 'word/document.xml',
+        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK "%7Bd.url%7D" </w:instrText></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r w:rsidRPr="001D7338"><w:rPr><w:rStyle w:val="Hyperlink"/><w:lang w:val="en-US"/></w:rPr><w:t>Name</w:t></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r></w:p><w:p w14:paraId="370438E1" w14:textId="164335FC" w:rsidR="00D3621D" w:rsidRDefault="001D7338"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:hyperlink r:id="rId4" w:history="1"><w:proofErr w:type="spellStart"/><w:r w:rsidR="00D3621D" w:rsidRPr="00D3621D"><w:rPr><w:rStyle w:val="Hyperlink"/><w:lang w:val="en-US"/></w:rPr><w:t>Lastname</w:t></w:r><w:proofErr w:type="spellEnd"/></w:hyperlink></w:p><w:p w14:paraId="7EA8F894" w14:textId="3355503C" w:rsidR="00D3621D" w:rsidRDefault="00D3621D"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr></w:p><w:p w14:paraId="6AF3DB0C" w14:textId="6C1644E8" w:rsidR="00D3621D" w:rsidRPr="00D3621D" w:rsidRDefault="001D7338"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr></w:p><w:sectPr w:rsidR="00D3621D" w:rsidRPr="00D3621D"><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/><w:cols w:space="708"/><w:docGrid w:linePitch="360"/></w:sectPr></w:body></w:document>'
+      }]
+    };
+    const _expectedRelsResult = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK "{d.url}" </w:instrText></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r w:rsidRPr="001D7338"><w:rPr><w:rStyle w:val="Hyperlink"/><w:lang w:val="en-US"/></w:rPr><w:t>Name</w:t></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r></w:p><w:p w14:paraId="370438E1" w14:textId="164335FC" w:rsidR="00D3621D" w:rsidRDefault="001D7338"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:hyperlink r:id="{d.url:generateHyperlinkReference()}" w:history="1"><w:proofErr w:type="spellStart"/><w:r w:rsidR="00D3621D" w:rsidRPr="00D3621D"><w:rPr><w:rStyle w:val="Hyperlink"/><w:lang w:val="en-US"/></w:rPr><w:t>Lastname</w:t></w:r><w:proofErr w:type="spellEnd"/></w:hyperlink></w:p><w:p w14:paraId="7EA8F894" w14:textId="3355503C" w:rsidR="00D3621D" w:rsidRDefault="00D3621D"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr></w:p><w:p w14:paraId="6AF3DB0C" w14:textId="6C1644E8" w:rsidR="00D3621D" w:rsidRPr="00D3621D" w:rsidRDefault="001D7338"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr></w:p><w:sectPr w:rsidR="00D3621D" w:rsidRPr="00D3621D"><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/><w:cols w:space="708"/><w:docGrid w:linePitch="360"/></w:sectPr></w:body></w:document>';
+    hyperlinks.preProcesstHyperlinksDocx(_template);
+    helper.assert(_template.files[0].data, _expectedRelsResult);
+    helper.assert(_template.files[1].data, _expectedDocumentResult);
+  });
+
+  it('[DOCX - preprocess] should do nothing if the link inside `w:instrText` at the top of the document.xml is not a Carbone marker', function () {
+    const _templateData = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK "https://carbone.io/documentation.html#getting-started-with-carbone-js" </w:instrText></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r w:rsidRPr="001D7338"><w:rPr><w:rStyle w:val="Hyperlink"/><w:lang w:val="en-US"/></w:rPr><w:t>Name</w:t></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r></w:p><w:sectPr w:rsidR="00D3621D" w:rsidRPr="00D3621D"><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/><w:cols w:space="708"/><w:docGrid w:linePitch="360"/></w:sectPr></w:body></w:document>';
+    const _template = {
+      files : [{
+        name : 'word/document.xml',
+        data : _templateData
+      }]
+    };
+    hyperlinks.preProcesstHyperlinksDocx(_template);
+    helper.assert(_template.files[0].data, _templateData);
+  });
+
   it('[DOCX - preprocess] should remove multiple hyperlinks marker from the rels file and move them to the document.xml file', function () {
     const _template = {
       files : [{
@@ -276,7 +311,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
-  it('[DOCX post-process] should fill the relation file from the hyperlinkDatabase', function () {
+  it('[DOCX - post-process] should fill the relation file from the hyperlinkDatabase', function () {
     const _template = {
       files : [{
         name : 'word/_rels/document.xml.rels',
@@ -306,6 +341,44 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[0].data, _expectedResult);
   });
 
+  it('[DOCX - formatter] generateHyperlinkReference - Add encoded and not encoded', function () {
+    const _options = {
+      hyperlinkDatabase : new Map()
+    };
+    // ENCODED
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "https://carbone.io?name=john&lastname=wick");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&f=1&nofb=1`);
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B");
+
+    // NOT ENCODED
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `https://carbone.io/?x=шеллые`);
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://carbone.io/page?arg=12&arg1="value"&arg2>=23&arg3<=23&arg4='valu2'`);
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://my_test.asp?name=ståle&car=saab`);
+
+    const _it = _options.hyperlinkDatabase.keys();
+    helper.assert(_it.next().value, "https://carbone.io?name=john&amp;lastname=wick");
+    helper.assert(_it.next().value, "https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1");
+    helper.assert(_it.next().value, "https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B");
+    helper.assert(_it.next().value, "https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B%D0%B5");
+    helper.assert(_it.next().value, "http://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'");
+    helper.assert(_it.next().value, "http://my_test.asp?name=st%C3%A5le&amp;car=saab");
+  });
+
+  it('[DOCX - formatter] generateHyperlinkReference - should set by default "https://." if the URL is invalid', function () {
+    const _options = {
+      hyperlinkDatabase : new Map()
+    };
+
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "carbone.io?name=john&lastname=wick");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "javascript:void(0)");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "dfdsfdsfdfdsfsdf");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, "magnet:?xt=urn:btih:123");
+    hyperlinksFormatters.generateHyperlinkReference.call(_options, `http://my test.asp`);
+
+    const _it = _options.hyperlinkDatabase.keys();
+    helper.assert(_it.next().value, "https://carbone.io?name=john&amp;lastname=wick");
+    helper.assert(_it.next().value, "https://.");
+  });
 
   it('[XLSX] should make a single hyperlink marker valid on a single sheet ("http://d.url" to "{d.url}")', function () {
     const _template = {

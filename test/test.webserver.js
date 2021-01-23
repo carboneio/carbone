@@ -151,12 +151,12 @@ describe('Webserver', () => {
         const _bind = '127.0.0.1';
         const _studio = true;
         const _studioUser = 'root:1234';
-        const _templatePathRetention = "30";
+        const _templatePathRetention = '30';
         const _lang = 'zh-tw';
         const _timezone = 'Asia/Singapore';
         const _currencySource = 'CNY';
         const _currencyTarget = 'EUR';
-        const _licenseDir = "/var/tmp/test/"
+        const _licenseDir = '/var/tmp/test/';
         const _licenseDirPrev = params.licenseDir;
         webserver = require('../lib/webserver');
         webserver.handleParams(['--port', _port,
@@ -884,7 +884,7 @@ describe('Webserver', () => {
         done();
       });
 
-      it('should retrieve the render file', (done) => {
+      it('should retrieve the render file and set content type and charset', (done) => {
         const body = {
           data : {
             firstname : 'John',
@@ -899,8 +899,31 @@ describe('Webserver', () => {
           assert.strictEqual(err, null);
           get.concat(getBody(4000, `/render/${data.data.renderId}`, 'GET'), (err, res, data) => {
             assert.strictEqual(err, null);
+            assert.strictEqual(res.headers['content-type'], 'text/html; charset=UTF-8');
             assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
             assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+            done();
+          });
+        });
+      });
+
+      it('should retrieve the render file and set content type and no charset for PDF', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          reportName : 'renderedReport',
+          complement : {},
+          enum       : {},
+          convertTo  : 'pdf'
+        };
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          assert.strictEqual(err, null);
+          get.concat(getBody(4000, `/render/${data.data.renderId}`, 'GET'), (err, res) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(res.headers['content-type'], 'application/pdf');
+            assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.pdf"');
             done();
           });
         });

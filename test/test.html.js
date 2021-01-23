@@ -579,14 +579,146 @@ describe.only('Dynamic HTML', function () {
         helper.assert(html.buildContentDOCX(null), '');
       });
 
+
       it('should return nothing if the descriptor has only 1 element', function () {
         helper.assert(html.buildContentDOCX([{ content : 'text', tags : ['b'] }]), '' +
-        '<w:r>' +
-          '<w:rPr>' +
-            '<w:b/><w:bCs/>' +
-          '</w:rPr>' +
-          '<w:t xml:space="preserve">text</w:t>' +
-        '</w:r>');
+        '<w:p>'+
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:b/><w:bCs/>' +
+            '</w:rPr>' +
+            '<w:t xml:space="preserve">text</w:t>' +
+          '</w:r>'+
+        '</w:p>');
+      });
+
+      it('should convert HTML to DOCX xml 1', function () {
+        const _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:b/><w:bCs/></w:rPr>'+
+            '<w:t xml:space="preserve">Hello</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:rPr></w:rPr>'+
+            '<w:t xml:space="preserve"> thit is some text</w:t>'+
+          '</w:r>'+
+        '</w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 2', function () {
+        const _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p><i>John</i>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:b/><w:bCs/></w:rPr>'+
+            '<w:t xml:space="preserve">Hello</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:rPr></w:rPr>'+
+            '<w:t xml:space="preserve"> thit is some text</w:t>'+
+          '</w:r>'+
+        '</w:p>' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:i/><w:iCs/></w:rPr>'+
+            '<w:t xml:space="preserve">John</w:t>'+
+          '</w:r>'+
+        '</w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 3', function () {
+        const _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p><i>John</i> green blue red");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:b/><w:bCs/></w:rPr>'+
+            '<w:t xml:space="preserve">Hello</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:rPr></w:rPr>'+
+            '<w:t xml:space="preserve"> thit is some text</w:t>'+
+          '</w:r>'+
+        '</w:p>' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:i/><w:iCs/></w:rPr>'+
+            '<w:t xml:space="preserve">John</w:t>'+
+          '</w:r>'+
+        '</w:p>' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr></w:rPr>'+
+            '<w:t xml:space="preserve"> green blue red</w:t>'+
+          '</w:r>'+
+        '</w:p>'
+        );
+      });
+
+      it.skip('should convert HTML to DOCX xml 4', function () {
+        const _descriptor = html.parseHTML("<i>John</i><p><strong>Hello</strong> thit is some text</p>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:i/><w:iCs/></w:rPr>'+
+            '<w:t xml:space="preserve">John</w:t>'+
+          '</w:r>'+
+        '</w:p>' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:b/><w:bCs/></w:rPr>'+
+            '<w:t xml:space="preserve">Hello</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:rPr></w:rPr>'+
+            '<w:t xml:space="preserve"> thit is some text</w:t>'+
+          '</w:r>'+
+        '</w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 5: SIMPLE LIST', function () {
+        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 6: NESTED LIST 1 level', function () {
+        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea</li></ul></li><li>Milk</li></ul>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Black tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Green tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 7: NESTED LIST 2 level', function () {
+        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><li>Soft Green</li><li>light Green</li></ul></li></ul></li><li>Milk</li></ul>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Black tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Green tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Dark Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Soft Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>light Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:pStyle w:val="ListParagraph"/><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
+        );
       });
 
       it('should return the DOCX xml content based on the descriptor', function () {
@@ -595,18 +727,23 @@ describe.only('Dynamic HTML', function () {
             { content : 'bold', tags : ['b'] },
             { content : 'and italic', tags : ['em'] }
           ]
-        ), '<w:r>' +
+        ),
+          '<w:p>'+
+            '<w:r>' +
               '<w:rPr>' +
                 '<w:b/><w:bCs/>' +
               '</w:rPr>' +
               '<w:t xml:space="preserve">bold</w:t>' +
             '</w:r>' +
+          '</w:p>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr>' +
                 '<w:i/><w:iCs/>' +
               '</w:rPr>' +
               '<w:t xml:space="preserve">and italic</w:t>' +
-            '</w:r>'
+            '</w:r>'+
+          '</w:p>'
         );
 
         helper.assert(html.buildContentDOCX(
@@ -616,26 +753,34 @@ describe.only('Dynamic HTML', function () {
             { content : 'and italic', tags : ['em'] },
             { content : ' text', tags : [] },
           ]
-        ), '<w:r>' +
+        ),'<w:p>'+
+          '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve">this</w:t>' +
             '</w:r>' +
+          '</w:p>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr>' +
                 '<w:b/><w:bCs/>' +
               '</w:rPr>' +
               '<w:t xml:space="preserve"> is a bold</w:t>' +
             '</w:r>' +
+          '</w:p>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr>' +
                 '<w:i/><w:iCs/>' +
               '</w:rPr>' +
               '<w:t xml:space="preserve">and italic</w:t>' +
             '</w:r>' +
+          '</w:p>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve"> text</w:t>' +
-            '</w:r>'
+            '</w:r>' +
+          '</w:p>'
         );
       });
 
@@ -650,12 +795,16 @@ describe.only('Dynamic HTML', function () {
             { content : 'text', tags : ['div', 'b', 's'] },
             { content : '.', tags : [] },
           ]
-        ), '<w:r>'+
+        ),
+          '<w:p>'+
+            '<w:r>'+
               '<w:rPr>'+
                 '<w:b/><w:bCs/>'+
               '</w:rPr>'+
               '<w:t xml:space="preserve">this </w:t>'+
             '</w:r>'+
+          '</w:p>' +
+          '<w:p>'+
             '<w:r>'+
               '<w:rPr>'+
                 '<w:b/><w:bCs/>'+
@@ -683,16 +832,21 @@ describe.only('Dynamic HTML', function () {
               '</w:rPr>'+
               '<w:t xml:space="preserve">italic </w:t>'+
             '</w:r>'+
+          '</w:p>' +
+          '<w:p>'+
             '<w:r>'+
               '<w:rPr>'+
                 '<w:b/><w:bCs/><w:strike/>'+
               '</w:rPr>'+
               '<w:t xml:space="preserve">text</w:t>'+
             '</w:r>'+
+          '</w:p>' +
+          '<w:p>'+
             '<w:r>'+
               '<w:rPr></w:rPr>'+
               '<w:t xml:space="preserve">.</w:t>'+
-            '</w:r>'
+            '</w:r>' +
+          '</w:p>'
         );
       });
 
@@ -703,17 +857,21 @@ describe.only('Dynamic HTML', function () {
             { content : '#break#', tags : [] },
             { content : 'a tree', tags : ['i'] },
           ]
-        ), '<w:r>' +
-              '<w:rPr></w:rPr>' +
-              '<w:t xml:space="preserve">This is </w:t>' +
-            '</w:r>' +
-            '<w:br/>' +
-            '<w:r>' +
-              '<w:rPr>' +
-                '<w:i/><w:iCs/>' +
-              '</w:rPr>' +
-              '<w:t xml:space="preserve">a tree</w:t>' +
-            '</w:r>'
+        ), '<w:p>'+
+              '<w:r>' +
+                '<w:rPr></w:rPr>' +
+                '<w:t xml:space="preserve">This is </w:t>' +
+              '</w:r>' +
+            '</w:p>' +
+            '<w:p/>' +
+            '<w:p>'+
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:i/><w:iCs/>' +
+                '</w:rPr>' +
+                '<w:t xml:space="preserve">a tree</w:t>' +
+              '</w:r>' +
+            '</w:p>'
         );
 
         helper.assert(html.buildContentDOCX(
@@ -731,36 +889,48 @@ describe.only('Dynamic HTML', function () {
             { content : '#break#', tags : [] },
             { content : '.', tags : [] }
           ]
-        ), '<w:r>' +
+        ), '<w:p>'+
+            '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve">This </w:t>' +
             '</w:r>' +
-            '<w:br/>' +
+          '</w:p>'+
+          '<w:p/>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve"> is</w:t>' +
             '</w:r>' +
-            '<w:br/>' +
+          '</w:p>'+
+          '<w:p/>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve">a</w:t>' +
             '</w:r>' +
-            '<w:br/>' +
+          '</w:p>'+
+          '<w:p/>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve">simple</w:t>' +
             '</w:r>' +
-            '<w:br/>' +
-            '<w:br/>' +
+          '</w:p>'+
+          '<w:p/>' +
+          '<w:p/>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve"> text</w:t>' +
             '</w:r>' +
-            '<w:br/>' +
+          '</w:p>'+
+          '<w:p/>' +
+          '<w:p>'+
             '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve">.</w:t>' +
-            '</w:r>'
+            '</w:r>' +
+          '</w:p>'
         );
 
       });
@@ -770,7 +940,7 @@ describe.only('Dynamic HTML', function () {
       it('should add content element to htmlDatabase', () => {
         const _expected =  {
           id      : 0,
-          content : '<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r>'
+          content : '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve\">This is some content</w:t></w:r></w:p>'
         };
         const _options = {
           htmlDatabase : new Map()
@@ -790,13 +960,13 @@ describe.only('Dynamic HTML', function () {
         const _content = 'I have&nbsp;to creates bills in euro <i>&euro;</i>, Yen <i>&yen;</i> and Pound <b>&pound;</b>.';
         const _expected =  {
           id      : 0,
-          content : '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">I have&#160;to creates bills in euro </w:t></w:r>' +
-                    '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">€</w:t></w:r>' +
-                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">, Yen </w:t></w:r>' +
-                    '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r>' +
-                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve"> and Pound </w:t></w:r>' +
-                    '<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">£</w:t></w:r>' +
-                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">.</w:t></w:r>'
+          content : '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">I have&#160;to creates bills in euro </w:t></w:r></w:p>' +
+                    '<w:p><w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">€</w:t></w:r></w:p>' +
+                    '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">, Yen </w:t></w:r></w:p>' +
+                    '<w:p><w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r></w:p>' +
+                    '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve"> and Pound </w:t></w:r></w:p>' +
+                    '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">£</w:t></w:r></w:p>' +
+                    '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">.</w:t></w:r></w:p>'
         };
         htmlFormatters.getHTMLContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
@@ -808,7 +978,9 @@ describe.only('Dynamic HTML', function () {
         const _content = '<em><b>Apples are red</b></em><br><u> hello </u>';
         const _expected = {
           id      : 0,
-          content : '<w:r><w:rPr><w:i/><w:iCs/><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">Apples are red</w:t></w:r><w:br/><w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve"> hello </w:t></w:r>',
+          content : '<w:p><w:r><w:rPr><w:i/><w:iCs/><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">Apples are red</w:t></w:r></w:p>'+
+                    '<w:p/>'+
+                    '<w:p><w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve"> hello </w:t></w:r></w:p>',
         };
         const _options = {
           htmlDatabase : new Map()

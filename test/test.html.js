@@ -3,7 +3,7 @@ const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 const assert = require('assert');
 
-describe('Dynamic HTML', function () {
+describe.only('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -317,7 +317,7 @@ describe('Dynamic HTML', function () {
       });
     });
   });
-  describe.only('Docx Documents', function () {
+  describe('Docx Documents', function () {
     describe('preProcessDocx', function () {
       it('should do nothing is the content does not contain HTML markers', function () {
         const _expectedContent = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t>Some text 12345</w:t></w:r></w:p><w:sectPr w:rsidR="002B2418" w:rsidRPr="00ED3CF0"><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/><w:cols w:space="708"/><w:docGrid w:linePitch="360"/></w:sectPr></w:body></w:document>';
@@ -651,7 +651,13 @@ describe('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 1', function () {
-        const _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p>");
+        let _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p>");
+        // _descriptor = [
+        //   { content: '#PB#', tags: [] },
+        //   { content: 'Hello', tags: ['strong'] },
+        //   { content: ' thit is some text', tags: [] },
+        //   { content: '#PE#', tags: [ ] }
+        // ]
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
         '<w:p>'+
@@ -669,7 +675,14 @@ describe('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 2', function () {
-        const _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p><i>John</i>");
+        let _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p><i>John</i>");
+        // _descriptor = [
+        //   { content: '#PB#', tags: [] },
+        //   { content: 'Hello', tags: ['strong'] },
+        //   { content: ' thit is some text', tags: [] },
+        //   { content: '#PE#', tags: [ ] },
+        //   { content: 'John', tags: ['i'] }
+        // ]
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
         '<w:p>'+
@@ -693,9 +706,16 @@ describe('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 3', function () {
-        const _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p><i>John</i> green blue red");
-        const _res = html.buildContentDOCX(_descriptor);
-        console.log(_res);
+        let _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p><i>John</i> green blue red");
+        // _descriptor = [
+        //   { content: '#PB#', tags: [] },
+        //   { content: 'Hello', tags: ['strong'] },
+        //   { content: ' thit is some text', tags: [] },
+        //   { content: '#PE#', tags: [ ] },
+        //   { content: 'John', tags: ['i'] },
+        //   { content: ' green blue red', tags: [ ] },
+        // ]
+        let _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
         '<w:p>'+
           '<w:r>'+
@@ -722,7 +742,14 @@ describe('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 4', function () {
-        const _descriptor = html.parseHTML("<i>John</i><p><strong>Hello</strong> thit is some text</p>");
+        let _descriptor = html.parseHTML("<i>John</i><p><strong>Hello</strong> thit is some text</p>");
+        // _descriptor = [
+        //   { content: 'John', tags: [ 'i' ] },
+        //   { content: '#PB#', tags: [ ] },
+        //   { content: 'Hello', tags: [ 'strong' ] },
+        //   { content: ' thit is some text', tags: [] },
+        //   { content: '#PE#', tags: [ ] },
+        // ]
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
         '<w:p>'+
@@ -745,11 +772,36 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it.skip('should convert HTML to DOCX xml 5', function () {
-        const _descriptor = html.parseHTML("<p>Professional Accreditation</p><p><strong>La Trobes Bachelor of Biomedicine</strong></p>");
-        console.log(_descriptor[0], _descriptor[1]);
+      it('should convert HTML to DOCX xml 5', function () {
+        let _descriptor = html.parseHTML("<p>Professional Accreditation</p><p><strong>La Trobes Bachelor of Biomedicine</strong></p>");
+        // _descriptor = [
+        //   {
+        //     content: '#PB#',
+        //     tags: [ ]
+        //   },
+        //   {
+        //     content: 'Professional Accreditation',
+        //     tags: [ ]
+        //   },
+        //   {
+        //     content: '#PE#',
+        //     tags: [ ]
+        //   },
+        //   {
+        //     content: '#PB#',
+        //     tags: [ ]
+        //   },
+        //   {
+        //     content: 'La Trobes Bachelor of Biomedicine',
+        //     tags: [ 'strong' ]
+        //   },
+        //   {
+        //     content: '#PE#',
+        //     tags: [ ]
+        //   },
+        // ]
         const _res = html.buildContentDOCX(_descriptor);
-        console.log(_res);
+
         helper.assert(_res, '' +
         '<w:p>'+
           '<w:r>'+
@@ -768,11 +820,34 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should convert HTML to DOCX xml 5', function () {
+        let _descriptor = html.parseHTML("<p><strong><p>Professional Accreditation</p></strong></p><p><em>La <p>Trobes</p></em></p>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:b/><w:bCs/></w:rPr>'+
+            '<w:t xml:space="preserve">Professional Accreditation</w:t>'+
+          '</w:r>'+
+        '</w:p>' +
+        '<w:p/>' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:i/><w:iCs/></w:rPr>'+
+            '<w:t xml:space="preserve">La </w:t>'+
+          '</w:r>' +
+          '<w:r>'+
+            '<w:rPr><w:i/><w:iCs/></w:rPr>'+
+            '<w:t xml:space="preserve">Trobes</w:t>'+
+          '</w:r>' +
+        '</w:p>' +
+        '<w:p/>'
+        );
+      });
+
       it.skip('should convert HTML to DOCX xml 6 hyperlink', function () {
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</p>');
-        console.log(_descriptor);
         const _res = html.buildContentDOCX(_descriptor);
-        console.log(_res);
         helper.assert(_res, '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
@@ -882,9 +957,11 @@ describe('Dynamic HTML', function () {
           [
             { content : 'this ', tags : ['div', 'b'] },
             { content : ' is a bold', tags : ['div', 'b', 'u'] },
-            { content : ' text ', tags : ['div', 'b', 'u',  'p', 'em'] },
-            { content : 'and ', tags : ['div', 'b', 'p', 'em'] },
-            { content : 'italic ', tags : ['div', 'b', 'p', 'em', 's'] },
+            { content : '#PB#', tags : [] },
+            { content : ' text ', tags : ['div', 'b', 'u', 'em'] },
+            { content : 'and ', tags : ['div', 'b', 'em'] },
+            { content : 'italic ', tags : ['div', 'b', 'em', 's'] },
+            { content : '#PE#', tags : [] },
             { content : 'text', tags : ['div', 'b', 's'] },
             { content : '.', tags : [] },
           ]
@@ -966,13 +1043,15 @@ describe('Dynamic HTML', function () {
 
         helper.assert(html.buildContentDOCX(
           [
-            { content : 'This ', tags : ['p'] },
-            { content : '#break#', tags : ['p'] },
-            { content : ' is', tags : ['p'] },
-            { content : '#break#', tags : ['p'] },
-            { content : 'a', tags : ['p'] },
-            { content : '#break#', tags : ['p'] },
-            { content : 'simple', tags : ['p'] },
+            { content : '#PB#', tags : [] },
+            { content : 'This ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : ' is', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'simple', tags : [] },
+            { content : '#PE#', tags : [] },
             { content : '#break#', tags : [] },
             { content : '#break#', tags : [] },
             { content : ' text', tags : [] },
@@ -1020,7 +1099,7 @@ describe('Dynamic HTML', function () {
       });
     });
 
-    describe.skip('formatters/postProcessFormatters DOCX', function () {
+    describe('formatters/postProcessFormatters DOCX', function () {
       it('should add content element to htmlDatabase', () => {
         const _expected =  {
           id      : 0,
@@ -1044,13 +1123,13 @@ describe('Dynamic HTML', function () {
         const _content = 'I have&nbsp;to creates bills in euro <i>&euro;</i>, Yen <i>&yen;</i> and Pound <b>&pound;</b>.';
         const _expected =  {
           id      : 0,
-          content : '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">I have&#160;to creates bills in euro </w:t></w:r></w:p>' +
-                    '<w:p><w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">€</w:t></w:r></w:p>' +
-                    '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">, Yen </w:t></w:r></w:p>' +
-                    '<w:p><w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r></w:p>' +
-                    '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve"> and Pound </w:t></w:r></w:p>' +
-                    '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">£</w:t></w:r></w:p>' +
-                    '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">.</w:t></w:r></w:p>'
+          content : '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">I have&#160;to creates bills in euro </w:t></w:r>' +
+                    '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">€</w:t></w:r>' +
+                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">, Yen </w:t></w:r>' +
+                    '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r>' +
+                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve"> and Pound </w:t></w:r>' +
+                    '<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">£</w:t></w:r>' +
+                    '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">.</w:t></w:r></w:p>'
         };
         htmlFormatters.getHTMLContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
@@ -1062,9 +1141,8 @@ describe('Dynamic HTML', function () {
         const _content = '<em><b>Apples are red</b></em><br><u> hello </u>';
         const _expected = {
           id      : 0,
-          content : '<w:p><w:r><w:rPr><w:i/><w:iCs/><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">Apples are red</w:t></w:r></w:p>'+
-                    '<w:p/>'+
-                    '<w:p><w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve"> hello </w:t></w:r></w:p>',
+          content : '<w:p><w:r><w:rPr><w:i/><w:iCs/><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">Apples are red</w:t></w:r>'+
+                    '<w:br/><w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve"> hello </w:t></w:r></w:p>',
         };
         const _options = {
           htmlDatabase : new Map()
@@ -1113,7 +1191,7 @@ describe('Dynamic HTML', function () {
         helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', tags : ['b'] } ]);
         helper.assert(html.parseHTML('<i>Italic content</i>'), [ { content : 'Italic content', tags : ['i'] } ]);
         helper.assert(html.parseHTML('<s>Striked content</s>'), [ { content : 'Striked content', tags : ['s'] } ]);
-        helper.assert(html.parseHTML('<p id="1234"> simple text </p>'), [ { content : ' simple text ', tags : ['p'] } ]);
+        helper.assert(html.parseHTML('<span id="1234"> simple text </span>'), [ { content : ' simple text ', tags : ['span'] } ]);
       });
 
       it('should not consider a tag "brie" is a carriage return', function () {
@@ -1299,6 +1377,33 @@ describe('Dynamic HTML', function () {
             { content : 'is ', tags : ['u'] },
             { content : 'wonderful', tags : ['u', 's'] },
             { content : '.', tags : [] }
+          ]
+        );
+      });
+      it('should parse HTML content with PARAGRAPHE tags <p> [MIX]', function () {
+        helper.assert(html.parseHTML('<p>This is <br><i>a tree</i></p>'),
+          [
+            { content : '#PB#', tags : [] },
+            { content : 'This is ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : 'a tree', tags : ['i'] },
+            { content : '#PE#', tags : [] },
+          ]
+        );
+        helper.assert(html.parseHTML('Beginning <p>some content <p>This is <br><i><p>a tree</p></i></p> end of sentence</p>'),
+          [
+            { content : 'Beginning ', tags : [] },
+            { content : '#PB#', tags : [] },
+            { content : 'some content ', tags : [] },
+            { content : '#PB#', tags : [] },
+            { content : 'This is ', tags : [] },
+            { content : '#break#', tags : [] },
+            { content : '#PB#', tags : [] },
+            { content : 'a tree', tags : ['i'] },
+            { content : '#PE#', tags : [] },
+            { content : '#PE#', tags : [] },
+            { content : ' end of sentence', tags : [] },
+            { content : '#PE#', tags : [] },
           ]
         );
       });

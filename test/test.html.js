@@ -845,7 +845,7 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it('should convert HTML to DOCX xml 8 string followed by a list', function () {
+      it('should convert HTML to DOCX xml 6 string followed by a list', function () {
         let _descriptor = html.parseHTML('You’ll learn<ul><li>Understand</li></ul>');
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
@@ -864,7 +864,57 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it.skip('should convert HTML to DOCX xml 6 hyperlink', function () {
+      it('should convert HTML to DOCX xml 7: SIMPLE LIST', function () {
+        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 8: NESTED LIST 1 level', function () {
+        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea</li></ul></li><li>Milk</li></ul>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Black tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Green tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 9: NESTED LIST 2 level', function () {
+        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><li>Soft Green</li><li>light Green</li></ul></li></ul></li><li>Milk</li></ul>");
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Black tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Green tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Dark Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Soft Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>light Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 10: LIST with malformed HTML (content between ul and li)', function () {
+        const _descriptor = html.parseHTML("<ul>Hello 1<li>Coffee</li>Hello 2<li>Tea</li>Hello 3</ul>");
+        console.log(_descriptor);
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+          '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">Hello 1</w:t></w:r></w:p>' + // simple text
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' + // list
+          '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">Hello 2</w:t></w:r></w:p>' + // simple text 2
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' + // list
+          '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">Hello 3</w:t></w:r></w:p>' // simple text 3
+        );
+      });
+
+      it.skip('should convert HTML to DOCX xml 10 hyperlink simple', function () {
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a>');
         console.log(_descriptor);
         const _res = html.buildContentDOCX(_descriptor);
@@ -877,43 +927,6 @@ describe.only('Dynamic HTML', function () {
             '</w:r>' +
           '</w:hyperlink>' +
         '</w:p>'
-        );
-      });
-
-      it('should convert HTML to DOCX xml 5: SIMPLE LIST', function () {
-        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>");
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
-        );
-      });
-
-      it('should convert HTML to DOCX xml 6: NESTED LIST 1 level', function () {
-        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea</li></ul></li><li>Milk</li></ul>");
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Black tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Green tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
-        );
-      });
-
-      it('should convert HTML to DOCX xml 7: NESTED LIST 2 level', function () {
-        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><li>Soft Green</li><li>light Green</li></ul></li></ul></li><li>Milk</li></ul>");
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Black tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Green tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Dark Green</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Soft Green</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>light Green</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Milk</w:t></w:r></w:p>'
         );
       });
 
@@ -1123,7 +1136,7 @@ describe.only('Dynamic HTML', function () {
       it('should add content element to htmlDatabase', () => {
         const _expected =  {
           id      : 0,
-          content : '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve\">This is some content</w:t></w:r></w:p>'
+          content : '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r></w:p>'
         };
         const _options = {
           htmlDatabase : new Map()
@@ -1464,6 +1477,18 @@ describe.only('Dynamic HTML', function () {
       it('should convert unsupported HTML entities into valid HTML entities [special characters]', function () {
         const _content = '<div>This &cent; is &pound; an &yen; <b>apple &euro;</b> &copy; and &reg; <i>strawberry</i>.</div>';
         const _expected = '<div>This ¢ is £ an ¥ <b>apple €</b> © and ® <i>strawberry</i>.</div>';
+        helper.assert(html.convertHTMLEntities(_content), _expected);
+      });
+
+      it('should remove "\\r\\n|\\n|\\r|\\t"', function () {
+        const _content = '\t\t\t<div>\rThis is an <b>apple</b>\n and <i>strawberry</i>.</div>\r\n';
+        const _expected = '<div>This is an <b>apple</b> and <i>strawberry</i>.</div>';
+        helper.assert(html.convertHTMLEntities(_content), _expected);
+      });
+
+      it('should remove "\\r\\n|\\n|\\r|\\t" and convert html entities', function () {
+        const _content = '<div>'+String.fromCharCode(10)+'This is&euro; an'+String.fromCharCode(13)+' <b>apple</b>'+String.fromCharCode(9)+' and <i>strawberry&pound;</i>.</div>\r\n';
+        const _expected = '<div>This is€ an <b>apple</b> and <i>strawberry£</i>.</div>';
         helper.assert(html.convertHTMLEntities(_content), _expected);
       });
     });

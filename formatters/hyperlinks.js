@@ -2,35 +2,14 @@ const hyperlinks = require('../lib/hyperlinks');
 
 /**
  * @private
- * @description Add hyperlinks to the option.hyperlinkDatabse
- * @param {Object} options Carbone options that contains the hyperlinkDatabse
- * @param {String} hyperlink new hyperlink to insert
- */
-function addLinkDatabase (options, hyperlink) {
-  if (!options.hyperlinkDatabase.has(hyperlink)) {
-    // If the image doesn't exist, it create a new ID
-    options.hyperlinkDatabase.set(hyperlink, {
-      id : options.hyperlinkDatabase.size
-    });
-  }
-}
-
-/**
- * @private
  * @description Formatter used to add the hyperlink to the database and to return a post process formatter.
  * @param {String} hyperlink New hyperlink
  * @returns {Function} Post process formatter
  */
 function generateHyperlinkReference (hyperlink = '') {
-  /** Encode & character to avoid libre office crash*/
-  hyperlink = hyperlink.replace(/&/g, () => {
-    return '&amp;';
-  });
-
-  /** 3 - Check the URL */
-  hyperlink = hyperlinks.validateURL(hyperlink);
-
-  addLinkDatabase(this, hyperlink);
+  /** Check the URL */
+  hyperlink = hyperlinks.validateURL(hyperlink, "docx");
+  hyperlinks.addLinkDatabase(this, hyperlink);
   return {
     fn   : generateHyperkinReferencePostProcessing,
     args : [hyperlink]

@@ -5,14 +5,26 @@ const hyperlinksFormatters = require('../formatters/hyperlinks');
 
 describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
 
-  it('[ODT/ODS] should correct a xlink:href unicode to ascii and remove incorrect text before with only one Carbone marker', function () {
+  it('[ODT/ODS] should not do anything if the link is not a "<draw:a>" or "<text:a>"', function () {
     const _template = {
       files : [{
         name : 'content.xml',
         data : 'xlink:href="This is some text that should not be displayed here%7Bd.url%7D"'
       }]
     };
-    const _expectedResult = 'xlink:href="{d.url:validateURL}"';
+    const _expectedResult = 'xlink:href="This is some text that should not be displayed here%7Bd.url%7D"';
+    hyperlinks.insertHyperlinksLO(_template);
+    helper.assert(_template.files[0].data, _expectedResult);
+  });
+
+  it('[ODT/ODS] should correct a xlink:href unicode to ascii and remove incorrect text before with only one Carbone marker', function () {
+    const _template = {
+      files : [{
+        name : 'content.xml',
+        data : '<draw:a xlink:href="This is some text that should not be displayed here%7Bd.url%7D"'
+      }]
+    };
+    const _expectedResult = '<draw:a xlink:href="{d.url:validateURL}"';
     hyperlinks.insertHyperlinksLO(_template);
     helper.assert(_template.files[0].data, _expectedResult);
   });
@@ -21,10 +33,10 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     const _template = {
       files : [{
         name : 'content.xml',
-        data : 'xlink:href="%7Bd.url%7DThis is some text that should not be displayed here"'
+        data : '<text:a xlink:type="simple" xlink:href="%7Bd.url%7DThis is some text that should not be displayed here"'
       }]
     };
-    const _expectedResult = 'xlink:href="{d.url:validateURL}"';
+    const _expectedResult = '<text:a xlink:type="simple" xlink:href="{d.url:validateURL}"';
     hyperlinks.insertHyperlinksLO(_template);
     helper.assert(_template.files[0].data, _expectedResult);
   });
@@ -33,10 +45,10 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     const _template = {
       files : [{
         name : 'content.xml',
-        data : 'xlink:href="file:///Users/Documents/carbone-test/hyperlink/hyperlink-odt/%7Bd.url%7Dthis is some textThis is again some text"'
+        data : '<text:a xlink:href="file:///Users/Documents/carbone-test/hyperlink/hyperlink-odt/%7Bd.url%7Dthis is some textThis is again some text"'
       }]
     };
-    const _expectedResult = 'xlink:href="{d.url:validateURL}"';
+    const _expectedResult = '<text:a xlink:href="{d.url:validateURL}"';
     hyperlinks.insertHyperlinksLO(_template);
     helper.assert(_template.files[0].data, _expectedResult);
   });
@@ -367,7 +379,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_it.next().value, undefined);
   });
 
-  it('[DOCX - utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
+  it('[utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
     helper.assert(hyperlinks.validateURL("carbone.io"), 'https://carbone.io');
     helper.assert(hyperlinks.validateURL("www.carbone.com.au"), 'https://www.carbone.com.au');
     helper.assert(hyperlinks.validateURL("www.carbone.com.au/?key=value&name=john"), 'https://www.carbone.com.au/?key=value&name=john');
@@ -383,7 +395,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(hyperlinks.validateURL(`https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`), `https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`);
   });
 
-  it('[DOCX - utils] validateURL - should return an error URL when the URL is invalid', () => {
+  it('[utils] validateURL - should return an error URL when the URL is invalid', () => {
     helper.assert(hyperlinks.validateURL("javascript:void(0)"), hyperlinks.URL_ON_ERROR);
     helper.assert(hyperlinks.validateURL("dfdsfdsfdfdsfsdf"), hyperlinks.URL_ON_ERROR);
     helper.assert(hyperlinks.validateURL("magnet:?xt=urn:btih:123"), hyperlinks.URL_ON_ERROR);
@@ -391,6 +403,12 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(hyperlinks.validateURL(`carbone.io?quer=23`), hyperlinks.URL_ON_ERROR);
     helper.assert(hyperlinks.validateURL("www.carbone.com.au?key=value&name=john"), hyperlinks.URL_ON_ERROR);
     helper.assert(hyperlinks.validateURL("http://carbone.io?name=john&lastname=wick"), hyperlinks.URL_ON_ERROR);
+  });
+
+  it('[utils] validateURL + DOCX - should correct the URL and convert "&" caracter to "&amp;" encoded caracter', () => {
+    helper.assert(hyperlinks.validateURL("carbone.io", "docx"), 'https://carbone.io');
+    helper.assert(hyperlinks.validateURL("http://carbone.io/?name=john&lastname=wick", "docx"), 'http://carbone.io/?name=john&amp;lastname=wick');
+    helper.assert(hyperlinks.validateURL("https://carbone.io/?name=john&lastname=wick&key=code", "docx"), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
   });
 
   it('[XLSX] should transform a single hyperlink marker valid ("d.url" to "{d.url}")', function () {

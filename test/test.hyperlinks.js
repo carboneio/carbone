@@ -379,38 +379,6 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_it.next().value, undefined);
   });
 
-  it('[utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
-    helper.assert(hyperlinks.validateURL("carbone.io"), 'https://carbone.io');
-    helper.assert(hyperlinks.validateURL("www.carbone.com.au"), 'https://www.carbone.com.au');
-    helper.assert(hyperlinks.validateURL("www.carbone.com.au/?key=value&name=john"), 'https://www.carbone.com.au/?key=value&name=john');
-    helper.assert(hyperlinks.validateURL("http://carbone.io/?name=john&lastname=wick"), 'http://carbone.io/?name=john&lastname=wick');
-    helper.assert(hyperlinks.validateURL("https://carbone.io/?name=john&lastname=wick"), 'https://carbone.io/?name=john&lastname=wick');
-    helper.assert(hyperlinks.validateURL("example.com:3000"), 'https://example.com:3000');
-    helper.assert(hyperlinks.validateURL("example.com:3000/?key=value&name=john"), 'https://example.com:3000/?key=value&name=john');
-    helper.assert(hyperlinks.validateURL("my_test.asp/?name=st%C3%A5le&amp;car=saab"), 'https://my_test.asp/?name=st%C3%A5le&amp;car=saab');
-    helper.assert(hyperlinks.validateURL("http://my_test.asp/?name=st%C3%A5le&amp;car=saab"), 'http://my_test.asp/?name=st%C3%A5le&amp;car=saab');
-    helper.assert(hyperlinks.validateURL("https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B"), 'https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
-    helper.assert(hyperlinks.validateURL("https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1"), 'https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1');
-    helper.assert(hyperlinks.validateURL(`carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`), `https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`);
-    helper.assert(hyperlinks.validateURL(`https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`), `https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`);
-  });
-
-  it('[utils] validateURL - should return an error URL when the URL is invalid', () => {
-    helper.assert(hyperlinks.validateURL("javascript:void(0)"), hyperlinks.URL_ON_ERROR);
-    helper.assert(hyperlinks.validateURL("dfdsfdsfdfdsfsdf"), hyperlinks.URL_ON_ERROR);
-    helper.assert(hyperlinks.validateURL("magnet:?xt=urn:btih:123"), hyperlinks.URL_ON_ERROR);
-    helper.assert(hyperlinks.validateURL(`http://my test.asp`), hyperlinks.URL_ON_ERROR);
-    helper.assert(hyperlinks.validateURL(`carbone.io?quer=23`), hyperlinks.URL_ON_ERROR);
-    helper.assert(hyperlinks.validateURL("www.carbone.com.au?key=value&name=john"), hyperlinks.URL_ON_ERROR);
-    helper.assert(hyperlinks.validateURL("http://carbone.io?name=john&lastname=wick"), hyperlinks.URL_ON_ERROR);
-  });
-
-  it('[utils] validateURL + DOCX - should correct the URL and convert "&" caracter to "&amp;" encoded caracter', () => {
-    helper.assert(hyperlinks.validateURL("carbone.io", "docx"), 'https://carbone.io');
-    helper.assert(hyperlinks.validateURL("http://carbone.io/?name=john&lastname=wick", "docx"), 'http://carbone.io/?name=john&amp;lastname=wick');
-    helper.assert(hyperlinks.validateURL("https://carbone.io/?name=john&lastname=wick&key=code", "docx"), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
-  });
-
   it('[XLSX] should transform a single hyperlink marker valid ("d.url" to "{d.url}")', function () {
     const _template = {
       files : [{
@@ -475,4 +443,50 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expected[1]);
     helper.assert(_template.files[2].data, _expected[2]);
   });
+
+  describe('Utils', () => {
+    it('[utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
+      helper.assert(hyperlinks.validateURL("carbone.io"), 'https://carbone.io');
+      helper.assert(hyperlinks.validateURL("www.carbone.com.au"), 'https://www.carbone.com.au');
+      helper.assert(hyperlinks.validateURL("www.carbone.com.au/?key=value&name=john"), 'https://www.carbone.com.au/?key=value&name=john');
+      helper.assert(hyperlinks.validateURL("http://carbone.io/?name=john&lastname=wick"), 'http://carbone.io/?name=john&lastname=wick');
+      helper.assert(hyperlinks.validateURL("https://carbone.io/?name=john&lastname=wick"), 'https://carbone.io/?name=john&lastname=wick');
+      helper.assert(hyperlinks.validateURL("example.com:3000"), 'https://example.com:3000');
+      helper.assert(hyperlinks.validateURL("example.com:3000/?key=value&name=john"), 'https://example.com:3000/?key=value&name=john');
+      helper.assert(hyperlinks.validateURL("my_test.asp/?name=st%C3%A5le&amp;car=saab"), 'https://my_test.asp/?name=st%C3%A5le&amp;car=saab');
+      helper.assert(hyperlinks.validateURL("http://my_test.asp/?name=st%C3%A5le&amp;car=saab"), 'http://my_test.asp/?name=st%C3%A5le&amp;car=saab');
+      helper.assert(hyperlinks.validateURL("https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B"), 'https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
+      helper.assert(hyperlinks.validateURL("https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1"), 'https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1');
+      helper.assert(hyperlinks.validateURL(`carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`), `https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`);
+      helper.assert(hyperlinks.validateURL(`https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`), `https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4='valu2'`);
+    });
+
+    it('[utils] validateURL - should return an error URL when the URL is invalid', () => {
+      helper.assert(hyperlinks.validateURL("javascript:void(0)"), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL("dfdsfdsfdfdsfsdf"), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL("magnet:?xt=urn:btih:123"), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(`http://my test.asp`), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(`carbone.io?quer=23`), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL("www.carbone.com.au?key=value&name=john"), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL("http://carbone.io?name=john&lastname=wick"), hyperlinks.URL_ON_ERROR);
+    });
+
+    it('[utils] validateURL + DOCX - should correct the URL and convert "&" caracter to "&amp;" encoded caracter', () => {
+      helper.assert(hyperlinks.validateURL("carbone.io", "docx"), 'https://carbone.io');
+      helper.assert(hyperlinks.validateURL("http://carbone.io/?name=john&lastname=wick", "docx"), 'http://carbone.io/?name=john&amp;lastname=wick');
+      helper.assert(hyperlinks.validateURL("https://carbone.io/?name=john&lastname=wick&key=code", "docx"), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
+    });
+
+    it('[utils] should add to the hyperlinkDatabase and return the hyperlink properties', () => {
+      const _options = {
+        hyperlinkDatabase: new Map()
+      }
+      helper.assert(hyperlinks.addLinkDatabase(_options, "https://carbone.io"), { id: 0 });
+      helper.assert(hyperlinks.addLinkDatabase(_options, "https://carbone.io"), { id: 0 });
+      const _it = _options.hyperlinkDatabase.keys();
+      helper.assert(_it.next().value, "https://carbone.io");
+      helper.assert(_it.next().value, undefined);
+    });
+  });
+
 });

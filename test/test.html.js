@@ -914,20 +914,25 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it.skip('should convert HTML to DOCX xml 10 hyperlink simple', function () {
+      it.only('should convert HTML to DOCX xml 10 hyperlink simple', function () {
+        const _options = {
+          hyperlinkDatabase : new Map()
+        }
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a>');
-        console.log(_descriptor);
-        const _res = html.buildContentDOCX(_descriptor);
+        const _res = html.buildContentDOCX(_descriptor, _options);
         helper.assert(_res, '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
            '<w:r>' +
-             '<w:rPr><w:rStyle w:val="InternetLink"/></w:rPr>' +
-              '<w:t>Carbone Website</w:t>' +
+             '<w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr>' +
+              '<w:t xml:space="preserve">Carbone Website</w:t>' +
             '</w:r>' +
           '</w:hyperlink>' +
         '</w:p>'
         );
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io');
+        helper.assert(_it.next().value, undefined);
       });
 
       it('should return the DOCX xml content based on the descriptor', function () {

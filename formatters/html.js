@@ -69,7 +69,7 @@ function addHtmlDatabaseDOCX (options, htmlContent) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     _htmlDatabaseProperties = {
       id      : options.htmlDatabase.size,
-      content : html.buildContentDOCX(descriptor)
+      content : html.buildContentDOCX(descriptor, options)
     };
     options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
   }

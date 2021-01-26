@@ -914,7 +914,7 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it.only('should convert HTML to DOCX xml 10 hyperlink simple', function () {
+      it('should convert HTML to DOCX xml 10 hyperlink simple', function () {
         const _options = {
           hyperlinkDatabase : new Map()
         }
@@ -1258,10 +1258,11 @@ describe('Dynamic HTML', function () {
       it('should parse HTML content and return a descriptors [MIX without break line]', function () {
         helper.assert(html.parseHTML('<b><em>this is a bold and italic text</em></b>'), [ { content : 'this is a bold and italic text', tags : ['b', 'em'] } ]);
         helper.assert(html.parseHTML('<b><u><s><em>this is a bold and italic text</em></s></u></b>'), [ { content : 'this is a bold and italic text', tags : ['b', 'u', 's', 'em'] } ]);
-        helper.assert(html.parseHTML('<li style="color:red;padding: 10px 2px 4px">This is a <a href="">LINK</a></li>'),
+        helper.assert(html.parseHTML('<li style="color:red;padding: 10px 2px 4px"><a href="carbone.io">This is a LINK</a></li>'),
           [
-            { content : 'This is a ', tags : ['li'] },
-            { content : 'LINK', tags : ['li', 'a'] }
+            { content : '#AB#', href: 'carbone.io', tags : [] },
+            { content : 'This is a LINK', tags : ['li'] },
+            { content : '#AE#', tags : [] },
           ]
         );
         helper.assert(html.parseHTML('<b>bold</b><em>and italic</em>'),

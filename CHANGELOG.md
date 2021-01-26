@@ -1,3 +1,6 @@
+### v3.1.0-beta.0
+  - `:html` formatter converts `p`, `ul`, `ol`, `li` into DOCX style
+
 ### v3.0.3
   - Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
 

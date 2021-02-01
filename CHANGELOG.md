@@ -1,3 +1,4 @@
+### v3.1.0-beta.1
 ### v3.1.0-beta.0
   - `:html` formatter converts `p`, `ul`, `ol`, `li`, `a` into DOCX style
   - Improve hyperlinks validation

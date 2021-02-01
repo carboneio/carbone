@@ -5,7 +5,7 @@
   - Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
 
 ### v3.0.2
-  - Fix: accepts hyperlinks with &
+  - Fix: accepts hyperlinks with "&", add the "https://" protocol if it missing, add URL validation. If the URL is invalid, it is replaced by a valid URL refering to the carbone documentation.
   - Fix: do not crash if hyperlink is undefined
   - Fix: support random way of managing hyperlinks in MS Word
   - Fix: set Content-Type when downloading the report

@@ -874,6 +874,45 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_it.next().value, undefined);
       });
 
+      it('should convert HTML to DOCX xml 13 hyperlink multiple', function () {
+        const _options = {
+          hyperlinkDatabase : new Map()
+        }
+        const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a><p><a href="carbone.io/documentation.html">Carbone Documentation</a></p><a href="carbone.io">Carbone Site Again</a>');
+        const _res = html.buildContentDOCX(_descriptor, _options);
+        helper.assert(_res, '' +
+        '<w:p>' +
+          '<w:hyperlink r:id="CarboneHyperlinkId0">' +
+           '<w:r>' +
+             '<w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr>' +
+              '<w:t xml:space="preserve">Carbone Website</w:t>' +
+            '</w:r>' +
+          '</w:hyperlink>' +
+        '</w:p>' +
+        '<w:p>' +
+          '<w:hyperlink r:id="CarboneHyperlinkId1">' +
+           '<w:r>' +
+             '<w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr>' +
+              '<w:t xml:space="preserve">Carbone Documentation</w:t>' +
+            '</w:r>' +
+          '</w:hyperlink>' +
+        '</w:p>' +
+        '<w:p/>' +
+        '<w:p>' +
+          '<w:hyperlink r:id="CarboneHyperlinkId0">' +
+           '<w:r>' +
+             '<w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr>' +
+              '<w:t xml:space="preserve">Carbone Site Again</w:t>' +
+            '</w:r>' +
+          '</w:hyperlink>' +
+        '</w:p>'
+        );
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io');
+        helper.assert(_it.next().value, 'https://carbone.io/documentation.html');
+        helper.assert(_it.next().value, undefined);
+      });
+
       it('should return the DOCX xml content based on the descriptor', function () {
         helper.assert(html.buildContentDOCX(
           [

@@ -50,7 +50,7 @@ describe('Dynamic colors', function () {
               ce1 : {
                 file        : 'content.xml',
                 styleFamily : 'table-cell',
-                colors      : [{ id: 0, color : '#ff0000', element : 'textColor', marker : 'd.color2', colorType : '#hexa' }],
+                colors      : [{ id : 0, color : '#ff0000', element : 'textColor', marker : 'd.color2', colorType : '#hexa' }],
                 attributes  : ''
               }
             }};
@@ -131,7 +131,7 @@ describe('Dynamic colors', function () {
                   marker    : 'd.color6',
                   colorType : 'hsl'
                 }, {
-                  id        : -1,
+                  id      : -1,
                   color   : 'transparent',
                   element : 'textBackgroundColor'
                 }],
@@ -296,7 +296,7 @@ describe('Dynamic colors', function () {
             data : '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>'
           };
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#ffff00', colorType : 'color', marker : 'd.color2' }];
-          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ id: 0, color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { id : 0,  color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : 'color' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' } };
+          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ id : 0, color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { id : 0,  color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : 'color' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' } };
 
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -330,7 +330,7 @@ describe('Dynamic colors', function () {
           };
           const _bindColorList = [{ referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = {
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id: 0, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {id: -1, color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id : 0, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {id : -1, color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -344,7 +344,7 @@ describe('Dynamic colors', function () {
           };
           const _bindColorList = [{ referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = {
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id: 0, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {id: -1, color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id : 0, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {id : -1, color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -358,7 +358,7 @@ describe('Dynamic colors', function () {
           };
           const _bindColorList = [{ referenceColor : '#0000ff', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.list[i].element' }];
           const _expectedColorListElement = {
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id: 1, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.list[i].element', colorType : '#hexa'}, {id: 0, color : '#0000ff', element : 'textColor', marker : 'd.color1', colorType : '#hexa'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id : 1, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.list[i].element', colorType : '#hexa'}, {id : 0, color : '#0000ff', element : 'textColor', marker : 'd.color1', colorType : '#hexa'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);

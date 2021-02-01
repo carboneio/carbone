@@ -3,7 +3,7 @@ const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 const assert = require('assert');
 
-describe.only('Dynamic HTML', function () {
+describe('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -585,7 +585,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 1', function () {
-        let _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p>");
+        let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p>');
         // _descriptor = [
         //   { content: '#PB#', tags: [] },
         //   { content: 'Hello', tags: ['strong'] },
@@ -609,7 +609,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 2', function () {
-        let _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p><i>John</i>");
+        let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i>');
         // _descriptor = [
         //   { content: '#PB#', tags: [] },
         //   { content: 'Hello', tags: ['strong'] },
@@ -640,7 +640,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 3', function () {
-        let _descriptor = html.parseHTML("<p><strong>Hello</strong> thit is some text</p><i>John</i> green blue red");
+        let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i> green blue red');
         // _descriptor = [
         //   { content: '#PB#', tags: [] },
         //   { content: 'Hello', tags: ['strong'] },
@@ -676,7 +676,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 4', function () {
-        let _descriptor = html.parseHTML("<i>John</i><p><strong>Hello</strong> thit is some text</p>");
+        let _descriptor = html.parseHTML('<i>John</i><p><strong>Hello</strong> thit is some text</p>');
         // _descriptor = [
         //   { content: 'John', tags: [ 'i' ] },
         //   { content: '#PB#', tags: [ ] },
@@ -707,7 +707,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 5', function () {
-        let _descriptor = html.parseHTML("<p>Professional Accreditation</p><p><strong>La Trobes Bachelor of Biomedicine</strong></p>");
+        let _descriptor = html.parseHTML('<p>Professional Accreditation</p><p><strong>La Trobes Bachelor of Biomedicine</strong></p>');
         // _descriptor = [
         //   {
         //     content: '#PB#',
@@ -755,7 +755,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 5', function () {
-        let _descriptor = html.parseHTML("<p><strong><p>Professional Accreditation</p></strong></p><p><em>La <p>Trobes</p></em></p>");
+        let _descriptor = html.parseHTML('<p><strong><p>Professional Accreditation</p></strong></p><p><em>La <p>Trobes</p></em></p>');
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
         '<w:p>'+
@@ -799,7 +799,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 7: SIMPLE LIST', function () {
-        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>");
+        const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>');
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
@@ -809,7 +809,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 8: NESTED LIST 1 level', function () {
-        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea</li></ul></li><li>Milk</li></ul>");
+        const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea</li></ul></li><li>Milk</li></ul>');
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
@@ -821,7 +821,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 9: NESTED LIST 2 level', function () {
-        const _descriptor = html.parseHTML("<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><li>Soft Green</li><li>light Green</li></ul></li></ul></li><li>Milk</li></ul>");
+        const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><li>Soft Green</li><li>light Green</li></ul></li></ul></li><li>Milk</li></ul>');
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>Coffee</w:t></w:r></w:p>' +
@@ -836,7 +836,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 10: LIST with malformed HTML (content between ul and li)', function () {
-        const _descriptor = html.parseHTML("<ul>Hello 1<li>Coffee</li>Hello 2<li>Tea</li>Hello 3</ul>");
+        const _descriptor = html.parseHTML('<ul>Hello 1<li>Coffee</li>Hello 2<li>Tea</li>Hello 3</ul>');
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
           '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">Hello 1</w:t></w:r></w:p>' + // simple text
@@ -848,7 +848,7 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should convert HTML to DOCX xml 11', function () {
-        const _descriptor = html.parseHTML("You will learn<br />");
+        const _descriptor = html.parseHTML('You will learn<br />');
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">You will learn</w:t></w:r><w:br/></w:p>');
       });
@@ -856,7 +856,7 @@ describe.only('Dynamic HTML', function () {
       it('should convert HTML to DOCX xml 12 hyperlink simple', function () {
         const _options = {
           hyperlinkDatabase : new Map()
-        }
+        };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a>');
         const _res = html.buildContentDOCX(_descriptor, _options);
         helper.assert(_res, '' +
@@ -877,7 +877,7 @@ describe.only('Dynamic HTML', function () {
       it('should convert HTML to DOCX xml 13 hyperlink multiple', function () {
         const _options = {
           hyperlinkDatabase : new Map()
-        }
+        };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a><p><a href="carbone.io/documentation.html">Carbone Documentation</a></p><a href="carbone.io">Carbone Site Again</a>');
         const _res = html.buildContentDOCX(_descriptor, _options);
         helper.assert(_res, '' +
@@ -920,7 +920,7 @@ describe.only('Dynamic HTML', function () {
             { content : 'and italic', type : '', tags : ['em'] }
           ]
         ),
-          '<w:p>'+
+        '<w:p>'+
             '<w:r>' +
               '<w:rPr>' +
                 '<w:b/><w:bCs/>' +
@@ -971,18 +971,18 @@ describe.only('Dynamic HTML', function () {
       it('should return the DOCX XML content based on a descriptor and should skip unknown tags', function () {
         helper.assert(html.buildContentDOCX(
           [
-            { content : 'this ', type: '', tags : ['div', 'b'] },
-            { content : ' is a bold', type: '', tags : ['div', 'b', 'u'] },
+            { content : 'this ', type : '', tags : ['div', 'b'] },
+            { content : ' is a bold', type : '', tags : ['div', 'b', 'u'] },
             { content : '', type : '#PB#', tags : [] },
-            { content : ' text ', type: '', tags : ['div', 'b', 'u', 'em'] },
-            { content : 'and ', type: '', tags : ['div', 'b', 'em'] },
-            { content : 'italic ', type: '', tags : ['div', 'b', 'em', 's'] },
+            { content : ' text ', type : '', tags : ['div', 'b', 'u', 'em'] },
+            { content : 'and ', type : '', tags : ['div', 'b', 'em'] },
+            { content : 'italic ', type : '', tags : ['div', 'b', 'em', 's'] },
             { content : '', type : '#PE#', tags : [] },
-            { content : 'text', type: '', tags : ['div', 'b', 's'] },
-            { content : '.', type: '', tags : [] },
+            { content : 'text', type : '', tags : ['div', 'b', 's'] },
+            { content : '.', type : '', tags : [] },
           ]
         ),
-          '<w:p>'+
+        '<w:p>'+
             '<w:r>'+
               '<w:rPr>'+
                 '<w:b/><w:bCs/>'+
@@ -1075,7 +1075,7 @@ describe.only('Dynamic HTML', function () {
             { content : '.', type : '', tags : [] }
           ]
         ),
-          '<w:p>'+
+        '<w:p>'+
             '<w:r>' +
               '<w:rPr></w:rPr>' +
               '<w:t xml:space="preserve">This </w:t>' +
@@ -1198,39 +1198,39 @@ describe.only('Dynamic HTML', function () {
         helper.assert(html.parseHTML(null), []);
       });
       it('should parse HTML content and return a descriptors [SIMPLE]', function () {
-        helper.assert(html.parseHTML('This is a simple text'), [ { content : 'This is a simple text', type: '', tags : [] } ]);
-        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', type: '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('<b>Bold</b> content'), [ { content : 'Bold', type: '', tags : ['b'] }, { content : ' content', type: '', tags : [] } ]);
-        helper.assert(html.parseHTML('Bold <b>content</b>'), [ { content : 'Bold ', type: '', tags : [] }, { content : 'content', type: '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('Bold <b title="value1">content</b>'), [ { content : 'Bold ', type: '', tags : [] }, { content : 'content', type: '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('<b style="color:red;margin:10px 20px" title="value2">Bold content</b>'), [ { content : 'Bold content', type: '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', type: '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('<i>Italic content</i>'), [ { content : 'Italic content', type: '', tags : ['i'] } ]);
-        helper.assert(html.parseHTML('<s>Striked content</s>'), [ { content : 'Striked content', type: '', tags : ['s'] } ]);
-        helper.assert(html.parseHTML('<span id="1234"> simple text </span>'), [ { content : ' simple text ', type: '', tags : ['span'] } ]);
+        helper.assert(html.parseHTML('This is a simple text'), [ { content : 'This is a simple text', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold</b> content'), [ { content : 'Bold', type : '', tags : ['b'] }, { content : ' content', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('Bold <b>content</b>'), [ { content : 'Bold ', type : '', tags : [] }, { content : 'content', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('Bold <b title="value1">content</b>'), [ { content : 'Bold ', type : '', tags : [] }, { content : 'content', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b style="color:red;margin:10px 20px" title="value2">Bold content</b>'), [ { content : 'Bold content', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<i>Italic content</i>'), [ { content : 'Italic content', type : '', tags : ['i'] } ]);
+        helper.assert(html.parseHTML('<s>Striked content</s>'), [ { content : 'Striked content', type : '', tags : ['s'] } ]);
+        helper.assert(html.parseHTML('<span id="1234"> simple text </span>'), [ { content : ' simple text ', type : '', tags : ['span'] } ]);
       });
 
       it('should not consider a tag "brie" is a carriage return', function () {
-        helper.assert(html.parseHTML('<b>Bold <brie/><brie>content<brie/></b>'), [ { content : 'Bold ', type: '', tags : ['b'] }, { content : 'content', type: '', tags : ['b', 'brie'] } ]);
+        helper.assert(html.parseHTML('<b>Bold <brie/><brie>content<brie/></b>'), [ { content : 'Bold ', type : '', tags : ['b'] }, { content : 'content', type : '', tags : ['b', 'brie'] } ]);
       });
 
       it('should accepts some weird HTML to always return a result in production', function () {
         // Missing ending marker
-        helper.assert(html.parseHTML('<b>Underlined content'), [ { content : 'Underlined content', type: '', tags : [] } ]);
-        helper.assert(html.parseHTML('<b>Underlined content</bold>'), [ { content : 'Underlined content', type: '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('<bold>Underlined</b> content'), [ { content : 'Underlined', type: '', tags : ['bold'] }, { content : ' content', type: '', tags : [] } ]);
-        helper.assert(html.parseHTML('<em><bold>Underlined </i> content</em>'), [ { content : 'Underlined ', type: '', tags : ['em', 'bold'] }, { content : ' content', type: '', tags : ['em'] } ]);
+        helper.assert(html.parseHTML('<b>Underlined content'), [ { content : 'Underlined content', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('<b>Underlined content</bold>'), [ { content : 'Underlined content', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<bold>Underlined</b> content'), [ { content : 'Underlined', type : '', tags : ['bold'] }, { content : ' content', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('<em><bold>Underlined </i> content</em>'), [ { content : 'Underlined ', type : '', tags : ['em', 'bold'] }, { content : ' content', type : '', tags : ['em'] } ]);
 
         // the HTML tag is missing a closing mark
-        helper.assert(html.parseHTML('<btest content'), [ { content : '<btest content', type: '', tags : [] } ]);
-        helper.assert(html.parseHTML('<   test')      , [ { content : '<   test', type: '', tags : [] } ]);
-        helper.assert(html.parseHTML('<<b>Bold</b>')  , [ { content : 'Bold', type: '', tags : ['<b'] } ]);
-        helper.assert(html.parseHTML('<b>Bold</b<>')  , [ { content : 'Bold', type: '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('<b>Bold</<b>')  , [ { content : 'Bold', type: '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('<b>Bold</>b>')  , [ { content : 'Bold', type: '', tags : ['b'] }, { content : 'b>', type: '', tags : [] } ]);
+        helper.assert(html.parseHTML('<btest content'), [ { content : '<btest content', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('<   test')      , [ { content : '<   test', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('<<b>Bold</b>')  , [ { content : 'Bold', type : '', tags : ['<b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold</b<>')  , [ { content : 'Bold', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold</<b>')  , [ { content : 'Bold', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<b>Bold</>b>')  , [ { content : 'Bold', type : '', tags : ['b'] }, { content : 'b>', type : '', tags : [] } ]);
 
         // missing opening tag
-        helper.assert(html.parseHTML('test</b>content'), [ { content : 'test', type: '', tags : [] }, { content : 'content', type: '', tags : [] } ]);
+        helper.assert(html.parseHTML('test</b>content'), [ { content : 'test', type : '', tags : [] }, { content : 'content', type : '', tags : [] } ]);
       });
 
       it('should parse HTML content and return a descriptors [MIX without break line]', function () {
@@ -1238,8 +1238,8 @@ describe.only('Dynamic HTML', function () {
         helper.assert(html.parseHTML('<b><u><s><em>this is a bold and italic text</em></s></u></b>'), [ { content : 'this is a bold and italic text',  type : '', tags : ['b', 'u', 's', 'em'] } ]);
         helper.assert(html.parseHTML('<li style="color:red;padding: 10px 2px 4px"><a href="carbone.io">This is a LINK</a></li>'),
           [
-            { content : '',  type : '#AB#', href: 'carbone.io', tags : [] },
-            { content : 'This is a LINK', type: '', tags : ['li'] },
+            { content : '',  type : '#AB#', href : 'carbone.io', tags : [] },
+            { content : 'This is a LINK', type : '', tags : ['li'] },
             { content : '', type : '#AE#', tags : [] },
           ]
         );
@@ -1306,56 +1306,56 @@ describe.only('Dynamic HTML', function () {
       it('should parse HTML content with BREAK LINES tags <br> [MIX]', function () {
         helper.assert(html.parseHTML('This is <br><i>a tree</i>'),
           [
-            { content : 'This is ', type: '', tags : [] },
+            { content : 'This is ', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
-            { content : 'a tree', type: '', tags : ['i'] },
+            { content : 'a tree', type : '', tags : ['i'] },
           ]
         );
         helper.assert(html.parseHTML('This is <br/><i>a tree</i>'),
           [
-            { content : 'This is ', type: '', tags : [] },
-            { content : '' , type :  '#break#', tags : [] },
-            { content : 'a tree', type: '', tags : ['i'] },
+            { content : 'This is ', type : '', tags : [] },
+            { content : '' , type : '#break#', tags : [] },
+            { content : 'a tree', type : '', tags : ['i'] },
           ]
         );
         helper.assert(html.parseHTML('This is a<br>simple text.'),
           [
-            { content : 'This is a', type: '', tags : [] },
+            { content : 'This is a', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] } ,
-            { content : 'simple text.', type: '', tags : [] }
+            { content : 'simple text.', type : '', tags : [] }
           ]
         );
         helper.assert(html.parseHTML('This <br /> is<br/>a<br>simple<br/> text<br/>.'),
           [
-            { content : 'This ', type: '', tags : [] },
+            { content : 'This ', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
-            { content : ' is', type: '', tags : [] },
+            { content : ' is', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
-            { content : 'a', type: '', tags : [] },
+            { content : 'a', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
-            { content : 'simple', type: '', tags : [] },
+            { content : 'simple', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
-            { content : ' text', type: '', tags : [] },
+            { content : ' text', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
-            { content : '.', type: '', tags : [] }
+            { content : '.', type : '', tags : [] }
           ]
         );
         helper.assert(html.parseHTML('<br/>This<br/>is<br/><br>a<br>sim<br/>ple<br/><br/>text.<br>'),
           [
             { content : '', type : '#break#', tags : [] } ,
-            { content : 'This', type: '', tags : [] },
+            { content : 'This', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] } ,
-            { content : 'is', type: '', tags : [] },
+            { content : 'is', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
             { content : '', type : '#break#', tags : [] } ,
-            { content : 'a', type: '', tags : [] },
+            { content : 'a', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] } ,
-            { content : 'sim', type: '', tags : [] },
+            { content : 'sim', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] } ,
-            { content : 'ple', type: '', tags : [] },
+            { content : 'ple', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] } ,
             { content : '', type : '#break#', tags : [] } ,
-            { content : 'text.', type: '', tags : [] },
+            { content : 'text.', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] } ,
           ]
         );

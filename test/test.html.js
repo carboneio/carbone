@@ -3,7 +3,7 @@ const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 const assert = require('assert');
 
-describe('Dynamic HTML', function () {
+describe.only('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -24,7 +24,7 @@ describe('Dynamic HTML', function () {
             data : '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>'
           }]
         };
-        const _expectedContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:getHTMLContentOdt}</text:p></office:text></office:body>';
+        const _expectedContent = '<office:body><office:text><text:p text:style-name="P5"></text:p>{d.content:getHTMLContentOdt}</office:text></office:body>';
         html.preprocessODT(_template);
         helper.assert(_template.files[0].data, _expectedContent);
       });
@@ -35,7 +35,7 @@ describe('Dynamic HTML', function () {
             name : 'content.xml',
             data : '' +
                   '<office:body>' +
-                  '<text:p text:style-name="P5">{d.value1:html} {d.element} {d.value2:html()}</text:p>' +
+                  '<text:p text:style-name="P5">{d.value1:html} {d.element}</text:p>' +
                   '<text:p text:style-name="P1"/>' +
                   '<text:p text:style-name="P5">This is some content</text:p>' +
                   '<text:p text:style-name="P1"/>' +
@@ -45,11 +45,11 @@ describe('Dynamic HTML', function () {
         };
         const _expectedContent = '' +
                       '<office:body>' +
-                      '<text:p text:style-name="P5">{d.value1:getHTMLContentOdt} {d.element} {d.value2:getHTMLContentOdt}</text:p>' +
+                      '<text:p text:style-name="P5"> {d.element}</text:p>{d.value1:getHTMLContentOdt}' +
                       '<text:p text:style-name="P1"/>' +
                       '<text:p text:style-name="P5">This is some content</text:p>' +
                       '<text:p text:style-name="P1"/>' +
-                      '<text:p text:style-name="P3">{d.value3:getHTMLContentOdt}</text:p>' +
+                      '<text:p text:style-name="P3"></text:p>{d.value3:getHTMLContentOdt}' +
                       '</office:body>';
         html.preprocessODT(_template);
         helper.assert(_template.files[0].data, _expectedContent);
@@ -67,33 +67,33 @@ describe('Dynamic HTML', function () {
       it('should create the content and style from an HTML descriptor', function () {
         helper.assert(html.buildXMLContentOdt(_uniqueID,
           [
-            { content : 'bold', tags : ['b'] },
-            { content : 'and italic', tags : ['em'] }
+            { content : 'bold', type: '', tags : ['b'] },
+            { content : 'and italic', type: '', tags : ['em'] }
           ]
         ),
         {
           content : '' +
-            '<text:span text:style-name="C010">bold</text:span>' +
-            '<text:span text:style-name="C011">and italic</text:span>',
+            '<text:p><text:span text:style-name="C010">bold</text:span>' +
+            '<text:span text:style-name="C011">and italic</text:span></text:p>',
           style : '' +
-          '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
-          '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
+            '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
+            '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
         });
 
         helper.assert(html.buildXMLContentOdt(_uniqueID,
           [
-            { content : 'this', tags : [] },
-            { content : ' is a bold', tags : ['b'] },
-            { content : 'and italic', tags : ['em'] },
-            { content : ' text', tags : [] },
+            { content : 'this', type: '', tags : [] },
+            { content : ' is a bold', type: '', tags : ['b'] },
+            { content : 'and italic', type: '', tags : ['em'] },
+            { content : ' text', type: '', tags : [] },
           ]
         ),
         {
           content : '' +
-            '<text:span text:style-name="C010">this</text:span>' +
+            '<text:p><text:span>this</text:span>' +
             '<text:span text:style-name="C011"> is a bold</text:span>' +
             '<text:span text:style-name="C012">and italic</text:span>' +
-            '<text:span text:style-name="C013"> text</text:span>',
+            '<text:span> text</text:span></text:p>',
           style : '' +
             '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
             '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
@@ -101,85 +101,119 @@ describe('Dynamic HTML', function () {
       });
 
       it('should create the content and style from an HTML descriptor that contains unknown tags', function () {
-        helper.assert(html.buildXMLContentOdt(_uniqueID,
-          [
-            { content : 'this ', tags : ['div', 'b'] },
-            { content : ' is a bold', tags : ['div', 'b', 'u'] },
-            { content : ' text ', tags : ['div', 'b', 'u',  'p', 'em'] },
-            { content : 'and ', tags : ['div', 'b', 'p', 'em'] },
-            { content : 'italic ', tags : ['div', 'b', 'p', 'em', 's'] },
-            { content : 'text', tags : ['div', 'b', 's'] },
-            { content : '.', tags : [] },
-          ]
-        ),
-        {
-          content : '' +
+        const descriptor = [
+          { content : 'this ', type: '', tags : ['div', 'b'] },
+          { content : ' is a bold', type: '', tags : ['div', 'b', 'u'] },
+          { content : '', type: '#PB#', tags : [] },
+          { content : ' text ', type: '', tags : ['div', 'b', 'u', 'em'] },
+          { content : 'and ', type: '', tags : ['div', 'b', 'em'] },
+          { content : 'italic ', type: '', tags : ['div', 'b', 'em', 's'] },
+          { content : '', type: '#PE#', tags : [] },
+          { content : 'text', type: '', tags : ['div', 'b', 's'] },
+          { content : '.', type: '', tags : [] },
+        ]
+        const expectedContent = '' +
+          '<text:p>' +
             '<text:span text:style-name="C010">this </text:span>' +
             '<text:span text:style-name="C011"> is a bold</text:span>' +
-            '<text:span text:style-name="C012"> text </text:span>' +
-            '<text:span text:style-name="C013">and </text:span>' +
-            '<text:span text:style-name="C014">italic </text:span>' +
-            '<text:span text:style-name="C015">text</text:span>' +
-            '<text:span text:style-name="C016">.</text:span>',
-          style : '' +
+          '</text:p>' +
+          '<text:p>' +
+            '<text:span text:style-name="C013"> text </text:span>' +
+            '<text:span text:style-name="C014">and </text:span>' +
+            '<text:span text:style-name="C015">italic </text:span>' +
+          '</text:p><text:line-break/>' +
+          '<text:p>' +
+            '<text:span text:style-name="C017">text</text:span>' +
+            '<text:span>.</text:span>' +
+          '</text:p>';
+        const expectedStyle = '' +
             '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
             '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-weight="bold" style:text-underline-style="solid"/></style:style>' +
-            '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-weight="bold" style:text-underline-style="solid" fo:font-style="italic"/></style:style>' +
-            '<style:style style:name="C013" style:family="text"><style:text-properties fo:font-weight="bold" fo:font-style="italic"/></style:style>' +
-            '<style:style style:name="C014" style:family="text"><style:text-properties fo:font-weight="bold" fo:font-style="italic" style:text-line-through-style="solid"/></style:style>' +
-            '<style:style style:name="C015" style:family="text"><style:text-properties fo:font-weight="bold" style:text-line-through-style="solid"/></style:style>'
-        });
+            '<style:style style:name="C013" style:family="text"><style:text-properties fo:font-weight="bold" style:text-underline-style="solid" fo:font-style="italic"/></style:style>' +
+            '<style:style style:name="C014" style:family="text"><style:text-properties fo:font-weight="bold" fo:font-style="italic"/></style:style>' +
+            '<style:style style:name="C015" style:family="text"><style:text-properties fo:font-weight="bold" fo:font-style="italic" style:text-line-through-style="solid"/></style:style>' +
+            '<style:style style:name="C017" style:family="text"><style:text-properties fo:font-weight="bold" style:text-line-through-style="solid"/></style:style>'
+        const res = html.buildXMLContentOdt(_uniqueID, descriptor)
+        helper.assert(res.content, expectedContent);
+        helper.assert(res.style, expectedStyle);
       });
 
       it('should create the content and style from an HTML descriptor that contains BREAK LINE', function () {
 
         helper.assert(html.buildXMLContentOdt(_uniqueID,
           [
-            { content : 'This is ', tags : [] },
-            { content : '#break#', tags : [] },
-            { content : 'a tree', tags : ['i'] },
+            { content : 'This is ', type: '', tags : [] },
+            { content : '', type: '#break#', tags : [] },
+            { content : 'a tree', type: '', tags : ['i'] },
           ]
         ),
         {
           content : '' +
-            '<text:span text:style-name="C010">This is </text:span>' +
-            '<text:line-break/>' +
-            '<text:span text:style-name="C012">a tree</text:span>',
+            '<text:p>'+
+              '<text:span>This is </text:span>'+
+              '<text:line-break/>'+
+              '<text:span text:style-name="C012">a tree</text:span>'+
+            '</text:p>',
           style : '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
         });
 
         helper.assert(html.buildXMLContentOdt(_uniqueID,
           [
-            { content : 'This ', tags : [] },
-            { content : '#break#', tags : [] },
-            { content : ' is', tags : [] },
-            { content : '#break#', tags : [] },
-            { content : 'a', tags : [] },
-            { content : '#break#', tags : [] },
-            { content : 'simple', tags : [] },
-            { content : '#break#', tags : [] },
-            { content : '#break#', tags : [] },
-            { content : ' text', tags : [] },
-            { content : '#break#', tags : [] },
-            { content : '.', tags : [] }
+            { content : 'This ', type: '', tags : [] },
+            { content : '', type: '#break#', tags : [] },
+            { content : ' is', type: '', tags : [] },
+            { content : '', type: '#break#', tags : [] },
+            { content : 'a', type: '', tags : [] },
+            { content : '', type: '#break#', tags : [] },
+            { content : 'simple', type: '', tags : [] },
+            { content : '', type: '#break#', tags : [] },
+            { content : '', type: '#break#', tags : [] },
+            { content : ' text', type: '', tags : [] },
+            { content : '', type: '#break#', tags : [] },
+            { content : '.', type: '', tags : [] }
           ]
         ),
         {
           content : '' +
-            '<text:span text:style-name="C010">This </text:span>' +
+            '<text:p><text:span>This </text:span>' +
             '<text:line-break/>' +
-            '<text:span text:style-name="C012"> is</text:span>' +
+            '<text:span> is</text:span>' +
             '<text:line-break/>' +
-            '<text:span text:style-name="C014">a</text:span>' +
+            '<text:span>a</text:span>' +
             '<text:line-break/>' +
-            '<text:span text:style-name="C016">simple</text:span>' +
+            '<text:span>simple</text:span>' +
             '<text:line-break/>' +
             '<text:line-break/>' +
-            '<text:span text:style-name="C019"> text</text:span>' +
+            '<text:span> text</text:span>' +
             '<text:line-break/>' +
-            '<text:span text:style-name="C0111">.</text:span>',
+            '<text:span>.</text:span></text:p>',
           style : ''
         });
+      });
+
+      it('should create hyperlinks', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com">Carbone Website</a>'));
+        helper.assert(res.content, '' +
+          '<text:p>' +
+            '<text:a xlink:type="simple" xlink:href="https://carbone.com">' +
+              '<text:span>Carbone Website</text:span>' +
+            '</text:a>' +
+          '</text:p>'
+        );
+
+        res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('Some content before <a href="carbone.com">Carbone Website something <b>bold</b> and <i>italic</i></a> Content after'));
+        helper.assert(res.content, '' +
+          '<text:p>' +
+            '<text:span>Some content before </text:span>' +
+            '<text:a xlink:type="simple" xlink:href="https://carbone.com">' +
+              '<text:span>Carbone Website something </text:span>' +
+              '<text:span text:style-name="C013">bold</text:span>' +
+              '<text:span> and </text:span>' +
+              '<text:span text:style-name="C015">italic</text:span>' +
+            '</text:a>' +
+            '<text:span> Content after</text:span>' +
+          '</text:p>'
+        );
       });
     });
 
@@ -254,13 +288,15 @@ describe('Dynamic HTML', function () {
           htmlDatabase : new Map()
         };
         const _content = '<strong>This is some content</strong>';
+        const _expectedContent = '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>';
+        const _expectedStyle = '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>';
         const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_properties, {
-          content : '<text:span text:style-name="TC00">This is some content</text:span>',
-          style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
+          content : _expectedContent,
+          style   : _expectedStyle
         });
-        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), '<text:span text:style-name="TC00">This is some content</text:span>');
+        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expectedContent);
       });
 
 
@@ -268,15 +304,15 @@ describe('Dynamic HTML', function () {
         const _options = {
           htmlDatabase : new Map()
         };
-        const _content = 'I have&nbsp;to creates bills in euro <i>&euro;</i>, Yen <i>&yen;</i> and Pound <b>&pound;</b>.';
+        const _content = 'I have to creates bills in euro <i>&euro;</i>, Yen <i>&yen;</i> and Pound <b>&pound;</b>.';
         const _expected =  {
-          content : '<text:span text:style-name="TC00">I have&#160;to creates bills in euro </text:span>' +
+          content : '<text:p><text:span>I have to creates bills in euro </text:span>' +
                     '<text:span text:style-name="TC01">€</text:span>' +
-                    '<text:span text:style-name="TC02">, Yen </text:span>' +
+                    '<text:span>, Yen </text:span>' +
                     '<text:span text:style-name="TC03">¥</text:span>' +
-                    '<text:span text:style-name="TC04"> and Pound </text:span>' +
+                    '<text:span> and Pound </text:span>' +
                     '<text:span text:style-name="TC05">£</text:span>' +
-                    '<text:span text:style-name="TC06">.</text:span>',
+                    '<text:span>.</text:span></text:p>',
           style : '<style:style style:name="TC01" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>' +
                   '<style:style style:name="TC03" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>' +
                   '<style:style style:name="TC05" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
@@ -292,13 +328,15 @@ describe('Dynamic HTML', function () {
           htmlDatabase : new Map()
         };
         const _content = '<em><b>This is some content</b></em>';
+        const _expected = '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>';
+        const _style = '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>';
         const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_properties, {
-          content : '<text:span text:style-name="TC00">This is some content</text:span>',
-          style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>'
+          content : _expected,
+          style   : _style
         });
-        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), '<text:span text:style-name="TC00">This is some content</text:span>');
+        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expected);
       });
 
       it('getHtmlStyleName + getHtmlContent - should not add the same HTML content to htmlDatabase', () => {
@@ -311,7 +349,7 @@ describe('Dynamic HTML', function () {
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_properties, {
-          content : '<text:span text:style-name="TC00">This is some content</text:span>',
+          content : '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>',
           style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>'
         });
       });
@@ -1139,7 +1177,7 @@ describe('Dynamic HTML', function () {
         const _content = 'I have&nbsp;to creates bills in euro <i>&euro;</i>, Yen <i>&yen;</i> and Pound <b>&pound;</b>.';
         const _expected =  {
           id      : 0,
-          content : '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">I have&#160;to creates bills in euro </w:t></w:r>' +
+          content : `<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">I have${String.fromCodePoint(160)}to creates bills in euro </w:t></w:r>` +
                     '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">€</w:t></w:r>' +
                     '<w:r><w:rPr></w:rPr><w:t xml:space="preserve">, Yen </w:t></w:r>' +
                     '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r>' +
@@ -1454,14 +1492,21 @@ describe('Dynamic HTML', function () {
 
       it('should convert unsupported HTML entities into valid HTML entities [non-breaking space]', function () {
         const _content = '<div>This&nbsp;is an&nbsp;<b>apple</b>&nbsp;and&nbsp;<i>strawberry</i>.</div>';
-        const _expected = '<div>This&#160;is an&#160;<b>apple</b>&#160;and&#160;<i>strawberry</i>.</div>';
+        const _expected = `<div>This${String.fromCodePoint(160)}is an${String.fromCodePoint(160)}<b>apple</b>${String.fromCodePoint(160)}and${String.fromCodePoint(160)}<i>strawberry</i>.</div>`;
         helper.assert(html.convertHTMLEntities(_content), _expected);
       });
 
       it('should convert unsupported HTML entities into valid HTML entities [special characters]', function () {
-        const _content = '<div>This &cent; is &pound; an &yen; <b>apple &euro;</b> &copy; and &reg; <i>strawberry</i>.</div>';
-        const _expected = '<div>This ¢ is £ an ¥ <b>apple €</b> © and ® <i>strawberry</i>.</div>';
-        helper.assert(html.convertHTMLEntities(_content), _expected);
+        helper.assert(html.convertHTMLEntities(
+          '<div>This &cent; is &pound; an &yen; <b>apple &euro;</b> &copy; and &reg; <i>strawberry</i>.</div>'
+          ),
+          '<div>This ¢ is £ an ¥ <b>apple €</b> © and ® <i>strawberry</i>.</div>'
+          );
+        helper.assert(html.convertHTMLEntities(
+          '<div>This is a list of HTML entities: &nleftrightarrow; &NotSubsetEqual; &nwarhk; &rx; &subset; &Subset;</div>'
+          ),
+          '<div>This is a list of HTML entities: ↮ ⊈ ⤣ ℞ ⊂ ⋐</div>'
+          );
       });
 
       it('should remove "\\r\\n|\\n|\\r|\\t"', function () {
@@ -1475,6 +1520,7 @@ describe('Dynamic HTML', function () {
         const _expected = '<div>This is€ an <b>apple</b> and <i>strawberry£</i>.</div>';
         helper.assert(html.convertHTMLEntities(_content), _expected);
       });
+
     });
   });
 });

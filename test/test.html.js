@@ -121,7 +121,7 @@ describe.only('Dynamic HTML', function () {
             '<text:span text:style-name="C013"> text </text:span>' +
             '<text:span text:style-name="C014">and </text:span>' +
             '<text:span text:style-name="C015">italic </text:span>' +
-          '</text:p><text:line-break/>' +
+          '</text:p><text:p text:style-name="Standard"/>' +
           '<text:p>' +
             '<text:span text:style-name="C017">text</text:span>' +
             '<text:span>.</text:span>' +
@@ -189,6 +189,19 @@ describe.only('Dynamic HTML', function () {
             '<text:span>.</text:span></text:p>',
           style : ''
         });
+
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><strong>Bold content</strong> Content without style. <br /><br>After double new lines</p><br/>'));
+        helper.assert(res.content, '' +
+          '<text:p>' +
+            '<text:span text:style-name="C011">Bold content</text:span>' +
+            '<text:span> Content without style. </text:span>' +
+            '<text:line-break/>' +
+            '<text:line-break/>' +
+            '<text:span>After double new lines</text:span>' +
+          '</text:p>' +
+          '<text:p text:style-name="Standard"/>' +
+          '<text:p text:style-name="Standard"/>'
+        );
       });
 
       it('should create hyperlinks', function () {
@@ -214,6 +227,191 @@ describe.only('Dynamic HTML', function () {
             '<text:span> Content after</text:span>' +
           '</text:p>'
         );
+        helper.assert(res.style, ''+
+          '<style:style style:name="C013" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
+          '<style:style style:name="C015" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
+        );
+      });
+
+      it('should generate a simple unordored list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>'));
+        console.log(res);
+        helper.assert(res.content, '' +
+          '<text:list>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Coffee</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Tea</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Milk</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+          '</text:list><text:p text:style-name=\"Standard\"/>'
+        );
+      });
+
+
+      it.skip('TODO: should generate a simple ordored list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li><li>Tea</li><li>Milk</li></ol>'));
+        console.log(res);
+        helper.assert(res.content, '' +
+          '<text:list>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Coffee</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Tea</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Milk</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+          '</text:list><text:p text:style-name="Standard"/>'
+        );
+      });
+
+      it('should create a nested unordored list && should not add an extra break line at the end of the nested list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee<ul><li>Mocha</li><li>Cappucino</li><li>Americano</li></ul></li><li>Tea</li><li>Milk</li></ul>'));
+        console.log(res);
+        helper.assert(res.content, '' +
+          '<text:list>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Coffee</text:span>'+
+              '</text:p>'+ // END OF PARAGRAPH HERE
+              '<text:list>'+
+                '<text:list-item>'+
+                  '<text:p>'+
+                    '<text:span>Mocha</text:span>'+
+                  '</text:p>'+
+                '</text:list-item>'+
+                '<text:list-item>'+
+                  '<text:p>'+
+                    '<text:span>Cappucino</text:span>'+
+                  '</text:p>'+
+                '</text:list-item>'+
+                '<text:list-item>'+
+                  '<text:p>'+
+                    '<text:span>Americano</text:span>'+
+                  '</text:p>'+
+                '</text:list-item>'+
+              '</text:list>' +
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Tea</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Milk</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+          '</text:list><text:p text:style-name="Standard"/>'
+        );
+      });
+
+      it.only('should generate a simple unordored list with a break line and styles', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Banana with some text<br/>Second line</li><li>Pineapple with a <b>bold</b> and <u>underlined</u> style</li></ul>'));
+        console.log(res);
+        helper.assert(res.content, '' +
+            '<text:list>' +
+              '<text:list-item>'+
+                '<text:p>'+
+                  '<text:span>Banana with some text</text:span>'+
+                  '<text:line-break/>'+
+                  '<text:span>Second line</text:span>'+
+                '</text:p>'+
+              '</text:list-item>'+
+              '<text:list-item>' +
+                '<text:p>' +
+                  '<text:span>Pineapple with a </text:span>' +
+                  '<text:span text:style-name="C018">bold</text:span>' +
+                  '<text:span> and </text:span>' +
+                  '<text:span text:style-name="C0110">underlined</text:span>' +
+                  '<text:span> style</text:span>' +
+                '</text:p>' +
+              '</text:list-item>' +
+            '</text:list><text:p text:style-name="Standard"/>'
+        );
+        helper.assert(res.style, '' +
+          '<style:style style:name="C018" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
+          '<style:style style:name="C0110" style:family="text"><style:text-properties style:text-underline-style="solid"/></style:style>'
+        );
+      });
+
+      it('should create a list of mix elements (hyperlink / styles/ break lines)', function () {
+        let content = 'This is a list:<br>' +
+                  '<ul>' +
+                    '<li>Banana</li>' +
+                    '<li>An URL to <a href="carbone.io">carbone.io</a> and a <a href="carbone.io/documentation.html"><i>link with a style</i></a></li>' +
+                  '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        helper.assert(res.content, '' +
+          '<text:p><text:span>This is a list:</text:span><text:line-break/></text:p>' +
+          '<text:list>' +
+            '<text:list-item>' +
+              '<text:p>' +
+                '<text:span>Banana</text:span>' +
+              '</text:p>' +
+            '</text:list-item>' +
+            '<text:list-item>' +
+              '<text:p>' +
+                '<text:span>An URL to </text:span>' +
+                '<text:a xlink:type="simple" xlink:href="https://carbone.io">' +
+                  '<text:span>carbone.io</text:span>' +
+                '</text:a>' +
+                '<text:span> and a </text:span>' +
+                '<text:a xlink:type="simple" xlink:href="https://carbone.io/documentation.html">' +
+                  '<text:span text:style-name="C0113">link with a style</text:span>' +
+                '</text:a>' +
+              '</text:p>' +
+            '</text:list-item>' +
+          '</text:list><text:p text:style-name="Standard"/>'
+        );
+      });
+
+      it.skip('TO DO: should test the limit of the HTML generation', function () {
+        // Invalid
+        let content = '' +
+                  '<ul>' +
+                    '<li>Banana</li>' +
+                    '<a href="carbone.io">carbone.io</a>' +
+                    '<li>An URL to  and a</li>' +
+                  '</ul>';
+        let content2 = '' +
+                  '<ul>' +
+                    '<a href="carbone.io">carbone.io</a>' +
+                    '<li>Banana</li>' +
+                    '<li>An URL to  and a</li>' +
+                    '<a href="carbone.io">carbone.io</a>' +
+                  '</ul>';
+        // Valid
+        // Nested list without text on the parent item
+        let content3 = '' +
+                  '<ul>' +
+                    '<li>Banana</li>' +
+                    '<ul><li>Mocha</li><li>Cappucino</li><li>Americano</li></ul>' +
+                    '<li>An URL to  and a</li>' +
+                  '</ul>';
+        let content3 = '' +
+                  '<ul>' +
+                    '<li>Banana</li>' +
+                    '<li><p>Apple</p></li>' +
+                    '<li>An URL to  and a</li>' +
+                  '</ul>';
       });
     });
 

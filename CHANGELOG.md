@@ -1,3 +1,13 @@
+### v3.1.0-beta.2
+  - HTML conversion for DOCX / ODT has been improved a lot:
+    - Fixed spacing management between list / paragraph / multi elements.
+    - All HTML entities are supported (Full List: https://www.w3schools.com/charsets/ref_html_entities_4.asp)
+    - Improved break-lines support
+    - Fixed hyperlinks when exporting DOCX to PDF
+    - Support hyperlinks for ODT reports
+    - Possible to include hyperlinks, break-lines, and style tags into any level of lists
+    - Improved overall stability
+
 ### v3.1.0-beta.1
 ### v3.1.0-beta.0
   - `:html` formatter converts `p`, `ul`, `ol`, `li`, `a` into DOCX style

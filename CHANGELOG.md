@@ -6,6 +6,7 @@
     - Fixed hyperlinks when exporting DOCX to PDF
     - Support hyperlinks for ODT reports
     - Possible to include hyperlinks, break-lines, and style tags into any level of lists
+    - Support nested ordered and unordored lists for ODT documents.
     - Improved overall stability
 
 ### v3.1.0-beta.1

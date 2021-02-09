@@ -3,7 +3,7 @@ const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 const assert = require('assert');
 
-describe.only('Dynamic HTML', function () {
+describe('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -252,7 +252,7 @@ describe.only('Dynamic HTML', function () {
                 '<text:span>Milk</text:span>'+
               '</text:p>'+
             '</text:list-item>'+
-          '</text:list><text:p text:style-name=\"Standard\"/>'
+          '</text:list><text:p text:style-name="Standard"/>'
         );
       });
 
@@ -348,7 +348,7 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it('should create a list preceded by a simple string', function () {
+      it('should create a list preceded by a string, a middle string and a next string', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('Before<ul><li>Content1</li></ul>Middle<ol><li>Content2</li></ol>End'));
         helper.assert(res.content, '' +
             '<text:p>'+
@@ -372,13 +372,54 @@ describe.only('Dynamic HTML', function () {
                 '</text:p>'+
               '</text:list-item>'+
             '</text:list>'+
-            '<text:p text:style-name=\"Standard\"/>' +
+            '<text:p text:style-name="Standard"/>' +
             '<text:p>'+
               '<text:span>End</text:span>'+
             '</text:p>'
         );
+      });
 
+      it('should create a nexted list without text in the parent LI', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('' +
+        '<ul>' +
+          '<li>Coffee</li>' +
+          '<ul><li>Mocha</li><li>Cappucino</li><li>Americano</li></ul>' +
+          '<li>Water</li>' +
+        '</ul>'));
 
+        helper.assert(res.content, '' +
+            '<text:list>'+ // Parent List
+              '<text:list-item>'+
+                '<text:p>'+
+                  '<text:span>Coffee</text:span>'+
+                '</text:p>'+
+              '</text:list-item>'+
+              '<text:list-item>'+
+                '<text:list>'+ // Nested list
+                  '<text:list-item>'+
+                    '<text:p>'+
+                      '<text:span>Mocha</text:span>'+
+                    '</text:p>'+
+                  '</text:list-item>'+
+                  '<text:list-item>'+
+                    '<text:p>'+
+                      '<text:span>Cappucino</text:span>'+
+                    '</text:p>'+
+                  '</text:list-item>'+
+                  '<text:list-item>'+
+                    '<text:p>'+
+                      '<text:span>Americano</text:span>'+
+                    '</text:p>'+
+                  '</text:list-item>'+
+                '</text:list>' +
+              '</text:list-item>'+
+              '<text:list-item>'+
+                '<text:p>'+
+                  '<text:span>Water</text:span>'+
+                '</text:p>'+
+              '</text:list-item>'+
+            '</text:list><text:p text:style-name=\"Standard\"/>'
+        );
       });
 
       it('should create a list of mix elements (hyperlink / styles/ break lines)', function () {
@@ -412,35 +453,135 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it.skip('TO DO: should test the limit of the HTML generation', function () {
-        // Invalid
+      it('should create a list with a paragraph', function () {
         let content = '' +
                   '<ul>' +
                     '<li>Banana</li>' +
-                    '<a href="carbone.io">carbone.io</a>' +
-                    '<li>An URL to  and a</li>' +
-                  '</ul>';
-        let content2 = '' +
-                  '<ul>' +
-                    '<a href="carbone.io">carbone.io</a>' +
-                    '<li>Banana</li>' +
-                    '<li>An URL to  and a</li>' +
-                    '<a href="carbone.io">carbone.io</a>' +
-                  '</ul>';
-        // Valid
-        // Nested list without text on the parent item
-        let content3 = '' +
-                  '<ul>' +
-                    '<li>Banana</li>' +
-                    '<ul><li>Mocha</li><li>Cappucino</li><li>Americano</li></ul>' +
-                    '<li>An URL to  and a</li>' +
-                  '</ul>';
-        let content3 = '' +
-                  '<ul>' +
-                    '<li>Banana</li>' +
                     '<li><p>Apple</p></li>' +
-                    '<li>An URL to  and a</li>' +
+                    '<li>Pear</li>' +
                   '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        helper.assert(res.content, '' +
+          '<text:list>' +
+            '<text:list-item>' +
+              '<text:p>' +
+                '<text:span>Banana</text:span>' +
+              '</text:p>' +
+            '</text:list-item>' +
+            '<text:list-item>' +
+              '<text:p>' +
+                '<text:span>Apple</text:span>' +
+              '</text:p>' +
+            '</text:list-item>' +
+            '<text:list-item>' +
+              '<text:p>' +
+                '<text:span>Pear</text:span>' +
+              '</text:p>' +
+            '</text:list-item>' +
+          '</text:list><text:p text:style-name="Standard"/>'
+        );
+      });
+
+      it('should create a double nested list', function () {
+        let content = '' +
+        '<ul>' +
+          '<li>Coffee' +
+            '<ul>' +
+              '<li>Mocha</li>' +
+                '<ul>' +
+                  '<li>green</li>' +
+                  '<li>red</li>' +
+                  '<li>blue</li>' +
+              '</ul>' +
+              '<li>Americano</li>' +
+            '</ul>' +
+          '</li>' +
+          '<li>Water</li>' +
+        '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        helper.assert(res.content, '' +
+        '<text:list>'+
+          '<text:list-item>'+
+            '<text:p>'+
+              '<text:span>Coffee</text:span>'+
+            '</text:p>'+
+            '<text:list>'+
+              '<text:list-item>'+
+                '<text:p>'+
+                  '<text:span>Mocha</text:span>'+
+                '</text:p>'+
+              '</text:list-item>'+
+              '<text:list-item>'+
+                '<text:list>'+
+                  '<text:list-item>'+
+                    '<text:p>'+
+                      '<text:span>green</text:span>'+
+                    '</text:p>'+
+                  '</text:list-item>'+
+                  '<text:list-item>'+
+                    '<text:p>'+
+                      '<text:span>red</text:span>'+
+                    '</text:p>'+
+                  '</text:list-item>'+
+                  '<text:list-item>'+
+                    '<text:p>'+
+                      '<text:span>blue</text:span>'+
+                    '</text:p>'+
+                  '</text:list-item>'+
+                '</text:list>'+
+              '</text:list-item>'+
+              '<text:list-item>'+
+                '<text:p>'+
+                  '<text:span>Americano</text:span>'+
+                '</text:p>'+
+              '</text:list-item>'+
+            '</text:list>'+
+          '</text:list-item>'+
+          '<text:list-item>'+
+            '<text:p>'+
+              '<text:span>Water</text:span>'+
+            '</text:p>'+
+          '</text:list-item>'+
+        '</text:list>'+
+        '<text:p text:style-name="Standard"/>'
+        );
+      });
+      it('should create a nested list with in a "li" tag without text', function () {
+        let content = '' +
+                  '<ul>' +
+                    '<li>Banana</li>' +
+                    '<li>' +
+                      '<ul>' +
+                        '<li>Mocha</li>' +
+                      '</ul>' +
+                    '</li>' +
+                    '<li>Pear</li>' +
+                  '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        helper.assert(res.content, '' +
+          '<text:list>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Banana</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:list>'+
+                '<text:list-item>'+
+                  '<text:p>'+
+                    '<text:span>Mocha</text:span>'+
+                  '</text:p>'+
+                '</text:list-item>'+
+              '</text:list>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Pear</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+          '</text:list>'+
+          '<text:p text:style-name="Standard"/>'
+        );
       });
     });
 
@@ -1084,8 +1225,61 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it('should convert HTML to DOCX xml 9: NESTED LIST 2 level', function () {
-        const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><li>Soft Green</li><li>light Green</li></ul></li></ul></li><li>Milk</li></ul>');
+      it('should convert HTML to DOCX xml 8: NESTED LIST 1 level but without text in the "li" attribute', function () {
+        const _descriptor = html.parseHTML('<ul><li>Coffee</li><ul><li>Black tea</li><li>Green tea</li></ul><li>Milk</li></ul>');
+        const _res = html.buildContentDOCX(_descriptor);
+        helper.assert(_res, '' +
+                    '<w:p>'+
+                      '<w:pPr>'+
+                        '<w:numPr>'+
+                          '<w:ilvl w:val="0"/>'+
+                          '<w:numId w:val="1"/>'+
+                        '</w:numPr>'+
+                      '</w:pPr>'+
+                      '<w:r>'+
+                        '<w:t xml:space="preserve">Coffee</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                    '<w:p>'+
+                      '<w:pPr>'+
+                        '<w:numPr>'+
+                          '<w:ilvl w:val="1"/>'+
+                          '<w:numId w:val="1"/>'+
+                        '</w:numPr>'+
+                      '</w:pPr>'+
+                      '<w:r>'+
+                        '<w:t xml:space="preserve">Black tea</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                    '<w:p>'+
+                      '<w:pPr>'+
+                        '<w:numPr>'+
+                          '<w:ilvl w:val="1"/>'+
+                          '<w:numId w:val="1"/>'+
+                        '</w:numPr>'+
+                      '</w:pPr>'+
+                      '<w:r>'+
+                        '<w:t xml:space="preserve">Green tea</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                    '<w:p>'+
+                      '<w:pPr>'+
+                        '<w:numPr>'+
+                          '<w:ilvl w:val="0"/>'+
+                          '<w:numId w:val="1"/>'+
+                        '</w:numPr>'+
+                      '</w:pPr>'+
+                      '<w:r>'+
+                        '<w:t xml:space="preserve">Milk</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                    '<w:p/>'
+
+        );
+      });
+
+      it('should convert HTML to DOCX xml 9: NESTED LIST 3 level', function () {
+        const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><ul><li>Soft Green</li><li>light Green</li></ul></ul></li></ul></li><li>Milk</li></ul>');
         const _res = html.buildContentDOCX(_descriptor);
         helper.assert(_res, '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
@@ -1093,21 +1287,110 @@ describe.only('Dynamic HTML', function () {
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Black tea</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Green tea</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Dark Green</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Soft Green</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">light Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="3"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Soft Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="3"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">light Green</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
         );
       });
 
-      it.skip('should convert HTML to DOCX xml 10: LIST with malformed HTML (content between ul and li)', function () {
-        const _descriptor = html.parseHTML('<ul>Hello 1<li>Coffee</li>Hello 2<li>Tea</li>Hello 3</ul>');
-        const _res = html.buildContentDOCX(_descriptor);
+      it.skip('TODO: should generate a simple ordored list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li><li>Tea</li><li>Milk</li></ol>'));
+        helper.assert(res.content, '' +
+          '<text:list>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Coffee</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Tea</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Milk</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+          '</text:list><text:p text:style-name="Standard"/>'
+        );
+      });
+
+
+      it('should convert HTML to DOCX xml with list, hyperlinks and styles', function () {
+        const _options = {
+          hyperlinkDatabase : new Map()
+        };
+        let content = '<ul>' +
+          '<li>Banana</li>' +
+          '<li>' +
+            '<u>This is an underline text</u>' +
+            '<br/>' +
+            'with <i>some</i> content' +
+            '<a href="carbone.io">' +
+              'and a <u>link</u>' +
+            '</a>' +
+          '</li>' +
+        '</ul>'
+        const _res = html.buildContentDOCX(html.parseHTML(content), _options);
         helper.assert(_res, '' +
-          '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">Hello 1</w:t></w:r></w:p>' + // simple text
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' + // list
-          '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">Hello 2</w:t></w:r></w:p>' + // simple text 2
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' + // list
-          '<w:p><w:r><w:rPr></w:rPr><w:t xml:space="preserve">Hello 3</w:t></w:r></w:p>' // simple text 3
+        '<w:p>'+
+          '<w:pPr>'+
+            '<w:numPr>'+
+              '<w:ilvl w:val="0"/>'+
+              '<w:numId w:val="1"/>'+
+            '</w:numPr>'+
+          '</w:pPr>'+
+          '<w:r>'+
+            '<w:t xml:space="preserve">Banana</w:t>'+
+          '</w:r>'+
+        '</w:p>'+
+        '<w:p>'+
+          '<w:pPr>'+
+            '<w:numPr>'+
+              '<w:ilvl w:val="0"/>'+
+              '<w:numId w:val="1"/>'+
+            '</w:numPr>'+
+          '</w:pPr>'+
+          '<w:r>'+
+            '<w:rPr>'+
+              '<w:u w:val="single"/>'+
+            '</w:rPr>'+
+            '<w:t xml:space="preserve">This is an underline text</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:br/>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:t xml:space="preserve">with </w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:rPr>'+
+              '<w:i/>'+
+              '<w:iCs/>'+
+            '</w:rPr>'+
+            '<w:t xml:space="preserve">some</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:t xml:space="preserve"> content</w:t>'+
+          '</w:r>'+
+          '<w:hyperlink r:id="CarboneHyperlinkId0">'+
+            '<w:r>'+
+              '<w:rPr>'+
+                '<w:rStyle w:val="Hyperlink"/>'+
+              '</w:rPr>'+
+              '<w:t xml:space="preserve">and a </w:t>'+
+            '</w:r>'+
+            '<w:r>'+
+              '<w:rPr>'+
+                '<w:u w:val="single"/>'+
+                '<w:rStyle w:val="Hyperlink"/>'+
+              '</w:rPr>'+
+              '<w:t xml:space="preserve">link</w:t>'+
+            '</w:r>'+
+          '</w:hyperlink>'+
+        '</w:p>'+
+        '<w:p/>'
         );
       });
 
@@ -1203,10 +1486,6 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_it.next().value, 'https://carbone.io');
         helper.assert(_it.next().value, 'https://carbone.io/documentation.html');
         helper.assert(_it.next().value, undefined);
-      });
-
-      it.skip('should convert HTML to DOCX xml with list, hyperlinks and styles', function () {
-        // <ul><li>Banana</li><li><u>This is an underline text</u><br/>with <i>some</i> content<ul><li>Mocha</li><li>Cappucino</li><li>Americano</li></ul></li><li>An URL to  and a</li></ul>
       });
 
       it('should return the DOCX xml content based on the descriptor', function () {

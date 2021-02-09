@@ -3,7 +3,7 @@ const htmlFormatters = require('../formatters/html');
 const helper = require('../lib/helper');
 const assert = require('assert');
 
-describe('Dynamic HTML', function () {
+describe.only('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -77,7 +77,8 @@ describe('Dynamic HTML', function () {
             '<text:span text:style-name="C011">and italic</text:span></text:p>',
           style : '' +
             '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
-            '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
+            '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>',
+          styleLists: ""
         });
 
         helper.assert(html.buildXMLContentOdt(_uniqueID,
@@ -96,7 +97,8 @@ describe('Dynamic HTML', function () {
             '<text:span> text</text:span></text:p>',
           style : '' +
             '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
-            '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
+            '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>',
+          styleLists: ""
         });
       });
 
@@ -154,7 +156,8 @@ describe('Dynamic HTML', function () {
               '<text:line-break/>'+
               '<text:span text:style-name="C012">a tree</text:span>'+
             '</text:p>',
-          style : '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>'
+          style : '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>',
+          styleLists: ''
         });
 
         helper.assert(html.buildXMLContentOdt(_uniqueID,
@@ -187,7 +190,8 @@ describe('Dynamic HTML', function () {
             '<text:span> text</text:span>' +
             '<text:line-break/>' +
             '<text:span>.</text:span></text:p>',
-          style : ''
+          style : '',
+          styleLists: ''
         });
 
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><strong>Bold content</strong> Content without style. <br /><br>After double new lines</p><br/>'));
@@ -233,10 +237,10 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it('should generate a simple unordored list', function () {
+      it('should generate a simple unordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>'));
         helper.assert(res.content, '' +
-          '<text:list>'+
+          '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
                 '<text:span>Coffee</text:span>'+
@@ -254,36 +258,120 @@ describe('Dynamic HTML', function () {
             '</text:list-item>'+
           '</text:list><text:p text:style-name="Standard"/>'
         );
+
+        helper.assert(res.styleLists, '' +
+          '<text:list-style style:name="LC010">'+
+            '<text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">'+
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">'+
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>'+
+              '</style:list-level-properties>'+
+            '</text:list-level-style-bullet>'+
+          '</text:list-style>'
+        );
       });
 
 
-      it.skip('TODO: should generate a simple ordored list', function () {
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li><li>Tea</li><li>Milk</li></ol>'));
+      it('should generate a simple ordered list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li></ol>'));
         helper.assert(res.content, '' +
-          '<text:list>'+
+          '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
                 '<text:span>Coffee</text:span>'+
               '</text:p>'+
-            '</text:list-item>'+
-            '<text:list-item>'+
-              '<text:p>'+
-                '<text:span>Tea</text:span>'+
-              '</text:p>'+
-            '</text:list-item>'+
-            '<text:list-item>'+
-              '<text:p>'+
-                '<text:span>Milk</text:span>'+
-              '</text:p>'+
-            '</text:list-item>'+
+            '</text:list-item>' +
           '</text:list><text:p text:style-name="Standard"/>'
+        );
+
+        helper.assert(res.styleLists, '' +
+          '<text:list-style style:name="LC010">'+
+            '<text:list-level-style-number text:level="1" text:style-name="Numbering_20_Symbols" style:num-suffix="." style:num-format="1">'+
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">'+
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>'+
+              '</style:list-level-properties>'+
+            '</text:list-level-style-number>'+
+          '</text:list-style>'
+        );
+      });
+
+      it('should generate a nested ordered list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li><ol><li>Americano</li></ol></ol>'));
+        helper.assert(res.content, '' +
+          '<text:list text:style-name="LC010">'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Coffee</text:span>'+
+              '</text:p>'+
+            '</text:list-item>' +
+            '<text:list-item>'+
+              '<text:list>'+
+                '<text:list-item>'+
+                  '<text:p>'+
+                    '<text:span>Americano</text:span>'+
+                  '</text:p>'+
+                '</text:list-item>' +
+              '</text:list>'+
+            '</text:list-item>' +
+          '</text:list><text:p text:style-name="Standard"/>'
+        );
+
+        helper.assert(res.styleLists, '' +
+          '<text:list-style style:name="LC010">'+
+            '<text:list-level-style-number text:level="1" text:style-name="Numbering_20_Symbols" style:num-suffix="." style:num-format="1">'+
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">'+
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>'+
+              '</style:list-level-properties>'+
+            '</text:list-level-style-number>'+
+            '<text:list-level-style-number text:level="2" text:style-name="Numbering_20_Symbols" style:num-suffix="." style:num-format="1">'+
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">'+
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.91cm" fo:text-indent="-0.635cm" fo:margin-left="1.91cm"/>'+
+              '</style:list-level-properties>'+
+            '</text:list-level-style-number>'+
+          '</text:list-style>'
+        );
+      });
+
+      it('should generate a nested ordered and unordered list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li><ul><li>Americano</li></ul></ol>'));
+        helper.assert(res.content, '' +
+          '<text:list text:style-name="LC010">'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Coffee</text:span>'+
+              '</text:p>'+
+            '</text:list-item>' +
+            '<text:list-item>'+
+              '<text:list>'+
+                '<text:list-item>'+
+                  '<text:p>'+
+                    '<text:span>Americano</text:span>'+
+                  '</text:p>'+
+                '</text:list-item>' +
+              '</text:list>'+
+            '</text:list-item>' +
+          '</text:list><text:p text:style-name="Standard"/>'
+        );
+
+        helper.assert(res.styleLists, '' +
+          '<text:list-style style:name="LC010">'+
+            '<text:list-level-style-number text:level="1" text:style-name="Numbering_20_Symbols" style:num-suffix="." style:num-format="1">'+
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">'+
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>'+
+              '</style:list-level-properties>'+
+            '</text:list-level-style-number>'+
+            '<text:list-level-style-bullet text:level="2" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">' +
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">' +
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.91cm" fo:text-indent="-0.635cm" fo:margin-left="1.91cm"/>' +
+              '</style:list-level-properties>' +
+            '</text:list-level-style-bullet>' +
+          '</text:list-style>'
         );
       });
 
       it('should create a nested unordored list && should not add an extra break line at the end of the nested list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee<ul><li>Mocha</li><li>Cappucino</li><li>Americano</li></ul></li><li>Tea</li><li>Milk</li></ul>'));
         helper.assert(res.content, '' +
-          '<text:list>'+
+          '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
                 '<text:span>Coffee</text:span>'+
@@ -318,12 +406,27 @@ describe('Dynamic HTML', function () {
             '</text:list-item>'+
           '</text:list><text:p text:style-name="Standard"/>'
         );
+
+        helper.assert(res.styleLists, '' +
+          '<text:list-style style:name="LC010">'+
+            '<text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">'+
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">'+
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>'+
+              '</style:list-level-properties>'+
+            '</text:list-level-style-bullet>'+
+            '<text:list-level-style-bullet text:level="2" text:style-name="Bullet_20_Symbols" text:bullet-char="▪">' +
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">' +
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.91cm" fo:text-indent="-0.635cm" fo:margin-left="1.91cm"/>' +
+              '</style:list-level-properties>' +
+            '</text:list-level-style-bullet>' +
+          '</text:list-style>'
+        );
       });
 
       it('should generate a simple unordored list with a break line and styles', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Banana with some text<br/>Second line</li><li>Pineapple with a <b>bold</b> and <u>underlined</u> style</li></ul>'));
         helper.assert(res.content, '' +
-            '<text:list>' +
+            '<text:list text:style-name="LC010">' +
               '<text:list-item>'+
                 '<text:p>'+
                   '<text:span>Banana with some text</text:span>'+
@@ -346,6 +449,15 @@ describe('Dynamic HTML', function () {
           '<style:style style:name="C018" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
           '<style:style style:name="C0110" style:family="text"><style:text-properties style:text-underline-style="solid"/></style:style>'
         );
+        helper.assert(res.styleLists, '' +
+          '<text:list-style style:name="LC010">'+
+            '<text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">'+
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">'+
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>'+
+              '</style:list-level-properties>'+
+            '</text:list-level-style-bullet>'+
+          '</text:list-style>'
+        );
       });
 
       it('should create a list preceded by a string, a middle string and a next string', function () {
@@ -354,7 +466,7 @@ describe('Dynamic HTML', function () {
             '<text:p>'+
               '<text:span>Before</text:span>'+
             '</text:p>'+
-            '<text:list>'+
+            '<text:list text:style-name="LC011">'+
               '<text:list-item>'+
                 '<text:p>'+
                   '<text:span>Content1</text:span>'+
@@ -365,7 +477,7 @@ describe('Dynamic HTML', function () {
             '<text:p>'+
               '<text:span>Middle</text:span>'+
             '</text:p>'+
-            '<text:list>'+
+            '<text:list text:style-name="LC017">'+
               '<text:list-item>'+
                 '<text:p>'+
                   '<text:span>Content2</text:span>'+
@@ -376,6 +488,22 @@ describe('Dynamic HTML', function () {
             '<text:p>'+
               '<text:span>End</text:span>'+
             '</text:p>'
+        );
+        helper.assert(res.styleLists, '' +
+          '<text:list-style style:name="LC011">'+
+            '<text:list-level-style-bullet text:level="1" text:style-name="Bullet_20_Symbols" text:bullet-char="◦">'+
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">'+
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>'+
+              '</style:list-level-properties>'+
+            '</text:list-level-style-bullet>'+
+          '</text:list-style>' +
+          '<text:list-style style:name="LC017">' +
+            '<text:list-level-style-number text:level="1" text:style-name="Numbering_20_Symbols" style:num-suffix="." style:num-format="1">' +
+              '<style:list-level-properties text:list-level-position-and-space-mode="label-alignment">' +
+                '<style:list-level-label-alignment text:label-followed-by="listtab" text:list-tab-stop-position="1.27cm" fo:text-indent="-0.635cm" fo:margin-left="1.27cm"/>' +
+              '</style:list-level-properties>' +
+            '</text:list-level-style-number>' +
+          '</text:list-style>'
         );
       });
 
@@ -388,7 +516,7 @@ describe('Dynamic HTML', function () {
         '</ul>'));
 
         helper.assert(res.content, '' +
-            '<text:list>'+ // Parent List
+            '<text:list text:style-name="LC010">'+ // Parent List
               '<text:list-item>'+
                 '<text:p>'+
                   '<text:span>Coffee</text:span>'+
@@ -431,7 +559,7 @@ describe('Dynamic HTML', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
         helper.assert(res.content, '' +
           '<text:p><text:span>This is a list:</text:span><text:line-break/></text:p>' +
-          '<text:list>' +
+          '<text:list text:style-name="LC012">' +
             '<text:list-item>' +
               '<text:p>' +
                 '<text:span>Banana</text:span>' +
@@ -462,7 +590,7 @@ describe('Dynamic HTML', function () {
                   '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
         helper.assert(res.content, '' +
-          '<text:list>' +
+          '<text:list text:style-name="LC010">' +
             '<text:list-item>' +
               '<text:p>' +
                 '<text:span>Banana</text:span>' +
@@ -500,7 +628,7 @@ describe('Dynamic HTML', function () {
         '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
         helper.assert(res.content, '' +
-        '<text:list>'+
+        '<text:list text:style-name="LC010">'+
           '<text:list-item>'+
             '<text:p>'+
               '<text:span>Coffee</text:span>'+
@@ -559,7 +687,7 @@ describe('Dynamic HTML', function () {
                   '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
         helper.assert(res.content, '' +
-          '<text:list>'+
+          '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
                 '<text:span>Banana</text:span>'+
@@ -662,7 +790,8 @@ describe('Dynamic HTML', function () {
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_properties, {
           content : _expectedContent,
-          style   : _expectedStyle
+          style   : _expectedStyle,
+          styleLists: ''
         });
         helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expectedContent);
       });
@@ -683,7 +812,8 @@ describe('Dynamic HTML', function () {
                     '<text:span>.</text:span></text:p>',
           style : '<style:style style:name="TC01" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>' +
                   '<style:style style:name="TC03" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>' +
-                  '<style:style style:name="TC05" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
+                  '<style:style style:name="TC05" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>',
+          styleLists: ''
         };
         htmlFormatters.getHTMLContentOdt.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
@@ -702,7 +832,8 @@ describe('Dynamic HTML', function () {
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_properties, {
           content : _expected,
-          style   : _style
+          style   : _style,
+          styleLists: ''
         });
         helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expected);
       });
@@ -718,7 +849,8 @@ describe('Dynamic HTML', function () {
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_properties, {
           content : '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>',
-          style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>'
+          style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>',
+          styleLists : ''
         });
       });
     });

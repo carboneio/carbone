@@ -16,11 +16,12 @@ function addHtmlDatabase (options, htmlContent) {
   if (!options.htmlDatabase.has(htmlContent)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     const id = html.generateStyleID(options.htmlDatabase.size);
-    const { content, style } = html.buildXMLContentOdt(id, descriptor);
+    const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor);
 
     _htmlDatabaseProperties = {
       content,
-      style
+      style,
+      styleLists
     };
     options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
   }

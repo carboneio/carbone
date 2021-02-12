@@ -68,9 +68,12 @@ function addHtmlDatabaseDOCX (options, htmlContent) {
 
   if (!options.htmlDatabase.has(htmlContent)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
+    const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(descriptor, options);
     _htmlDatabaseProperties = {
       id      : options.htmlDatabase.size,
-      content : html.buildContentDOCX(descriptor, options)
+      content,
+      listStyleAbstract,
+      listStyleNum
     };
     options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
   }

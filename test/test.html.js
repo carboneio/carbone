@@ -368,7 +368,7 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it('should create a nested unordored list && should not add an extra break line at the end of the nested list', function () {
+      it('should create a nested unordered list && should not add an extra break line at the end of the nested list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee<ul><li>Mocha</li><li>Cappucino</li><li>Americano</li></ul></li><li>Tea</li><li>Milk</li></ul>'));
         helper.assert(res.content, '' +
           '<text:list text:style-name="LC010">'+
@@ -423,7 +423,7 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it('should generate a simple unordored list with a break line and styles', function () {
+      it('should generate a simple unordered list with a break line and styles', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Banana with some text<br/>Second line</li><li>Pineapple with a <b>bold</b> and <u>underlined</u> style</li></ul>'));
         helper.assert(res.content, '' +
             '<text:list text:style-name="LC010">' +
@@ -1103,15 +1103,18 @@ describe('Dynamic HTML', function () {
 
     describe('buildContentDOCX', function () {
       it('should return nothing if the descriptor is empty/undefined/null', function () {
-        helper.assert(html.buildContentDOCX([]), '');
-        helper.assert(html.buildContentDOCX(), '');
-        helper.assert(html.buildContentDOCX(undefined), '');
-        helper.assert(html.buildContentDOCX(null), '');
+        helper.assert(html.buildContentDOCX([]), {content: '', listStyleAbstract: '', listStyleNum: ''});
+        helper.assert(html.buildContentDOCX(), {content: '',  listStyleAbstract: '', listStyleNum: '' });
+        helper.assert(html.buildContentDOCX(undefined), {content: '',  listStyleAbstract: '', listStyleNum: '' });
+        helper.assert(html.buildContentDOCX(null), {content: '',  listStyleAbstract: '', listStyleNum: '' });
       });
 
 
       it('should return nothing if the descriptor has only 1 element', function () {
-        helper.assert(html.buildContentDOCX([{ content : 'text', type : '', tags : ['b'] }]), '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX([{ content : 'text', type : '', tags : ['b'] }])
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>'+
           '<w:r>' +
             '<w:rPr>' +
@@ -1130,8 +1133,10 @@ describe('Dynamic HTML', function () {
         //   { content: ' thit is some text', tags: [] },
         //   { content: '#PE#', tags: [ ] }
         // ]
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -1154,8 +1159,10 @@ describe('Dynamic HTML', function () {
         //   { content: '#PE#', tags: [ ] },
         //   { content: 'John', tags: ['i'] }
         // ]
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -1185,8 +1192,10 @@ describe('Dynamic HTML', function () {
         //   { content: 'John', tags: ['i'] },
         //   { content: ' green blue red', tags: [ ] },
         // ]
-        let _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -1218,8 +1227,10 @@ describe('Dynamic HTML', function () {
         //   { content: ' thit is some text', tags: [] },
         //   { content: '#PE#', tags: [ ] },
         // ]
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:i/><w:iCs/></w:rPr>'+
@@ -1267,9 +1278,10 @@ describe('Dynamic HTML', function () {
         //     tags: [ ]
         //   },
         // ]
-        const _res = html.buildContentDOCX(_descriptor);
-
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>'+
           '<w:r>'+
             '<w:t xml:space="preserve">Professional Accreditation</w:t>'+
@@ -1288,8 +1300,10 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 5', function () {
         let _descriptor = html.parseHTML('<p><strong><p>Professional Accreditation</p></strong></p><p><em>La <p>Trobes</p></em></p>');
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -1313,59 +1327,134 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 6 string followed by a list', function () {
         let _descriptor = html.parseHTML('You’ll learn<ul><li>Understand</li></ul>');
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
-        '<w:p>'+
-          '<w:r>'+
-            '<w:t xml:space="preserve">You’ll learn</w:t>'+
-          '</w:r>'+
-        '</w:p>' +
-        '<w:p>'+
-          '<w:pPr>' +
-            '<w:numPr>' +
-              '<w:ilvl w:val="0"/>' +
-              '<w:numId w:val="1"/>' +
-            '</w:numPr>' +
-          '</w:pPr>' +
-          '<w:r>'+
-            '<w:t xml:space="preserve">Understand</w:t>'+
-          '</w:r>' +
-        '</w:p>' +
-        '<w:p/>'
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(content, '' +
+          '<w:p>'+
+            '<w:r>'+
+              '<w:t xml:space="preserve">You’ll learn</w:t>'+
+            '</w:r>'+
+          '</w:p>' +
+          '<w:p>'+
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>'+
+              '<w:t xml:space="preserve">Understand</w:t>'+
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
         );
+        helper.assert(listStyleAbstract, '' +
+          '<w:abstractNum w:abstractNumId="1000">' +
+            '<w:multiLevelType w:val="hybridMultilevel"/>' +
+            '<w:lvl w:ilvl="0">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="bullet"/>' +
+              '<w:lvlText w:val=""/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="720" w:hanging="360"/>' +
+              '</w:pPr>' +
+              '<w:rPr>' +
+                '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+              '</w:rPr>' +
+            '</w:lvl>' +
+          '</w:abstractNum>'
+        );
+        helper.assert(listStyleNum, '' +
+        '<w:num w:numId="1000">' +
+          '<w:abstractNumId w:val="1000"/>' +
+        '</w:num>')
       });
 
-      it('should convert HTML to DOCX xml 7: SIMPLE LIST', function () {
+      it('should convert HTML to DOCX xml 7: simple unordered list', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>');
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(content, '' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
         );
+        helper.assert(listStyleAbstract, '' +
+        '<w:abstractNum w:abstractNumId="1000">' +
+          '<w:multiLevelType w:val="hybridMultilevel"/>' +
+          '<w:lvl w:ilvl="0">' +
+            '<w:start w:val="1"/>' +
+            '<w:numFmt w:val="bullet"/>' +
+            '<w:lvlText w:val=""/>' +
+            '<w:lvlJc w:val="left"/>' +
+            '<w:pPr>' +
+              '<w:ind w:left="720" w:hanging="360"/>' +
+            '</w:pPr>' +
+            '<w:rPr>' +
+              '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+            '</w:rPr>' +
+          '</w:lvl>' +
+        '</w:abstractNum>'
+        );
+        helper.assert(listStyleNum, '' +
+        '<w:num w:numId="1000">' +
+          '<w:abstractNumId w:val="1000"/>' +
+        '</w:num>')
       });
 
       it('should convert HTML to DOCX xml 8: NESTED LIST 1 level', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea</li></ul></li><li>Milk</li></ul>');
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Black tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Green tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(content, '' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Black tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Green tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
         );
+        helper.assert(listStyleAbstract, '' +
+        '<w:abstractNum w:abstractNumId="1000">' +
+          '<w:multiLevelType w:val="hybridMultilevel"/>' +
+          '<w:lvl w:ilvl="0">' +
+            '<w:start w:val="1"/>' +
+            '<w:numFmt w:val="bullet"/>' +
+            '<w:lvlText w:val=""/>' +
+            '<w:lvlJc w:val="left"/>' +
+            '<w:pPr>' +
+              '<w:ind w:left="720" w:hanging="360"/>' +
+            '</w:pPr>' +
+            '<w:rPr>' +
+              '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+            '</w:rPr>' +
+          '</w:lvl>' +
+          '<w:lvl w:ilvl="1">' +
+            '<w:start w:val="1"/>' +
+            '<w:numFmt w:val="bullet"/>' +
+            '<w:lvlText w:val="o"/>' +
+            '<w:lvlJc w:val="left"/>' +
+            '<w:pPr>' +
+              '<w:ind w:left="1440" w:hanging="360"/>' +
+            '</w:pPr>' +
+            '<w:rPr>' +
+              '<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:hint="default"/>' +
+            '</w:rPr>' +
+          '</w:lvl>' +
+        '</w:abstractNum>'
+        );
+        helper.assert(listStyleNum, '' +
+        '<w:num w:numId="1000">' +
+          '<w:abstractNumId w:val="1000"/>' +
+        '</w:num>')
       });
 
       it('should convert HTML to DOCX xml 8: NESTED LIST 1 level but without text in the "li" attribute', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><ul><li>Black tea</li><li>Green tea</li></ul><li>Milk</li></ul>');
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(content, '' +
                     '<w:p>'+
                       '<w:pPr>'+
                         '<w:numPr>'+
                           '<w:ilvl w:val="0"/>'+
-                          '<w:numId w:val="1"/>'+
+                          '<w:numId w:val="1000"/>'+
                         '</w:numPr>'+
                       '</w:pPr>'+
                       '<w:r>'+
@@ -1376,7 +1465,7 @@ describe('Dynamic HTML', function () {
                       '<w:pPr>'+
                         '<w:numPr>'+
                           '<w:ilvl w:val="1"/>'+
-                          '<w:numId w:val="1"/>'+
+                          '<w:numId w:val="1000"/>'+
                         '</w:numPr>'+
                       '</w:pPr>'+
                       '<w:r>'+
@@ -1387,7 +1476,7 @@ describe('Dynamic HTML', function () {
                       '<w:pPr>'+
                         '<w:numPr>'+
                           '<w:ilvl w:val="1"/>'+
-                          '<w:numId w:val="1"/>'+
+                          '<w:numId w:val="1000"/>'+
                         '</w:numPr>'+
                       '</w:pPr>'+
                       '<w:r>'+
@@ -1398,7 +1487,7 @@ describe('Dynamic HTML', function () {
                       '<w:pPr>'+
                         '<w:numPr>'+
                           '<w:ilvl w:val="0"/>'+
-                          '<w:numId w:val="1"/>'+
+                          '<w:numId w:val="1000"/>'+
                         '</w:numPr>'+
                       '</w:pPr>'+
                       '<w:r>'+
@@ -1408,44 +1497,346 @@ describe('Dynamic HTML', function () {
                     '<w:p/>'
 
         );
+
+        helper.assert(listStyleAbstract, '' +
+            '<w:abstractNum w:abstractNumId="1000">' +
+              '<w:multiLevelType w:val="hybridMultilevel"/>' +
+              '<w:lvl w:ilvl="0">' +
+                '<w:start w:val="1"/>' +
+                '<w:numFmt w:val="bullet"/>' +
+                '<w:lvlText w:val=""/>' +
+                '<w:lvlJc w:val="left"/>' +
+                '<w:pPr>' +
+                  '<w:ind w:left="720" w:hanging="360"/>' +
+                '</w:pPr>' +
+                '<w:rPr>' +
+                  '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+                '</w:rPr>' +
+              '</w:lvl>' +
+              '<w:lvl w:ilvl="1">' +
+                '<w:start w:val="1"/>' +
+                '<w:numFmt w:val="bullet"/>' +
+                '<w:lvlText w:val="o"/>' +
+                '<w:lvlJc w:val="left"/>' +
+                '<w:pPr>' +
+                  '<w:ind w:left="1440" w:hanging="360"/>' +
+                '</w:pPr>' +
+                '<w:rPr>' +
+                  '<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:hint="default"/>' +
+                '</w:rPr>' +
+              '</w:lvl>' +
+            '</w:abstractNum>'
+        );
+        helper.assert(listStyleNum, '' +
+        '<w:num w:numId="1000">' +
+          '<w:abstractNumId w:val="1000"/>' +
+        '</w:num>')
       });
 
       it('should convert HTML to DOCX xml 9: NESTED LIST 3 level', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><ul><li>Soft Green</li><li>light Green</li></ul></ul></li></ul></li><li>Milk</li></ul>');
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Black tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Green tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Dark Green</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="3"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Soft Green</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="3"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">light Green</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(content, '' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Black tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Green tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="2"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Dark Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="3"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Soft Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="3"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">light Green</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
         );
+
+        helper.assert(listStyleAbstract, '' +
+          '<w:abstractNum w:abstractNumId="1000">' +
+            '<w:multiLevelType w:val="hybridMultilevel"/>' +
+            '<w:lvl w:ilvl="0">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="bullet"/>' +
+              '<w:lvlText w:val=""/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="720" w:hanging="360"/>' +
+              '</w:pPr>' +
+              '<w:rPr>' +
+                '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+              '</w:rPr>' +
+            '</w:lvl>' +
+            '<w:lvl w:ilvl="1">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="bullet"/>' +
+              '<w:lvlText w:val="o"/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="1440" w:hanging="360"/>' +
+              '</w:pPr>' +
+              '<w:rPr>' +
+                '<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:hint="default"/>' +
+              '</w:rPr>' +
+            '</w:lvl>' +
+            '<w:lvl w:ilvl="2">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="bullet"/>' +
+              '<w:lvlText w:val=""/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="2160" w:hanging="360"/>' +
+              '</w:pPr>' +
+              '<w:rPr>' +
+                '<w:rFonts w:ascii="Wingdings" w:hAnsi="Wingdings" w:hint="default"/>' +
+              '</w:rPr>' +
+            '</w:lvl>' +
+            '<w:lvl w:ilvl="3">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="bullet"/>' +
+              '<w:lvlText w:val=""/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="2880" w:hanging="360"/>' +
+              '</w:pPr>' +
+              '<w:rPr>' +
+                '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+              '</w:rPr>' +
+            '</w:lvl>' +
+          '</w:abstractNum>'
+        );
+        helper.assert(listStyleNum, '' +
+        '<w:num w:numId="1000">' +
+          '<w:abstractNumId w:val="1000"/>' +
+        '</w:num>')
       });
 
-      it.skip('TODO: should generate a simple ordored list', function () {
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li><li>Tea</li><li>Milk</li></ol>'));
-        helper.assert(res.content, '' +
-          '<text:list>'+
-            '<text:list-item>'+
-              '<text:p>'+
-                '<text:span>Coffee</text:span>'+
-              '</text:p>'+
-            '</text:list-item>'+
-            '<text:list-item>'+
-              '<text:p>'+
-                '<text:span>Tea</text:span>'+
-              '</text:p>'+
-            '</text:list-item>'+
-            '<text:list-item>'+
-              '<text:p>'+
-                '<text:span>Milk</text:span>'+
-              '</text:p>'+
-            '</text:list-item>'+
-          '</text:list><text:p text:style-name="Standard"/>'
+      it('should generate a simple ordered list', function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>Coffee</li><li>Tea</li><li>Milk</li></ol>'));
+        helper.assert(content, '' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve">Coffee</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve">Tea</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve">Milk</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
         );
+
+        helper.assert(listStyleAbstract, '' +
+          '<w:abstractNum w:abstractNumId="1000">' +
+            '<w:multiLevelType w:val="hybridMultilevel"/>' +
+            '<w:lvl w:ilvl="0">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="decimal"/>' +
+              '<w:lvlText w:val="%1."/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="720" w:hanging="360"/>' +
+              '</w:pPr>' +
+            '</w:lvl>' +
+          '</w:abstractNum>'
+        )
+        helper.assert(listStyleNum, '' +
+        '<w:num w:numId="1000">' +
+          '<w:abstractNumId w:val="1000"/>' +
+        '</w:num>')
+      });
+
+      it('should generate 3 different list and should generate the corresponding list style for numbering.xml', function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>Coffee</li></ol><ul><li>Tea</li></ul><ol><li>Milk</li></ol>'));
+        helper.assert(content, '' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve">Coffee</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1001"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve">Tea</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1002"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve">Milk</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+
+        helper.assert(listStyleAbstract, '' +
+          '<w:abstractNum w:abstractNumId="1000">' +
+            '<w:multiLevelType w:val="hybridMultilevel"/>' +
+            '<w:lvl w:ilvl="0">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="decimal"/>' +
+              '<w:lvlText w:val="%1."/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="720" w:hanging="360"/>' +
+              '</w:pPr>' +
+            '</w:lvl>' +
+          '</w:abstractNum>' +
+          '<w:abstractNum w:abstractNumId="1001">' +
+            '<w:multiLevelType w:val="hybridMultilevel"/>' +
+            '<w:lvl w:ilvl="0">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="bullet"/>' +
+              '<w:lvlText w:val=""/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="720" w:hanging="360"/>' +
+              '</w:pPr>' +
+              '<w:rPr>' +
+                '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+              '</w:rPr>' +
+            '</w:lvl>' +
+          '</w:abstractNum>' +
+          '<w:abstractNum w:abstractNumId="1002">' +
+            '<w:multiLevelType w:val="hybridMultilevel"/>' +
+            '<w:lvl w:ilvl="0">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="decimal"/>' +
+              '<w:lvlText w:val="%1."/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="720" w:hanging="360"/>' +
+              '</w:pPr>' +
+            '</w:lvl>' +
+          '</w:abstractNum>'
+        )
+
+        helper.assert(listStyleNum, '' +
+          '<w:num w:numId="1000">' +
+            '<w:abstractNumId w:val="1000"/>' +
+          '</w:num>' +
+          '<w:num w:numId="1001">' +
+            '<w:abstractNumId w:val="1001"/>' +
+          '</w:num>' +
+          '<w:num w:numId="1002">' +
+            '<w:abstractNumId w:val="1002"/>' +
+          '</w:num>'
+        )
+      });
+
+      it("should create nested list at the same level and should not create extra style of the list", function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>Hello<ul><li>Tea</li></ul></li><li>Hello2<ul><li>Tea</li></ul></li></ol>'));
+        helper.assert(content, '' +
+        '<w:p>' +
+          '<w:pPr>' +
+            '<w:numPr>' +
+              '<w:ilvl w:val="0"/>' +
+              '<w:numId w:val="1000"/>' +
+            '</w:numPr>' +
+          '</w:pPr>' +
+          '<w:r>' +
+            '<w:t xml:space="preserve">Hello</w:t>' +
+          '</w:r>' +
+        '</w:p>' +
+        '<w:p>' +
+          '<w:pPr>' +
+            '<w:numPr>' +
+              '<w:ilvl w:val="1"/>' +
+              '<w:numId w:val="1000"/>' +
+            '</w:numPr>' +
+          '</w:pPr>' +
+          '<w:r>' +
+            '<w:t xml:space="preserve">Tea</w:t>' +
+          '</w:r>' +
+        '</w:p>' +
+        '<w:p>' +
+          '<w:pPr>' +
+            '<w:numPr>' +
+              '<w:ilvl w:val="0"/>' +
+              '<w:numId w:val="1000"/>' +
+            '</w:numPr>' +
+          '</w:pPr>' +
+          '<w:r>' +
+            '<w:t xml:space="preserve">Hello2</w:t>' +
+          '</w:r>' +
+        '</w:p>' +
+        '<w:p>' +
+          '<w:pPr>' +
+            '<w:numPr>' +
+              '<w:ilvl w:val="1"/>' +
+              '<w:numId w:val="1000"/>' +
+            '</w:numPr>' +
+          '</w:pPr>' +
+          '<w:r>' +
+            '<w:t xml:space="preserve">Tea</w:t>' +
+          '</w:r>' +
+        '</w:p>' +
+        '<w:p/>'
+        );
+
+        helper.assert(listStyleAbstract, '' +
+        '<w:abstractNum w:abstractNumId="1000">'+
+          '<w:multiLevelType w:val="hybridMultilevel"/>'+
+          '<w:lvl w:ilvl="0">'+
+            '<w:start w:val="1"/>'+
+            '<w:numFmt w:val="decimal"/>'+
+            '<w:lvlText w:val="%1."/>'+
+            '<w:lvlJc w:val="left"/>'+
+            '<w:pPr>'+
+              '<w:ind w:left="720" w:hanging="360"/>'+
+            '</w:pPr>'+
+          '</w:lvl>'+
+          '<w:lvl w:ilvl="1">'+
+            '<w:start w:val="1"/>'+
+            '<w:numFmt w:val="bullet"/>'+
+            '<w:lvlText w:val="o"/>'+
+            '<w:lvlJc w:val="left"/>'+
+            '<w:pPr>'+
+              '<w:ind w:left="1440" w:hanging="360"/>'+
+            '</w:pPr>'+
+            '<w:rPr>'+
+              '<w:rFonts w:ascii="Courier New" w:hAnsi="Courier New" w:hint="default"/>'+
+            '</w:rPr>'+
+          '</w:lvl>'+
+        '</w:abstractNum>');
+        helper.assert(listStyleNum, '<w:num w:numId="1000"><w:abstractNumId w:val="1000"/></w:num>');
       });
 
 
@@ -1453,7 +1844,7 @@ describe('Dynamic HTML', function () {
         const _options = {
           hyperlinkDatabase : new Map()
         };
-        let content = '<ul>' +
+        let htmlContent = '<ul>' +
           '<li>Banana</li>' +
           '<li>' +
             '<u>This is an underline text</u>' +
@@ -1464,13 +1855,13 @@ describe('Dynamic HTML', function () {
             '</a>' +
           '</li>' +
         '</ul>'
-        const _res = html.buildContentDOCX(html.parseHTML(content), _options);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML(htmlContent), _options);
+        helper.assert(content, '' +
         '<w:p>'+
           '<w:pPr>'+
             '<w:numPr>'+
               '<w:ilvl w:val="0"/>'+
-              '<w:numId w:val="1"/>'+
+              '<w:numId w:val="1000"/>'+
             '</w:numPr>'+
           '</w:pPr>'+
           '<w:r>'+
@@ -1481,7 +1872,7 @@ describe('Dynamic HTML', function () {
           '<w:pPr>'+
             '<w:numPr>'+
               '<w:ilvl w:val="0"/>'+
-              '<w:numId w:val="1"/>'+
+              '<w:numId w:val="1000"/>'+
             '</w:numPr>'+
           '</w:pPr>'+
           '<w:r>'+
@@ -1524,12 +1915,36 @@ describe('Dynamic HTML', function () {
         '</w:p>'+
         '<w:p/>'
         );
+        helper.assert(listStyleAbstract, '' +
+          '<w:abstractNum w:abstractNumId="1000">' +
+            '<w:multiLevelType w:val="hybridMultilevel"/>' +
+            '<w:lvl w:ilvl="0">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="bullet"/>' +
+              '<w:lvlText w:val=""/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="720" w:hanging="360"/>' +
+              '</w:pPr>' +
+              '<w:rPr>' +
+                '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+              '</w:rPr>' +
+            '</w:lvl>' +
+          '</w:abstractNum>'
+        );
+        helper.assert(listStyleNum, '' +
+          '<w:num w:numId="1000">' +
+            '<w:abstractNumId w:val="1000"/>' +
+          '</w:num>'
+        )
       });
 
       it('should convert HTML to DOCX xml 11', function () {
         const _descriptor = html.parseHTML('You will learn<br />');
-        const _res = html.buildContentDOCX(_descriptor);
-        helper.assert(_res, '<w:p><w:r><w:t xml:space="preserve">You will learn</w:t></w:r><w:r><w:br/></w:r></w:p>');
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(content, '<w:p><w:r><w:t xml:space="preserve">You will learn</w:t></w:r><w:r><w:br/></w:r></w:p>');
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
       });
 
       it('should convert HTML to DOCX xml 12 hyperlink simple', function () {
@@ -1537,8 +1952,10 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a>');
-        const _res = html.buildContentDOCX(_descriptor, _options);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
            '<w:r>' +
@@ -1558,8 +1975,10 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone<br>Website</a>');
-        const _res = html.buildContentDOCX(_descriptor, _options);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
            '<w:r>' +
@@ -1586,8 +2005,10 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a><p><a href="carbone.io/documentation.html">Carbone Documentation</a></p><a href="carbone.io">Carbone Site Again</a>');
-        const _res = html.buildContentDOCX(_descriptor, _options);
-        helper.assert(_res, '' +
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
            '<w:r>' +
@@ -1621,12 +2042,14 @@ describe('Dynamic HTML', function () {
       });
 
       it('should return the DOCX xml content based on the descriptor', function () {
-        helper.assert(html.buildContentDOCX(
-          [
-            { content : 'bold', type : '', tags : ['b'] },
-            { content : 'and italic', type : '', tags : ['em'] }
-          ]
-        ),
+        let _descriptor = [
+          { content : 'bold', type : '', tags : ['b'] },
+          { content : 'and italic', type : '', tags : ['em'] }
+        ];
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content,
         '<w:p>'+
             '<w:r>' +
               '<w:rPr>' +
@@ -1642,15 +2065,19 @@ describe('Dynamic HTML', function () {
             '</w:r>'+
           '</w:p>'
         );
+      });
 
-        helper.assert(html.buildContentDOCX(
-          [
-            { content : 'this', type : '', tags : [] },
-            { content : ' is a bold', type : '', tags : ['b'] },
-            { content : 'and italic', type : '', tags : ['em'] },
-            { content : ' text', type : '', tags : [] },
-          ]
-        ),'<w:p>'+
+      it('should return the DOCX xml content based on the descriptor 2', function () {
+        let _descriptor = [
+          { content : 'this', type : '', tags : [] },
+          { content : ' is a bold', type : '', tags : ['b'] },
+          { content : 'and italic', type : '', tags : ['em'] },
+          { content : ' text', type : '', tags : [] },
+        ];
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '<w:p>'+
             '<w:r>' +
               '<w:t xml:space="preserve">this</w:t>' +
             '</w:r>' +
@@ -1674,19 +2101,21 @@ describe('Dynamic HTML', function () {
       });
 
       it('should return the DOCX XML content based on a descriptor and should skip unknown tags', function () {
-        helper.assert(html.buildContentDOCX(
-          [
-            { content : 'this ', type : '', tags : ['div', 'b'] },
-            { content : ' is a bold', type : '', tags : ['div', 'b', 'u'] },
-            { content : '', type : '#PB#', tags : [] },
-            { content : ' text ', type : '', tags : ['div', 'b', 'u', 'em'] },
-            { content : 'and ', type : '', tags : ['div', 'b', 'em'] },
-            { content : 'italic ', type : '', tags : ['div', 'b', 'em', 's'] },
-            { content : '', type : '#PE#', tags : [] },
-            { content : 'text', type : '', tags : ['div', 'b', 's'] },
-            { content : '.', type : '', tags : [] },
-          ]
-        ),
+        let _descriptor = [
+          { content : 'this ', type : '', tags : ['div', 'b'] },
+          { content : ' is a bold', type : '', tags : ['div', 'b', 'u'] },
+          { content : '', type : '#PB#', tags : [] },
+          { content : ' text ', type : '', tags : ['div', 'b', 'u', 'em'] },
+          { content : 'and ', type : '', tags : ['div', 'b', 'em'] },
+          { content : 'italic ', type : '', tags : ['div', 'b', 'em', 's'] },
+          { content : '', type : '#PE#', tags : [] },
+          { content : 'text', type : '', tags : ['div', 'b', 's'] },
+          { content : '.', type : '', tags : [] },
+        ];
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content,
         '<w:p>'+
             '<w:r>'+
               '<w:rPr>'+
@@ -1740,13 +2169,15 @@ describe('Dynamic HTML', function () {
       });
 
       it('should insert break line in the new content', function () {
-        helper.assert(html.buildContentDOCX(
-          [
-            { content : 'This is ', type : '', tags : [] },
-            { content : '', type : '#break#', tags : [] },
-            { content : 'a tree', type : '', tags : ['i'] },
-          ]
-        ), '<w:p>'+
+        let _descriptor = [
+          { content : 'This is ', type : '', tags : [] },
+          { content : '', type : '#break#', tags : [] },
+          { content : 'a tree', type : '', tags : ['i'] },
+        ];
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '<w:p>'+
               '<w:r>' +
                 '<w:t xml:space="preserve">This is </w:t>' +
               '</w:r>' +
@@ -1761,25 +2192,29 @@ describe('Dynamic HTML', function () {
               '</w:r>' +
             '</w:p>'
         );
+      });
 
-        helper.assert(html.buildContentDOCX(
-          [
-            { content : '', type : '#PB#', tags : [] },
-            { content : 'This ', type : '', tags : [] },
-            { content : '', type : '#break#', tags : [] },
-            { content : ' is', type : '', tags : [] },
-            { content : '', type : '#break#', tags : [] },
-            { content : 'a', type : '', tags : [] },
-            { content : '', type : '#break#', tags : [] },
-            { content : 'simple', type : '', tags : [] },
-            { content : '', type : '#PE#', tags : [] },
-            { content : '', type : '#break#', tags : [] },
-            { content : '', type : '#break#', tags : [] },
-            { content : ' text', type : '', tags : [] },
-            { content : '', type : '#break#', tags : [] },
-            { content : '.', type : '', tags : [] }
-          ]
-        ),
+      it('should insert break line in the new content 2', function () {
+        let _descriptor = [
+          { content : '', type : '#PB#', tags : [] },
+          { content : 'This ', type : '', tags : [] },
+          { content : '', type : '#break#', tags : [] },
+          { content : ' is', type : '', tags : [] },
+          { content : '', type : '#break#', tags : [] },
+          { content : 'a', type : '', tags : [] },
+          { content : '', type : '#break#', tags : [] },
+          { content : 'simple', type : '', tags : [] },
+          { content : '', type : '#PE#', tags : [] },
+          { content : '', type : '#break#', tags : [] },
+          { content : '', type : '#break#', tags : [] },
+          { content : ' text', type : '', tags : [] },
+          { content : '', type : '#break#', tags : [] },
+          { content : '.', type : '', tags : [] }
+        ];
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content,
         '<w:p>'+
             '<w:r>' +
               '<w:t xml:space="preserve">This </w:t>' +
@@ -1826,7 +2261,9 @@ describe('Dynamic HTML', function () {
       it('should add content element to htmlDatabase', () => {
         const _expected =  {
           id      : 0,
-          content : '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r></w:p>'
+          content : '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r></w:p>',
+          listStyleAbstract: "",
+          listStyleNum: ""
         };
         const _options = {
           htmlDatabase : new Map()
@@ -1852,7 +2289,9 @@ describe('Dynamic HTML', function () {
                     '<w:r><w:rPr><w:i/><w:iCs/></w:rPr><w:t xml:space="preserve">¥</w:t></w:r>' +
                     '<w:r><w:t xml:space="preserve"> and Pound </w:t></w:r>' +
                     '<w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">£</w:t></w:r>' +
-                    '<w:r><w:t xml:space="preserve">.</w:t></w:r></w:p>'
+                    '<w:r><w:t xml:space="preserve">.</w:t></w:r></w:p>',
+          listStyleAbstract: "",
+          listStyleNum: ""
         };
         htmlFormatters.getHTMLContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
@@ -1867,6 +2306,8 @@ describe('Dynamic HTML', function () {
           content : '<w:p><w:r><w:rPr><w:i/><w:iCs/><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">Apples are red</w:t></w:r>'+
                     '<w:r><w:br/></w:r>'+
                     '<w:r><w:rPr><w:u w:val="single"/></w:rPr><w:t xml:space="preserve"> hello </w:t></w:r></w:p>',
+          listStyleAbstract: "",
+          listStyleNum: ""
         };
         const _options = {
           htmlDatabase : new Map()
@@ -1876,6 +2317,43 @@ describe('Dynamic HTML', function () {
         helper.assert(_properties, _expected);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
+      });
+    });
+
+    describe('PostprocessDocx', function () {
+      it('should do nothing if listStyleAbstract and listStyleNum are empty', function () {
+        let _numberingContent = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering><w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num></w:numbering>';
+        let template = {
+          files: [
+            {
+              name: "numbering.xml",
+              data: _numberingContent
+            }
+          ]
+        }
+        let options = {
+          htmlDatabase: new Map()
+        }
+        html.postProcessDocx(template, null, options)
+        helper.assert(template.files[0].data, _numberingContent);
+      });
+      it('should add listStyleAbstract and listStyleNum to the file numbering.xml', function () {
+        let _content = "<ul><li>Apple</li><li>Banana</li></ul><ol><li>dog</li></ol>"
+        let _expectedNumberingFile = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering><w:abstractNum w:abstractNumId="1000"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum><w:abstractNum w:abstractNumId="1001"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr></w:lvl></w:abstractNum><w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num><w:num w:numId="1000"><w:abstractNumId w:val="1000"/></w:num><w:num w:numId="1001"><w:abstractNumId w:val="1001"/></w:num></w:numbering>';
+        let template = {
+          files: [
+            {
+              name: "numbering.xml",
+              data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering><w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num></w:numbering>'
+            }
+          ]
+        }
+        let _options = {
+          htmlDatabase: new Map()
+        }
+        htmlFormatters.getHTMLContentDocx.call(_options, _content);
+        html.postProcessDocx(template, null, _options)
+        helper.assert(template.files[0].data, _expectedNumberingFile);
       });
     });
   });

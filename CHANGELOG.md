@@ -4,9 +4,9 @@
     - All HTML entities are supported (Full List: https://www.w3schools.com/charsets/ref_html_entities_4.asp)
     - Improved break-lines support
     - Fixed hyperlinks when exporting DOCX to PDF
-    - Support hyperlinks for ODT reports
+    - Support hyperlinks tag `a href="url"` for ODT reports
+    - Support fully `ol` and `ul` tags
     - Possible to include hyperlinks, break-lines, and style tags into any level of lists
-    - Support nested ordered and unordored lists for ODT documents.
     - Improved overall stability
 
 ### v3.1.0-beta.1

@@ -1,11 +1,14 @@
+### v3.1.0-beta.3
+  - Improved HTML conversion
+    - Support hyperlinks tag `a href="url"` for ODT reports
+    - Support `ol` and `ul` tags
+
 ### v3.1.0-beta.2
   - HTML conversion for DOCX / ODT has been improved a lot:
     - Fixed spacing management between list / paragraph / multi elements.
     - All HTML entities are supported (Full List: https://www.w3schools.com/charsets/ref_html_entities_4.asp)
     - Improved break-lines support
     - Fixed hyperlinks when exporting DOCX to PDF
-    - Support hyperlinks tag `a href="url"` for ODT reports
-    - Support fully `ol` and `ul` tags
     - Possible to include hyperlinks, break-lines, and style tags into any level of lists
     - Improved overall stability
 

@@ -24,10 +24,10 @@
   - [EE] Fix: set Content-Type when downloading the report
 
 ### v3.0.1
-  - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`
   - Fix: aliases beginning with same prefix names are properly rendered in the generated reports instead of not being skip.
-  - Fix: license detection in Docker
-  - Fix dynamic hyperlinks for DOCX reports
+  - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`
+  - [EE] Fix: license detection in Docker
+  - [EE] Fix dynamic hyperlinks for DOCX reports
   - Improve documentation
 
 ### v3.0.0
@@ -37,7 +37,7 @@
     - If not defined by you in `options.complement`, `{c.now}` returns the current date in UTC.
     - [BREAKING CHANGE]: remove old date formatter which were not documented: `format`, `parse`, `addDays` and `convert`.
       You should use `formatD` instead and new formatters below. They were very old formatters, the chance you use them is low because you had to
-      look into the source code to know their existance.
+      look into the source code to know their existence.
     - New formatters:
       - `addD(amount, unit [, patternIn])`     : add days, month to a date. `formatD` can be used after without specifying  patternIn
       - `subD(amount, unit [, patternIn])`     : subtract days, month to a date. `formatD` can be used after without specifying  patternIn

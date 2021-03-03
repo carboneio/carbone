@@ -1,3 +1,5 @@
+### v3.0.1
+  - Fix: aliases beginning with same prefix names are properly rendered in the generated reports instead of not being skip.
 
 ### v3.0.0
   - 👋🏻 NOTE: This version contains breaking changes of undocumented features.
@@ -5,10 +7,10 @@
   - ⚡️ **Manage timezone + new date formatters + switch from MomentJS to DayJS**
     - If not defined by you in `options.complement`, `{c.now}` returns the current date in UTC.
     - [BREAKING CHANGE]: remove old date formatter which were not documented: `format`, `parse`, `addDays` and `convert`.
-      You should use `formatD` instead and new formatters below. They were very old formatters, the chance you use them is low because you had to 
+      You should use `formatD` instead and new formatters below. They were very old formatters, the chance you use them is low because you had to
       look into the source code to know their existance.
     - New formatters:
-      - `addD(amount, unit [, patternIn])`     : add days, month to a date. `formatD` can be used after without specifying  patternIn 
+      - `addD(amount, unit [, patternIn])`     : add days, month to a date. `formatD` can be used after without specifying  patternIn
       - `subD(amount, unit [, patternIn])`     : subtract days, month to a date. `formatD` can be used after without specifying  patternIn
       - `startOfD(amount, unit [, patternIn])` : Set a date to the start of a unit of time. `formatD` can be used after without specifying  patternIn
       - `endOfD(amount, unit [, patternIn])`   : Set a date to the end of a unit of time. `formatD` can be used after without specifying  patternIn
@@ -34,13 +36,13 @@
         - `{d.dateTZ:formatD(LLLL)}`      => `Sunday  , November 29, 2020 2:54 AM`
         - `{d.dateUnix:formatD(LLLL, X)}` => `Saturday, November 28, 2020 10:54 PM`
 
-      if `options.timezone = 'America/New_York'` 
+      if `options.timezone = 'America/New_York'`
         - `{d.date:formatD(LLLL)}`        => `Saturday, November 28, 2020 4:54 PM`
         - `{d.dateWTZ:formatD(LLLL)}`     => `Saturday, November 28, 2020 3:54 PM`
         - `{d.dateTZ:formatD(LLLL)}`      => `Saturday, November 28, 2020 8:54 PM`
         - `{d.dateUnix:formatD(LLLL, X)}` => `Saturday, November 28, 2020 4:54 PM`
 
-      List of timezone:  https://en.wikipedia.org/wiki/List_of_tz_database_time_zones 
+      List of timezone:  https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 
   - Fix: if a path does not exist inside a formatter argument, it returns an empty string instead of the error "[[C_ERROR]] attribute_name not defined".
@@ -56,11 +58,11 @@
   - Performance: deactivate image compression by default to speed up PDF conversion
   - [BREAKING CHANGE]: remove the possibility to use `convertTo.formatOptionsRaw` for CSV export. This feature was not documented
     and can lead to security issues. Use `convertTo.formatOptions` instead.
-  - new paramater in `Carbone.set` 
+  - new paramater in `Carbone.set`
      - `renderPath`   : `Carbone.set` can changes the default path where rendered files are temporary saved.
                         By default, it creates the directory `carbone_render` in Operating System temp directory.
                         It creates the path automatically
-  - new paramater in `Carbone.render` 
+  - new paramater in `Carbone.render`
      - `renderPrefix` : If defined in `options` object. `Carbone.render` returns a file path instead of a buffer, and it adds this prefix in the rendered filename
                         The generated filename contains three parts:
                           - the prefix

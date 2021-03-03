@@ -34,8 +34,9 @@
 
 >  ⚡️ Breaking news :
 > 
-> **Carbone v3.x 🚀 is coming :**
+> **Carbone v3.1.0 🚀 is here :**
 >   
+>   - Carbone Render Enterprise Edition **On-Premise** is officially available. Please contact us.
 >   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
 
 README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
@@ -162,14 +163,14 @@ Carbone does a lot of thing for you behind the scene:
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/6.4.5.2/deb/x86_64/LibreOffice_6.4.5.2_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.0.4.2/deb/x86_64/LibreOffice_7.0.4.2_Linux_x86-64_deb.tar.gz
 
-  # Install required dependencies on ubuntu server for LibreOffice 6.0+
+  # Install required dependencies on ubuntu server for LibreOffice 7.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_6.4.5.2_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_6.4.5.2_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_7.0.4.2_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_7.0.4.2_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb

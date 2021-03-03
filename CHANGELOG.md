@@ -1,4 +1,5 @@
 ### v3.1.0
+  - Release March 3rd 2021
   - Accepts boolean in array filters `d.array[i, myBoolean=true]` 
   - [EE] Improve hyperlinks validation
   - [EE] Improved HTML conversion with formatter `:html` for DOCX / ODT templates:

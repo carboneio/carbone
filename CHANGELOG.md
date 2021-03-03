@@ -1,4 +1,5 @@
 ### v3.1.0
+  - Accepts boolean in array filters `d.array[i, myBoolean=true]` 
   - [EE] Improve hyperlinks validation
   - [EE] Improved HTML conversion with formatter `:html` for DOCX / ODT templates:
     - Support `ol`, `ul`, `p`, `ul`, `ol`, `li` and `a` tags
@@ -10,16 +11,16 @@
     - Improved overall stability
 
 ### v3.0.4
-  - Restore old `convert` formatter for some clients
+  - [EE] Restore old `convert` formatter for some clients
 
 ### v3.0.3
-  - Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
+  - [EE] Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
 
 ### v3.0.2
-  - Fix: accepts hyperlinks with "&", add the "https://" protocol if it missing, add URL validation. If the URL is invalid, it is replaced by a valid URL refering to the carbone documentation.
-  - Fix: do not crash if hyperlink is undefined
-  - Fix: support random way of managing hyperlinks in MS Word
-  - Fix: set Content-Type when downloading the report
+  - [EE] Fix: accepts hyperlinks with "&", add the "https://" protocol if it missing, add URL validation. If the URL is invalid, it is replaced by a valid URL refering to the carbone documentation.
+  - [EE] Fix: do not crash if hyperlink is undefined
+  - [EE] Fix: support random way of managing hyperlinks in MS Word
+  - [EE] Fix: set Content-Type when downloading the report
 
 ### v3.0.1
   - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`
@@ -74,15 +75,15 @@
 
   - Fix: if a path does not exist inside a formatter argument, it returns an empty string instead of the error "[[C_ERROR]] attribute_name not defined".
     It fixes some weird behaviour with ifEM formatters
-  - Feature: cells colors on ODT/DOCX report can be changed dynamically with the "bindColor" marker.
-  - ODT Improvement: the "bindColor" marker will not remove other styles than colors.
+  - [EE] Feature: cells colors on ODT/DOCX report can be changed dynamically with the "bindColor" marker.
+  - [EE] ODT Improvement: the "bindColor" marker will not remove other styles than colors.
   - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`
   - Improve HTML type detection. Accepts html5 without doctype.
   - [EE] Fix Carbone marker inside ODT text box
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website
   - Accepts Adobe Indesign IDML file as a template
-  - Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Right click an element, select "hyperlinks", insert the marker and validate. It is working with ODS, ODT, and DOCX reports. The compatibility is limited for XLSX documents: It is not possible to create a list of hyperlinks and the marker should not be written with curly braces, example: a typical `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it is also valid.
+  - [EE] Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Right click an element, select "hyperlinks", insert the marker and validate. It is working with ODS, ODT, and DOCX reports. The compatibility is limited for XLSX documents: It is not possible to create a list of hyperlinks and the marker should not be written with curly braces, example: a typical `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it is also valid.
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
   - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
   - Performance: reduce disk IO when converting document

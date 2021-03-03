@@ -17,6 +17,9 @@
   - `:html` formatter converts `p`, `ul`, `ol`, `li`, `a` into DOCX style
   - Improve hyperlinks validation
 
+### v3.0.4
+  - Restore old `convert` formatter for some clients
+
 ### v3.0.3
   - Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
 

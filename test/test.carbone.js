@@ -346,7 +346,7 @@ describe('Carbone', function () {
         done();
       });
     });
-    it('should render an XML string with boolean (true) in filter keys', function (done) {
+    it('should accept to filter with boolean (true) in arrays', function (done) {
       var data = {
         'param-dash' : [{
           'filter-val'          : true,
@@ -365,7 +365,26 @@ describe('Carbone', function () {
         done();
       });
     });
-    it('should render an XML string with boolean (false) in filter keys', function (done) {
+    it('should consider the boolean is a string if there are quotes', function (done) {
+      var data = {
+        'param-dash' : [{
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val'
+        }, {
+          'filter-val'          : false,
+          'new-param-with-dash' : 'val1'
+        }, {
+          'filter-val'          : 'true',
+          'new-param-with-dash' : 'val2'
+        }]
+      };
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=\'true\'].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=\'true\'].new-param-with-dash}</t></xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml><t>val2</t></xml>');
+        done();
+      });
+    });
+    it('should accept to filter with boolean (false) in arrays', function (done) {
       var data = {
         'param-dash' : [{
           'filter-val'          : true,

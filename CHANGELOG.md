@@ -1,21 +1,13 @@
-### v3.1.0-beta.3
-  - Improved HTML conversion
-    - Support hyperlinks tag `a href="url"` for ODT reports
-    - Support `ol` and `ul` tags
-
-### v3.1.0-beta.2
-  - HTML conversion for DOCX / ODT has been improved a lot:
+### v3.1.0
+  - [EE] Improve hyperlinks validation
+  - [EE] Improved HTML conversion with formatter `:html` for DOCX / ODT templates:
+    - Support `ol`, `ul`, `p`, `ul`, `ol`, `li` and `a` tags
     - Fixed spacing management between list / paragraph / multi elements.
     - All HTML entities are supported (Full List: https://www.w3schools.com/charsets/ref_html_entities_4.asp)
     - Improved break-lines support
     - Fixed hyperlinks when exporting DOCX to PDF
     - Possible to include hyperlinks, break-lines, and style tags into any level of lists
     - Improved overall stability
-
-### v3.1.0-beta.1
-### v3.1.0-beta.0
-  - `:html` formatter converts `p`, `ul`, `ol`, `li`, `a` into DOCX style
-  - Improve hyperlinks validation
 
 ### v3.0.4
   - Restore old `convert` formatter for some clients
@@ -142,15 +134,9 @@
     `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`.
     Unsupported tags and tags attributes are skipped and not rendered.
     HTML entities are accepted.
-  - [EE] Can override plugins (readTemplate, writeTemplate, deleteTemplate, generateOutputFile, readPublicKey, onRenderEnd, readRender)
-  - [EE] Can access GET render without authentication
-  - [EE] Can add middlewares before and after route
-  - [EE] Add GET and DELETE route for template
-  - [EE] Fix workDir parameter
-  - [EE] Remove error message if no plugin exists
-  - [EE] Fix bug with environment variable
-  - [EE] Add licensing system
   - [EE] New feature: Dynamic pictures are supported on ODG and ODP files. It is not possible to create loops.
+  - [EE] New Carbone Render On-Premise
+    - Carbone can be safely deployed on your own servers. Contact us for further information
 
 ### v2.1.1
   - Release September 23rd 2020

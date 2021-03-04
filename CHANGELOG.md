@@ -1,3 +1,6 @@
+### v3.1.1
+  - [EE] Fix: remove html entities not supported by XML format when using `:html` formatter
+
 ### v3.1.0
   - Release March 3rd 2021
   - Accepts boolean in array filters `d.array[i, myBoolean=true]` 

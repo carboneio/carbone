@@ -1,4 +1,5 @@
 ### v3.1.1
+  - Release March 4rd 2021
   - [EE] Fix: remove html entities not supported by XML format when using `:html` formatter
 
 ### v3.1.0

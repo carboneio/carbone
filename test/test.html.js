@@ -2690,6 +2690,11 @@ describe('Dynamic HTML', function () {
         helper.assert(html.convertHTMLEntities(_content), _content);
       });
 
+      it('should keep html entities that are supported by XML format: <>\'\"&', function () {
+        const _content = '<div> &amp; &quot; &apos; &lt; &gt; </div>';
+        helper.assert(html.convertHTMLEntities(_content), _content);
+      });
+
       it('should convert unsupported HTML entities into valid HTML entities [non-breaking space]', function () {
         const _content = '<div>This&nbsp;is an&nbsp;<b>apple</b>&nbsp;and&nbsp;<i>strawberry</i>.</div>';
         const _expected = `<div>This${String.fromCodePoint(160)}is an${String.fromCodePoint(160)}<b>apple</b>${String.fromCodePoint(160)}and${String.fromCodePoint(160)}<i>strawberry</i>.</div>`;

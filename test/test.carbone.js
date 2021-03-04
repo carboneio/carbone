@@ -402,7 +402,7 @@ describe('Carbone', function () {
         done();
       });
     });
-    it('should accept to filter with boolean (true) in arrays', function (done) {
+    it('should accept to filter with boolean in arrays', function (done) {
       var data = {
         'param-dash' : [{
           'filter-val'          : true,
@@ -415,10 +415,14 @@ describe('Carbone', function () {
           'new-param-with-dash' : 'val2'
         }]
       };
-      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=true].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=true].new-param-with-dash}</t></xml>', data, function (err, result) {
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=false].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=false].new-param-with-dash}</t></xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
-        helper.assert(result, '<xml><t>val</t><t>val2</t></xml>');
-        done();
+        helper.assert(result, '<xml><t>val1</t></xml>');
+        carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=true].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=true].new-param-with-dash}</t></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><t>val</t><t>val2</t></xml>');
+          done();
+        });
       });
     });
     it('should consider the boolean is a string if there are quotes', function (done) {
@@ -440,23 +444,50 @@ describe('Carbone', function () {
         done();
       });
     });
-    it('should accept to filter with boolean (false) in arrays', function (done) {
+    it('should accept to filter with boolean even if the boolean is a string in data (backward compatible with v1/v2, same behavior as numbers)', function (done) {
       var data = {
         'param-dash' : [{
-          'filter-val'          : true,
+          'filter-val'          : 'true',
           'new-param-with-dash' : 'val'
         }, {
-          'filter-val'          : false,
+          'filter-val'          : 'false',
           'new-param-with-dash' : 'val1'
         }, {
-          'filter-val'          : true,
+          'filter-val'          : 'true',
           'new-param-with-dash' : 'val2'
         }]
       };
       carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=false].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=false].new-param-with-dash}</t></xml>', data, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, '<xml><t>val1</t></xml>');
-        done();
+        carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=true].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=true].new-param-with-dash}</t></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><t>val</t><t>val2</t></xml>');
+          done();
+        });
+      });
+    });
+    it('should accept to filter with boolean even if the boolean has whitespaces', function (done) {
+      var data = {
+        'param-dash' : [{
+          'filter-val'          : 'true',
+          'new-param-with-dash' : 'val'
+        }, {
+          'filter-val'          : 'false',
+          'new-param-with-dash' : 'val1'
+        }, {
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val2'
+        }]
+      };
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val= false  ].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=  false  ].new-param-with-dash}</t></xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml><t>val1</t></xml>');
+        carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=  true  ].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=  true  ].new-param-with-dash}</t></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><t>val</t><t>val2</t></xml>');
+          done();
+        });
       });
     });
 

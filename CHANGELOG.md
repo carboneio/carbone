@@ -1,3 +1,14 @@
+### v3.1.2
+  - Fix: v3.1.0 introduced a backward compatibility issue with reports made with v1/v2. Now, filter with boolean works like this (same behavior as numbers)
+    - data                       => template                       => condition result in array
+    - `data.myBoolean = true`    => `d.array[i, myBoolean=true]`   => true
+    - `data.myBoolean = "true"`  => `d.array[i, myBoolean=true]`   => true
+    - `data.myBoolean = "false"` => `d.array[i, myBoolean=true]`   => false
+    - `data.myBoolean = false`   => `d.array[i, myBoolean=true]`   => false
+    - `data.myBoolean = "true"`  => `d.array[i, myBoolean='true']` => true
+    - `data.myBoolean = true`    => `d.array[i, myBoolean='true']` => false
+
+
 ### v3.1.1
   - Release March 4rd 2021
   - [EE] Fix: remove html entities not supported by XML format when using `:html` formatter

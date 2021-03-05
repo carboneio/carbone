@@ -1,3 +1,5 @@
+### v3.1.3
+  - Improvement: if a font is applied to an HTML formatter `{d.content:html}`, the font will be applied to the whole rendered HTML
 ### v3.1.2
   - Release March 4rd 2021
   - Fix: v3.1.0 introduced a backward compatibility issue with reports made with v1/v2. Now, filter with boolean works like this (same behavior as numbers)
@@ -16,7 +18,7 @@
 
 ### v3.1.0
   - Release March 3rd 2021
-  - Accepts boolean in array filters `d.array[i, myBoolean=true]` 
+  - Accepts boolean in array filters `d.array[i, myBoolean=true]`
   - [EE] Improve hyperlinks validation
   - [EE] Improved HTML conversion with formatter `:html` for DOCX / ODT templates:
     - Support `ol`, `ul`, `p`, `ul`, `ol`, `li` and `a` tags

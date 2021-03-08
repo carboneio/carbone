@@ -63,12 +63,12 @@ const getHTMLContentOdtPostProcess = function (contentId) {
  * @param  {Object} options contains htmlDatabase
  * @param  {String} htmlContent string with html tags
  */
-function addHtmlDatabaseDOCX (options, contentId, htmlContent = '', defaultFont = '') {
+function addHtmlDatabaseDOCX (options, contentId, htmlContent = '', defaultFont = '', defaultFontSize = '') {
   var _htmlDatabaseProperties = null;
 
   if (!options.htmlDatabase.has(contentId)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
-    const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(descriptor, options, defaultFont);
+    const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(descriptor, options, defaultFont, defaultFontSize);
     _htmlDatabaseProperties = {
       id      : options.htmlDatabase.size,
       content,
@@ -85,9 +85,9 @@ function addHtmlDatabaseDOCX (options, contentId, htmlContent = '', defaultFont 
  * @description Add the new HTML content and return a post process formatter
  * @param {String} htmlContent New HTML content to inject
  */
-const getHTMLContentDocx = function (htmlContent, defaultFont = '') {
-  const _contentId = htmlContent + defaultFont;
-  addHtmlDatabaseDOCX(this, _contentId, htmlContent, defaultFont);
+const getHTMLContentDocx = function (htmlContent, defaultFont = '', defaultFontSize = '') {
+  const _contentId = htmlContent + defaultFont + defaultFontSize;
+  addHtmlDatabaseDOCX(this, _contentId, htmlContent, defaultFont, defaultFontSize);
   return {
     fn   : getHTMLContentDocxPostProcess,
     args : [_contentId]

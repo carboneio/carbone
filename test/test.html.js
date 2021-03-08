@@ -1100,7 +1100,7 @@ describe('Dynamic HTML', function () {
         helper.assert(_template.files[2].data, _expectedXMLheader);
       });
 
-      it('should find one HTML formatter and pass the applied font as an argument 1', function () {
+      it('should find one HTML formatter and pass the applied font FAMILY as an argument', function () {
         const _XMLtemplate = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
@@ -1137,7 +1137,7 @@ describe('Dynamic HTML', function () {
                 '</w:rPr>' +
                 '<w:t></w:t>' +
               '</w:r>' +
-            '</w:p>{d.mix2:getHTMLContentDocx(\'American Typewriter\')}' +
+            '</w:p>{d.mix2:getHTMLContentDocx(\'American Typewriter\', null)}' +
             '<w:p >' +
               '<w:r>' +
                 '<w:rPr>' +
@@ -1146,7 +1146,133 @@ describe('Dynamic HTML', function () {
                 '</w:rPr>' +
                 '<w:t></w:t>' +
               '</w:r>' +
-            '</w:p>{d.mix1:getHTMLContentDocx(\'Segoe Print\')}' +
+            '</w:p>{d.mix1:getHTMLContentDocx(\'Segoe Print\', null)}' +
+            '</w:body>' +
+          '</w:document>';
+        const _template = {
+          files : [
+            {
+              name : 'word/document.xml',
+              data : _XMLtemplate,
+            }
+          ]
+        };
+        html.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _XMLexpected);
+      });
+
+      it('should find one HTML formatter and pass the applied font SIZE as an argument', function () {
+        const _XMLtemplate = '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+          '<w:document>' +
+            '<w:body>' +
+            '<w:p>' +
+                '<w:r>' +
+                  '<w:rPr>' +
+                    '<w:lang w:val="en-US"/>' +
+                    '<w:sz w:val="18"/>' +
+                  '</w:rPr>' +
+                  '<w:t>{d.mix2:html}</w:t>' +
+                '</w:r>' +
+              '</w:p>' +
+              '<w:p >' +
+                '<w:r>' +
+                  '<w:rPr>' +
+                    '<w:lang w:val="en-US"/>' +
+                    '<w:sz w:val="36"/>' +
+                  '</w:rPr>' +
+                  '<w:t>{d.mix1:html}</w:t>' +
+                '</w:r>' +
+              '</w:p>' +
+            '</w:body>' +
+          '</w:document>';
+        const _XMLexpected = '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+          '<w:document>' +
+            '<w:body>' +
+            '<w:p>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                  '<w:sz w:val="18"/>' +
+                '</w:rPr>' +
+                '<w:t></w:t>' +
+              '</w:r>' +
+            '</w:p>{d.mix2:getHTMLContentDocx(null, \'18\')}' +
+            '<w:p >' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                  '<w:sz w:val="36"/>' +
+                '</w:rPr>' +
+                '<w:t></w:t>' +
+              '</w:r>' +
+            '</w:p>{d.mix1:getHTMLContentDocx(null, \'36\')}' +
+            '</w:body>' +
+          '</w:document>';
+        const _template = {
+          files : [
+            {
+              name : 'word/document.xml',
+              data : _XMLtemplate,
+            }
+          ]
+        };
+        html.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _XMLexpected);
+      });
+
+      it('should find one HTML formatter and pass the applied font SIZE && font FAMILY as arguments', function () {
+        const _XMLtemplate = '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+          '<w:document>' +
+            '<w:body>' +
+            '<w:p>' +
+                '<w:r>' +
+                  '<w:rPr>' +
+                    '<w:lang w:val="en-US"/>' +
+                    '<w:sz w:val="18"/>' +
+                    '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
+                  '</w:rPr>' +
+                  '<w:t>{d.mix2:html}</w:t>' +
+                '</w:r>' +
+              '</w:p>' +
+              '<w:p >' +
+                '<w:r>' +
+                  '<w:rPr>' +
+                    '<w:lang w:val="en-US"/>' +
+                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
+                    '<w:sz w:val="36"/>' +
+                  '</w:rPr>' +
+                  '<w:t>{d.mix1:html}</w:t>' +
+                '</w:r>' +
+              '</w:p>' +
+            '</w:body>' +
+          '</w:document>';
+        const _XMLexpected = '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+          '<w:document>' +
+            '<w:body>' +
+            '<w:p>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                  '<w:sz w:val="18"/>' +
+                  '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
+                '</w:rPr>' +
+                '<w:t></w:t>' +
+              '</w:r>' +
+            '</w:p>{d.mix2:getHTMLContentDocx(\'American Typewriter\', \'18\')}' +
+            '<w:p >' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                  '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
+                  '<w:sz w:val="36"/>' +
+                '</w:rPr>' +
+                '<w:t></w:t>' +
+              '</w:r>' +
+            '</w:p>{d.mix1:getHTMLContentDocx(\'Segoe Print\', \'36\')}' +
             '</w:body>' +
           '</w:document>';
         const _template = {
@@ -1244,7 +1370,7 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it('should convert HTML to DOCX xml 2 WITH A DEFAULT FONT', function () {
+      it('should convert HTML to DOCX xml 2 WITH A DEFAULT FONT FAMILY', function () {
         let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i>');
         // _descriptor = [
         //   { content: '#PB#', tags: [] },
@@ -1271,6 +1397,73 @@ describe('Dynamic HTML', function () {
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:i/><w:iCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/></w:rPr>'+
+            '<w:t xml:space="preserve">John</w:t>'+
+          '</w:r>'+
+        '</w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX xml 2 WITH A DEFAULT FONT SIZE', function () {
+        let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i>');
+        // _descriptor = [
+        //   { content: '#PB#', tags: [] },
+        //   { content: 'Hello', tags: ['strong'] },
+        //   { content: ' thit is some text', tags: [] },
+        //   { content: '#PE#', tags: [ ] },
+        //   { content: 'John', tags: ['i'] }
+        // ]
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, {}, "null", "18"); // FONT AS A LAST ARGUMENT
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:b/><w:bCs/><w:sz w:val="18"/></w:rPr>'+
+            '<w:t xml:space="preserve">Hello</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:rPr><w:sz w:val="18"/></w:rPr>' +
+            '<w:t xml:space="preserve"> thit is some text</w:t>' +
+          '</w:r>'+
+        '</w:p>' +
+        '<w:p/>' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:i/><w:iCs/><w:sz w:val="18"/></w:rPr>'+
+            '<w:t xml:space="preserve">John</w:t>'+
+          '</w:r>'+
+        '</w:p>'
+        );
+      });
+
+
+      it('should convert HTML to DOCX xml 2 WITH A DEFAULT FONT SIZE and FONT FAMILY', function () {
+        let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i>');
+        // _descriptor = [
+        //   { content: '#PB#', tags: [] },
+        //   { content: 'Hello', tags: ['strong'] },
+        //   { content: ' thit is some text', tags: [] },
+        //   { content: '#PE#', tags: [ ] },
+        //   { content: 'John', tags: ['i'] }
+        // ]
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, {}, "Segoe Print", "18"); // FONT AS A LAST ARGUMENT
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:b/><w:bCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
+            '<w:t xml:space="preserve">Hello</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:rPr><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/></w:rPr>' +
+            '<w:t xml:space="preserve"> thit is some text</w:t>' +
+          '</w:r>'+
+        '</w:p>' +
+        '<w:p/>' +
+        '<w:p>'+
+          '<w:r>'+
+            '<w:rPr><w:i/><w:iCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
             '<w:t xml:space="preserve">John</w:t>'+
           '</w:r>'+
         '</w:p>'

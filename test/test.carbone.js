@@ -924,15 +924,15 @@ describe('Carbone', function () {
 
     it('Should insert the correct values even if aliases are beginning with the same name', function (done) {
       var _xml = '{#myVar=d.name}{#myVarSecond=d.age}<xml><t_row>{$myVar}<br/>{$myVarSecond}</t_row></xml>';
-      var _xml2 = '{#a = d.report.contact.methods}{#ao = d.report.postal}<xml><div>{$a}</div><div>{$ao}</div></xml>'
+      var _xml2 = '{#a = d.report.contact.methods}{#ao = d.report.postal}<xml><div>{$a}</div><div>{$ao}</div></xml>';
       var _data = {
-        name: "John",
-        age: 20,
-        report: {
-          contact: {
-            methods: 'blue'
+        name   : 'John',
+        age    : 20,
+        report : {
+          contact : {
+            methods : 'blue'
           },
-          postal: 94000
+          postal : 94000
         }
       };
       carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {

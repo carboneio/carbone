@@ -1,6 +1,7 @@
 
 ### v3.1.3
   - Fix: Do not break documents if the `i+1` row contains some markers coming from parent object or condition blocks (rare)
+  - [EE] if a font family and font size is applied to an HTML formatter `{d.content:html}`, the font & size will be applied to the whole rendered HTML
 
 ### v3.1.2
   - Release March 4rd 2021
@@ -20,7 +21,7 @@
 
 ### v3.1.0
   - Release March 3rd 2021
-  - Accepts boolean in array filters `d.array[i, myBoolean=true]` 
+  - Accepts boolean in array filters `d.array[i, myBoolean=true]`
   - [EE] Improve hyperlinks validation
   - [EE] Improved HTML conversion with formatter `:html` for DOCX / ODT templates:
     - Support `ol`, `ul`, `p`, `ul`, `ol`, `li` and `a` tags

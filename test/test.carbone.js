@@ -946,6 +946,48 @@ describe('Carbone', function () {
       });
     });
 
+    it('should generate valid XML even if the second row is repeated entirely and includes simple markers d.type without arrays', function (done) {
+      var _xml = ''
+        + '<xml>'
+        +   '<p>'
+        +     '<i>'
+        +       '{d.type}'
+        +     '</i>'
+        +     '<i>'
+        +       '{d.cars[i].id}'
+        +     '</i>'
+        +   '</p>'
+        +   '<p>'
+        +     '<i>'
+        +       '{d.type}'
+        +     '</i>'
+        +     '<i>'
+        +       '{d.cars[i+1].id}'
+        +     '</i>'
+        +   '</p>'
+        +   '<p>'
+        +    '{d.id}'
+        +   '</p>'
+        + '</xml>'
+      ;
+      var _data = {
+        type : 201,
+        id   : 177193,
+        cars : [
+          {
+            id       : 0,
+            pictures : null,
+            other    : 1
+          }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml><p><i>201</i><i>0</i></p><p>177193</p></xml>');
+        done();
+      });
+    });
+
     describe('Dynamic variables in formatters', function () {
       it('should use variable in object if the variable starts with a point', function (done) {
         var data = {
@@ -1892,7 +1934,7 @@ describe('Carbone', function () {
           _data.isDataHidden = false;
           carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
             assert.equal(err+'', 'null');
-            assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr><tr>my Toyota </tr> my</xml>');
+            assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr><tr>my Toyota </tr> <a></a> my</xml>');
             done();
           });
         });
@@ -1950,7 +1992,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           assert.equal(err+'', 'null');
-          assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr> my</xml>');
+          assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr> <a></a> my</xml>');
           _data.cars = [];
           carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
             assert.equal(err+'', 'null');

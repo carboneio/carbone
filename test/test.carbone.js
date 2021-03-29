@@ -978,15 +978,15 @@ describe('Carbone', function () {
 
     it('Should insert the correct values even if aliases are beginning with the same name', function (done) {
       var _xml = '{#myVar=d.name}{#myVarSecond=d.age}<xml><t_row>{$myVar}<br/>{$myVarSecond}</t_row></xml>';
-      var _xml2 = '{#a = d.report.contact.methods}{#ao = d.report.postal}<xml><div>{$a}</div><div>{$ao}</div></xml>'
+      var _xml2 = '{#a = d.report.contact.methods}{#ao = d.report.postal}<xml><div>{$a}</div><div>{$ao}</div></xml>';
       var _data = {
-        name: "John",
-        age: 20,
-        report: {
-          contact: {
-            methods: 'blue'
+        name   : 'John',
+        age    : 20,
+        report : {
+          contact : {
+            methods : 'blue'
           },
-          postal: 94000
+          postal : 94000
         }
       };
       carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
@@ -997,6 +997,48 @@ describe('Carbone', function () {
           helper.assert(_xmlBuilt, '<xml><div>blue</div><div>94000</div></xml>');
           done();
         });
+      });
+    });
+
+    it('should generate valid XML even if the second row is repeated entirely and includes simple markers d.type without arrays', function (done) {
+      var _xml = ''
+        + '<xml>'
+        +   '<p>'
+        +     '<i>'
+        +       '{d.type}'
+        +     '</i>'
+        +     '<i>'
+        +       '{d.cars[i].id}'
+        +     '</i>'
+        +   '</p>'
+        +   '<p>'
+        +     '<i>'
+        +       '{d.type}'
+        +     '</i>'
+        +     '<i>'
+        +       '{d.cars[i+1].id}'
+        +     '</i>'
+        +   '</p>'
+        +   '<p>'
+        +    '{d.id}'
+        +   '</p>'
+        + '</xml>'
+      ;
+      var _data = {
+        type : 201,
+        id   : 177193,
+        cars : [
+          {
+            id       : 0,
+            pictures : null,
+            other    : 1
+          }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml><p><i>201</i><i>0</i></p><p>177193</p></xml>');
+        done();
       });
     });
 
@@ -1946,7 +1988,7 @@ describe('Carbone', function () {
           _data.isDataHidden = false;
           carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
             assert.equal(err+'', 'null');
-            assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr><tr>my Toyota </tr> my</xml>');
+            assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr><tr>my Toyota </tr> <a></a> my</xml>');
             done();
           });
         });
@@ -2004,7 +2046,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           assert.equal(err+'', 'null');
-          assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr> my</xml>');
+          assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr> <a></a> my</xml>');
           _data.cars = [];
           carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
             assert.equal(err+'', 'null');

@@ -2,6 +2,7 @@
 ### v3.1.3
   - Fix: Do not break documents if the `i+1` row contains some markers coming from parent object or condition blocks (rare)
   - [EE] if a font family and font size is applied to an HTML formatter `{d.content:html}`, the font & size will be applied to the whole rendered HTML
+  - [EE] return an error message when image anchor is not correct in the template
 
 ### v3.1.2
   - Release March 4rd 2021

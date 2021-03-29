@@ -109,6 +109,28 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
     });
+    it('should return an error if the image anchor is absolute and used in a loop', function (done) {
+      const _testedReport = 'image/odt-image-absolute-anchor-loop';
+      const _data = [{
+        image : _imageLogoBase64jpg
+      }];
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'Error: The template contains a list of floating images, you must change the images anchor-type to \"as character\" where the marker \"d[i].image\" is bound.');
+        helperTest.assert(res, null);
+        done();
+      });
+    });
+    it('should replace image if the anchor is absolute and not used in a loop', function (done) {
+      const _testedReport = 'image/odt-image-absolute-anchor-no-loop';
+      const _data = {
+        image : _imageLogoBase64jpg
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
     it('should replace image with loops (base64 jpg)\
       should accept PNG image even if the template image is a JPEG\
       should accept image in header with conditions i=0\

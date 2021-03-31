@@ -1,4 +1,7 @@
 
+### v3.1.4
+  - [EE] Improve `:html` formatter stability when using special characters such as "'<>& for ODT and DOCX reports.
+
 ### v3.1.3
   - Release March 29th 2021
   - Fix: Do not break documents if the `i+1` row contains some markers coming from parent object or condition blocks (rare)

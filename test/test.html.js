@@ -2745,12 +2745,12 @@ describe('Dynamic HTML', function () {
         helper.assert(html.parseHTML('<em><bold>Underlined </i> content</em>'), [ { content : 'Underlined ', type : '', tags : ['em', 'bold'] }, { content : ' content', type : '', tags : ['em'] } ]);
 
         // the HTML tag is missing a closing mark
-        helper.assert(html.parseHTML('<btest content'), [ { content : '<btest content', type : '', tags : [] } ]);
-        helper.assert(html.parseHTML('<   test')      , [ { content : '<   test', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('<btest content'), [ { content : '&lt;btest content', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('<   test')      , [ { content : '&lt;   test', type : '', tags : [] } ]);
         helper.assert(html.parseHTML('<<b>Bold</b>')  , [ { content : 'Bold', type : '', tags : ['<b'] } ]);
         helper.assert(html.parseHTML('<b>Bold</b<>')  , [ { content : 'Bold', type : '', tags : ['b'] } ]);
         helper.assert(html.parseHTML('<b>Bold</<b>')  , [ { content : 'Bold', type : '', tags : ['b'] } ]);
-        helper.assert(html.parseHTML('<b>Bold</>b>')  , [ { content : 'Bold', type : '', tags : ['b'] }, { content : 'b>', type : '', tags : [] } ]);
+        helper.assert(html.parseHTML('<b>Bold</>b>')  , [ { content : 'Bold', type : '', tags : ['b'] }, { content : 'b&gt;', type : '', tags : [] } ]);
 
         // missing opening tag
         helper.assert(html.parseHTML('test</b>content'), [ { content : 'test', type : '', tags : [] }, { content : 'content', type : '', tags : [] } ]);
@@ -2830,6 +2830,42 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should parse HTML content with unsupported character and your convert to XML entities: <>\'\"&', function () {
+        helper.assert(html.parseHTML('<b>On Mar. 30, 2021, &amp; & Global Polygraph & &amp; Security LLC</b>'),
+          [
+            { content : 'On Mar. 30, 2021, &amp; &amp; Global Polygraph &amp; &amp; Security LLC',  type : '', tags : ['b'] }
+          ]
+        );
+        helper.assert(html.parseHTML('\"<b>\'This is a text &\'</b>\"'),
+          [
+            { content : '&quot;',  type : '', tags : [] },
+            { content : '&apos;This is a text &amp;&apos;',  type : '', tags : ['b'] },
+            { content : '&quot;',  type : '', tags : [] },
+          ]
+        );
+        helper.assert(html.parseHTML('<b>\<\></b>'),
+          [
+            { content : '&lt;&gt;',  type : '', tags : ['b'] }
+          ]
+        );
+        /** This case should will never happen, it is just to test if the & regex is not replacing other HTML entities. */
+        helper.assert(html.parseHTML('This is some HTML with HTML entities:<br/><i>&Afr; &bullet;&cdot; & &Congruent;</i>'),
+          [
+            { content : 'This is some HTML with HTML entities:',  type : '', tags : [] },
+            {
+              "content" : "",
+              "type" : "#break#",
+              "tags" : []
+            },
+            {
+              "content": "&Afr; &bullet;&cdot; &amp; &Congruent;",
+              "type": "",
+              "tags": ["i"]
+            }
+          ]
+        );
+      });
+
       it('should parse HTML content with BREAK LINES tags <br> [MIX]', function () {
         helper.assert(html.parseHTML('This is <br><i>a tree</i>'),
           [
@@ -2889,7 +2925,7 @@ describe('Dynamic HTML', function () {
         helper.assert(html.parseHTML('<u>Although the term <b>"alpinism"</b> <br/>has become synonymous with <b>sporting <br> achievement</b>,<br/><em>pyreneism</em>,<br/>appearing in the <em><s>20th</s></em> 19th century</u>'),
           [
             { content : 'Although the term ', type : '', tags : ['u'] },
-            { content : '"alpinism"', type : '', tags : ['u', 'b'] },
+            { content : '&quot;alpinism&quot;', type : '', tags : ['u', 'b'] },
             { content : ' ', type : '', tags : ['u'] },
             { content : '', type : '#break#', tags : [] },
             { content : 'has become synonymous with ', type : '', tags : ['u'] },
@@ -3062,7 +3098,6 @@ describe('Dynamic HTML', function () {
         const _expected = '<div>This is€ an <b>apple</b> and <i>strawberry£</i>.</div>';
         helper.assert(html.convertHTMLEntities(_content), _expected);
       });
-
     });
   });
 });

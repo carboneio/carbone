@@ -6,7 +6,7 @@ const fs        = require('fs');
 const image     = require('../lib/image');
 const nock      = require('nock');
 
-describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
+describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -1123,32 +1123,77 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      it("_computeImageSize 1: should compute the imageFit size as 'contain'", function (done) {
-        let _imageInfo = {
-          unit           : 'emu',
-          newImageWidth  : 220,
-          newImageHeight : 100,
-          imageWidth     : 100,
-          imageHeight    : 80
-        };
-        image._computeImageSize(_imageInfo);
-        helperTest.assert(_imageInfo.imageWidth, 100);
-        helperTest.assert(_imageInfo.imageHeight, 46);
-        done();
-      });
+      describe("_computeImageSize", function () {
+        it("_computeImageSize EMU 1: should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            unit           : 'emu',
+            newImageWidth  : 220,
+            newImageHeight : 100,
+            imageWidth     : 100,
+            imageHeight    : 80
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 100);
+          helperTest.assert(_imageInfo.imageHeight, 45);
+          done();
+        });
 
-      it("_computeImageSize 2: should compute the imageFit size as 'contain'", function (done) {
-        let _imageInfo = {
-          unit           : 'emu',
-          newImageWidth  : 2857500,
-          newImageHeight : 1905000,
-          imageWidth     : 952500,
-          imageHeight    : 590550
-        };
-        image._computeImageSize(_imageInfo);
-        helperTest.assert(_imageInfo.imageWidth, 952500);
-        helperTest.assert(_imageInfo.imageHeight, 635000);
-        done();
+        it("_computeImageSize EMU 2: should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            unit           : 'emu',
+            newImageWidth  : 2857500,
+            newImageHeight : 1905000,
+            imageWidth     :  952500,
+            imageHeight    :  590550
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 885825);
+          helperTest.assert(_imageInfo.imageHeight, 590550);
+          done();
+        });
+
+        it("_computeImageSize CM : should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            unit           : 'cm',
+            newImageWidth  : 20.45,
+            newImageHeight : 15,
+            imageWidth     : 8,
+            imageHeight    : 5
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 6.817);
+          helperTest.assert(_imageInfo.imageHeight, 5);
+          done();
+        });
+
+        it("_computeImageSize CM with 3 decimal : should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            unit           : 'cm',
+            newImageWidth  : 33.558,
+            newImageHeight : 20.312,
+            imageWidth     : 12,
+            imageHeight    : 10
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 12);
+          helperTest.assert(_imageInfo.imageHeight, 7.263);
+          done();
+        });
+
+
+        it("_computeImageSize IN : should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            unit           : 'in',
+            newImageWidth  : 8.6952,
+            newImageHeight : 10.6713,
+            imageWidth     :  2.8984,
+            imageHeight    :  1.4492
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 1.181); // 1.1808
+          helperTest.assert(_imageInfo.imageHeight, 1.449); // 1.387269
+          done();
+        });
       });
     });
 

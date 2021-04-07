@@ -29,7 +29,7 @@
         <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
         <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
       </text:sequence-decls>
-      <draw:frame draw:name="Image1" draw:style-name="fr1" draw:z-index="0" svg:height="5.0085cm" svg:width="4.099cm" svg:x="2.18cm" svg:y="2.79cm" text:anchor-page-number="1" text:anchor-type="page">
+      <draw:frame draw:name="Image1" draw:style-name="fr1" draw:z-index="0" svg:height="4.099cm" svg:width="4.099cm" svg:x="2.18cm" svg:y="2.79cm" text:anchor-page-number="1" text:anchor-type="page">
         <draw:image draw:mime-type="image/jpeg" xlink:actuate="onLoad" xlink:href="Pictures/CarboneImage0.jpeg" xlink:show="embed" xlink:type="simple"/>
         <svg:title></svg:title>
       </draw:frame>

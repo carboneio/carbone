@@ -6,7 +6,7 @@ const fs        = require('fs');
 const image     = require('../lib/image');
 const nock      = require('nock');
 
-describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
+describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -1020,7 +1020,7 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
     describe('DOCX ODT scaling', function () {
       it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
         let _imageInfo = {
-          unit           : 'emu',
+          imageUnit      : 'emu',
           data           : new Buffer.from(''),
           newImageWidth  : -1,
           newImageHeight : -1
@@ -1034,12 +1034,12 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
       it('_getImageSize: should return the EMU size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'emu',
+            imageUnit      : 'emu',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 952500);
           helperTest.assert(_imageInfo.newImageHeight, 590550);
           done();
@@ -1050,12 +1050,12 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
       it('_getImageSize: should return the EMU size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'emu',
+            imageUnit      : 'emu',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 2857500);
           helperTest.assert(_imageInfo.newImageHeight, 1905000);
           done();
@@ -1065,12 +1065,12 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
       it('_getImageSize: should return the CM size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'cm',
+            imageUnit      : 'cm',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 2.65);
           helperTest.assert(_imageInfo.newImageHeight, 1.643);
           done();
@@ -1081,12 +1081,12 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
       it('_getImageSize: should return the CM size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'cm',
+            imageUnit      : 'cm',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 7.95);
           helperTest.assert(_imageInfo.newImageHeight, 5.3);
           done();
@@ -1096,12 +1096,12 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
       it('_getImageSize: should return the INCH size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'in',
+            imageUnit      : 'in',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 1.0416666666666667);
           helperTest.assert(_imageInfo.newImageHeight, 0.6458333333333334);
           done();
@@ -1111,12 +1111,12 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
       it('_getImageSize: should return the INCH size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'in',
+            imageUnit           : 'in',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 3.125);
           helperTest.assert(_imageInfo.newImageHeight, 2.0833333333333335);
           done();
@@ -1126,7 +1126,7 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
       describe("_computeImageSize", function () {
         it("_computeImageSize EMU 1: should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            unit           : 'emu',
+            imageUnit      : 'emu',
             newImageWidth  : 220,
             newImageHeight : 100,
             imageWidth     : 100,
@@ -1140,7 +1140,7 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
 
         it("_computeImageSize EMU 2: should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            unit           : 'emu',
+            imageUnit           : 'emu',
             newImageWidth  : 2857500,
             newImageHeight : 1905000,
             imageWidth     :  952500,
@@ -1154,7 +1154,7 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
 
         it("_computeImageSize CM : should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            unit           : 'cm',
+            imageUnit      : 'cm',
             newImageWidth  : 20.45,
             newImageHeight : 15,
             imageWidth     : 8,
@@ -1168,7 +1168,7 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
 
         it("_computeImageSize CM with 3 decimal : should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            unit           : 'cm',
+            imageUnit      : 'cm',
             newImageWidth  : 33.558,
             newImageHeight : 20.312,
             imageWidth     : 12,
@@ -1183,7 +1183,7 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
 
         it("_computeImageSize IN : should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            unit           : 'in',
+            imageUnit      : 'in',
             newImageWidth  : 8.6952,
             newImageHeight : 10.6713,
             imageWidth     :  2.8984,

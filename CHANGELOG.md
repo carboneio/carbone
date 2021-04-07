@@ -1,4 +1,6 @@
 
+### v3.1.5
+  - [EE] Fix dynamic image resize when using the `:imageFit` formatter with the `contain` property.
 ### v3.1.4
   - Release April 1st 2021
   - [EE] Improve `:html` formatter stability when using special characters such as "'<>& for ODT and DOCX reports.

@@ -470,6 +470,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       helper.assert(hyperlinks.validateURL('carbone.io?quer=23'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('www.carbone.com.au?key=value&name=john'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick'), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37'), hyperlinks.URL_ON_ERROR);
     });
 
     it('[utils] validateURL + DOCX - should correct the URL and convert "&" caracter to "&amp;" encoded caracter', () => {

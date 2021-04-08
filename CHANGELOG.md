@@ -1,4 +1,7 @@
 
+### v3.1.5
+  - [EE] Fix hyperlinks verification which could lead to crash.
+
 ### v3.1.4
   - Release April 1st 2021
   - [EE] Improve `:html` formatter stability when using special characters such as "'<>& for ODT and DOCX reports.

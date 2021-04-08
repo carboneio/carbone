@@ -1,5 +1,5 @@
 
-### v3.1.4
+### v3.1.5
   - [EE] Fix hyperlinks verification which could lead to crash.
 
 ### v3.1.4

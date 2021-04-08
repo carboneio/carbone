@@ -1,5 +1,6 @@
 
 ### v3.1.5
+  - Release April 8th 2021
   - [EE] Fix hyperlinks verification which could lead to crash.
 
 ### v3.1.4

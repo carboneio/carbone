@@ -2201,7 +2201,7 @@ describe('Dynamic HTML', function () {
             '<u>This is an underline text</u>' +
             '<br/>' +
             'with <i>some</i> content' +
-            '<a href="carbone.io">' +
+            '<a href="carbone.io/test_website">' +
               'and a <u>link</u>' +
             '</a>' +
           '</li>' +
@@ -2288,6 +2288,9 @@ describe('Dynamic HTML', function () {
             '<w:abstractNumId w:val="1000"/>' +
           '</w:num>'
         )
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io/test_website');
+        helper.assert(_it.next().value, undefined);
       });
 
       it('should convert HTML to DOCX xml 11', function () {

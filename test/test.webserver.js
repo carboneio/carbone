@@ -424,6 +424,22 @@ describe('Webserver', () => {
         });
       });
 
+      it('should return 404 error when the template does not exist for SDK', (done) => {
+        let templateId = 'template_not_exists';
+        let body = {
+          data : {
+            firstname : 'John'
+          }
+        };
+        get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(data.error, 'Template not found');
+          assert.strictEqual(data.code, 'w100');
+          assert.strictEqual(res.statusCode, 404);
+          done();
+        });
+      });
+
       it('should return template in the user location choice', (done) => {
         exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'PREFIX_abcdefghi')}`, () => {
           get.concat(getBody(4001, '/template/abcdefghi', 'GET', null, token), (err, res, data) => {

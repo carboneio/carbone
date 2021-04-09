@@ -1,4 +1,7 @@
 
+### v3.1.6
+  - [EE] Fix: return 404 error when the template does not exist on rendering
+
 ### v3.1.5
   - Release April 8th 2021
   - [EE] Fix hyperlinks verification which could lead to crash.

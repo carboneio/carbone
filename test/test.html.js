@@ -2627,6 +2627,52 @@ describe('Dynamic HTML', function () {
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
       });
 
+      it('[invalid hyperlink + getHTMLContentDocx] should add content element to htmlDatabase and should add the default hyperlinks.URL_ON_ERROR', () => {
+        const _expected =  {
+          id      : 0,
+          content : '<w:p><w:hyperlink r:id=\"CarboneHyperlinkId0\"><w:r><w:rPr><w:rStyle w:val=\"Hyperlink\"/></w:rPr><w:t xml:space=\"preserve\">TUSKLA WEBSITE</w:t></w:r></w:hyperlink></w:p>',
+          listStyleAbstract: "",
+          listStyleNum: ""
+        };
+        const _options = {
+          htmlDatabase : new Map(),
+          hyperlinkDatabase : new Map()
+        };
+        const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
+        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, hyperlinks.URL_ON_ERROR);
+        helper.assert(_it.next().value, undefined);
+      });
+
+      it('[invalid hyperlink + defaultURL + getHTMLContentDocx] should add content element to htmlDatabase and should add a different url ', () => {
+        const _expected =  {
+          id      : 0,
+          content : '<w:p><w:hyperlink r:id=\"CarboneHyperlinkId0\"><w:r><w:rPr><w:rStyle w:val=\"Hyperlink\"/></w:rPr><w:t xml:space=\"preserve\">TUSKLA WEBSITE</w:t></w:r></w:hyperlink></w:p>',
+          listStyleAbstract: "",
+          listStyleNum: ""
+        };
+        const _options = {
+          htmlDatabase : new Map(),
+          hyperlinkDatabase : new Map()
+        };
+        const _expectedURL = 'https://carbone.io/url_on_error_test'
+
+        const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
+        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, hyperlinksFormatters.defaultURL.call(_options,  _content, _expectedURL));
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, _expectedURL);
+        helper.assert(_it.next().value, undefined);
+      });
+
       it('should add content element to htmlDatabase with a FONT', () => {
         const _expected =  {
           id      : 0,

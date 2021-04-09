@@ -1,3 +1,5 @@
+### v3.1.6
+  - [EE] New formatter `:defaultURL()`: if a **dynamic hyperlink** or a **HTML anchor tag** is injected into a report and the URL verification fails, the formatter is used to replace the default error URL. Example to use it with and HTML formatter: `{d.content:defaultURL(https:url.of.your.choice):html}`. The `:defaultURL` should be placed before the `:html` formatter.
 
 ### v3.1.5
   - Release April 8th 2021

@@ -289,7 +289,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
-  it.only('[DOCX - preprocess + chain defaultURL] should remove multiple hyperlinks marker from the rels file and move them to the document.xml file', function () {
+  it('[DOCX - preprocess + chain defaultURL] should remove multiple hyperlinks marker from the rels file and move them to the document.xml file', function () {
     const _template = {
       files : [{
         name : '_rels/document.xml.rels',
@@ -430,7 +430,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[0].data, _expected);
   });
 
-  it.only('[XLSX preprocess] should transform a single hyperlink marker valid with the defaultURL formatter ("d.url:defaultURL()" to "{d.url:defaultURL()}")', function () {
+  it('[XLSX preprocess] should transform a single hyperlink marker valid with the defaultURL formatter ("d.url:defaultURL()" to "{d.url:defaultURL()}")', function () {
     const _template = {
       files : [{
         name : 'xl/worksheets/_rels/sheet1.xml.rels',

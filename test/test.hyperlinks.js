@@ -29,6 +29,18 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[0].data, _expectedResult);
   });
 
+  it('[ODT/ODS] should correct a xlink:href unicode to ascii and remove incorrect text before with only one Carbone marker and shoud keep the defaultURL formatter', function () {
+    const _template = {
+      files : [{
+        name : 'content.xml',
+        data : '<draw:a xlink:href="This is some text that should not be displayed here%7Bd.url:defaultURL(https://carbone.io)%7D"'
+      }]
+    };
+    const _expectedResult = '<draw:a xlink:href="{d.url:defaultURL(https://carbone.io):validateURL}"';
+    hyperlinks.insertHyperlinksLO(_template);
+    helper.assert(_template.files[0].data, _expectedResult);
+  });
+
   it('[ODT/ODS] should correct a xlink:href unicode to ascii and remove incorrect text after only one Carbone marker', function () {
     const _template = {
       files : [{
@@ -277,6 +289,32 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
+  it.only('[DOCX - preprocess + chain defaultURL] should remove multiple hyperlinks marker from the rels file and move them to the document.xml file', function () {
+    const _template = {
+      files : [{
+        name : '_rels/document.xml.rels',
+        data : ''
+          + '<?xml version="1.0" encoding="UTF-8"?>'
+          + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+          + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="%7Bd.url:defaultURL(carbone.io)%7D" TargetMode="External"/>'
+          + '</Relationships>'
+      }, {
+        name : 'word/document.xml',
+        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="rId2"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>This</w:t></w:r></w:hyperlink></w:p></w:body></w:document>'
+      }]
+    };
+    const _expectedResult = ''
+      + '<?xml version="1.0" encoding="UTF-8"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+      + '</Relationships>'
+    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:hyperlink r:id="{d.url:defaultURL(carbone.io):generateHyperlinkReference()}"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>This</w:t></w:r></w:hyperlink></w:p></w:body></w:document>';
+    hyperlinks.preProcesstHyperlinksDocx(_template);
+    helper.assert(_template.files[0].data, _expectedResult);
+    helper.assert(_template.files[1].data, _expectedDocumentResult);
+  });
+
   it('[DOCX - preprocess] should remove a picture hyperlink marker from the rels file and move it to the document.xml file', function () {
     const _template = {
       files : [{
@@ -380,6 +418,19 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
   });
 
   it('[XLSX] should transform a single hyperlink marker valid ("d.url" to "{d.url}")', function () {
+    const _template = {
+      files : [{
+        name : 'xl/worksheets/_rels/sheet1.xml.rels',
+        data : '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="d.url" TargetMode="External"/></Relationships>'
+      }]
+    };
+    const _expected =
+      '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="{d.url:validateURL}" TargetMode="External"/></Relationships>';
+    hyperlinks.insertHyperlinksXLSX(_template);
+    helper.assert(_template.files[0].data, _expected);
+  });
+
+  it.only('[XLSX preprocess] should transform a single hyperlink marker valid with the defaultURL formatter ("d.url:defaultURL()" to "{d.url:defaultURL()}")', function () {
     const _template = {
       files : [{
         name : 'xl/worksheets/_rels/sheet1.xml.rels',

@@ -1,7 +1,9 @@
 const html = require('../lib/html');
 const htmlFormatters = require('../formatters/html');
+const hyperlinksFormatters = require('../formatters/hyperlinks');
 const helper = require('../lib/helper');
 const assert = require('assert');
+const hyperlinks = require('../lib/hyperlinks');
 
 describe('Dynamic HTML', function () {
   describe('ODT reports', function () {
@@ -209,7 +211,7 @@ describe('Dynamic HTML', function () {
       });
 
       it('should create hyperlinks', function () {
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com">Carbone Website</a>'));
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com">Carbone Website</a>'), {});
         helper.assert(res.content, '' +
           '<text:p>' +
             '<text:a xlink:type="simple" xlink:href="https://carbone.com">' +
@@ -218,7 +220,7 @@ describe('Dynamic HTML', function () {
           '</text:p>'
         );
 
-        res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('Some content before <a href="carbone.com">Carbone Website something <b>bold</b> and <i>italic</i></a> Content after'));
+        res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('Some content before <a href="carbone.com">Carbone Website something <b>bold</b> and <i>italic</i></a> Content after'), {});
         helper.assert(res.content, '' +
           '<text:p>' +
             '<text:span>Some content before </text:span>' +
@@ -556,7 +558,7 @@ describe('Dynamic HTML', function () {
                     '<li>Banana</li>' +
                     '<li>An URL to <a href="carbone.io">carbone.io</a> and a <a href="carbone.io/documentation.html"><i>link with a style</i></a></li>' +
                   '</ul>';
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), {});
         helper.assert(res.content, '' +
           '<text:p><text:span>This is a list:</text:span><text:line-break/></text:p>' +
           '<text:list text:style-name="LC012">' +
@@ -850,6 +852,36 @@ describe('Dynamic HTML', function () {
         helper.assert(_properties, {
           content : '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>',
           style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>',
+          styleLists : ''
+        });
+      });
+
+      it('getHtmlContent + hyperlink - should use the default URL_ON_ERROR link if the HTML anchor tag is invalid', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
+        htmlFormatters.getHTMLContentOdt.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_properties, {
+          content : `<text:p><text:a xlink:type=\"simple\" xlink:href=\"${hyperlinks.URL_ON_ERROR}\"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>`,
+          style   : '',
+          styleLists : ''
+        });
+      });
+
+      it('getHtmlContent + hyperlink - should call the formatter "defaultURL" and should use the default URL_ON_ERROR link if the HTML anchor tag is invalid', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
+        htmlFormatters.getHTMLContentOdt.call(_options, hyperlinksFormatters.defaultURL.call(_options, _content, "https://carbone.io/link_on_error_test"));
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_properties, {
+          content : '<text:p><text:a xlink:type=\"simple\" xlink:href=\"https://carbone.io/link_on_error_test\"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>',
+          style   : '',
           styleLists : ''
         });
       });

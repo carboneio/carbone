@@ -16,7 +16,7 @@ function addHtmlDatabase (options, htmlContent) {
   if (!options.htmlDatabase.has(htmlContent)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     const id = html.generateStyleID(options.htmlDatabase.size);
-    const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor);
+    const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor, options);
 
     _htmlDatabaseProperties = {
       content,

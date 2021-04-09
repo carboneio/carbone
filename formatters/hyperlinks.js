@@ -41,9 +41,18 @@ function validateURL (hyperlink = '') {
   return hyperlinks.validateURL(hyperlink, this.defaultUrlOnError);
 }
 
-function defaultURL (hyperlink = '', newDefaultUrlOnError = '') {
+/**
+ * Replace the default value hyperlinks.URL_ON_ERROR when dynamic hyperlinks are injected into a report.
+ * If the `newDefaultUrlOnError` argument is invalid, it is replaced by the default hyperlinks.URL_ON_ERROR.
+ *
+ * @private
+ * @param {String} content Main content coming from the marker.
+ * @param {String} newDefaultUrlOnError new URL replacing the hyperlinks.URL_ON_ERROR
+ * @returns {String} the content
+ */
+function defaultURL (content, newDefaultUrlOnError = '') {
   this.defaultUrlOnError = hyperlinks.validateURL(newDefaultUrlOnError);
-  return hyperlink;
+  return content;
 }
 
 module.exports = {

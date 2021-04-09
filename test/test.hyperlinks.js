@@ -3,7 +3,7 @@ const helper     = require('./helper');
 const hyperlinks = require('../lib/hyperlinks');
 const hyperlinksFormatters = require('../formatters/hyperlinks');
 
-describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
+describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
 
   it('[ODT/ODS] should not do anything if the link is not a "<draw:a>" or "<text:a>"', function () {
     const _template = {
@@ -444,7 +444,7 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
     helper.assert(_template.files[2].data, _expected[2]);
   });
 
-  describe.only('Utils', () => {
+  describe('Utils', () => {
     it('[utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
       helper.assert(hyperlinks.validateURL('carbone.io'), 'https://carbone.io');
       helper.assert(hyperlinks.validateURL('www.carbone.com.au'), 'https://www.carbone.com.au');
@@ -474,6 +474,7 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
       helper.assert(hyperlinks.validateURL('www.carbone.com.au?key=value&name=john'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37'), hyperlinks.URL_ON_ERROR);
+
       /** URL ON ERROR RECEIVED BY ARGUMENTS */
       helper.assert(hyperlinks.validateURL('javascript:void(0)', 'https://carbone.io'), 'https://carbone.io');
       helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf', 'https://carbone.io/index.html'), 'https://carbone.io/index.html');
@@ -518,7 +519,7 @@ describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tabl
       helper.assert(_options.defaultUrlOnError, hyperlinks.URL_ON_ERROR);
     });
 
-    it.only('[utils] chain formatters: "defaultURL" + "validateURL"', function() {
+    it('[utils] chain formatters: "defaultURL" + "validateURL"', function() {
       let _resultUrl = '';
       const _options = {};
       /** if the url is valide, it should return it */

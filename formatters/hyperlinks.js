@@ -8,7 +8,7 @@ const hyperlinks = require('../lib/hyperlinks');
  */
 function generateHyperlinkReference (hyperlink = '') {
   /** Check the URL */
-  hyperlink = hyperlinks.validateURL(hyperlink, 'docx');
+  hyperlink = hyperlinks.validateURL(hyperlink, this.defaultUrlOnError, 'docx');
   hyperlinks.addLinkDatabase(this, hyperlink);
   return {
     fn   : generateHyperkinReferencePostProcessing,
@@ -38,10 +38,16 @@ function generateHyperkinReferencePostProcessing (hyperlink) {
  * @param {String} hyperlink
  */
 function validateURL (hyperlink = '') {
-  return hyperlinks.validateURL(hyperlink);
+  return hyperlinks.validateURL(hyperlink, this.defaultUrlOnError);
+}
+
+function defaultURL (hyperlink = '', newDefaultUrlOnError = '') {
+  this.defaultUrlOnError = hyperlinks.validateURL(newDefaultUrlOnError);
+  return hyperlink;
 }
 
 module.exports = {
   generateHyperlinkReference,
-  validateURL
+  validateURL,
+  defaultURL
 };

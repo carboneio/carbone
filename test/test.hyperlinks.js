@@ -3,7 +3,7 @@ const helper     = require('./helper');
 const hyperlinks = require('../lib/hyperlinks');
 const hyperlinksFormatters = require('../formatters/hyperlinks');
 
-describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
+describe.only('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) for ODS, ODT, DOCX and XLSX templates. It convert unicode characters to ascii characters or setup post process formatters', function () {
 
   it('[ODT/ODS] should not do anything if the link is not a "<draw:a>" or "<text:a>"', function () {
     const _template = {
@@ -444,7 +444,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[2].data, _expected[2]);
   });
 
-  describe('Utils', () => {
+  describe.only('Utils', () => {
     it('[utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
       helper.assert(hyperlinks.validateURL('carbone.io'), 'https://carbone.io');
       helper.assert(hyperlinks.validateURL('www.carbone.com.au'), 'https://www.carbone.com.au');
@@ -462,7 +462,10 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       helper.assert(hyperlinks.validateURL('https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c'), 'https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c');
     });
 
-    it('[utils] validateURL - should return an error URL when the URL is invalid', () => {
+    it('[utils] validateURL - \n \
+        should return an error URL when the URL is invalid && \n\
+        should return an error URL passed as a second argument when the URL is invalid', () => {
+      /** DEFAULT URL ON ERROR */
       helper.assert(hyperlinks.validateURL('javascript:void(0)'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('magnet:?xt=urn:btih:123'), hyperlinks.URL_ON_ERROR);
@@ -471,15 +474,25 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       helper.assert(hyperlinks.validateURL('www.carbone.com.au?key=value&name=john'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37'), hyperlinks.URL_ON_ERROR);
+      /** URL ON ERROR RECEIVED BY ARGUMENTS */
+      helper.assert(hyperlinks.validateURL('javascript:void(0)', 'https://carbone.io'), 'https://carbone.io');
+      helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf', 'https://carbone.io/index.html'), 'https://carbone.io/index.html');
+      helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick', 'https://my_test.asp'), 'https://my_test.asp');
+      helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37', 'https://carbone.io/url_on_error.html'), 'https://carbone.io/url_on_error.html');
     });
 
-    it('[utils] validateURL + DOCX - should correct the URL and convert "&" caracter to "&amp;" encoded caracter', () => {
-      helper.assert(hyperlinks.validateURL('carbone.io', 'docx'), 'https://carbone.io');
-      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick', 'docx'), 'http://carbone.io/?name=john&amp;lastname=wick');
-      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick&key=code', 'docx'), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
+    it('[utils] validateURL + DOCX && \n \
+        should correct the URL and convert "&" caracter to "&amp;" encoded caracter && \n \
+        should return the default Error URL when the URL is invalid && \n \
+        should return a different default Error URL when the URL is invalid', () => {
+      helper.assert(hyperlinks.validateURL('carbone.io', '', 'docx'), 'https://carbone.io');
+      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick', '', 'docx'), 'http://carbone.io/?name=john&amp;lastname=wick');
+      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick&key=code', '', 'docx'), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
+      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', '', 'docx'), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', 'https://www.carbone.com.au', 'docx'), 'https://www.carbone.com.au');
     });
 
-    it('[utils] should add to the hyperlinkDatabase and return the hyperlink properties', () => {
+    it('[utils] formatter "addLinkDatabase" should add to the hyperlinkDatabase and return the hyperlink properties', () => {
       const _options = {
         hyperlinkDatabase : new Map()
       };
@@ -488,6 +501,37 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       const _it = _options.hyperlinkDatabase.keys();
       helper.assert(_it.next().value, 'https://carbone.io');
       helper.assert(_it.next().value, undefined);
+    });
+
+    it('[utils] formatter "defaultURL" \n\
+        should set a new default URL on error && \n\
+        should set the default URL if the new default URL is invalid && \n\
+        should set the default URL if the new default URL is undefined', function() {
+      const _options = {};
+      hyperlinksFormatters.defaultURL.call(_options, 'link', 'https://carbone.io/default_url_on_error');
+      helper.assert(_options.defaultUrlOnError, 'https://carbone.io/default_url_on_error');
+      hyperlinksFormatters.defaultURL.call(_options, 'link', 'carbone.io');
+      helper.assert(_options.defaultUrlOnError, 'https://carbone.io');
+      hyperlinksFormatters.defaultURL.call(_options, 'link', 'http://my test.asp');
+      helper.assert(_options.defaultUrlOnError, hyperlinks.URL_ON_ERROR);
+      hyperlinksFormatters.defaultURL.call(_options, 'link');
+      helper.assert(_options.defaultUrlOnError, hyperlinks.URL_ON_ERROR);
+    });
+
+    it.only('[utils] chain formatters: "defaultURL" + "validateURL"', function() {
+      let _resultUrl = '';
+      const _options = {};
+      /** if the url is valide, it should return it */
+      helper.assert(_options.defaultUrlOnError, undefined);
+      _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://carbone.io', 'https://carbone.io/default_url_on_error1'));
+      helper.assert(_options.defaultUrlOnError, 'https://carbone.io/default_url_on_error1');
+      helper.assert(_resultUrl, 'http://carbone.io');
+      /** if the url is invalid, it should return the new URL On Error passed by the formatter "defaultURL" */
+      _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://my test.asp', 'https://carbone.io/default_url_on_error2'));
+      helper.assert(_resultUrl, 'https://carbone.io/default_url_on_error2');
+      /** if the url is invalid AND if the new URL On Error passed by the formatter "defaultURL" is invalid, it should return the default hyperlinks.URL_ON_ERROR */
+      _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://my test.asp', 'carbone.io?quer=23'));
+      helper.assert(_resultUrl, 'https://carbone.io/documentation.html#hyperlink-validation');
     });
   });
 

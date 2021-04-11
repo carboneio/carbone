@@ -19,6 +19,10 @@ function writeTemplate (req, res, templateId, templatePathTemp) {
 }
 
 function readTemplate (req, res, templateId, callback) {
+  if (templateId === 'template_not_exists') {
+    // simulate error from Carbone SaaS Plugin
+    return callback(new Error('File does not exist'));
+  }
   return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
 }
 

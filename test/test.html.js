@@ -1,7 +1,9 @@
 const html = require('../lib/html');
 const htmlFormatters = require('../formatters/html');
+const hyperlinksFormatters = require('../formatters/hyperlinks');
 const helper = require('../lib/helper');
 const assert = require('assert');
+const hyperlinks = require('../lib/hyperlinks');
 
 describe('Dynamic HTML', function () {
   describe('ODT reports', function () {
@@ -209,7 +211,7 @@ describe('Dynamic HTML', function () {
       });
 
       it('should create hyperlinks', function () {
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com">Carbone Website</a>'));
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com">Carbone Website</a>'), {});
         helper.assert(res.content, '' +
           '<text:p>' +
             '<text:a xlink:type="simple" xlink:href="https://carbone.com">' +
@@ -218,7 +220,7 @@ describe('Dynamic HTML', function () {
           '</text:p>'
         );
 
-        res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('Some content before <a href="carbone.com">Carbone Website something <b>bold</b> and <i>italic</i></a> Content after'));
+        res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('Some content before <a href="carbone.com">Carbone Website something <b>bold</b> and <i>italic</i></a> Content after'), {});
         helper.assert(res.content, '' +
           '<text:p>' +
             '<text:span>Some content before </text:span>' +
@@ -556,7 +558,7 @@ describe('Dynamic HTML', function () {
                     '<li>Banana</li>' +
                     '<li>An URL to <a href="carbone.io">carbone.io</a> and a <a href="carbone.io/documentation.html"><i>link with a style</i></a></li>' +
                   '</ul>';
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), {});
         helper.assert(res.content, '' +
           '<text:p><text:span>This is a list:</text:span><text:line-break/></text:p>' +
           '<text:list text:style-name="LC012">' +
@@ -850,6 +852,36 @@ describe('Dynamic HTML', function () {
         helper.assert(_properties, {
           content : '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>',
           style   : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>',
+          styleLists : ''
+        });
+      });
+
+      it('getHtmlContent + hyperlink - should use the default URL_ON_ERROR link if the HTML anchor tag is invalid', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
+        htmlFormatters.getHTMLContentOdt.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_properties, {
+          content : `<text:p><text:a xlink:type=\"simple\" xlink:href=\"${hyperlinks.URL_ON_ERROR}\"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>`,
+          style   : '',
+          styleLists : ''
+        });
+      });
+
+      it('getHtmlContent + hyperlink - should call the formatter "defaultURL" and should use the default URL_ON_ERROR link if the HTML anchor tag is invalid', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
+        htmlFormatters.getHTMLContentOdt.call(_options, hyperlinksFormatters.defaultURL.call(_options, _content, "https://carbone.io/link_on_error_test"));
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_properties, {
+          content : '<text:p><text:a xlink:type=\"simple\" xlink:href=\"https://carbone.io/link_on_error_test\"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>',
+          style   : '',
           styleLists : ''
         });
       });
@@ -2169,7 +2201,7 @@ describe('Dynamic HTML', function () {
             '<u>This is an underline text</u>' +
             '<br/>' +
             'with <i>some</i> content' +
-            '<a href="carbone.io">' +
+            '<a href="carbone.io/test_website">' +
               'and a <u>link</u>' +
             '</a>' +
           '</li>' +
@@ -2256,6 +2288,9 @@ describe('Dynamic HTML', function () {
             '<w:abstractNumId w:val="1000"/>' +
           '</w:num>'
         )
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io/test_website');
+        helper.assert(_it.next().value, undefined);
       });
 
       it('should convert HTML to DOCX xml 11', function () {
@@ -2593,6 +2628,52 @@ describe('Dynamic HTML', function () {
         helper.assert(_properties, _expected);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
+      });
+
+      it('[invalid hyperlink + getHTMLContentDocx] should add content element to htmlDatabase and should add the default hyperlinks.URL_ON_ERROR', () => {
+        const _expected =  {
+          id      : 0,
+          content : '<w:p><w:hyperlink r:id=\"CarboneHyperlinkId0\"><w:r><w:rPr><w:rStyle w:val=\"Hyperlink\"/></w:rPr><w:t xml:space=\"preserve\">TUSKLA WEBSITE</w:t></w:r></w:hyperlink></w:p>',
+          listStyleAbstract: "",
+          listStyleNum: ""
+        };
+        const _options = {
+          htmlDatabase : new Map(),
+          hyperlinkDatabase : new Map()
+        };
+        const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
+        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, hyperlinks.URL_ON_ERROR);
+        helper.assert(_it.next().value, undefined);
+      });
+
+      it('[invalid hyperlink + defaultURL + getHTMLContentDocx] should add content element to htmlDatabase and should add a different url ', () => {
+        const _expected =  {
+          id      : 0,
+          content : '<w:p><w:hyperlink r:id=\"CarboneHyperlinkId0\"><w:r><w:rPr><w:rStyle w:val=\"Hyperlink\"/></w:rPr><w:t xml:space=\"preserve\">TUSKLA WEBSITE</w:t></w:r></w:hyperlink></w:p>',
+          listStyleAbstract: "",
+          listStyleNum: ""
+        };
+        const _options = {
+          htmlDatabase : new Map(),
+          hyperlinkDatabase : new Map()
+        };
+        const _expectedURL = 'https://carbone.io/url_on_error_test'
+
+        const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
+        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, hyperlinksFormatters.defaultURL.call(_options,  _content, _expectedURL));
+        const _properties = _options.htmlDatabase.get(_content);
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, _expectedURL);
+        helper.assert(_it.next().value, undefined);
       });
 
       it('should add content element to htmlDatabase with a FONT', () => {

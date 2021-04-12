@@ -4,6 +4,7 @@
   - [EE] Add the option `:imageFit(fillWidth)` to fill the full width of the template image while keeping aspect ratio of the inserted image.
       Before fixing the bug with `contain` property, it was more or less the default behaviour of Carbone before this version.
       So, `fillWidth` becomes the default option to avoid changing the style of existing reports.
+  - [EE] Improve performance to download images. It takes almost 5 times less time to build a report with a lot of dynamic images.
 
 ### v3.1.4
   - Release April 1st 2021

@@ -5,7 +5,9 @@
       Before fixing the bug with `contain` property, it was more or less the default behaviour of Carbone before this version.
       So, `fillWidth` becomes the default option to avoid changing the style of existing reports.
   - [EE] Improve performance to download images. It takes almost 5 times less time to build a report with a lot of dynamic images.
-  - [EE] When the dynamic image cannot be inserted (fetch failed, image type not supported), the aspect ratio of the replacement image keep the aspect ratio of the template
+  - [EE] When the dynamic image cannot be inserted (fetch failed, image type not supported), 
+    - the aspect ratio of the replacement image keep the aspect ratio of the template
+    - this replacement image more beautiful (vectorial) and does not contain any text for internationalisation
 
 ### v3.1.4
   - Release April 1st 2021

@@ -5,7 +5,7 @@ const helper = require('../lib/helper');
 const assert = require('assert');
 const hyperlinks = require('../lib/hyperlinks');
 
-describe.only('Dynamic HTML', function () {
+describe('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {

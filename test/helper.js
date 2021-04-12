@@ -43,8 +43,8 @@ const helperTests = {
     var _expected = helperTests.openUnzippedDocument(expectedDirname, 'expected', getHiddenFiles);
     var _max = Math.max(carboneResult.files.length, _expected.files.length);
     for (var i = 0; i < _max; i++) {
-      var _resultFile   = carboneResult.files[i];
-      var _expectedFile = _expected.files[i];
+      var _resultFile   = carboneResult.files[i] || {};
+      var _expectedFile = _expected.files[i] || {};
       if (_resultFile.name !== _expectedFile.name) {
         for (var j = 0; j < _expected.files.length; j++) {
           _expectedFile = _expected.files[j];
@@ -74,7 +74,7 @@ const helperTests = {
   },
   openUnzippedDocument : function (dirname, type, getHiddenFiles = false) {
     var _dirname = path.join(__dirname, 'datasets', dirname, type);
-    var _files = helperLib.walkDirSync(_dirname, getHiddenFiles === true ? /.*/ : undefined);
+    var _files = helperLib.walkDirSync(_dirname, getHiddenFiles === true ? /.*[^.DS_Store]/ : undefined);
     var _report = {
       isZipped   : false,
       filename   : dirname,

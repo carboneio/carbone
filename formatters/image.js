@@ -243,9 +243,11 @@ function generateImageXlsxReference (urlOrBase64, sheetId) {
  * @param {String} measure     width or height
  * @param {String} value       value
  * @param {String} unit        can be cm, in or emu
+ * @param {String} imageFit    can be fill, contain, fillWidth
  */
-function scaleImage (urlOrBase64, measure, value, unit) {
+function scaleImage (urlOrBase64, measure, value, unit, imageFit) {
   let _imageSourceProperties = {};
+  _imageSourceProperties.imageFit = imageFit;
   if (unit === 'cm' || unit === 'in' || unit === 'emu') {
     _imageSourceProperties.imageUnit = unit;
   }

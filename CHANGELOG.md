@@ -1,6 +1,10 @@
 
-### v3.1.5
+### v3.2.0
   - [EE] Fix dynamic image resize when using the `:imageFit` formatter with the `contain` property.
+  - [EE] Add the option `:imageFit(fillWidth)` to fill the full width of the template image while keeping aspect ratio of the inserted image.
+      Before fixing the bug with `contain` property, it was more or less the default behaviour of Carbone before this version.
+      So, `fillWidth` becomes the default option to avoid changing the style of existing reports.
+
 ### v3.1.4
   - Release April 1st 2021
   - [EE] Improve `:html` formatter stability when using special characters such as "'<>& for ODT and DOCX reports.

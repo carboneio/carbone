@@ -8,6 +8,7 @@
   - [EE] When the dynamic image cannot be inserted (fetch failed, image type not supported), 
     - the aspect ratio of the replacement image keep the aspect ratio of the template
     - this replacement image more beautiful (vectorial) and does not contain any text for internationalisation
+  - [EE] Fix corrupted XLSX files when inserting new type of image which were not previously present
 
 ### v3.1.6
   - Release April 12th 2021

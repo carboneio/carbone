@@ -1,4 +1,5 @@
 ### v3.2.0
+  - Release April 13th 2021
   - [EE] Fix dynamic image resize when using the `:imageFit` formatter with the `contain` property.
   - [EE] Add the option `:imageFit(fillWidth)` to fill the full width of the template image while keeping aspect ratio of the inserted image.
       Before fixing the bug with `contain` property, it was more or less the default behaviour of Carbone before this version.

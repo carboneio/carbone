@@ -239,6 +239,17 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should generate a link with a nested paragraph and should not print the paragraph', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.io"><p>Carbone Website</p></a>'), {});
+        helper.assert(res.content, '' +
+          '<text:p>' +
+            '<text:a xlink:type=\"simple\" xlink:href=\"https://carbone.io\">' +
+              '<text:span>Carbone Website</text:span>' +
+            '</text:a>' +
+          '</text:p>'
+        );
+      });
+
       it('should generate a simple unordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>'));
         helper.assert(res.content, '' +
@@ -367,6 +378,19 @@ describe('Dynamic HTML', function () {
               '</style:list-level-properties>' +
             '</text:list-level-style-bullet>' +
           '</text:list-style>'
+        );
+      });
+
+      it('should generate a simple unordered list with a nested paragraph', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li><strong><p>Biochemistry, molecular and cell biology</p></strong></li></ul>'));
+        helper.assert(res.content, '' +
+          '<text:list text:style-name="LC010">'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span text:style-name="C013">Biochemistry, molecular and cell biology</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+          '</text:list><text:p text:style-name="Standard"/>'
         );
       });
 
@@ -711,6 +735,36 @@ describe('Dynamic HTML', function () {
             '</text:list-item>'+
           '</text:list>'+
           '<text:p text:style-name="Standard"/>'
+        );
+      });
+      it('should create a nested list with in a "li" tag preceded by a break line', function () {
+        let content = '' +
+                  '<ul>' +
+                    '<li>' +
+                      'Drinks:<br/>' +
+                      '<ul>' +
+                        '<li>Mocha</li>' +
+                      '</ul>' +
+                    '</li>' +
+                  '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        helper.assert(res.content, '' +
+          '<text:list text:style-name=\"LC010\">' +
+            '<text:list-item>' +
+              '<text:p>' +
+                '<text:span>Drinks:</text:span>' +
+                '<text:line-break/>' +
+              '</text:p>' +
+              '<text:list>' +
+                '<text:list-item>' +
+                  '<text:p>' +
+                    '<text:span>Mocha</text:span>' +
+                  '</text:p>' +
+                '</text:list-item>' +
+              '</text:list>' +
+            '</text:list-item>' +
+          '</text:list>' +
+          '<text:p text:style-name=\"Standard\"/>'
         );
       });
     });
@@ -2190,6 +2244,82 @@ describe('Dynamic HTML', function () {
         helper.assert(listStyleNum, '<w:num w:numId="1000"><w:abstractNumId w:val="1000"/></w:num>');
       });
 
+      it("should create nested list without text on the first element", function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li><ol><li>Tea</li></ol></li></ol>'));
+        helper.assert(content, '' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"0\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+          '</w:p>' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"1\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space=\"preserve\">Tea</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+      });
+
+      it("should create nested list with text on the first element and a break line", function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>This is some content<br/><ol><li>Tea</li></ol></li></ol>'));
+        helper.assert(content, '' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"0\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space=\"preserve\">This is some content</w:t>' +
+            '</w:r>' +
+            '<w:r><w:br/></w:r>' +
+          '</w:p>' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"1\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space=\"preserve\">Tea</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+      });
+
+
+
+      it("should create nested list with text on the first element and a break line", function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ul><li><p>The introduction</p></li></ul>'));
+        helper.assert(content, '' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"0\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space=\"preserve\">The introduction</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+      });
+
 
       it('should convert HTML to DOCX xml with list, hyperlinks and styles', function () {
         const _options = {
@@ -2306,6 +2436,29 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a>');
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
+        '<w:p>' +
+          '<w:hyperlink r:id="CarboneHyperlinkId0">' +
+           '<w:r>' +
+             '<w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr>' +
+              '<w:t xml:space="preserve">Carbone Website</w:t>' +
+            '</w:r>' +
+          '</w:hyperlink>' +
+        '</w:p>'
+        );
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io');
+        helper.assert(_it.next().value, undefined);
+      });
+
+      it('should convert HTML to DOCX xml 12.5 hyperlink simple with a paragraph inside', function () {
+        const _options = {
+          hyperlinkDatabase : new Map()
+        };
+        const _descriptor = html.parseHTML('<a href="carbone.io"><p>Carbone Website</p></a>');
         const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');

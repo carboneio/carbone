@@ -9,6 +9,15 @@
     - the aspect ratio of the replacement image keep the aspect ratio of the template
     - this replacement image more beautiful (vectorial) and does not contain any text for internationalisation
 
+### v3.1.6
+  - Release April 12th 2021
+  - [EE] New formatter `:defaultURL()`: if a **dynamic hyperlink** or a **HTML anchor tag** is injected into a report and the URL verification fails, the formatter is used to replace the default error URL. Example to use it with and HTML formatter: `{d.content:defaultURL(https:url.of.your.choice):html}`. The `:defaultURL` should be placed before the `:html` formatter.
+  - [EE] Fix: return 404 error when the template does not exist on rendering
+
+### v3.1.5
+  - Release April 8th 2021
+  - [EE] Fix hyperlinks verification which could lead to crash.
+
 ### v3.1.4
   - Release April 1st 2021
   - [EE] Improve `:html` formatter stability when using special characters such as "'<>& for ODT and DOCX reports.

@@ -1,4 +1,5 @@
 ### v3.1.7
+  - Release April 12th 2021
   - [EE] Fix Dynamic HTML: paragraph and break lines inside nested lists or anchor tags were creating corrupted DOCX/ODT documents.
 
 ### v3.1.6

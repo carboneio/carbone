@@ -2190,6 +2190,61 @@ describe('Dynamic HTML', function () {
         helper.assert(listStyleNum, '<w:num w:numId="1000"><w:abstractNumId w:val="1000"/></w:num>');
       });
 
+      it("should create nested list without text on the first element", function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li><ol><li>Tea</li></ol></li></ol>'));
+        helper.assert(content, '' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"0\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+          '</w:p>' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"1\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space=\"preserve\">Tea</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+      });
+
+      it.only("should create nested list with text on the first element and a break line", function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>This is some content<br/><ol><li>Tea</li></ol></li></ol>'));
+        helper.assert(content, '' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"0\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space=\"preserve\">This is some content</w:t>' +
+            '</w:r>' +
+            '<w:r><w:br/></w:r>' +
+          '</w:p>' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"1\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space=\"preserve\">Tea</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+      });
 
       it('should convert HTML to DOCX xml with list, hyperlinks and styles', function () {
         const _options = {

@@ -239,6 +239,17 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
+      it('should generate a link with a nested paragraph and should not print the paragraph', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.io"><p>Carbone Website</p></a>'), {});
+        helper.assert(res.content, '' +
+          '<text:p>' +
+            '<text:a xlink:type=\"simple\" xlink:href=\"https://carbone.io\">' +
+              '<text:span>Carbone Website</text:span>' +
+            '</text:a>' +
+          '</text:p>'
+        );
+      });
+
       it('should generate a simple unordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>'));
         helper.assert(res.content, '' +
@@ -367,6 +378,19 @@ describe.only('Dynamic HTML', function () {
               '</style:list-level-properties>' +
             '</text:list-level-style-bullet>' +
           '</text:list-style>'
+        );
+      });
+
+      it('should generate a simple unordered list with a nested paragraph', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li><strong><p>Biochemistry, molecular and cell biology</p></strong></li></ul>'));
+        helper.assert(res.content, '' +
+          '<text:list text:style-name="LC010">'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span text:style-name="C013">Biochemistry, molecular and cell biology</text:span>'+
+              '</text:p>'+
+            '</text:list-item>'+
+          '</text:list><text:p text:style-name="Standard"/>'
         );
       });
 
@@ -711,6 +735,36 @@ describe.only('Dynamic HTML', function () {
             '</text:list-item>'+
           '</text:list>'+
           '<text:p text:style-name="Standard"/>'
+        );
+      });
+      it('should create a nested list with in a "li" tag preceded by a break line', function () {
+        let content = '' +
+                  '<ul>' +
+                    '<li>' +
+                      'Drinks:<br/>' +
+                      '<ul>' +
+                        '<li>Mocha</li>' +
+                      '</ul>' +
+                    '</li>' +
+                  '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        helper.assert(res.content, '' +
+          '<text:list text:style-name=\"LC010\">' +
+            '<text:list-item>' +
+              '<text:p>' +
+                '<text:span>Drinks:</text:span>' +
+                '<text:line-break/>' +
+              '</text:p>' +
+              '<text:list>' +
+                '<text:list-item>' +
+                  '<text:p>' +
+                    '<text:span>Mocha</text:span>' +
+                  '</text:p>' +
+                '</text:list-item>' +
+              '</text:list>' +
+            '</text:list-item>' +
+          '</text:list>' +
+          '<text:p text:style-name=\"Standard\"/>'
         );
       });
     });

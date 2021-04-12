@@ -5,7 +5,7 @@ const helper = require('../lib/helper');
 const assert = require('assert');
 const hyperlinks = require('../lib/hyperlinks');
 
-describe('Dynamic HTML', function () {
+describe.only('Dynamic HTML', function () {
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {
@@ -2216,7 +2216,7 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it.only("should create nested list with text on the first element and a break line", function () {
+      it("should create nested list with text on the first element and a break line", function () {
         let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>This is some content<br/><ol><li>Tea</li></ol></li></ol>'));
         helper.assert(content, '' +
           '<w:p>' +
@@ -2245,6 +2245,27 @@ describe('Dynamic HTML', function () {
           '<w:p/>'
         );
       });
+
+
+
+      it("should create nested list with text on the first element and a break line", function () {
+        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ul><li><p>The introduction</p></li></ul>'));
+        helper.assert(content, '' +
+          '<w:p>' +
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val=\"0\"/>' +
+                '<w:numId w:val=\"1000\"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:t xml:space=\"preserve\">The introduction</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+      });
+
 
       it('should convert HTML to DOCX xml with list, hyperlinks and styles', function () {
         const _options = {
@@ -2361,6 +2382,29 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a>');
+        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
+        '<w:p>' +
+          '<w:hyperlink r:id="CarboneHyperlinkId0">' +
+           '<w:r>' +
+             '<w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr>' +
+              '<w:t xml:space="preserve">Carbone Website</w:t>' +
+            '</w:r>' +
+          '</w:hyperlink>' +
+        '</w:p>'
+        );
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io');
+        helper.assert(_it.next().value, undefined);
+      });
+
+      it('should convert HTML to DOCX xml 12.5 hyperlink simple with a paragraph inside', function () {
+        const _options = {
+          hyperlinkDatabase : new Map()
+        };
+        const _descriptor = html.parseHTML('<a href="carbone.io"><p>Carbone Website</p></a>');
         const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');

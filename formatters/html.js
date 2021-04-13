@@ -35,6 +35,7 @@ function addHtmlDatabase (options, htmlContent) {
  * @returns {Function} Return a post process formatter
  */
 const getHTMLContentOdt = function (htmlContent) {
+  htmlContent = htmlContent || '';
   addHtmlDatabase(this, htmlContent);
   return {
     fn   : getHTMLContentOdtPostProcess,
@@ -50,7 +51,7 @@ const getHTMLContentOdt = function (htmlContent) {
  */
 const getHTMLContentOdtPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.content;
+  return _htmlProperties !== undefined && _htmlProperties.content ? _htmlProperties.content : '';
 };
 
 /** ======================= DOCX ======================== */
@@ -86,6 +87,7 @@ function addHtmlDatabaseDOCX (options, contentId, htmlContent = '', defaultFont 
  * @param {String} htmlContent New HTML content to inject
  */
 const getHTMLContentDocx = function (htmlContent, defaultFont = '', defaultFontSize = '') {
+  htmlContent = htmlContent || '';
   const _contentId = htmlContent + defaultFont + defaultFontSize;
   addHtmlDatabaseDOCX(this, _contentId, htmlContent, defaultFont, defaultFontSize);
   return {
@@ -102,7 +104,7 @@ const getHTMLContentDocx = function (htmlContent, defaultFont = '', defaultFontS
  */
 const getHTMLContentDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.content;
+  return _htmlProperties !== undefined && _htmlProperties.content ? _htmlProperties.content : '';
 };
 
 module.exports = {

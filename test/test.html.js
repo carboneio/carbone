@@ -835,6 +835,28 @@ describe('Dynamic HTML', function () {
     });
 
     describe('formatters/postProcessFormatters ODT', function () {
+      it('getHtmlContentOdt - should not crash if the content is null &&\n\
+               getHTMLContentOdtPostProcess - should not crash if the contentID does not exist', () => {
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        _options.htmlDatabase.set('nullContent', { content: null });
+        const _content = null;
+        const _expectedContent = '';
+        const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content);
+        /** The null content is transformed into an empty string */
+        const _properties = _options.htmlDatabase.get('');
+        helper.assert(_properties, {
+          content : _expectedContent,
+          style   : '',
+          styleLists: ''
+        });
+        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expectedContent);
+        helper.assert(_postProcess.fn.call(_options, null), '');
+        helper.assert(_postProcess.fn.call(_options, 'randomKey'), '');
+        helper.assert(_postProcess.fn.call(_options, 'nullContent'), '');
+      });
+
       it('getHtmlContent - should add content and style element to htmlDatabase', () => {
         const _options = {
           htmlDatabase : new Map()
@@ -2765,6 +2787,30 @@ describe('Dynamic HTML', function () {
     });
 
     describe('formatters/postProcessFormatters DOCX', function () {
+      it('getHTMLContentDocx - should not crash if the formatter is null && \n \
+               getHTMLContentDocxPostProcess - should not crash if the contentId does not exist', () => {
+        const _expected =  {
+          id      : 1,
+          content : '',
+          listStyleAbstract: "",
+          listStyleNum: ""
+        };
+        const _options = {
+          htmlDatabase : new Map()
+        };
+        _options.htmlDatabase.set('nullContent', { content: null });
+        const _content = null;
+        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
+        /** Null is converted into an empty string */
+        const _properties = _options.htmlDatabase.get('');
+        helper.assert(_properties, _expected);
+        helper.assert(_options.htmlDatabase.size, 2);
+        helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), '');
+        helper.assert(_postProcessContent.fn.call(_options, "this contentID doesnt exist"), '');
+        helper.assert(_postProcessContent.fn.call(_options, null), '');
+        helper.assert(_postProcessContent.fn.call(_options, 'nullContent'), '');
+      });
+
       it('should add content element to htmlDatabase', () => {
         const _expected =  {
           id      : 0,

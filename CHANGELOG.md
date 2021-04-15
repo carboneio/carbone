@@ -1,3 +1,5 @@
+### v3.2.1
+  - [EE] Fix dynamic HTML: unvalid values are returning an empty instead of an error.
 ### v3.2.0
   - Release April 13th 2021
   - [EE] Fix dynamic image resize when using the `:imageFit` formatter with the `contain` property.
@@ -5,7 +7,7 @@
       Before fixing the bug with `contain` property, it was more or less the default behaviour of Carbone before this version.
       So, `fillWidth` becomes the default option to avoid changing the style of existing reports.
   - [EE] Improve performance to download images. Building a report with a lot of dynamic images is almost 5 times faster than before.
-  - [EE] When the dynamic image cannot be inserted (fetch failed, image type not supported), 
+  - [EE] When the dynamic image cannot be inserted (fetch failed, image type not supported),
     - the aspect ratio of the replacement image keep the aspect ratio of the template
     - this replacement image more beautiful (vectorial) and does not contain any text for internationalisation
   - [EE] Fix corrupted XLSX files when inserting new type of image which were not previously present

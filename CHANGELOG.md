@@ -1,7 +1,6 @@
 
-### v3.1.4
+### v3.2.1
   - Fix locale de-de
-### v3.1.3
   - Fix: Do not break documents if the `i+1` row contains some markers coming from parent object or condition blocks (rare)
 
 ### v3.1.2

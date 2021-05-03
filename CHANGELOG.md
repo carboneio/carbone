@@ -1,4 +1,6 @@
 
+### v3.1.4
+  - Fix locale de-de
 ### v3.1.3
   - Fix: Do not break documents if the `i+1` row contains some markers coming from parent object or condition blocks (rare)
 
@@ -13,13 +15,13 @@
     - `data.myBoolean = "true"`  => `d.array[i, myBoolean='true']` => true
     - `data.myBoolean = true`    => `d.array[i, myBoolean='true']` => false
 
-### v3.1.1 
+### v3.1.1
   - Release March 4rd 2021
   - [EE] fixes
 
 ### v3.1.0
   - Release March 3rd 2021
-  - Accepts boolean in array filters `d.array[i, myBoolean=true]` 
+  - Accepts boolean in array filters `d.array[i, myBoolean=true]`
 
 ### v3.0.1
   - Fix: aliases beginning with same prefix names are properly rendered in the generated reports instead of not being skip.

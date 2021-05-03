@@ -1,4 +1,5 @@
 ### v3.2.1
+  - Release May 4th 2021
   - Fix locale de-de
   - [EE] Fix dynamic HTML: null or undefined values return an empty string instead of an error.
 

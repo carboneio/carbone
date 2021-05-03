@@ -815,7 +815,7 @@ const locales = {
   },
   'de-de' : {
     number : {
-      separator : ' ',
+      separator : '.',
       decimal   : ',',
       group     : 3
     },

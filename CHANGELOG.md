@@ -1,4 +1,5 @@
 ### v3.2.1
+  - Fix locale de-de
   - [EE] Fix dynamic HTML: unvalid values are returning an empty instead of an error.
 ### v3.2.0
   - Release April 13th 2021

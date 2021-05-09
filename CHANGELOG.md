@@ -1,4 +1,7 @@
 
+### v3.2.2
+  - Fix: Fix broken Excel files. It removes the alert which appears sometime when opening the file with MS Excel.
+
 ### v3.2.1
   - Fix locale de-de
   - Fix: Do not break documents if the `i+1` row contains some markers coming from parent object or condition blocks (rare)

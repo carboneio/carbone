@@ -150,6 +150,26 @@ describe('preprocessor', function () {
             done();
           });
         });
+        it('should remove calcChain in xlsx file', function (done) {
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.xlsx',
+            embeddings : [],
+            extension  : 'xlsx',
+            files      : [
+              {name : 'xl/calcChain.xml'        , parent : '', data : '<xml></xml>'},
+              {name : 'xl/worksheets/sheet1.xml', parent : '', data : '<xml></xml>'}
+            ]
+          };
+          preprocessor.execute(_report, function (err, tmpl) {
+            helper.assert(err + '', 'null');
+            helper.assert(err + '', 'null');
+            helper.assert(tmpl.files.length, 1);
+            helper.assert(tmpl.files[0].name, 'xl/worksheets/sheet1.xml');
+            helper.assert(tmpl.files[0].data, '<xml></xml>');
+            done();
+          });
+        });
         it('should replace shared string by inline strings in embedded xlsx file', function (done) {
           var _report = {
             isZipped   : true,
@@ -342,6 +362,84 @@ describe('preprocessor', function () {
           });
         });
         it('should works with sheet2.xml');
+      });
+      describe('removeCalcChain', function () {
+        var _relationFileBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+          +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          +'  <Relationship Id="rId8"  Target="worksheets/sheet1.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"/>'
+          +'  <Relationship Id="rId11" Target="calcChain.xml"         Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain"/>'
+          +'  <Relationship Id="rId12" Target="sharedStrings.xml"     Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings"/>'
+          +'</Relationships>';
+        var _relationFileAfter = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+          +'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          +'  <Relationship Id="rId8"  Target="worksheets/sheet1.xml" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"/>'
+          +'  '
+          +'  <Relationship Id="rId12" Target="sharedStrings.xml"     Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings"/>'
+          +'</Relationships>';
+        it('should do not crash if the file is not an xlsx file (should not happen because execute filter)', function () {
+          var _report = {
+            isZipped  : true,
+            filename  : 'template.docx',
+            extension : 'docx',
+            files     : [
+              {name : 'my_file.xml', data : 'some text'}
+            ]
+          };
+          var _fileConverted = preprocessor.removeCalcChain(_report);
+          helper.assert(_fileConverted, _report);
+        });
+        it('should remove calcChain file', function () {
+          var _report = {
+            isZipped  : true,
+            filename  : 'template.xlsx',
+            extension : 'xlsx',
+            files     : [
+              {name : 'xl/sharedStrings.xml'      , data : '<xml></xml>'       },
+              {name : 'xl/calcChain.xml'          , data : '<xml></xml>'       },
+              {name : 'xl/worksheets/sheet1.xml'  , data : '<xml></xml>'       },
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileBefore },
+            ]
+          };
+          var _fileConverted = preprocessor.removeCalcChain(_report);
+          helper.assert(_fileConverted, {
+            isZipped  : true,
+            filename  : 'template.xlsx',
+            extension : 'xlsx',
+            files     : [
+              {name : 'xl/sharedStrings.xml'      , data : '<xml></xml>'       },
+              {name : 'xl/worksheets/sheet1.xml'  , data : '<xml></xml>'       },
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileAfter  },
+            ]
+          });
+        });
+        it('should remove calcChain file only in a specific embbeded file', function () {
+          var _report = {
+            isZipped  : true,
+            filename  : 'template.xlsx',
+            extension : 'xlsx',
+            files     : [
+              {name : 'xl/sharedStrings.xml'      , data : '<xml></xml>'       , parent : ''            },
+              {name : 'xl/calcChain.xml'          , data : '<xml></xml>'       , parent : 'subdoc.xlsx' },
+              {name : 'xl/calcChain.xml'          , data : '<xml></xml>'       , parent : ''            },
+              {name : 'xl/worksheets/sheet1.xml'  , data : '<xml></xml>'       , parent : ''            },
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileBefore , parent : 'subdoc.xlsx' },
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileBefore , parent : ''            }
+            ]
+          };
+          var _fileConverted = preprocessor.removeCalcChain(_report, 'subdoc.xlsx');
+          helper.assert(_fileConverted, {
+            isZipped  : true,
+            filename  : 'template.xlsx',
+            extension : 'xlsx',
+            files     : [
+              {name : 'xl/sharedStrings.xml'      , data : '<xml></xml>'       , parent : ''            },
+              {name : 'xl/calcChain.xml'          , data : '<xml></xml>'       , parent : ''            },
+              {name : 'xl/worksheets/sheet1.xml'  , data : '<xml></xml>'       , parent : ''            },
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileAfter  , parent : 'subdoc.xlsx' },
+              {name : 'xl/_rels/workbook.xml.rels', data : _relationFileBefore , parent : ''            }
+            ]
+          });
+        });
       });
       describe('readSharedString', function () {
         it('should do nothing if the string is empty or null', function () {

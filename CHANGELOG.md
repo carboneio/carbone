@@ -1,6 +1,34 @@
 
 ### v3.2.2
-  - Fix: Fix broken Excel files. It removes the alert which appears sometime when opening the file with MS Excel.
+  - Fix broken Excel files. It removes the alert which appears sometime when opening the file with MS Excel.
+  - Update DayJS dependency from 1.9.6 to 1.10.4.
+  - Fix date formatters (`formatD`...) and number formatters  (`formatN`...) when the country code is used in `options.lang`.
+    It accepts lower case or upper case for the locale.
+    Example: 
+    
+    *Data*:
+      ```js
+      { 
+        date  : '20140131 23:45:00',
+        price : 1000.1234
+      }
+      ```
+    *Template*: `{d.date:formatD(dddd)} {d.price:formatN()}`
+
+    *Result*:
+    
+      - `de-DE` => `Friday 1.000,123` (before) `Freitag 1.000,123` (after)
+      - `fr-fr` => `Friday 1 000,123` (before) `vendredi 1 000,123` (after)
+
+  - Fix number formatting for these locales: nl-be, am, ar, ar-dz, ar-bh, ar-eg, ar-iq, ar-jo, ar-kw, ar-lb, ar-ly,
+    ar-ma, ar-om, ar-qa, ar-sa, ar-sy, ar-tn, ar-ae, ar-ye, az-az, bn, bs, zh-cn, zh-hk, zh-mo, zh-sg, zh-tw, hr,
+    da, en-au, en-bz, en-ca, en-cb, en-in, en-ie, en-jm, en-nz, en-ph, en-tt, fa, fr-lu, de-li, de-lu, de-ch, el,
+    he, hi, id, it-it, it-ch, ja, kn, ko, ms-bn, ms-my, ml, mr, ro-mo, ro, ru-mo, sr-sp, sl, es-ar, es-bo, es-cl,
+    es-co, es-do, es-ec, es-sv, es-gt, es-hn, es-mx, es-ni, es-pa, es-py, es-pe, es-pr, es-es, es-uy, es-ve, sw,
+    ta, te, th, tr, uz-uz, vi, de, es, it
+    
+    Example: 
+      - `de` => `Freitag 1,000.123` (before) `Freitag 1.000,123` (after)
 
 ### v3.2.1
   - Fix locale de-de

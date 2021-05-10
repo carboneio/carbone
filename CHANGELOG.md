@@ -1,5 +1,6 @@
 
 ### v3.2.2
+  - Release May 10th 2021
   - Fix broken Excel files. It removes the alert which appears sometime when opening the file with MS Excel.
   - Update DayJS dependency from 1.9.6 to 1.10.4.
   - Fix date formatters (`formatD`...) and number formatters  (`formatN`...) when the country code is used in `options.lang`.

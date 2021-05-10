@@ -71,7 +71,7 @@ function addHtmlDatabaseDOCX (options, contentId, htmlContent = '', defaultFont 
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(descriptor, options, defaultFont, defaultFontSize);
     _htmlDatabaseProperties = {
-      id      : options.htmlDatabase.size,
+      id : options.htmlDatabase.size,
       content,
       listStyleAbstract,
       listStyleNum

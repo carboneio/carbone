@@ -38,6 +38,9 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, 1318781876, 'LLLL', 'X'), 'dimanche 16 octobre 2011 18:17');
       helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, 1318781876000, 'LLLL', 'x'), 'dimanche 16 octobre 2011 18:17');
     });
+    it('should accept de-de even if de-de does not exists in DaysJS by default (only de)', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'de-de', timezone : _tz}, 1318781876, 'LLLL', 'X'), 'Sonntag, 16. Oktober 2011 18:17');
+    });
     it('should consider input format is ISO 8601 by default if not provided', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '20101201', 'L'), '12/01/2010');
       helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, '20101201', 'L'), '01/12/2010');

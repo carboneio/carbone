@@ -33,7 +33,7 @@
   "dependencies": {
     "body-parser": "=1.19.0",
     "cors": "=2.8.5",
-    "dayjs": "=1.9.6",
+    "dayjs": "=1.10.4",
     "debug": "=4.1.1",
     "formidable": "=1.2.2",
     "image-size": "=0.7.4",

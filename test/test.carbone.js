@@ -101,6 +101,30 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should accept locale with or without country code (upper or lowercase)', function (done) {
+      let _data = {
+        date  : '20140131 23:45:00',
+        price : 1000.1234
+      };
+      let _xml = '<xml> {d.date:formatD(dddd)} {d.price:formatN()} </xml>';
+      carbone.renderXML(_xml, _data , {lang : 'fr-FR'},  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> vendredi 1 000,123 </xml>');
+        carbone.renderXML(_xml, _data, {lang : 'de-DE'},  function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> Freitag 1.000,123 </xml>');
+          carbone.renderXML(_xml, _data, {lang : 'fr-fr'},  function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> vendredi 1 000,123 </xml>');
+            carbone.renderXML(_xml, _data, {lang : 'de'},  function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml> Freitag 1.000,123 </xml>');
+              done();
+            });
+          });
+        });
+      });
+    });
     it('should change the timezone globally and localy', function (done) {
       carbone.set({timezone : 'Europe/Paris'});
       carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {

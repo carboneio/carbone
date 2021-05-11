@@ -9,14 +9,15 @@ const html = require('../lib/html');
  *
  * @param  {Object} options contains htmlDatabase
  * @param  {String} htmlContent string with html tags
+ * @param {Boolean} force html to be inline. Avoid generating a new paragraph in documents
  */
-function addHtmlDatabase (options, htmlContent) {
+function addHtmlDatabase (options, htmlContent, isInline = false) {
   var _htmlDatabaseProperties = null;
 
   if (!options.htmlDatabase.has(htmlContent)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     const id = html.generateStyleID(options.htmlDatabase.size);
-    const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor, options);
+    const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor, options, isInline);
 
     _htmlDatabaseProperties = {
       content,
@@ -42,6 +43,17 @@ const getHTMLContentOdt = function (htmlContent) {
     args : [htmlContent]
   };
 };
+
+function htmlInline (htmlContent) {
+  htmlContent = htmlContent || '';
+  if (this.extension === 'odt') {
+    addHtmlDatabase(this, htmlContent, true);
+    return {
+      fn   : getHTMLContentOdtPostProcess,
+      args : [htmlContent]
+    };
+  }
+}
 
 /**
  * @private
@@ -110,5 +122,6 @@ const getHTMLContentDocxPostProcess = function (contentId) {
 module.exports = {
   getHTMLContentOdt,
   getHTMLContentDocx,
-  html : () => ''
+  htmlInline,
+  html       : () => '',
 };

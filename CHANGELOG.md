@@ -1,4 +1,8 @@
 
+### v3.2.3
+  - Release May 21th 2021
+  - Accepts letter `W` to get the week number in `formatD` formatter
+
 ### v3.2.2
   - Release May 10th 2021
   - Fix broken Excel files. It removes the alert which appears sometime when opening the file with MS Excel.

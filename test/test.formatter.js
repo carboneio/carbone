@@ -28,6 +28,9 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '20101201', 'L', 'YYYYMMDD'), '12/01/2010');
       helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, '20101201', 'L', 'YYYYMMDD'), '01/12/2010');
     });
+    it('should return week number', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, '20101201', 'W', 'YYYYMMDD'), '48');
+    });
     it('should return null or undefined if value is null or undefined', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, undefined, 'L', 'YYYYMMDD'), undefined);
       helper.assert(dateFormatter.formatD.call({lang : 'fr', timezone : _tz}, null, 'L',  'YYYYMMDD'), null);

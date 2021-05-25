@@ -1,3 +1,7 @@
+### v3.2.4
+  - Release May 25th 2021
+  - Add the possibility to upload templates in base64. The content-type must be `application/json` and the template 
+    must be sent in base64 in the body `{ "template" : "pure base64 or data-URI scheme in base64"}`
 
 ### v3.2.3
   - Release May 21th 2021

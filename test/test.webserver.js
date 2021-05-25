@@ -551,6 +551,48 @@ describe('Webserver', () => {
       });
     });
 
+    it('should upload the template in base64 if user is authenticated', (done) => {
+      let _data = {
+        template : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'})
+      };
+
+      get.concat(getBody(4001, '/template', 'POST', _data, token), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        let exists = fs.existsSync(path.join(os.tmpdir(), 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+        assert.strictEqual(exists, true);
+        toDelete.push('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        done();
+      });
+    });
+
+    it('should upload the template in base64 and accept data-URI format', (done) => {
+      let _data = {
+        template : 'data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sPgo8cD5JJ20gYSBDYXJib25lIHRlbXBsYXRlICE8L3A+CjxwPkkgQU0ge2QuZmlyc3RuYW1lfSB7ZC5sYXN0bmFtZX08L3A+CjwvaHRtbD4K'
+      };
+
+      get.concat(getBody(4001, '/template', 'POST', _data, token), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        let exists = fs.existsSync(path.join(os.tmpdir(), 'template', '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+        assert.strictEqual(exists, true);
+        toDelete.push('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+        done();
+      });
+    });
+
+    it('should not crash and return an error if template field is empty', (done) => {
+      get.concat(getBody(4001, '/template', 'POST', {}, token), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.error, '"template" field is empty');
+        assert.strictEqual(data.code, 'w112');
+        done();
+      });
+    });
+
     it('should upload the template if user is authenticated with the header Expect:100-continue', (done) => {
       let form = new FormData();
 
@@ -1112,14 +1154,18 @@ describe('Webserver', () => {
       });
 
       it('should return an error if content type is different than multipart/form-data', (done) => {
-        const body = {
-          template : 'tete'
-        };
-
-        get.concat(getBody(4000, '/template', 'POST', body), (err, res, data) => {
+        get.concat({
+          url     : 'http://localhost:4000/template',
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'application/octet-stream'
+          },
+          body : fs.createReadStream(path.join(__dirname, 'datasets', 'template.html'))
+        }, (err, res, data) => {
           assert.strictEqual(err, null);
+          data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Content-Type header should be multipart/form-data');
+          assert.strictEqual(data.error, 'Content-Type header should be multipart/form-data (preferred) or application/json (base64 mode)');
           done();
         });
       });

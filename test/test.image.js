@@ -48,12 +48,28 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    it('should inject 3 images inside the ODG document with no imageFit, with imageFit contain and imageFit fill', function (done) {
+    it('should inject 3 images inside the ODP document with no imageFit, with imageFit contain and imageFit fill', function (done) {
       const _testedReport = 'image/odp-simple';
       const _data = {
         image  : _imageDEBase64jpg,
         image2 : _imageLogoBase64jpg,
         image3 : _imageLogoBase64jpg
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should accept image loop across slides', function (done) {
+      const _testedReport = 'image/odp-image-loop';
+      const _data = {
+        sample : [
+          { image : _imageFRBase64jpg },
+          { image : _imageDEBase64jpg },
+          { image : _imageITBase64png }
+        ]
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');

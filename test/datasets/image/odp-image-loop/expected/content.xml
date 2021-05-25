@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content office:version="1.3" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:ooo="http://openoffice.org/2004/office" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:presentation="urn:oasis:names:tc:opendocument:xmlns:presentation:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:smil="urn:oasis:names:tc:opendocument:xmlns:smil-compatible:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <office:scripts/>
+  <office:font-face-decls>
+    <style:font-face style:font-family-generic="roman" style:font-pitch="variable" style:name="Liberation Sans" svg:font-family="'Liberation Sans'"/>
+    <style:font-face style:font-family-generic="roman" style:font-pitch="variable" style:name="Liberation Serif" svg:font-family="'Liberation Serif'"/>
+    <style:font-face style:font-family-generic="roman" style:font-pitch="variable" style:name="Noto Sans" svg:font-family="'Noto Sans'"/>
+    <style:font-face style:font-family-generic="system" style:font-pitch="variable" style:name="Arial Unicode MS" svg:font-family="'Arial Unicode MS'"/>
+    <style:font-face style:font-family-generic="system" style:font-pitch="variable" style:name="PingFang SC" svg:font-family="'PingFang SC'"/>
+    <style:font-face style:font-family-generic="system" style:font-pitch="variable" style:name="Tahoma" svg:font-family="Tahoma"/>
+  </office:font-face-decls>
+  <office:automatic-styles>
+    <style:style style:family="drawing-page" style:name="dp1">
+      <style:drawing-page-properties presentation:background-objects-visible="true" presentation:background-visible="true" presentation:display-date-time="true" presentation:display-footer="true" presentation:display-page-number="false"/>
+    </style:style>
+    <style:style style:family="drawing-page" style:name="dp2">
+      <style:drawing-page-properties presentation:display-date-time="true" presentation:display-footer="true" presentation:display-header="true" presentation:display-page-number="false"/>
+    </style:style>
+    <style:style style:family="graphic" style:name="gr1" style:parent-style-name="Object_20_with_20_no_20_fill_20_and_20_no_20_line">
+      <style:graphic-properties draw:blue="0%" draw:color-mode="standard" draw:contrast="0%" draw:gamma="100%" draw:green="0%" draw:image-opacity="100%" draw:luminance="0%" draw:red="0%" draw:textarea-horizontal-align="center" draw:textarea-vertical-align="middle" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" style:mirror="none"/>
+    </style:style>
+    <style:style style:family="graphic" style:name="gr2">
+      <style:graphic-properties style:protect="size"/>
+    </style:style>
+    <style:style style:family="presentation" style:name="pr1" style:parent-style-name="Default-notes">
+      <style:graphic-properties draw:fill-color="#ffffff" fo:min-height="13.364cm"/>
+      <style:paragraph-properties style:writing-mode="lr-tb"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P1">
+      <style:paragraph-properties fo:text-align="center"/>
+    </style:style>
+    <style:style style:family="paragraph" style:name="P2">
+      <loext:graphic-properties draw:fill-color="#ffffff"/>
+    </style:style>
+  </office:automatic-styles>
+  <office:body>
+    <office:presentation>
+      <draw:page draw:master-page-name="Default" draw:name="page1" draw:style-name="dp1" presentation:presentation-page-layout-name="AL1T0">
+        <draw:frame draw:layer="layout" draw:style-name="gr1" draw:text-style-name="P1" svg:height="4.695cm" svg:width="7.573cm" svg:x="2.5cm" svg:y="2cm">
+          <draw:image draw:mime-type="image/jpeg" xlink:actuate="onLoad" xlink:href="Pictures/CarboneImage0.jpeg" xlink:show="embed" xlink:type="simple">
+            <text:p/>
+          </draw:image>
+          <svg:desc></svg:desc>
+        </draw:frame>
+        <presentation:notes draw:style-name="dp2">
+          <draw:page-thumbnail draw:layer="layout" draw:page-number="1" draw:style-name="gr2" presentation:class="page" svg:height="11.136cm" svg:width="19.798cm" svg:x="0.6cm" svg:y="2.257cm"/>
+          <draw:frame draw:layer="layout" draw:text-style-name="P2" presentation:class="notes" presentation:placeholder="true" presentation:style-name="pr1" svg:height="13.364cm" svg:width="16.799cm" svg:x="2.1cm" svg:y="14.107cm">
+            <draw:text-box/>
+          </draw:frame>
+        </presentation:notes>
+      </draw:page>
+      <draw:page draw:master-page-name="Default" draw:name="page1" draw:style-name="dp1" presentation:presentation-page-layout-name="AL1T0">
+        <draw:frame draw:layer="layout" draw:style-name="gr1" draw:text-style-name="P1" svg:height="4.695cm" svg:width="7.573cm" svg:x="2.5cm" svg:y="2cm">
+          <draw:image draw:mime-type="image/jpeg" xlink:actuate="onLoad" xlink:href="Pictures/CarboneImage1.jpeg" xlink:show="embed" xlink:type="simple">
+            <text:p/>
+          </draw:image>
+          <svg:desc></svg:desc>
+        </draw:frame>
+        <presentation:notes draw:style-name="dp2">
+          <draw:page-thumbnail draw:layer="layout" draw:page-number="1" draw:style-name="gr2" presentation:class="page" svg:height="11.136cm" svg:width="19.798cm" svg:x="0.6cm" svg:y="2.257cm"/>
+          <draw:frame draw:layer="layout" draw:text-style-name="P2" presentation:class="notes" presentation:placeholder="true" presentation:style-name="pr1" svg:height="13.364cm" svg:width="16.799cm" svg:x="2.1cm" svg:y="14.107cm">
+            <draw:text-box/>
+          </draw:frame>
+        </presentation:notes>
+      </draw:page>
+      <draw:page draw:master-page-name="Default" draw:name="page1" draw:style-name="dp1" presentation:presentation-page-layout-name="AL1T0">
+        <draw:frame draw:layer="layout" draw:style-name="gr1" draw:text-style-name="P1" svg:height="5.049cm" svg:width="7.573cm" svg:x="2.5cm" svg:y="2cm">
+          <draw:image draw:mime-type="image/jpeg" xlink:actuate="onLoad" xlink:href="Pictures/CarboneImage2.png" xlink:show="embed" xlink:type="simple">
+            <text:p/>
+          </draw:image>
+          <svg:desc></svg:desc>
+        </draw:frame>
+        <presentation:notes draw:style-name="dp2">
+          <draw:page-thumbnail draw:layer="layout" draw:page-number="1" draw:style-name="gr2" presentation:class="page" svg:height="11.136cm" svg:width="19.798cm" svg:x="0.6cm" svg:y="2.257cm"/>
+          <draw:frame draw:layer="layout" draw:text-style-name="P2" presentation:class="notes" presentation:placeholder="true" presentation:style-name="pr1" svg:height="13.364cm" svg:width="16.799cm" svg:x="2.1cm" svg:y="14.107cm">
+            <draw:text-box/>
+          </draw:frame>
+        </presentation:notes>
+      </draw:page>
+      <presentation:settings presentation:mouse-visible="false"/>
+    </office:presentation>
+  </office:body>
+</office:document-content>

@@ -567,6 +567,23 @@ describe('Webserver', () => {
       });
     });
 
+    it('should upload the template in base64 with a payload if user is authenticated', (done) => {
+      let _data = {
+        template : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'}),
+        payload: "thisIsAPayload"
+      };
+
+      get.concat(getBody(4001, '/template', 'POST', _data, token), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.data.templateId, '8f4f0b570f0ca077ecf6f1f8f1d72d01c5d81020e4057a4ad02113a647404cd9');
+        let exists = fs.existsSync(path.join(os.tmpdir(), 'template', '8f4f0b570f0ca077ecf6f1f8f1d72d01c5d81020e4057a4ad02113a647404cd9'));
+        assert.strictEqual(exists, true);
+        toDelete.push('8f4f0b570f0ca077ecf6f1f8f1d72d01c5d81020e4057a4ad02113a647404cd9');
+        done();
+      });
+    });
+
     it('should upload the template in base64 and accept data-URI format', (done) => {
       let _data = {
         template : 'data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sPgo8cD5JJ20gYSBDYXJib25lIHRlbXBsYXRlICE8L3A+CjxwPkkgQU0ge2QuZmlyc3RuYW1lfSB7ZC5sYXN0bmFtZX08L3A+CjwvaHRtbD4K'

@@ -1,5 +1,5 @@
 ### v3.3.0
-  - Dynamic Checkbox are supported only for ODT file. A marker should be inserted into the checkbox property "name" and it is used to set the value of the checkbox on the generated report. The checkbox is nticked (checked) when the value is a Boolean with the value true, a non empty string, a non empty array or a non empty object. If the exported file type is a PDF, the checkbox can be edited on the generated document.
+  - Dynamic Checkbox are supported only for ODT file. A marker should be inserted into the checkbox property "name" and it is used to set the value of the checkbox on the generated report. The checkbox is ticked (checked) when the value is a Boolean with the value "true", a non empty string, a non empty array or a non empty object. If the exported file type is a PDF, the checkbox can be edited on the generated document. An ODT document created from MS Word that include checkboxes does not work.
 ### v3.2.4
   - Release May 25th 2021
   - Add the possibility to upload templates in base64. The content-type must be `application/json` and the template

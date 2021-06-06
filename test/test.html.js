@@ -6,6 +6,67 @@ const assert = require('assert');
 const hyperlinks = require('../lib/hyperlinks');
 
 describe('Dynamic HTML', function () {
+
+  describe.only('reorderXML - should seperate the html formatter outside paragraphs ', function () {
+    it('should do nothing if the html formatter is not included', function () {
+      const _Content = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
+      assert.strictEqual(html.reorderXML(_Content), _Content);
+    });
+
+    it('should seperate a single html formatter and delete the empty paragraph', function () {
+      const _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
+      const _expectedContent = '<office:body><office:text>{d.content:html}</office:text></office:body>';
+      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
+    });
+
+    it('should seperate a single html formatter with other elements', function () {
+      const _templateContent = '' +
+          '<office:body><office:text>'+
+            '<text:p text:style-name="P5">Some content before {d.content:html} and after</text:p>'+
+          '</office:text></office:body>';
+      const _expectedContent = '' +
+          '<office:body><office:text>'+
+            '<text:p text:style-name="P5">Some content before </text:p>'+
+            '{d.content:html}'+
+            '<text:p text:style-name="P5"> and after</text:p>'+
+          '</office:text></office:body>';
+      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
+    });
+
+    it('should seperate multiple html formatter with other elements', function () {
+      const _templateContent = '' +
+          '<office:body><office:text>'+
+            '<text:p text:style-name="P5">{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</text:p>'+
+          '</office:text></office:body>';
+      const _expectedContent = '' +
+          '<office:body><office:text>'+
+            '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
+            '{d.list[i].content:html}'+
+            '<text:p text:style-name="P5"> and after</text:p>'+
+            '{d.value:html}'+
+          '</office:text></office:body>';
+      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
+    });
+
+    it('should seperate a multiple html formatter with other elements inside multiple paragrpahs', function () {
+      const _templateContent = '' +
+          '<office:body><office:text>'+
+            '<text:p text:style-name="P5">Some content before 1 {d.content1:html} and after 1</text:p>'+
+            '<text:p text:style-name="P5">Some content before 2 {d.content2:html} and after 2</text:p>'+
+          '</office:text></office:body>';
+      const _expectedContent = '' +
+          '<office:body><office:text>'+
+            '<text:p text:style-name="P5">Some content before 1 </text:p>'+
+            '{d.content1:html}'+
+            '<text:p text:style-name="P5"> and after 1</text:p>'+
+            '<text:p text:style-name="P5">Some content before 2 </text:p>'+
+            '{d.content2:html}'+
+            '<text:p text:style-name="P5"> and after 2</text:p>'+
+          '</office:text></office:body>';
+      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
+    });
+  });
+
   describe('ODT reports', function () {
     describe('preprocessODT', function () {
       it('should do nothing', () => {

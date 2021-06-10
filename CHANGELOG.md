@@ -1,3 +1,7 @@
+### v3.2.5
+  - Release June 19th 2021
+  - Accept URLs with weird Content-Type such as `image/png; charset=utf-8`  for dynamic image replacement
+
 ### v3.2.4
   - Release May 25th 2021
   - Add the possibility to upload templates in base64. The content-type must be `application/json` and the template 

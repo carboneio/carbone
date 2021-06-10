@@ -7,192 +7,419 @@ const hyperlinks = require('../lib/hyperlinks');
 
 describe.only('Dynamic HTML', function () {
 
-  describe('reorderXML - should seperate the html formatter outside paragraphs ', function () {
-    it('should do nothing if the html formatter is not included', function () {
-      const _Content = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
-      assert.strictEqual(html.reorderXML(_Content), _Content);
-    });
+  describe.only('reorderXML - should seperate the html formatter outside paragraphs ', function () {
+    describe('ODT', function () {
+      it('should do nothing if the html formatter is not included', function () {
+        const _Content = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
+        assert.strictEqual(html.reorderXML(_Content, 'odt'), _Content);
+      });
 
-    it('should seperate a single html formatter and delete the empty paragraph', function () {
-      const _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
-      const _expectedContent = '<office:body><office:text>{d.content:getHTMLContentOdt}</office:text></office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
-    });
+      it('should seperate a single html formatter and delete the empty paragraph', function () {
+        const _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
+        const _expectedContent = '<office:body><office:text>{d.content:getHTMLContentOdt}</office:text></office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
 
-    it('should seperate a single html formatter with other elements', function () {
-      const _templateContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P5">Some content before {d.content:html} and after</text:p>'+
-          '</office:text></office:body>';
-      const _expectedContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P5">Some content before </text:p>'+
-            '{d.content:getHTMLContentOdt}'+
-            '<text:p text:style-name="P5"> and after</text:p>'+
-          '</office:text></office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
-    });
+      it('should seperate a single html formatter with other elements', function () {
+        const _templateContent = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P5">Some content before {d.content:html} and after</text:p>'+
+            '</office:text></office:body>';
+        const _expectedContent = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P5">Some content before </text:p>'+
+              '{d.content:getHTMLContentOdt}'+
+              '<text:p text:style-name="P5"> and after</text:p>'+
+            '</office:text></office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
 
-    it('should seperate a single html formatter mixed inside a span', function () {
-      const _templateContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P1">' +
-              '<text:span text:style-name="T2">Content before{d.courseloop1:html}Content after</text:span>'+
-            '</text:p>' +
-          '</office:text></office:body>';
-      const _expectedContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P1">' +
-              '<text:span text:style-name="T2">Content before</text:span>' +
-            '</text:p>' +
-            '{d.courseloop1:getHTMLContentOdt}' +
-            '<text:p text:style-name="P1">' +
-              '<text:span text:style-name="T2">Content after</text:span>' +
-            '</text:p>' +
-          '</office:text></office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
-    });
-
-    it('should seperate a single html formatter mixed inside multiple spans', function () {
-      const _templateContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P1">' +
-              '<text:span text:style-name="T3"></text:span>'+
-              '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>'+
-              '<text:span text:style-name="T2"></text:span>'+
-            '</text:p>' +
-          '</office:text></office:body>';
-      const _expectedContent = '' +
-          '<office:body><office:text>'+
-            '{d.courseloop1:getHTMLContentOdt}' +
-          '</office:text></office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
-    });
-
-    it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
-      const _templateContent = '' +
-          '<office:body>' +
-            '<office:text>' +
+      it('should seperate a single html formatter mixed inside a span', function () {
+        const _templateContent = '' +
+            '<office:body><office:text>'+
               '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>' +
-                '<text:span text:style-name="T3">Some Static content</text:span>' +
-                '<text:span text:style-name="T2">{d.courseloop2:html}</text:span>' +
+                '<text:span text:style-name="T2">Content before{d.courseloop1:html}Content after</text:span>'+
               '</text:p>' +
-            '</office:text>' +
-          '</office:body>';
-      const _expectedContent = '' +
-          '<office:body>' +
-            '<office:text>' +
-              '{d.courseloop1:getHTMLContentOdt}' +
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2"></text:span>' +
-                '<text:span text:style-name="T3">Some Static content</text:span>' +
-                '<text:span text:style-name="T2"></text:span>' +
-              '</text:p>' +
-              '{d.courseloop2:getHTMLContentOdt}' +
-            '</office:text>' +
-          '</office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
-    });
-
-    it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
-      const _templateContent = '' +
-          '<office:body>' +
-            '<office:text>' +
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2">Some Static content1</text:span>' +
-                '<text:span text:style-name="T3">Before{d.courseloop2:html}After</text:span>' +
-                '<text:span text:style-name="T2">Some Static content2</text:span>' +
-              '</text:p>' +
-            '</office:text>' +
-          '</office:body>';
-      const _expectedContent = '' +
-          '<office:body>' +
-            '<office:text>' +
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2">Some Static content1</text:span>' +
-                '<text:span text:style-name="T3">Before</text:span>' +
-                '<text:span text:style-name="T2"></text:span>' +
-              '</text:p>' +
-              '{d.courseloop2:getHTMLContentOdt}' +
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2"></text:span>' +
-                '<text:span text:style-name="T3">After</text:span>' +
-                '<text:span text:style-name="T2">Some Static content2</text:span>' +
-              '</text:p>' +
-            '</office:text>' +
-          '</office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
-    });
-
-    it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
-      const _templateContent = '' +
-          '<office:body>' +
-            '<office:text>' +
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2">Content before{d.courseloop1:html}</text:span>' +
-                '<text:span text:style-name="T3">Some Static content</text:span>' +
-                '<text:span text:style-name="T2">{d.courseloop2:html}Content after</text:span>' +
-              '</text:p>' +
-            '</office:text>' +
-          '</office:body>';
-      const _expectedContent = '' +
-          '<office:body>' +
-            '<office:text>' +
+            '</office:text></office:body>';
+        const _expectedContent = '' +
+            '<office:body><office:text>'+
               '<text:p text:style-name="P1">' +
                 '<text:span text:style-name="T2">Content before</text:span>' +
-                '<text:span text:style-name="T3"></text:span>' +
-                '<text:span text:style-name="T2"></text:span>' +
               '</text:p>' +
               '{d.courseloop1:getHTMLContentOdt}' +
               '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2"></text:span>' +
-                '<text:span text:style-name="T3">Some Static content</text:span>' +
-                '<text:span text:style-name="T2"></text:span>' +
-              '</text:p>' +
-              '{d.courseloop2:getHTMLContentOdt}' +
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2"></text:span>' +
-                '<text:span text:style-name="T3"></text:span>' +
                 '<text:span text:style-name="T2">Content after</text:span>' +
               '</text:p>' +
-            '</office:text>' +
-          '</office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent), _expectedContent);
+            '</office:text></office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
+
+      it('should seperate a single html formatter mixed inside multiple spans', function () {
+        const _templateContent = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P1">' +
+                '<text:span text:style-name="T3"></text:span>'+
+                '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>'+
+                '<text:span text:style-name="T2"></text:span>'+
+              '</text:p>' +
+            '</office:text></office:body>';
+        const _expectedContent = '' +
+            '<office:body><office:text>'+
+              '{d.courseloop1:getHTMLContentOdt}' +
+            '</office:text></office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
+
+      it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+        const _templateContent = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>' +
+                  '<text:span text:style-name="T3">Some Static content</text:span>' +
+                  '<text:span text:style-name="T2">{d.courseloop2:html}</text:span>' +
+                '</text:p>' +
+              '</office:text>' +
+            '</office:body>';
+        const _expectedContent = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '{d.courseloop1:getHTMLContentOdt}' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2"></text:span>' +
+                  '<text:span text:style-name="T3">Some Static content</text:span>' +
+                  '<text:span text:style-name="T2"></text:span>' +
+                '</text:p>' +
+                '{d.courseloop2:getHTMLContentOdt}' +
+              '</office:text>' +
+            '</office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
+
+      it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+        const _templateContent = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2">Some Static content1</text:span>' +
+                  '<text:span text:style-name="T3">Before{d.courseloop2:html}After</text:span>' +
+                  '<text:span text:style-name="T2">Some Static content2</text:span>' +
+                '</text:p>' +
+              '</office:text>' +
+            '</office:body>';
+        const _expectedContent = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2">Some Static content1</text:span>' +
+                  '<text:span text:style-name="T3">Before</text:span>' +
+                  '<text:span text:style-name="T2"></text:span>' +
+                '</text:p>' +
+                '{d.courseloop2:getHTMLContentOdt}' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2"></text:span>' +
+                  '<text:span text:style-name="T3">After</text:span>' +
+                  '<text:span text:style-name="T2">Some Static content2</text:span>' +
+                '</text:p>' +
+              '</office:text>' +
+            '</office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
+
+      it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+        const _templateContent = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2">Content before{d.courseloop1:html}</text:span>' +
+                  '<text:span text:style-name="T3">Some Static content</text:span>' +
+                  '<text:span text:style-name="T2">{d.courseloop2:html}Content after</text:span>' +
+                '</text:p>' +
+              '</office:text>' +
+            '</office:body>';
+        const _expectedContent = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2">Content before</text:span>' +
+                  '<text:span text:style-name="T3"></text:span>' +
+                  '<text:span text:style-name="T2"></text:span>' +
+                '</text:p>' +
+                '{d.courseloop1:getHTMLContentOdt}' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2"></text:span>' +
+                  '<text:span text:style-name="T3">Some Static content</text:span>' +
+                  '<text:span text:style-name="T2"></text:span>' +
+                '</text:p>' +
+                '{d.courseloop2:getHTMLContentOdt}' +
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T2"></text:span>' +
+                  '<text:span text:style-name="T3"></text:span>' +
+                  '<text:span text:style-name="T2">Content after</text:span>' +
+                '</text:p>' +
+              '</office:text>' +
+            '</office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
+
+      it('should seperate multiple html formatter with other elements', function () {
+        const _templateContent = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P5">{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</text:p>'+
+            '</office:text></office:body>';
+        const _expectedContent = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
+              '{d.list[i].content:getHTMLContentOdt}'+
+              '<text:p text:style-name="P5"> after content </text:p>'+
+              '{d.value:getHTMLContentOdt}'+
+              '<text:p text:style-name="P5"> end</text:p>'+
+            '</office:text></office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
+
+      it('should seperate a multiple html formatter with other elements inside multiple paragrpahs', function () {
+        const _templateContent = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P5">Some content before 1 {d.content1:html} and after 1</text:p>'+
+              '<text:p text:style-name="P5">Some content before 2 {d.content2:html} and after 2</text:p>'+
+            '</office:text></office:body>';
+        const _expectedContent = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P5">Some content before 1 </text:p>'+
+              '{d.content1:getHTMLContentOdt}'+
+              '<text:p text:style-name="P5"> and after 1</text:p>'+
+              '<text:p text:style-name="P5">Some content before 2 </text:p>'+
+              '{d.content2:getHTMLContentOdt}'+
+              '<text:p text:style-name="P5"> and after 2</text:p>'+
+            '</office:text></office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      });
     });
 
-    it('should seperate multiple html formatter with other elements', function () {
-      const _templateContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P5">{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</text:p>'+
-          '</office:text></office:body>';
-      const _expectedContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
-            '{d.list[i].content:getHTMLContentOdt}'+
-            '<text:p text:style-name="P5"> after content </text:p>'+
-            '{d.value:getHTMLContentOdt}'+
-            '<text:p text:style-name="P5"> end</text:p>'+
-          '</office:text></office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-    });
+    describe('DOCX', function () {
+      it('should do nothing if the html formatter is not included', function () {
+        const _templateContent = ''+
+          '<w:document>'+
+            '<w:body>'+
+              '<w:p>'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>'+
+                  '</w:rPr>'+
+                  '<w:t>Static content</w:t>'+
+                '</w:r>'+
+              '</w:p>'+
+            '</w:body>'+
+          '</w:document>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _templateContent);
+      });
 
-    it('should seperate a multiple html formatter with other elements inside multiple paragrpahs', function () {
-      const _templateContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P5">Some content before 1 {d.content1:html} and after 1</text:p>'+
-            '<text:p text:style-name="P5">Some content before 2 {d.content2:html} and after 2</text:p>'+
-          '</office:text></office:body>';
-      const _expectedContent = '' +
-          '<office:body><office:text>'+
-            '<text:p text:style-name="P5">Some content before 1 </text:p>'+
-            '{d.content1:getHTMLContentOdt}'+
-            '<text:p text:style-name="P5"> and after 1</text:p>'+
-            '<text:p text:style-name="P5">Some content before 2 </text:p>'+
-            '{d.content2:getHTMLContentOdt}'+
-            '<text:p text:style-name="P5"> and after 2</text:p>'+
-          '</office:text></office:body>';
-      assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+      it('should seperate a single html formatter and delete the empty paragraph', function () {
+        const _templateContent = ''+
+          '<w:document>'+
+            '<w:body>'+
+              '<w:p>'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>'+
+                  '</w:rPr>'+
+                  '<w:t>{d.courseloop1:html}</w:t>'+
+                '</w:r>'+
+              '</w:p>'+
+            '</w:body>'+
+          '</w:document>'
+        const _expectedContent = ''+
+          '<w:document>'+
+            '<w:body>'+
+              '{d.courseloop1:getHTMLContentDocx}'+
+            '</w:body>'+
+          '</w:document>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+      });
+
+
+      it.only('should seperate a single html formatter mixed with static content 1', function () {
+        const _templateContent = ''+
+          '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
+            '<w:pPr>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t>Content before </w:t>' +
+            '</w:r>' +
+            '<w:proofErr w:type="spellStart"/>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t>Start{d.value:html}End</w:t>' +
+            '</w:r>' +
+            '<w:proofErr w:type="spellEnd"/>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t> Content after</w:t>' +
+            '</w:r>' +
+          '</w:p>';
+        const _expectedContent = ''+
+          '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
+          '<w:pPr>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+            '</w:rPr>' +
+          '</w:pPr>' +
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+            '</w:rPr>' +
+            '<w:t>Content before </w:t>' +
+          '</w:r>' +
+          '<w:proofErr w:type="spellStart"/>' +
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+            '</w:rPr>' +
+            '<w:t>Start</w:t>' +
+          '</w:r>' +
+          '<w:proofErr w:type="spellEnd"/>' +
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+            '</w:rPr>' +
+            '<w:t></w:t>' +
+          '</w:r>' +
+        '</w:p>' +
+        '{d.value:getHTMLContentDocx}' +
+        '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
+          '<w:pPr>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+            '</w:rPr>' +
+          '</w:pPr>' +
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+            '</w:rPr>' +
+            '<w:t></w:t>' +
+          '</w:r>' +
+          '<w:proofErr w:type="spellStart"/>' +
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+            '</w:rPr>' +
+            '<w:t>End</w:t>' +
+          '</w:r>' +
+          '<w:proofErr w:type="spellEnd"/>' +
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+            '</w:rPr>' +
+            '<w:t> Content after</w:t>' +
+          '</w:r>' +
+        '</w:p>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+      });
+
+      it.only('should seperate a single html formatter mixed with static content 2', function () {
+        const _templateContent = ''+
+          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+            '<w:pPr>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t>{d.value1:html} Content between {d.value2:html}</w:t>' +
+            '</w:r>' +
+          '</w:p>';
+        const _expectedContent = ''+
+          '{d.value1:getHTMLContentDocx}' +
+          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+            '<w:pPr>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t> Content between </w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '{d.value2:getHTMLContentDocx}'
+        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+      });
+
+      it.only('should seperate a single html formatter mixed with static content 3', function () {
+        const _templateContent = ''+
+          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+            '<w:pPr>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t>{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</w:t>' +
+            '</w:r>' +
+          '</w:p>';
+        const _expectedContent = ''+
+          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+            '<w:pPr>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t>{d.list[i].name} some content1 </w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '{d.list[i].content:getHTMLContentDocx}' +
+          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+            '<w:pPr>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t> after content </w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '{d.value:getHTMLContentDocx}' +
+          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+            '<w:pPr>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t> end</w:t>' +
+            '</w:r>' +
+          '</w:p>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+      });
     });
   });
 

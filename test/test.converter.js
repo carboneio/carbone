@@ -8,7 +8,7 @@ var converter = require('../lib/converter');
 var params = require('../lib/params');
 var exec = require('child_process').exec;
 var tempPath = path.join(__dirname, 'temp');
-var pdfjsLib = require('pdfjs-dist/es5/build/pdf.js');
+var pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 
 var defaultOptions = {
   pipeNamePrefix : '_carbone',

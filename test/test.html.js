@@ -16,7 +16,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should seperate a single html formatter and delete the empty paragraph', function () {
         const _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
-        const _expectedContent = '<office:body><office:text>{d.content:getHTMLContentOdt}</office:text></office:body>';
+        const _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt}</carbone></office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
       });
 
@@ -28,7 +28,7 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = '' +
             '<office:body><office:text>'+
               '<text:p text:style-name="P5">Some content before </text:p>'+
-              '{d.content:getHTMLContentOdt}'+
+              '<carbone>{d.content:getHTMLContentOdt}</carbone>'+
               '<text:p text:style-name="P5"> and after</text:p>'+
             '</office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
@@ -46,7 +46,7 @@ describe.only('Dynamic HTML', function () {
               '<text:p text:style-name="P1">' +
                 '<text:span text:style-name="T2">Content before</text:span>' +
               '</text:p>' +
-              '{d.courseloop1:getHTMLContentOdt}' +
+              '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
               '<text:p text:style-name="P1">' +
                 '<text:span text:style-name="T2">Content after</text:span>' +
               '</text:p>' +
@@ -65,7 +65,7 @@ describe.only('Dynamic HTML', function () {
             '</office:text></office:body>';
         const _expectedContent = '' +
             '<office:body><office:text>'+
-              '{d.courseloop1:getHTMLContentOdt}' +
+              '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
             '</office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
       });
@@ -84,13 +84,13 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = '' +
             '<office:body>' +
               '<office:text>' +
-                '{d.courseloop1:getHTMLContentOdt}' +
+                '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2"></text:span>' +
                   '<text:span text:style-name="T3">Some Static content</text:span>' +
                   '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
-                '{d.courseloop2:getHTMLContentOdt}' +
+                '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
               '</office:text>' +
             '</office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
@@ -115,7 +115,7 @@ describe.only('Dynamic HTML', function () {
                   '<text:span text:style-name="T3">Before</text:span>' +
                   '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
-                '{d.courseloop2:getHTMLContentOdt}' +
+                '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2"></text:span>' +
                   '<text:span text:style-name="T3">After</text:span>' +
@@ -145,13 +145,13 @@ describe.only('Dynamic HTML', function () {
                   '<text:span text:style-name="T3"></text:span>' +
                   '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
-                '{d.courseloop1:getHTMLContentOdt}' +
+                '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2"></text:span>' +
                   '<text:span text:style-name="T3">Some Static content</text:span>' +
                   '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
-                '{d.courseloop2:getHTMLContentOdt}' +
+                '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2"></text:span>' +
                   '<text:span text:style-name="T3"></text:span>' +
@@ -170,9 +170,9 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = '' +
             '<office:body><office:text>'+
               '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
-              '{d.list[i].content:getHTMLContentOdt}'+
+              '<carbone>{d.list[i].content:getHTMLContentOdt}</carbone>'+
               '<text:p text:style-name="P5"> after content </text:p>'+
-              '{d.value:getHTMLContentOdt}'+
+              '<carbone>{d.value:getHTMLContentOdt}</carbone>'+
               '<text:p text:style-name="P5"> end</text:p>'+
             '</office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
@@ -187,10 +187,10 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = '' +
             '<office:body><office:text>'+
               '<text:p text:style-name="P5">Some content before 1 </text:p>'+
-              '{d.content1:getHTMLContentOdt}'+
+              '<carbone>{d.content1:getHTMLContentOdt}</carbone>'+
               '<text:p text:style-name="P5"> and after 1</text:p>'+
               '<text:p text:style-name="P5">Some content before 2 </text:p>'+
-              '{d.content2:getHTMLContentOdt}'+
+              '<carbone>{d.content2:getHTMLContentOdt}</carbone>'+
               '<text:p text:style-name="P5"> and after 2</text:p>'+
             '</office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
@@ -205,7 +205,8 @@ describe.only('Dynamic HTML', function () {
               '<w:p>'+
                 '<w:r>'+
                   '<w:rPr>'+
-                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>'+
+                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
+                    '<w:sz w:val="36"/>' +
                   '</w:rPr>'+
                   '<w:t>Static content</w:t>'+
                 '</w:r>'+
@@ -215,14 +216,15 @@ describe.only('Dynamic HTML', function () {
         assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _templateContent);
       });
 
-      it('should seperate a single html formatter and delete the empty paragraph', function () {
+      it.only('should seperate a single html formatter and delete the empty paragraph', function () {
         const _templateContent = ''+
           '<w:document>'+
             '<w:body>'+
               '<w:p>'+
                 '<w:r>'+
                   '<w:rPr>'+
-                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>'+
+                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
+                    '<w:sz w:val="36"/>' +
                   '</w:rPr>'+
                   '<w:t>{d.courseloop1:html}</w:t>'+
                 '</w:r>'+
@@ -232,14 +234,14 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = ''+
           '<w:document>'+
             '<w:body>'+
-              '{d.courseloop1:getHTMLContentDocx}'+
+              '<carbone>{d.courseloop1:getHTMLContentDocx}</carbone>'+
             '</w:body>'+
           '</w:document>';
         assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
       });
 
 
-      it.only('should seperate a single html formatter mixed with static content 1', function () {
+      it('should seperate a single html formatter mixed with static content 1', function () {
         const _templateContent = ''+
           '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
             '<w:pPr>' +
@@ -296,7 +298,7 @@ describe.only('Dynamic HTML', function () {
             '<w:t></w:t>' +
           '</w:r>' +
         '</w:p>' +
-        '{d.value:getHTMLContentDocx}' +
+        '<carbone>{d.value:getHTMLContentDocx}</carbone>' +
         '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
           '<w:pPr>' +
             '<w:rPr>' +
@@ -327,7 +329,7 @@ describe.only('Dynamic HTML', function () {
         assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
       });
 
-      it.only('should seperate a single html formatter mixed with static content 2', function () {
+      it('should seperate a single html formatter mixed with static content 2', function () {
         const _templateContent = ''+
           '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
             '<w:pPr>' +
@@ -343,7 +345,7 @@ describe.only('Dynamic HTML', function () {
             '</w:r>' +
           '</w:p>';
         const _expectedContent = ''+
-          '{d.value1:getHTMLContentDocx}' +
+          '<carbone>{d.value1:getHTMLContentDocx}</carbone>' +
           '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
             '<w:pPr>' +
               '<w:rPr>' +
@@ -357,11 +359,11 @@ describe.only('Dynamic HTML', function () {
               '<w:t> Content between </w:t>' +
             '</w:r>' +
           '</w:p>' +
-          '{d.value2:getHTMLContentDocx}'
+          '<carbone>{d.value2:getHTMLContentDocx}</carbone>'
         assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
       });
 
-      it.only('should seperate a single html formatter mixed with static content 3', function () {
+      it('should seperate a single html formatter mixed with static content 3', function () {
         const _templateContent = ''+
           '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
             '<w:pPr>' +
@@ -390,7 +392,7 @@ describe.only('Dynamic HTML', function () {
               '<w:t>{d.list[i].name} some content1 </w:t>' +
             '</w:r>' +
           '</w:p>' +
-          '{d.list[i].content:getHTMLContentDocx}' +
+          '<carbone>{d.list[i].content:getHTMLContentDocx}</carbone>' +
           '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
             '<w:pPr>' +
               '<w:rPr>' +
@@ -404,7 +406,7 @@ describe.only('Dynamic HTML', function () {
               '<w:t> after content </w:t>' +
             '</w:r>' +
           '</w:p>' +
-          '{d.value:getHTMLContentDocx}' +
+          '<carbone>{d.value:getHTMLContentDocx}</carbone>' +
           '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
             '<w:pPr>' +
               '<w:rPr>' +

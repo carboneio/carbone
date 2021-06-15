@@ -1,5 +1,9 @@
-### v3.2.5
+### v3.2.6
   - [EE] Fix the generation of ODP document that includes table lists. It was returning an error.
+
+### v3.2.5
+  - Release June 19th 2021
+  - Accept URLs with weird Content-Type such as `image/png; charset=utf-8`  for dynamic image replacement
 
 ### v3.2.4
   - Release May 25th 2021

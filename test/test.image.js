@@ -1499,6 +1499,20 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+      it('should download a PNG image from an url with weird Content-Type', function (done) {
+        nock('https://google.com')
+          .get('/blabla?size=10&color=blue')
+          .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
+            'Content-Type' : 'image/png; charset=UTF-8',
+          });
+        image.downloadImage('https://google.com/blabla?size=10&color=blue', {}, function (err, imageInfo) {
+          helperTest.assert(err+'', 'null');
+          assert(imageInfo.data.length > 0);
+          helperTest.assert(imageInfo.mimetype, 'image/png');
+          helperTest.assert(imageInfo.extension, 'png');
+          done();
+        });
+      });
       it('should download a PNG image from an url even if the header.content-type is incorrect (application/json)', function (done) {
         nock('https://google.com')
           .get('/image-flag-it.png')
@@ -1675,6 +1689,18 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(image.checkIfImageIncludedDocx('word/_rels/document.xml.rels', ['header3.xml', 'header2.xml', 'footer1.xml']), false);
         helperTest.assert(image.checkIfImageIncludedDocx('word/_rels/document.xml.rels', []), false);
         helperTest.assert(image.checkIfImageIncludedDocx('', ['header3.xml', 'header2.xml']), false);
+      });
+    });
+    describe('cleanContentType', function () {
+      it('should clean content type', function () {
+        helperTest.assert(image.cleanContentType(undefined), '');
+        helperTest.assert(image.cleanContentType(null), '');
+        helperTest.assert(image.cleanContentType(0), '');
+        helperTest.assert(image.cleanContentType(1), '');
+        helperTest.assert(image.cleanContentType('image/png; charset=UTF-8'), 'image/png');
+        helperTest.assert(image.cleanContentType('image/png ; charset=UTF-8'), 'image/png');
+        helperTest.assert(image.cleanContentType('  image/png '), 'image/png');
+        helperTest.assert(image.cleanContentType('  image/png  ; charset=UTF-8 ; s '), 'image/png');
       });
     });
   });

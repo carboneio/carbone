@@ -1,6 +1,9 @@
+### v3.2.5
+  - [EE] Fix the generation of ODP document that includes table lists. It was returning an error.
+
 ### v3.2.4
   - Release May 25th 2021
-  - Add the possibility to upload templates in base64. The content-type must be `application/json` and the template 
+  - Add the possibility to upload templates in base64. The content-type must be `application/json` and the template
     must be sent in base64 in the body `{ "template" : "pure base64 or data-URI scheme in base64"}`
   - Accepts loops with dynamic image replacement across slides/pages in ODP templates
 
@@ -14,11 +17,11 @@
   - Update DayJS dependency from 1.9.6 to 1.10.4.
   - Fix date formatters (`formatD`...) and number formatters  (`formatN`...) when the country code is used in `options.lang`.
     It accepts lower case or upper case for the locale.
-    Example: 
-    
+    Example:
+
     *Data*:
       ```js
-      { 
+      {
         date  : '20140131 23:45:00',
         price : 1000.1234
       }
@@ -26,7 +29,7 @@
     *Template*: `{d.date:formatD(dddd)} {d.price:formatN()}`
 
     *Result*:
-    
+
       - `de-DE` => `Friday 1.000,123` (before) `Freitag 1.000,123` (after)
       - `fr-fr` => `Friday 1 000,123` (before) `vendredi 1 000,123` (after)
 
@@ -36,8 +39,8 @@
     he, hi, id, it-it, it-ch, ja, kn, ko, ms-bn, ms-my, ml, mr, ro-mo, ro, ru-mo, sr-sp, sl, es-ar, es-bo, es-cl,
     es-co, es-do, es-ec, es-sv, es-gt, es-hn, es-mx, es-ni, es-pa, es-py, es-pe, es-pr, es-es, es-uy, es-ve, sw,
     ta, te, th, tr, uz-uz, vi, de, es, it
-    
-    Example: 
+
+    Example:
       - `de` => `Freitag 1,000.123` (before) `Freitag 1.000,123` (after)
 
 ### v3.2.1

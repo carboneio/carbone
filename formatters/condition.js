@@ -432,8 +432,7 @@ function len (d) {
 /**
  * Test if data is empty (null, undefined, [], {}, ...). The new formatter `ifEM` should be used instead of this one.
  *
- * @deprecated
- * @version 0.12.5 deprecated
+ * @version 0.12.5
  *
  * @example [ null     ,  "D'oh!" ]
  * @example [ []       ,  "D'oh!" ]
@@ -467,8 +466,7 @@ function ifEmpty (d, message, continueOnSuccess) {
 /**
  * Test if a value equals a variable. The new formatter `ifEQ` should be used instead of this one.
  *
- * @deprecated
- * @version 0.13.0 deprecated
+ * @version 0.13.0
  *
  * @example [ 100      , 100     ,  "bingo" ]
  * @example [ 100      , 101     ,  "bingo" ]
@@ -499,8 +497,7 @@ function ifEqual (d, value, messageIfTrue, continueOnSuccess) {
 /**
  * Test if a string or an array contains a value. The new formatter `ifIN` should be used instead of this one.
  *
- * @deprecated
- * @version 0.13.0 deprecated
+ * @version 0.13.0
  *
  * @example [ "your beautiful eyes", "beauti",  "bingo" ]
  * @example [ "your beautiful eyes", "leg"   ,  "bingo" ]

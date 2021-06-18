@@ -7,16 +7,21 @@ const hyperlinks = require('../lib/hyperlinks');
 
 describe.only('Dynamic HTML', function () {
 
-  describe.only('reorderXML - should seperate the html formatter outside paragraphs ', function () {
-    describe('ODT', function () {
+  describe('reorderXML - should seperate the html formatter outside paragraphs ', function () {
+    describe.only('ODT', function () {
       it('should do nothing if the html formatter is not included', function () {
         const _Content = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
         assert.strictEqual(html.reorderXML(_Content, 'odt'), _Content);
       });
 
-      it('should seperate a single html formatter and delete the empty paragraph', function () {
-        const _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
-        const _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt}</carbone></office:text></office:body>';
+      it('should seperate a single html formatter, retrieve the style on the paragraph and delete the empty paragraph', function () {
+        /** WITHOUT STYLE */
+        let _templateContent = '<office:body><office:text><text:p>{d.content:html}</text:p></office:text></office:body>';
+        let _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt}</carbone></office:text></office:body>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        /** WITH STYLE */
+        _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
+        _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone></office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
       });
 
@@ -28,7 +33,7 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = '' +
             '<office:body><office:text>'+
               '<text:p text:style-name="P5">Some content before </text:p>'+
-              '<carbone>{d.content:getHTMLContentOdt}</carbone>'+
+              '<carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
               '<text:p text:style-name="P5"> and after</text:p>'+
             '</office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
@@ -46,7 +51,7 @@ describe.only('Dynamic HTML', function () {
               '<text:p text:style-name="P1">' +
                 '<text:span text:style-name="T2">Content before</text:span>' +
               '</text:p>' +
-              '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
+              '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
               '<text:p text:style-name="P1">' +
                 '<text:span text:style-name="T2">Content after</text:span>' +
               '</text:p>' +
@@ -65,7 +70,7 @@ describe.only('Dynamic HTML', function () {
             '</office:text></office:body>';
         const _expectedContent = '' +
             '<office:body><office:text>'+
-              '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
+              '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
             '</office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
       });
@@ -84,13 +89,13 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = '' +
             '<office:body>' +
               '<office:text>' +
-                '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
+                '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2"></text:span>' +
                   '<text:span text:style-name="T3">Some Static content</text:span>' +
                   '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
-                '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
+                '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
               '</office:text>' +
             '</office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
@@ -115,7 +120,7 @@ describe.only('Dynamic HTML', function () {
                   '<text:span text:style-name="T3">Before</text:span>' +
                   '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
-                '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
+                '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2"></text:span>' +
                   '<text:span text:style-name="T3">After</text:span>' +
@@ -145,13 +150,13 @@ describe.only('Dynamic HTML', function () {
                   '<text:span text:style-name="T3"></text:span>' +
                   '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
-                '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
+                '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2"></text:span>' +
                   '<text:span text:style-name="T3">Some Static content</text:span>' +
                   '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
-                '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
+                '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2"></text:span>' +
                   '<text:span text:style-name="T3"></text:span>' +
@@ -216,8 +221,9 @@ describe.only('Dynamic HTML', function () {
         assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _templateContent);
       });
 
-      it.only('should seperate a single html formatter and delete the empty paragraph', function () {
-        const _templateContent = ''+
+      it('should seperate a single html formatter and delete the empty paragraph', function () {
+        /** WITHOUT A FONT */
+        let _templateContent = ''+
           '<w:document>'+
             '<w:body>'+
               '<w:p>'+
@@ -230,11 +236,33 @@ describe.only('Dynamic HTML', function () {
                 '</w:r>'+
               '</w:p>'+
             '</w:body>'+
-          '</w:document>'
-        const _expectedContent = ''+
+          '</w:document>';
+        let _expectedContent = ''+
           '<w:document>'+
             '<w:body>'+
-              '<carbone>{d.courseloop1:getHTMLContentDocx}</carbone>'+
+              '<carbone>{d.courseloop1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>'+
+            '</w:body>'+
+          '</w:document>';
+        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+        /** WITH A FONT */
+        _templateContent = ''+
+          '<w:document>'+
+            '<w:body>'+
+              '<w:p>'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
+                    '<w:sz w:val="36"/>' +
+                  '</w:rPr>'+
+                  '<w:t>{d.courseloop1:html}</w:t>'+
+                '</w:r>'+
+              '</w:p>'+
+            '</w:body>'+
+          '</w:document>';
+        _expectedContent = ''+
+          '<w:document>'+
+            '<w:body>'+
+              '<carbone>{d.courseloop1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>'+
             '</w:body>'+
           '</w:document>';
         assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
@@ -359,7 +387,7 @@ describe.only('Dynamic HTML', function () {
               '<w:t> Content between </w:t>' +
             '</w:r>' +
           '</w:p>' +
-          '<carbone>{d.value2:getHTMLContentDocx}</carbone>'
+          '<carbone>{d.value2:getHTMLContentDocx}</carbone>';
         assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
       });
 
@@ -662,7 +690,7 @@ describe.only('Dynamic HTML', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.io"><p>Carbone Website</p></a>'), {});
         helper.assert(res.content, '' +
           '<text:p>' +
-            '<text:a xlink:type=\"simple\" xlink:href=\"https://carbone.io\">' +
+            '<text:a xlink:type="simple" xlink:href="https://carbone.io">' +
               '<text:span>Carbone Website</text:span>' +
             '</text:a>' +
           '</text:p>'
@@ -918,7 +946,7 @@ describe.only('Dynamic HTML', function () {
                 '</text:p>'+
               '</text:list-item>'+
             '</text:list>'+
-            '<text:p text:style-name=\"Standard\"/>' +
+            '<text:p text:style-name="Standard"/>' +
             '<text:p>'+
               '<text:span>Middle</text:span>'+
             '</text:p>'+
@@ -991,7 +1019,7 @@ describe.only('Dynamic HTML', function () {
                   '<text:span>Water</text:span>'+
                 '</text:p>'+
               '</text:list-item>'+
-            '</text:list><text:p text:style-name=\"Standard\"/>'
+            '</text:list><text:p text:style-name="Standard"/>'
         );
       });
 
@@ -1168,7 +1196,7 @@ describe.only('Dynamic HTML', function () {
                   '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
         helper.assert(res.content, '' +
-          '<text:list text:style-name=\"LC010\">' +
+          '<text:list text:style-name="LC010">' +
             '<text:list-item>' +
               '<text:p>' +
                 '<text:span>Drinks:</text:span>' +
@@ -1183,7 +1211,7 @@ describe.only('Dynamic HTML', function () {
               '</text:list>' +
             '</text:list-item>' +
           '</text:list>' +
-          '<text:p text:style-name=\"Standard\"/>'
+          '<text:p text:style-name="Standard"/>'
         );
       });
     });
@@ -1360,7 +1388,7 @@ describe.only('Dynamic HTML', function () {
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_properties, {
-          content    : `<text:p><text:a xlink:type=\"simple\" xlink:href=\"${hyperlinks.URL_ON_ERROR}\"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>`,
+          content    : `<text:p><text:a xlink:type="simple" xlink:href="${hyperlinks.URL_ON_ERROR}"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>`,
           style      : '',
           styleLists : ''
         });
@@ -1375,7 +1403,7 @@ describe.only('Dynamic HTML', function () {
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_properties, {
-          content    : '<text:p><text:a xlink:type=\"simple\" xlink:href=\"https://carbone.io/link_on_error_test\"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>',
+          content    : '<text:p><text:a xlink:type="simple" xlink:href="https://carbone.io/link_on_error_test"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>',
           style      : '',
           styleLists : ''
         });
@@ -2220,9 +2248,9 @@ describe.only('Dynamic HTML', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>');
         const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, {}, 'American Typewriter');
         helper.assert(content, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cs=\"American Typewriter\" w:eastAsia=\"American Typewriter\"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cs=\"American Typewriter\" w:eastAsia=\"American Typewriter\"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cs=\"American Typewriter\" w:eastAsia=\"American Typewriter\"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
         );
         helper.assert(listStyleAbstract, '' +
         '<w:abstractNum w:abstractNumId="1000">' +
@@ -2686,25 +2714,26 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should create nested list without text on the first element', function () {
+        // eslint-disable-next-line no-unused-vars
         let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li><ol><li>Tea</li></ol></li></ol>'));
         helper.assert(content, '' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
-                '<w:ilvl w:val=\"0\"/>' +
-                '<w:numId w:val=\"1000\"/>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
               '</w:numPr>' +
             '</w:pPr>' +
           '</w:p>' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
-                '<w:ilvl w:val=\"1\"/>' +
-                '<w:numId w:val=\"1000\"/>' +
+                '<w:ilvl w:val="1"/>' +
+                '<w:numId w:val="1000"/>' +
               '</w:numPr>' +
             '</w:pPr>' +
             '<w:r>' +
-              '<w:t xml:space=\"preserve\">Tea</w:t>' +
+              '<w:t xml:space="preserve">Tea</w:t>' +
             '</w:r>' +
           '</w:p>' +
           '<w:p/>'
@@ -2712,29 +2741,30 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should create nested list with text on the first element and a break line', function () {
+        // eslint-disable-next-line no-unused-vars
         let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>This is some content<br/><ol><li>Tea</li></ol></li></ol>'));
         helper.assert(content, '' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
-                '<w:ilvl w:val=\"0\"/>' +
-                '<w:numId w:val=\"1000\"/>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
               '</w:numPr>' +
             '</w:pPr>' +
             '<w:r>' +
-              '<w:t xml:space=\"preserve\">This is some content</w:t>' +
+              '<w:t xml:space="preserve">This is some content</w:t>' +
             '</w:r>' +
             '<w:r><w:br/></w:r>' +
           '</w:p>' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
-                '<w:ilvl w:val=\"1\"/>' +
-                '<w:numId w:val=\"1000\"/>' +
+                '<w:ilvl w:val="1"/>' +
+                '<w:numId w:val="1000"/>' +
               '</w:numPr>' +
             '</w:pPr>' +
             '<w:r>' +
-              '<w:t xml:space=\"preserve\">Tea</w:t>' +
+              '<w:t xml:space="preserve">Tea</w:t>' +
             '</w:r>' +
           '</w:p>' +
           '<w:p/>'
@@ -2744,17 +2774,18 @@ describe.only('Dynamic HTML', function () {
 
 
       it('should create nested list with text on the first element and a break line', function () {
+        // eslint-disable-next-line no-unused-vars
         let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ul><li><p>The introduction</p></li></ul>'));
         helper.assert(content, '' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
-                '<w:ilvl w:val=\"0\"/>' +
-                '<w:numId w:val=\"1000\"/>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
               '</w:numPr>' +
             '</w:pPr>' +
             '<w:r>' +
-              '<w:t xml:space=\"preserve\">The introduction</w:t>' +
+              '<w:t xml:space="preserve">The introduction</w:t>' +
             '</w:r>' +
           '</w:p>' +
           '<w:p/>'
@@ -3251,7 +3282,7 @@ describe.only('Dynamic HTML', function () {
       it('[invalid hyperlink + getHTMLContentDocx] should add content element to htmlDatabase and should add the default hyperlinks.URL_ON_ERROR', () => {
         const _expected =  {
           id                : 0,
-          content           : '<w:p><w:hyperlink r:id=\"CarboneHyperlinkId0\"><w:r><w:rPr><w:rStyle w:val=\"Hyperlink\"/></w:rPr><w:t xml:space=\"preserve\">TUSKLA WEBSITE</w:t></w:r></w:hyperlink></w:p>',
+          content           : '<w:p><w:hyperlink r:id="CarboneHyperlinkId0"><w:r><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t xml:space="preserve">TUSKLA WEBSITE</w:t></w:r></w:hyperlink></w:p>',
           listStyleAbstract : '',
           listStyleNum      : ''
         };
@@ -3273,7 +3304,7 @@ describe.only('Dynamic HTML', function () {
       it('[invalid hyperlink + defaultURL + getHTMLContentDocx] should add content element to htmlDatabase and should add a different url ', () => {
         const _expected =  {
           id                : 0,
-          content           : '<w:p><w:hyperlink r:id=\"CarboneHyperlinkId0\"><w:r><w:rPr><w:rStyle w:val=\"Hyperlink\"/></w:rPr><w:t xml:space=\"preserve\">TUSKLA WEBSITE</w:t></w:r></w:hyperlink></w:p>',
+          content           : '<w:p><w:hyperlink r:id="CarboneHyperlinkId0"><w:r><w:rPr><w:rStyle w:val="Hyperlink"/></w:rPr><w:t xml:space="preserve">TUSKLA WEBSITE</w:t></w:r></w:hyperlink></w:p>',
           listStyleAbstract : '',
           listStyleNum      : ''
         };
@@ -3529,19 +3560,20 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it('should parse HTML content with unsupported character and your convert to XML entities: <>\'\"&', function () {
+      it('should parse HTML content with unsupported character and your convert to XML entities: <>\'"&', function () {
         helper.assert(html.parseHTML('<b>On Mar. 30, 2021, &amp; & Global Polygraph & &amp; Security LLC</b>'),
           [
             { content : 'On Mar. 30, 2021, &amp; &amp; Global Polygraph &amp; &amp; Security LLC',  type : '', tags : ['b'] }
           ]
         );
-        helper.assert(html.parseHTML('\"<b>\'This is a text &\'</b>\"'),
+        helper.assert(html.parseHTML('"<b>\'This is a text &\'</b>"'),
           [
             { content : '&quot;',  type : '', tags : [] },
             { content : '&apos;This is a text &amp;&apos;',  type : '', tags : ['b'] },
             { content : '&quot;',  type : '', tags : [] },
           ]
         );
+        // eslint-disable-next-line no-useless-escape
         helper.assert(html.parseHTML('<b>\<\></b>'),
           [
             { content : '&lt;&gt;',  type : '', tags : ['b'] }
@@ -3762,7 +3794,7 @@ describe.only('Dynamic HTML', function () {
         helper.assert(html.convertHTMLEntities(_content), _content);
       });
 
-      it('should keep html entities that are supported by XML format: <>\'\"&', function () {
+      it('should keep html entities that are supported by XML format: <>\'"&', function () {
         const _content = '<div> &amp; &quot; &apos; &lt; &gt; </div>';
         helper.assert(html.convertHTMLEntities(_content), _content);
       });

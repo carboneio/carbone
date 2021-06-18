@@ -10,20 +10,20 @@ const html = require('../lib/html');
  * @param  {Object} options contains htmlDatabase
  * @param  {String} htmlContent string with html tags
  */
-function addHtmlDatabase (options, htmlContent) {
+function addHtmlDatabase (options, contentID, htmlContent, fontStyles) {
   var _htmlDatabaseProperties = null;
 
-  if (!options.htmlDatabase.has(htmlContent)) {
+  if (!options.htmlDatabase.has(contentID)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     const id = html.generateStyleID(options.htmlDatabase.size);
-    const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor, options);
+    const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor, options, fontStyles);
 
     _htmlDatabaseProperties = {
       content,
       style,
       styleLists
     };
-    options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
+    options.htmlDatabase.set(contentID, _htmlDatabaseProperties);
   }
 }
 
@@ -34,12 +34,13 @@ function addHtmlDatabase (options, htmlContent) {
  * @param {String} htmlContent
  * @returns {Function} Return a post process formatter
  */
-const getHTMLContentOdt = function (htmlContent) {
+const getHTMLContentOdt = function (htmlContent, styles) {
   htmlContent = htmlContent || '';
-  addHtmlDatabase(this, htmlContent);
+  const _contentID = htmlContent + styles;
+  addHtmlDatabase(this, _contentID, htmlContent, styles);
   return {
     fn   : getHTMLContentOdtPostProcess,
-    args : [htmlContent]
+    args : [_contentID]
   };
 };
 

@@ -32,13 +32,6 @@
 
 <p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using your JSON data as input !</p>
 
->  ⚡️ Breaking news :
->
-> **Carbone v3.1.0 🚀 is here :**
->
->   - Carbone Render Enterprise Edition **On-Premise** is officially available. Please contact us.
->   - Changelog : https://github.com/carboneio/carbone/blob/master/CHANGELOG.md
-
 README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
 
 ## Table of content

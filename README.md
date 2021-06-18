@@ -21,10 +21,10 @@
     <img src="https://badgen.net/bundlephobia/minzip/carbone" alt="minizip badge">
   </a>
   <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
-    <img src="https://badgen.net/docker/pulls/ideolys/carbone-env-docker?icon=docker" alt="docker badge">
+    <img src="https://badgen.net/docker/pulls/carbone/carbone-env-docker?icon=docker" alt="docker badge">
   </a>
-  <a href="https://github.com/Ideolys/carbone">
-    <img src="https://badgen.net/github/forks/ideolys/carbone?icon=github" alt="github fork badge">
+  <a href="https://github.com/carboneio/carbone">
+    <img src="https://badgen.net/github/forks/carboneio/carbone?icon=github" alt="github fork badge">
   </a>
 </p>
 
@@ -33,11 +33,11 @@
 <p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using your JSON data as input !</p>
 
 >  ⚡️ Breaking news :
-> 
+>
 > **Carbone v3.1.0 🚀 is here :**
->   
+>
 >   - Carbone Render Enterprise Edition **On-Premise** is officially available. Please contact us.
->   - Changelog : https://github.com/Ideolys/carbone/blob/master/CHANGELOG.md
+>   - Changelog : https://github.com/carboneio/carbone/blob/master/CHANGELOG.md
 
 README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
 
@@ -265,7 +265,7 @@ To checkout out the Carbone CLI documentation, visit [carbone.io](https://carbon
 
 ## Issues
 
-If you're facing any issues, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/Ideolys/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/Ideolys/carbone/issues/new/choose).
+If you're facing any issues, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/carboneio/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/carboneio/carbone/issues/new/choose).
 
 ## Roadmap
 
@@ -303,7 +303,7 @@ We already know that beneficiaries will be, at least :heart:
 
 ## Contributors
 
-Thanks to all Ideolys's direct contributors (random order)
+Thanks to all Carbone contributors (random order)
 
   - Florian Bezagu
   - Matthieu Robin
@@ -319,5 +319,3 @@ Thanks to all Ideolys's direct contributors (random order)
   - Léo Labruyère
   - Aurélien Kermabon
   - [Steeve Payraudeau](https://github.com/steevepay)
-
-Thanks to all French citizens (Crédit Impôt Recherche, Jeune Entreprise Innovante, BPI)!

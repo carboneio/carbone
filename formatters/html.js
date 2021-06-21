@@ -36,6 +36,7 @@ function addHtmlDatabase (options, contentID, htmlContent, fontStyles) {
  */
 const getHTMLContentOdt = function (htmlContent, styles) {
   htmlContent = htmlContent || '';
+  styles = styles || '';
   const _contentID = htmlContent + styles;
   addHtmlDatabase(this, _contentID, htmlContent, styles);
   return {

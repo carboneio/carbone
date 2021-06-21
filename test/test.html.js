@@ -8,10 +8,15 @@ const hyperlinks = require('../lib/hyperlinks');
 describe.only('Dynamic HTML', function () {
 
   describe('reorderXML - should seperate the html formatter outside paragraphs ', function () {
-    describe.only('ODT', function () {
+    describe('ODT', function () {
       it('should do nothing if the html formatter is not included', function () {
         const _Content = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
         assert.strictEqual(html.reorderXML(_Content, 'odt'), _Content);
+      });
+
+      it('should throw an error is the XML is not valid, the paragraph is missing', function () {
+        let _templateContent = '<office:body><office:text>{d.content:html}</office:text></office:body>';
+        assert.throws(() => html.reorderXML(_templateContent, 'odt'), 'Error');
       });
 
       it('should seperate a single html formatter, retrieve the style on the paragraph and delete the empty paragraph', function () {
@@ -175,9 +180,9 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = '' +
             '<office:body><office:text>'+
               '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
-              '<carbone>{d.list[i].content:getHTMLContentOdt}</carbone>'+
+              '<carbone>{d.list[i].content:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
               '<text:p text:style-name="P5"> after content </text:p>'+
-              '<carbone>{d.value:getHTMLContentOdt}</carbone>'+
+              '<carbone>{d.value:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
               '<text:p text:style-name="P5"> end</text:p>'+
             '</office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
@@ -192,10 +197,10 @@ describe.only('Dynamic HTML', function () {
         const _expectedContent = '' +
             '<office:body><office:text>'+
               '<text:p text:style-name="P5">Some content before 1 </text:p>'+
-              '<carbone>{d.content1:getHTMLContentOdt}</carbone>'+
+              '<carbone>{d.content1:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
               '<text:p text:style-name="P5"> and after 1</text:p>'+
               '<text:p text:style-name="P5">Some content before 2 </text:p>'+
-              '<carbone>{d.content2:getHTMLContentOdt}</carbone>'+
+              '<carbone>{d.content2:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
               '<text:p text:style-name="P5"> and after 2</text:p>'+
             '</office:text></office:body>';
         assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
@@ -473,7 +478,7 @@ describe.only('Dynamic HTML', function () {
             data : '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>'
           }]
         };
-        const _expectedContent = '<office:body><office:text><text:p text:style-name="P5"></text:p>{d.content:getHTMLContentOdt}</office:text></office:body>';
+        const _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone></office:text></office:body>';
         html.preprocessODT(_template);
         helper.assert(_template.files[0].data, _expectedContent);
       });
@@ -494,11 +499,12 @@ describe.only('Dynamic HTML', function () {
         };
         const _expectedContent = '' +
                       '<office:body>' +
-                      '<text:p text:style-name="P5"> {d.element}</text:p>{d.value1:getHTMLContentOdt}' +
+                      '<carbone>{d.value1:getHTMLContentOdt(text:style-name="P5")}</carbone>' +
+                      '<text:p text:style-name="P5"> {d.element}</text:p>' +
                       '<text:p text:style-name="P1"/>' +
                       '<text:p text:style-name="P5">This is some content</text:p>' +
                       '<text:p text:style-name="P1"/>' +
-                      '<text:p text:style-name="P3"></text:p>{d.value3:getHTMLContentOdt}' +
+                      '<carbone>{d.value3:getHTMLContentOdt(text:style-name="P3")}</carbone>' +
                       '</office:body>';
         html.preprocessODT(_template);
         helper.assert(_template.files[0].data, _expectedContent);
@@ -1346,15 +1352,17 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_options.htmlDatabase.size, 1);
       });
 
-      it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name', () => {
+      it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name + apply the previous paragraph style', () => {
         const _options = {
           htmlDatabase : new Map()
         };
         const _content = '<em><b>This is some content</b></em>';
-        const _expected = '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>';
+        const _previousStyleParapgraph = 'text:style-name="P3"';
+        const _uniqueID = _content + _previousStyleParapgraph;
+        const _expected = '<text:p text:style-name="P3"><text:span text:style-name="TC00">This is some content</text:span></text:p>';
         const _style = '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>';
-        const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content);
-        const _properties = _options.htmlDatabase.get(_content);
+        const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content, 'text:style-name="P3"');
+        const _properties = _options.htmlDatabase.get(_uniqueID);
         helper.assert(_properties, {
           content    : _expected,
           style      : _style,
@@ -1463,14 +1471,7 @@ describe.only('Dynamic HTML', function () {
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
             '<w:body>' +
-              '<w:p >' +
-                '<w:r>' +
-                  '<w:rPr>' +
-                    '<w:lang w:val="en-US"/>' +
-                  '</w:rPr>' +
-                  '<w:t></w:t>' +
-                '</w:r>' +
-              '</w:p>{d.mix1:getHTMLContentDocx}' +
+              '<carbone>{d.mix1:getHTMLContentDocx}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _template = {
@@ -1520,14 +1521,7 @@ describe.only('Dynamic HTML', function () {
                 '<w:t>lalala</w:t>' +
               '</w:r>' +
             '</w:p>' +
-            '<w:p >' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.mix1:getHTMLContentDocx}' +
+            '<carbone>{d.mix1:getHTMLContentDocx}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _template = {
@@ -1542,7 +1536,7 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_template.files[0].data, _XMLexpected);
       });
 
-      it('should find one HTML formatter and inject HTML formatters for the new content and WITHOUT spacePreserve (already inserted)', function () {
+      it('should find HTML formatters into the footer, header and content', function () {
         const _XMLtemplate = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
@@ -1561,14 +1555,7 @@ describe.only('Dynamic HTML', function () {
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
             '<w:body>' +
-              '<w:p >' +
-                '<w:r>' +
-                  '<w:rPr>' +
-                    '<w:lang w:val="en-US"/>' +
-                  '</w:rPr>' +
-                  '<w:t xml:space="preserve"></w:t>' +
-                '</w:r>' +
-              '</w:p>{d.strongContent:getHTMLContentDocx}' +
+              '<carbone>{d.strongContent:getHTMLContentDocx}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _XMLfooter = '' +
@@ -1593,21 +1580,7 @@ describe.only('Dynamic HTML', function () {
         const _expectedXMLfooter = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:ftr>' +
-            '<w:p>' +
-              '<w:pPr>' +
-                '<w:pStyle w:val="Footer"/>' +
-                '<w:jc w:val="right"/>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                '</w:rPr>' +
-              '</w:pPr>' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.strikedel:getHTMLContentDocx}' +
+            '<carbone>{d.strikedel:getHTMLContentDocx}</carbone>' +
           '</w:ftr>';
         const _XMLheader = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -1624,14 +1597,7 @@ describe.only('Dynamic HTML', function () {
         const _expectedXMLheader = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:hdr>' +
-            '<w:p>' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.italic:getHTMLContentDocx}' +
+            '<carbone>{d.italic:getHTMLContentDocx}</carbone>' +
           '</w:hdr>';
         const _template = {
           files : [
@@ -1655,7 +1621,7 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_template.files[2].data, _expectedXMLheader);
       });
 
-      it('should find one HTML formatter and pass the applied font FAMILY as an argument', function () {
+      it('should find one HTML formatter and pass the original font FAMILY as a formatter argument', function () {
         const _XMLtemplate = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
@@ -1684,24 +1650,8 @@ describe.only('Dynamic HTML', function () {
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
             '<w:body>' +
-            '<w:p>' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                  '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.mix2:getHTMLContentDocx(\'American Typewriter\', null)}' +
-            '<w:p >' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                  '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.mix1:getHTMLContentDocx(\'Segoe Print\', null)}' +
+            '<carbone>{d.mix2:getHTMLContentDocx(\'American Typewriter\', null)}</carbone>' +
+            '<carbone>{d.mix1:getHTMLContentDocx(\'Segoe Print\', null)}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _template = {
@@ -1745,24 +1695,8 @@ describe.only('Dynamic HTML', function () {
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
             '<w:body>' +
-            '<w:p>' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                  '<w:sz w:val="18"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.mix2:getHTMLContentDocx(null, \'18\')}' +
-            '<w:p >' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                  '<w:sz w:val="36"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.mix1:getHTMLContentDocx(null, \'36\')}' +
+              '<carbone>{d.mix2:getHTMLContentDocx(null, \'18\')}</carbone>' +
+              '<carbone>{d.mix1:getHTMLContentDocx(null, \'36\')}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _template = {
@@ -1808,26 +1742,8 @@ describe.only('Dynamic HTML', function () {
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
             '<w:body>' +
-            '<w:p>' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                  '<w:sz w:val="18"/>' +
-                  '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.mix2:getHTMLContentDocx(\'American Typewriter\', \'18\')}' +
-            '<w:p >' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                  '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
-                  '<w:sz w:val="36"/>' +
-                '</w:rPr>' +
-                '<w:t></w:t>' +
-              '</w:r>' +
-            '</w:p>{d.mix1:getHTMLContentDocx(\'Segoe Print\', \'36\')}' +
+            '<carbone>{d.mix2:getHTMLContentDocx(\'American Typewriter\', \'18\')}</carbone>' +
+            '<carbone>{d.mix1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _template = {

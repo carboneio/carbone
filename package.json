@@ -56,12 +56,12 @@
   },
   "devDependencies": {
     "eslint": "=7.7.0",
-    "form-data": "^3.0.0",
+    "form-data": "=3.0.0",
     "mocha": "=8.1.3",
     "nock": "=12.0.0",
-    "pdfjs-dist": "^2.5.207",
+    "pdfjs-dist": "=2.5.207",
     "sinon": "=9.0.2",
-    "xml-beautifier": "0.4.3"
+    "xml-beautifier": "=0.4.3"
   },
   "engines": {
     "node": ">= 10.15.0"

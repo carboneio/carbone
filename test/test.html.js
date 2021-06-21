@@ -7,276 +7,306 @@ const hyperlinks = require('../lib/hyperlinks');
 
 describe.only('Dynamic HTML', function () {
 
-  describe('reorderXML - should seperate the html formatter outside paragraphs ', function () {
-    describe('ODT', function () {
-      it('should do nothing if the html formatter is not included', function () {
-        const _Content = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
-        assert.strictEqual(html.reorderXML(_Content, 'odt'), _Content);
-      });
+  describe('Preprocess - functions used by ODT and DOCX reports', function () {
 
-      it('should throw an error is the XML is not valid, the paragraph is missing', function () {
-        let _templateContent = '<office:body><office:text>{d.content:html}</office:text></office:body>';
-        assert.throws(() => html.reorderXML(_templateContent, 'odt'), 'Error');
-      });
+    describe('reorderXML - should seperate the html formatter outside paragraphs ', function () {
+      describe('ODT', function () {
+        it('should do nothing if the html formatter is not included', function () {
+          const _Content = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_Content, 'odt'), _Content);
+        });
 
-      it('should seperate a single html formatter, retrieve the style on the paragraph and delete the empty paragraph', function () {
-        /** WITHOUT STYLE */
-        let _templateContent = '<office:body><office:text><text:p>{d.content:html}</text:p></office:text></office:body>';
-        let _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt}</carbone></office:text></office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-        /** WITH STYLE */
-        _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
-        _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone></office:text></office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-      });
+        it('should throw an error is the XML is not valid, the paragraph is missing', function () {
+          let _templateContent = '<office:body><office:text>{d.content:html}</office:text></office:body>';
+          assert.throws(() => html.reorderXML(_templateContent, 'odt'), 'Error');
+        });
 
-      it('should seperate a single html formatter with other elements', function () {
-        const _templateContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P5">Some content before {d.content:html} and after</text:p>'+
-            '</office:text></office:body>';
-        const _expectedContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P5">Some content before </text:p>'+
-              '<carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
-              '<text:p text:style-name="P5"> and after</text:p>'+
-            '</office:text></office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-      });
+        it('should seperate a single html formatter, retrieve the style on the paragraph and delete the empty paragraph', function () {
+          /** WITHOUT STYLE */
+          let _templateContent = '<office:body><office:text><text:p>{d.content:html}</text:p></office:text></office:body>';
+          let _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt}</carbone></office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          /** WITH STYLE */
+          _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
+          _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone></office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
 
-      it('should seperate a single html formatter mixed inside a span', function () {
-        const _templateContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2">Content before{d.courseloop1:html}Content after</text:span>'+
-              '</text:p>' +
-            '</office:text></office:body>';
-        const _expectedContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2">Content before</text:span>' +
-              '</text:p>' +
-              '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T2">Content after</text:span>' +
-              '</text:p>' +
-            '</office:text></office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-      });
+        it('should seperate a single html formatter with other elements', function () {
+          const _templateContent = '' +
+              '<office:body><office:text>'+
+                '<text:p text:style-name="P5">Some content before {d.content:html} and after</text:p>'+
+              '</office:text></office:body>';
+          const _expectedContent = '' +
+              '<office:body><office:text>'+
+                '<text:p text:style-name="P5">Some content before </text:p>'+
+                '<carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<text:p text:style-name="P5"> and after</text:p>'+
+              '</office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
 
-      it('should seperate a single html formatter mixed inside multiple spans', function () {
-        const _templateContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P1">' +
-                '<text:span text:style-name="T3"></text:span>'+
-                '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>'+
-                '<text:span text:style-name="T2"></text:span>'+
-              '</text:p>' +
-            '</office:text></office:body>';
-        const _expectedContent = '' +
-            '<office:body><office:text>'+
-              '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
-            '</office:text></office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-      });
-
-      it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
-        const _templateContent = '' +
-            '<office:body>' +
-              '<office:text>' +
+        it('should seperate a single html formatter mixed inside a span', function () {
+          const _templateContent = '' +
+              '<office:body><office:text>'+
                 '<text:p text:style-name="P1">' +
-                  '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>' +
-                  '<text:span text:style-name="T3">Some Static content</text:span>' +
-                  '<text:span text:style-name="T2">{d.courseloop2:html}</text:span>' +
+                  '<text:span text:style-name="T2">Content before{d.courseloop1:html}Content after</text:span>'+
                 '</text:p>' +
-              '</office:text>' +
-            '</office:body>';
-        const _expectedContent = '' +
-            '<office:body>' +
-              '<office:text>' +
-                '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
-                '<text:p text:style-name="P1">' +
-                  '<text:span text:style-name="T2"></text:span>' +
-                  '<text:span text:style-name="T3">Some Static content</text:span>' +
-                  '<text:span text:style-name="T2"></text:span>' +
-                '</text:p>' +
-                '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
-              '</office:text>' +
-            '</office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-      });
-
-      it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
-        const _templateContent = '' +
-            '<office:body>' +
-              '<office:text>' +
-                '<text:p text:style-name="P1">' +
-                  '<text:span text:style-name="T2">Some Static content1</text:span>' +
-                  '<text:span text:style-name="T3">Before{d.courseloop2:html}After</text:span>' +
-                  '<text:span text:style-name="T2">Some Static content2</text:span>' +
-                '</text:p>' +
-              '</office:text>' +
-            '</office:body>';
-        const _expectedContent = '' +
-            '<office:body>' +
-              '<office:text>' +
-                '<text:p text:style-name="P1">' +
-                  '<text:span text:style-name="T2">Some Static content1</text:span>' +
-                  '<text:span text:style-name="T3">Before</text:span>' +
-                  '<text:span text:style-name="T2"></text:span>' +
-                '</text:p>' +
-                '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
-                '<text:p text:style-name="P1">' +
-                  '<text:span text:style-name="T2"></text:span>' +
-                  '<text:span text:style-name="T3">After</text:span>' +
-                  '<text:span text:style-name="T2">Some Static content2</text:span>' +
-                '</text:p>' +
-              '</office:text>' +
-            '</office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-      });
-
-      it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
-        const _templateContent = '' +
-            '<office:body>' +
-              '<office:text>' +
-                '<text:p text:style-name="P1">' +
-                  '<text:span text:style-name="T2">Content before{d.courseloop1:html}</text:span>' +
-                  '<text:span text:style-name="T3">Some Static content</text:span>' +
-                  '<text:span text:style-name="T2">{d.courseloop2:html}Content after</text:span>' +
-                '</text:p>' +
-              '</office:text>' +
-            '</office:body>';
-        const _expectedContent = '' +
-            '<office:body>' +
-              '<office:text>' +
+              '</office:text></office:body>';
+          const _expectedContent = '' +
+              '<office:body><office:text>'+
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2">Content before</text:span>' +
-                  '<text:span text:style-name="T3"></text:span>' +
-                  '<text:span text:style-name="T2"></text:span>' +
                 '</text:p>' +
                 '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
                 '<text:p text:style-name="P1">' +
-                  '<text:span text:style-name="T2"></text:span>' +
-                  '<text:span text:style-name="T3">Some Static content</text:span>' +
-                  '<text:span text:style-name="T2"></text:span>' +
-                '</text:p>' +
-                '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
-                '<text:p text:style-name="P1">' +
-                  '<text:span text:style-name="T2"></text:span>' +
-                  '<text:span text:style-name="T3"></text:span>' +
                   '<text:span text:style-name="T2">Content after</text:span>' +
                 '</text:p>' +
-              '</office:text>' +
-            '</office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+              '</office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
+
+        it('should seperate a single html formatter mixed inside multiple spans', function () {
+          const _templateContent = '' +
+              '<office:body><office:text>'+
+                '<text:p text:style-name="P1">' +
+                  '<text:span text:style-name="T3"></text:span>'+
+                  '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>'+
+                  '<text:span text:style-name="T2"></text:span>'+
+                '</text:p>' +
+              '</office:text></office:body>';
+          const _expectedContent = '' +
+              '<office:body><office:text>'+
+                '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+              '</office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
+
+        it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+          const _templateContent = '' +
+              '<office:body>' +
+                '<office:text>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>' +
+                    '<text:span text:style-name="T3">Some Static content</text:span>' +
+                    '<text:span text:style-name="T2">{d.courseloop2:html}</text:span>' +
+                  '</text:p>' +
+                '</office:text>' +
+              '</office:body>';
+          const _expectedContent = '' +
+              '<office:body>' +
+                '<office:text>' +
+                  '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2"></text:span>' +
+                    '<text:span text:style-name="T3">Some Static content</text:span>' +
+                    '<text:span text:style-name="T2"></text:span>' +
+                  '</text:p>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                '</office:text>' +
+              '</office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
+
+        it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+          const _templateContent = '' +
+              '<office:body>' +
+                '<office:text>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2">Some Static content1</text:span>' +
+                    '<text:span text:style-name="T3">Before{d.courseloop2:html}After</text:span>' +
+                    '<text:span text:style-name="T2">Some Static content2</text:span>' +
+                  '</text:p>' +
+                '</office:text>' +
+              '</office:body>';
+          const _expectedContent = '' +
+              '<office:body>' +
+                '<office:text>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2">Some Static content1</text:span>' +
+                    '<text:span text:style-name="T3">Before</text:span>' +
+                    '<text:span text:style-name="T2"></text:span>' +
+                  '</text:p>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2"></text:span>' +
+                    '<text:span text:style-name="T3">After</text:span>' +
+                    '<text:span text:style-name="T2">Some Static content2</text:span>' +
+                  '</text:p>' +
+                '</office:text>' +
+              '</office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
+
+        it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+          const _templateContent = '' +
+              '<office:body>' +
+                '<office:text>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2">Content before{d.courseloop1:html}</text:span>' +
+                    '<text:span text:style-name="T3">Some Static content</text:span>' +
+                    '<text:span text:style-name="T2">{d.courseloop2:html}Content after</text:span>' +
+                  '</text:p>' +
+                '</office:text>' +
+              '</office:body>';
+          const _expectedContent = '' +
+              '<office:body>' +
+                '<office:text>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2">Content before</text:span>' +
+                    '<text:span text:style-name="T3"></text:span>' +
+                    '<text:span text:style-name="T2"></text:span>' +
+                  '</text:p>' +
+                  '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2"></text:span>' +
+                    '<text:span text:style-name="T3">Some Static content</text:span>' +
+                    '<text:span text:style-name="T2"></text:span>' +
+                  '</text:p>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<text:p text:style-name="P1">' +
+                    '<text:span text:style-name="T2"></text:span>' +
+                    '<text:span text:style-name="T3"></text:span>' +
+                    '<text:span text:style-name="T2">Content after</text:span>' +
+                  '</text:p>' +
+                '</office:text>' +
+              '</office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
+
+        it('should seperate multiple html formatter with other elements', function () {
+          const _templateContent = '' +
+              '<office:body><office:text>'+
+                '<text:p text:style-name="P5">{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</text:p>'+
+              '</office:text></office:body>';
+          const _expectedContent = '' +
+              '<office:body><office:text>'+
+                '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
+                '<carbone>{d.list[i].content:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<text:p text:style-name="P5"> after content </text:p>'+
+                '<carbone>{d.value:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<text:p text:style-name="P5"> end</text:p>'+
+              '</office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
+
+        it('should seperate a multiple html formatter with other elements inside multiple paragrpahs', function () {
+          const _templateContent = '' +
+              '<office:body><office:text>'+
+                '<text:p text:style-name="P5">Some content before 1 {d.content1:html} and after 1</text:p>'+
+                '<text:p text:style-name="P5">Some content before 2 {d.content2:html} and after 2</text:p>'+
+              '</office:text></office:body>';
+          const _expectedContent = '' +
+              '<office:body><office:text>'+
+                '<text:p text:style-name="P5">Some content before 1 </text:p>'+
+                '<carbone>{d.content1:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<text:p text:style-name="P5"> and after 1</text:p>'+
+                '<text:p text:style-name="P5">Some content before 2 </text:p>'+
+                '<carbone>{d.content2:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<text:p text:style-name="P5"> and after 2</text:p>'+
+              '</office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+        });
       });
 
-      it('should seperate multiple html formatter with other elements', function () {
-        const _templateContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P5">{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</text:p>'+
-            '</office:text></office:body>';
-        const _expectedContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
-              '<carbone>{d.list[i].content:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
-              '<text:p text:style-name="P5"> after content </text:p>'+
-              '<carbone>{d.value:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
-              '<text:p text:style-name="P5"> end</text:p>'+
-            '</office:text></office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-      });
+      describe('DOCX', function () {
+        it('should do nothing if the html formatter is not included', function () {
+          const _templateContent = ''+
+            '<w:document>'+
+              '<w:body>'+
+                '<w:p>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
+                      '<w:sz w:val="36"/>' +
+                    '</w:rPr>'+
+                    '<w:t>Static content</w:t>'+
+                  '</w:r>'+
+                '</w:p>'+
+              '</w:body>'+
+            '</w:document>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _templateContent);
+        });
 
-      it('should seperate a multiple html formatter with other elements inside multiple paragrpahs', function () {
-        const _templateContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P5">Some content before 1 {d.content1:html} and after 1</text:p>'+
-              '<text:p text:style-name="P5">Some content before 2 {d.content2:html} and after 2</text:p>'+
-            '</office:text></office:body>';
-        const _expectedContent = '' +
-            '<office:body><office:text>'+
-              '<text:p text:style-name="P5">Some content before 1 </text:p>'+
-              '<carbone>{d.content1:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
-              '<text:p text:style-name="P5"> and after 1</text:p>'+
-              '<text:p text:style-name="P5">Some content before 2 </text:p>'+
-              '<carbone>{d.content2:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
-              '<text:p text:style-name="P5"> and after 2</text:p>'+
-            '</office:text></office:body>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
-      });
-    });
-
-    describe('DOCX', function () {
-      it('should do nothing if the html formatter is not included', function () {
-        const _templateContent = ''+
-          '<w:document>'+
-            '<w:body>'+
-              '<w:p>'+
-                '<w:r>'+
-                  '<w:rPr>'+
-                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
-                    '<w:sz w:val="36"/>' +
-                  '</w:rPr>'+
-                  '<w:t>Static content</w:t>'+
-                '</w:r>'+
-              '</w:p>'+
-            '</w:body>'+
-          '</w:document>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _templateContent);
-      });
-
-      it('should seperate a single html formatter and delete the empty paragraph', function () {
-        /** WITHOUT A FONT */
-        let _templateContent = ''+
-          '<w:document>'+
-            '<w:body>'+
-              '<w:p>'+
-                '<w:r>'+
-                  '<w:rPr>'+
-                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
-                    '<w:sz w:val="36"/>' +
-                  '</w:rPr>'+
-                  '<w:t>{d.courseloop1:html}</w:t>'+
-                '</w:r>'+
-              '</w:p>'+
-            '</w:body>'+
-          '</w:document>';
-        let _expectedContent = ''+
-          '<w:document>'+
-            '<w:body>'+
-              '<carbone>{d.courseloop1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>'+
-            '</w:body>'+
-          '</w:document>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
-        /** WITH A FONT */
-        _templateContent = ''+
-          '<w:document>'+
-            '<w:body>'+
-              '<w:p>'+
-                '<w:r>'+
-                  '<w:rPr>'+
-                    '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
-                    '<w:sz w:val="36"/>' +
-                  '</w:rPr>'+
-                  '<w:t>{d.courseloop1:html}</w:t>'+
-                '</w:r>'+
-              '</w:p>'+
-            '</w:body>'+
-          '</w:document>';
-        _expectedContent = ''+
-          '<w:document>'+
-            '<w:body>'+
-              '<carbone>{d.courseloop1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>'+
-            '</w:body>'+
-          '</w:document>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
-      });
+        it('should seperate a single html formatter and delete the empty paragraph', function () {
+          /** WITHOUT A FONT */
+          let _templateContent = ''+
+            '<w:document>'+
+              '<w:body>'+
+                '<w:p>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
+                      '<w:sz w:val="36"/>' +
+                    '</w:rPr>'+
+                    '<w:t>{d.courseloop1:html}</w:t>'+
+                  '</w:r>'+
+                '</w:p>'+
+              '</w:body>'+
+            '</w:document>';
+          let _expectedContent = ''+
+            '<w:document>'+
+              '<w:body>'+
+                '<carbone>{d.courseloop1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>'+
+              '</w:body>'+
+            '</w:document>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+          /** WITH A FONT */
+          _templateContent = ''+
+            '<w:document>'+
+              '<w:body>'+
+                '<w:p>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
+                      '<w:sz w:val="36"/>' +
+                    '</w:rPr>'+
+                    '<w:t>{d.courseloop1:html}</w:t>'+
+                  '</w:r>'+
+                '</w:p>'+
+              '</w:body>'+
+            '</w:document>';
+          _expectedContent = ''+
+            '<w:document>'+
+              '<w:body>'+
+                '<carbone>{d.courseloop1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>'+
+              '</w:body>'+
+            '</w:document>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+        });
 
 
-      it('should seperate a single html formatter mixed with static content 1', function () {
-        const _templateContent = ''+
-          '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
+        it('should seperate a single html formatter mixed with static content 1', function () {
+          const _templateContent = ''+
+            '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
+              '<w:pPr>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t>Content before </w:t>' +
+              '</w:r>' +
+              '<w:proofErr w:type="spellStart"/>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t>Start{d.value:html}End</w:t>' +
+              '</w:r>' +
+              '<w:proofErr w:type="spellEnd"/>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t> Content after</w:t>' +
+              '</w:r>' +
+            '</w:p>';
+          const _expectedContent = ''+
+            '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
             '<w:pPr>' +
               '<w:rPr>' +
                 '<w:lang w:val="en-US"/>' +
@@ -293,7 +323,35 @@ describe.only('Dynamic HTML', function () {
               '<w:rPr>' +
                 '<w:lang w:val="en-US"/>' +
               '</w:rPr>' +
-              '<w:t>Start{d.value:html}End</w:t>' +
+              '<w:t>Start</w:t>' +
+            '</w:r>' +
+            '<w:proofErr w:type="spellEnd"/>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t></w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<carbone>{d.value:getHTMLContentDocx}</carbone>' +
+          '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
+            '<w:pPr>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t></w:t>' +
+            '</w:r>' +
+            '<w:proofErr w:type="spellStart"/>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>' +
+              '<w:t>End</w:t>' +
             '</w:r>' +
             '<w:proofErr w:type="spellEnd"/>' +
             '<w:r>' +
@@ -303,157 +361,346 @@ describe.only('Dynamic HTML', function () {
               '<w:t> Content after</w:t>' +
             '</w:r>' +
           '</w:p>';
-        const _expectedContent = ''+
-          '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
-          '<w:pPr>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-            '</w:rPr>' +
-          '</w:pPr>' +
-          '<w:r>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-            '</w:rPr>' +
-            '<w:t>Content before </w:t>' +
-          '</w:r>' +
-          '<w:proofErr w:type="spellStart"/>' +
-          '<w:r>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-            '</w:rPr>' +
-            '<w:t>Start</w:t>' +
-          '</w:r>' +
-          '<w:proofErr w:type="spellEnd"/>' +
-          '<w:r>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-            '</w:rPr>' +
-            '<w:t></w:t>' +
-          '</w:r>' +
-        '</w:p>' +
-        '<carbone>{d.value:getHTMLContentDocx}</carbone>' +
-        '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
-          '<w:pPr>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-            '</w:rPr>' +
-          '</w:pPr>' +
-          '<w:r>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-            '</w:rPr>' +
-            '<w:t></w:t>' +
-          '</w:r>' +
-          '<w:proofErr w:type="spellStart"/>' +
-          '<w:r>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-            '</w:rPr>' +
-            '<w:t>End</w:t>' +
-          '</w:r>' +
-          '<w:proofErr w:type="spellEnd"/>' +
-          '<w:r>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-            '</w:rPr>' +
-            '<w:t> Content after</w:t>' +
-          '</w:r>' +
-        '</w:p>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+        });
+
+        it('should seperate a single html formatter mixed with static content 2', function () {
+          const _templateContent = ''+
+            '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+              '<w:pPr>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t>{d.value1:html} Content between {d.value2:html}</w:t>' +
+              '</w:r>' +
+            '</w:p>';
+          const _expectedContent = ''+
+            '<carbone>{d.value1:getHTMLContentDocx}</carbone>' +
+            '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+              '<w:pPr>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t> Content between </w:t>' +
+              '</w:r>' +
+            '</w:p>' +
+            '<carbone>{d.value2:getHTMLContentDocx}</carbone>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+        });
+
+        it('should seperate a single html formatter mixed with static content 3', function () {
+          const _templateContent = ''+
+            '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+              '<w:pPr>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t>{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</w:t>' +
+              '</w:r>' +
+            '</w:p>';
+          const _expectedContent = ''+
+            '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+              '<w:pPr>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t>{d.list[i].name} some content1 </w:t>' +
+              '</w:r>' +
+            '</w:p>' +
+            '<carbone>{d.list[i].content:getHTMLContentDocx}</carbone>' +
+            '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+              '<w:pPr>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t> after content </w:t>' +
+              '</w:r>' +
+            '</w:p>' +
+            '<carbone>{d.value:getHTMLContentDocx}</carbone>' +
+            '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
+              '<w:pPr>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                '<w:t> end</w:t>' +
+              '</w:r>' +
+            '</w:p>';
+          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+        });
+      });
+    });
+
+    describe('seperateHTMLMarker', function () {
+      it('should return a simple element when no HTML marker is included', function () {
+        const _content = 'This is a simple sentence without elements';
+        helper.assert(html.seperateHTMLMarker(_content, 244, 'odt'),
+          [
+            {
+              pos    : 244,
+              data   : 'This is a simple sentence without elements',
+              isHTML : false
+            }
+          ]
+        );
       });
 
-      it('should seperate a single html formatter mixed with static content 2', function () {
-        const _templateContent = ''+
-          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
-            '<w:pPr>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-            '</w:pPr>' +
-            '<w:r>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-              '<w:t>{d.value1:html} Content between {d.value2:html}</w:t>' +
-            '</w:r>' +
-          '</w:p>';
-        const _expectedContent = ''+
-          '<carbone>{d.value1:getHTMLContentDocx}</carbone>' +
-          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
-            '<w:pPr>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-            '</w:pPr>' +
-            '<w:r>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-              '<w:t> Content between </w:t>' +
-            '</w:r>' +
-          '</w:p>' +
-          '<carbone>{d.value2:getHTMLContentDocx}</carbone>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+      it('should return a descriptor with a static content and html marker without style', function () {
+        const _content = 'How a rocket does work? {d.description:html} Voila!';
+        /** ODT file */
+        helper.assert(html.seperateHTMLMarker(_content, 130, 'odt'),
+          [
+            {
+              pos    : 130,
+              data   : 'How a rocket does work? ',
+              isHTML : false
+            },
+            {
+              pos    : 130,
+              data   : '<carbone>{d.description:getHTMLContentOdt}</carbone>',
+              isHTML : true
+            },
+            {
+              pos    : 130,
+              data   : ' Voila!',
+              isHTML : false
+            }
+          ]
+        );
+
+        /** DOCX file */
+        helper.assert(html.seperateHTMLMarker(_content, 130, 'docx'),
+          [
+            {
+              pos    : 130,
+              data   : 'How a rocket does work? ',
+              isHTML : false
+            },
+            {
+              pos    : 130,
+              data   : '<carbone>{d.description:getHTMLContentDocx}</carbone>',
+              isHTML : true
+            },
+            {
+              pos    : 130,
+              data   : ' Voila!',
+              isHTML : false
+            }
+          ]
+        );
       });
 
-      it('should seperate a single html formatter mixed with static content 3', function () {
-        const _templateContent = ''+
-          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
-            '<w:pPr>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-            '</w:pPr>' +
+      it('should return a descriptor with a static content and html marker with a style', function () {
+        const _content = 'start {d.html1:html} content between {d.html2:html} static content with a marker {d.element}';
+        /** ODT file */
+        helper.assert(html.seperateHTMLMarker(_content, 130, 'odt', '(text:style-name="P5")'),
+          [
+            {
+              pos    : 130,
+              data   : 'start ',
+              isHTML : false
+            },
+            {
+              pos    : 130,
+              data   : '<carbone>{d.html1:getHTMLContentOdt(text:style-name="P5")}</carbone>',
+              isHTML : true
+            },
+            {
+              pos    : 130,
+              data   : ' content between ',
+              isHTML : false
+            },
+            {
+              pos    : 130,
+              data   : '<carbone>{d.html2:getHTMLContentOdt(text:style-name="P5")}</carbone>',
+              isHTML : true
+            },
+            {
+              pos    : 130,
+              data   : ' static content with a marker {d.element}',
+              isHTML : false
+            }
+          ]
+        );
+
+        /** DOCX file */
+        helper.assert(html.seperateHTMLMarker(_content, 130, 'docx', '(\'American Typewriter\', 28)'),
+          [
+            {
+              pos    : 130,
+              data   : 'start ',
+              isHTML : false
+            },
+            {
+              pos    : 130,
+              data   : '<carbone>{d.html1:getHTMLContentDocx(\'American Typewriter\', 28)}</carbone>',
+              isHTML : true
+            },
+            {
+              pos    : 130,
+              data   : ' content between ',
+              isHTML : false
+            },
+            {
+              pos    : 130,
+              data   : '<carbone>{d.html2:getHTMLContentDocx(\'American Typewriter\', 28)}</carbone>',
+              isHTML : true
+            },
+            {
+              pos    : 130,
+              data   : ' static content with a marker {d.element}',
+              isHTML : false
+            }
+          ]
+        );
+      });
+    });
+
+    describe('findStartingParagraph', function () {
+      it('should throw an error is the XML is not valid, the paragraph is missing', function () {
+        let _templateContent = '<office:body><office:text>{d.content:html}</office:text></office:body>';
+        assert.throws(() => html.findStartingParagraph('<w:p', _templateContent, 30), 'Error');
+      });
+
+      it('should find the position of the paragraph ODT/DOCX', function () {
+        /** DOCX */
+        helper.assert(html.findStartingParagraph('<w:p', '<office:body><office:text><w:p>{d.content:html}</w:p></office:text></office:body>', 40), 26);
+        helper.assert(html.findStartingParagraph('<w:p', '' +
+            '<office:text>' +
+              '<w:p w:rsidRDefault="00B03DAF">' +
+                '<w:pPr>' +
+                  '<w:rPr>' +
+                    '<w:lang w:val="en-US"/>' +
+                  '</w:rPr>' +
+                '</w:pPr>' +
+                '<w:proofErr w:type="spellStart"/>' +
+                '<w:r>' +
+                  '<w:rPr>' +
+                    '<w:lang w:val="en-US"/>' +
+                  '</w:rPr>' +
+                  '<w:t>{d.content:html}</w:t>' +
+                '</w:r>' +
+              '</w:p>' +
+            '</office:text>'
+        , 120), 13);
+        /** ODT */
+        helper.assert(html.findStartingParagraph('<text:p', '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>', 50), 26);
+        helper.assert(html.findStartingParagraph('<text:p', '<office:text><text:p>{d.content:html}</text:p></office:text>', 30), 13);
+      });
+    });
+
+    describe('getFontStyle', function () {
+      it('should return an empty string if no style is included', function () {
+        helper.assert(html.getFontStyle('<office:text><text:p>{d.content:html}</text:p></office:text>', 'odt'), '');
+        helper.assert(html.getFontStyle('<office:body><office:text><w:p>{d.content:html}</w:p></office:text></office:body>', 'docx'), '');
+      });
+
+      it('should return DOCX font family and font size', function () {
+        helper.assert(html.getFontStyle('<w:p>' +
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:lang w:val="en-US"/>' +
+              '<w:sz w:val="18"/>' +
+              '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
+            '</w:rPr>', 'docx'), '(\'American Typewriter\', \'18\')');
+        /** Missing font size */
+        helper.assert(html.getFontStyle('<w:p>' +
             '<w:r>' +
               '<w:rPr>' +
                 '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-              '<w:t>{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</w:t>' +
-            '</w:r>' +
-          '</w:p>';
-        const _expectedContent = ''+
-          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
-            '<w:pPr>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-            '</w:pPr>' +
+                '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
+              '</w:rPr>', 'docx'), '(\'American Typewriter\', null)');
+        /** Missing font family */
+        helper.assert(html.getFontStyle('<w:p>' +
             '<w:r>' +
               '<w:rPr>' +
                 '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-              '<w:t>{d.list[i].name} some content1 </w:t>' +
-            '</w:r>' +
-          '</w:p>' +
-          '<carbone>{d.list[i].content:getHTMLContentDocx}</carbone>' +
-          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
-            '<w:pPr>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-            '</w:pPr>' +
-            '<w:r>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-              '<w:t> after content </w:t>' +
-            '</w:r>' +
-          '</w:p>' +
-          '<carbone>{d.value:getHTMLContentDocx}</carbone>' +
-          '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
-            '<w:pPr>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-            '</w:pPr>' +
-            '<w:r>' +
-              '<w:rPr>' +
-                '<w:lang w:val="en-US"/>' +
-              '</w:rPr>' +
-              '<w:t> end</w:t>' +
-            '</w:r>' +
-          '</w:p>';
-        assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+                '<w:sz w:val="18"/>' +
+              '</w:rPr>', 'docx'), '(null, \'18\')');
+      });
+
+      it('should return ODT font style', function () {
+        helper.assert(html.getFontStyle('<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>', 'odt'), '(text:style-name="P5")');
+      });
+    });
+
+    describe('removeCarboneTags', function () {
+      it('should do nothing if the file is not an XML file', function () {
+        const _expectedContent = '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>';
+        const _template = {
+          files : [{
+            name : 'anotherfile.xml',
+            data : _expectedContent
+          },
+          {
+            name : 'document',
+            data : _expectedContent
+          },
+          {
+            name : 'document.rels',
+            data : _expectedContent
+          }]
+        };
+        html.removeCarboneTags(_template);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1].data, _expectedContent);
+        helper.assert(_template.files[2].data, _expectedContent);
+      });
+
+      it('should replace the carbone tag on each XML files that contain in the file name "content", "document", "footer" or "header"', function () {
+        const _expectedContent = '<office:body><office:text><text:p text:style-name="P5">HTML content</text:p></office:text></office:body>';
+        const _template = {
+          files : [{
+            name : 'document.xml',
+            data : '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>'
+          },
+          {
+            name : 'footer.xml',
+            data : '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>'
+          },
+          {
+            name : 'header.xml',
+            data : '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>'
+          },
+          {
+            name : 'content.xml',
+            data : '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>'
+          }]
+        };
+        html.removeCarboneTags(_template);
+        helper.assert(_template.files[0].data, _expectedContent);
+        helper.assert(_template.files[1].data, _expectedContent);
+        helper.assert(_template.files[2].data, _expectedContent);
+        helper.assert(_template.files[3].data, _expectedContent);
       });
     });
   });

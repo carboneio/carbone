@@ -5,6 +5,14 @@
     - New: If static content and Carbone markers are mixed with an HTML formatter in the same paragraph, the html is isolated into a new paragraph and each element are seperated above or below. For example, the following template on a text editor `<paragraph>A rocket is made of {d.data:html} {d.details}, this is cool!</paragraph>` will be transform into 3 paragraphs on the generated report `<paragraph>A rocket is made of </paragraph><paragraph>{d.data:html}</paragraph><paragraph> {d.details}, this is cool!</paragraph>`.
     - Improved HTML rendering stability when it is mixed with lists, tables, and images.
 
+### v3.2.6
+  - Release June 15th 2021
+  - [EE] Fix the generation of ODP document that includes table lists.
+
+### v3.2.5
+  - Release June 10th 2021
+  - Accept URLs with weird Content-Type such as `image/png; charset=utf-8`  for dynamic image replacement
+
 ### v3.2.4
   - Release May 25th 2021
   - Add the possibility to upload templates in base64. The content-type must be `application/json` and the template

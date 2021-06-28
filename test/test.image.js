@@ -230,7 +230,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     });
   });
 
-  describe('Methods for LO (ODT/ODS)', function () {
+  describe('Methods for LO (ODT/ODS/ODP/ODG)', function () {
     describe('preProcessLo', function () {
       it('should do nothing if the image tags are including a text box', function (done) {
         const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:body><office:text><text:p text:style-name="Standard"><draw:frame text:anchor-type="paragraph" draw:z-index="0" draw:name="Shape1" draw:style-name="gr2" draw:text-style-name="P1" svg:width="4.315cm" svg:height="2.585cm" svg:x="1.732cm" svg:y="0.714cm"><draw:text-box><text:p>{d.id}</text:p></draw:text-box></draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="1" draw:name="Shape2" draw:style-name="gr1" draw:text-style-name="P1" svg:width="3.197cm" svg:height="1.812cm" svg:x="8.326cm" svg:y="0.572cm"><draw:text-box><text:p>{d.missionId}</text:p></draw:text-box></draw:frame></text:p></office:text></office:body></office:document-content>';
@@ -244,6 +244,50 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         };
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, _expectedXML);
+        done();
+      });
+
+      it('should do nothing if it is not an image but a table inside an ODG file', function (done) {
+        const _expectedXML = '' +
+          '<office:body>' +
+            '<office:presentation>' +
+              '<draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL1T0">' +
+                '<draw:frame draw:style-name="standard" draw:layer="layout" svg:width="12.683cm" svg:height="3.998cm" svg:x="7.373cm" svg:y="8.549cm">' +
+                  '<table:table table:template-name="default" table:use-first-row-styles="true" table:use-banding-rows-styles="true">' +
+                    '<table:table-column table:style-name="co1"/>' +
+                    '<table:table-column table:style-name="co1"/>' +
+                    '<table:table-row table:style-name="ro1" table:default-cell-style-name="ce1">' +
+                      '<table:table-cell>' +
+                        '<text:p>{d.list[i].name}</text:p>' +
+                      '</table:table-cell>' +
+                      '<table:table-cell>' +
+                        '<text:p>{d.list[i].age}</text:p>' +
+                      '</table:table-cell>' +
+                    '</table:table-row>' +
+                    '<table:table-row table:style-name="ro2" table:default-cell-style-name="ce1">' +
+                      '<table:table-cell>' +
+                        '<text:p>{d.list[i+1]}</text:p>' +
+                      '</table:table-cell>' +
+                      '<table:table-cell/>' +
+                    '</table:table-row>' +
+                  '</table:table>' +
+                  '<draw:image xlink:href="Pictures/TablePreview1.svm" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                '</draw:frame>' +
+              '</draw:page>' +
+              '<presentation:settings presentation:mouse-visible="false"/>' +
+            '</office:presentation>' +
+          '</office:body>';
+        const _template = {
+          extension : 'odp',
+          files     : [
+            {
+              name : 'content.xml',
+              data : _expectedXML
+            }
+          ]
+        };
+        image.preProcessLo(_template);
+        helperTest.assert(_template.files[0].data, _expectedXML);
         done();
       });
 
@@ -1455,6 +1499,20 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+      it('should download a PNG image from an url with weird Content-Type', function (done) {
+        nock('https://google.com')
+          .get('/blabla?size=10&color=blue')
+          .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
+            'Content-Type' : 'image/png; charset=UTF-8',
+          });
+        image.downloadImage('https://google.com/blabla?size=10&color=blue', {}, function (err, imageInfo) {
+          helperTest.assert(err+'', 'null');
+          assert(imageInfo.data.length > 0);
+          helperTest.assert(imageInfo.mimetype, 'image/png');
+          helperTest.assert(imageInfo.extension, 'png');
+          done();
+        });
+      });
       it('should download a PNG image from an url even if the header.content-type is incorrect (application/json)', function (done) {
         nock('https://google.com')
           .get('/image-flag-it.png')
@@ -1631,6 +1689,18 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(image.checkIfImageIncludedDocx('word/_rels/document.xml.rels', ['header3.xml', 'header2.xml', 'footer1.xml']), false);
         helperTest.assert(image.checkIfImageIncludedDocx('word/_rels/document.xml.rels', []), false);
         helperTest.assert(image.checkIfImageIncludedDocx('', ['header3.xml', 'header2.xml']), false);
+      });
+    });
+    describe('cleanContentType', function () {
+      it('should clean content type', function () {
+        helperTest.assert(image.cleanContentType(undefined), '');
+        helperTest.assert(image.cleanContentType(null), '');
+        helperTest.assert(image.cleanContentType(0), '');
+        helperTest.assert(image.cleanContentType(1), '');
+        helperTest.assert(image.cleanContentType('image/png; charset=UTF-8'), 'image/png');
+        helperTest.assert(image.cleanContentType('image/png ; charset=UTF-8'), 'image/png');
+        helperTest.assert(image.cleanContentType('  image/png '), 'image/png');
+        helperTest.assert(image.cleanContentType('  image/png  ; charset=UTF-8 ; s '), 'image/png');
       });
     });
   });

@@ -1,3 +1,6 @@
+### v3.3.0
+  - Add new aggregator formatters : sum(by), avg(by)
+
 ### v3.2.6
   - Release June 15th 2021
   - [EE] Fix the generation of ODP document that includes table lists.

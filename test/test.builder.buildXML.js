@@ -1225,6 +1225,52 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept direct access of an other array, with sub-objects, within a loop', function (done) {
+    var _xml = ''
+      + '<d>'
+      + '  <l>'
+      + '    <acc>{d[i].groups[i].label}</acc>'
+      + '    <sub>{d[i].direct[0].sub.id}</sub>'
+      + '  </l>'
+      + '  <l>'
+      + '    {d[i].groups[i+1]}'
+      + '  </l>'
+      + '  <l>'
+      + '    {d[i+1]}'
+      + '  </l>'
+      + '</d>'
+    ;
+    var _data = [
+      {
+        groups : [ { label : 10 }, {label : 11 } ],
+        direct : [ { sub : { id : 'aa' }} ]
+      },
+      {
+        groups : [ { label : 20 } ],
+        direct : [ { sub : { id : 'aa' }} ]
+      }
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, ''
+        + '<d>'
+        + '  <l>'
+        + '    <acc>10</acc>'
+        + '    <sub>aa</sub>'
+        + '  </l>'
+        + '  <l>'
+        + '    <acc>11</acc>'
+        + '    <sub>aa</sub>'
+        + '  </l>  '
+        + '  <l>'
+        + '    <acc>20</acc>'
+        + '    <sub>aa</sub>'
+        + '  </l>    '
+        + '</d>'
+      );
+      done();
+    });
+  });
+
   it('should not crash if the object null or undefined', function (done) {
     var _xml = '<xml> <t_row> {d.test.id} </t_row></xml>';
     var _data = {

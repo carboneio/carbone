@@ -1,3 +1,7 @@
+### v3.2.7
+  - Release July 21th 2021
+  - Fix corrupted document when accessing a sub-object in an array `{d.surrounding[i].subArray[0].subObject.id}`, within a surrounding loop
+
 ### v3.2.6
   - Release June 15th 2021
   - [EE] Fix the generation of ODP document that includes table lists.

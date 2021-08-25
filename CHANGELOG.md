@@ -1,4 +1,4 @@
-### v3.2.8
+### v3.3.0
   - Accept `null` for the attribute `complement` in `options`
 
 ### v3.2.7

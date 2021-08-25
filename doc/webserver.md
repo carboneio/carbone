@@ -22,11 +22,12 @@ Carbone On-premise can be installed in different ways:
 
   - Self-contained binary executable + external LibreOffice (used for conversion)
   - Debian/Ubuntu package (coming soon)
+
 ### Basic Installation
 
 1. Download the license and the Carbone On-premise binary for server/OS: Mac, Linux or Windows
 2. Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
-3. Insert the **license** in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is picked. The binary can't start if the license is outdated or invalid.
+3. Insert the **license** in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is selected. The binary can't start if the license is outdated or invalid.
 3. Start Carbone web server or [daemonize it with systemd](#Installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#Carbone-Options-overview) to Carbone On-Premise through the CLI:
 
 ```bash
@@ -36,6 +37,7 @@ Carbone On-premise can be installed in different ways:
 If an error appears during the start up, you must verify:
 - if your license is valid
 - if CLI options and values are valid
+
 ### Installation from systemd (Ubuntu/Debian ONLY)
 
 Carbone On-Premise contains automatic installation scripts to daemonize with systemd. It has been carefully configured to provide a high level of security.
@@ -48,7 +50,8 @@ Carbone On-Premise contains automatic installation scripts to daemonize with sys
   sudo ./install.sh
 ```
 
-The service is configured to run by "carbone" user in the "/var/www/carbone-ee" directory. It is possible to overwrite values through environment variables `CARBONE_USER` and `CARBONE_WORKDIR`.
+The service is configured to run with "carbone" user (automatically created) in the "/var/www/carbone-ee" directory. 
+It is possible to overwrite values through environment variables `CARBONE_USER` and `CARBONE_WORKDIR`.
 
 ## How and why install LibreOffice?
 
@@ -68,14 +71,14 @@ The service is configured to run by "carbone" user in the "/var/www/carbone-ee" 
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.0.3.1/deb/x86_64/LibreOffice_7.0.3.1_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.1.5.2/deb/x86_64/LibreOffice_7.1.5.2_Linux_x86-64_deb.tar.gz
 
-  # Install required dependencies on ubuntu server for LibreOffice 6.0+
+  # Install required dependencies on ubuntu server for LibreOffice 7.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_7.0.3.1_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_7.0.3.1_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_7.1.5.2_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_7.1.5.2_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb
@@ -99,7 +102,7 @@ Carbone does a lot of thing behind the scene:
 - starts LibreOffice in "server-mode": headless, no User Interface loaded
 - manages multiple LibreOffice workers to maximize performance (configurable number of workers)
 - automatically restarts LibreOffice worker if it crashes or does not respond
-- job queue, re-try conversion three times if something bad happen
+- job queue, re-try conversion two times if something bad happen
 
 ## Carbone Options overview
 

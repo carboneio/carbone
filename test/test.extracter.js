@@ -2637,7 +2637,7 @@ describe('extracter', function () {
       var _data = {
         staticData  : {},
         dynamicData : {
-          d       : {name : ''       , type : 'array'  , parent : ''        , xmlParts : [], depth : 500},
+          d       : {name : ''       , type : 'array'  , parent : ''        , xmlParts : [], depth : 0},
           menu1   : {name : 'menu'   , type : 'array'  , parent : 'd'       , xmlParts : [], depth : 4},
           menu2   : {name : 'menu'   , type : 'array'  , parent : 'menu1'   , xmlParts : [], depth : 2},
           menu3   : {name : 'menu'   , type : 'array'  , parent : 'menu2'   , xmlParts : [], depth : 3},

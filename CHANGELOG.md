@@ -4,6 +4,12 @@
     - Fix: The HTML content and static content are rendered in the expected order.
     - New: If static content and Carbone markers are mixed with an HTML formatter in the same paragraph, the html is isolated into a new paragraph and each element are seperated above or below. For example, the following template on a text editor `<paragraph>A rocket is made of {d.data:html} {d.details}, this is cool!</paragraph>` will be transform into 3 paragraphs on the generated report `<paragraph>A rocket is made of </paragraph><paragraph>{d.data:html}</paragraph><paragraph> {d.details}, this is cool!</paragraph>`.
     - Improved HTML rendering stability when it is mixed with lists, tables, and images.
+  - [EE] Dynamic Checkbox are supported only for ODT file. A marker should be inserted into the checkbox property "name" and it is used to set the value of the checkbox on the generated report. The checkbox is ticked (checked) when the value is a Boolean with the value "true", a non empty string, a non empty array or a non empty object. If the exported file type is a PDF, the checkbox can be edited on the generated document. An ODT document created from MS Word that include checkboxes does not work. It is also not possible to create a list of checkboxes with the expressions `[i] / [i+1]`.
+  - Accept `null` for the attribute `complement` in `options`
+
+### v3.2.7
+  - Release July 21th 2021
+  - Fix corrupted document when accessing a sub-object in an array `{d.surrounding[i].subArray[0].subObject.id}`, within a surrounding loop
 
 ### v3.2.6
   - Release June 15th 2021

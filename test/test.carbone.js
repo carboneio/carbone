@@ -633,6 +633,14 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should return the current timestamp in UTC with c.now even if complement is null', function (done) {
+      carbone.renderXML('{c.now}', {}, { complement : null }, function (err, result) {
+        helper.assert(err+'', 'null');
+        var _parseDate = new Date(result);
+        helper.assert(((Date.now()/1000) - _parseDate.getTime()) < 1, true) ;
+        done();
+      });
+    });
     it('should execute formatter if the data object is empty with the formatter ifEmpty', function (done) {
       var data = {};
       carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : {}}, function (err, result) {

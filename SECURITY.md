@@ -1,6 +1,6 @@
 # Security Policy
 
-Ideolys takes the security of our software products and services seriously, which includes all source code repositories managed through our GitHub organizations.
+CarboneIO SAS takes the security of our software products and services seriously, which includes all source code repositories managed through our GitHub organizations.
 
 While the discovery of new vulnerabilities is rare, we also recommend always using the latest versions of CarboneJS to ensure your application remains as secure as possible.
 
@@ -29,4 +29,4 @@ Thank you for improving the security of Carbone and its ecosystem. Your efforts 
 ## Comments on this Policy
 
 If you have suggestions on how this process could be improved please submit a
-[pull request](https://github.com/Ideolys/carbone/issues/new) to discuss.
+[pull request](https://github.com/carboneio/carbone/issues/new) to discuss.

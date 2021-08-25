@@ -21,10 +21,10 @@
     <img src="https://badgen.net/bundlephobia/minzip/carbone" alt="minizip badge">
   </a>
   <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
-    <img src="https://badgen.net/docker/pulls/ideolys/carbone-env-docker?icon=docker" alt="docker badge">
+    <img src="https://badgen.net/docker/pulls/carbone/carbone-env-docker?icon=docker" alt="docker badge">
   </a>
-  <a href="https://github.com/Ideolys/carbone">
-    <img src="https://badgen.net/github/forks/ideolys/carbone?icon=github" alt="github fork badge">
+  <a href="https://github.com/carboneio/carbone">
+    <img src="https://badgen.net/github/forks/carboneio/carbone?icon=github" alt="github fork badge">
   </a>
 </p>
 
@@ -261,7 +261,7 @@ Carbone有两个版本：
 
 ## 贡献者
 
-感谢所有Ideolys的贡献者（按随机顺序排列）
+感谢所有CarboneIO的贡献者（按随机顺序排列）
   - Florian Bezagu
   - Matthieu Robin
   - Arnaud Lelièvre

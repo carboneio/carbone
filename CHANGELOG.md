@@ -1,3 +1,6 @@
+### v3.2.8
+  - Accept `null` for the attribute `complement` in `options`
+
 ### v3.2.7
   - Release July 21th 2021
   - Fix corrupted document when accessing a sub-object in an array `{d.surrounding[i].subArray[0].subObject.id}`, within a surrounding loop

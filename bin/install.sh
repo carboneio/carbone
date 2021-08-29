@@ -121,7 +121,7 @@ if id $CARBONE_USER &>/dev/null; then
   print_success "OK"
 else
   print_info "Create carbone user "
-  adduser $CARBONE_USER --no-create-home --disabled-password --system --group
+  adduser $CARBONE_USER --no-create-home --disabled-password --system --group > /dev/null
   exit_on_command_error "Cannot create user $CARBONE_USER"
   print_success "OK"
 fi
@@ -158,7 +158,7 @@ chown $CARBONE_USER:$CARBONE_USER $CARBONE_BIN_PATH
 exit_on_command_error "Cannot change owner of $CARBONE_BIN_PATH"
 print_success "OK"
 
-print_info "Create $CARBONE_SERVICE_NAME systemd service"
+print_info "Create $CARBONE_SERVICE_NAME systemd service "
 cp $SYSTEMD_TEMPLATE $SYSTEMD_SERVICE_PATH
 exit_on_command_error "Cannot copy ${SYSTEMD_TEMPLATE} to ${SYSTEMD_SERVICE_PATH}. Execute 'carbone-ee install' again if ${SYSTEMD_TEMPLATE} does not exit."
 print_success "OK"
@@ -179,7 +179,7 @@ exit_on_command_error "Cannot reload or enable service $CARBONE_SERVICE_NAME"
 print_success "OK"
 if [ ! "$NO_START" = true ]; then
   print_info "Starting service "
-  systemctl start $CARBONE_SERVICE_NAME
+  systemctl start $CARBONE_SERVICE_NAME > /dev/null
   print_success "OK"
 fi
 

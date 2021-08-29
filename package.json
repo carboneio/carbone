@@ -9,7 +9,7 @@
   },
   "author": "David Grelaud",
   "private": true,
-  "carbonePublicationDate": "2021-07-21T08:08:49.922Z",
+  "carbonePublicationDate": "2021-06-28T05:41:47.552Z",
   "license": "Carbone-Enterprise-Edition",
   "homepage": "https://carbone.io",
   "keywords": [
@@ -56,12 +56,12 @@
   },
   "devDependencies": {
     "eslint": "=7.7.0",
-    "form-data": "^3.0.0",
+    "form-data": "=3.0.0",
     "mocha": "=8.4.0",
     "nock": "=12.0.0",
-    "pdfjs-dist": "2.8.335",
+    "pdfjs-dist": "=2.8.335",
     "sinon": "=9.0.2",
-    "xml-beautifier": "0.4.3"
+    "xml-beautifier": "=0.4.3"
   },
   "engines": {
     "node": ">= 10.15.0"

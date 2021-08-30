@@ -23,7 +23,7 @@
     "json"
   ],
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit",
+    "test": "./node_modules/.bin/mocha test --timeout 100000 --exit",
     "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
     "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
     "build": "pkg -o ./build/carbone-ee .",

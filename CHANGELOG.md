@@ -1,4 +1,5 @@
 ### v3.3.0
+  - Release August 30th 2021
   - [EE] HTML Formatter:
     - Fix: The HTML content is rendered without adding an empty line above it.
     - Fix: The HTML content and static content are rendered in the expected order.

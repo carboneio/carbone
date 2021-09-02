@@ -2,25 +2,28 @@ Carbone On-Premise Documentation
 ============================
 ## Table of content
 
-- [Installations](#Installations)
-  - [Basic install](#Basic-Installation)
-  - [Systemd install](#Installation-from-systemd-(Ubuntu/Debian-ONLY))
-  - [Install LibreOffice and why?](#How-and-why-install-LibreOffice?)
-- [Carbone Options overview](#Carbone-Options-overview)
-  - [CLI](#CLI-options)
-  - [Environment variable](#Environment-variable-options)
-  - [Configuration file](#Configuration-file-options)
-- [How to use Carbone On-premise?](#How-to-use-Carbone-On-premise?)
-- [Customise Carbone On-premise](#Customise-Carbone-On-premise)
-  - [Plugins](#Plugins)
-  - [Middlewares](#Middlewares)
-- [Carbone Studio Light](#Carbone-studio-light)
+- [Installations](#installations)
+  - [Basic install](#basic-installation)
+  - [Systemd install](#installation-from-systemd)
+  - [Install LibreOffice and why?](#how-and-why-install-libreoffice)
+  - [Docker CLI install](#installation-from-docker-cli)
+  - [Docker Compose install](#installation-from-docker-compose)
+- [Carbone Options overview](#carbone-options-overview)
+  - [CLI](#cli-options)
+  - [Environment variable](#environment-variable-options)
+  - [Configuration file](#configuration-file-options)
+- [How to use Carbone On-premise?](#how-to-use-carbone-on-premise)
+- [Customise Carbone On-premise](#customise-carbone-on-premise)
+  - [Plugins](#plugins)
+  - [Middlewares](#middlewares)
+  - [Carbone Studio Light](#carbone-studio-light)
 
 ## Installations
 
 Carbone On-premise can be installed in different ways:
 
   - Self-contained binary executable + external LibreOffice (used for conversion)
+  - Docker container (Libre Office is included)
   - Debian/Ubuntu package (coming soon)
 
 ### Basic Installation
@@ -38,7 +41,11 @@ If an error appears during the start up, you must verify:
 - if your license is valid
 - if CLI options and values are valid
 
-### Installation from systemd (Ubuntu/Debian ONLY)
+You must install LibreOffice to generate PDF documents, [read instructions](#how-and-why-install-libreoffice).
+
+### Installation from systemd
+
+> Working only for Ubuntu or Debian.
 
 Carbone On-Premise contains automatic installation scripts to daemonize with systemd. It has been carefully configured to provide a high level of security.
 
@@ -50,11 +57,11 @@ Carbone On-Premise contains automatic installation scripts to daemonize with sys
   sudo ./install.sh
 ```
 
-The service is configured to run with "carbone" user (automatically created) in the "/var/www/carbone-ee" directory. 
+The service is configured to run with "carbone" user (automatically created) in the "/var/www/carbone-ee" directory.
 It is possible to overwrite values through environment variables `CARBONE_USER` and `CARBONE_WORKDIR`.
 
+You must install LibreOffice to generate PDF documents, [read instructions](#how-and-why-install-libreoffice).
 ## How and why install LibreOffice?
-
 #### on OSX
 
 - Install LibreOffice normally using the stable version from https://www.libreoffice.org/
@@ -103,6 +110,56 @@ Carbone does a lot of thing behind the scene:
 - manages multiple LibreOffice workers to maximize performance (configurable number of workers)
 - automatically restarts LibreOffice worker if it crashes or does not respond
 - job queue, re-try conversion two times if something bad happen
+
+### Installation from Docker CLI
+
+> Installing Carbone On-premise with docker doesn't need LibreOffice to be installed, it is already included on the Docker image.
+
+Build the image with the command:
+```sh
+$ docker build --platform "linux/amd64" -t carbone-ee:latest .
+```
+Then start the container:
+```sh
+$ docker container run --name carbone-ee -p 4000:4000 --platform linux/amd64 --volume=/var/tmp/key:/key --env CARBONE_EE_LICENSEDIR=/key --entrypoint ./carbone-ee-linux carbone-ee:latest webserver
+## For background mode, add the -d option
+```
+The server is listening by default on `http://localhost:4000`. To change configuration, add [CLI options](#cli-options) at the end of the command.
+
+Stop the container:
+```
+docker stop carbone-ee
+```
+Remove the container:
+```
+docker container rm carbone-ee
+```
+
+
+### Installation from Docker Compose
+
+> Installing Carbone On-premise with docker doesn't need LibreOffice to be installed, it is already included on the Docker image.
+
+Open a terminal where the `Dockerfile` and the `docker-compose.yml` are located.
+
+Start the server with the command:
+```sh
+$ docker-compose up
+## For background mode, add the -d option
+```
+The server is listening by default on `http://localhost:4000`. To change configuration, add [CLI options](#cli-options) on the `docker-compose.xml`.
+
+
+Command to stop the container without removing it:
+```sh
+$ docker-compose stop
+```
+Command to stop the container and removes the container, networks, volumes, and images created by up:
+```sh
+$ docker-compose down
+```
+Discover more commands by reading the [docker-compose CLI overview](https://docs.docker.com/compose/reference/).
+
 
 ## Carbone Options overview
 
@@ -222,8 +279,9 @@ Carbone On-Premise works the same way as Carbone Render API, the endpoints list:
 
 [Click here to learn more about the API.](https://carbone.io/api-reference.html#carbone-render-api.)
 
-Carbone Render SDKs [on Github](https://github.com/Ideolys?q=sdk) can be used to request Carbone On-Premise easily in multiple languages (Node, Go, Python, PHP, ...).
+For testing in few minutes, copy and past [CURL command example](https://carbone.io/api-reference.html#carbone-render-curl) on your terminal.
 
+For an easy and fast integration, SDKs are available [on Github](https://github.com/carboneio?q=sdk) to request the API in multiple languages (Node, Go, Python, PHP, ...).
 
 ## Customise Carbone On-premise
 
@@ -443,7 +501,7 @@ module.exports = {
 }
 ```
 
-## Carbone Studio Light
+### Carbone Studio Light
 
 Carbone Studio Light is a web interface to preview reports with a JSON editor.
 It is a "light" version of [https://studio.carbone.io](https://studio.carbone.io) without files and version management.

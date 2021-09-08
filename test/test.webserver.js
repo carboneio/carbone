@@ -158,6 +158,8 @@ describe('Webserver', () => {
         const _currencyTarget = 'EUR';
         const _licenseDir = '/var/tmp/test/';
         const _licenseDirPrev = params.licenseDir;
+        const _maxDataSize = 100 * 1024 * 1024;
+        assert.strictEqual(params.maxDataSize, 60 * 1024 * 1024); // default datasize 60MB
         webserver = require('../lib/webserver');
         webserver.handleParams(['--port', _port,
                                 '--workdir', _workdir,
@@ -171,7 +173,8 @@ describe('Webserver', () => {
                                 '--timezone', _timezone,
                                 '--currencySource', _currencySource,
                                 '--currencyTarget', _currencyTarget,
-                                '--licenseDir', _licenseDir], () => {
+                                '--licenseDir', _licenseDir,
+                                '--maxDataSize', _maxDataSize], () => {
           assert.strictEqual(params.port, _port);
           assert.strictEqual(fs.existsSync(_workdir), true);
           helper.rmDirRecursive(_workdir);
@@ -193,6 +196,7 @@ describe('Webserver', () => {
           params.currencyTarget = '';
           assert.strictEqual(params.licenseDir, _licenseDir);
           params.licenseDir = _licenseDirPrev;
+          assert.strictEqual(params.maxDataSize, _maxDataSize);
           webserver.stopServer(done);
         });
       });
@@ -205,6 +209,7 @@ describe('Webserver', () => {
         process.env.CARBONE_EE_ATTEMPTS = 2;
         process.env.CARBONE_EE_BIND = '127.0.0.1';
         process.env.CARBONE_EE_AUTHENTICATION = 'true';
+        process.env.CARBONE_EE_MAXDATASIZE = 200 * 1024 * 1024;
         webserver = require('../lib/webserver');
         webserver.handleParams([], () => {
           assert.strictEqual(params.port + '', process.env.CARBONE_EE_PORT);
@@ -214,6 +219,7 @@ describe('Webserver', () => {
           assert.strictEqual(params.bind, process.env.CARBONE_EE_BIND);
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication + '', process.env.CARBONE_EE_AUTHENTICATION);
+          assert.strictEqual(params.maxDataSize + '', process.env.CARBONE_EE_MAXDATASIZE);
           // clean
           helper.rmDirRecursive(process.env.CARBONE_EE_WORKDIR);
           delete process.env.CARBONE_EE_PORT;
@@ -222,6 +228,7 @@ describe('Webserver', () => {
           delete process.env.CARBONE_EE_ATTEMPTS;
           delete process.env.CARBONE_EE_BIND;
           delete process.env.CARBONE_EE_AUTHENTICATION;
+          delete process.env.CARBONE_EE_MAXDATASIZE;
           webserver.stopServer(done);
         });
       });
@@ -235,7 +242,8 @@ describe('Webserver', () => {
           bind           : '127.0.0.1',
           factories      : 4,
           attempts       : 2,
-          authentication : true
+          authentication : true,
+          maxDataSize    : 120 * 1024 * 1024
         };
         fs.mkdirSync(_workdirConfig, { recursive : true });
         fs.writeFileSync(path.join(_workdirConfig, 'config.json'), JSON.stringify(_configContent));
@@ -247,6 +255,7 @@ describe('Webserver', () => {
           assert.strictEqual(params.bind, _configContent.bind);
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication, _configContent.authentication);
+          assert.strictEqual(params.maxDataSize, _configContent.maxDataSize);
           helper.rmDirRecursive(_workdir);
           webserver.stopServer(done);
         });
@@ -570,7 +579,7 @@ describe('Webserver', () => {
     it('should upload the template in base64 with a payload if user is authenticated', (done) => {
       let _data = {
         template : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'}),
-        payload: "thisIsAPayload"
+        payload  : 'thisIsAPayload'
       };
 
       get.concat(getBody(4001, '/template', 'POST', _data, token), (err, res, data) => {

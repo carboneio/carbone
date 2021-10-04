@@ -1,3 +1,5 @@
+### v3.3.2
+  - [EE] Dynamic Image fix: image types verification support uppercase and lower case formats
 ### v3.3.1
   - [EE] New Carbone On-premise: Pass the option "maxDataSize" to change the maximum JSON data size when rendering a report. The value must be **bytes**. The default value is 60MB.
 

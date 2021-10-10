@@ -755,6 +755,38 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml even if the temporary image type is in uppercase', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.JPG"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>',
+          },
+          {
+            name : '[Content_Types].xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="JPG" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.JPG"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.jpg" Id="rIdCarbone0"/></Relationships>';
+        const _expectedContentType = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="JPG" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('carbone.io/logo.jpg', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'jpg'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helperTest.assert(_template.files[0].data, _expectedContent);
+        helperTest.assert(_template.files[1].data, _expectedContentType);
+        helperTest.assert(_template.files[2], {
+          name   : 'word/media/CarboneImage0.jpg',
+          parent : '',
+          data   : '1234'
+        });
+      });
+
       it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define a different media path because the template is coming from word online', function () {
         const _template = {
           files : [{
@@ -895,7 +927,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    describe('DOCX pdefineImageContentTypeDocx (part of postProcessDocx)', function () {
+    describe('DOCX defineImageContentTypeDocx (part of postProcessDocx)', function () {
       it('should not add the image type definition if the image type list is empty []', function () {
         const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
                             '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
@@ -959,6 +991,27 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
                             '<Default Extension="jpg" ContentType="image/jpeg"/>'+
                             '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
         image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'png', 'jpeg', 'svg', 'svg', 'jpg']);
+        helperTest.assert(_template.files[0].data, _expectedXml);
+      });
+      it('should not add the image type if it is already defined in uppercase', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="PnG" ContentType="image/png"/>' +
+                    '<Default Extension="JPG" ContentType="image/jpeg"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="PnG" ContentType="image/png"/>'+
+                            '<Default Extension="JPG" ContentType="image/jpeg"/>'+
+                            '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
+
+        image.defineImageContentTypeDocx(_template, ['jpg', 'pNg', 'Svg']);
         helperTest.assert(_template.files[0].data, _expectedXml);
       });
       it ('should not add the image type definition if the image mime type format does not exist [PNG, JPG, SVG, JSON, HTML]', function () {

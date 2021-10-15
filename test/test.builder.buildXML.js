@@ -175,6 +175,18 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it.only('should automatically repeat the xml if the root is an array of objects', function (done) {
+    var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1*qty].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , qty : 1},
+      {brand : 'Tesla motors', qty : 0},
+      {brand : 'Toyota'      , qty : 3}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row></xml>');
+      done();
+    });
+  });
   it('should accept markers next to other loop markers (without whitespaces)', function (done) {
     var _xml = '<xml> {d.id}<t_row>{d.id}{d.cars[i].brand}{d.id}</t_row>{d.id}<t_row>{d.id}{d.cars[i+1].brand}{d.id}</t_row>{d.id}</xml>';
     var _data = {

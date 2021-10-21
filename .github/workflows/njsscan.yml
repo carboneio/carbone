@@ -13,4 +13,4 @@ jobs:
       id: njsscan
       uses: ajinabraham/njsscan-action@master
       with:
-        args: '.'
+        args: 'lib/* formatters/* bin/* studio/*'

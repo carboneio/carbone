@@ -307,7 +307,36 @@ function barcode (data, type) {
 }
 
 module.exports = {
-  barcode : barcode
+  // barcode : barcode
+  barcode : (data, type) => {
+    let _opt = {};
+    if (type === 'mailmark') {
+      _opt.type = '9'; //7, 9 or 29 The type number should be a string
+    }
+    if (type==='rectangularmicroqrcode') {
+      _opt.version= "R17x139"
+    }
+    if (type==='gs1-cc') {
+      _opt.ccversion='b';
+      _opt.cccolumns=4;
+    }
+    if (type === 'maxicode') {
+      // Mode 2 Formatted data containing a Structured Carrier Message with a numeric (US domestic) postal code.
+      // Mode 3 Formatted data containing a Structured Carrier Message with an alphanumeric (international) postal code.
+      _opt.mode = 2;
+      _opt.parse = true;
+    }
+
+    return JSON.stringify({
+      bcid        : type,
+      text        : data,
+      scale       : 3,
+      rotate      : 'N',
+      includetext : true,            // Show human-readable text
+      textxalign  : 'center',        // Always good to set this
+      ..._opt,
+    });
+  }
 };
 
 

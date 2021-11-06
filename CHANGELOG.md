@@ -1,3 +1,8 @@
+### v3.3.3
+  - [EE] NEW: Deffered rendering with a webhook, it is dedicated to render huge reports:
+    1. Render a document as usual with the request `POST render.carbone.io/render/:templateID` with the JSON dataset into the body request AND you have to insert the header `carbone-webhook-success-url` as a callback URL. It is an endpoint of your server listening when a document is rendered.
+    2. Carbone will generate your document and it will notify your webhook with a renderID
+    3. Retrieve the generated document with a `GET render.carbone.io/render/:renderID` and voilà!
 ### v3.3.2
   - Release October 11th 2021
   - [EE] Dynamic Image fix: image types verification support uppercase and lower case formats

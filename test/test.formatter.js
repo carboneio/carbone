@@ -1400,91 +1400,109 @@ describe('formatter', function () {
     });
   });
 
-  describe('Barcodes', function () {
+  describe.only('Barcodes', function () {
 
-    it('should return an empty string with a undefined barcode format', () => {
-      helper.assert(barcodeFormatter.barcode('fweffewfweq'), '');
+    describe('Barcode as a font', function () {
+      it('should return an empty string with a undefined barcode format', () => {
+        helper.assert(barcodeFormatter.barcode('fweffewfweq'), '');
+      });
+
+      it('should format the ean13 barcode to EAN13.TTF code (ean13 format)', () => {
+        helper.assert(barcodeFormatter.barcode('9780201134476', 'ean13'), '9HSKCKB*bdeehg+');
+        helper.assert(barcodeFormatter.barcode('8056459824973', 'ean13'), '8APGOPJ*icejhd+');
+      });
+
+      it('should return an empty string with a string of letters (ean13 format)', () => {
+        helper.assert(barcodeFormatter.barcode('fweffewfweq', 'ean13'), '');
+      });
+
+      it('should return an empty string with less than 13 numbers (ean13 format)', () => {
+        helper.assert(barcodeFormatter.barcode('805645982497', 'ean13'), '');
+      });
+
+      it('should format the ean8 barcode to EAN13.TTF code (ean8 format)',  () => {
+        helper.assert(barcodeFormatter.barcode('96385074', 'ean8'), ':JGDI*fahe+');
+        helper.assert(barcodeFormatter.barcode('35967101', 'ean8'), ':DFJG*hbab+');
+      });
+
+      it('should return an empty string with a string of letters (ean8 format)', () => {
+        helper.assert(barcodeFormatter.barcode('fweffewfweq', 'ean8'), '');
+      });
+
+      it('should return an empty string with less than 8 numbers (ean8 format)', () => {
+        helper.assert(barcodeFormatter.barcode('8056', 'ean8'), '');
+      });
+
+      it('should format the code39 barcode to CODE39.TTF code (code39 format)',  () => {
+        helper.assert(barcodeFormatter.barcode('GSJ-220097', 'code39'), '*GSJ-220097*');
+        helper.assert(barcodeFormatter.barcode('96385074', 'code39'), '*96385074*');
+        helper.assert(barcodeFormatter.barcode('ASDFGHJKLZXCVBNQWERTYUIOP-.$/+% ', 'code39'), '*ASDFGHJKLZXCVBNQWERTYUIOP-.$/+% *');
+      });
+
+      it('should return an empty string with a wrong character (code39 format)', () => {
+        helper.assert(barcodeFormatter.barcode('80a56', 'code39'), '');
+        helper.assert(barcodeFormatter.barcode('w8056', 'code39'), '');
+        helper.assert(barcodeFormatter.barcode('8056,', 'code39'), '');
+        helper.assert(barcodeFormatter.barcode('', 'code39'), '');
+        helper.assert(barcodeFormatter.barcode(null, 'code39'), '');
+      });
+
+      it('should format the ean128 barcode to EAN128.TTF code (ean128 format)',  () => {
+        helper.assert(barcodeFormatter.barcode('3754 KC 75', 'ean128'), 'ÒEVÍ KC 75)Ó');
+        helper.assert(barcodeFormatter.barcode('3754KC75', 'ean128'), 'ÒEVÍKC75QÓ');
+        helper.assert(barcodeFormatter.barcode('0312345600001', 'ean128'), 'Ò#,BX  Í1ZÓ');
+        helper.assert(barcodeFormatter.barcode('(15)071231(10)LOTA', 'ean128'), "Ñ(15)Ì',?Í(10)LOTASÓ");
+        helper.assert(barcodeFormatter.barcode('DR39', 'ean128'), 'ÑDR39xÓ');
+        helper.assert(barcodeFormatter.barcode('ZB65', 'ean128'), 'ÑZB65gÓ');
+        helper.assert(barcodeFormatter.barcode('~2020112345678901231', 'ean128'), 'Ñ~Ì44+7Mcy!7Í1PÓ');
+        helper.assert(barcodeFormatter.barcode('(01)12345678901231', 'ean128'), 'Ñ(01)Ì,BXnz,?xÓ');
+        helper.assert(barcodeFormatter.barcode('00 12345678 0000000001', 'ean128'), 'Ñ00 Ì,BXnÍ Ì    !6Ó');
+        helper.assert(barcodeFormatter.barcode('[FNC1] 21 12345 [FNC1] 11 (01)123', 'ean128'), 'Ñ[FNC1] 21 12345 [FNC1] 11 (01)123;Ó');
+      });
+
+      it('should return an empty string with a wrong arguments (ean128 format)', () => {
+        helper.assert(barcodeFormatter.barcode(null, 'ean128'), '');
+        helper.assert(barcodeFormatter.barcode(undefined, 'ean128'), '');
+        helper.assert(barcodeFormatter.barcode('', 'ean128'), '');
+      });
+
+      it('should be fast to format ean128 barcode',  () => {
+        let _loops = 10000;
+        let _res = [];
+        let _start = process.hrtime();
+        let _barcodes  = ['00 12345678 0000000001', '(15)071231(10)LOTA', 'DR39'];
+        for (let i = 0; i < _loops; i++) {
+          _res.push(barcodeFormatter.barcode(_barcodes[i%3], 'ean128'));
+        }
+        let _diff = process.hrtime(_start);
+        let _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+        console.log('\n barcode e128 number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
+        helper.assert(_elapsed > 50, false, 'barcode(ean128) is too slow');
+      });
     });
 
-    it('should format the ean13 barcode to EAN13.TTF code (ean13 format)', () => {
-      helper.assert(barcodeFormatter.barcode('9780201134476', 'ean13'), '9HSKCKB*bdeehg+');
-      helper.assert(barcodeFormatter.barcode('8056459824973', 'ean13'), '8APGOPJ*icejhd+');
-    });
+    describe.only('Barcode as an Image', function () {
+      describe('barcode and isImage formatters', function () {
+        it('should return the data URI of the value and type of barcode', function () {
+          const _context = {};
+          barcodeFormatter.isImage.call(_context);
+          helper.assert(_context.isBarcodeImage, true);
+          helper.assert(barcodeFormatter.barcode.call(_context, '978-1-56581-231-4 90000', 'isbn'), 'bcid=isbn&text=978-1-56581-231-4%2090000');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'http://goo.gl/0bis', 'qrcode'), 'bcid=qrcode&text=http%3A%2F%2Fgoo.gl%2F0bis');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '2112345678900', 'ean13'), 'bcid=ean13&text=2112345678900');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '02345673', 'ean8'), 'bcid=ean8&text=02345673');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '5715311709768', 'code128'), 'bcid=code128&text=5715311709768');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'THIS IS CODE 39', 'code39'), 'bcid=code39&text=THIS%20IS%20CODE%2039');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '(01)95012345678903(3103)000123', 'gs1-128'), 'bcid=gs1-128&text=(01)95012345678903(3103)000123');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '(01)03453120000011(8200)http://www.abc.net(10)ABCD1234(410)9501101020917',  'gs1qrcode'), 'bcid=gs1qrcode&text=(01)03453120000011(8200)http%3A%2F%2Fwww.abc.net(10)ABCD1234(410)9501101020917');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '[)>^03001^02996152382802^029840^029001^0291Z00004951^029UPSN^02906X610^029159^0291234567^0291/1^029^029Y^029634 ALPHA DR^029PITTSBURGH^029PA^029^004',  'maxicode'), 'bcid=maxicode&text=%5B)%3E%5E03001%5E02996152382802%5E029840%5E029001%5E0291Z00004951%5E029UPSN%5E02906X610%5E029159%5E0291234567%5E0291%2F1%5E029%5E029Y%5E029634%20ALPHA%20DR%5E029PITTSBURGH%5E029PA%5E029%5E004');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'SPC\n0200\n1\nCH5800791123000889012\nS\nRobert Schneider AG\nRue du Lac\n1268\n2501\nBiel\nCH\n\n199.95\nCHF\nKPia-Maria Rutschmann-Schnyder\nGrosse Marktgasse 28\n9400 Rorschach\n\n\nCH\nSCOR\nRF18539007547034\n\nEPD\n',  'swissqrcode'), 'bcid=swissqrcode&text=SPC%0A0200%0A1%0ACH5800791123000889012%0AS%0ARobert%20Schneider%20AG%0ARue%20du%20Lac%0A1268%0A2501%0ABiel%0ACH%0A%0A199.95%0ACHF%0AKPia-Maria%20Rutschmann-Schnyder%0AGrosse%20Marktgasse%2028%0A9400%20Rorschach%0A%0A%0ACH%0ASCOR%0ARF18539007547034%0A%0AEPD%0A');
+        });
+      });
 
-    it('should return an empty string with a string of letters (ean13 format)', () => {
-      helper.assert(barcodeFormatter.barcode('fweffewfweq', 'ean13'), '');
-    });
+      describe('generateBarcodeImage', function () {
 
-    it('should return an empty string with less than 13 numbers (ean13 format)', () => {
-      helper.assert(barcodeFormatter.barcode('805645982497', 'ean13'), '');
-    });
-
-    // it('should return an empty string with a false barecode control key (ean13 format)', () => {
-    //   helper.assert(barcodeFormatter.barcode('8056459824972', 'ean13'), '');
-    // });
-
-    it('should format the ean8 barcode to EAN13.TTF code (ean8 format)',  () => {
-      helper.assert(barcodeFormatter.barcode('96385074', 'ean8'), ':JGDI*fahe+');
-      helper.assert(barcodeFormatter.barcode('35967101', 'ean8'), ':DFJG*hbab+');
-    });
-
-    it('should return an empty string with a string of letters (ean8 format)', () => {
-      helper.assert(barcodeFormatter.barcode('fweffewfweq', 'ean8'), '');
-    });
-
-    it('should return an empty string with less than 8 numbers (ean8 format)', () => {
-      helper.assert(barcodeFormatter.barcode('8056', 'ean8'), '');
-    });
-
-    // it('should return an empty string with a false barecode control key (ean8 format)', () => {
-    //   helper.assert(barcodeFormatter.barcode('35967100', 'ean8'), '');
-    // });
-
-    it('should format the code39 barcode to CODE39.TTF code (code39 format)',  () => {
-      helper.assert(barcodeFormatter.barcode('GSJ-220097', 'code39'), '*GSJ-220097*');
-      helper.assert(barcodeFormatter.barcode('96385074', 'code39'), '*96385074*');
-      helper.assert(barcodeFormatter.barcode('ASDFGHJKLZXCVBNQWERTYUIOP-.$/+% ', 'code39'), '*ASDFGHJKLZXCVBNQWERTYUIOP-.$/+% *');
-    });
-
-    it('should return an empty string with a wrong character (code39 format)', () => {
-      helper.assert(barcodeFormatter.barcode('80a56', 'code39'), '');
-      helper.assert(barcodeFormatter.barcode('w8056', 'code39'), '');
-      helper.assert(barcodeFormatter.barcode('8056,', 'code39'), '');
-      helper.assert(barcodeFormatter.barcode('', 'code39'), '');
-      helper.assert(barcodeFormatter.barcode(null, 'code39'), '');
-    });
-
-    it('should format the ean128 barcode to EAN128.TTF code (ean128 format)',  () => {
-      helper.assert(barcodeFormatter.barcode('3754 KC 75', 'ean128'), 'ÒEVÍ KC 75)Ó');
-      helper.assert(barcodeFormatter.barcode('3754KC75', 'ean128'), 'ÒEVÍKC75QÓ');
-      helper.assert(barcodeFormatter.barcode('0312345600001', 'ean128'), 'Ò#,BX  Í1ZÓ');
-      helper.assert(barcodeFormatter.barcode('(15)071231(10)LOTA', 'ean128'), "Ñ(15)Ì',?Í(10)LOTASÓ");
-      helper.assert(barcodeFormatter.barcode('DR39', 'ean128'), 'ÑDR39xÓ');
-      helper.assert(barcodeFormatter.barcode('ZB65', 'ean128'), 'ÑZB65gÓ');
-      helper.assert(barcodeFormatter.barcode('~2020112345678901231', 'ean128'), 'Ñ~Ì44+7Mcy!7Í1PÓ');
-      helper.assert(barcodeFormatter.barcode('(01)12345678901231', 'ean128'), 'Ñ(01)Ì,BXnz,?xÓ');
-      helper.assert(barcodeFormatter.barcode('00 12345678 0000000001', 'ean128'), 'Ñ00 Ì,BXnÍ Ì    !6Ó');
-      helper.assert(barcodeFormatter.barcode('[FNC1] 21 12345 [FNC1] 11 (01)123', 'ean128'), 'Ñ[FNC1] 21 12345 [FNC1] 11 (01)123;Ó');
-    });
-
-    it('should return an empty string with a wrong arguments (ean128 format)', () => {
-      helper.assert(barcodeFormatter.barcode(null, 'ean128'), '');
-      helper.assert(barcodeFormatter.barcode(undefined, 'ean128'), '');
-      helper.assert(barcodeFormatter.barcode('', 'ean128'), '');
-    });
-
-    it('should be fast to format ean128 barcode',  () => {
-      let _loops = 10000;
-      let _res = [];
-      let _start = process.hrtime();
-      let _barcodes  = ['00 12345678 0000000001', '(15)071231(10)LOTA', 'DR39'];
-      for (let i = 0; i < _loops; i++) {
-        _res.push(barcodeFormatter.barcode(_barcodes[i%3], 'ean128'));
-      }
-      let _diff = process.hrtime(_start);
-      let _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
-      console.log('\n barcode e128 number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
-      helper.assert(_elapsed > 50, false, 'barcode(ean128) is too slow');
+      });
     });
   });
 });

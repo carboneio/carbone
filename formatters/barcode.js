@@ -279,64 +279,70 @@ function _code39 (data) {
 }
 
 /**
+ *
+ * Formatter injected before the `:barcode` formatter is used into image.
+ * It is used to know if the barcode is an image or not.
+ *
+ * @private
+ * @param {*} value
+ * @returns
+ */
+function isImage (value) {
+  this.isImage = true;
+  return value;
+}
+
+/**
  * Translate a barcode to specific font code.
  *
- * You have to apply the barecode font to your text in order to display the barcode.
- *
- * @example [ "8056459824973" ,  "ean13"   ]
- * @example [ "9780201134476" ,  "ean13"   ]
- * @example [ "3754 KC 75"    ,  "ean128"  ]
- * @example [ "DR39"          ,  "ean128"  ]
- * @example [ "35967101"      ,  "ean8"    ]
- * @example [ "96385074"      ,  "ean8"    ]
- * @example [ "GSJ-220097"    ,  "code39"  ]
- * @example [ "ASDFGH-.$/+% " ,  "code39"  ]
- *
- * @version 2.0.0
+ * @version 3.0.0 UPDATED
  *
  * @param   {String} data Barcode numbers
  * @param   {String} type Barcode type: `ean13`, `ean8`, `ean128` or `code39`
  * @returns {String}      translated  to EAN13.TTF font code or empty string
  */
 function barcode (data, type) {
-  var _fc = barcodesMethods.get(type);
-  if (_fc !== undefined ) {
-    return _fc(data);
+  if (!this.isImage) {
+    /** BARCODE as a FONT - Previous system */
+    var _fc = barcodesMethods.get(type);
+    if (_fc !== undefined ) {
+      return _fc(data);
+    }
+    return '';
   }
-  return '';
+  this.isImage = false;
+    /** BARCODE as an IMAGE */
+  let _opt = {};
+  if (type === 'mailmark') {
+    _opt.type = '9'; //7, 9 or 29 The type number should be a string
+  }
+  if (type==='rectangularmicroqrcode') {
+    _opt.version= "R17x139"
+  }
+  if (type==='gs1-cc') {
+    _opt.ccversion='b';
+    _opt.cccolumns=4;
+  }
+  if (type === 'maxicode') {
+    // Mode 2 Formatted data containing a Structured Carrier Message with a numeric (US domestic) postal code.
+    // Mode 3 Formatted data containing a Structured Carrier Message with an alphanumeric (international) postal code.
+    _opt.mode = 2;
+    _opt.parse = true;
+  }
+  return JSON.stringify({
+    bcid        : type,
+    text        : data,
+    scale       : 3,
+    rotate      : 'N',
+    includetext : true,            // Show human-readable text
+    textxalign  : 'center',        // Always good to set this
+    ..._opt,
+  });
 }
 
 module.exports = {
-  // barcode : barcode
-  barcode : (data, type) => {
-    let _opt = {};
-    if (type === 'mailmark') {
-      _opt.type = '9'; //7, 9 or 29 The type number should be a string
-    }
-    if (type==='rectangularmicroqrcode') {
-      _opt.version= "R17x139"
-    }
-    if (type==='gs1-cc') {
-      _opt.ccversion='b';
-      _opt.cccolumns=4;
-    }
-    if (type === 'maxicode') {
-      // Mode 2 Formatted data containing a Structured Carrier Message with a numeric (US domestic) postal code.
-      // Mode 3 Formatted data containing a Structured Carrier Message with an alphanumeric (international) postal code.
-      _opt.mode = 2;
-      _opt.parse = true;
-    }
-
-    return JSON.stringify({
-      bcid        : type,
-      text        : data,
-      scale       : 3,
-      rotate      : 'N',
-      includetext : true,            // Show human-readable text
-      textxalign  : 'center',        // Always good to set this
-      ..._opt,
-    });
-  }
+  isImage,
+  barcode
 };
 
 

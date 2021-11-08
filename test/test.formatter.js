@@ -1482,7 +1482,7 @@ describe('formatter', function () {
     });
 
     describe.only('Barcode as an Image', function () {
-      describe('barcode and isImage formatters', function () {
+      describe(':barcode and :isImage formatters', function () {
         it('should return the data URI of the value and type of barcode', function () {
           const _context = {};
           barcodeFormatter.isImage.call(_context);
@@ -1502,6 +1502,39 @@ describe('formatter', function () {
 
       describe('generateBarcodeImage', function () {
 
+        it('should not generate if the bcid (barcode ID) is empty', function (done) {
+          barcodeFormatter.generateBarcodeImage('bcid=&text=2112345678900', function (err) {
+            helper.assert(err, 'Barcode generation error: Error: bwipp.undefinedEncoder: bcid is not defined');
+            done();
+          });
+        });
+
+        it('should not generate if the text is empty', function (done) {
+          barcodeFormatter.generateBarcodeImage('bcid=ean13', function (err) {
+            helper.assert(err, 'Barcode generation error: ReferenceError: bwip-js: bar code text not specified.');
+            done();
+          });
+        });
+
+        it('should generate an ean13 barcode base64 image from a url parameter format', function (done) {
+          barcodeFormatter.generateBarcodeImage('bcid=ean13&text=2112345678900', function (err, image) {
+            helper.assert(err, null);
+            helper.assert(image.data.toString('base64').length > 0, true);
+            helper.assert(image.extension, 'png');
+            helper.assert(image.mimetype, 'image/png');
+            done();
+          });
+        });
+
+        it('should generate an ean13 barcode base64 image from a url parameter format', function (done) {
+          barcodeFormatter.generateBarcodeImage('bcid=ean13&text=2112345678900', function (err, image) {
+            helper.assert(err, null);
+            helper.assert(image.data.toString('base64').length > 0, true);
+            helper.assert(image.extension, 'png');
+            helper.assert(image.mimetype, 'image/png');
+            done();
+          });
+        });
       });
     });
   });

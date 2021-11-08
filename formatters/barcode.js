@@ -1,3 +1,4 @@
+const bwipjs = require('bwip-js');
 
 let barcodesMethods = new Map();
 barcodesMethods.set('ean13', _ean13);
@@ -288,9 +289,11 @@ function _code39 (data) {
  * @returns
  */
 function isImage (value) {
-  this.isImage = true;
+  this.isBarcodeImage = true;
   return value;
 }
+
+
 
 /**
  * Translate a barcode to specific font code.
@@ -302,7 +305,7 @@ function isImage (value) {
  * @returns {String}      translated  to EAN13.TTF font code or empty string
  */
 function barcode (data, type) {
-  if (!this.isImage) {
+  if (!this.isBarcodeImage) {
     /** BARCODE as a FONT - Previous system */
     var _fc = barcodesMethods.get(type);
     if (_fc !== undefined ) {
@@ -310,39 +313,82 @@ function barcode (data, type) {
     }
     return '';
   }
-  this.isImage = false;
-    /** BARCODE as an IMAGE */
-  let _opt = {};
-  if (type === 'mailmark') {
-    _opt.type = '9'; //7, 9 or 29 The type number should be a string
-  }
-  if (type==='rectangularmicroqrcode') {
-    _opt.version= "R17x139"
-  }
-  if (type==='gs1-cc') {
-    _opt.ccversion='b';
-    _opt.cccolumns=4;
-  }
-  if (type === 'maxicode') {
-    // Mode 2 Formatted data containing a Structured Carrier Message with a numeric (US domestic) postal code.
-    // Mode 3 Formatted data containing a Structured Carrier Message with an alphanumeric (international) postal code.
-    _opt.mode = 2;
-    _opt.parse = true;
-  }
-  return JSON.stringify({
-    bcid        : type,
-    text        : data,
+  this.isBarcodeImage = false;
+  /**
+   * BARCODE as an IMAGE
+   * Arguments are saved as URL parameters string because it is saved on the Image Database Map
+  */
+  return `bcid=${encodeURIComponent(type)}&text=${encodeURIComponent(data)}`;
+}
+
+/**
+ * @private
+ * @param {String} type
+ * @returns
+ */
+function initBarcodeValuesBasedOnType (bcid) {
+  const _barcodeObject = {
     scale       : 3,
     rotate      : 'N',
     includetext : true,            // Show human-readable text
     textxalign  : 'center',        // Always good to set this
-    ..._opt,
+  }
+
+  if (bcid === 'mailmark') {
+    _barcodeObject.type = '9'; //7, 9 or 29 The type number should be a string
+  }
+  if (bcid ==='rectangularmicroqrcode') {
+    _barcodeObject.version= "R17x139"
+  }
+  if (bcid ==='gs1-cc') {
+    _barcodeObject.ccversion='b';
+    _barcodeObject.cccolumns=4;
+  }
+  if (bcid === 'maxicode') {
+    // Mode 2 Formatted data containing a Structured Carrier Message with a numeric (US domestic) postal code.
+    // Mode 3 Formatted data containing a Structured Carrier Message with an alphanumeric (international) postal code.
+    _barcodeObject.mode = 2;
+    _barcodeObject.parse = true;
+  }
+  return _barcodeObject;
+}
+
+/**
+ * @private
+ * @param {Function} callback
+ * @returns
+ */
+function generateBarcodeImage(barcodeUrlParams, callback) {
+  let _barcodeData = {}
+  try {
+    _barcodeData = Object.fromEntries(new URLSearchParams(barcodeUrlParams));
+  }
+  catch (err) {
+    return callback('Barcode read values: ' + err.toString());
+  }
+  return bwipjs.toBuffer({
+      ...initBarcodeValuesBasedOnType(_barcodeData.bcid),
+      ..._barcodeData
+    }, function (err, png) {
+    if (err) {
+      // `err` may be a string or Error object
+      console.log(''+err.toString());
+      return callback('Barcode generation error: ', err.toString());
+    }
+    else {
+      return callback(null, {
+        data      : new Buffer.from(png, 'base64'),
+        extension : 'png',
+        mimetype  : 'image/png'
+      });
+    }
   });
 }
 
 module.exports = {
   isImage,
-  barcode
+  barcode,
+  generateBarcodeImage
 };
 
 

@@ -5,6 +5,8 @@ barcodesMethods.set("ean13", _ean13);
 barcodesMethods.set("ean8", _ean8);
 barcodesMethods.set("code39", _code39);
 barcodesMethods.set("ean128", _ean128);
+// "ean128" barcode does not exist, it should be "code128" or SG1
+barcodesMethods.set("code128", _ean128);
 
 /**
  * Return true if letters from `fromIndex` to (`fromIndex` + `length`) are numbers

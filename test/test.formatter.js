@@ -5,7 +5,6 @@ var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
 const barcodeFormatter = require('../formatters/barcode');
 var helper = require('../lib/helper');
-const util = require('util');
 
 describe('formatter', function () {
   describe('convDate', function () {
@@ -1401,7 +1400,7 @@ describe('formatter', function () {
     });
   });
 
-  describe.only('Barcodes', function () {
+  describe('Barcodes', function () {
 
     describe('Barcode as a font', function () {
       it('should return an empty string with a undefined barcode format', () => {
@@ -1482,7 +1481,7 @@ describe('formatter', function () {
       });
     });
 
-    describe.only('Barcode as an Image', function () {
+    describe('Barcode as an Image', function () {
       describe(':barcode and :isImage formatters', function () {
         it('should return the data URI of the value and type of barcode', function () {
           const _context = {};

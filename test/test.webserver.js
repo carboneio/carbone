@@ -789,7 +789,7 @@ describe('Webserver', () => {
         };
         const _successUrl = 'https://carbone.io/callback';
 
-        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-success-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.message, 'A render ID will be sent to your callback URL when the document is generated');
           assert.strictEqual(data.data.renderId, '');
@@ -823,7 +823,7 @@ describe('Webserver', () => {
         const _previousQueuePath = params.queuePath;
         params.queuePath = '/folderDoesNotExist/queue';
 
-        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-success-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Error while setting up the webhook');
           assert.strictEqual(data.code, 'w117');
@@ -1048,7 +1048,7 @@ describe('Webserver', () => {
           renderPrefix : ''
         };
 
-        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-success-url' : _successUrl + _successUrlPath }), (err, res, data) => {
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl + _successUrlPath }), (err, res, data) => {
           assert.strictEqual(data.success, true);
           webserver.renderWebhookQueue();
           setTimeout(() => {
@@ -1103,11 +1103,11 @@ describe('Webserver', () => {
           renderPrefix : ''
         };
 
-        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-success-url' : _successUrl1 + _successUrlPath }), (err, res, data) => {
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl1 + _successUrlPath }), (err, res, data) => {
           assert.strictEqual(data.success, true);
-          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-success-url' : _successUrl2 + _successUrlPath }), (err, res, data) => {
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl2 + _successUrlPath }), (err, res, data) => {
             assert.strictEqual(data.success, true);
-            get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-success-url' : _successUrl3 + _successUrlPath }), (err, res, data) => {
+            get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl3 + _successUrlPath }), (err, res, data) => {
               assert.strictEqual(data.success, true);
               webserver.renderWebhookQueue();
               // Should do nothing

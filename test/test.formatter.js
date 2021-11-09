@@ -1525,6 +1525,8 @@ describe('formatter', function () {
 
         it('should generate all barcodes as base64 image from a url parameter format', (done) => {
 
+          const _originalBarcodeList = [...barcodeFormatter.supportedBarcodes];
+
           function unpackBarcode (barcodesList) {
             if (barcodesList.length === 0) {
               return done();
@@ -1539,7 +1541,7 @@ describe('formatter', function () {
             });
           }
 
-          unpackBarcode(barcodeFormatter.supportedBarcodes);
+          unpackBarcode(_originalBarcodeList);
         });
       });
 

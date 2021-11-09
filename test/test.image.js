@@ -5,9 +5,9 @@ const path      = require('path');
 const fs        = require('fs');
 const image     = require('../lib/image');
 const nock      = require('nock');
-const barcodeFormatter = require('../formatters/barcode')
+const barcodeFormatter = require('../formatters/barcode');
 
-describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
+describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -675,6 +675,22 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
           done();
         });
       });
+
+      it('should generate barcodes as images and as fonts', function (done) {
+        const _testedReport = 'image/docx-barcodes';
+        const _data = {
+          /** Barcodes as Fonts & Images*/
+          item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+          item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+          item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+          item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
     });
 
     describe('DOCX preprocess XML', function () {
@@ -1208,6 +1224,22 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
         carbone.render(helperTest.openTemplate(_testedReport, true), _data, (err, res) => {
           helperTest.assert(err+'', 'null');
           helperTest.assertFullReport(res, _testedReport, true);
+          done();
+        });
+      });
+
+      it('should generate barcodes as images and as fonts', function (done) {
+        const _testedReport = 'image/xlsx-barcodes';
+        const _data = {
+          /** Barcodes as Fonts & Images*/
+          item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+          item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+          item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+          item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
           done();
         });
       });

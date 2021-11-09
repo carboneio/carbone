@@ -1233,7 +1233,7 @@ const supportedBarcodes = [
     desc: "HIBC Aztec Code",
     text: "A123BJC5D6E71",
     opts: "",
-  },
+  }
 ];
 
 module.exports = {

@@ -5,6 +5,7 @@ var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
 const barcodeFormatter = require('../formatters/barcode');
 var helper = require('../lib/helper');
+const util = require('util');
 
 describe('formatter', function () {
   describe('convDate', function () {
@@ -1516,24 +1517,23 @@ describe('formatter', function () {
           });
         });
 
-        it('should generate an ean13 barcode base64 image from a url parameter format', function (done) {
-          barcodeFormatter.generateBarcodeImage('bcid=ean13&text=2112345678900', function (err, image) {
-            helper.assert(err, null);
-            helper.assert(image.data.toString('base64').length > 0, true);
-            helper.assert(image.extension, 'png');
-            helper.assert(image.mimetype, 'image/png');
-            done();
-          });
-        });
+        it('should generate an ean13 barcode base64 image from a url parameter format', (done) => {
 
-        it('should generate an ean13 barcode base64 image from a url parameter format', function (done) {
-          barcodeFormatter.generateBarcodeImage('bcid=ean13&text=2112345678900', function (err, image) {
-            helper.assert(err, null);
-            helper.assert(image.data.toString('base64').length > 0, true);
-            helper.assert(image.extension, 'png');
-            helper.assert(image.mimetype, 'image/png');
-            done();
-          });
+          function unpackBarcode (barcodesList) {
+            if (barcodesList.length === 0) {
+              return done();
+            }
+            barcodeFormatter.generateBarcodeImage(`bcid=${barcodesList[0].sym}&text=${barcodesList[0].text}`, function (err, image) {
+              helper.assert(err, null);
+              helper.assert(image.data.toString('base64').length > 0, true);
+              helper.assert(image.extension, 'png');
+              helper.assert(image.mimetype, 'image/png');
+              barcodesList.shift();
+              unpackBarcode(barcodesList);
+            });
+          }
+
+          unpackBarcode(barcodeFormatter.supportedBarcodes);
         });
       });
     });

@@ -1503,21 +1503,28 @@ describe('formatter', function () {
 
       describe('generateBarcodeImage', function () {
 
-        it('should not generate if the bcid (barcode ID) is empty', function (done) {
+        it('should return an error if the bcid (barcode ID) is empty', function (done) {
           barcodeFormatter.generateBarcodeImage('bcid=&text=2112345678900', function (err) {
             helper.assert(err, 'Barcode generation error: Error: bwipp.undefinedEncoder: bcid is not defined');
             done();
           });
         });
 
-        it('should not generate if the text is empty', function (done) {
+        it('should return an error if the text is empty', function (done) {
           barcodeFormatter.generateBarcodeImage('bcid=ean13', function (err) {
             helper.assert(err, 'Barcode generation error: ReferenceError: bwip-js: bar code text not specified.');
             done();
           });
         });
 
-        it('should generate an ean13 barcode base64 image from a url parameter format', (done) => {
+        it('should return an error if the barcode is not an URL param format', function (done) {
+          barcodeFormatter.generateBarcodeImage('{==This is not valid==}', function (err) {
+            helper.assert(err, 'Barcode generation error: Error: bwipp.undefinedEncoder: bcid is not defined');
+            done();
+          });
+        });
+
+        it('should generate all barcodes as base64 image from a url parameter format', (done) => {
 
           function unpackBarcode (barcodesList) {
             if (barcodesList.length === 0) {
@@ -1534,6 +1541,54 @@ describe('formatter', function () {
           }
 
           unpackBarcode(barcodeFormatter.supportedBarcodes);
+        });
+      });
+
+      describe('initBarcodeValuesBasedOnType', function () {
+        it('should return the default barcode options', function () {
+          const _barcodeOptions = barcodeFormatter.initBarcodeValuesBasedOnType('ean13');
+          helper.assert(_barcodeOptions.scale, 3);
+          helper.assert(_barcodeOptions.rotate, 'N');
+          helper.assert(_barcodeOptions.includetext, true);
+          helper.assert(_barcodeOptions.textxalign, 'center');
+        });
+
+        it('should return the default barcode options with "mailmark" special case', function () {
+          const _barcodeOptions = barcodeFormatter.initBarcodeValuesBasedOnType('mailmark');
+          helper.assert(_barcodeOptions.scale, 3);
+          helper.assert(_barcodeOptions.rotate, 'N');
+          helper.assert(_barcodeOptions.includetext, true);
+          helper.assert(_barcodeOptions.textxalign, 'center');
+          helper.assert(_barcodeOptions.type, '9');
+        });
+
+        it('should return the default barcode options with "rectangularmicroqrcode" special case', function () {
+          const _barcodeOptions = barcodeFormatter.initBarcodeValuesBasedOnType('rectangularmicroqrcode');
+          helper.assert(_barcodeOptions.scale, 3);
+          helper.assert(_barcodeOptions.rotate, 'N');
+          helper.assert(_barcodeOptions.includetext, true);
+          helper.assert(_barcodeOptions.textxalign, 'center');
+          helper.assert(_barcodeOptions.version, 'R17x139');
+        });
+
+        it('should return the default barcode options with "gs1-cc" special case', function () {
+          const _barcodeOptions = barcodeFormatter.initBarcodeValuesBasedOnType('gs1-cc');
+          helper.assert(_barcodeOptions.scale, 3);
+          helper.assert(_barcodeOptions.rotate, 'N');
+          helper.assert(_barcodeOptions.includetext, true);
+          helper.assert(_barcodeOptions.textxalign, 'center');
+          helper.assert(_barcodeOptions.ccversion, 'b');
+          helper.assert(_barcodeOptions.cccolumns, 4);
+        });
+
+        it('should return the default barcode options with "maxicode" special case', function () {
+          const _barcodeOptions = barcodeFormatter.initBarcodeValuesBasedOnType('maxicode');
+          helper.assert(_barcodeOptions.scale, 3);
+          helper.assert(_barcodeOptions.rotate, 'N');
+          helper.assert(_barcodeOptions.includetext, true);
+          helper.assert(_barcodeOptions.textxalign, 'center');
+          helper.assert(_barcodeOptions.mode, 2);
+          helper.assert(_barcodeOptions.parse, true);
         });
       });
     });

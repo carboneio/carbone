@@ -389,11 +389,6 @@ function generateBarcodeImage(barcodeUrlParams, callback) {
   );
 }
 
-const mailmark24x24type7 = "JGB 012800011000000744BN189AA1B0W1T1HQ       TEST";
-const mailmark32x32type9 = "JGB 011123456712345678CW14NJ1T 0EC2M2QS      REFERENCE1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
-const mailmark16x48type29 = "JGB 011123456712345678CW14NJ1T 0EC2M2QS      REF1234567890QWERTYUIOPASD";
-const mailmark16x48type29v2 = "JGB 012100123412345678AB19XY1A 0             www.xyz.com"
-
 /**
  * List of supported barcodes with the symbol, the fullname, a text example, and available options
  * The 'tested' at false means: the barcode was not tested because the scanner is really specific and not available on smartphone
@@ -932,7 +927,11 @@ const supportedBarcodes = [
     tested: true,
     sym: "mailmark",
     desc: "Royal Mail Mailmark",
-    text: mailmark32x32type9, //
+    text: "JGB 011123456712345678CW14NJ1T 0EC2M2QS      REFERENCE1234567890QWERTYUIOPASDFGHJKLZXCVBNM",
+    textType7: "JGB 012800011000000744BN189AA1B0W1T1HQ       TEST",
+    textType9: "JGB 011123456712345678CW14NJ1T 0EC2M2QS      REFERENCE1234567890QWERTYUIOPASDFGHJKLZXCVBNM",
+    textType29: "JGB 011123456712345678CW14NJ1T 0EC2M2QS      REF1234567890QWERTYUIOPASD",
+    textType29bis: "JGB 012100123412345678AB19XY1A 0             www.xyz.com",
     opts: "type=29", // type 7 or 9
   },
   {

@@ -334,7 +334,13 @@ function barcode (data, type) {
    * BARCODE as an IMAGE
    * Arguments are saved as URL parameters string because it is saved on the Image Database Map
    */
-  return `bcid=${encodeURIComponent(type)}&text=${encodeURIComponent(data)}`;
+
+  try {
+    return JSON.stringify({bcid : type, text : data });
+  }
+  catch (err) {
+    return '';
+  }
 }
 
 /**
@@ -374,10 +380,10 @@ function initBarcodeValuesBasedOnType (bcid) {
  * @param {Function} callback
  * @returns
  */
-function generateBarcodeImage (barcodeUrlParams, callback) {
+function generateBarcodeImage (jsonStringBarcodeData, callback) {
   let _barcodeData = {};
   try {
-    _barcodeData = Object.fromEntries(new URLSearchParams(barcodeUrlParams));
+    _barcodeData = JSON.parse(jsonStringBarcodeData);
   }
   catch (err) {
     return callback('Barcode read values: ' + err.toString());

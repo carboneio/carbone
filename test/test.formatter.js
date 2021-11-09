@@ -1487,30 +1487,30 @@ describe('formatter', function () {
           const _context = {};
           barcodeFormatter.isImage.call(_context);
           helper.assert(_context.isBarcodeImage, true);
-          helper.assert(barcodeFormatter.barcode.call(_context, '978-1-56581-231-4 90000', 'isbn'), 'bcid=isbn&text=978-1-56581-231-4%2090000');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'http://goo.gl/0bis', 'qrcode'), 'bcid=qrcode&text=http%3A%2F%2Fgoo.gl%2F0bis');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '2112345678900', 'ean13'), 'bcid=ean13&text=2112345678900');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '02345673', 'ean8'), 'bcid=ean8&text=02345673');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '5715311709768', 'code128'), 'bcid=code128&text=5715311709768');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'THIS IS CODE 39', 'code39'), 'bcid=code39&text=THIS%20IS%20CODE%2039');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '(01)95012345678903(3103)000123', 'gs1-128'), 'bcid=gs1-128&text=(01)95012345678903(3103)000123');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '(01)03453120000011(8200)http://www.abc.net(10)ABCD1234(410)9501101020917',  'gs1qrcode'), 'bcid=gs1qrcode&text=(01)03453120000011(8200)http%3A%2F%2Fwww.abc.net(10)ABCD1234(410)9501101020917');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '[)>^03001^02996152382802^029840^029001^0291Z00004951^029UPSN^02906X610^029159^0291234567^0291/1^029^029Y^029634 ALPHA DR^029PITTSBURGH^029PA^029^004',  'maxicode'), 'bcid=maxicode&text=%5B)%3E%5E03001%5E02996152382802%5E029840%5E029001%5E0291Z00004951%5E029UPSN%5E02906X610%5E029159%5E0291234567%5E0291%2F1%5E029%5E029Y%5E029634%20ALPHA%20DR%5E029PITTSBURGH%5E029PA%5E029%5E004');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'SPC\n0200\n1\nCH5800791123000889012\nS\nRobert Schneider AG\nRue du Lac\n1268\n2501\nBiel\nCH\n\n199.95\nCHF\nKPia-Maria Rutschmann-Schnyder\nGrosse Marktgasse 28\n9400 Rorschach\n\n\nCH\nSCOR\nRF18539007547034\n\nEPD\n',  'swissqrcode'), 'bcid=swissqrcode&text=SPC%0A0200%0A1%0ACH5800791123000889012%0AS%0ARobert%20Schneider%20AG%0ARue%20du%20Lac%0A1268%0A2501%0ABiel%0ACH%0A%0A199.95%0ACHF%0AKPia-Maria%20Rutschmann-Schnyder%0AGrosse%20Marktgasse%2028%0A9400%20Rorschach%0A%0A%0ACH%0ASCOR%0ARF18539007547034%0A%0AEPD%0A');
+          helper.assert(barcodeFormatter.barcode.call(_context, '978-1-56581-231-4 90000', 'isbn'), '{"bcid":"isbn","text":"978-1-56581-231-4 90000"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'http://goo.gl/0bis', 'qrcode'), '{"bcid":"qrcode","text":"http://goo.gl/0bis"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '2112345678900', 'ean13'), '{"bcid":"ean13","text":"2112345678900"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '02345673', 'ean8'), '{"bcid":"ean8","text":"02345673"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '5715311709768', 'code128'), '{"bcid":"code128","text":"5715311709768"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'THIS IS CODE 39', 'code39'), '{"bcid":"code39","text":"THIS IS CODE 39"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '(01)95012345678903(3103)000123', 'gs1-128'), '{"bcid":"gs1-128","text":"(01)95012345678903(3103)000123"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '(01)03453120000011(8200)http://www.abc.net(10)ABCD1234(410)9501101020917',  'gs1qrcode'), '{"bcid":"gs1qrcode","text":"(01)03453120000011(8200)http://www.abc.net(10)ABCD1234(410)9501101020917"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '[)>^03001^02996152382802^029840^029001^0291Z00004951^029UPSN^02906X610^029159^0291234567^0291/1^029^029Y^029634 ALPHA DR^029PITTSBURGH^029PA^029^004',  'maxicode'), '{"bcid":"maxicode","text":"[)>^03001^02996152382802^029840^029001^0291Z00004951^029UPSN^02906X610^029159^0291234567^0291/1^029^029Y^029634 ALPHA DR^029PITTSBURGH^029PA^029^004"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'SPC\n0200\n1\nCH5800791123000889012\nS\nRobert Schneider AG\nRue du Lac\n1268\n2501\nBiel\nCH\n\n199.95\nCHF\nKPia-Maria Rutschmann-Schnyder\nGrosse Marktgasse 28\n9400 Rorschach\n\n\nCH\nSCOR\nRF18539007547034\n\nEPD\n',  'swissqrcode'), '{"bcid":"swissqrcode","text":"SPC\\n0200\\n1\\nCH5800791123000889012\\nS\\nRobert Schneider AG\\nRue du Lac\\n1268\\n2501\\nBiel\\nCH\\n\\n199.95\\nCHF\\nKPia-Maria Rutschmann-Schnyder\\nGrosse Marktgasse 28\\n9400 Rorschach\\n\\n\\nCH\\nSCOR\\nRF18539007547034\\n\\nEPD\\n"}');
         });
       });
 
       describe('generateBarcodeImage', function () {
 
         it('should return an error if the bcid (barcode ID) is empty', function (done) {
-          barcodeFormatter.generateBarcodeImage('bcid=&text=2112345678900', function (err) {
+          barcodeFormatter.generateBarcodeImage('{"bcid":"","text":"2112345678900"}', function (err) {
             helper.assert(err, 'Barcode generation error: Error: bwipp.undefinedEncoder: bcid is not defined');
             done();
           });
         });
 
         it('should return an error if the text is empty', function (done) {
-          barcodeFormatter.generateBarcodeImage('bcid=ean13', function (err) {
+          barcodeFormatter.generateBarcodeImage('{"bcid":"ean13","text":""}', function (err) {
             helper.assert(err, 'Barcode generation error: ReferenceError: bwip-js: bar code text not specified.');
             done();
           });
@@ -1518,20 +1518,28 @@ describe('formatter', function () {
 
         it('should return an error if the barcode is not an URL param format', function (done) {
           barcodeFormatter.generateBarcodeImage('{==This is not valid==}', function (err) {
-            helper.assert(err, 'Barcode generation error: Error: bwipp.undefinedEncoder: bcid is not defined');
+            helper.assert(err, 'Barcode read values: SyntaxError: Unexpected token = in JSON at position 1');
             done();
           });
         });
 
         it('should generate all barcodes as base64 image from a url parameter format', (done) => {
-
+          var _start = process.hrtime();
           const _originalBarcodeList = [...barcodeFormatter.supportedBarcodes];
 
           function unpackBarcode (barcodesList) {
             if (barcodesList.length === 0) {
+              var _diff = process.hrtime(_start);
+              var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+              console.log('\n Generale all barcodes speed :  ' + _elapsed + ' ms total / Average of ' + (_elapsed / barcodeFormatter.supportedBarcodes.length) + ' ms per barcode \n');
               return done();
             }
-            barcodeFormatter.generateBarcodeImage(`bcid=${barcodesList[0].sym}&text=${barcodesList[0].text}`, function (err, image) {
+            const _barcodeKey = JSON.stringify({bcid : barcodesList[0].sym, text : barcodesList[0].text });
+            var _startBarcodeGeneration = process.hrtime();
+            barcodeFormatter.generateBarcodeImage(_barcodeKey, function (err, image) {
+              var _diffBarcodeGeneration = process.hrtime(_startBarcodeGeneration);
+              var _elapsedBarcodeGeneration = ((_diffBarcodeGeneration[0] * 1e9 + _diffBarcodeGeneration[1]) / 1e6);
+              console.log(barcodesList[0].sym + ' speed :  ' + _elapsedBarcodeGeneration + ' ms total');
               helper.assert(err, null);
               helper.assert(image.data.toString('base64').length > 0, true);
               helper.assert(image.extension, 'png');

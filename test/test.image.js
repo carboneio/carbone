@@ -37,6 +37,23 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
         done();
       });
     });
+
+
+    it('should generate barcodes as images and as fonts', function (done) {
+      const _testedReport = 'image/odg-barcodes';
+      const _data = {
+        /** Barcodes as Fonts & Images*/
+        item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
   describe('[Full test] ODP', function () {
@@ -71,6 +88,22 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
           { image : _imageDEBase64jpg },
           { image : _imageITBase64png }
         ]
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should generate barcodes as images and as fonts', function (done) {
+      const _testedReport = 'image/odp-barcodes';
+      const _data = {
+        /** Barcodes as Fonts & Images*/
+        item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');

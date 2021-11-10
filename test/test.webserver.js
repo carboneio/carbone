@@ -1050,7 +1050,7 @@ describe.only('Webserver', () => {
 
         get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl + _successUrlPath }), (err, res, data) => {
           assert.strictEqual(data.success, true);
-          webserver.runWebhookRenderJob();
+          webserver.runWebhookRenderJob(`id-${Date.now()}`);
           setTimeout(() => {
             const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
             assert.strictEqual(_queueItems.length, 0);
@@ -1060,7 +1060,7 @@ describe.only('Webserver', () => {
         });
       });
 
-      it('should render 3 documents from the queue, should request all different callback URL, and should not execute more than 1 queues at the same time', (done) => {
+      it('should render 3 documents from the queue, should request all different callback URL, and should not execute more than 1 job at the same time', (done) => {
         const _successUrl1 = 'https://carbone.io';
         const _successUrl2 = 'https://anotherdomain.carbone.io';
         const _successUrl3 = 'https://random.carbone.io';
@@ -1109,9 +1109,9 @@ describe.only('Webserver', () => {
             assert.strictEqual(data.success, true);
             get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl3 + _successUrlPath }), (err, res, data) => {
               assert.strictEqual(data.success, true);
-              webserver.runWebhookRenderJob();
+              webserver.runWebhookRenderJob(`id-${Date.now()}`);
               // Should do nothing
-              webserver.runWebhookRenderJob();
+              webserver.runWebhookRenderJob(`id-${Date.now()}`);
               setTimeout(() => {
                 const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
                 assert.strictEqual(_queueItems.length, 0);
@@ -1125,9 +1125,95 @@ describe.only('Webserver', () => {
         });
       });
 
+      it('should render 3 documents from the queue, should request all different callback URL, and should not execute more than 3 job at the same time', (done) => {
+        params.factories = 3;
+        const _successUrl1 = 'https://subdomain.carbone.io';
+        const _successUrl2 = 'https://anotherdomain.carbone.io';
+        const _successUrl3 = 'https://random.carbone.io';
+        const _successUrl4 = 'https://finaldomain.carbone.io';
+        const _successUrlPath = '/callback';
+        const webhookRequestNock1 = nock(_successUrl1)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+        const webhookRequestNock2 = nock(_successUrl2)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+        const webhookRequestNock3 = nock(_successUrl3)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+        const webhookRequestNock4 = nock(_successUrl4)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+
+
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement   : {},
+          enum         : {},
+          renderPrefix : ''
+        };
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl1 + _successUrlPath }), function (err, res, data) {
+          assert.strictEqual(data.success, true);
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl2 + _successUrlPath }), function (err, res, data) {
+            assert.strictEqual(data.success, true);
+            get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl3 + _successUrlPath }), function (err, res, data) {
+              assert.strictEqual(data.success, true);
+              get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl4 + _successUrlPath }), function (err, res, data) {
+                assert.strictEqual(data.success, true);
+                webserver.runWebhookRenderJob(`id-${Date.now()}`);
+                setTimeout(() => {
+                  webserver.runWebhookRenderJob(`id-${Date.now()}`);
+                }, 2);
+                setTimeout(() => {
+                  webserver.runWebhookRenderJob(`id-${Date.now()}`);
+                }, 4);
+                setTimeout(() => {
+                  const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
+                  assert.strictEqual(_queueItems.length, 0);
+                  assert.strictEqual(webhookRequestNock1.pendingMocks().length, 0);
+                  assert.strictEqual(webhookRequestNock2.pendingMocks().length, 0);
+                  assert.strictEqual(webhookRequestNock3.pendingMocks().length, 0);
+                  assert.strictEqual(webhookRequestNock4.pendingMocks().length, 0);
+                  params.factories = 1;
+                  done();
+                }, 200);
+              });
+            });
+          });
+        });
+      });
+
       it('should not render the document if the file queue is not a JSON file and should be deleted', (done) => {
         fs.writeFileSync(path.join(os.tmpdir(), 'queue', 'file.xml'), '<xml>This is some data</xml>');
-        webserver.runWebhookRenderJob();
+        webserver.runWebhookRenderJob(`id-${Date.now()}`);
         setTimeout(() => {
           const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
           assert.strictEqual(_queueItems.length, 0);
@@ -1139,7 +1225,7 @@ describe.only('Webserver', () => {
         const _previousQueuePath = params.queuePath;
         params.queuePath = '/folderDoesNotExist/queue';
         fs.writeFileSync(path.join(os.tmpdir(), 'queue', 'file.xml'), '<xml>This is some data</xml>');
-        webserver.runWebhookRenderJob();
+        webserver.runWebhookRenderJob(`id-${Date.now()}`);
         setTimeout(() => {
           const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
           assert.strictEqual(_queueItems.length, 1);

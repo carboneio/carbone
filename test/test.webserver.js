@@ -132,7 +132,7 @@ function unlinkConfigFile () {
   fs.rmdirSync(path.join(os.tmpdir(), 'plugin'));
 }
 
-describe('Webserver', () => {
+describe.only('Webserver', () => {
   before(() => {
     writeConfigFile();
   });
@@ -1050,7 +1050,7 @@ describe('Webserver', () => {
 
         get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl + _successUrlPath }), (err, res, data) => {
           assert.strictEqual(data.success, true);
-          webserver.renderWebhookQueue();
+          webserver.runWebhookRenderJob();
           setTimeout(() => {
             const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
             assert.strictEqual(_queueItems.length, 0);
@@ -1109,9 +1109,9 @@ describe('Webserver', () => {
             assert.strictEqual(data.success, true);
             get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl3 + _successUrlPath }), (err, res, data) => {
               assert.strictEqual(data.success, true);
-              webserver.renderWebhookQueue();
+              webserver.runWebhookRenderJob();
               // Should do nothing
-              webserver.renderWebhookQueue();
+              webserver.runWebhookRenderJob();
               setTimeout(() => {
                 const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
                 assert.strictEqual(_queueItems.length, 0);
@@ -1127,7 +1127,7 @@ describe('Webserver', () => {
 
       it('should not render the document if the file queue is not a JSON file and should be deleted', (done) => {
         fs.writeFileSync(path.join(os.tmpdir(), 'queue', 'file.xml'), '<xml>This is some data</xml>');
-        webserver.renderWebhookQueue();
+        webserver.runWebhookRenderJob();
         setTimeout(() => {
           const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
           assert.strictEqual(_queueItems.length, 0);
@@ -1139,7 +1139,7 @@ describe('Webserver', () => {
         const _previousQueuePath = params.queuePath;
         params.queuePath = '/folderDoesNotExist/queue';
         fs.writeFileSync(path.join(os.tmpdir(), 'queue', 'file.xml'), '<xml>This is some data</xml>');
-        webserver.renderWebhookQueue();
+        webserver.runWebhookRenderJob();
         setTimeout(() => {
           const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
           assert.strictEqual(_queueItems.length, 1);

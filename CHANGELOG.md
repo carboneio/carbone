@@ -1,3 +1,17 @@
+### v3.4.0
+  - [EE] Experimental feature: add the possibility to duplicate rows using an attribute of an object
+    *Data*:
+      ```json
+      [
+        { "id" : "A", "qty" : 2 },
+        { "id" : "B", "qty" : 3 },
+        { "id" : "C", "qty" : 0 },
+        { "id" : "D", "qty" : 1 }
+      ]
+      ```
+    *Template*: `{d[i].id} - {d[i+1*qty].id}`
+    *Result*:  `A - A - B - B - B - D`
+
 ### v3.3.2
   - Release October 11th 2021
   - [EE] Dynamic Image fix: image types verification support uppercase and lower case formats

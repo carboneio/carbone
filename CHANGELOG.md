@@ -1,3 +1,5 @@
+### v3.4.0
+
 ### v3.3.2
   - Release October 11th 2021
   - [EE] Dynamic Image fix: image types verification support uppercase and lower case formats

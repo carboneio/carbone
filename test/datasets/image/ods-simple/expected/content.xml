@@ -43,7 +43,7 @@
         <table:table-row table:style-name="ro2">
           <table:table-cell/>
           <table:table-cell>
-            <draw:frame draw:z-index="0" draw:name="Image 1" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0012in" svg:y="0.0012in">
+            <draw:frame draw:z-index="0" draw:name="carbone-image-1" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0012in" svg:y="0.0012in">
               <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg">
                 <text:p/>
               </draw:image>

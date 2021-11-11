@@ -150,7 +150,7 @@
           </table:table-cell>
           <table:table-cell table:style-name="Table1.B2">
             <text:p text:style-name="P7">
-              <draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-1" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
                 <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
                 <svg:title></svg:title>
               </draw:frame>
@@ -168,7 +168,7 @@
           </table:table-cell>
           <table:table-cell table:style-name="Table1.B2">
             <text:p text:style-name="P7">
-              <draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-2" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
                 <draw:image xlink:href="Pictures/CarboneImage1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
                 <svg:title></svg:title>
               </draw:frame>
@@ -186,7 +186,7 @@
           </table:table-cell>
           <table:table-cell table:style-name="Table1.B2">
             <text:p text:style-name="P7">
-              <draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.313cm" draw:z-index="1">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-3" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.313cm" draw:z-index="1">
                 <draw:image xlink:href="Pictures/CarboneImage2.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
                 <svg:title></svg:title>
               </draw:frame>
@@ -226,7 +226,7 @@
           </table:table-cell>
           <table:table-cell table:style-name="Table1.B2">
             <text:p text:style-name="P7">
-              <draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-4" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
                 <draw:image xlink:href="Pictures/CarboneImage1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
                 <svg:title></svg:title>
               </draw:frame>
@@ -244,7 +244,7 @@
           </table:table-cell>
           <table:table-cell table:style-name="Table1.B2">
             <text:p text:style-name="P7">
-              <draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-5" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
                 <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
                 <svg:title></svg:title>
               </draw:frame>

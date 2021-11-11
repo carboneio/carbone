@@ -1,4 +1,6 @@
 ### v3.4.0
+  - [EE] Fix random image display in LibreOffice documents. Sometimes, LibreOffice hides one image when two or more images share the same name.
+         Now, Carbone generates a unique name for each image with the format "carbone-image-<counter>".
 
 ### v3.3.2
   - Release October 11th 2021

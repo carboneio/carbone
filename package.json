@@ -24,18 +24,16 @@
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin $PACKAGE_VERSION && git push github-origin $PACKAGE_VERSION"
   },
   "dependencies": {
-    "dayjs": "=1.10.4",
-    "debug": "=4.1.1",
-    "timsort": "=0.3.0",
+    "dayjs": "=1.10.7",
+    "debug": "=4.3.2",
     "which": "=2.0.2",
     "yauzl": "=2.10.0",
     "yazl": "=2.5.1"
   },
   "devDependencies": {
-    "eslint": "=7.7.0",
     "mocha": "=8.4.0"
   },
   "engines": {
-    "node": ">= 10.15.0"
+    "node": ">= 12.14.0"
   }
 }

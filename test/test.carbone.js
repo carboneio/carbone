@@ -3358,6 +3358,9 @@ describe('Carbone', function () {
 function unzipSystem (filePath, destPath, callback) {
   var _unzippedFiles = {};
   var _unzip = spawn('unzip', ['-o', filePath, '-d', destPath]);
+  _unzip.on('error', function () {
+    throw Error('\n\nPlease install unzip program to execute tests. Ex: sudo apt install unzip\n\n');
+  });
   _unzip.stderr.on('data', function (data) {
     throw Error(data);
   });

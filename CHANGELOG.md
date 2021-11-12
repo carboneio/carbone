@@ -2,6 +2,14 @@
   - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
   - Bump DayJS to 1.10.7
   - Bump debug to 4.3.2
+  - Improve thread management of LibreOffice on Linux:
+    - The system which auto-restarts LibreOffice when it crashes or if there is a conversion timeout could hang indefinitely on Linux.
+      On the Enterprise Edition, the global watchdog system is able to fix this bad behavior but it is slow.
+      Now, the LibreOffice is correctly killed. No zombie processes remaining.
+    - Avoid launching the parent process "oosplash" of LibreOffice
+    - Improve auto-restart mechanism
+    - Add debug logs
+    - All tests passed on Linux 😅
 
 ### v3.3.0
   - Accept `null` for the attribute `complement` in `options`

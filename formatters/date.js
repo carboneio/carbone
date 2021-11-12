@@ -188,12 +188,6 @@ function parse (d, patternIn) {
   if (!patternIn) {
     return dayjs(d + '');
   }
-  if (patternIn === 'X') {
-    return dayjs.unix(d);
-  }
-  if (patternIn === 'x') {
-    return dayjs(d);
-  }
   return dayjs(d, patternIn);
 }
 

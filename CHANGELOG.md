@@ -1,3 +1,8 @@
+### v3.4.0
+  - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
+  - Bump DayJS to 1.10.7
+  - Bump debug to 4.3.2
+
 ### v3.3.0
   - Accept `null` for the attribute `complement` in `options`
 

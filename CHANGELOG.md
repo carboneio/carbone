@@ -1,6 +1,10 @@
 ### v3.4.0
   - [EE] Fix random image display in LibreOffice documents. Sometimes, LibreOffice hides one image when two or more images share the same name.
          Now, Carbone generates a unique name for each image with the format "carbone-image-<counter>".
+  - [EE] Experimental: Deffered rendering with a webhook, it is dedicated to render huge reports:
+    1. Render a document as usual with the request `POST /render/:templateID` with the JSON dataset into the body request AND you have to insert the header `carbone-webhook-url` as a callback URL. It is an endpoint of your server listening when a document is rendered.
+    2. Carbone will generate your document and it will notify your webhook with a renderID
+    3. Retrieve the generated document with a `GET /render/:renderID` and voilà!
 
 ### v3.3.2
   - Release October 11th 2021

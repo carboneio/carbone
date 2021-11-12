@@ -1,4 +1,7 @@
 ### v3.4.0
+  - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
+  - Bump DayJS to 1.10.7
+  - Bump debug to 4.3.2
   - [EE] Fix random image display in LibreOffice documents. Sometimes, LibreOffice hides one image when two or more images share the same name.
          Now, Carbone generates a unique name for each image with the format "carbone-image-<counter>".
   - [EE] Experimental: Deffered rendering with a webhook, it is dedicated to render huge reports:

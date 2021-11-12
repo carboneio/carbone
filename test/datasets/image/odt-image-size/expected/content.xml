@@ -36,7 +36,7 @@
       </text:sequence-decls>
       <text:p text:style-name="P1">Image fit contain (without formater)</text:p>
       <text:p text:style-name="P1">
-        <draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="2.342cm" svg:height="2.342cm" draw:z-index="0">
+        <draw:frame draw:style-name="fr1" draw:name="carbone-image-1" text:anchor-type="as-char" svg:width="2.342cm" svg:height="2.342cm" draw:z-index="0">
           <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/>
           <svg:title></svg:title>
         </draw:frame>
@@ -46,7 +46,7 @@
       <text:p text:style-name="P1"/>
       <text:p text:style-name="P1">Image fit contain (with formater)</text:p>
       <text:p text:style-name="P1">
-        <draw:frame draw:style-name="fr1" draw:name="Image2" text:anchor-type="as-char" svg:width="2.342cm" svg:height="2.342cm" draw:z-index="1">
+        <draw:frame draw:style-name="fr1" draw:name="carbone-image-2" text:anchor-type="as-char" svg:width="2.342cm" svg:height="2.342cm" draw:z-index="1">
           <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/>
           <svg:title></svg:title>
         </draw:frame>
@@ -57,7 +57,7 @@
       <text:p text:style-name="P2">Image fit fill (without formater)</text:p>
       <text:p text:style-name="P3">
         <text:span text:style-name="T1">
-          <draw:frame draw:style-name="fr1" draw:name="Image3" text:anchor-type="as-char" svg:width="3.794cm" svg:height="2.353cm" draw:z-index="2">
+          <draw:frame draw:style-name="fr1" draw:name="carbone-image-3" text:anchor-type="as-char" svg:width="3.794cm" svg:height="2.353cm" draw:z-index="2">
             <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/>
             <svg:title></svg:title>
           </draw:frame>

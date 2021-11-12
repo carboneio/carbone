@@ -26,7 +26,7 @@
       <text:p text:style-name="Standard"/>
       <text:p text:style-name="Standard"/>
       <text:p text:style-name="Standard">
-        <draw:frame draw:name="Image1" draw:style-name="fr1" draw:z-index="0" svg:height="3.412cm" svg:width="5.503cm" text:anchor-type="paragraph">
+        <draw:frame draw:name="carbone-image-1" draw:style-name="fr1" draw:z-index="0" svg:height="3.412cm" svg:width="5.503cm" text:anchor-type="paragraph">
           <draw:image loext:mime-type="image/jpeg" xlink:actuate="onLoad" xlink:href="Pictures/CarboneImage0.jpeg" xlink:show="embed" xlink:type="simple"/>
           <svg:title></svg:title>
         </draw:frame>

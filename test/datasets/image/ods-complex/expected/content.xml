@@ -61,7 +61,7 @@
         <table:table-row table:style-name="ro2">
           <table:table-cell/>
           <table:table-cell>
-            <draw:frame draw:z-index="0" draw:name="Image 1" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0035in" svg:y="0.0035in">
+            <draw:frame draw:z-index="0" draw:name="carbone-image-1" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0035in" svg:y="0.0035in">
               <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg">
                 <text:p/>
               </draw:image>
@@ -73,7 +73,7 @@
         <table:table-row table:style-name="ro3">
           <table:table-cell table:number-columns-repeated="2"/>
           <table:table-cell>
-            <draw:frame draw:z-index="1" draw:name="Image 1_0" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0047in" svg:y="0.0091in">
+            <draw:frame draw:z-index="1" draw:name="carbone-image-2" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0047in" svg:y="0.0091in">
               <draw:image xlink:href="Pictures/CarboneImage1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg">
                 <text:p/>
               </draw:image>
@@ -82,7 +82,7 @@
           </table:table-cell>
           <table:table-cell/>
           <table:table-cell>
-            <draw:frame draw:z-index="3" draw:name="Image 1_3" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0079in" svg:y="0.0031in">
+            <draw:frame draw:z-index="3" draw:name="carbone-image-3" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0079in" svg:y="0.0031in">
               <draw:image xlink:href="Pictures/CarboneImage2.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/png">
                 <text:p/>
               </draw:image>
@@ -100,7 +100,7 @@
         <table:table-row table:style-name="ro4">
           <table:table-cell table:number-columns-repeated="3"/>
           <table:table-cell>
-            <draw:frame draw:z-index="2" draw:name="Image 1_1" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0083in" svg:y="0.0146in">
+            <draw:frame draw:z-index="2" draw:name="carbone-image-4" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0083in" svg:y="0.0146in">
               <draw:image xlink:href="Pictures/CarboneImage3.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg">
                 <text:p/>
               </draw:image>
@@ -115,7 +115,7 @@
         <table:table-row table:style-name="ro3">
           <table:table-cell/>
           <table:table-cell>
-            <draw:frame draw:z-index="4" draw:name="Image 1_4" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0008in" svg:y="0.011in">
+            <draw:frame draw:z-index="4" draw:name="carbone-image-5" draw:style-name="gr1" draw:text-style-name="P1" svg:width="0.9453in" svg:height="0.5795in" svg:x="0.0008in" svg:y="0.011in">
               <draw:image xlink:href="Pictures/CarboneImage4.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg">
                 <text:p/>
               </draw:image>

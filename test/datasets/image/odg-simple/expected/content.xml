@@ -22,17 +22,17 @@
   <office:body>
     <office:drawing>
       <draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default">
-        <draw:frame draw:name="" draw:style-name="gr1" draw:text-style-name="P1" draw:layer="layout" svg:width="10.16cm" svg:height="6.299cm" svg:x="6.08cm" svg:y="2.321cm">
+        <draw:frame draw:name="carbone-image-1" draw:style-name="gr1" draw:text-style-name="P1" draw:layer="layout" svg:width="10.16cm" svg:height="6.299cm" svg:x="6.08cm" svg:y="2.321cm">
           <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg">
             <text:p/>
           </draw:image>
         </draw:frame>
-        <draw:frame draw:name="" draw:style-name="gr1" draw:text-style-name="P1" draw:layer="layout" svg:width="6.299cm" svg:height="6.299cm" svg:x="6.08cm" svg:y="9.572cm">
+        <draw:frame draw:name="carbone-image-2" draw:style-name="gr1" draw:text-style-name="P1" draw:layer="layout" svg:width="6.299cm" svg:height="6.299cm" svg:x="6.08cm" svg:y="9.572cm">
           <draw:image xlink:href="Pictures/CarboneImage1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg">
             <text:p/>
           </draw:image>
         </draw:frame>
-        <draw:frame draw:name="" draw:style-name="gr1" draw:text-style-name="P1" draw:layer="layout" svg:width="10.16cm" svg:height="6.299cm" svg:x="6.08cm" svg:y="17.192cm">
+        <draw:frame draw:name="carbone-image-3" draw:style-name="gr1" draw:text-style-name="P1" draw:layer="layout" svg:width="10.16cm" svg:height="6.299cm" svg:x="6.08cm" svg:y="17.192cm">
           <draw:image xlink:href="Pictures/CarboneImage1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg">
             <text:p/>
           </draw:image>

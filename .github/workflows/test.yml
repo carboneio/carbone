@@ -1,9 +1,12 @@
-name: test
+name: Test
 on:
   # https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
   # triggers https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
-  pull_request:
-    branches: [ master, main, enterprise-edition-master ]
+  # pull_request:
+  #   branches: [ master, main, enterprise-edition-master ]
+  
+  # Manual event   
+  workflow_dispatch:
 jobs:
   test:
     # https://docs.github.com/en/actions/learn-github-actions/environment-variables
@@ -44,8 +47,7 @@ jobs:
 
       # Performance tips #2
       # https://github.com/actions/cache
-      # Complex example wjhich use dpkg to list all installed deps:
-      # https://stackoverflow.com/questions/59269850/caching-apt-packages-in-github-actions-workflow
+      # Here is a complex example which use dpkg to list all installed deps: https://stackoverflow.com/questions/59269850/caching-apt-packages-in-github-actions-workflow
       - name: Install Libreoffice using cache
         id: libreoffice-cache
         uses: actions/cache@v2
@@ -71,4 +73,7 @@ jobs:
 
 # Deploy with git actions
 # https://levelup.gitconnected.com/how-to-manually-trigger-a-github-actions-workflow-4712542f1960
+# 
+# Same on Mac
+# https://github.com/metanorma/reverse_adoc/actions/runs/26372536/workflow
 

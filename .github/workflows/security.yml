@@ -1,7 +1,10 @@
-name: njsscan
+name: Security-check
 on:
-  pull_request:
-    branches: [ master, main, enterprise-edition-master ]
+  # Manual event   
+  workflow_dispatch:
+
+  # pull_request:
+  #   branches: [ master, main, enterprise-edition-master ]
 jobs:
   njsscan:
     runs-on: ubuntu-latest

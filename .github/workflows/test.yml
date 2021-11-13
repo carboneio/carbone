@@ -23,6 +23,7 @@ jobs:
       - uses: actions/checkout@v2
 
       # Performance tips #1
+      # Cache NodeJS and project NPM dependencies using a hash of package-lock.json as the invalidation key
       # https://docs.github.com/en/actions/advanced-guides/caching-dependencies-to-speed-up-workflows
       # https://github.com/actions/setup-node
       - name: Setup node using cache (faster)
@@ -50,7 +51,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            /opt/libreoffice*
+            /opt/libreoffice**
           # Invalidate cache if Libreoffice version change, or os change
           key: ${{ runner.os }}-${{ env.LIBREOFFICE_VERSION }}
 

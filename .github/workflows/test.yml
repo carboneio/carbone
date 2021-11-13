@@ -1,0 +1,37 @@
+name: test
+on:
+  pull_request:
+    branches: [ master, main, enterprise-edition-master ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ '16' ]
+    name: Node ${{ matrix.node }} test
+    steps:
+      - uses: actions/checkout@v2
+
+      # https://docs.github.com/en/actions/advanced-guides/caching-dependencies-to-speed-up-workflows
+      # https://github.com/actions/setup-node
+      - name: Setup node using cache (faster)
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
+          wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.0.4.2/deb/x86_64/LibreOffice_7.0.4.2_Linux_x86-64_deb.tar.gz
+          tar -zxvf LibreOffice_7.0.4.2_Linux_x86-64_deb.tar.gz
+          cd LibreOffice_7.0.4.2_Linux_x86-64_deb/DEBS
+          sudo dpkg -i *.deb
+
+      # Use npm "ci" instead of "i" to rad only package-lock.json
+      - run: npm ci
+      - run: npm test
+
+
+# Deploy with git actions
+# https://levelup.gitconnected.com/how-to-manually-trigger-a-github-actions-workflow-4712542f1960
+

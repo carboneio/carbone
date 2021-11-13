@@ -332,7 +332,7 @@ describe('builder', function () {
       var _diff = process.hrtime(_start);
       var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
       console.log('\n sortXmlParts speed : ' + _elapsed + ' ms (usually around 800 ms)\n');
-      helper.assert(_elapsed < 2000, true);
+      helper.assert(_elapsed < (2000 * helper.CPU_PERFORMANCE_FACTOR), true);
     });
     it('should sort by rowShow first if "pos" are the same', function () {
       var _data     = [{pos : [4], rowShow : false}, {pos : [4], rowShow : false}, {pos : [4], rowShow : true }, {pos : [1], rowShow : false}];

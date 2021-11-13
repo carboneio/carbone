@@ -3607,7 +3607,7 @@ describe('Dynamic HTML', function () {
         helper.assert(_nbTag, _nbHtmlRepetition * 16 * _nbLoop + _nbLoop /* a */);
         var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
         console.log('\n parseHTML speed : ' + (_elapsed / _nbLoop) + ' ms (around 1.5ms) \n');
-        helper.assert((_elapsed / _nbLoop)  > 10, false, 'parseHTML is too slow');
+        helper.assert((_elapsed / _nbLoop)  < (10 * helper.CPU_PERFORMANCE_FACTOR), true, 'parseHTML is too slow');
       });
       it('should parse HTML without error if the string empty', function () {
         helper.assert(html.parseHTML(''), []);

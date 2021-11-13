@@ -9,7 +9,7 @@ var jwt = require('kitten-jwt');
 describe('helper', function () {
 
   describe('getUID', function () {
-    it.only('should return a unique id', function () {
+    it('should return a unique id', function () {
       var _uid = helper.getUID();
       var _uid2 = helper.getUID();
       helper.assert((_uid!==_uid2), true);

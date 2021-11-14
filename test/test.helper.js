@@ -190,7 +190,7 @@ describe('helper', function () {
       }
       var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
       console.log('\n getRandomString : ' + _elapsed + ' ms (around 1.3ms for 1000) \n');
-      helper.assert(_elapsed > 5, false, 'getRandomString is too slow');
+      helper.assert(_elapsed < (10 * helper.CPU_PERFORMANCE_FACTOR), true, 'getRandomString is too slow');
     });
   });
 
@@ -287,7 +287,7 @@ describe('helper', function () {
       var _diff = process.hrtime(_start);
       var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
       console.log('\n getValueOfPath speed : ' + _elapsed  + ' ms (usually around 30 ms) '+_res+'\n');
-      helper.assert(_elapsed < 100, true);
+      helper.assert(_elapsed < (100 * helper.CPU_PERFORMANCE_FACTOR), true);
     });
   });
 
@@ -512,7 +512,7 @@ describe('helper', function () {
     });
     it('should be an invalid license if the signature is not correct even if the plan is eternity and the expiration date is after carbone package date', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
-      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
       helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
@@ -522,10 +522,10 @@ describe('helper', function () {
     });
     it('should read a directory and select the most recent *.carbone-license file (valid)', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
-      generateLicense(path.join(_testDir, 'acm.otherfile')                  , 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
-      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
-      generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 1000, privKey   , _data);
-      generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 1000, badPrivKey   , _data);
+      generateLicense(path.join(_testDir, 'acm.otherfile')                  , 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 5000, privKey   , _data);
+      generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 5000, badPrivKey   , _data);
       helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, true);
         helper.assert(message, 'Valid license file.carbone-license');
@@ -535,10 +535,10 @@ describe('helper', function () {
     });
     it('should read a directory and select the most recent *.carbone-license file (invalid)', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
-      generateLicense(path.join(_testDir, 'acm.otherfile')                  , 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
-      generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 1000, privKey   , _data);
-      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
-      generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'acm.otherfile')                  , 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 5000, privKey   , _data);
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
+      generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
       helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');

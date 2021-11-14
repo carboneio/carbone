@@ -1340,7 +1340,7 @@ describe('Dynamic colors', function () {
         var _diff = process.hrtime(_start);
         var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
         console.log('\n\n bindColor parsing : '+_elapsed + ' ms (usally around 900ms) \n\n\n');
-        helper.assert(_elapsed < 2000, true);
+        helper.assert(_elapsed < (2000 * helper.CPU_PERFORMANCE_FACTOR), true);
         helper.assert(res.length, 15251);
       });
     });

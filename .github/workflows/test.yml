@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         node: [ '16.13.0' ]
-    name: Node 16.13.0 on Ubuntu-20.04
+    name: Node on Ubuntu-20.04
     steps:
       # Checkout source code of the project
       - uses: actions/checkout@v2

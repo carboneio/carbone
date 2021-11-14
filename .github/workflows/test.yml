@@ -7,6 +7,7 @@ on:
   # Automatic trigger
   pull_request:
     branches: [ master, main, enterprise-edition-master ]
+    types: [edited, assigned]
   
   # Manual event   
 jobs:

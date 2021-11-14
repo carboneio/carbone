@@ -7,19 +7,22 @@ on:
   # Automatic trigger
   pull_request:
     branches: [ master, main, enterprise-edition-master ]
+    # listen pull request title change
     types: [edited, assigned]
   
-  # Manual event   
 jobs:
-  test:
+  TEST:
     # https://docs.github.com/en/actions/learn-github-actions/environment-variables
     env:
       LIBREOFFICE_VERSION: 7.0.4.2
-      NODE_VERSION: 16.13.0
     
-    # Content of github object
-    # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
-    # ALternative if: "contains(github.event.head_commit.message, '@review')"
+    # Execute tests only if tests are launched manually (workflow_dispatch) or if the pull request title does not contain "WIP:".
+    # 
+    # In the free edition, we cannot use the draft_request event: https://github.community/t/dont-run-actions-on-draft-pull-requests/16817/16
+    # Other ideas: https://stackoverflow.com/questions/63014786/how-to-schedule-a-github-actions-nightly-build-but-run-it-only-when-there-where
+    # 
+    # Doc github object: https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+    # Alternative if: "contains(github.event.head_commit.message, '@test')"
     if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) }}
 
     # The maximum number of minutes to let a job run before GitHub automatically cancels it
@@ -30,7 +33,7 @@ jobs:
     strategy:
       matrix:
         node: [ '16.13.0' ]
-    name: Node ${{ matrix.node }} test
+    name: Node 16.13.0 on Ubuntu-20.04
     steps:
       # Checkout source code of the project
       - uses: actions/checkout@v2
@@ -80,17 +83,21 @@ jobs:
       - run: npm ci
       - run: npm test
 
+  
+  # Static Application Security Testing
+  SAST:
+    runs-on: ubuntu-latest
+    name: Static security tests with Njsscan
+    # The maximum number of minutes to let a job run before GitHub automatically cancels it
+    timeout-minutes: 10
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    - name: nodejsscan scan
+      id: njsscan
+      uses: ajinabraham/njsscan-action@master
+      with:
+        args: 'lib/* formatters/* bin/* studio/*'
 
-# Deploy with git actions
-# https://levelup.gitconnected.com/how-to-manually-trigger-a-github-actions-workflow-4712542f1960
-# 
-# Same on Mac
+# Other doc for MacOS
 # https://github.com/metanorma/reverse_adoc/actions/runs/26372536/workflow
-# 
-# Technique pour deboucing les actions
-# https://stackoverflow.com/questions/63014786/how-to-schedule-a-github-actions-nightly-build-but-run-it-only-when-there-where
-# 
-# Nous, on peut pas utiliser les draft_request
-# https://github.community/t/dont-run-actions-on-draft-pull-requests/16817/16
-# 
-# Mais on peut lire le titre de la pull request et détecter le WIP

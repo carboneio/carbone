@@ -12,7 +12,7 @@ switch (_action) {
     tool.findMarkers(process.argv.slice(3));
     break;
   default:
-    usage(); 
+    usage();
 }
 
 function usage () {

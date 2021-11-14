@@ -2,7 +2,9 @@ name: Test
 on:
   # https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
   # triggers https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+  # Manual trigger
   workflow_dispatch:
+  # Automatic trigger
   pull_request:
     branches: [ master, main, enterprise-edition-master ]
   

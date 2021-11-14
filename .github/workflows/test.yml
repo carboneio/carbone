@@ -7,8 +7,8 @@ on:
   # Automatic trigger
   pull_request:
     branches: [ master, main, enterprise-edition-master ]
-    # listen pull request title change
-    types: [edited, assigned]
+    # trigger the workflow only when the pull request title change, or someone is assigned, or the pull_request is synchronized (new commit)
+    types: [edited, assigned, synchronize]
   
 jobs:
   TEST:
@@ -23,7 +23,7 @@ jobs:
     # 
     # Doc github object: https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
     # Alternative if: "contains(github.event.head_commit.message, '@test')"
-    if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) || contains(github.event.head_commit.message, '@test') }}
 
     # The maximum number of minutes to let a job run before GitHub automatically cancels it
     timeout-minutes: 10
@@ -85,7 +85,10 @@ jobs:
 
   
   # Static Application Security Testing
+  # TODO limit only on modified files with something like: 
+  # git diff --name-only "$GITHUB_BASE_REF..$GITHUB_SHA" | egrep '\.(js|vue)$' | cat | xargs -r njsscan -w -o njsscan.log
   SAST:
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) || contains(github.event.head_commit.message, '@test') }}
     runs-on: ubuntu-latest
     name: Static security tests with Njsscan
     # The maximum number of minutes to let a job run before GitHub automatically cancels it
@@ -101,3 +104,9 @@ jobs:
 
 # Other doc for MacOS
 # https://github.com/metanorma/reverse_adoc/actions/runs/26372536/workflow
+# 
+# Tips to print the content of github.event
+# steps:
+#  - name: Logging
+#    run: |
+#      echo "${{toJSON(github.event)}}"

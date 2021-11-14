@@ -11,6 +11,7 @@ const { exec }   = require('child_process');
 const package    = require('../package.json');
 const params     = require('../lib/params');
 const helper     = require('../lib/helper');
+const nock       = require('nock');
 
 function deleteRequiredFiles () {
   try {
@@ -25,11 +26,11 @@ function deleteRequiredFiles () {
   }
 }
 
-function getBody (port, route, method, body, token) {
+function getBody (port, route, method, body, token, headers) {
   let toSend = {
     url     : `http://localhost:${port}${route}`,
     method  : method,
-    headers : {}
+    headers : headers || {}
   };
 
   if (method === 'POST') {
@@ -302,7 +303,7 @@ describe('Webserver', () => {
       it('should create nested workdir with sub directories if it does not exist and \
           the asset folder should contain the converter.py and \
           the config folder should contain the config files (keys + config.json)', (done) => {
-        const _listDir = ['template', 'render', 'asset', 'config', 'plugin'];
+        const _listDir = ['template', 'render', 'asset', 'config', 'plugin', 'queue'];
         const _workdir = path.join(os.tmpdir(), '/this/is/a/special/dir/1/2/3/');
         webserver = require('../lib/webserver');
         webserver.handleParams(['--port', 4000, '--workdir', _workdir], () => {
@@ -721,6 +722,10 @@ describe('Webserver', () => {
           if (fs.existsSync(path.join(os.tmpdir(), 'template', toDelete[i]))) {
             fs.unlinkSync(path.join(os.tmpdir(), 'template', toDelete[i]));
           }
+
+          if (fs.existsSync(path.join(os.tmpdir(), 'queue', toDelete[i]))) {
+            fs.unlinkSync(path.join(os.tmpdir(), 'queue', toDelete[i]));
+          }
         }
 
         toDelete = [];
@@ -767,6 +772,62 @@ describe('Webserver', () => {
           const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
           toDelete.push(data.data.renderId);
+          done();
+        });
+      });
+
+
+      it('should add a new item on the render queue', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement   : {},
+          enum         : {},
+          renderPrefix : ''
+        };
+        const _successUrl = 'https://carbone.io/callback';
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
+          assert.strictEqual(data.success, true);
+          assert.strictEqual(data.message, 'A render ID will be sent to your callback URL when the document is generated');
+          assert.strictEqual(data.data.renderId, '');
+          fs.readdir(path.join(os.tmpdir(), 'queue'), function (err, data) {
+            assert.strictEqual(!err, true);
+            assert.strictEqual(data.length > 0, true);
+            const _queueItemData = JSON.parse(fs.readFileSync(path.join(os.tmpdir(), 'queue', data[0]), 'utf-8'));
+            assert.strictEqual(_queueItemData.successUrl, _successUrl);
+            assert.strictEqual(_queueItemData.templateAbsolutePath.length > 0, true);
+            assert.strictEqual(JSON.stringify(_queueItemData.body), JSON.stringify(body));
+            assert.strictEqual(_queueItemData.req.url.length > 0, true);
+            assert.strictEqual(_queueItemData.req.method, 'Webhook POST');
+            assert.strictEqual(_queueItemData.req.headers['carbone-webhook-test'], 'true');
+            toDelete.push(...data);
+            done();
+          });
+        });
+      });
+
+      it('should NOT add a new item on the render queue if the queuePath is not valid', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement   : {},
+          enum         : {},
+          renderPrefix : ''
+        };
+        const _successUrl = 'https://carbone.io/callback';
+        const _previousQueuePath = params.queuePath;
+        params.queuePath = '/folderDoesNotExist/queue';
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Error while setting up the webhook');
+          assert.strictEqual(data.code, 'w117');
+          params.queuePath = _previousQueuePath;
           done();
         });
       });
@@ -936,6 +997,242 @@ describe('Webserver', () => {
           assert.strictEqual(data.error, 'Unvalid ID');
           done();
         });
+      });
+    });
+
+    describe('renderWebhookQueue', () => {
+
+      let toDelete = [];
+
+      before((done) => {
+        uploadFile(4000, null, done);
+      });
+
+      afterEach(() => {
+        for (let i = 0; i < toDelete.length; i++) {
+          if (fs.existsSync(path.join(os.tmpdir(), 'render', toDelete[i]))) {
+            fs.unlinkSync(path.join(os.tmpdir(), 'render', toDelete[i]));
+          }
+        }
+        toDelete = [];
+      });
+
+      after((done) => {
+        if (fs.existsSync(path.join(os.tmpdir(), 'template', templateId))) {
+          fs.unlinkSync(path.join(os.tmpdir(), 'template', templateId));
+        }
+        done();
+      });
+
+
+      it('should render one document from a queue item and should request the callbackURL', (done) => {
+
+        const _successUrl = 'https://carbone.io';
+        const _successUrlPath = '/callback';
+        const webhookRequestNock = nock(_successUrl).post(_successUrlPath).reply(200, function (uri, body) {
+          assert.strictEqual(body.success, true);
+          assert.strictEqual(body.data.renderId.length > 0, true);
+          if (body.data.renderId) {
+            toDelete.push(body.data.renderId);
+          }
+          return {};
+        });
+
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement   : {},
+          enum         : {},
+          renderPrefix : ''
+        };
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl + _successUrlPath }), (err, res, data) => {
+          assert.strictEqual(data.success, true);
+          webserver.runWebhookRenderJob(`id-${Date.now()}`);
+          setTimeout(() => {
+            const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
+            assert.strictEqual(_queueItems.length, 0);
+            assert.strictEqual(webhookRequestNock.pendingMocks().length, 0);
+            done();
+          }, 100);
+        });
+      });
+
+      it('should render 3 documents from the queue, should request all different callback URL, and should not execute more than 1 job at the same time', (done) => {
+        const _successUrl1 = 'https://carbone.io';
+        const _successUrl2 = 'https://anotherdomain.carbone.io';
+        const _successUrl3 = 'https://random.carbone.io';
+        const _successUrlPath = '/callback';
+        const webhookRequestNock1 = nock(_successUrl1)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+        const webhookRequestNock2 = nock(_successUrl2)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+        const webhookRequestNock3 = nock(_successUrl3)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement   : {},
+          enum         : {},
+          renderPrefix : ''
+        };
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl1 + _successUrlPath }), (err, res, data) => {
+          assert.strictEqual(data.success, true);
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl2 + _successUrlPath }), (err, res, data) => {
+            assert.strictEqual(data.success, true);
+            get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl3 + _successUrlPath }), (err, res, data) => {
+              assert.strictEqual(data.success, true);
+              webserver.runWebhookRenderJob(`id-${Date.now()}`);
+              // Should do nothing
+              webserver.runWebhookRenderJob(`id-${Date.now()}`);
+              setTimeout(() => {
+                const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
+                assert.strictEqual(_queueItems.length, 0);
+                assert.strictEqual(webhookRequestNock1.pendingMocks().length, 0);
+                assert.strictEqual(webhookRequestNock2.pendingMocks().length, 0);
+                assert.strictEqual(webhookRequestNock3.pendingMocks().length, 0);
+                done();
+              }, 200);
+            });
+          });
+        });
+      });
+
+      it('should render 3 documents from the queue, should request all different callback URL, and should not execute more than 3 job at the same time', (done) => {
+        params.factories = 3;
+        const _successUrl1 = 'https://subdomain.carbone.io';
+        const _successUrl2 = 'https://anotherdomain.carbone.io';
+        const _successUrl3 = 'https://random.carbone.io';
+        const _successUrl4 = 'https://finaldomain.carbone.io';
+        const _successUrlPath = '/callback';
+        const webhookRequestNock1 = nock(_successUrl1)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+        const webhookRequestNock2 = nock(_successUrl2)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+        const webhookRequestNock3 = nock(_successUrl3)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+        const webhookRequestNock4 = nock(_successUrl4)
+          .post(_successUrlPath).reply(200, function (uri, body) {
+            assert.strictEqual(body.success, true);
+            assert.strictEqual(body.data.renderId.length > 0, true);
+            if (body.data.renderId) {
+              toDelete.push(body.data.renderId);
+            }
+            return {};
+          });
+
+
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement   : {},
+          enum         : {},
+          renderPrefix : ''
+        };
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl1 + _successUrlPath }), function (err, res, data) {
+          assert.strictEqual(data.success, true);
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl2 + _successUrlPath }), function (err, res, data) {
+            assert.strictEqual(data.success, true);
+            get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl3 + _successUrlPath }), function (err, res, data) {
+              assert.strictEqual(data.success, true);
+              get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl4 + _successUrlPath }), function (err, res, data) {
+                assert.strictEqual(data.success, true);
+                webserver.runWebhookRenderJob(`id-${Date.now()}`);
+                setTimeout(() => {
+                  webserver.runWebhookRenderJob(`id-${Date.now()}`);
+                }, 2);
+                setTimeout(() => {
+                  webserver.runWebhookRenderJob(`id-${Date.now()}`);
+                }, 4);
+                setTimeout(() => {
+                  const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
+                  assert.strictEqual(_queueItems.length, 0);
+                  assert.strictEqual(webhookRequestNock1.pendingMocks().length, 0);
+                  assert.strictEqual(webhookRequestNock2.pendingMocks().length, 0);
+                  assert.strictEqual(webhookRequestNock3.pendingMocks().length, 0);
+                  assert.strictEqual(webhookRequestNock4.pendingMocks().length, 0);
+                  params.factories = 1;
+                  done();
+                }, 200);
+              });
+            });
+          });
+        });
+      });
+
+      it('should not render the document if the file queue is not a JSON file and should be deleted', (done) => {
+        fs.writeFileSync(path.join(os.tmpdir(), 'queue', 'file.xml'), '<xml>This is some data</xml>');
+        webserver.runWebhookRenderJob(`id-${Date.now()}`);
+        setTimeout(() => {
+          const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
+          assert.strictEqual(_queueItems.length, 0);
+          done();
+        }, 100);
+      });
+
+      it('should not render the document if the queuePath is not valid', (done) => {
+        const _previousQueuePath = params.queuePath;
+        params.queuePath = '/folderDoesNotExist/queue';
+        fs.writeFileSync(path.join(os.tmpdir(), 'queue', 'file.xml'), '<xml>This is some data</xml>');
+        webserver.runWebhookRenderJob(`id-${Date.now()}`);
+        setTimeout(() => {
+          const _queueItems = fs.readdirSync(path.join(os.tmpdir(), 'queue'));
+          assert.strictEqual(_queueItems.length, 1);
+          fs.unlinkSync(path.join(os.tmpdir(), 'queue', 'file.xml'));
+          params.queuePath = _previousQueuePath;
+          done();
+        }, 100);
       });
     });
 

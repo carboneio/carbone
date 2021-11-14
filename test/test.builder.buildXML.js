@@ -1467,7 +1467,7 @@ describe('builder.buildXML', function () {
       var _end = new Date();
       var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
       console.log('\n\n buildXML Time Elapsed : '+_elapsed + ' ms per call for '+_nbExecuted+' calls (usally around 20ms)\n\n\n');
-      assert.equal((_elapsed < 50), true);
+      assert.equal((_elapsed < (50 * helper.CPU_PERFORMANCE_FACTOR)), true);
       done();
     }
   });

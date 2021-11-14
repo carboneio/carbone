@@ -1,4 +1,21 @@
 ### v3.4.0
+  - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
+  - Bump DayJS to 1.10.7
+  - Bump debug to 4.3.2
+  - Improve thread management of LibreOffice on Linux:
+    - The system which auto-restarts LibreOffice when it crashes or if there is a conversion timeout could hang indefinitely on Linux.
+      On the Enterprise Edition, the global watchdog system is able to fix this bad behavior but it is slow.
+      Now, the LibreOffice is correctly killed. No zombie processes remaining.
+    - Avoid launching the parent process "oosplash" of LibreOffice
+    - Improve auto-restart mechanism
+    - Add debug logs
+    - All tests passed on Linux 😅
+  - [EE] Fix random image display in LibreOffice documents. Sometimes, LibreOffice hides one image when two or more images share the same name.
+         Now, Carbone generates a unique name for each image with the format "carbone-image-<counter>".
+  - [EE] Experimental: Deffered rendering with a webhook, it is dedicated to render huge reports:
+    1. Render a document as usual with the request `POST /render/:templateID` with the JSON dataset into the body request AND you have to insert the header `carbone-webhook-url` as a callback URL. It is an endpoint of your server listening when a document is rendered.
+    2. Carbone will generate your document and it will notify your webhook with a renderID
+    3. Retrieve the generated document with a `GET /render/:renderID` and voilà!
   - [EE] Experimental feature: add the possibility to duplicate rows using an attribute of an object
     *Data*:
       ```json

@@ -19,7 +19,7 @@ jobs:
     # Content of github object
     # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
     # ALternative if: "contains(github.event.head_commit.message, '@review')"
-    if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) }}
 
     # The maximum number of minutes to let a job run before GitHub automatically cancels it
     timeout-minutes: 10

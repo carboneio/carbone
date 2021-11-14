@@ -39,7 +39,7 @@ describe('helper', function () {
       }
       var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
       console.log('\n getRandomString : ' + _elapsed + ' ms (around 1.3ms for 1000) \n');
-      helper.assert(_elapsed > 5, false, 'getRandomString is too slow');
+      helper.assert(_elapsed < (10 * helper.CPU_PERFORMANCE_FACTOR), true, 'getRandomString is too slow');
     });
   });
 
@@ -66,9 +66,9 @@ describe('helper', function () {
       helper.assert(helper.encodeSafeFilename('报道'), '5oql6YGT');
       helper.assert(helper.decodeSafeFilename('5oql6YGT'), '报道');
 
-      helper.assert(helper.encodeSafeFilename('k�'), 'a__-vQ');
-      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
-      helper.assert(helper.decodeSafeFilename('a__-vQ'), 'k�');
+      helper.assert(helper.encodeSafeFilename('k�'), 'a--_vQ');
+      helper.assert(helper.decodeSafeFilename('a--_vQ'), 'k�');
+      helper.assert(helper.decodeSafeFilename('a--_vQ'), 'k�');
     });
   });
 
@@ -136,7 +136,7 @@ describe('helper', function () {
       var _diff = process.hrtime(_start);
       var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
       console.log('\n getValueOfPath speed : ' + _elapsed  + ' ms (usually around 30 ms) '+_res+'\n');
-      helper.assert(_elapsed < 100, true);
+      helper.assert(_elapsed < (100 * helper.CPU_PERFORMANCE_FACTOR), true);
     });
   });
 
@@ -168,7 +168,6 @@ describe('helper', function () {
       helper.assert(helper.removeQuote('\'sd " sd\''), 'sd " sd');
     });
   });
-
 
   describe('readFileDirSync', function () {
     beforeEach(function () {

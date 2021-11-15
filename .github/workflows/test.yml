@@ -1,0 +1,112 @@
+name: Test
+on:
+  # https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows
+  # triggers https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+  # Manual trigger
+  workflow_dispatch:
+  # Automatic trigger
+  pull_request:
+    branches: [ master, main, enterprise-edition-master ]
+    # trigger the workflow only when the pull request title change, or someone is assigned
+    types: [edited, assigned]
+  
+jobs:
+  TEST:
+    # https://docs.github.com/en/actions/learn-github-actions/environment-variables
+    env:
+      LIBREOFFICE_VERSION: 7.0.4.2
+    
+    # Execute tests only if tests are launched manually (workflow_dispatch) or if the pull request title does not contain "WIP:".
+    # 
+    # In the free edition, we cannot use the draft_request event: https://github.community/t/dont-run-actions-on-draft-pull-requests/16817/16
+    # Other ideas: https://stackoverflow.com/questions/63014786/how-to-schedule-a-github-actions-nightly-build-but-run-it-only-when-there-where
+    # 
+    # Doc github object: https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+    # Alternative if: "contains(github.event.head_commit.message, '@test') && github.event_name === 'push'
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) }}
+
+    # The maximum number of minutes to let a job run before GitHub automatically cancels it
+    timeout-minutes: 25
+    # Content of the Ubuntu image: https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md
+    # List of available platform: https://github.com/actions/virtual-environments
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node: [ '16.13.0' ]
+    name: Node on Ubuntu-20.04
+    steps:
+      # Checkout source code of the project
+      - uses: actions/checkout@v2
+
+      # Performance tips #1
+      # Cache NodeJS and project NPM dependencies using a hash of package-lock.json as the invalidation key
+      # https://docs.github.com/en/actions/advanced-guides/caching-dependencies-to-speed-up-workflows
+      # https://github.com/actions/setup-node
+      - name: Setup node using cache (faster)
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      
+      # Github images contains most of these dependancies but install it anyway 
+      - name: Install LibreOffice Dependencies
+        run: |
+          sudo apt-get install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
+
+      # darwin: sudo systemsetup -settimezone Europe/Paris
+      # win: tzutil /s Europe/Paris
+      - name: Set Timezone for testing
+        run: |
+          sudo timedatectl set-timezone Europe/Paris
+
+      # Performance tips #2
+      # https://github.com/actions/cache
+      # Here is a complex example which use dpkg to list all installed deps: https://stackoverflow.com/questions/59269850/caching-apt-packages-in-github-actions-workflow
+      - name: Install Libreoffice using cache
+        id: libreoffice-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            /opt/libreoffice**
+          # Invalidate cache if Libreoffice version change, or os change
+          key: ${{ runner.os }}-${{ env.LIBREOFFICE_VERSION }}
+
+      - name: Install LibreOffice if cache is invalid
+        # If the cache is empty
+        if: steps.libreoffice-cache.outputs.cache-hit != 'true'
+        run: |
+          wget https://downloadarchive.documentfoundation.org/libreoffice/old/${{env.LIBREOFFICE_VERSION}}/deb/x86_64/LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb.tar.gz
+          tar -zxvf LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb.tar.gz
+          cd LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb/DEBS
+          sudo dpkg -i *.deb
+
+      # Use npm "ci" instead of "i" to use only package-lock.json as source
+      - run: npm ci
+      - run: npm test
+
+  
+  # Static Application Security Testing
+  # TODO limit only on modified files with something like: 
+  # git diff --name-only "$GITHUB_BASE_REF..$GITHUB_SHA" | egrep '\.(js|vue)$' | cat | xargs -r njsscan -w -o njsscan.log
+  SAST:
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) || contains(github.event.head_commit.message, '@test') }}
+    runs-on: ubuntu-latest
+    name: Static security tests with Njsscan
+    # The maximum number of minutes to let a job run before GitHub automatically cancels it
+    timeout-minutes: 10
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+    - name: nodejsscan scan
+      id: njsscan
+      uses: ajinabraham/njsscan-action@master
+      with:
+        args: 'lib/* formatters/* bin/* studio/*'
+
+# Other doc for MacOS
+# https://github.com/metanorma/reverse_adoc/actions/runs/26372536/workflow
+# 
+# Tips to print the content of github.event
+# steps:
+#  - name: Logging
+#    run: |
+#      echo "${{toJSON(github.event)}}"

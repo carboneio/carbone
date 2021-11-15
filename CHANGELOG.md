@@ -16,6 +16,18 @@
     1. Render a document as usual with the request `POST /render/:templateID` with the JSON dataset into the body request AND you have to insert the header `carbone-webhook-url` as a callback URL. It is an endpoint of your server listening when a document is rendered.
     2. Carbone will generate your document and it will notify your webhook with a renderID
     3. Retrieve the generated document with a `GET /render/:renderID` and voilà!
+  - [EE] Experimental feature: add the possibility to duplicate rows using an attribute of an object
+    *Data*:
+      ```json
+      [
+        { "id" : "A", "qty" : 2 },
+        { "id" : "B", "qty" : 3 },
+        { "id" : "C", "qty" : 0 },
+        { "id" : "D", "qty" : 1 }
+      ]
+      ```
+    *Template*: `{d[i].id} - {d[i+1*qty].id}`
+    *Result*:  `A - A - B - B - B - D`
   - [EE] New Dynamic Barcodes system for DOCX/ODT/XLSX/ODS:
     - Instead of creating barcodes from Font Families, barcodes are now created as Dynamic Images.
     - In your template, barcodes markers should be inserted inside the title or description field of a temporary image, and then it should be followed with the barcode formatter, such as `{d.value:barcode(type)}`.

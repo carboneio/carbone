@@ -2753,7 +2753,7 @@ describe('Carbone', function () {
           assert.equal(Buffer.isBuffer(_results[i]), true);
           assert.equal((_results[i].slice(0, 2).toString() === 'PK'), true);
         }
-        assert.equal((_elapsed < 200), true);
+        assert.equal((_elapsed < (200 * helper.CPU_PERFORMANCE_FACTOR)), true);
         done();
       }
     });
@@ -3216,7 +3216,7 @@ describe('Carbone', function () {
             assert.equal(Buffer.isBuffer(_results[i]), true);
             assert.equal(_results[i].slice(0, 4).toString(), '%PDF');
           }
-          // assert.equal((_elapsed < 200), true);
+          assert.equal((_elapsed < (200 * helper.CPU_PERFORMANCE_FACTOR)), true);
           done();
         }
       });

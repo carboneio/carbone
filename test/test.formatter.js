@@ -1378,7 +1378,7 @@ describe('formatter', function () {
       var _diff = process.hrtime(_start);
       var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
       console.log('\n formatC number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
-      helper.assert(_elapsed > 70, false, 'formatC is too slow');
+      helper.assert(_elapsed < (70 * helper.CPU_PERFORMANCE_FACTOR), true, 'formatC is too slow');
     });
   });
 
@@ -1477,7 +1477,7 @@ describe('formatter', function () {
         let _diff = process.hrtime(_start);
         let _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
         console.log('\n barcode e128 number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
-        helper.assert(_elapsed > 50, false, 'barcode(ean128) is too slow');
+        helper.assert(_elapsed < (50 * helper.CPU_PERFORMANCE_FACTOR), true, 'barcode(ean128) is too slow');
       });
     });
 

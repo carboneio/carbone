@@ -1378,7 +1378,7 @@ describe('formatter', function () {
       var _diff = process.hrtime(_start);
       var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
       console.log('\n formatC number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
-      helper.assert(_elapsed > 50, false, 'formatC is too slow');
+      helper.assert(_elapsed > 70, false, 'formatC is too slow');
     });
   });
 

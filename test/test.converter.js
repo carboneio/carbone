@@ -88,7 +88,8 @@ describe('Converter', function () {
       var _customOptions = {
         pipeNamePrefix : '_carboneTest',
         factories      : 3,
-        startFactory   : true
+        startFactory   : true,
+        tempPath       : tempPath
       };
       converter.init(_customOptions, function (factories) {
         var _nbFactories = 0;

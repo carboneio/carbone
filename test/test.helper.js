@@ -190,7 +190,7 @@ describe('helper', function () {
       }
       var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
       console.log('\n getRandomString : ' + _elapsed + ' ms (around 1.3ms for 1000) \n');
-      helper.assert(_elapsed > 5, false, 'getRandomString is too slow');
+      helper.assert(_elapsed > 10, false, 'getRandomString is too slow');
     });
   });
 

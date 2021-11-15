@@ -1532,6 +1532,7 @@ describe('formatter', function () {
               var _diff = process.hrtime(_start);
               var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
               console.log('\n Generale all barcodes speed :  ' + _elapsed + ' ms total / Average of ' + (_elapsed / barcodeFormatter.supportedBarcodes.length) + ' ms per barcode \n');
+              helper.assert(_elapsed < 1000, true);
               return done();
             }
             const _barcodeKey = JSON.stringify({bcid : barcodesList[0].sym, text : barcodesList[0].text });

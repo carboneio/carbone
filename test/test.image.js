@@ -391,7 +391,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:isImage:barcode(ean13):scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:isImage:barcode(ean13):scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:isImage:barcode(ean13):generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:isImage:barcode(ean13):generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:isImage:barcode(ean13):generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:isImage:barcode(ean13):scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:isImage:barcode(ean13):scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:isImage:barcode(ean13):generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:isImage:barcode(ean13):generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();

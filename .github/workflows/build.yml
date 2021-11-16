@@ -1,0 +1,64 @@
+name: Build Enterprise Releases
+
+on: push
+
+jobs:
+  BUILD:
+    env:
+      PKG_VERSION: 5.4.1
+
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node_version: ['16.13.0']
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node using cache (faster)
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      
+      # "--production" avoid installing dev dependencies to speed up process
+      - run: npm ci --production
+      - run: sudo npm i -g pkg@${{ env.PKG_VERSION }}
+      - run: echo "PACKAGE_VERSION=$(jq '.version' package.json)" >> $GITHUB_ENV
+      - run: echo "${{ env.PACKAGE_VERSION }}"
+      - run: echo "BUILD_FILENAME_LINUX=$(echo carbone-ee-${{ env.PACKAGE_VERSION }}-linux)" >> $GITHUB_ENV
+      - run: echo "BUILD_FILENAME_MACOS=$(echo carbone-ee-${{ env.PACKAGE_VERSION }}-macos)" >> $GITHUB_ENV
+      - run: npm run publishBuild # Use our own script to be able to build without Github in case of emergency
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.PACKAGE_VERSION }}
+          release_name: ${{ env.PACKAGE_VERSION }}
+          draft: false
+          prerelease: false
+      
+      - name: Upload Release Asset (Linux)
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./build/${{ env.BUILD_FILENAME_LINUX }}
+          asset_name: ${{ env.BUILD_FILENAME_LINUX }}
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset (Mac)
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./build/${{ env.BUILD_FILENAME_MACOS }}
+          asset_name: ${{ env.BUILD_FILENAME_MACOS }}
+          asset_content_type: application/octet-stream
+

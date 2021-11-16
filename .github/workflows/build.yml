@@ -1,4 +1,4 @@
-name: Build Enterprise Releases
+name: Release Enterprise Edition
 
 on: push
 
@@ -7,7 +7,6 @@ jobs:
     env:
       PKG_VERSION: 5.4.1
       BUILD_TARGET: "node16-linux-x64,node16-macos-x64"
-      BUILD_PREFIX: "./build/carbone-ee-"
 
     runs-on: ubuntu-20.04
 
@@ -26,9 +25,8 @@ jobs:
       - run: echo "PACKAGE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
       - run: echo "CARBONE_EE_TAG=$(echo ee-${{env.PACKAGE_VERSION}})" >> $GITHUB_ENV
       # remove dots in filename because Github release does not accept filename with dots
-      - run: echo "FILENAME_VERSION=$(echo ${env.PACKAGE_VERSION//./-})" >> $GITHUB_ENV
-      - run: echo "BUILD_FILENAME_LINUX=$(echo carbone-ee-${{env.FILENAME_VERSION}}-linux-x64)" >> $GITHUB_ENV
-      - run: echo "BUILD_FILENAME_MACOS=$(echo carbone-ee-${{env.FILENAME_VERSION}}-macos-x64)" >> $GITHUB_ENV
+      # - run: echo "FILENAME_VERSION=$(echo ${env.PACKAGE_VERSION//./-})" >> $GITHUB_ENV
+      - run: echo "BUILD_PREFIX=$(echo ./build/carbone-ee-${{env.PACKAGE_VERSION}})" >> $GITHUB_ENV
       
       - run: git config user.name github-actions
       - run: git config user.email github-actions@github.com
@@ -52,7 +50,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.CARBONE_EE_TAG }}
-          release_name: ${{ env.PACKAGE_VERSION }}
+          release_name: "v${{ env.PACKAGE_VERSION }}"
           draft: false
           prerelease: false
 

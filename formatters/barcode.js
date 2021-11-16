@@ -18,10 +18,10 @@ barcodesMethods.set('code128', _ean128);
  * @return {Boolean}
  */
 function _isNumber (str, fromIndex, length) {
-  if (fromIndex + length - 1 > str.length) {
+  if ((fromIndex + length - 1) > str.length) {
     return false;
   }
-  return /^\d+$/.test(str.substr(fromIndex - 1, length));
+  return /^\d+$/.test(str.substr(fromIndex-1, length));
 }
 
 /**
@@ -48,13 +48,11 @@ function _ean128 (arg) {
   while (i <= arg.length) {
     if (tableB) {
       // Change to table C if `i` is the first iterator or 4 digits following
-      mini = i === 1 || i + 3 === arg.length ? 4 : 6;
+      mini = ((i === 1) || (i + 3 === arg.length)) ? 4 : 6;
 
       if (_isNumber(arg, i, mini) === true) {
         // Table C
-        i === 1
-          ? (code128 = String.fromCharCode(210))
-          : (code128 += String.fromCharCode(204));
+        (i === 1 ? code128 = String.fromCharCode(210) : code128 += String.fromCharCode(204));
         tableB = false;
       }
       else if (i === 1) {
@@ -65,7 +63,7 @@ function _ean128 (arg) {
 
     if (!tableB) {
       mini = 2;
-      if (_isNumber(arg, i, mini) === true) {
+      if ( _isNumber(arg, i, mini) === true) {
         dummy = parseInt(arg.substr(i - 1, 2));
         if (dummy < 95) {
           dummy += 32;
@@ -100,7 +98,7 @@ function _ean128 (arg) {
     if (i === 1) {
       checksum = dummy;
     }
-    checksum = (checksum + (i - 1) * dummy) % 103;
+    checksum = (checksum + (i - 1) * dummy ) % 103;
   }
 
   if (checksum < 95) {
@@ -173,6 +171,7 @@ function _ean13 (arg) {
   var _barcode = ''; // final result
   var _tableA; // Boolean used to define the table A or B
 
+
   // Allow only a string of numbers
   if (isNaN(arg)) {
     // console.error('It should be a string.');
@@ -201,40 +200,27 @@ function _ean13 (arg) {
       }
     }
     else if (i === 3) {
-      if (_first === 0 || _first === 4 || _first === 7 || _first === 8) {
+      if (_first === 0 || _first === 4 ||
+          _first === 7 || _first === 8) {
         _tableA = true;
       }
     }
     else if (i === 4) {
-      if (
-        _first === 0 ||
-        _first === 1 ||
-        _first === 4 ||
-        _first === 5 ||
-        _first === 9
-      ) {
+      if (_first === 0 || _first === 1 ||
+          _first === 4 || _first === 5 || _first === 9) {
         _tableA = true;
       }
     }
     else if (i === 5) {
-      if (
-        _first === 0 ||
-        _first === 2 ||
-        _first === 5 ||
-        _first === 6 ||
-        _first === 7
-      ) {
+      if (_first === 0 || _first === 2 ||
+          _first === 5 || _first === 6 || _first === 7) {
         _tableA = true;
       }
     }
     else if (i === 6) {
-      if (
-        _first === 0 ||
-        _first === 3 ||
-        _first === 6 ||
-        _first === 8 ||
-        _first === 9
-      ) {
+      if (_first === 0 || _first === 3 ||
+          _first === 6 || _first === 8 ||
+          _first === 9) {
         _tableA = true;
       }
     }
@@ -250,7 +236,7 @@ function _ean13 (arg) {
   _barcode += '*';
 
   // Second part characters from C table
-  for (let i = 7; i <= 12; i++) {
+  for (let i = 7 ; i <= 12 ; i++ ) {
     _barcode += String.fromCharCode(97 - 48 + arg.charCodeAt(i));
   }
 
@@ -274,18 +260,16 @@ function _code39 (data) {
     return '';
   }
 
-  for (let i = data.length - 1; i >= 0 && _err === false; i--) {
+  for (let i = data.length - 1; i >= 0 && _err === false ; i--) {
     const c = data[i].charCodeAt(0);
 
     // characters not allowed
-    if (
-      c !== 32 &&
+    if (c !== 32 &&
       c !== 36 &&
       c !== 37 &&
       c !== 43 &&
       !(c >= 45 && c <= 57) &&
-      !(c >= 65 && c <= 90)
-    ) {
+      !(c >= 65 && c <= 90)) {
       _err = true;
     }
   }

@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "body-parser": "=1.19.0",
+    "bwip-js": "=3.0.4",
     "cors": "=2.8.5",
     "dayjs": "=1.10.7",
     "debug": "=4.3.2",

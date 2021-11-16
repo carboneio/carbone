@@ -39,26 +39,33 @@ jobs:
           release_name: ${{ env.PACKAGE_VERSION }}
           draft: false
           prerelease: false
-      
-      - name: Upload Release Asset (Linux)
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./build/${{ env.BUILD_FILENAME_LINUX }}
-          asset_name: ${{ env.BUILD_FILENAME_LINUX }}
-          asset_content_type: application/octet-stream
 
-      - name: Upload Release Asset (Mac)
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+      - name: Upload
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./build/${{ env.BUILD_FILENAME_MACOS }}
-          asset_name: ${{ env.BUILD_FILENAME_MACOS }}
-          asset_content_type: application/octet-stream
+        run: |
+          tag_name="${{ env.PACKAGE_VERSION }}"
+          hub release edit $(find build/ -type f -name "carbone-ee*" -printf "-a %p ") -m "" "$tag_name"
+      
+#      - name: Upload Release Asset (Linux)
+#        id: upload-release-asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+#          asset_path: ./build/${{ env.BUILD_FILENAME_LINUX }}
+#          asset_name: ${{ env.BUILD_FILENAME_LINUX }}
+#          asset_content_type: application/octet-stream
+#
+#      - name: Upload Release Asset (Mac)
+#        id: upload-release-asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+#          asset_path: ./build/${{ env.BUILD_FILENAME_MACOS }}
+#          asset_name: ${{ env.BUILD_FILENAME_MACOS }}
+#          asset_content_type: application/octet-stream
 

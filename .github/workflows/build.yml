@@ -6,6 +6,8 @@ jobs:
   BUILD:
     env:
       PKG_VERSION: 5.4.1
+      BUILD_TARGET: "node16-linux-x64,node16-macos-x64"
+      BUILD_PREFIX: "./build/carbone-ee-"
 
     runs-on: ubuntu-20.04
 
@@ -20,14 +22,26 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       
-      # "--production" avoid installing dev dependencies to speed up process
-      - run: npm ci --production
-      - run: sudo npm i -g pkg@${{ env.PKG_VERSION }}
+      #- run: echo "${{ env.PACKAGE_VERSION }}"
       - run: echo "PACKAGE_VERSION=$(jq '.version' package.json)" >> $GITHUB_ENV
-      - run: echo "${{ env.PACKAGE_VERSION }}"
-      - run: echo "BUILD_FILENAME_LINUX=$(echo carbone-ee-${{ env.PACKAGE_VERSION }}-linux)" >> $GITHUB_ENV
-      - run: echo "BUILD_FILENAME_MACOS=$(echo carbone-ee-${{ env.PACKAGE_VERSION }}-macos)" >> $GITHUB_ENV
-      - run: npm run publishBuild # Use our own script to be able to build without Github in case of emergency
+      - run: echo "CARBONE_EE_TAG=$(echo ee-${{env.PACKAGE_VERSION}})" >> $GITHUB_ENV
+      - run: echo "BUILD_FILENAME_LINUX=$(echo carbone-ee-${{env.PACKAGE_VERSION}}-linux)" >> $GITHUB_ENV
+      - run: echo "BUILD_FILENAME_MACOS=$(echo carbone-ee-${{env.PACKAGE_VERSION}}-macos)" >> $GITHUB_ENV
+      
+      - run: git config user.name github-actions
+      - run: git config user.email github-actions@github.com
+
+      # Prepare and build
+      - run: sudo npm i -g pkg@${{env.PKG_VERSION}}
+      - run: npm ci --production
+      - run: node script/updatePackage.js
+      - run: pkg -t ${{env.BUILD_TARGET}} -o ${{env.BUILD_PREFIX}} .
+      # commit
+      - run: git add "package.json"
+      - run: git commit -n -m "Save date in package.json"
+      - run: git push
+      - run: git tag ${{env.CARBONE_EE_TAG}}
+      - run: git push origin ${{env.CARBONE_EE_TAG}}
 
       - name: Create Release
         id: create_release
@@ -35,7 +49,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.PACKAGE_VERSION }}
+          tag_name: ${{ env.CARBONE_EE_TAG }}
           release_name: ${{ env.PACKAGE_VERSION }}
           draft: false
           prerelease: false
@@ -44,7 +58,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tag_name="${{ env.PACKAGE_VERSION }}"
+          tag_name="${{ env.CARBONE_EE_TAG }}"
           hub release edit $(find build/ -type f -name "carbone-ee*" -printf "-a %p ") -m "" "$tag_name"
       
 #      - name: Upload Release Asset (Linux)

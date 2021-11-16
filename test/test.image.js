@@ -39,7 +39,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     });
 
 
-    it('should generate barcodes as images and as fonts', function (done) {
+    it.skip('should generate barcodes as images and as fonts', function (done) {
       const _testedReport = 'image/odg-barcodes';
       const _data = {
         /** Barcodes as Fonts & Images*/
@@ -96,7 +96,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    it('should generate barcodes as images and as fonts', function (done) {
+    it.skip('should generate barcodes as images and as fonts', function (done) {
       const _testedReport = 'image/odp-barcodes';
       const _data = {
         /** Barcodes as Fonts & Images*/
@@ -215,7 +215,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    it('should generate all barcodes as images', function (done) {
+    it.skip('should generate all barcodes as images', function (done) {
       const _testedReport = 'image/odt-barcodes';
       const _data = {
         /** Barcodes as Fonts */
@@ -281,7 +281,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    it('should generate barcodes as images and as fonts', function (done) {
+    it.skip('should generate barcodes as images and as fonts', function (done) {
       const _testedReport = 'image/ods-barcodes';
       const _data = {
         /** Barcodes as Fonts & Images*/
@@ -676,7 +676,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      it('should generate barcodes as images and as fonts', function (done) {
+      it.skip('should generate barcodes as images and as fonts', function (done) {
         const _testedReport = 'image/docx-barcodes';
         const _data = {
           /** Barcodes as Fonts & Images*/
@@ -1228,7 +1228,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      it('should generate barcodes as images and as fonts', function (done) {
+      it.skip('should generate barcodes as images and as fonts', function (done) {
         const _testedReport = 'image/xlsx-barcodes';
         const _data = {
           /** Barcodes as Fonts & Images*/

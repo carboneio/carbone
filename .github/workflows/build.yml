@@ -1,6 +1,6 @@
 name: Release Enterprise Edition
 
-on: push
+on: workflow_dispatch
 
 jobs:
   BUILD:

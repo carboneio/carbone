@@ -1,22 +1,23 @@
 ### v3.4.0
+  - Release November 17th 2021
   - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
-  - Bump DayJS to 1.10.7
-  - Bump debug to 4.3.2
+  - Bump DayJS to 1.10.7 and debug to 4.3.2
   - Improve thread management of LibreOffice on Linux:
-    - The system which auto-restarts LibreOffice when it crashes or if there is a conversion timeout could hang indefinitely on Linux.
-      On the Enterprise Edition, the global watchdog system is able to fix this bad behavior but it is slow.
+    - The system, which auto-restarts LibreOffice when it crashes or if there is a conversion timeout, could hang indefinitely on Linux.
+      On the Enterprise Edition, the global watchdog system was able to fix this bad behavior but it was slow.
       Now, the LibreOffice is correctly killed. No zombie processes remaining.
     - Avoid launching the parent process "oosplash" of LibreOffice
     - Improve auto-restart mechanism
     - Add debug logs
     - All tests passed on Linux 😅
+  - [EE] Bump all dependencies
   - [EE] Fix random image display in LibreOffice documents. Sometimes, LibreOffice hides one image when two or more images share the same name.
          Now, Carbone generates a unique name for each image with the format "carbone-image-<counter>".
   - [EE] Experimental: Deffered rendering with a webhook, it is dedicated to render huge reports:
     1. Render a document as usual with the request `POST /render/:templateID` with the JSON dataset into the body request AND you have to insert the header `carbone-webhook-url` as a callback URL. It is an endpoint of your server listening when a document is rendered.
     2. Carbone will generate your document and it will notify your webhook with a renderID
     3. Retrieve the generated document with a `GET /render/:renderID` and voilà!
-  - [EE] Experimental feature: add the possibility to duplicate rows using an attribute of an object
+  - [EE] Experimental: add the possibility to duplicate rows using an attribute of an object
     *Data*:
       ```json
       [
@@ -28,10 +29,11 @@
       ```
     *Template*: `{d[i].id} - {d[i+1*qty].id}`
     *Result*:  `A - A - B - B - B - D`
-  - [EE] New Dynamic Barcodes system for DOCX/ODT/XLSX/ODS:
-    - Instead of creating barcodes from Font Families, barcodes are now created as Dynamic Images.
-    - In your template, barcodes markers should be inserted inside the title or description field of a temporary image, and then it should be followed with the barcode formatter, such as `{d.value:barcode(type)}`.
-    - Carbone supports 107 barcodes, you must pass one of the following types to the `:barcode` formatter as a first argument: `ean5`,`ean2`,`ean13`,`ean8`,`upca`,`upce`,`isbn`,`ismn`,`issn`,`code128`,`gs1-128`,`ean14`,`sscc18`,`code39`,`code39ext`,`code32`,`pzn`,`code93`,`code93ext`,`interleaved2of5`,`itf14`,`identcode`,`leitcode`,`databaromni`,`databarstacked`,`databarstackedomni`,`databartruncated`,`databarlimited`,`databarexpanded`,`databarexpandedstacked`,`gs1northamericancoupon`,`pharmacode`,`pharmacode2`,`code2of5`,`industrial2of5`,`iata2of5`,`matrix2of5`,`coop2of5`,`datalogic2of5`,`code11`,`bc412`,`rationalizedCodabar`,`onecode`,`postnet`,`planet`,`royalmail`,`auspost`,`kix`,`japanpost`,`msi`,`plessey`,`telepen`,`telepennumeric`,`posicode`,`codablockf`,`code16k`,`code49`,`channelcode`,`flattermarken`,`raw`,`daft`,`symbol`,`pdf417`,`pdf417compact`,`micropdf417`,`datamatrix`,`datamatrixrectangular`,`datamatrixrectangularextension`,`mailmark`,`qrcode`,`swissqrcode`,`microqrcode`,`rectangularmicroqrcode`,`maxicode`,`azteccode`,`azteccodecompact`,`aztecrune`,`codeone`,`hanxin`,`dotcode`,`ultracode`,`gs1-cc`,`ean13composite`,`ean8composite`,`upcacomposite`,`upcecomposite`,`databaromnicomposite`,`databarstackedcomposite`,`databarstackedomnicomposite`,`databartruncatedcomposite`,`databarlimitedcomposite`,`databarexpandedcomposite`,`databarexpandedstackedcomposite`,`gs1-128composite`,`gs1datamatrix`,`gs1datamatrixrectangular`,`gs1qrcode`,`gs1dotcode`,`hibccode39`,`hibccode128`,`hibcdatamatrix`,`hibcdatamatrixrectangular`,`hibcpdf417`,`hibcmicropdf417`, `hibcqrcode`, `hibccodablockf`, `hibcazteccode`
+  - [EE] ⚡️ **Carbone supports 107 barcodes** in DOCX/ODT/XLSX/ODS templates:
+    - Barcodes are inserted as a dynamic image to support more types 
+    - In your template, barcodes markers must be inserted inside the title or description field of a temporary image, and then it must be followed with the barcode formatter, such as `{d.value:barcode(type)}`.
+    - You must pass one of the following types to the `:barcode` formatter as a first argument: `ean5`,`ean2`,`ean13`,`ean8`,`upca`,`upce`,`isbn`,`ismn`,`issn`,`code128`,`gs1-128`,`ean14`,`sscc18`,`code39`,`code39ext`,`code32`,`pzn`,`code93`,`code93ext`,`interleaved2of5`,`itf14`,`identcode`,`leitcode`,`databaromni`,`databarstacked`,`databarstackedomni`,`databartruncated`,`databarlimited`,`databarexpanded`,`databarexpandedstacked`,`gs1northamericancoupon`,`pharmacode`,`pharmacode2`,`code2of5`,`industrial2of5`,`iata2of5`,`matrix2of5`,`coop2of5`,`datalogic2of5`,`code11`,`bc412`,`rationalizedCodabar`,`onecode`,`postnet`,`planet`,`royalmail`,`auspost`,`kix`,`japanpost`,`msi`,`plessey`,`telepen`,`telepennumeric`,`posicode`,`codablockf`,`code16k`,`code49`,`channelcode`,`flattermarken`,`raw`,`daft`,`symbol`,`pdf417`,`pdf417compact`,`micropdf417`,`datamatrix`,`datamatrixrectangular`,`datamatrixrectangularextension`,`mailmark`,`qrcode`,`swissqrcode`,`microqrcode`,`rectangularmicroqrcode`,`maxicode`,`azteccode`,`azteccodecompact`,`aztecrune`,`codeone`,`hanxin`,`dotcode`,`ultracode`,`gs1-cc`,`ean13composite`,`ean8composite`,`upcacomposite`,`upcecomposite`,`databaromnicomposite`,`databarstackedcomposite`,`databarstackedomnicomposite`,`databartruncatedcomposite`,`databarlimitedcomposite`,`databarexpandedcomposite`,`databarexpandedstackedcomposite`,`gs1-128composite`,`gs1datamatrix`,`gs1datamatrixrectangular`,`gs1qrcode`,`gs1dotcode`,`hibccode39`,`hibccode128`,`hibcdatamatrix`,`hibcdatamatrixrectangular`,`hibcpdf417`,`hibcmicropdf417`, `hibcqrcode`, `hibccodablockf`, `hibcazteccode`
+    - The previous system, which uses a special font, is still available but is limited to `ean8`, `ean13`, `ean128`, `code39`.
 
 ### v3.3.2
   - Release October 11th 2021

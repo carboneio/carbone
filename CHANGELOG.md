@@ -1,3 +1,9 @@
+### v3.3.3
+  - Release November 26th 2021
+  - Fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
+    `2021-11-18T08:05+0000` -> `Europe/London` -> `Thursday, November 18, 2021 8:05 AM`
+
+
 ### v3.3.2
   - Release October 11th 2021
   - [EE] Dynamic Image fix: image types verification support uppercase and lower case formats

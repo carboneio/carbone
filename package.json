@@ -1,7 +1,7 @@
 {
   "name": "carbone-ee",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "bin": "bin/carbone",
   "main": "./lib",
   "publishConfig": {
@@ -34,6 +34,7 @@
     "body-parser": "=1.19.0",
     "cors": "=2.8.5",
     "dayjs": "=1.10.4",
+    "dayjs-timezone-iana-plugin": "git+https://github.com/carboneio/dayjs-timezone-iana-plugin.git",
     "debug": "=4.1.1",
     "formidable": "=1.2.2",
     "image-size": "=0.7.4",

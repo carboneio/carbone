@@ -267,9 +267,9 @@ function div (d, value) {
 function sum (d, key) {
   if (Array.isArray(d) == true && d.length > 0) {
     if (typeof d[0] == "object") {
-      return d.reduce(function(total, value) { return total + value[key] }, 0);
+      return d.reduce(function(total, value) { return total + parseFloat(value[key]) }, 0);
     } else if ( typeof d[0] == "number") {
-      return d.reduce(function(total, value) { return total + value }, 0);
+      return d.reduce(function(total, value) { return total + parseFloat(value) }, 0);
     }
   } 
   return d;

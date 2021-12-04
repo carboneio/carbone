@@ -256,6 +256,25 @@ function div (d, value) {
   return d;
 }
 
+/**
+ * Sum of array
+ *
+ * @version 3.2.3
+ *
+ * @param {key} key if object array
+ * @return {Number} Result
+ */
+function sum (d, key) {
+  if (Array.isArray(d) == true && d.length > 0) {
+    if (typeof d[0] == "object") {
+      return d.reduce(function(total, value) { return total + value[key] }, 0);
+    } else if ( typeof d[0] == "number") {
+      return d.reduce(function(total, value) { return total + value }, 0);
+    }
+  } 
+  return d;
+}
+
 module.exports = {
   formatN  : formatN,
   formatC  : formatC,
@@ -265,6 +284,7 @@ module.exports = {
   sub      : sub,
   mul      : mul,
   div      : div,
+  sum      : sum,
 
   /**
    * Converts a number to an INT

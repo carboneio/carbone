@@ -1097,15 +1097,25 @@ describe('Dynamic colors', function () {
       });
 
       it('should replace a cell color with a color marker + formatter AND should remove the "themeFill" tag', function () {
+        // themeFill located in the middle of the tag
         const _template = {
           files : [{
             name : 'word/document.xml',
             data : parser.removeXMLInsideMarkers('<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="FF0000" w:themeFill="accent6" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p></w:body></w:document>')
           }]
         };
+        // themeFill located in the end of the tag
+        const _template2 = {
+          files : [{
+            name : 'word/document.xml',
+            data : parser.removeXMLInsideMarkers('<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="FF0000" w:val="clear" w:themeFill="accent6"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p></w:body></w:document>')
+          }]
+        };
         const _expectedXML = '<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="{d.color:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>';
         color.preProcessDocx(_template);
         helper.assert(_template.files[0].data, _expectedXML);
+        color.preProcessDocx(_template2);
+        helper.assert(_template2.files[0].data, _expectedXML);
       });
 
       it('should replace mutliple cells color with color markers + formatters', function () {

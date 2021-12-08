@@ -57,15 +57,49 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'fr'   , timezone : _tz}, '20101201', 'L'), '01/12/2010');
     });
     it('should manage timezone', function () {
+      // America/Los_Angeles UTC -08:00 UTS DST -07:00 converted into Europe/Paris UTC +01:00 / UTC DST +02:00
       helper.assert(dateFormatter.formatD.call(
         { lang : 'en', timezone : 'Europe/Paris' }, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM'
       );
+      // America/Los_Angeles UTC -08:00 UTS DST -07:00 converted into America/New_York UTC -05:00 / UTC DST -04:00
       helper.assert(dateFormatter.formatD.call(
         { lang : 'en', timezone : 'America/New_York' }, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 10:37 AM'
       );
-      // By default if no timezone in date, it considers the timezone is Europe/Paris
+      // Europe/Paris UTC +01:00 / UTC DST +02:00 converted into America/New_York UTC -05:00 UTS DST -04:00
       helper.assert(dateFormatter.formatD.call(
         { lang : 'en', timezone : 'America/New_York' }, '1997-12-17 18:32:16', 'LLLL'), 'Wednesday, December 17, 1997 12:32 PM'
+      );
+      // Europe/London is UTC+0000, it means the date should not change when it convert into Europe/London
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/London' }, '2021-11-18T08:05+0000', 'LLLL'), 'Thursday, November 18, 2021 8:05 AM'
+      );
+      // Z ou +0000 c'est la même chose:
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/London' }, '2021-11-18T08:05Z', 'LLLL'), 'Thursday, November 18, 2021 8:05 AM'
+      );
+      // UTC0 into Europe/Belfast, the timezone is equal to London UTC +00:00 / UTC DST +01:00
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/Belfast' }, '2021-11-18T08:05Z', 'LLLL'), 'Thursday, November 18, 2021 8:05 AM'
+      );
+      // Europe/London converted into Europe/Amsterdam, Brussel, Berlin, and Paris UTC +01:00 / UTC DST +02:00
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/Amsterdam' }, '2021-11-18T08:05Z', 'LLLL'), 'Thursday, November 18, 2021 9:05 AM'
+      );
+      // Europe/London converted into Europe/Dublin UTC +01:00 / UTC DST+00:00
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/Brussels' }, '2021-11-18T08:05Z', 'LLLL'), 'Thursday, November 18, 2021 9:05 AM'
+      );
+      // America/Toronto UTC -05:00 / UTC DST -04:00 converted into En Europe/Berlin UTC +01:00 / UTC DST +02:00
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/Berlin' }, '2013-11-18T11:55-0500', 'LLLL'), 'Monday, November 18, 2013 5:55 PM'
+      );
+      // Australia/Melbourne UTC +10:00 UTC DST +11:00 converted into Merlbourne time
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Australia/Melbourne' }, '2021-04-01T08:00+1100', 'LLLL'), 'Thursday, April 1, 2021 8:00 AM'
+      );
+      // Australia/Melbourne UTC +10:00 UTC DST +11:00 converted into Europe/Paris UTC +01:00 / UTC DST +02:00
+      helper.assert(dateFormatter.formatD.call(
+        { lang : 'en', timezone : 'Europe/Paris' }, '2021-04-01T08:00+1100', 'LLLL'), 'Wednesday, March 31, 2021 11:00 PM'
       );
     });
   });

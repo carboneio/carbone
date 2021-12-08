@@ -1,4 +1,5 @@
 ### v3.4.1
+  - Release December 9th 2021
   - Accepts "OpenDocument Text Flat XML" (.fodt) template files
   - Includes v3.3.3: fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
   - [EE] Fix dynamic colors for DOCX cells background

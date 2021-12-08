@@ -120,6 +120,13 @@ describe('file', function () {
         done();
       });
     });
+    it('should detect a fodt type', function (done) {
+      carbone.getFileExtension('test_fodt.fodt', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'fodt');
+        done();
+      });
+    });
   });
 
   describe('isZipped', function () {

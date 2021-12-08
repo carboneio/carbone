@@ -1,6 +1,7 @@
 ### v3.4.1
   - Accepts "OpenDocument Text Flat XML" (.fodt) template files
   - Includes v3.3.3: fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
+  - [EE] Fix dynamic colors for DOCX cells background
 
 ### v3.4.0
   - Release November 17th 2021
@@ -34,7 +35,7 @@
     *Template*: `{d[i].id} - {d[i+1*qty].id}`
     *Result*:  `A - A - B - B - B - D`
   - [EE] ⚡️ **Carbone supports 107 barcodes** in DOCX/ODT/XLSX/ODS templates:
-    - Barcodes are inserted as a dynamic image to support more types 
+    - Barcodes are inserted as a dynamic image to support more types
     - In your template, barcodes markers must be inserted inside the title or description field of a temporary image, and then it must be followed with the barcode formatter, such as `{d.value:barcode(type)}`.
     - You must pass one of the following types to the `:barcode` formatter as a first argument: `ean5`,`ean2`,`ean13`,`ean8`,`upca`,`upce`,`isbn`,`ismn`,`issn`,`code128`,`gs1-128`,`ean14`,`sscc18`,`code39`,`code39ext`,`code32`,`pzn`,`code93`,`code93ext`,`interleaved2of5`,`itf14`,`identcode`,`leitcode`,`databaromni`,`databarstacked`,`databarstackedomni`,`databartruncated`,`databarlimited`,`databarexpanded`,`databarexpandedstacked`,`gs1northamericancoupon`,`pharmacode`,`pharmacode2`,`code2of5`,`industrial2of5`,`iata2of5`,`matrix2of5`,`coop2of5`,`datalogic2of5`,`code11`,`bc412`,`rationalizedCodabar`,`onecode`,`postnet`,`planet`,`royalmail`,`auspost`,`kix`,`japanpost`,`msi`,`plessey`,`telepen`,`telepennumeric`,`posicode`,`codablockf`,`code16k`,`code49`,`channelcode`,`flattermarken`,`raw`,`daft`,`symbol`,`pdf417`,`pdf417compact`,`micropdf417`,`datamatrix`,`datamatrixrectangular`,`datamatrixrectangularextension`,`mailmark`,`qrcode`,`swissqrcode`,`microqrcode`,`rectangularmicroqrcode`,`maxicode`,`azteccode`,`azteccodecompact`,`aztecrune`,`codeone`,`hanxin`,`dotcode`,`ultracode`,`gs1-cc`,`ean13composite`,`ean8composite`,`upcacomposite`,`upcecomposite`,`databaromnicomposite`,`databarstackedcomposite`,`databarstackedomnicomposite`,`databartruncatedcomposite`,`databarlimitedcomposite`,`databarexpandedcomposite`,`databarexpandedstackedcomposite`,`gs1-128composite`,`gs1datamatrix`,`gs1datamatrixrectangular`,`gs1qrcode`,`gs1dotcode`,`hibccode39`,`hibccode128`,`hibcdatamatrix`,`hibcdatamatrixrectangular`,`hibcpdf417`,`hibcmicropdf417`, `hibcqrcode`, `hibccodablockf`, `hibcazteccode`
     - The previous system, which uses a special font, is still available but is limited to `ean8`, `ean13`, `ean128`, `code39`.

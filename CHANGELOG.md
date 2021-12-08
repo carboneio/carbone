@@ -1,5 +1,8 @@
-### v3.4.X
+### v3.4.1
+  - Accepts "OpenDocument Text Flat XML" (.fodt) template files
+  - Includes v3.3.3: fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
   - [EE] Fix dynamic colors for DOCX cells background
+
 ### v3.4.0
   - Release November 17th 2021
   - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
@@ -44,6 +47,11 @@
 ### v3.3.1
   - Release September 9th 2021
   - [EE] New Carbone On-premise: Pass the option "maxDataSize" to change the maximum JSON data size when rendering a report. The value must be **bytes**. The default value is 60MB.
+
+### v3.3.3
+  - Release November 26th 2021
+  - Fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
+    `2021-11-18T08:05+0000` -> `Europe/London` -> `Thursday, November 18, 2021 8:05 AM`
 
 ### v3.3.0
   - Release August 30th 2021

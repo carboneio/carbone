@@ -1,3 +1,6 @@
+### v3.4.1
+  - Accepts "OpenDocument Text Flat XML" (.fodt) template files
+
 ### v3.4.0
   - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
   - Bump DayJS to 1.10.7

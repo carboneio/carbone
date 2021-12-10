@@ -296,17 +296,15 @@ function isImage (value) {
 }
 
 /**
- * Translate a barcode to specific font code.
- *
- * @version 3.0.0 UPDATED
+ * Generate a barcode as an image or as a font.
  *
  * @param   {String} data Barcode numbers
- * @param   {String} type Barcode type: `ean13`, `ean8`, `ean128` or `code39`
+ * @param   {String} type Barcode type: `ean13`, `ean8`, `code128`, `code39`, `gs1-128`, `qrcode`, `swissqrcode`, and more...
  * @returns {String}      translated  to EAN13.TTF font code or empty string
  */
 function barcode (data, type) {
   if (!this.isBarcodeImage) {
-    /** BARCODE as a FONT - Previous system */
+     // BARCODE as a FONT - Previous system
     var _fc = barcodesMethods.get(type);
     if (_fc !== undefined) {
       return _fc(data);
@@ -314,11 +312,8 @@ function barcode (data, type) {
     return '';
   }
   this.isBarcodeImage = false;
-  /**
-   * BARCODE as an IMAGE
-   * Arguments are saved as URL parameters string because it is saved on the Image Database Map
-   */
 
+  // BARCODE as an IMAGE - New system
   try {
     return JSON.stringify({bcid : type, text : data });
   }
@@ -394,6 +389,7 @@ function generateBarcodeImage (jsonStringBarcodeData, callback) {
 }
 
 /**
+ * @private
  * List of supported barcodes with the symbol, the fullname, a text example, and available options
  * The 'tested' at false means: the barcode was not tested because the scanner is really specific and not available on smartphone
  */

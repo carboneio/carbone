@@ -408,7 +408,6 @@ function generateBarcodeImage (jsonStringBarcodeData, callback) {
   catch (err) {
     return callback('Barcode read values: ' + err.toString());
   }
-  console.log(_barcodeData);
   return bwipjs.toBuffer(
     {
       ...initBarcodeValuesBasedOnType(_barcodeData.bcid),

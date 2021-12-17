@@ -9,7 +9,7 @@ const CHECK_BARCODE_OPTIONS_VALUE = {
   'textsize': (value) => !isNaN(value) && parseInt(value) > 0, // The font size of the text in points.
   'textxalign': (value) => ['left', 'center', 'right', 'justify'].includes(value),
   'textyalign': (value) => ['below', 'center', 'above'].includes(value),
-  'rotate': (value) => ['N', 'R', 'L', 'I'].includes(value),
+  'rotate': (value) => /^[NRLI]{1}$/i.test(value),
   'barcolor': (value) => REG_HEXA_COLOR.test(value),
   'textcolor': (value) => REG_HEXA_COLOR.test(value),
   'backgroundcolor': (value) => REG_HEXA_COLOR.test(value)
@@ -344,6 +344,10 @@ function barcode (data, type) {
         // If the option is an hexadecimal color beginning with an hashtag '#', it must be removed for bwipjs, otherwhise the color is not considered
         if ((_barcodeOption[0] === 'barcolor' || _barcodeOption[0] === 'backgroundcolor' || _barcodeOption[0] === 'textcolor') && _barcodeOption[1][0] === "#") {
           _barcodeOption[1] = _barcodeOption[1].slice(1);
+        }
+        // If the option is "rotate", the option must be uppercase
+        if (_barcodeOption[0] === 'rotate') {
+          _barcodeOption[1] = _barcodeOption[1].toUpperCase();
         }
         // If it is a boolean as a string, convert into a real boolean, otherwhise return the string value. bwipjs takes numbers as strings
         _options[_barcodeOption[0]] = _barcodeOption[1] === 'true' ? true : (_barcodeOption[1] === 'false' ? false : _barcodeOption[1]);

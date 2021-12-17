@@ -1517,7 +1517,7 @@ describe('formatter', function () {
 
     describe('Barcode as an Image', function () {
       describe(':barcode and :isImage formatters', function () {
-        it.only('should return the barcode as JSON', function () {
+        it('should return the barcode as JSON', function () {
           const _context = {};
           barcodeFormatter.isImage.call(_context);
           helper.assert(_context.isBarcodeImage, true);

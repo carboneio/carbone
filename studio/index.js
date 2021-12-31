@@ -22,7 +22,8 @@ let json = {
   complement   : {},
   enum         : {},
   translations : {},
-  convertTo    : 'pdf'
+  convertTo    : 'pdf',
+  lang         : 'en-US'
 };
 
 // JSON Editor
@@ -95,6 +96,20 @@ fileInput.addEventListener('click', async (event) => {
 fileInput.addEventListener('change', () => {
   addTemplateAndRender(fileInput.files[0])
 });
+
+
+const langSelector = document.getElementById('lang-selector');
+langSelector.addEventListener('change', (event) => {
+  json.lang = event.target.value;
+  refreshRender();
+});
+
+const convertToSelector = document.getElementById('convertTo-selector');
+convertToSelector.addEventListener('change', (event) => {
+  json.convertTo = event.target.value;
+  refreshRender();
+});
+
 
 
 function changePan (newPanNode, newActiveEditorPan) {

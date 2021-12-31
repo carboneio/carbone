@@ -160,7 +160,22 @@ async function refreshRender () {
   const result = await renderReport(templateId, json);
 
   if (result.success) {
-    pdfviewer.data = `${carboneConfig.apiUrl}/render/${result.data.renderId}`;
+    const _url = `${carboneConfig.apiUrl}/render/${result.data.renderId}`;
+    // direct preview in browser if pdf
+    if (json.convertTo === 'pdf') {
+      pdfviewer.data = _url;
+    }
+    else {
+      // force file download
+      fetch(_url)
+        .then( res => res.blob() )
+        .then( blob => {
+          let file = window.URL.createObjectURL(blob);
+          window.location.assign(file);
+        });
+      // empty right window for better UX
+      pdfviewer.data = '';
+    }
     setConsoleMessage('success', 'Template rendered');
   }
   else {

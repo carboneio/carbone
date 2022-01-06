@@ -1,3 +1,6 @@
+### v3.4.2
+  - [EE] Fix do not crash if content passed to `:html` formatter is not a string
+
 ### v3.4.1
   - Release December 9th 2021
   - Accepts "OpenDocument Text Flat XML" (.fodt) template files

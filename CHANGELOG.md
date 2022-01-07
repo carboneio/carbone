@@ -1,3 +1,8 @@
+### v3.5.0
+  - [EE] On-Premise Embedded Studio has new features. Like the SaaS version, it is possible to 
+    - export to other formats than PDF
+    - change language
+
 ### v3.4.1
   - Release December 9th 2021
   - Accepts "OpenDocument Text Flat XML" (.fodt) template files

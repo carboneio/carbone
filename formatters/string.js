@@ -276,6 +276,26 @@ function padr (d, targetLength, padString) {
   return d;
 }
 
+
+/**
+ * Returns the length of a string or array.
+ *
+ * @version 2.0.0
+ * @example ["Hello World"]
+ * @example [""]
+ * @example [[1, 2, 3, 4, 5]]
+ * @example [[1, "Hello"]]
+ *
+ * @param {Mixed} d Array or String
+ * @returns {Number} Length of the element
+ */
+function len (d) {
+  if (typeof d === 'string' || Array.isArray(d)) {
+    return d.length;
+  }
+  return 0;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -288,5 +308,6 @@ module.exports = {
   substr    : substr,
   slice     : substr,
   padl      : padl,
+  len       : len,
   padr      : padr
 };

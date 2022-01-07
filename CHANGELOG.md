@@ -1,3 +1,6 @@
+### v3.4.2
+  - Accept regular formatters after conditional formatters
+
 ### v3.4.1
   - Accepts "OpenDocument Text Flat XML" (.fodt) template files
   - Includes v3.3.3: fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time

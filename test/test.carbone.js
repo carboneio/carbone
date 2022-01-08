@@ -152,8 +152,6 @@ describe('Carbone', function () {
     it('should not crash it the wrong timezone or wrong lang is passed during rendering', function (done) {
       carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {timezone : 'BULLSHIT'}, function (err, result) {
         helper.assert(/BULLSHIT/.test(err), true);
-        helper.assert(/RangeError/.test(err), true);
-        helper.assert(/time zone/.test(err), true);
         helper.assert(result, null);
         carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00-04:00'}, {lang : 'BULLSHIT'}, function (err, result) {
           helper.assert(err+'', 'null');
@@ -630,6 +628,14 @@ describe('Carbone', function () {
       carbone.renderXML('{c.now}', {}, { complement : {now : 'aa'} }, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, 'aa');
+        done();
+      });
+    });
+    it('should return the current timestamp in UTC with c.now even if complement is null', function (done) {
+      carbone.renderXML('{c.now}', {}, { complement : null }, function (err, result) {
+        helper.assert(err+'', 'null');
+        var _parseDate = new Date(result);
+        helper.assert(((Date.now()/1000) - _parseDate.getTime()) < 1, true) ;
         done();
       });
     });
@@ -2745,7 +2751,7 @@ describe('Carbone', function () {
           assert.equal(Buffer.isBuffer(_results[i]), true);
           assert.equal((_results[i].slice(0, 2).toString() === 'PK'), true);
         }
-        assert.equal((_elapsed < 200), true);
+        assert.equal((_elapsed < (200 * helper.CPU_PERFORMANCE_FACTOR)), true);
         done();
       }
     });
@@ -3208,7 +3214,7 @@ describe('Carbone', function () {
             assert.equal(Buffer.isBuffer(_results[i]), true);
             assert.equal(_results[i].slice(0, 4).toString(), '%PDF');
           }
-          // assert.equal((_elapsed < 200), true);
+          assert.equal((_elapsed < (200 * helper.CPU_PERFORMANCE_FACTOR)), true);
           done();
         }
       });
@@ -3513,6 +3519,9 @@ describe('Carbone', function () {
 function unzipSystem (filePath, destPath, callback) {
   var _unzippedFiles = {};
   var _unzip = spawn('unzip', ['-o', filePath, '-d', destPath]);
+  _unzip.on('error', function () {
+    throw Error('\n\nPlease install unzip program to execute tests. Ex: sudo apt install unzip\n\n');
+  });
   _unzip.stderr.on('data', function (data) {
     throw Error(data);
   });

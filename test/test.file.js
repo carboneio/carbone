@@ -120,6 +120,13 @@ describe('file', function () {
         done();
       });
     });
+    it('should detect a fodt type', function (done) {
+      carbone.getFileExtension('test_fodt.fodt', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'fodt');
+        done();
+      });
+    });
   });
 
   describe('isZipped', function () {
@@ -191,7 +198,7 @@ describe('file', function () {
         var _end = new Date();
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Unzip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' unzip tasks\n\n\n');
-        assert.equal((_elapsed < 7), true);
+        assert.equal((_elapsed < (7 * helper.CPU_PERFORMANCE_FACTOR)), true);
         done();
       }
     });
@@ -385,7 +392,7 @@ describe('file', function () {
         var _end = new Date();
         var _elapsed = (_end.getTime() - _start.getTime())/_nbExecuted; // time in milliseconds
         console.log('\n\n Zip - Time Elapsed : '+_elapsed + ' ms per file for '+_nbExecuted+' zip tasks\n\n\n');
-        assert.equal((_elapsed < 5), true);
+        assert.equal((_elapsed < (5 * helper.CPU_PERFORMANCE_FACTOR)), true);
         //* ***** check the first one and the 90th
         fs.mkdirSync(testPath, parseInt('0755', 8));
         var _zipFilePath = path.join(testPath, 'file.zip');

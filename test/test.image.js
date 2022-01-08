@@ -5,6 +5,7 @@ const path      = require('path');
 const fs        = require('fs');
 const image     = require('../lib/image');
 const nock      = require('nock');
+const barcodeFormatter = require('../formatters/barcode');
 
 describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
@@ -29,6 +30,23 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         image  : _imageDEBase64jpg,
         image2 : _imageLogoBase64jpg,
         image3 : _imageLogoBase64jpg
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+
+    it.skip('should generate barcodes as images and as fonts', function (done) {
+      const _testedReport = 'image/odg-barcodes';
+      const _data = {
+        /** Barcodes as Fonts & Images*/
+        item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');
@@ -70,6 +88,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           { image : _imageDEBase64jpg },
           { image : _imageITBase64png }
         ]
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it.skip('should generate barcodes as images and as fonts', function (done) {
+      const _testedReport = 'image/odp-barcodes';
+      const _data = {
+        /** Barcodes as Fonts & Images*/
+        item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');
@@ -180,6 +214,24 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
     });
+
+    it.skip('should generate all barcodes as images', function (done) {
+      const _testedReport = 'image/odt-barcodes';
+      const _data = {
+        /** Barcodes as Fonts */
+        item     : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2    : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3    : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4    : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39'),
+        /** Barcodes as Images */
+        barcodes : barcodeFormatter.supportedBarcodes
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
   describe('[Full test] ODS', function () {
@@ -221,6 +273,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         imageLogo : _imageLogoBase64jpg,
         text      : "0+rR_r+f|U*aG!^[;sEAN[y|x'TCe}|?20D_E,[Z",
         text2     : 'K$-QXILVAB#j:XnR$*m"$9Rk76B@ARy2_qBdp2Xu',
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it.skip('should generate barcodes as images and as fonts', function (done) {
+      const _testedReport = 'image/ods-barcodes';
+      const _data = {
+        /** Barcodes as Fonts & Images*/
+        item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');
@@ -304,7 +372,26 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        image.preProcessLo(template);
+        helperTest.assert(template.files[0].data, expectedXML);
+        done();
+      });
+
+      it('should replace the main document tag attributes with image formatters, AND the `:isImage` formatter if the `:barcode` formatter exist on the xml (ODT/ODS XML from LO) (unit: CM) (BARCODE formatter)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'content.xml',
+              data : '' +
+              '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0">' +
+                '<draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/>' +
+                '<svg:desc>{d.image:barcode(ean13)}</svg:desc>' +
+              '</draw:frame>'
+            }
+          ]
+        };
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:isImage:barcode(ean13):generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:isImage:barcode(ean13):scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:isImage:barcode(ean13):scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:isImage:barcode(ean13):generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:isImage:barcode(ean13):generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -319,7 +406,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="{d.image:scaleImage(width, 0.3375, in, fillWidth)}in" svg:height="{d.image:scaleImage(height, 0.20903, in, fillWidth)}in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="{d.image:scaleImage(width, 0.3375, in, fillWidth)}in" svg:height="{d.image:scaleImage(height, 0.20903, in, fillWidth)}in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -334,7 +421,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, contain)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, contain)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, contain)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, contain)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -348,7 +435,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -362,7 +449,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -588,6 +675,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+
+      it.skip('should generate barcodes as images and as fonts', function (done) {
+        const _testedReport = 'image/docx-barcodes';
+        const _data = {
+          /** Barcodes as Fonts & Images*/
+          item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+          item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+          item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+          item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
     });
 
     describe('DOCX preprocess XML', function () {
@@ -662,6 +765,21 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           ]
         };
         let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu, contain)}" cy="{d.image:scaleImage(height, 590550, emu, contain)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu, contain)}" cy="{d.image:scaleImage(height, 590550, emu, contain)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        image.preProcessDocx(template);
+        helperTest.assert(template.files[0].data, expectedXML);
+        done();
+      });
+
+      it('should replace the main document tag attributes with image formatters and the `isImage` formatter if the `barcode` is included (common DOCX xml from LO or MS) (BARCODE)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'word/document.xml',
+              data : '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="952500" cy="590550"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="1" name="Image1" descr="{d.image:barcode(ean13):imageFit(contain)}"></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="Image1" descr="{d.image}"></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId2"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="952500" cy="590550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>'
+            }
+          ]
+        };
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:isImage:barcode(ean13):scaleImage(width, 952500, emu, contain)}" cy="{d.image:isImage:barcode(ean13):scaleImage(height, 590550, emu, contain)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:isImage:barcode(ean13):generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:isImage:barcode(ean13):generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:isImage:barcode(ean13):generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:isImage:barcode(ean13):scaleImage(width, 952500, emu, contain)}" cy="{d.image:isImage:barcode(ean13):scaleImage(height, 590550, emu, contain)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -750,6 +868,38 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(_template.files[1].data, _expectedContentType);
         helperTest.assert(_template.files[2], {
           name   : 'word/media/CarboneImage0.png',
+          parent : '',
+          data   : '1234'
+        });
+      });
+
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml even if the temporary image type is in uppercase', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.JPG"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>',
+          },
+          {
+            name : '[Content_Types].xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="JPG" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.JPG"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.jpg" Id="rIdCarbone0"/></Relationships>';
+        const _expectedContentType = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="JPG" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('carbone.io/logo.jpg', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'jpg'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helperTest.assert(_template.files[0].data, _expectedContent);
+        helperTest.assert(_template.files[1].data, _expectedContentType);
+        helperTest.assert(_template.files[2], {
+          name   : 'word/media/CarboneImage0.jpg',
           parent : '',
           data   : '1234'
         });
@@ -895,7 +1045,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    describe('DOCX pdefineImageContentTypeDocx (part of postProcessDocx)', function () {
+    describe('DOCX defineImageContentTypeDocx (part of postProcessDocx)', function () {
       it('should not add the image type definition if the image type list is empty []', function () {
         const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
                             '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
@@ -959,6 +1109,27 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
                             '<Default Extension="jpg" ContentType="image/jpeg"/>'+
                             '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
         image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'png', 'jpeg', 'svg', 'svg', 'jpg']);
+        helperTest.assert(_template.files[0].data, _expectedXml);
+      });
+      it('should not add the image type if it is already defined in uppercase', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="PnG" ContentType="image/png"/>' +
+                    '<Default Extension="JPG" ContentType="image/jpeg"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="PnG" ContentType="image/png"/>'+
+                            '<Default Extension="JPG" ContentType="image/jpeg"/>'+
+                            '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
+
+        image.defineImageContentTypeDocx(_template, ['jpg', 'pNg', 'Svg']);
         helperTest.assert(_template.files[0].data, _expectedXml);
       });
       it ('should not add the image type definition if the image mime type format does not exist [PNG, JPG, SVG, JSON, HTML]', function () {
@@ -1056,6 +1227,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+
+      it.skip('should generate barcodes as images and as fonts', function (done) {
+        const _testedReport = 'image/xlsx-barcodes';
+        const _data = {
+          /** Barcodes as Fonts & Images*/
+          item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+          item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+          item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+          item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
     });
 
     describe('XLSX preprocess xml', function () {
@@ -1085,6 +1272,21 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         };
         // let _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr=""></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="{d.list[i].img:generateImageXlsxReference(1)}"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>';
         assert.throws(() => image.preProcessXLSX(_template), Error('Carbone does not support a list of images on XLSX template.'));
+        done();
+      });
+
+      it('should replace the main document tag attributes with image marker/formatters and the `isImage` formatter if the `barcode` formatter is included (BARCODE)', function (done) {
+        let _template = {
+          files : [
+            {
+              name : 'xl/drawings/drawing1.xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr="{d.tests.image:barcode(ean13)}"></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId1"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>'
+            }
+          ]
+        };
+        let _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr=""></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="{d.tests.image:isImage:barcode(ean13):generateImageXlsxReference(1)}"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>';
+        image.preProcessXLSX(_template);
+        helperTest.assert(_template.files[0].data, _expectedXML);
         done();
       });
     });

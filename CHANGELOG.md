@@ -1,5 +1,77 @@
+- Add new aggregator formatters : sum(by), avg(by)
+
+### v3.4.2
+  - [EE] Fix do not crash if content passed to `:html` formatter is not a string
+
+### v3.4.1
+  - Release December 9th 2021
+  - Accepts "OpenDocument Text Flat XML" (.fodt) template files
+  - Includes v3.3.3: fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
+  - [EE] Fix dynamic colors for DOCX cells background
+
+### v3.4.0
+  - Release November 17th 2021
+  - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
+  - Bump DayJS to 1.10.7 and debug to 4.3.2
+  - Improve thread management of LibreOffice on Linux:
+    - The system, which auto-restarts LibreOffice when it crashes or if there is a conversion timeout, could hang indefinitely on Linux.
+      On the Enterprise Edition, the global watchdog system was able to fix this bad behavior but it was slow.
+      Now, the LibreOffice is correctly killed. No zombie processes remaining.
+    - Avoid launching the parent process "oosplash" of LibreOffice
+    - Improve auto-restart mechanism
+    - Add debug logs
+    - All tests passed on Linux 😅
+  - [EE] Bump all dependencies
+  - [EE] Fix random image display in LibreOffice documents. Sometimes, LibreOffice hides one image when two or more images share the same name.
+         Now, Carbone generates a unique name for each image with the format "carbone-image-<counter>".
+  - [EE] Experimental: Deffered rendering with a webhook, it is dedicated to render huge reports:
+    1. Render a document as usual with the request `POST /render/:templateID` with the JSON dataset into the body request AND you have to insert the header `carbone-webhook-url` as a callback URL. It is an endpoint of your server listening when a document is rendered.
+    2. Carbone will generate your document and it will notify your webhook with a renderID
+    3. Retrieve the generated document with a `GET /render/:renderID` and voilà!
+  - [EE] Experimental: add the possibility to duplicate rows using an attribute of an object
+    *Data*:
+      ```json
+      [
+        { "id" : "A", "qty" : 2 },
+        { "id" : "B", "qty" : 3 },
+        { "id" : "C", "qty" : 0 },
+        { "id" : "D", "qty" : 1 }
+      ]
+      ```
+    *Template*: `{d[i].id} - {d[i+1*qty].id}`
+    *Result*:  `A - A - B - B - B - D`
+  - [EE] ⚡️ **Carbone supports 107 barcodes** in DOCX/ODT/XLSX/ODS templates:
+    - Barcodes are inserted as a dynamic image to support more types
+    - In your template, barcodes markers must be inserted inside the title or description field of a temporary image, and then it must be followed with the barcode formatter, such as `{d.value:barcode(type)}`.
+    - You must pass one of the following types to the `:barcode` formatter as a first argument: `ean5`, `ean2`, `ean13`, `ean8`, `upca`, `upce`, `isbn`, `ismn`, `issn`, `code128`, `gs1-128`, `ean14`, `sscc18`, `code39`, `code39ext`, `code32`, `pzn`, `code93`, `code93ext`, `interleaved2of5`, `itf14`, `identcode`, `leitcode`, `databaromni`, `databarstacked`, `databarstackedomni`, `databartruncated`, `databarlimited`, `databarexpanded`, `databarexpandedstacked`, `gs1northamericancoupon`, `pharmacode`, `pharmacode2`, `code2of5`, `industrial2of5`, `iata2of5`, `matrix2of5`, `coop2of5`, `datalogic2of5`, `code11`, `bc412`, `rationalizedCodabar`, `onecode`, `postnet`, `planet`, `royalmail`, `auspost`, `kix`, `japanpost`, `msi`, `plessey`, `telepen`, `telepennumeric`, `posicode`, `codablockf`, `code16k`, `code49`, `channelcode`, `flattermarken`, `raw`, `daft`, `symbol`, `pdf417`, `pdf417compact`, `micropdf417`, `datamatrix`, `datamatrixrectangular`, `datamatrixrectangularextension`, `mailmark`, `qrcode`, `swissqrcode`, `microqrcode`, `rectangularmicroqrcode`, `maxicode`, `azteccode`, `azteccodecompact`, `aztecrune`, `codeone`, `hanxin`, `dotcode`, `ultracode`, `gs1-cc`, `ean13composite`, `ean8composite`, `upcacomposite`, `upcecomposite`, `databaromnicomposite`, `databarstackedcomposite`, `databarstackedomnicomposite`, `databartruncatedcomposite`, `databarlimitedcomposite`, `databarexpandedcomposite`, `databarexpandedstackedcomposite`, `gs1-128composite`, `gs1datamatrix`, `gs1datamatrixrectangular`, `gs1qrcode`, `gs1dotcode`, `hibccode39`, `hibccode128`, `hibcdatamatrix`, `hibcdatamatrixrectangular`, `hibcpdf417`, `hibcmicropdf417`, `hibcqrcode`, `hibccodablockf`, `hibcazteccode`
+    - The previous system, which uses a special font, is still available but is limited to `ean8`, `ean13`, `ean128`, `code39`.
+
+### v3.3.2
+  - Release October 11th 2021
+  - [EE] Dynamic Image fix: image types verification support uppercase and lower case formats
+
+### v3.3.1
+  - Release September 9th 2021
+  - [EE] New Carbone On-premise: Pass the option "maxDataSize" to change the maximum JSON data size when rendering a report. The value must be **bytes**. The default value is 60MB.
+
+### v3.3.3
+  - Release November 26th 2021
+  - Fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
+    `2021-11-18T08:05+0000` -> `Europe/London` -> `Thursday, November 18, 2021 8:05 AM`
+
 ### v3.3.0
-  - Add new aggregator formatters : sum(by), avg(by)
+  - Release August 30th 2021
+  - [EE] HTML Formatter:
+    - Fix: The HTML content is rendered without adding an empty line above it.
+    - Fix: The HTML content and static content are rendered in the expected order.
+    - New: If static content and Carbone markers are mixed with an HTML formatter in the same paragraph, the html is isolated into a new paragraph and each element are seperated above or below. For example, the following template on a text editor `<paragraph>A rocket is made of {d.data:html} {d.details}, this is cool!</paragraph>` will be transform into 3 paragraphs on the generated report `<paragraph>A rocket is made of </paragraph><paragraph>{d.data:html}</paragraph><paragraph> {d.details}, this is cool!</paragraph>`.
+    - Improved HTML rendering stability when it is mixed with lists, tables, and images.
+  - [EE] Dynamic Checkbox are supported only for ODT file. A marker should be inserted into the checkbox property "name" and it is used to set the value of the checkbox on the generated report. The checkbox is ticked (checked) when the value is a Boolean with the value "true", a non empty string, a non empty array or a non empty object. If the exported file type is a PDF, the checkbox can be edited on the generated document. An ODT document created from MS Word that include checkboxes does not work. It is also not possible to create a list of checkboxes with the expressions `[i] / [i+1]`.
+  - Accept `null` for the attribute `complement` in `options`
+
+### v3.2.7
+  - Release July 21th 2021
+  - Fix corrupted document when accessing a sub-object in an array `{d.surrounding[i].subArray[0].subObject.id}`, within a surrounding loop
 
 ### v3.2.6
   - Release June 15th 2021
@@ -7,13 +79,13 @@
 
 ### v3.2.5
   - Release June 10th 2021
-  - Accept URLs with weird Content-Type such as `image/png; charset=utf-8`  for dynamic image replacement
+  - [EE] Accept URLs with weird Content-Type such as `image/png; charset=utf-8`  for dynamic image replacement
 
 ### v3.2.4
   - Release May 25th 2021
-  - Add the possibility to upload templates in base64. The content-type must be `application/json` and the template
+  - [EE] Add the possibility to upload templates in base64. The content-type must be `application/json` and the template
     must be sent in base64 in the body `{ "template" : "pure base64 or data-URI scheme in base64"}`
-  - Accepts loops with dynamic image replacement across slides/pages in ODP templates
+  - [EE] Accepts loops with dynamic image replacement across slides/pages in ODP templates
 
 ### v3.2.3
   - Release May 21th 2021

@@ -199,7 +199,7 @@
         <w:rPr></w:rPr>
         <w:drawing>
           <wp:inline distT="0" distB="0" distL="0" distR="0">
-            <wp:extent cx="590550" cy="590550"/>
+            <wp:extent cx="952500" cy="952500"/>
             <wp:effectExtent l="0" t="0" r="0" b="0"/>
             <wp:docPr id="1003" name="Image1" descr=""></wp:docPr>
             <wp:cNvGraphicFramePr>
@@ -223,7 +223,7 @@
                   <pic:spPr bwMode="auto">
                     <a:xfrm>
                       <a:off x="0" y="0"/>
-                      <a:ext cx="590550" cy="590550"/>
+                      <a:ext cx="952500" cy="952500"/>
                     </a:xfrm>
                     <a:prstGeom prst="rect">
                       <a:avLst/>

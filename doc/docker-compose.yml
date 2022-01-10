@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  carbone:
+    build: .
+    platform: linux/amd64
+    ports:
+      - "4000:4000"
+    volumes:
+      - "/var/tmp/key:/key"
+    environment:
+      - CARBONE_EE_LICENSEDIR=/key
+    command: /app/carbone-ee-linux webserver --studio

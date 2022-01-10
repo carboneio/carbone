@@ -2,47 +2,14 @@ const hyperlinks = require('../lib/hyperlinks');
 
 /**
  * @private
- * @description Add hyperlinks to the option.hyperlinkDatabse
- * @param {Object} options Carbone options that contains the hyperlinkDatabse
- * @param {String} hyperlink new hyperlink to insert
- */
-function addLinkDatabase (options, hyperlink) {
-  if (!options.hyperlinkDatabase.has(hyperlink)) {
-    // If the image doesn't exist, it create a new ID
-    options.hyperlinkDatabase.set(hyperlink, {
-      id : options.hyperlinkDatabase.size
-    });
-  }
-}
-
-/**
- * @private
  * @description Formatter used to add the hyperlink to the database and to return a post process formatter.
  * @param {String} hyperlink New hyperlink
  * @returns {Function} Post process formatter
  */
 function generateHyperlinkReference (hyperlink = '') {
-
-  /** 1 - Check if the URL is not encoded to encode, it protects Libre Office from crashing */
-  const _decodedLink = decodeURIComponent(hyperlink);
-  if (_decodedLink == hyperlink) {
-    hyperlink = encodeURI(hyperlink)
-  }
-  /** 2 - Replace everytime & characters by an encoded '&amp;', it protects Libre Office from crashing */
-  hyperlink = hyperlink.replace(/&/g, () => {
-    return '&amp;';
-  });
-
-  if (/^https?:\/\//.test(hyperlink) === false) {
-    hyperlink = 'https://' + hyperlink;
-  }
-
-  /** 3 - Verify if the URL is valid with a protocol, it protects libre office to include server local paths */
-  if (hyperlinks.isValidHttpUrl(hyperlink) === false) {
-    hyperlink = 'https://.';
-  }
-
-  addLinkDatabase(this, hyperlink);
+  /** Check the URL */
+  hyperlink = hyperlinks.validateURL(hyperlink, this.defaultUrlOnError, 'docx');
+  hyperlinks.addLinkDatabase(this, hyperlink);
   return {
     fn   : generateHyperkinReferencePostProcessing,
     args : [hyperlink]
@@ -63,6 +30,33 @@ function generateHyperkinReferencePostProcessing (hyperlink) {
   return '';
 }
 
+
+/**
+ * Validate and correct dynamic hyperlinks, or return a carbone URL with a special error URL
+ *
+ * @private
+ * @param {String} hyperlink
+ */
+function validateURL (hyperlink = '') {
+  return hyperlinks.validateURL(hyperlink, this.defaultUrlOnError);
+}
+
+/**
+ * Replace the default value hyperlinks.URL_ON_ERROR when dynamic hyperlinks are injected into a report.
+ * If the `newDefaultUrlOnError` argument is invalid, it is replaced by the default hyperlinks.URL_ON_ERROR.
+ *
+ * @private
+ * @param {String} content Main content coming from the marker.
+ * @param {String} newDefaultUrlOnError new URL replacing the hyperlinks.URL_ON_ERROR
+ * @returns {String} the content
+ */
+function defaultURL (content, newDefaultUrlOnError = '') {
+  this.defaultUrlOnError = hyperlinks.validateURL(newDefaultUrlOnError);
+  return content;
+}
+
 module.exports = {
-  generateHyperlinkReference
+  generateHyperlinkReference,
+  validateURL,
+  defaultURL
 };

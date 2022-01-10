@@ -10,19 +10,20 @@ const html = require('../lib/html');
  * @param  {Object} options contains htmlDatabase
  * @param  {String} htmlContent string with html tags
  */
-function addHtmlDatabase (options, htmlContent) {
+function addHtmlDatabase (options, contentID, htmlContent, fontStyles) {
   var _htmlDatabaseProperties = null;
 
-  if (!options.htmlDatabase.has(htmlContent)) {
+  if (!options.htmlDatabase.has(contentID)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
     const id = html.generateStyleID(options.htmlDatabase.size);
-    const { content, style } = html.buildXMLContentOdt(id, descriptor);
+    const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor, options, fontStyles);
 
     _htmlDatabaseProperties = {
       content,
-      style
+      style,
+      styleLists
     };
-    options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
+    options.htmlDatabase.set(contentID, _htmlDatabaseProperties);
   }
 }
 
@@ -33,11 +34,14 @@ function addHtmlDatabase (options, htmlContent) {
  * @param {String} htmlContent
  * @returns {Function} Return a post process formatter
  */
-const getHTMLContentOdt = function (htmlContent) {
-  addHtmlDatabase(this, htmlContent);
+const getHTMLContentOdt = function (htmlContent, styles) {
+  htmlContent = htmlContent || '';
+  styles = styles || '';
+  const _contentID = htmlContent + styles;
+  addHtmlDatabase(this, _contentID, htmlContent, styles);
   return {
     fn   : getHTMLContentOdtPostProcess,
-    args : [htmlContent]
+    args : [_contentID]
   };
 };
 
@@ -49,7 +53,7 @@ const getHTMLContentOdt = function (htmlContent) {
  */
 const getHTMLContentOdtPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.content;
+  return _htmlProperties !== undefined && _htmlProperties.content ? _htmlProperties.content : '';
 };
 
 /** ======================= DOCX ======================== */
@@ -62,16 +66,19 @@ const getHTMLContentOdtPostProcess = function (contentId) {
  * @param  {Object} options contains htmlDatabase
  * @param  {String} htmlContent string with html tags
  */
-function addHtmlDatabaseDOCX (options, htmlContent) {
+function addHtmlDatabaseDOCX (options, contentId, htmlContent = '', defaultFont = '', defaultFontSize = '') {
   var _htmlDatabaseProperties = null;
 
-  if (!options.htmlDatabase.has(htmlContent)) {
+  if (!options.htmlDatabase.has(contentId)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
+    const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(descriptor, options, defaultFont, defaultFontSize);
     _htmlDatabaseProperties = {
-      id      : options.htmlDatabase.size,
-      content : html.buildContentDOCX(descriptor)
+      id : options.htmlDatabase.size,
+      content,
+      listStyleAbstract,
+      listStyleNum
     };
-    options.htmlDatabase.set(htmlContent, _htmlDatabaseProperties);
+    options.htmlDatabase.set(contentId, _htmlDatabaseProperties);
   }
 }
 
@@ -81,11 +88,13 @@ function addHtmlDatabaseDOCX (options, htmlContent) {
  * @description Add the new HTML content and return a post process formatter
  * @param {String} htmlContent New HTML content to inject
  */
-const getHTMLContentDocx = function (htmlContent) {
-  addHtmlDatabaseDOCX(this, htmlContent);
+const getHTMLContentDocx = function (htmlContent, defaultFont = '', defaultFontSize = '') {
+  htmlContent = htmlContent || '';
+  const _contentId = htmlContent + defaultFont + defaultFontSize;
+  addHtmlDatabaseDOCX(this, _contentId, htmlContent, defaultFont, defaultFontSize);
   return {
     fn   : getHTMLContentDocxPostProcess,
-    args : [htmlContent]
+    args : [_contentId]
   };
 };
 
@@ -97,7 +106,7 @@ const getHTMLContentDocx = function (htmlContent) {
  */
 const getHTMLContentDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties.content;
+  return _htmlProperties !== undefined && _htmlProperties.content ? _htmlProperties.content : '';
 };
 
 module.exports = {

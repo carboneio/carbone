@@ -9,7 +9,7 @@ var converter = require('../lib/converter');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
-var pdfjsLib = require('pdfjs-dist/es5/build/pdf.js');
+var pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 var os = require('os');
 
 describe('Carbone', function () {
@@ -95,6 +95,30 @@ describe('Carbone', function () {
             carbone.renderXML('<xml> {d.date:formatD(dddd)} </xml>', { date : '20140131'}, {lang : 'en'}, function (err, result) {
               helper.assert(err+'', 'null');
               helper.assert(result, '<xml> Friday </xml>');
+              done();
+            });
+          });
+        });
+      });
+    });
+    it('should accept locale with or without country code (upper or lowercase)', function (done) {
+      let _data = {
+        date  : '20140131 23:45:00',
+        price : 1000.1234
+      };
+      let _xml = '<xml> {d.date:formatD(dddd)} {d.price:formatN()} </xml>';
+      carbone.renderXML(_xml, _data , {lang : 'fr-FR'},  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> vendredi 1 000,123 </xml>');
+        carbone.renderXML(_xml, _data, {lang : 'de-DE'},  function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml> Freitag 1.000,123 </xml>');
+          carbone.renderXML(_xml, _data, {lang : 'fr-fr'},  function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml> vendredi 1 000,123 </xml>');
+            carbone.renderXML(_xml, _data, {lang : 'de'},  function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml> Freitag 1.000,123 </xml>');
               done();
             });
           });
@@ -400,6 +424,95 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should accept to filter with boolean in arrays', function (done) {
+      var data = {
+        'param-dash' : [{
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val'
+        }, {
+          'filter-val'          : false,
+          'new-param-with-dash' : 'val1'
+        }, {
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val2'
+        }]
+      };
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=false].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=false].new-param-with-dash}</t></xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml><t>val1</t></xml>');
+        carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=true].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=true].new-param-with-dash}</t></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><t>val</t><t>val2</t></xml>');
+          done();
+        });
+      });
+    });
+    it('should consider the boolean is a string if there are quotes', function (done) {
+      var data = {
+        'param-dash' : [{
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val'
+        }, {
+          'filter-val'          : false,
+          'new-param-with-dash' : 'val1'
+        }, {
+          'filter-val'          : 'true',
+          'new-param-with-dash' : 'val2'
+        }]
+      };
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=\'true\'].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=\'true\'].new-param-with-dash}</t></xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml><t>val2</t></xml>');
+        done();
+      });
+    });
+    it('should accept to filter with boolean even if the boolean is a string in data (backward compatible with v1/v2, same behavior as numbers)', function (done) {
+      var data = {
+        'param-dash' : [{
+          'filter-val'          : 'true',
+          'new-param-with-dash' : 'val'
+        }, {
+          'filter-val'          : 'false',
+          'new-param-with-dash' : 'val1'
+        }, {
+          'filter-val'          : 'true',
+          'new-param-with-dash' : 'val2'
+        }]
+      };
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=false].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=false].new-param-with-dash}</t></xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml><t>val1</t></xml>');
+        carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=true].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=true].new-param-with-dash}</t></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><t>val</t><t>val2</t></xml>');
+          done();
+        });
+      });
+    });
+    it('should accept to filter with boolean even if the boolean has whitespaces', function (done) {
+      var data = {
+        'param-dash' : [{
+          'filter-val'          : 'true',
+          'new-param-with-dash' : 'val'
+        }, {
+          'filter-val'          : 'false',
+          'new-param-with-dash' : 'val1'
+        }, {
+          'filter-val'          : true,
+          'new-param-with-dash' : 'val2'
+        }]
+      };
+      carbone.renderXML('<xml><t>{d.param-dash[i, filter-val= false  ].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=  false  ].new-param-with-dash}</t></xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml><t>val1</t></xml>');
+        carbone.renderXML('<xml><t>{d.param-dash[i, filter-val=  true  ].new-param-with-dash}</t><t>{d.param-dash[i+1, filter-val=  true  ].new-param-with-dash}</t></xml>', data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml><t>val</t><t>val2</t></xml>');
+          done();
+        });
+      });
+    });
+
     it('should render XML with dahs in array kes and filter keys', function (done) {
       var _xml = '<xml><t_row> {d.cars-dash[sort-dash-s,i].brand-dash-v:count()} {d.cars-dash[sort-dash-s,i].brand-dash-v} </t_row><t_row> {d.cars-dash[sort-dash-s+1,i+1].brand-dash-v} </t_row></xml>';
       var _data = {
@@ -515,6 +628,14 @@ describe('Carbone', function () {
       carbone.renderXML('{c.now}', {}, { complement : {now : 'aa'} }, function (err, result) {
         helper.assert(err+'', 'null');
         helper.assert(result, 'aa');
+        done();
+      });
+    });
+    it('should return the current timestamp in UTC with c.now even if complement is null', function (done) {
+      carbone.renderXML('{c.now}', {}, { complement : null }, function (err, result) {
+        helper.assert(err+'', 'null');
+        var _parseDate = new Date(result);
+        helper.assert(((Date.now()/1000) - _parseDate.getTime()) < 1, true) ;
         done();
       });
     });
@@ -887,15 +1008,15 @@ describe('Carbone', function () {
 
     it('Should insert the correct values even if aliases are beginning with the same name', function (done) {
       var _xml = '{#myVar=d.name}{#myVarSecond=d.age}<xml><t_row>{$myVar}<br/>{$myVarSecond}</t_row></xml>';
-      var _xml2 = '{#a = d.report.contact.methods}{#ao = d.report.postal}<xml><div>{$a}</div><div>{$ao}</div></xml>'
+      var _xml2 = '{#a = d.report.contact.methods}{#ao = d.report.postal}<xml><div>{$a}</div><div>{$ao}</div></xml>';
       var _data = {
-        name: "John",
-        age: 20,
-        report: {
-          contact: {
-            methods: 'blue'
+        name   : 'John',
+        age    : 20,
+        report : {
+          contact : {
+            methods : 'blue'
           },
-          postal: 94000
+          postal : 94000
         }
       };
       carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
@@ -906,6 +1027,48 @@ describe('Carbone', function () {
           helper.assert(_xmlBuilt, '<xml><div>blue</div><div>94000</div></xml>');
           done();
         });
+      });
+    });
+
+    it('should generate valid XML even if the second row is repeated entirely and includes simple markers d.type without arrays', function (done) {
+      var _xml = ''
+        + '<xml>'
+        +   '<p>'
+        +     '<i>'
+        +       '{d.type}'
+        +     '</i>'
+        +     '<i>'
+        +       '{d.cars[i].id}'
+        +     '</i>'
+        +   '</p>'
+        +   '<p>'
+        +     '<i>'
+        +       '{d.type}'
+        +     '</i>'
+        +     '<i>'
+        +       '{d.cars[i+1].id}'
+        +     '</i>'
+        +   '</p>'
+        +   '<p>'
+        +    '{d.id}'
+        +   '</p>'
+        + '</xml>'
+      ;
+      var _data = {
+        type : 201,
+        id   : 177193,
+        cars : [
+          {
+            id       : 0,
+            pictures : null,
+            other    : 1
+          }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml><p><i>201</i><i>0</i></p><p>177193</p></xml>');
+        done();
       });
     });
 
@@ -1855,7 +2018,7 @@ describe('Carbone', function () {
           _data.isDataHidden = false;
           carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
             assert.equal(err+'', 'null');
-            assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr><tr>my Toyota </tr> my</xml>');
+            assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr><tr>my Toyota </tr> <a></a> my</xml>');
             done();
           });
         });
@@ -1913,7 +2076,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           assert.equal(err+'', 'null');
-          assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr> my</xml>');
+          assert.equal(_xmlBuilt, '<xml>my <b/> <tr>my Lumeneo </tr><tr>my Tesla motors </tr> <a></a> my</xml>');
           _data.cars = [];
           carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
             assert.equal(err+'', 'null');
@@ -2588,7 +2751,7 @@ describe('Carbone', function () {
           assert.equal(Buffer.isBuffer(_results[i]), true);
           assert.equal((_results[i].slice(0, 2).toString() === 'PK'), true);
         }
-        assert.equal((_elapsed < 200), true);
+        assert.equal((_elapsed < (200 * helper.CPU_PERFORMANCE_FACTOR)), true);
         done();
       }
     });
@@ -3051,7 +3214,7 @@ describe('Carbone', function () {
             assert.equal(Buffer.isBuffer(_results[i]), true);
             assert.equal(_results[i].slice(0, 4).toString(), '%PDF');
           }
-          // assert.equal((_elapsed < 200), true);
+          assert.equal((_elapsed < (200 * helper.CPU_PERFORMANCE_FACTOR)), true);
           done();
         }
       });
@@ -3356,6 +3519,9 @@ describe('Carbone', function () {
 function unzipSystem (filePath, destPath, callback) {
   var _unzippedFiles = {};
   var _unzip = spawn('unzip', ['-o', filePath, '-d', destPath]);
+  _unzip.on('error', function () {
+    throw Error('\n\nPlease install unzip program to execute tests. Ex: sudo apt install unzip\n\n');
+  });
   _unzip.stderr.on('data', function (data) {
     throw Error(data);
   });

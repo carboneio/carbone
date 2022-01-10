@@ -50,7 +50,7 @@ describe('Dynamic colors', function () {
               ce1 : {
                 file        : 'content.xml',
                 styleFamily : 'table-cell',
-                colors      : [{ id: 0, color : '#ff0000', element : 'textColor', marker : 'd.color2', colorType : '#hexa' }],
+                colors      : [{ id : 0, color : '#ff0000', element : 'textColor', marker : 'd.color2', colorType : '#hexa' }],
                 attributes  : ''
               }
             }};
@@ -131,7 +131,7 @@ describe('Dynamic colors', function () {
                   marker    : 'd.color6',
                   colorType : 'hsl'
                 }, {
-                  id        : -1,
+                  id      : -1,
                   color   : 'transparent',
                   element : 'textBackgroundColor'
                 }],
@@ -296,7 +296,7 @@ describe('Dynamic colors', function () {
             data : '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#000000" officeooo:rsid="00200176" officeooo:paragraph-rsid="00200176"/></style:style><style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#ff0000" officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328" fo:background-color="#ffff00"/></style:style><style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard"><style:text-properties fo:color="#0000ff" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382" fo:background-color="transparent"/></style:style>'
           };
           const _bindColorList = [{ referenceColor : '#ff0000', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#ffff00', colorType : 'color', marker : 'd.color2' }];
-          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ id: 0, color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { id : 0,  color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : 'color' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' } };
+          const _expectedColorListElement = { P3 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{ id : 0, color : '#ff0000', element : 'textColor', marker : 'd.color1', colorType : '#hexa' }, { id : 0,  color : '#ffff00', element : 'textBackgroundColor', marker : 'd.color2', colorType : 'color' } ], attributes : ' officeooo:rsid="00085328" officeooo:paragraph-rsid="00085328"' } };
 
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -330,7 +330,7 @@ describe('Dynamic colors', function () {
           };
           const _bindColorList = [{ referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = {
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id: 0, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {id: -1, color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id : 0, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {id : -1, color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -344,7 +344,7 @@ describe('Dynamic colors', function () {
           };
           const _bindColorList = [{ referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.color1' }];
           const _expectedColorListElement = {
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id: 0, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {id: -1, color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id : 0, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.color1', colorType : '#hexa'}, {id : -1, color : '#0000ff', element : 'textColor'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -358,7 +358,7 @@ describe('Dynamic colors', function () {
           };
           const _bindColorList = [{ referenceColor : '#0000ff', colorType : '#hexa', marker : 'd.color1' }, { referenceColor : '#92AF11', colorType : '#hexa', marker : 'd.list[i].element' }];
           const _expectedColorListElement = {
-            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id: 1, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.list[i].element', colorType : '#hexa'}, {id: 0, color : '#0000ff', element : 'textColor', marker : 'd.color1', colorType : '#hexa'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
+            P4 : { file : 'content.xml', styleFamily : 'paragraph', colors : [{id : 1, color : '#92AF11', element : 'textBackgroundColor', marker : 'd.list[i].element', colorType : '#hexa'}, {id : 0, color : '#0000ff', element : 'textColor', marker : 'd.color1', colorType : '#hexa'}], attributes : ' officeooo:rsid="0025a382" officeooo:paragraph-rsid="0025a382"'}
           };
           const _colorStyleList = color.getColorStyleListLo(_file, _bindColorList);
           helper.assert(_colorStyleList, _expectedColorListElement);
@@ -1096,6 +1096,37 @@ describe('Dynamic colors', function () {
         helper.assert(_template.files[0].data, _expectedXML);
       });
 
+      it('should replace a cell color with a color marker + formatter AND should remove the "themeFill" tag', function () {
+        // themeFill located in the middle of the tag
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : parser.removeXMLInsideMarkers('<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="FF0000" w:themeFill="accent6" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p></w:body></w:document>')
+          }]
+        };
+        // themeFill located in the end of the tag
+        const _template2 = {
+          files : [{
+            name : 'word/document.xml',
+            data : parser.removeXMLInsideMarkers('<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="FF0000" w:val="clear" w:themeFill="accent6"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p></w:body></w:document>')
+          }]
+        };
+        // should not remove themeFill if there is no binding
+        const _template3 = {
+          files : [{
+            name : 'word/document.xml',
+            data : parser.removeXMLInsideMarkers('<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="000000" w:val="clear" w:themeFill="accent6"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t>{bindColor(#ff0000, #hexa)=d.color}</w:t></w:r></w:p></w:body></w:document>')
+          }]
+        };
+        const _expectedXML = '<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="{d.color:getAndConvertColorDocx(#hexa, textColor)}" w:val="clear"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>';
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data, _expectedXML);
+        color.preProcessDocx(_template2);
+        helper.assert(_template2.files[0].data, _expectedXML);
+        color.preProcessDocx(_template3);
+        helper.assert(_template3.files[0].data, '<w:document><w:body><w:tbl><w:tr><w:trPr></w:trPr><w:tc><w:tcPr><w:tcW w:w="9972" w:type="dxa"/><w:shd w:fill="000000" w:val="clear" w:themeFill="accent6"/></w:tcPr></w:tc></w:tr></w:tbl><w:p><w:r><w:t></w:t></w:r></w:p></w:body></w:document>');
+      });
+
       it('should replace mutliple cells color with color markers + formatters', function () {
         const _template = {
           files : [{
@@ -1340,7 +1371,7 @@ describe('Dynamic colors', function () {
         var _diff = process.hrtime(_start);
         var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
         console.log('\n\n bindColor parsing : '+_elapsed + ' ms (usally around 900ms) \n\n\n');
-        helper.assert(_elapsed < 2000, true);
+        helper.assert(_elapsed < (2000 * helper.CPU_PERFORMANCE_FACTOR), true);
         helper.assert(res.length, 15251);
       });
     });

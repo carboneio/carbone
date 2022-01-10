@@ -1,12 +1,11 @@
 const assert    = require('assert');
-const helper    = require('../lib/helper');
 const helperTest = require('./helper');
 const carbone   = require('../lib/index');
 const path      = require('path');
-const xmlFormat = require('xml-beautifier');
 const fs        = require('fs');
 const image     = require('../lib/image');
 const nock      = require('nock');
+const barcodeFormatter = require('../formatters/barcode');
 
 describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
@@ -38,6 +37,23 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
     });
+
+
+    it.skip('should generate barcodes as images and as fonts', function (done) {
+      const _testedReport = 'image/odg-barcodes';
+      const _data = {
+        /** Barcodes as Fonts & Images*/
+        item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
   describe('[Full test] ODP', function () {
@@ -50,12 +66,44 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    it('should inject 3 images inside the ODG document with no imageFit, with imageFit contain and imageFit fill', function (done) {
+    it('should inject 3 images inside the ODP document with no imageFit, with imageFit contain and imageFit fill', function (done) {
       const _testedReport = 'image/odp-simple';
       const _data = {
         image  : _imageDEBase64jpg,
         image2 : _imageLogoBase64jpg,
         image3 : _imageLogoBase64jpg
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it('should accept image loop across slides', function (done) {
+      const _testedReport = 'image/odp-image-loop';
+      const _data = {
+        sample : [
+          { image : _imageFRBase64jpg },
+          { image : _imageDEBase64jpg },
+          { image : _imageITBase64png }
+        ]
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it.skip('should generate barcodes as images and as fonts', function (done) {
+      const _testedReport = 'image/odp-barcodes';
+      const _data = {
+        /** Barcodes as Fonts & Images*/
+        item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');
@@ -111,6 +159,28 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
     });
+    it('should return an error if the image anchor is absolute and used in a loop', function (done) {
+      const _testedReport = 'image/odt-image-absolute-anchor-loop';
+      const _data = [{
+        image : _imageLogoBase64jpg
+      }];
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'Error: The template contains a list of floating images, you must change the images anchor-type to \"as character\" where the marker \"d[i].image\" is bound.');
+        helperTest.assert(res, null);
+        done();
+      });
+    });
+    it('should replace image if the anchor is absolute and not used in a loop', function (done) {
+      const _testedReport = 'image/odt-image-absolute-anchor-no-loop';
+      const _data = {
+        image : _imageLogoBase64jpg
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
     it('should replace image with loops (base64 jpg)\
       should accept PNG image even if the template image is a JPEG\
       should accept image in header with conditions i=0\
@@ -137,6 +207,24 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             { name : 'de', image : _imageDEBase64jpg }
           ]
         }]
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+    it.skip('should generate all barcodes as images', function (done) {
+      const _testedReport = 'image/odt-barcodes';
+      const _data = {
+        /** Barcodes as Fonts */
+        item     : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2    : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3    : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4    : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39'),
+        /** Barcodes as Images */
+        barcodes : barcodeFormatter.supportedBarcodes
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');
@@ -192,9 +280,25 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
     });
+
+    it.skip('should generate barcodes as images and as fonts', function (done) {
+      const _testedReport = 'image/ods-barcodes';
+      const _data = {
+        /** Barcodes as Fonts & Images*/
+        item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+        item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+        item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+        item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
-  describe('Methods for LO (ODT/ODS)', function () {
+  describe('Methods for LO (ODT/ODS/ODP/ODG)', function () {
     describe('preProcessLo', function () {
       it('should do nothing if the image tags are including a text box', function (done) {
         const _expectedXML = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:body><office:text><text:p text:style-name="Standard"><draw:frame text:anchor-type="paragraph" draw:z-index="0" draw:name="Shape1" draw:style-name="gr2" draw:text-style-name="P1" svg:width="4.315cm" svg:height="2.585cm" svg:x="1.732cm" svg:y="0.714cm"><draw:text-box><text:p>{d.id}</text:p></draw:text-box></draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="1" draw:name="Shape2" draw:style-name="gr1" draw:text-style-name="P1" svg:width="3.197cm" svg:height="1.812cm" svg:x="8.326cm" svg:y="0.572cm"><draw:text-box><text:p>{d.missionId}</text:p></draw:text-box></draw:frame></text:p></office:text></office:body></office:document-content>';
@@ -211,6 +315,50 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
 
+      it('should do nothing if it is not an image but a table inside an ODG file', function (done) {
+        const _expectedXML = '' +
+          '<office:body>' +
+            '<office:presentation>' +
+              '<draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL1T0">' +
+                '<draw:frame draw:style-name="standard" draw:layer="layout" svg:width="12.683cm" svg:height="3.998cm" svg:x="7.373cm" svg:y="8.549cm">' +
+                  '<table:table table:template-name="default" table:use-first-row-styles="true" table:use-banding-rows-styles="true">' +
+                    '<table:table-column table:style-name="co1"/>' +
+                    '<table:table-column table:style-name="co1"/>' +
+                    '<table:table-row table:style-name="ro1" table:default-cell-style-name="ce1">' +
+                      '<table:table-cell>' +
+                        '<text:p>{d.list[i].name}</text:p>' +
+                      '</table:table-cell>' +
+                      '<table:table-cell>' +
+                        '<text:p>{d.list[i].age}</text:p>' +
+                      '</table:table-cell>' +
+                    '</table:table-row>' +
+                    '<table:table-row table:style-name="ro2" table:default-cell-style-name="ce1">' +
+                      '<table:table-cell>' +
+                        '<text:p>{d.list[i+1]}</text:p>' +
+                      '</table:table-cell>' +
+                      '<table:table-cell/>' +
+                    '</table:table-row>' +
+                  '</table:table>' +
+                  '<draw:image xlink:href="Pictures/TablePreview1.svm" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+                '</draw:frame>' +
+              '</draw:page>' +
+              '<presentation:settings presentation:mouse-visible="false"/>' +
+            '</office:presentation>' +
+          '</office:body>';
+        const _template = {
+          extension : 'odp',
+          files     : [
+            {
+              name : 'content.xml',
+              data : _expectedXML
+            }
+          ]
+        };
+        image.preProcessLo(_template);
+        helperTest.assert(_template.files[0].data, _expectedXML);
+        done();
+      });
+
       it('should replace the main document tag attributes with image markers and formaters (ODT/ODS XML from LO) (unit: CM)', function (done) {
         let template = {
           files : [
@@ -224,7 +372,26 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        image.preProcessLo(template);
+        helperTest.assert(template.files[0].data, expectedXML);
+        done();
+      });
+
+      it('should replace the main document tag attributes with image formatters, AND the `:isImage` formatter if the `:barcode` formatter exist on the xml (ODT/ODS XML from LO) (unit: CM) (BARCODE formatter)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'content.xml',
+              data : '' +
+              '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0">' +
+                '<draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/>' +
+                '<svg:desc>{d.image:barcode(ean13)}</svg:desc>' +
+              '</draw:frame>'
+            }
+          ]
+        };
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:isImage:barcode(ean13):generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:isImage:barcode(ean13):scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:isImage:barcode(ean13):scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:isImage:barcode(ean13):generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:isImage:barcode(ean13):generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -239,7 +406,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="Image 1" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="{d.image:scaleImage(width, 0.3375, in)}in" svg:height="{d.image:scaleImage(height, 0.20903, in)}in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="a0" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:x="0in" svg:y="0in" svg:width="{d.image:scaleImage(width, 0.3375, in, fillWidth)}in" svg:height="{d.image:scaleImage(height, 0.20903, in, fillWidth)}in" style:rel-width="scale" style:rel-height="scale"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/><svg:title/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -254,7 +421,21 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, contain)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, contain)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        image.preProcessLo(template);
+        helperTest.assert(template.files[0].data, expectedXML);
+        done();
+      });
+      it('should replace the main document tag attributes with image markers and formaters (ODT/ODS XML from LO) (unit: CM) (imageFit fillWidth)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'content.xml',
+              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(fillWidth)}</svg:desc></draw:frame>'
+            }
+          ]
+        };
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm, fillWidth)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm, fillWidth)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -264,11 +445,11 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           files : [
             {
               name : 'content.xml',
-              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(contain)}</svg:desc></draw:frame>'
+              data : '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="Pictures/10000000000003E80000029B8FE7CEEBB673664E.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="image/jpeg"/><svg:desc>{d.image:imageFit(fill)}</svg:desc></draw:frame>'
             }
           ]
         };
-        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="{d.image:scaleImage(width, 6.92, cm)}cm" svg:height="{d.image:scaleImage(height, 4.616, cm)}cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -494,6 +675,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+
+      it.skip('should generate barcodes as images and as fonts', function (done) {
+        const _testedReport = 'image/docx-barcodes';
+        const _data = {
+          /** Barcodes as Fonts & Images*/
+          item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+          item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+          item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+          item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
     });
 
     describe('DOCX preprocess XML', function () {
@@ -535,7 +732,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu, fillWidth)}" cy="{d.image:scaleImage(height, 590550, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu, fillWidth)}" cy="{d.image:scaleImage(height, 590550, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -552,7 +749,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline wp14:editId="5C7CCEE1" wp14:anchorId="63CC715F"><wp:extent cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu)}" /><wp:effectExtent l="0" t="0" r="0" b="0" /><wp:docPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" title="" /><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1" /></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" /><pic:cNvPicPr /></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.child.child.imageDE:generateImageDocxReference(documentName1234.xml)}"><a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a14:useLocalDpi val="0" xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" /></a:ext></a:extLst></a:blip><a:stretch><a:fillRect /></a:stretch></pic:blipFill><pic:spPr><a:xfrm rot="0" flipH="0" flipV="0"><a:off x="0" y="0" /><a:ext cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu)}" /></a:xfrm><a:prstGeom prst="rect"><a:avLst /></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline wp14:editId="5C7CCEE1" wp14:anchorId="63CC715F"><wp:extent cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu, fillWidth)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu, fillWidth)}" /><wp:effectExtent l="0" t="0" r="0" b="0" /><wp:docPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" title="" /><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1" /></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" /><pic:cNvPicPr /></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.child.child.imageDE:generateImageDocxReference(documentName1234.xml)}"><a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a14:useLocalDpi val="0" xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" /></a:ext></a:extLst></a:blip><a:stretch><a:fillRect /></a:stretch></pic:blipFill><pic:spPr><a:xfrm rot="0" flipH="0" flipV="0"><a:off x="0" y="0" /><a:ext cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu, fillWidth)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu, fillWidth)}" /></a:xfrm><a:prstGeom prst="rect"><a:avLst /></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -567,7 +764,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu)}" cy="{d.image:scaleImage(height, 590550, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu, contain)}" cy="{d.image:scaleImage(height, 590550, emu, contain)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu, contain)}" cy="{d.image:scaleImage(height, 590550, emu, contain)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        image.preProcessDocx(template);
+        helperTest.assert(template.files[0].data, expectedXML);
+        done();
+      });
+
+      it('should replace the main document tag attributes with image formatters and the `isImage` formatter if the `barcode` is included (common DOCX xml from LO or MS) (BARCODE)', function (done) {
+        let template = {
+          files : [
+            {
+              name : 'word/document.xml',
+              data : '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="952500" cy="590550"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="1" name="Image1" descr="{d.image:barcode(ean13):imageFit(contain)}"></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="Image1" descr="{d.image}"></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId2"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="952500" cy="590550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>'
+            }
+          ]
+        };
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:isImage:barcode(ean13):scaleImage(width, 952500, emu, contain)}" cy="{d.image:isImage:barcode(ean13):scaleImage(height, 590550, emu, contain)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:isImage:barcode(ean13):generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:isImage:barcode(ean13):generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:isImage:barcode(ean13):generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:isImage:barcode(ean13):scaleImage(width, 952500, emu, contain)}" cy="{d.image:isImage:barcode(ean13):scaleImage(height, 590550, emu, contain)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -606,9 +818,9 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           ]
         };
         image.preProcessDocx(template);
-        helperTest.assert(template.files[0].data, '<w:document><w:body><w:p w14:paraId="10D86908" w14:textId="594213EC" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="57033187" wp14:editId="308FFE5B"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu)}" cy="{d.tests.image:scaleImage(height, 702021, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 6" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(document.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu)}" cy="{d.tests.image:scaleImage(height, 721727, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:body></w:document>');
-        helperTest.assert(template.files[1].data, '<w:ftr><w:p w14:paraId="570D5375" w14:textId="1642C3D9" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB" w:rsidP="00F040CB"><w:pPr><w:pStyle w:val="Footer"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="1A6006B2" wp14:editId="70ED8A3E"><wp:extent cx="{d.image:scaleImage(width, 925689, emu)}" cy="{d.image:scaleImage(height, 694318, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 7" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(footer2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu)}" cy="{d.image:scaleImage(height, 721508, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:ftr>');
-        helperTest.assert(template.files[2].data, '<w:hdr><w:p w14:paraId="50A57CAF" w14:textId="03063553" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34" w:rsidP="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="26BB6EA6" wp14:editId="7EC70FEB"><wp:extent cx="{d.image:scaleImage(width, 925689, emu)}" cy="{d.image:scaleImage(height, 694318, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 2" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu)}" cy="{d.image:scaleImage(height, 721508, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="75994D6B" wp14:editId="4DEE8DEE"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu)}" cy="{d.tests.image:scaleImage(height, 702021, emu)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 3" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu)}" cy="{d.tests.image:scaleImage(height, 721727, emu)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="46E11299" w14:textId="77777777" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr></w:p></w:hdr>');
+        helperTest.assert(template.files[0].data, '<w:document><w:body><w:p w14:paraId="10D86908" w14:textId="594213EC" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="57033187" wp14:editId="308FFE5B"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 702021, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 6" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(document.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 721727, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:body></w:document>');
+        helperTest.assert(template.files[1].data, '<w:ftr><w:p w14:paraId="570D5375" w14:textId="1642C3D9" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB" w:rsidP="00F040CB"><w:pPr><w:pStyle w:val="Footer"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="1A6006B2" wp14:editId="70ED8A3E"><wp:extent cx="{d.image:scaleImage(width, 925689, emu, fillWidth)}" cy="{d.image:scaleImage(height, 694318, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 7" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(footer2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu, fillWidth)}" cy="{d.image:scaleImage(height, 721508, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:ftr>');
+        helperTest.assert(template.files[2].data, '<w:hdr><w:p w14:paraId="50A57CAF" w14:textId="03063553" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34" w:rsidP="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="26BB6EA6" wp14:editId="7EC70FEB"><wp:extent cx="{d.image:scaleImage(width, 925689, emu, fillWidth)}" cy="{d.image:scaleImage(height, 694318, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 2" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu, fillWidth)}" cy="{d.image:scaleImage(height, 721508, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="75994D6B" wp14:editId="4DEE8DEE"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 702021, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 3" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 721727, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="46E11299" w14:textId="77777777" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr></w:p></w:hdr>');
         done();
       });
     });
@@ -656,6 +868,38 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(_template.files[1].data, _expectedContentType);
         helperTest.assert(_template.files[2], {
           name   : 'word/media/CarboneImage0.png',
+          parent : '',
+          data   : '1234'
+        });
+      });
+
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml even if the temporary image type is in uppercase', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.JPG"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>',
+          },
+          {
+            name : '[Content_Types].xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="JPG" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.JPG"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n<Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.jpg" Id="rIdCarbone0"/></Relationships>';
+        const _expectedContentType = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="JPG" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('carbone.io/logo.jpg', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'jpg'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helperTest.assert(_template.files[0].data, _expectedContent);
+        helperTest.assert(_template.files[1].data, _expectedContentType);
+        helperTest.assert(_template.files[2], {
+          name   : 'word/media/CarboneImage0.jpg',
           parent : '',
           data   : '1234'
         });
@@ -801,7 +1045,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    describe('DOCX pdefineImageContentTypeDocx (part of postProcessDocx)', function () {
+    describe('DOCX defineImageContentTypeDocx (part of postProcessDocx)', function () {
       it('should not add the image type definition if the image type list is empty []', function () {
         const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
                             '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
@@ -865,6 +1109,27 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
                             '<Default Extension="jpg" ContentType="image/jpeg"/>'+
                             '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
         image.defineImageContentTypeDocx(_template, ['png', 'jpg', 'png', 'jpeg', 'svg', 'svg', 'jpg']);
+        helperTest.assert(_template.files[0].data, _expectedXml);
+      });
+      it('should not add the image type if it is already defined in uppercase', function () {
+        const _template = {
+          files : [
+            {
+              name : '[Content_Types].xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                    '<Default Extension="PnG" ContentType="image/png"/>' +
+                    '<Default Extension="JPG" ContentType="image/jpeg"/></Types>'
+            }
+          ]
+        };
+        const _expectedXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+                            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'+
+                            '<Default Extension="PnG" ContentType="image/png"/>'+
+                            '<Default Extension="JPG" ContentType="image/jpeg"/>'+
+                            '<Default Extension="svg" ContentType="image/svg+xml"/></Types>';
+
+        image.defineImageContentTypeDocx(_template, ['jpg', 'pNg', 'Svg']);
         helperTest.assert(_template.files[0].data, _expectedXml);
       });
       it ('should not add the image type definition if the image mime type format does not exist [PNG, JPG, SVG, JSON, HTML]', function () {
@@ -962,6 +1227,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+
+      it.skip('should generate barcodes as images and as fonts', function (done) {
+        const _testedReport = 'image/xlsx-barcodes';
+        const _data = {
+          /** Barcodes as Fonts & Images*/
+          item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+          item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+          item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+          item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
     });
 
     describe('XLSX preprocess xml', function () {
@@ -993,6 +1274,21 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         assert.throws(() => image.preProcessXLSX(_template), Error('Carbone does not support a list of images on XLSX template.'));
         done();
       });
+
+      it('should replace the main document tag attributes with image marker/formatters and the `isImage` formatter if the `barcode` formatter is included (BARCODE)', function (done) {
+        let _template = {
+          files : [
+            {
+              name : 'xl/drawings/drawing1.xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr="{d.tests.image:barcode(ean13)}"></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId1"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>'
+            }
+          ]
+        };
+        let _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr=""></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="{d.tests.image:isImage:barcode(ean13):generateImageXlsxReference(1)}"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>';
+        image.preProcessXLSX(_template);
+        helperTest.assert(_template.files[0].data, _expectedXML);
+        done();
+      });
     });
   });
 
@@ -1000,7 +1296,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     describe('DOCX ODT scaling', function () {
       it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
         let _imageInfo = {
-          unit           : 'emu',
+          imageUnit      : 'emu',
           data           : new Buffer.from(''),
           newImageWidth  : -1,
           newImageHeight : -1
@@ -1014,12 +1310,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the EMU size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'emu',
+            imageUnit      : 'emu',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 952500);
           helperTest.assert(_imageInfo.newImageHeight, 590550);
           done();
@@ -1030,12 +1326,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the EMU size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'emu',
+            imageUnit      : 'emu',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 2857500);
           helperTest.assert(_imageInfo.newImageHeight, 1905000);
           done();
@@ -1045,12 +1341,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the CM size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'cm',
+            imageUnit      : 'cm',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 2.65);
           helperTest.assert(_imageInfo.newImageHeight, 1.643);
           done();
@@ -1061,12 +1357,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the CM size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'cm',
+            imageUnit      : 'cm',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 7.95);
           helperTest.assert(_imageInfo.newImageHeight, 5.3);
           done();
@@ -1076,12 +1372,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the INCH size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'in',
+            imageUnit      : 'in',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 1.0416666666666667);
           helperTest.assert(_imageInfo.newImageHeight, 0.6458333333333334);
           done();
@@ -1091,44 +1387,119 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the INCH size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            unit           : 'in',
+            imageUnit           : 'in',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
           };
-          image._getImageSize(_imageInfo, _imageInfo.unit);
+          image._getImageSize(_imageInfo, _imageInfo.imageUnit);
           helperTest.assert(_imageInfo.newImageWidth, 3.125);
           helperTest.assert(_imageInfo.newImageHeight, 2.0833333333333335);
           done();
         });
       });
 
-      it("_computeImageSize 1: should compute the imageFit size as 'contain'", function (done) {
-        let _imageInfo = {
-          unit           : 'emu',
-          newImageWidth  : 220,
-          newImageHeight : 100,
-          imageWidth     : 100,
-          imageHeight    : 80
-        };
-        image._computeImageSize(_imageInfo);
-        helperTest.assert(_imageInfo.imageWidth, 100);
-        helperTest.assert(_imageInfo.imageHeight, 46);
-        done();
-      });
+      describe("_computeImageSize", function () {
+        it("_computeImageSize EMU 1: should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            imageUnit      : 'emu',
+            newImageWidth  : 220,
+            newImageHeight : 100,
+            imageWidth     : 100,
+            imageHeight    : 80
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 100);
+          helperTest.assert(_imageInfo.imageHeight, 45);
+          done();
+        });
 
-      it("_computeImageSize 2: should compute the imageFit size as 'contain'", function (done) {
-        let _imageInfo = {
-          unit           : 'emu',
-          newImageWidth  : 2857500,
-          newImageHeight : 1905000,
-          imageWidth     : 952500,
-          imageHeight    : 590550
-        };
-        image._computeImageSize(_imageInfo);
-        helperTest.assert(_imageInfo.imageWidth, 952500);
-        helperTest.assert(_imageInfo.imageHeight, 635000);
-        done();
+        it("_computeImageSize EMU 2: should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            imageUnit           : 'emu',
+            newImageWidth  : 2857500,
+            newImageHeight : 1905000,
+            imageWidth     :  952500,
+            imageHeight    :  590550
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 885825);
+          helperTest.assert(_imageInfo.imageHeight, 590550);
+          done();
+        });
+
+        it("_computeImageSize CM : should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            imageUnit      : 'cm',
+            newImageWidth  : 20.45,
+            newImageHeight : 15,
+            imageWidth     : 8,
+            imageHeight    : 5
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 6.817);
+          helperTest.assert(_imageInfo.imageHeight, 5);
+          done();
+        });
+
+        it("_computeImageSize CM with 3 decimal : should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            imageUnit      : 'cm',
+            newImageWidth  : 33.558,
+            newImageHeight : 20.312,
+            imageWidth     : 12,
+            imageHeight    : 10
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 12);
+          helperTest.assert(_imageInfo.imageHeight, 7.263);
+          done();
+        });
+
+
+        it("_computeImageSize IN : should compute the imageFit size as 'contain'", function (done) {
+          let _imageInfo = {
+            imageUnit      : 'in',
+            newImageWidth  : 8.6952,
+            newImageHeight : 10.6713,
+            imageWidth     :  2.8984,
+            imageHeight    :  1.4492
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 1.181); // 1.1808
+          helperTest.assert(_imageInfo.imageHeight, 1.449); // 1.387269
+          done();
+        });
+
+        it('should compute the imageFit size as fillWidth', function (done) {
+          let _imageInfo = {
+            imageFit       : 'fillWidth',
+            imageUnit      : 'emu',
+            newImageWidth  : 50,
+            newImageHeight : 100,
+            imageWidth     : 100,
+            imageHeight    : 80
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 100);
+          helperTest.assert(_imageInfo.imageHeight, 200);
+          done();
+        });
+
+        it('should compute the imageFit size as fill', function (done) {
+          let _imageInfo = {
+            imageFit       : 'fill',
+            imageUnit      : 'emu',
+            newImageWidth  : 150,
+            newImageHeight : 250,
+            imageWidth     : 100,
+            imageHeight    : 80
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 100);
+          helperTest.assert(_imageInfo.imageHeight, 80);
+          done();
+        });
       });
     });
 
@@ -1330,6 +1701,20 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+      it('should download a PNG image from an url with weird Content-Type', function (done) {
+        nock('https://google.com')
+          .get('/blabla?size=10&color=blue')
+          .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
+            'Content-Type' : 'image/png; charset=UTF-8',
+          });
+        image.downloadImage('https://google.com/blabla?size=10&color=blue', {}, function (err, imageInfo) {
+          helperTest.assert(err+'', 'null');
+          assert(imageInfo.data.length > 0);
+          helperTest.assert(imageInfo.mimetype, 'image/png');
+          helperTest.assert(imageInfo.extension, 'png');
+          done();
+        });
+      });
       it('should download a PNG image from an url even if the header.content-type is incorrect (application/json)', function (done) {
         nock('https://google.com')
           .get('/image-flag-it.png')
@@ -1506,6 +1891,18 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(image.checkIfImageIncludedDocx('word/_rels/document.xml.rels', ['header3.xml', 'header2.xml', 'footer1.xml']), false);
         helperTest.assert(image.checkIfImageIncludedDocx('word/_rels/document.xml.rels', []), false);
         helperTest.assert(image.checkIfImageIncludedDocx('', ['header3.xml', 'header2.xml']), false);
+      });
+    });
+    describe('cleanContentType', function () {
+      it('should clean content type', function () {
+        helperTest.assert(image.cleanContentType(undefined), '');
+        helperTest.assert(image.cleanContentType(null), '');
+        helperTest.assert(image.cleanContentType(0), '');
+        helperTest.assert(image.cleanContentType(1), '');
+        helperTest.assert(image.cleanContentType('image/png; charset=UTF-8'), 'image/png');
+        helperTest.assert(image.cleanContentType('image/png ; charset=UTF-8'), 'image/png');
+        helperTest.assert(image.cleanContentType('  image/png '), 'image/png');
+        helperTest.assert(image.cleanContentType('  image/png  ; charset=UTF-8 ; s '), 'image/png');
       });
     });
   });

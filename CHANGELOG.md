@@ -1,17 +1,212 @@
+### v3.4.2
+  - [EE] Fix do not crash if content passed to `:html` formatter is not a string
+
+### v3.4.1
+  - Release December 9th 2021
+  - Accepts "OpenDocument Text Flat XML" (.fodt) template files
+  - Includes v3.3.3: fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
+  - [EE] Fix dynamic colors for DOCX cells background
+
+### v3.4.0
+  - Release November 17th 2021
+  - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
+  - Bump DayJS to 1.10.7 and debug to 4.3.2
+  - Improve thread management of LibreOffice on Linux:
+    - The system, which auto-restarts LibreOffice when it crashes or if there is a conversion timeout, could hang indefinitely on Linux.
+      On the Enterprise Edition, the global watchdog system was able to fix this bad behavior but it was slow.
+      Now, the LibreOffice is correctly killed. No zombie processes remaining.
+    - Avoid launching the parent process "oosplash" of LibreOffice
+    - Improve auto-restart mechanism
+    - Add debug logs
+    - All tests passed on Linux 😅
+  - [EE] Bump all dependencies
+  - [EE] Fix random image display in LibreOffice documents. Sometimes, LibreOffice hides one image when two or more images share the same name.
+         Now, Carbone generates a unique name for each image with the format "carbone-image-<counter>".
+  - [EE] Experimental: Deffered rendering with a webhook, it is dedicated to render huge reports:
+    1. Render a document as usual with the request `POST /render/:templateID` with the JSON dataset into the body request AND you have to insert the header `carbone-webhook-url` as a callback URL. It is an endpoint of your server listening when a document is rendered.
+    2. Carbone will generate your document and it will notify your webhook with a renderID
+    3. Retrieve the generated document with a `GET /render/:renderID` and voilà!
+  - [EE] Experimental: add the possibility to duplicate rows using an attribute of an object
+    *Data*:
+      ```json
+      [
+        { "id" : "A", "qty" : 2 },
+        { "id" : "B", "qty" : 3 },
+        { "id" : "C", "qty" : 0 },
+        { "id" : "D", "qty" : 1 }
+      ]
+      ```
+    *Template*: `{d[i].id} - {d[i+1*qty].id}`
+    *Result*:  `A - A - B - B - B - D`
+  - [EE] ⚡️ **Carbone supports 107 barcodes** in DOCX/ODT/XLSX/ODS templates:
+    - Barcodes are inserted as a dynamic image to support more types
+    - In your template, barcodes markers must be inserted inside the title or description field of a temporary image, and then it must be followed with the barcode formatter, such as `{d.value:barcode(type)}`.
+    - You must pass one of the following types to the `:barcode` formatter as a first argument: `ean5`, `ean2`, `ean13`, `ean8`, `upca`, `upce`, `isbn`, `ismn`, `issn`, `code128`, `gs1-128`, `ean14`, `sscc18`, `code39`, `code39ext`, `code32`, `pzn`, `code93`, `code93ext`, `interleaved2of5`, `itf14`, `identcode`, `leitcode`, `databaromni`, `databarstacked`, `databarstackedomni`, `databartruncated`, `databarlimited`, `databarexpanded`, `databarexpandedstacked`, `gs1northamericancoupon`, `pharmacode`, `pharmacode2`, `code2of5`, `industrial2of5`, `iata2of5`, `matrix2of5`, `coop2of5`, `datalogic2of5`, `code11`, `bc412`, `rationalizedCodabar`, `onecode`, `postnet`, `planet`, `royalmail`, `auspost`, `kix`, `japanpost`, `msi`, `plessey`, `telepen`, `telepennumeric`, `posicode`, `codablockf`, `code16k`, `code49`, `channelcode`, `flattermarken`, `raw`, `daft`, `symbol`, `pdf417`, `pdf417compact`, `micropdf417`, `datamatrix`, `datamatrixrectangular`, `datamatrixrectangularextension`, `mailmark`, `qrcode`, `swissqrcode`, `microqrcode`, `rectangularmicroqrcode`, `maxicode`, `azteccode`, `azteccodecompact`, `aztecrune`, `codeone`, `hanxin`, `dotcode`, `ultracode`, `gs1-cc`, `ean13composite`, `ean8composite`, `upcacomposite`, `upcecomposite`, `databaromnicomposite`, `databarstackedcomposite`, `databarstackedomnicomposite`, `databartruncatedcomposite`, `databarlimitedcomposite`, `databarexpandedcomposite`, `databarexpandedstackedcomposite`, `gs1-128composite`, `gs1datamatrix`, `gs1datamatrixrectangular`, `gs1qrcode`, `gs1dotcode`, `hibccode39`, `hibccode128`, `hibcdatamatrix`, `hibcdatamatrixrectangular`, `hibcpdf417`, `hibcmicropdf417`, `hibcqrcode`, `hibccodablockf`, `hibcazteccode`
+    - The previous system, which uses a special font, is still available but is limited to `ean8`, `ean13`, `ean128`, `code39`.
+
+### v3.3.2
+  - Release October 11th 2021
+  - [EE] Dynamic Image fix: image types verification support uppercase and lower case formats
+
+### v3.3.1
+  - Release September 9th 2021
+  - [EE] New Carbone On-premise: Pass the option "maxDataSize" to change the maximum JSON data size when rendering a report. The value must be **bytes**. The default value is 60MB.
+
+### v3.3.3
+  - Release November 26th 2021
+  - Fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
+    `2021-11-18T08:05+0000` -> `Europe/London` -> `Thursday, November 18, 2021 8:05 AM`
+
+### v3.3.0
+  - Release August 30th 2021
+  - [EE] HTML Formatter:
+    - Fix: The HTML content is rendered without adding an empty line above it.
+    - Fix: The HTML content and static content are rendered in the expected order.
+    - New: If static content and Carbone markers are mixed with an HTML formatter in the same paragraph, the html is isolated into a new paragraph and each element are seperated above or below. For example, the following template on a text editor `<paragraph>A rocket is made of {d.data:html} {d.details}, this is cool!</paragraph>` will be transform into 3 paragraphs on the generated report `<paragraph>A rocket is made of </paragraph><paragraph>{d.data:html}</paragraph><paragraph> {d.details}, this is cool!</paragraph>`.
+    - Improved HTML rendering stability when it is mixed with lists, tables, and images.
+  - [EE] Dynamic Checkbox are supported only for ODT file. A marker should be inserted into the checkbox property "name" and it is used to set the value of the checkbox on the generated report. The checkbox is ticked (checked) when the value is a Boolean with the value "true", a non empty string, a non empty array or a non empty object. If the exported file type is a PDF, the checkbox can be edited on the generated document. An ODT document created from MS Word that include checkboxes does not work. It is also not possible to create a list of checkboxes with the expressions `[i] / [i+1]`.
+  - Accept `null` for the attribute `complement` in `options`
+
+### v3.2.7
+  - Release July 21th 2021
+  - Fix corrupted document when accessing a sub-object in an array `{d.surrounding[i].subArray[0].subObject.id}`, within a surrounding loop
+
+### v3.2.6
+  - Release June 15th 2021
+  - [EE] Fix the generation of ODP document that includes table lists.
+
+### v3.2.5
+  - Release June 10th 2021
+  - [EE] Accept URLs with weird Content-Type such as `image/png; charset=utf-8`  for dynamic image replacement
+
+### v3.2.4
+  - Release May 25th 2021
+  - [EE] Add the possibility to upload templates in base64. The content-type must be `application/json` and the template
+    must be sent in base64 in the body `{ "template" : "pure base64 or data-URI scheme in base64"}`
+  - [EE] Accepts loops with dynamic image replacement across slides/pages in ODP templates
+
+### v3.2.3
+  - Release May 21th 2021
+  - Accepts letter `W` to get the week number in `formatD` formatter
+
+### v3.2.2
+  - Release May 10th 2021
+  - Fix broken Excel files. It removes the alert which appears sometime when opening the file with MS Excel.
+  - Update DayJS dependency from 1.9.6 to 1.10.4.
+  - Fix date formatters (`formatD`...) and number formatters  (`formatN`...) when the country code is used in `options.lang`.
+    It accepts lower case or upper case for the locale.
+    Example:
+
+    *Data*:
+      ```js
+      {
+        date  : '20140131 23:45:00',
+        price : 1000.1234
+      }
+      ```
+    *Template*: `{d.date:formatD(dddd)} {d.price:formatN()}`
+
+    *Result*:
+
+      - `de-DE` => `Friday 1.000,123` (before) `Freitag 1.000,123` (after)
+      - `fr-fr` => `Friday 1 000,123` (before) `vendredi 1 000,123` (after)
+
+  - Fix number formatting for these locales: nl-be, am, ar, ar-dz, ar-bh, ar-eg, ar-iq, ar-jo, ar-kw, ar-lb, ar-ly,
+    ar-ma, ar-om, ar-qa, ar-sa, ar-sy, ar-tn, ar-ae, ar-ye, az-az, bn, bs, zh-cn, zh-hk, zh-mo, zh-sg, zh-tw, hr,
+    da, en-au, en-bz, en-ca, en-cb, en-in, en-ie, en-jm, en-nz, en-ph, en-tt, fa, fr-lu, de-li, de-lu, de-ch, el,
+    he, hi, id, it-it, it-ch, ja, kn, ko, ms-bn, ms-my, ml, mr, ro-mo, ro, ru-mo, sr-sp, sl, es-ar, es-bo, es-cl,
+    es-co, es-do, es-ec, es-sv, es-gt, es-hn, es-mx, es-ni, es-pa, es-py, es-pe, es-pr, es-es, es-uy, es-ve, sw,
+    ta, te, th, tr, uz-uz, vi, de, es, it
+
+    Example:
+      - `de` => `Freitag 1,000.123` (before) `Freitag 1.000,123` (after)
+
+### v3.2.1
+  - Release May 4th 2021
+  - Fix locale de-de
+  - [EE] Fix dynamic HTML: null or undefined values return an empty string instead of an error.
+
+### v3.2.0
+  - Release April 13th 2021
+  - [EE] Fix dynamic image resize when using the `:imageFit` formatter with the `contain` property.
+  - [EE] Add the option `:imageFit(fillWidth)` to fill the full width of the template image while keeping aspect ratio of the inserted image.
+      Before fixing the bug with `contain` property, it was more or less the default behaviour of Carbone before this version.
+      So, `fillWidth` becomes the default option to avoid changing the style of existing reports.
+  - [EE] Improve performance to download images. Building a report with a lot of dynamic images is almost 5 times faster than before.
+  - [EE] When the dynamic image cannot be inserted (fetch failed, image type not supported),
+    - the aspect ratio of the replacement image keep the aspect ratio of the template
+    - this replacement image more beautiful (vectorial) and does not contain any text for internationalisation
+  - [EE] Fix corrupted XLSX files when inserting new type of image which were not previously present
+
+### v3.1.7
+  - Release April 12th 2021
+  - [EE] Fix Dynamic HTML: paragraph and break lines inside nested lists or anchor tags were creating corrupted DOCX/ODT documents.
+
+### v3.1.6
+  - Release April 12th 2021
+  - [EE] New formatter `:defaultURL()`: if a **dynamic hyperlink** or a **HTML anchor tag** is injected into a report and the URL verification fails, the formatter is used to replace the default error URL. Example to use it with and HTML formatter: `{d.content:defaultURL(https:url.of.your.choice):html}`. The `:defaultURL` should be placed before the `:html` formatter.
+  - [EE] Fix: return 404 error when the template does not exist on rendering
+
+### v3.1.5
+  - Release April 8th 2021
+  - [EE] Fix hyperlinks verification which could lead to crash.
+
+### v3.1.4
+  - Release April 1st 2021
+  - [EE] Improve `:html` formatter stability when using special characters such as "'<>& for ODT and DOCX reports.
+
+### v3.1.3
+  - Release March 29th 2021
+  - Fix: Do not break documents if the `i+1` row contains some markers coming from parent object or condition blocks (rare)
+  - [EE] if a font family and font size is applied to an HTML formatter `{d.content:html}`, the font & size will be applied to the whole rendered HTML
+  - [EE] return an error message when image anchor is not correct in the template
+
+### v3.1.2
+  - Release March 4rd 2021
+  - Fix: v3.1.0 introduced a backward compatibility issue with reports made with v1/v2. Now, filter with boolean works like this (same behavior as numbers)
+    - data                       => template                       => condition result in array
+    - `data.myBoolean = true`    => `d.array[i, myBoolean=true]`   => true
+    - `data.myBoolean = "true"`  => `d.array[i, myBoolean=true]`   => true
+    - `data.myBoolean = "false"` => `d.array[i, myBoolean=true]`   => false
+    - `data.myBoolean = false`   => `d.array[i, myBoolean=true]`   => false
+    - `data.myBoolean = "true"`  => `d.array[i, myBoolean='true']` => true
+    - `data.myBoolean = true`    => `d.array[i, myBoolean='true']` => false
+
+
+### v3.1.1
+  - Release March 4rd 2021
+  - [EE] Fix: remove html entities not supported by XML format when using `:html` formatter
+
+### v3.1.0
+  - Release March 3rd 2021
+  - Accepts boolean in array filters `d.array[i, myBoolean=true]`
+  - [EE] Improve hyperlinks validation
+  - [EE] Improved HTML conversion with formatter `:html` for DOCX / ODT templates:
+    - Support `ol`, `ul`, `p`, `ul`, `ol`, `li` and `a` tags
+    - Fixed spacing management between list / paragraph / multi elements.
+    - All HTML entities are supported (Full List: https://www.w3schools.com/charsets/ref_html_entities_4.asp)
+    - Improved break-lines support
+    - Fixed hyperlinks when exporting DOCX to PDF
+    - Possible to include hyperlinks, break-lines, and style tags into any level of lists
+    - Improved overall stability
+
+### v3.0.4
+  - [EE] Restore old `convert` formatter for some clients
+
 ### v3.0.3
-  - Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
+  - [EE] Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
 
 ### v3.0.2
-  - Fix: accepts hyperlinks with &
-  - Fix: do not crash if hyperlink is undefined
-  - Fix: support random way of managing hyperlinks in MS Word
-  - Fix: set Content-Type when downloading the report
+  - [EE] Fix: accepts hyperlinks with "&", add the "https://" protocol if it missing, add URL validation. If the URL is invalid, it is replaced by a valid URL refering to the carbone documentation.
+  - [EE] Fix: do not crash if hyperlink is undefined
+  - [EE] Fix: support random way of managing hyperlinks in MS Word
+  - [EE] Fix: set Content-Type when downloading the report
 
 ### v3.0.1
-  - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`
   - Fix: aliases beginning with same prefix names are properly rendered in the generated reports instead of not being skip.
-  - Fix: license detection in Docker
-  - Fix dynamic hyperlinks for DOCX reports
+  - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`
+  - [EE] Fix: license detection in Docker
+  - [EE] Fix dynamic hyperlinks for DOCX reports
   - Improve documentation
 
 ### v3.0.0
@@ -21,7 +216,7 @@
     - If not defined by you in `options.complement`, `{c.now}` returns the current date in UTC.
     - [BREAKING CHANGE]: remove old date formatter which were not documented: `format`, `parse`, `addDays` and `convert`.
       You should use `formatD` instead and new formatters below. They were very old formatters, the chance you use them is low because you had to
-      look into the source code to know their existance.
+      look into the source code to know their existence.
     - New formatters:
       - `addD(amount, unit [, patternIn])`     : add days, month to a date. `formatD` can be used after without specifying  patternIn
       - `subD(amount, unit [, patternIn])`     : subtract days, month to a date. `formatD` can be used after without specifying  patternIn
@@ -60,15 +255,15 @@
 
   - Fix: if a path does not exist inside a formatter argument, it returns an empty string instead of the error "[[C_ERROR]] attribute_name not defined".
     It fixes some weird behaviour with ifEM formatters
-  - Feature: cells colors on ODT/DOCX report can be changed dynamically with the "bindColor" marker.
-  - ODT Improvement: the "bindColor" marker will not remove other styles than colors.
+  - [EE] Feature: cells colors on ODT/DOCX report can be changed dynamically with the "bindColor" marker.
+  - [EE] ODT Improvement: the "bindColor" marker will not remove other styles than colors.
   - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`
   - Improve HTML type detection. Accepts html5 without doctype.
   - [EE] Fix Carbone marker inside ODT text box
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website
   - Accepts Adobe Indesign IDML file as a template
-  - Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Right click an element, select "hyperlinks", insert the marker and validate. It is working with ODS, ODT, and DOCX reports. The compatibility is limited for XLSX documents: It is not possible to create a list of hyperlinks and the marker should not be written with curly braces, example: a typical `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it is also valid.
+  - [EE] Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Right click an element, select "hyperlinks", insert the marker and validate. It is working with ODS, ODT, and DOCX reports. The compatibility is limited for XLSX documents: It is not possible to create a list of hyperlinks and the marker should not be written with curly braces, example: a typical `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it is also valid.
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
   - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
   - Performance: reduce disk IO when converting document
@@ -120,15 +315,9 @@
     `<br>`/`<b>`/`<strong>`/`<i>`/`<em>`/`<u>`/`<s>`/`<del>`.
     Unsupported tags and tags attributes are skipped and not rendered.
     HTML entities are accepted.
-  - [EE] Can override plugins (readTemplate, writeTemplate, deleteTemplate, generateOutputFile, readPublicKey, onRenderEnd, readRender)
-  - [EE] Can access GET render without authentication
-  - [EE] Can add middlewares before and after route
-  - [EE] Add GET and DELETE route for template
-  - [EE] Fix workDir parameter
-  - [EE] Remove error message if no plugin exists
-  - [EE] Fix bug with environment variable
-  - [EE] Add licensing system
   - [EE] New feature: Dynamic pictures are supported on ODG and ODP files. It is not possible to create loops.
+  - [EE] New Carbone Render On-Premise
+    - Carbone can be safely deployed on your own servers. Contact us for further information
 
 ### v2.1.1
   - Release September 23rd 2020

@@ -2532,7 +2532,7 @@ describe('extracter', function () {
             iterators : [{ attr : 'i' }],
             xmlParts  : [
               {obj : '_rootdcars', attr : 'brand' , pos : 13, posOrigin : 13, depth : 2, moveTo : '_rootdcarswheels' , after : ' '   },
-              {obj : '_rootdcars', attr : 'brand' , pos : 32, posOrigin : 32, depth : 0, toDelete : true, before : '', after : ''    }, // we do not care of depth because this part is in the odd section
+              {obj : '_rootdcars', attr : 'brand' , pos : 32, posOrigin : 32, depth : 0, toDelete : true, before : '' }, // we do not care of depth because this part is in the odd section
               {obj : '_rootdcars', array : 'start', pos : 5 , posOrigin : 12, depth : 1, after : ''           },
               {obj : '_rootdcars', array : 'end'  , pos : 25.015625, posOrigin : 32, depth : 1, before : ''          }
             ],
@@ -2547,7 +2547,7 @@ describe('extracter', function () {
             iterators : [{ attr : 'i' }],
             xmlParts  : [
               {obj : '_rootdcarswheels', attr : 'size'  , pos : 14       , posOrigin : 14, depth : 2, after : ' '},
-              {obj : '_rootdcarswheels', attr : 'size'  , pos : 33       , posOrigin : 33, depth : 0, toDelete : true, after : ''},
+              {obj : '_rootdcarswheels', attr : 'size'  , pos : 33       , posOrigin : 33, depth : 0, toDelete : true },
               {obj : '_rootdcarswheels', array : 'start', pos : 5.015625 , posOrigin : 12, depth : 2, after : '<t_row> ' },
               {obj : '_rootdcarswheels', array : 'end'  , pos : 25       , posOrigin : 32, depth : 2, before : '  </t_row>' }
             ],
@@ -2637,7 +2637,7 @@ describe('extracter', function () {
       var _data = {
         staticData  : {},
         dynamicData : {
-          d       : {name : ''       , type : 'array'  , parent : ''        , xmlParts : [], depth : 500},
+          d       : {name : ''       , type : 'array'  , parent : ''        , xmlParts : [], depth : 0},
           menu1   : {name : 'menu'   , type : 'array'  , parent : 'd'       , xmlParts : [], depth : 4},
           menu2   : {name : 'menu'   , type : 'array'  , parent : 'menu1'   , xmlParts : [], depth : 2},
           menu3   : {name : 'menu'   , type : 'array'  , parent : 'menu2'   , xmlParts : [], depth : 3},

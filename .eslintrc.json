@@ -7,6 +7,9 @@
     "mocha"   : true
   },
   "plugins" : [],
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
   "extends": "eslint:recommended",
   "rules": {
     "one-var"                       : [ "warn" , "never"     ], // Disallow declaration of multiple var in one line

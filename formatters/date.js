@@ -2,9 +2,11 @@ var dayjs = require('dayjs');
 
 
 /**
- * Format dates
+ * Format dates. It takes an output date pattern as an argument. Date patterns are available on [this section](#date-formats).
+ * It is possible to change the timezone through the option `options.timezone` and the lang through `options.lang`.
+ * List of timezones: [https://en.wikipedia.org/wiki/List_of_tz_database_time_zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
  *
- * Since 1.2.0, by default, it considers the input format is "ISO 8601"
+ * @version 3.0.0 updated
  *
  * @exampleContext {"lang":"en", "timezone":"Europe/Paris"}
  * @example ["20160131", "L"]
@@ -22,9 +24,13 @@ var dayjs = require('dayjs');
  * @example ["20160131", "dddd", "YYYYMMDD"]
  * @example [1410715640, "LLLL", "X" ]
  *
+ * @exampleContext {"lang":"fr", "timezone": "Asia/Singapore"}
+ * @example ["20160131", "dddd", "YYYYMMDD"]
+ * @example [1410715640, "LLLL", "X" ]
+ *
  * @param  {String|Number} d   date to format
  * @param  {String} patternOut output format
- * @param  {String} patternIn  [optional] input format, ISO8601 by default
+ * @param  {String} patternIn  [optional] input format, "ISO 8601" by default
  * @return {String}            return formatted date
  */
 function formatD (d, patternOut, patternIn) {
@@ -35,7 +41,11 @@ function formatD (d, patternOut, patternIn) {
 }
 
 /**
- * Adds days, hour, year, ... to a date
+ *
+ * Add a time to a date. Available units: day, week,	month, quarter, year, hour, minute, second and millisecond.
+ * Units are case insensitive, and support plural and short forms.
+ *
+ * @version 3.0.0 new
  *
  * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
  * @example ["2017-05-10T15:57:23.769561+03:00", "3", "day"]
@@ -58,7 +68,11 @@ function addD (d, amount, unit, patternIn) {
 }
 
 /**
- * Subtract days, hour, year, ... to a date
+ *
+ * Subtract a time to a date. Available units: day, week,	month, quarter, year, hour, minute, second and millisecond.
+ * Units are case insensitive, and support plural and short forms.
+ *
+ * @version 3.0.0 new
  *
  * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
  * @example ["2017-05-10T15:57:23.769561+03:00", "3", "day"]
@@ -81,7 +95,10 @@ function subD (d, amount, unit, patternIn) {
 }
 
 /**
- * Set a date to the start of a unit of time.
+ *
+ * Create a date and set it to the start of a unit of time.
+ *
+ * @version 3.0.0 new
  *
  * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
  * @example ["2017-05-10T15:57:23.769561+03:00", "day"]
@@ -103,7 +120,10 @@ function startOfD (d, unit, patternIn) {
 }
 
 /**
- * Set a date to the end of a unit of time.
+ *
+ * Create a date and set it to the end of a unit of time.
+ *
+ * @version 3.0.0 new
  *
  * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
  * @example ["2017-05-10T15:57:23.769561+03:00", "day"]
@@ -129,6 +149,7 @@ function endOfD (d, unit, patternIn) {
  * Format dates
  *
  * @deprecated
+ * @version 1.0.0 deprecated
  *
  * @exampleContext {"lang":"en", "timezone":"Europe/Paris"}
  * @example ["20160131", "YYYYMMDD", "L"]
@@ -167,12 +188,6 @@ function parse (d, patternIn) {
   if (!patternIn) {
     return dayjs(d + '');
   }
-  if (patternIn === 'X') {
-    return dayjs.unix(d);
-  }
-  if (patternIn === 'x') {
-    return dayjs(d);
-  }
   return dayjs(d, patternIn);
 }
 
@@ -181,6 +196,7 @@ function parse (d, patternIn) {
 module.exports = {
   formatD,
   convDate,
+  convert : convDate, // deprecated but used by Easilys
   addD,
   subD,
   startOfD,

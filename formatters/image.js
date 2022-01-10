@@ -54,6 +54,22 @@ function generateOpenDocumentImageHrefPostProcessing (urlOrBase64) {
 }
 
 /**
+ * Generate a unique id for LibreOffice image names
+ *
+ * LibreOffice can hide an image (random!) if two or more image share the same name (draw:name)
+ * So we generate a unique number, like in LibreOffice code:
+ * https://github.com/LibreOffice/core/blob/bdbb5d0389642c0d445b5779fe2a18fda3e4a4d4/lotuswordpro/source/filter/xfilter/xfglobal.cxx#L110
+ *
+ * @private
+ *
+ * @return {Integer} unique global number for the document
+ *
+ */
+function generateOpenDocumentUniqueNumber () {
+  return this.uniqueId++;
+}
+
+/**
  * Generate image link for open document
  *
  * Called by the builder. At this time, we do not know if this image
@@ -243,9 +259,11 @@ function generateImageXlsxReference (urlOrBase64, sheetId) {
  * @param {String} measure     width or height
  * @param {String} value       value
  * @param {String} unit        can be cm, in or emu
+ * @param {String} imageFit    can be fill, contain, fillWidth
  */
-function scaleImage (urlOrBase64, measure, value, unit) {
+function scaleImage (urlOrBase64, measure, value, unit, imageFit) {
   let _imageSourceProperties = {};
+  _imageSourceProperties.imageFit = imageFit;
   if (unit === 'cm' || unit === 'in' || unit === 'emu') {
     _imageSourceProperties.imageUnit = unit;
   }
@@ -289,6 +307,7 @@ module.exports = {
   generateOpenDocumentImageHref     : generateOpenDocumentImageHref,
   generateOpenDocumentImageMimeType : generateOpenDocumentImageMimeType,
   generateImageDocxId               : generateImageDocxId,
+  generateOpenDocumentUniqueNumber  : generateOpenDocumentUniqueNumber,
   generateImageDocxReference        : generateImageDocxReference,
   generateImageXlsxReference        : generateImageXlsxReference,
   scaleImage                        : scaleImage,

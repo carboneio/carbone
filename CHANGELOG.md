@@ -1,4 +1,5 @@
 ### v3.4.2
+  - Release January 10th 2022
   - [EE] Fix do not crash if content passed to `:html` formatter is not a string
 
 ### v3.4.1

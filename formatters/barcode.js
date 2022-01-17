@@ -12,7 +12,9 @@ const CHECK_BARCODE_OPTIONS_VALUE = {
   'rotate': (value) => /^[NRLI]{1}$/i.test(value),
   'barcolor': (value) => REG_HEXA_COLOR.test(value),
   'textcolor': (value) => REG_HEXA_COLOR.test(value),
-  'backgroundcolor': (value) => REG_HEXA_COLOR.test(value)
+  'backgroundcolor': (value) => REG_HEXA_COLOR.test(value),
+  /** ONLY FOR QRCODE, Micro QR Code, GS1 QR Code, HIBC QR Code, or Swiss QR Code */
+  'eclevel': (value) =>  /^[LMQH]{1}$/i.test(value) // L = Low, M = Medium (Default), Q = Quality, H = High
 }
 
 let barcodesMethods = new Map();
@@ -345,7 +347,7 @@ function barcode (data, type) {
         _barcodeOption[1] = _barcodeOption[1].slice(1);
       }
       // If the option is "rotate", the option must be uppercase
-      if (_barcodeOption[0] === 'rotate') {
+      if (_barcodeOption[0] === 'rotate' || _barcodeOption[0] === 'eclevel') {
         _barcodeOption[1] = _barcodeOption[1].toUpperCase();
       }
       // If it is a boolean as a string, convert into a real boolean, otherwhise return the string value. bwipjs takes numbers as strings

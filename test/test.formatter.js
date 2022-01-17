@@ -1650,6 +1650,18 @@ describe('formatter', function () {
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:abc'), '{"bcid":"qrcode","text":"https://carbone.io"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // eclevel - specify the error correction level ONLY FOR QRCODE
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevelQ'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'ecleel:Q'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:h'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"H"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:H'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"H"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:m'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"M"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:M'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"M"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:l'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"L"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:L'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"L"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:q'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"Q"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:Q'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"Q"}');
+
           // Mix with an option "round" which does not exist
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode',
             'width:20', 'height:6', 'scale:5', 'includetext:true', 'textsize:2', 'textxalign:right', 'rotate:R', 'textcolor:#ffffff', 'barcolor:#D8D8D8', 'backgroundcolor:#00ff08', 'round:true'),

@@ -1504,6 +1504,38 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should create list with default font coming from the template', function () {
+        let content = '<ol><li><i>Felgen ALU</i></li><li><i>Farbe rot</i></li></ol>';
+        const _options = {
+          extension : 'odt',
+          htmlStylesDatabase: new Map()
+        };
+
+        // Prepare the style coming from the template
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += ''
+        _htmlDefaultStyleObject.paragraph += 'style:name="P2"';
+        html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
+
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options, _styleId);
+        helper.assert(res.content, '' +
+          '<text:list text:style-name="LC010">' +
+            '<text:list-item>' +
+              '<text:p style:name="P2">' +
+                '<text:span text:style-name="C012">Felgen ALU</text:span>' +
+              '</text:p>' +
+            '</text:list-item>' +
+            '<text:list-item>' +
+              '<text:p style:name="P2">' +
+                '<text:span text:style-name="C015">Farbe rot</text:span>' +
+              '</text:p>' +
+            '</text:list-item>' +
+          '</text:list>' +
+          '<text:p text:style-name="Standard"/>'
+        );
+      });
+
       it('should create a nexted list without text in the parent LI', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('' +
         '<ul>' +
@@ -2797,21 +2829,22 @@ describe('Dynamic HTML', function () {
         '</w:num>');
       });
 
-      it('should convert HTML to DOCX xml 7: simple unordered list WITH A FONT', function () {
+      it('should convert HTML to DOCX xml 7: simple unordered list WITH A FONT AND RTL', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>');
 
         // set style
         const htmlDefaultStyleDatabase = new Map();
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
         const _styleId = 'styleID'
+        _htmlDefaultStyleObject.paragraph = '<w:bidi/>'
         _htmlDefaultStyleObject.text += '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/>'
         htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
 
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId);
         helper.assert(content, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
         );
         helper.assert(listStyleAbstract, '' +
         '<w:abstractNum w:abstractNumId="1000">' +

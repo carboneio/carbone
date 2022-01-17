@@ -332,26 +332,24 @@ function barcode (data, type) {
   let _options = {}
   const _args = [...arguments];
   // parse options
-  if (_args.length > 2) {
-    for (i = 2; i < _args.length; i++) {
-      // Each options should have the format "width:10".
-      // The option is already clean without extra space.
-      const _barcodeOption = _args[i].split(':');
-      // Check if the option exists and the value is valid
-      if (_barcodeOption.length == 2 &&
-          Object.prototype.hasOwnProperty.call(CHECK_BARCODE_OPTIONS_VALUE, _barcodeOption[0]) &&
-          CHECK_BARCODE_OPTIONS_VALUE[_barcodeOption[0]](_barcodeOption[1]) === true) {
-        // If the option is an hexadecimal color beginning with an hashtag '#', it must be removed for bwipjs, otherwhise the color is not considered
-        if ((_barcodeOption[0] === 'barcolor' || _barcodeOption[0] === 'backgroundcolor' || _barcodeOption[0] === 'textcolor') && _barcodeOption[1][0] === "#") {
-          _barcodeOption[1] = _barcodeOption[1].slice(1);
-        }
-        // If the option is "rotate", the option must be uppercase
-        if (_barcodeOption[0] === 'rotate') {
-          _barcodeOption[1] = _barcodeOption[1].toUpperCase();
-        }
-        // If it is a boolean as a string, convert into a real boolean, otherwhise return the string value. bwipjs takes numbers as strings
-        _options[_barcodeOption[0]] = _barcodeOption[1] === 'true' ? true : (_barcodeOption[1] === 'false' ? false : _barcodeOption[1]);
+  for (i = 2; i < _args.length; i++) {
+    // Each options should have the format "width:10".
+    // The option is already clean without extra space.
+    const _barcodeOption = _args[i].split(':');
+    // Check if the option exists and the value is valid
+    if (_barcodeOption.length == 2 &&
+        Object.prototype.hasOwnProperty.call(CHECK_BARCODE_OPTIONS_VALUE, _barcodeOption[0]) &&
+        CHECK_BARCODE_OPTIONS_VALUE[_barcodeOption[0]](_barcodeOption[1]) === true) {
+      // If the option is an hexadecimal color beginning with an hashtag '#', it must be removed for bwipjs, otherwhise the color is not considered
+      if ((_barcodeOption[0] === 'barcolor' || _barcodeOption[0] === 'backgroundcolor' || _barcodeOption[0] === 'textcolor') && _barcodeOption[1][0] === "#") {
+        _barcodeOption[1] = _barcodeOption[1].slice(1);
       }
+      // If the option is "rotate", the option must be uppercase
+      if (_barcodeOption[0] === 'rotate') {
+        _barcodeOption[1] = _barcodeOption[1].toUpperCase();
+      }
+      // If it is a boolean as a string, convert into a real boolean, otherwhise return the string value. bwipjs takes numbers as strings
+      _options[_barcodeOption[0]] = _barcodeOption[1] === 'true' ? true : (_barcodeOption[1] === 'false' ? false : _barcodeOption[1]);
     }
   }
 

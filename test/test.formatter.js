@@ -1438,6 +1438,8 @@ describe('formatter', function () {
 
     describe('Barcode as a font', function () {
       it('should return an empty string with a undefined barcode format', () => {
+        helper.assert(barcodeFormatter.barcode(), '');
+        helper.assert(barcodeFormatter.barcode(true, true, true), '');
         helper.assert(barcodeFormatter.barcode('fweffewfweq'), '');
       });
 

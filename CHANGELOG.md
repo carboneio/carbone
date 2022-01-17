@@ -1,3 +1,7 @@
+### v3.4.X
+  - [EE] Dynamic HTML improvement - the following styles applied on the `:html` formatter are kept on the generated document: Right-to-left text, and text/background colors.
+  - [EE] Dynamic HTML Fix - When creating a ordered or unordered list, the font-size, and font-family applied on the template are now kept in the generated document.
+
 ### v3.4.1
   - Release December 9th 2021
   - Accepts "OpenDocument Text Flat XML" (.fodt) template files

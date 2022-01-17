@@ -11,6 +11,7 @@
     - `barcolor` Color of bars as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, barcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
     - `textcolor` Color of the text as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, textcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
     - `backgroundcolor` Color of the background as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, backgroundcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
+    - `eclevel` Specify the error correction level: `L` for Low, `M` for Medium (default), `Q` for Quality and `H` for High. Option ONLY FOR QRCODES, Micro QR Code, GS1 QR Code, HIBC QR Code, or Swiss QR Code.
 
 ### v3.4.1
   - Release December 9th 2021

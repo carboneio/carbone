@@ -131,6 +131,32 @@ function arraySum (d, valuePath) {
 }
 
 /**
+ * Calculates the average of an array of values.
+ *
+ * @example [ [1, 3]                                                    ]
+ * @example [ [{"val": 5}, {"val": 7}], 'val'                           ]
+ * @example [ [{"obj": {"val": 9}}, {"obj": {"val": 11}}], 'obj.val'    ]
+ *
+ * @param {Array} d           array passed by carbone
+ * @param {String} valuePath  [Optional] Path to retrieve the value from each element.
+ *
+ * @returns {number}          Average of the values, or 0 if `d` has no elements, or `d` if `d` is not an array or sum of elements is not a number.
+ */
+function arrayAverage (d, valuePath) {
+  if (!Array.isArray(d)) {
+    return d;
+  }
+  if (d.length === 0) {
+    return 0;
+  }
+  const sum = arraySum(d, valuePath);
+  if (isNaN(Number(sum))) {
+    return d;
+  }
+  return (sum / d.length);
+}
+
+/**
  * Count and print row number of any array
  *
  * Usage example: `d[i].id:count()` will print a counter of the current row no matter the value of `id`
@@ -152,5 +178,6 @@ module.exports = {
   arrayJoin     : arrayJoin,
   arrayMap      : arrayMap,
   arraySum      : arraySum,
+  arrayAverage  : arrayAverage,
   count         : count
 };

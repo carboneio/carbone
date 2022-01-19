@@ -102,6 +102,35 @@ function arrayMap (d, objSeparator, attributeSeparator) {
 }
 
 /**
+ * Calculates the sum of an array of values.
+ *
+ * @example [ [1, 3]                                                    ]
+ * @example [ [{"val": 5}, {"val": 7}], 'val'                           ]
+ * @example [ [{"obj": {"val": 9}}, {"obj": {"val": 11}}], 'obj.val'    ]
+ *
+ * @param {Array} d           array passed by carbone
+ * @param {String} valuePath  [Optional] Path to retrieve the value from each element.
+ *
+ * @returns {number}          Sum of the values, or `d` if `d` is not an array or `valuePath` is not a string.
+ */
+function arraySum (d, valuePath) {
+  if (!Array.isArray(d)) {
+    return d;
+  }
+  if ((valuePath !== undefined) && (typeof valuePath) !== 'string') {
+    return d;
+  }
+  const sum = d.reduce((accumulated, curr) => {
+    let val = curr;
+    if (valuePath) {
+      val = valuePath.split('.').reduce((currRef, currPath) => currRef[currPath], curr);
+    }
+    return (accumulated + val);
+  }, 0);
+  return sum;
+}
+
+/**
  * Count and print row number of any array
  *
  * Usage example: `d[i].id:count()` will print a counter of the current row no matter the value of `id`
@@ -120,7 +149,8 @@ function count (d, loopId, start) {
 }
 
 module.exports = {
-  arrayJoin : arrayJoin,
-  arrayMap  : arrayMap,
-  count     : count
+  arrayJoin     : arrayJoin,
+  arrayMap      : arrayMap,
+  arraySum      : arraySum,
+  count         : count
 };

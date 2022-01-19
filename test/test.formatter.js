@@ -1197,6 +1197,27 @@ describe('formatter', function () {
     });
   });
 
+  describe('arraySum', function () {
+    it('should be able to add an array of numbers', function () {
+      const data = [1, 3, 5];
+      helper.assert(arrayFormatter.arraySum(data), 9);
+    });
+    it('should be able to retrieve values from array of objects', function () {
+      const data = [
+        { obj: { val: 1 } },
+        { obj: { val: 3 } }
+      ];
+      helper.assert(arrayFormatter.arraySum(data, 'obj.val'), 4);
+    });
+    it('should not crash if datas is null or undefined', function () {
+      helper.assert(arrayFormatter.arraySum(null), null);
+      helper.assert(arrayFormatter.arraySum(undefined), undefined);
+      helper.assert(arrayFormatter.arraySum(120), 120);
+      helper.assert(arrayFormatter.arraySum([]), 0);
+      helper.assert(arrayFormatter.arraySum({}), {});
+    });
+  });
+
   describe('convCurr', function () {
     it('should return the same value if the currency source is the same as the currency target', function () {
       var _this = {currency : { source : 'EUR', target : 'EUR', rates : {EUR : 1, USD : 1.14, GBP : 0.89} }};

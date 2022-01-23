@@ -1,22 +1,13 @@
 /* eslint-disable no-undef */
 
+const NATIVE_FILE_SYSTEM_IS_ACTIVE = 'showOpenFilePicker' in window;
+
 const carboneConfig = {
   apiVersion : 2,
   apiUrl     : window.location.origin
 };
 
-let templateId = '';
-let fileHandle = null;
-let file = {};
-let filename = '';
-let lastModifiedFile = null;
-let timeoutJsonChange = null;
-
-const nativeFileSystemIsActive = 'showOpenFilePicker' in window;
-
-let activeEditorPan = 'data';
-let prevEditorPanNode = document.getElementById('data');
-let json = {
+const carboneRenderObj = {
   data         : {},
   complement   : {},
   enum         : {},
@@ -25,33 +16,38 @@ let json = {
   lang         : 'en-US'
 };
 
+const currentTemplate = {
+  id            : '',
+  filename      : '',
+  lastModified  : null,
+  watchInterval : null
+};
+
+const codeEditor = {
+  activePan         : 'data',
+  prevActiveTabDOM  : document.getElementById('data'),
+  timeoutJSONChange : null
+};
+
 // JSON Editor
-const container = document.getElementById('jsoneditor');
-const options = {
+const JSONEditorOptions = {
   onChange : () => {
     if (isJsonValid() === false) {
       return;
     }
-    json[activeEditorPan] = editor.get();
-    if (timeoutJsonChange !== null) {
-      clearTimeout(timeoutJsonChange);
+    carboneRenderObj[codeEditor.activePan] = editor.get();
+    if (codeEditor.timeoutJSONChange !== null) {
+      clearTimeout(codeEditor.timeoutJSONChange);
     }
-    timeoutJsonChange = setTimeout(() => {
-      refreshRender();
-    }, 2000);
-  },
-  enableSort      : false,
-  enableTransform : false
+    codeEditor.timeoutJSONChange = setTimeout(refreshRender, 2000);
+  }
 };
-const editor = new JSONEditor(container, options);
-const initialJson = {};
-
+const editor = new JSONEditor(document.getElementById('jsoneditor'), JSONEditorOptions);
 editor.setMode('code');
-editor.set(initialJson);
+editor.set({});
 
 // PDF Viewer
 const pdfviewer = document.getElementById('pdfviewerobject');
-
 pdfviewer.data = '';
 
 // Drag and drop
@@ -64,85 +60,75 @@ holder.ondragend = function (e) {
 };
 holder.ondrop = function (e) {
   e.preventDefault();
+  // TODO use https://developer.mozilla.org/en-US/docs/Web/API/DataTransferItem/getAsFileSystemHandle
   addTemplateAndRender(e.dataTransfer.files[0]);
 };
 
-// Template input
-const fileInput = document.getElementById('template');
-
-fileInput.addEventListener('click', async (event) => {
-  if (nativeFileSystemIsActive) {
-    event.preventDefault();
+// eslint-disable-next-line
+async function uploadTemplate (e, eventType) {
+  event.stopPropagation(); // stop bubbling
+  // Only on browser which support Native FileSystem API (Chrome-like)
+  if (eventType === 'click' && NATIVE_FILE_SYSTEM_IS_ACTIVE === true) {
+    event.preventDefault(); // must be called as soon as possible to stop the default file upload behavior
     try {
-      [fileHandle] = await window.showOpenFilePicker();
-      file = await fileHandle.getFile();
-      lastModifiedFile = file.lastModified;
-
-      addTemplateAndRender(file);
-
-      setInterval(async () => {
-        let newFile = await fileHandle.getFile();
-
-        if (newFile !== null && newFile.lastModified !== lastModifiedFile) {
-          lastModifiedFile = newFile.lastModified;
-          addTemplateAndRender(newFile);
-        }
-      }, 1000);
+      let [_fileHandle] = await window.showOpenFilePicker();
+      let _file = await _fileHandle.getFile();
+      addTemplateAndRender(_file);
+      watchTemplate(_file.lastModified, _fileHandle);
     }
     catch (e) {
       setConsoleMessage('error', 'Cannot get template ' + e.toString());
     }
+    return;
   }
-  else {
-    addTemplateAndRender(event.target.value);
-  }
-});
+  // Else, on other browser, listen "onchange" event
+  let _file = e.files[0];
+  addTemplateAndRender(_file);
+}
 
-fileInput.addEventListener('change', () => {
-  addTemplateAndRender(fileInput.files[0]);
-});
-
-
-const langSelector = document.getElementById('lang-selector');
-langSelector.addEventListener('change', (event) => {
-  json.lang = event.target.value;
-  refreshRender();
-});
-
-const convertToSelector = document.getElementById('convertTo-selector');
-convertToSelector.addEventListener('change', (event) => {
-  json.convertTo = event.target.value;
-  refreshRender();
-});
+function watchTemplate (currentLastModified, fileHandle) {
+  clearInterval(currentTemplate.watchInterval);
+  currentTemplate.lastModified = currentLastModified;
+  currentTemplate.watchInterval = setInterval(async () => {
+    let _newFile = await fileHandle.getFile();
+    if (_newFile !== null && _newFile.lastModified !== currentTemplate.lastModified) {
+      currentTemplate.lastModified = _newFile.lastModified;
+      addTemplateAndRender(_newFile);
+    }
+  }, 1000);
+}
 
 // This function is used directly in html to change panel (enum, data, complement, etc...)
 // eslint-disable-next-line
 function changePan (newPanNode, newActiveEditorPan) {
-  if (activeEditorPan === newActiveEditorPan) {
+  if (codeEditor.activePan === newActiveEditorPan) {
     return;
   }
   if (isJsonValid() === false) {
     setConsoleMessage('error', 'Fix JSON to change pan');
     return;
   }
-  json[activeEditorPan] = editor.get();
-  prevEditorPanNode.classList.remove('active');
+  carboneRenderObj[codeEditor.activePan] = editor.get();
+  codeEditor.prevActiveTabDOM.classList.remove('active');
 
-  editor.set(json[newActiveEditorPan]);
+  editor.set(carboneRenderObj[newActiveEditorPan]);
   newPanNode.classList.add('active');
 
-  prevEditorPanNode = newPanNode;
-  activeEditorPan = newActiveEditorPan;
+  codeEditor.prevActiveTabDOM = newPanNode;
+  codeEditor.activePan = newActiveEditorPan;
 }
 
 async function addTemplateAndRender (file) {
-  filename = file.name;
+  if (!file) {
+    // onChange event, the file can be empty at first click in Firefox
+    return;
+  }
   setConsoleMessage('info', 'Uploading template...');
   const result = await addTemplate(file);
 
   if (result.success) {
-    templateId = result.data.templateId;
-    setContent('filename', `${filename} (live editing)`);
+    currentTemplate.id = result.data.templateId;
+    setContent('filename', `${file.name} (live editing)`);
     setConsoleMessage('success', 'Template added');
     refreshRender();
   }
@@ -152,17 +138,17 @@ async function addTemplateAndRender (file) {
 }
 
 async function refreshRender () {
-  if (isJsonValid() === false || templateId.length === 0) {
+  if (isJsonValid() === false || currentTemplate.id.length === 0) {
     return;
   }
 
   setConsoleMessage('info', 'Rendering template...');
-  const result = await renderReport(templateId, json);
+  const result = await renderReport(currentTemplate.id, carboneRenderObj);
 
   if (result.success) {
     const _url = `${carboneConfig.apiUrl}/render/${result.data.renderId}`;
     // direct preview in browser if pdf
-    if (json.convertTo === 'pdf') {
+    if (carboneRenderObj.convertTo === 'pdf') {
       pdfviewer.data = _url;
     }
     else {
@@ -187,9 +173,7 @@ async function refreshRender () {
 async function addTemplate (file, payload = '') {
   const form = new FormData();
   if (!file) {
-    throw new Error(
-      'Carbone SDK addTemplate error: the file argument is not valid.'
-    );
+    throw new Error('The file argument is not valid');
   }
   form.append('payload', payload);
   form.append('template', file);
@@ -206,14 +190,10 @@ async function addTemplate (file, payload = '') {
 
 async function renderReport (templateId, data) {
   if (!templateId) {
-    throw new Error(
-      'Carbone SDK renderReport error: the templateId argument is not valid.'
-    );
+    throw new Error('Cannot render report, template is not valid');
   }
   if (!data) {
-    throw new Error(
-      'Carbone SDK renderReport error: the data argument is not valid.'
-    );
+    throw new Error('Cannot render report, data is not valid');
   }
   const response = await fetch(`${carboneConfig.apiUrl}/render/${templateId}`, {
     method  : 'post',
@@ -250,8 +230,7 @@ function setConsoleMessage (type, message) {
 function isJsonValid () {
   try {
     editor.get();
-
-    if (templateId.length === 0) {
+    if (currentTemplate.id.length === 0) {
       setConsoleMessage('info', 'Upload a template to render it');
     }
     return true;
@@ -263,3 +242,17 @@ function isJsonValid () {
 }
 
 setConsoleMessage('info', 'Upload a template to start using the studio');
+
+// eslint-disable-next-line
+const toolBar = {
+  changeLang : (e) => {
+    event.stopPropagation();
+    carboneRenderObj.lang = e.value;
+    refreshRender();
+  },
+  changeConvertTo : (e) => {
+    event.stopPropagation();
+    carboneRenderObj.convertTo = e.value;
+    refreshRender();
+  }
+};

@@ -753,6 +753,30 @@ describe('Webserver', () => {
           assert.strictEqual(data.success, true);
           const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+          helper.assert(data.data.debug, undefined); // is isActiveDebug is false
+          toDelete.push(data.data.renderId);
+          done();
+        });
+      });
+
+      it('should render a template and return debugInfo', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement    : {},
+          enum          : {},
+          isDebugActive : true
+        };
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          assert.strictEqual(data.success, true);
+          const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
+          assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+          helper.assert(data.data.debug, {
+            markers : ['{d.firstname}', '{d.lastname}']
+          });
           toDelete.push(data.data.renderId);
           done();
         });

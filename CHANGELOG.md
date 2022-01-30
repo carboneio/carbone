@@ -1,5 +1,6 @@
 ### v3.4.3
   - Release January 31th 2022
+  - [EE] Bump dependencies to latest version
   - [EE] Add `options.isDebugActive`. If true, `POST /render` returns additional information in `debug` sub-object:
     ```js
     {

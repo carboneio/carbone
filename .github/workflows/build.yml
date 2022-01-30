@@ -5,14 +5,14 @@ on: workflow_dispatch
 jobs:
   BUILD:
     env:
-      PKG_VERSION: 5.4.1
+      PKG_VERSION: 5.5.2
       BUILD_TARGET: "node16-linux-x64,node16-macos-x64"
 
     runs-on: ubuntu-20.04
 
     strategy:
       matrix:
-        node_version: ['16.13.0']
+        node_version: ['16.13.2']
 
     steps:
       - uses: actions/checkout@v2

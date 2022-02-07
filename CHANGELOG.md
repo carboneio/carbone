@@ -1,3 +1,7 @@
+### v3.4.4
+  - Release February 7th 2022
+  - [EE] Experimental: increase the limit to 200 repetitions maximum when using the repetition feature `{d[i+1*qty]`
+
 ### v3.4.3
   - Release January 31th 2022
   - [EE] Bump dependencies to latest version

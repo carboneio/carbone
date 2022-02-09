@@ -1,3 +1,7 @@
+### v3.4.5
+  - Release February 9th 2022
+  - Now the parameter `converterFactoryTimeout` updates also the HTTP socket timeout accordingly
+
 ### v3.4.4
   - Release February 7th 2022
   - [EE] Experimental: increase the limit to 200 repetitions maximum when using the repetition feature `{d[i+1*qty]`

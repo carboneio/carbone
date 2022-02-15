@@ -1,28 +1,6 @@
 {
-  "_from": "git+https://bt.lwo.by/scm/gs/carbone.git",
-  "_id": "carbone@2.0.0-beta.3",
-  "_inBundle": false,
-  "_integrity": "",
-  "_location": "/carbone",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "git",
-    "raw": "git+https://bt.lwo.by/scm/gs/carbone.git",
-    "rawSpec": "git+https://bt.lwo.by/scm/gs/carbone.git",
-    "saveSpec": "git+https://bt.lwo.by/scm/gs/carbone.git",
-    "fetchSpec": "https://bt.lwo.by/scm/gs/carbone.git",
-    "gitCommittish": null
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "git+https://bt.lwo.by/scm/gs/carbone.git#747015cfdffa0eba2a2768bc6a296b0a7d4731f6",
-  "_shasum": "5099d0c7a989c479c6abc1f06002c9c33fb07adc",
-  "_spec": "git+https://bt.lwo.by/scm/gs/carbone.git",
-  "_where": "C:\\Users\\rodew\\Documents\\cases\\testCarbon",
   "author": {
-    "name": "David Grelaud"
+    "name": "Fork of the original work of David Grelaud"
   },
   "bin": {
     "carbone": "bin/carbone"
@@ -58,7 +36,7 @@
   ],
   "license": "Apache-2.0",
   "main": "./lib",
-  "name": "carbone",
+  "name": "@rodewitsch/carbone",
   "scripts": {
     "lint": "eslint ./*/**.js",
     "lint:fix": "eslint ./*/**.js --fix",

@@ -1,4 +1,32 @@
-<p align="center">
+# Changes:
+
+## DOCX:
+
+### HTML (minimal)
+
+### IMAGES
+
+## XLSX:
+
+### IMAGES
+
+### charts
+
+### FORMULAS
+
+### SPACES
+
+### CELLS MERGES
+
+### PRINT AREA
+
+
+<details>
+  <summary>
+    <strong> Original README.md </strong>
+  </summary>
+
+  <p align="center">
   <a href="https://carbone.io/" target="_blank">
     <img alt="CarboneJS" width="100" src="https://carbone.io/img/favicon.png">
   </a>
@@ -315,3 +343,6 @@ Thanks to all Ideolys's direct contributors (random order)
   - [Steeve Payraudeau](https://github.com/steevepay)
 
 Thanks to all French citizens (Crédit Impôt Recherche, Jeune Entreprise Innovante, BPI)!
+</details>
+
+

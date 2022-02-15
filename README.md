@@ -4,21 +4,126 @@
 
 ### HTML (minimal)
 
+Added formatter :html()
+
+Example: {d.html:html()}
+
+<details>
+  <summary>Comparing</summary>
+  
+#### Original:
+![image](https://user-images.githubusercontent.com/16050840/154114394-212758c9-af24-4834-acb1-654786571947.png)
+
+#### Current: 
+![image](https://user-images.githubusercontent.com/16050840/154114490-4150f32e-b6e7-43a5-8a61-5a51c19ccb5b.png)
+  
+  </details>
+
 ### IMAGES
+
+Added formatter :imageSize(width[,height])
+
+Example: {d.image:imageSize(100,200)}
+
+<details>
+  <summary>Comparing</summary>
+  
+ Original:
+![image](https://user-images.githubusercontent.com/16050840/154114685-cfea4d15-811a-41eb-980e-ea1bae2c4598.png)
+
+ Current: 
+![image](https://user-images.githubusercontent.com/16050840/154114732-6cb601a1-969d-4c4e-963b-b3dc77a17823.png)
+  
+</details>
+
+
 
 ## XLSX:
 
 ### IMAGES
 
-### charts
+Added formatter :imageSize(width[,height])
+
+Example: {d.image:imageSize(100,200)}
+
+<details>
+  <summary>Comparing</summary>
+
+#### Original:
+![image](https://user-images.githubusercontent.com/16050840/154115387-bc8713dc-f1cf-4a8e-a8fe-abb433158958.png)
+
+
+#### Current: 
+![image](https://user-images.githubusercontent.com/16050840/154115432-679da2e6-6f4c-482f-b61c-8659dfb5a7cc.png)
+  
+  </details>
+
+
+### CHARTS
+
+<details>
+  <summary>Comparing</summary>
+
+#### Original:
+
+![image](https://user-images.githubusercontent.com/16050840/154115955-4a90ace7-80d1-470a-9b43-ed5a44a5b7ca.png)
+
+
+#### Current: 
+![image](https://user-images.githubusercontent.com/16050840/154115994-602b6235-73ae-45c1-b8f7-faf621aa12f6.png)
+
+  
+  </details>
 
 ### FORMULAS
 
-### SPACES
+<details>
+  <summary>Comparing</summary>
 
-### CELLS MERGES
+#### Original:
+
+![image](https://user-images.githubusercontent.com/16050840/154116179-874fe3e8-e7b6-4cc7-bfdb-dc1c5d41f009.png)
+
+
+#### Current: 
+
+  ![image](https://user-images.githubusercontent.com/16050840/154116221-f001013d-b7e8-4674-916f-c0945cab19aa.png)
+
+  </details>
+
+### MERGED CELLS
+
+<details>
+  <summary>Comparing</summary>
+
+#### Original:
+
+  ![image](https://user-images.githubusercontent.com/16050840/154116465-386ad39a-1462-44e6-bcf1-5b5c61b949ce.png)
+
+#### Current: 
+
+  ![image](https://user-images.githubusercontent.com/16050840/154116518-8cc1e022-64e7-4096-b4a2-b1c20580fb00.png)
+
+
+  </details>
 
 ### PRINT AREA
+
+<details>
+  <summary>Comparing</summary>
+
+#### Original:
+
+  ![image](https://user-images.githubusercontent.com/16050840/154116649-acd4ad20-70f4-415b-b2ab-3d98cf3b149f.png)
+
+
+#### Current: 
+
+![image](https://user-images.githubusercontent.com/16050840/154116685-9cad116b-6358-458e-890f-96f943e5a02c.png)
+
+
+
+  </details>
 
 
 <details>

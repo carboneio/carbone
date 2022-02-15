@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 const locale   = require('./_locale.js');
 const currency = require('./_currency.js');
 
@@ -8,8 +9,6 @@ const currency = require('./_currency.js');
  * for one report in `options.currencyRates` of `Carbone.render` or globally with `Carbone.set`
  *
  * `convCurr()`  without parameters converts automatically from `options.currencySource` to `options.currencyTarget`.
- *
- * @version 1.2.0
  *
  * @exampleContext {"currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 }} }
  * @example [10                  ]
@@ -39,8 +38,6 @@ function convCurr (d, target, source) {
  * Round a number
  *
  * Same as toFixed(2) but it rounds number correclty `round(1.05, 1) = 1.1`
- *
- * @version 1.2.0
  *
  * @example [10.05123  , 2  ]
  * @example [1.05      , 1  ]
@@ -93,19 +90,14 @@ function _format (value, format, precision = 3) {
 }
 
 /**
- * Format number according to the locale.
- * Applying a number of decimals depends on the report type:
- * - For ODS/XLSX, the number of decimals has to be formatted based on the text editor.
- * - For the other type of files, the number of decimals depends on the `precision` parameter passed to the formatter.
- *
- * @version 1.2.0
+ * Format number according to the locale
  *
  * @exampleContext {"lang":"en-us"}
  * @example ["10"          ]
  * @example ["1000.456"    ]
  *
  * @param  {Number} d          Number to format
- * @param  {Number} precision  [optional] Number of decimals
+ * @param  {Number} precision  [optional] Number of decimal
  * @return {String} return     converted values
  */
 function formatN (d, precision) {
@@ -117,9 +109,6 @@ function formatN (d, precision) {
 }
 
 /**
- *
- * @version 1.2.0
- *
  * Format currency numbers
  *
  * Currencies are defined by the locale (`options.lang`). It can be overwritten by
@@ -174,9 +163,7 @@ function formatC (d, precisionOrFormat) {
     return _formatFn(_valueRaw,
       _currencyInfo.symbol,
       _currencyInfo.minSymbol,
-      // eslint-disable-next-line eqeqeq
       (d != 1 ? _currencyInfo.major + 's' : _currencyInfo.major),
-      // eslint-disable-next-line eqeqeq
       (d != 1 ? _currencyInfo.minor + 's' : _currencyInfo.minor),
       _currencyInfo.name
     );
@@ -186,8 +173,6 @@ function formatC (d, precisionOrFormat) {
 
 /**
  * Add two numbers
- *
- * @version 1.2.0
  *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
@@ -205,8 +190,6 @@ function add (d, value) {
 /**
  * Substract two numbers
  *
- * @version 1.2.0
- *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
  *
@@ -223,8 +206,6 @@ function sub (d, value) {
 /**
  * Multiply two numbers
  *
- * @version 1.2.0
- *
  * @example [1000.4  ,  2  ]
  * @example ["1000.4", "2" ]
  *
@@ -240,8 +221,6 @@ function mul (d, value) {
 
 /**
  * Divide two numbers
- *
- * @version 1.2.0
  *
  * @example [1000.4   ,  2  ]
  * @example ["1000.4" , "2" ]
@@ -269,7 +248,6 @@ module.exports = {
   /**
    * Converts a number to an INT
    * @deprecated
-   * @version 1.0.0 deprecated
    *
    * @return {Number}
    */
@@ -280,7 +258,6 @@ module.exports = {
   /**
    * Converts a number with English specifications (decimal separator is '.')
    * @deprecated
-   * @version 1.0.0 deprecated
    *
    * @return {String}
    */
@@ -291,7 +268,6 @@ module.exports = {
   /**
    * Converts a number into string, keeping only <nb> decimals
    * @deprecated
-   * @version 1.0.0 deprecated
    *
    * @param  {Number} nb
    * @return {String}
@@ -303,7 +279,6 @@ module.exports = {
   /**
    * Converts a number with French specifications (decimal separator is ',')
    * @deprecated
-   * @version 1.0.0 deprecated
    *
    * @return {String}
    */

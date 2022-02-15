@@ -21,18 +21,18 @@
     <img src="https://badgen.net/bundlephobia/minzip/carbone" alt="minizip badge">
   </a>
   <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
-    <img src="https://badgen.net/docker/pulls/carbone/carbone-env-docker?icon=docker" alt="docker badge">
+    <img src="https://badgen.net/docker/pulls/ideolys/carbone-env-docker?icon=docker" alt="docker badge">
   </a>
-  <a href="https://github.com/carboneio/carbone">
-    <img src="https://badgen.net/github/forks/carboneio/carbone?icon=github" alt="github fork badge">
+  <a href="https://github.com/Ideolys/carbone">
+    <img src="https://badgen.net/github/forks/ideolys/carbone?icon=github" alt="github fork badge">
   </a>
 </p>
 
 
 
-<p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using your JSON data as input !</p>
+<p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV...
 
-README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
+... using your JSON data as input !</p>
 
 ## Table of content
 
@@ -48,11 +48,10 @@ README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [Engli
 - [More examples](#more-examples)
 - [API Reference](#api-reference)
 - [Command line tools](#command-line-tools)
-- [Issues](#issues)
-- [Roadmap](#roadmap)
 - [Performance](#performance)
 - [Licenses and editions](#licenses-and-editions)
 - [Philosophy](#philosophy)
+- [Roadmap](#roadmap)
 - [Contributors](#contributors)
 
 <!-- /MarkdownTOC -->
@@ -84,8 +83,8 @@ Carbone is working only on the server-side.
 
 ## Minimum Requirements
 
-- NodeJS 10.x+
-- Runs on OSX, Linux (servers and desktop), and Windows
+- NodeJS 8.x+
+- Runs on OSX, Linux (servers and desktop), and coming soon on Windows
 
 #### Optional
 
@@ -156,14 +155,14 @@ Carbone does a lot of thing for you behind the scene:
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.0.4.2/deb/x86_64/LibreOffice_7.0.4.2_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/5.3.2.2/deb/x86_64/LibreOffice_5.3.2.2_Linux_x86-64_deb.tar.gz
 
-  # Install required dependencies on ubuntu server for LibreOffice 7.0+
+  # Install required dependencies on ubuntu server for LibreOffice 5.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_7.0.4.2_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_7.0.4.2_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_5.3.2.2_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_5.3.2.2_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb
@@ -258,11 +257,11 @@ To checkout out the Carbone CLI documentation, visit [carbone.io](https://carbon
 
 ## Issues
 
-If you're facing any issues, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/carboneio/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/carboneio/carbone/issues/new/choose).
+If you're facing any issues, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/Ideolys/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/Ideolys/carbone/issues/new/choose).
 
 ## Roadmap
 
-The roadmap is pinned on the github issues list.
+The roadmap is pinned on on the github issues list.
 
 ## Performance
 
@@ -272,6 +271,8 @@ Report generation speed (without network latency), using a basic one-page DOCX t
   - ~ `50 ms / report` with a PDF conversion (100 loops, 3 LibreOffice workers, without cold-start)
 
 On a MacBook Pro Mid-2015, 2,2 Ghz i7, 16Go.
+
+It could be even better when "code cache" will be activated. Coming soon...
 
 ## Licenses and editions
 
@@ -296,7 +297,7 @@ We already know that beneficiaries will be, at least :heart:
 
 ## Contributors
 
-Thanks to all Carbone contributors (random order)
+Thanks to all Ideolys's direct contributors (random order)
 
   - Florian Bezagu
   - Matthieu Robin
@@ -312,3 +313,5 @@ Thanks to all Carbone contributors (random order)
   - Léo Labruyère
   - Aurélien Kermabon
   - [Steeve Payraudeau](https://github.com/steevepay)
+
+Thanks to all French citizens (Crédit Impôt Recherche, Jeune Entreprise Innovante, BPI)!

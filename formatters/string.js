@@ -212,6 +212,12 @@ function substr (d, begin, end) {
   return d;
 }
 
+function imageSize(d, width, height) {
+  if (width && height) return `${d}:${width}*${height}`;
+  if (width) return `${d}:${width}*${width}`;
+  return d;
+}
+
 /**
  * Pad the string from the start with another string
  *
@@ -276,6 +282,23 @@ function padr (d, targetLength, padString) {
   return d;
 }
 
+function processLists(html) {
+  html = html.replace(/(<li>)(.+?)(<ul>)/, '$1$2</li><li>$3');
+  const lists = html.match(/(<li>)(?!(<ul>|<ol>))(.*?)(<\/li>)/g);
+  if(!lists) return html;
+  lists.forEach(list => {
+    html = html.replace(list, list.replace(/(<li>)(?!(<ul>|<ol>))(.*?)(<\/li>)/, '$1<span>{num}</span><p>$3</p><label> </label>$4'));
+  });
+  return html;
+}
+
+function html(d) {
+  const html2xml = require('../lib/html2xml');
+  d = processLists(d);
+  const html2XmlInstance = new html2xml(d);
+  return Buffer.from(html2XmlInstance.getXML()).toString('base64') + ':html';
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -288,5 +311,7 @@ module.exports = {
   substr    : substr,
   slice     : substr,
   padl      : padl,
-  padr      : padr
+  padr      : padr,
+  imageSize: imageSize,
+  html: html
 };

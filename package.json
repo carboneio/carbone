@@ -1,11 +1,50 @@
 {
-  "name": "carbone",
+  "_from": "git+https://bt.lwo.by/scm/gs/carbone.git",
+  "_id": "carbone@2.0.0-beta.3",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/carbone",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "git+https://bt.lwo.by/scm/gs/carbone.git",
+    "rawSpec": "git+https://bt.lwo.by/scm/gs/carbone.git",
+    "saveSpec": "git+https://bt.lwo.by/scm/gs/carbone.git",
+    "fetchSpec": "https://bt.lwo.by/scm/gs/carbone.git",
+    "gitCommittish": null
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "git+https://bt.lwo.by/scm/gs/carbone.git#747015cfdffa0eba2a2768bc6a296b0a7d4731f6",
+  "_shasum": "5099d0c7a989c479c6abc1f06002c9c33fb07adc",
+  "_spec": "git+https://bt.lwo.by/scm/gs/carbone.git",
+  "_where": "C:\\Users\\rodew\\Documents\\cases\\testCarbon",
+  "author": {
+    "name": "David Grelaud"
+  },
+  "bin": {
+    "carbone": "bin/carbone"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "html2json": "^1.0.2",
+    "debug": "=2.6.9",
+    "moment": "=2.19.3",
+    "moxie-zip": "=0.0.3",
+    "timsort": "=0.3.0",
+    "xml-js": "^1.6.11",
+    "yauzl": "=2.10.0"
+  },
+  "deprecated": false,
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "3.4.0",
-  "bin": "bin/carbone",
-  "main": "./lib",
-  "author": "David Grelaud",
-  "license": "Apache-2.0",
+  "devDependencies": {
+    "mocha": "=9.1.3"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
   "homepage": "https://carbone.io",
   "keywords": [
     "report",
@@ -17,23 +56,13 @@
     "ods",
     "json"
   ],
+  "license": "Apache-2.0",
+  "main": "./lib",
+  "name": "carbone",
   "scripts": {
-    "test": "./node_modules/.bin/mocha test --timeout 100000 --exit",
-    "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
-    "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
-    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin $PACKAGE_VERSION && git push github-origin $PACKAGE_VERSION"
+    "lint": "eslint ./*/**.js",
+    "lint:fix": "eslint ./*/**.js --fix",
+    "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit"
   },
-  "dependencies": {
-    "dayjs": "=1.10.7",
-    "debug": "=4.3.2",
-    "which": "=2.0.2",
-    "yauzl": "=2.10.0",
-    "yazl": "=2.5.1"
-  },
-  "devDependencies": {
-    "mocha": "=9.1.3"
-  },
-  "engines": {
-    "node": ">= 12.14.0"
-  }
+  "version": "4.0.0"
 }

@@ -1,6 +1,20 @@
 ### v3.4.X
+  - [EE] Add barcode options: pass to the formatter `:barcode` options as second argument. It should keep the format "key:value", such as: `{d.number:barcode(qrcode, width:300, height:100, includetext:false)}`. Options available:
+    - `width` Width a number as millimeters. Example: `{d.number:barcode(qrcode, width:300)}`
+    - `height` Height a number as millimeters. Example: `{d.number:barcode(qrcode, height:10)}`
+    - `scale` Quality of the barcode as a number between `1` to `10`. The default value is `3`. Example: `{d.number:barcode(qrcode, scale:3)}`
+    - `includetext` Show the text and takes a Boolean as value, `true` or `false`. Example: `{d.number:barcode(qrcode, includetext:false)}`.
+    - `textsize` Number to change the size of the text. Example: `{d.number:barcode(qrcode, textsize:20)}`
+    - `textxalign` Change the alignment of the text horizontally. Takes only 4 values: `left`, `center`, `right`, or `justify`. The default value is center. Example: `{d.number:barcode(qrcode, textxalign:right)}`
+    - `textyalign` Change the alignment of the text vertically. Takes only 3 values: `below`, `center`, or `above`. The default value is below. Example: `{d.number:barcode(qrcode, textyalign:above)}`.
+    - `rotate` Rotate the barcode and the text. Takes only 4 values (case insensitive): `N` for not rotated, `R` for 90 degree right rotation, `L` for 90 degree left rotation, `I` of 180 degree rotation. Example: `{d.number:barcode(qrcode, rotate:R)}` or `{d.number:barcode(qrcode, rotate:l)}`.
+    - `barcolor` Color of bars as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, barcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
+    - `textcolor` Color of the text as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, textcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
+    - `backgroundcolor` Color of the background as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, backgroundcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
+    - `eclevel` Specify the error correction level: `L` for Low, `M` for Medium (default), `Q` for Quality and `H` for High. Option ONLY FOR QRCODES, Micro QR Code, GS1 QR Code, HIBC QR Code, or Swiss QR Code.
   - [EE] Dynamic HTML improvement - the following styles applied on the `:html` formatter are kept on the generated document: Right-to-left text, and text/background colors.
   - [EE] Dynamic HTML Fix - When creating a ordered or unordered list, the font-size, and font-family applied on the template are now kept in the generated document.
+
 ### v3.4.5
   - Release February 9th 2022
   - Now the parameter `converterFactoryTimeout` updates also the HTTP socket timeout accordingly

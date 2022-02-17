@@ -12,6 +12,30 @@
     - `textcolor` Color of the text as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, textcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
     - `backgroundcolor` Color of the background as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, backgroundcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
     - `eclevel` Specify the error correction level: `L` for Low, `M` for Medium (default), `Q` for Quality and `H` for High. Option ONLY FOR QRCODES, Micro QR Code, GS1 QR Code, HIBC QR Code, or Swiss QR Code.
+### v3.4.5
+  - Release February 9th 2022
+  - Now the parameter `converterFactoryTimeout` updates also the HTTP socket timeout accordingly
+
+### v3.4.4
+  - Release February 7th 2022
+  - [EE] Experimental: increase the limit to 200 repetitions maximum when using the repetition feature `{d[i+1*qty]`
+
+### v3.4.3
+  - Release January 31th 2022
+  - [EE] Bump dependencies to latest version
+  - [EE] Add `options.isDebugActive`. If true, `POST /render` returns additional information in `debug` sub-object:
+    ```js
+    {
+      "renderId" : "file.pdf",
+      "debug"    : {
+        "markers" : ["{d.id}", "{d.tab[i].id}"] // all markers found in template
+      }
+    }
+    ```
+
+### v3.4.2
+  - Release January 10th 2022
+  - [EE] Fix do not crash if content passed to `:html` formatter is not a string
 
 ### v3.4.1
   - Release December 9th 2021

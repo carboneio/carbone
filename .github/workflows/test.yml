@@ -26,13 +26,13 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) }}
 
     # The maximum number of minutes to let a job run before GitHub automatically cancels it
-    timeout-minutes: 25
+    timeout-minutes: 50
     # Content of the Ubuntu image: https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md
     # List of available platform: https://github.com/actions/virtual-environments
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node: [ '16.13.0' ]
+        node: [ '16.13.2' ]
     name: Node on Ubuntu-20.04
     steps:
       # Checkout source code of the project

@@ -1438,6 +1438,8 @@ describe('formatter', function () {
 
     describe('Barcode as a font', function () {
       it('should return an empty string with a undefined barcode format', () => {
+        helper.assert(barcodeFormatter.barcode(), '');
+        helper.assert(barcodeFormatter.barcode(true, true, true), '');
         helper.assert(barcodeFormatter.barcode('fweffewfweq'), '');
       });
 
@@ -1517,12 +1519,12 @@ describe('formatter', function () {
 
     describe('Barcode as an Image', function () {
       describe(':barcode and :isImage formatters', function () {
-        it('should return the data URI of the value and type of barcode', function () {
+        it('should return the barcode as JSON', function () {
           const _context = {};
           barcodeFormatter.isImage.call(_context);
           helper.assert(_context.isBarcodeImage, true);
           helper.assert(barcodeFormatter.barcode.call(_context, '978-1-56581-231-4 90000', 'isbn'), '{"bcid":"isbn","text":"978-1-56581-231-4 90000"}');
-          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'http://goo.gl/0bis', 'qrcode'), '{"bcid":"qrcode","text":"http://goo.gl/0bis"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode'), '{"bcid":"qrcode","text":"https://carbone.io"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '2112345678900', 'ean13'), '{"bcid":"ean13","text":"2112345678900"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '02345673', 'ean8'), '{"bcid":"ean8","text":"02345673"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '5715311709768', 'code128'), '{"bcid":"code128","text":"5715311709768"}');
@@ -1531,6 +1533,139 @@ describe('formatter', function () {
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '(01)03453120000011(8200)http://www.abc.net(10)ABCD1234(410)9501101020917',  'gs1qrcode'), '{"bcid":"gs1qrcode","text":"(01)03453120000011(8200)http://www.abc.net(10)ABCD1234(410)9501101020917"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '[)>^03001^02996152382802^029840^029001^0291Z00004951^029UPSN^02906X610^029159^0291234567^0291/1^029^029Y^029634 ALPHA DR^029PITTSBURGH^029PA^029^004',  'maxicode'), '{"bcid":"maxicode","text":"[)>^03001^02996152382802^029840^029001^0291Z00004951^029UPSN^02906X610^029159^0291234567^0291/1^029^029Y^029634 ALPHA DR^029PITTSBURGH^029PA^029^004"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'SPC\n0200\n1\nCH5800791123000889012\nS\nRobert Schneider AG\nRue du Lac\n1268\n2501\nBiel\nCH\n\n199.95\nCHF\nKPia-Maria Rutschmann-Schnyder\nGrosse Marktgasse 28\n9400 Rorschach\n\n\nCH\nSCOR\nRF18539007547034\n\nEPD\n',  'swissqrcode'), '{"bcid":"swissqrcode","text":"SPC\\n0200\\n1\\nCH5800791123000889012\\nS\\nRobert Schneider AG\\nRue du Lac\\n1268\\n2501\\nBiel\\nCH\\n\\n199.95\\nCHF\\nKPia-Maria Rutschmann-Schnyder\\nGrosse Marktgasse 28\\n9400 Rorschach\\n\\n\\nCH\\nSCOR\\nRF18539007547034\\n\\nEPD\\n"}');
+        });
+
+        it('should return the barcode as JSON with options and should validate options', function () {
+          // width
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:2'), '{"bcid":"qrcode","text":"https://carbone.io","width":"2"}', );
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:100'), '{"bcid":"qrcode","text":"https://carbone.io","width":"100"}');
+          // width error
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'wdth:10'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:-1'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:abc'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:    '), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // height
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'height:2'), '{"bcid":"qrcode","text":"https://carbone.io","height":"2"}', );
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'height:100'), '{"bcid":"qrcode","text":"https://carbone.io","height":"100"}');
+          // height error
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'heght:10'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'height:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'height:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'height:-1'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'height:abc'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'height:    '), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'height'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // scale
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'scale:1'), '{"bcid":"qrcode","text":"https://carbone.io","scale":"1"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'scale:10'), '{"bcid":"qrcode","text":"https://carbone.io","scale":"10"}');
+          // scale error
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'scale:0'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'scale:11'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'scale:abc'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'scale:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'scale'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // includetext
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'includetext:true'), '{"bcid":"qrcode","text":"https://carbone.io","includetext":true}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'includetext:false'), '{"bcid":"qrcode","text":"https://carbone.io","includetext":false}');
+          // includetext errors
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'includetext'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'includetext:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'includetext::'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'includetext:faalse'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'includeetext:false'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // textsize
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textsize:2'), '{"bcid":"qrcode","text":"https://carbone.io","textsize":"2"}', );
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textsize:100'), '{"bcid":"qrcode","text":"https://carbone.io","textsize":"100"}');
+          // textsize error
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textsiz:10'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textsize:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textsize:-1'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textsize:abc'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textsize:    '), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textsize'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // textxalign
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textxalign:left'), '{"bcid":"qrcode","text":"https://carbone.io","textxalign":"left"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textxalign:center'), '{"bcid":"qrcode","text":"https://carbone.io","textxalign":"center"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textxalign:right'), '{"bcid":"qrcode","text":"https://carbone.io","textxalign":"right"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textxalign:justify'), '{"bcid":"qrcode","text":"https://carbone.io","textxalign":"justify"}');
+          // textxalign errors
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textxalign:middle'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textxalign:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textxalign'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // textyalign
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textyalign:below'), '{"bcid":"qrcode","text":"https://carbone.io","textyalign":"below"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textyalign:center'), '{"bcid":"qrcode","text":"https://carbone.io","textyalign":"center"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textyalign:above'), '{"bcid":"qrcode","text":"https://carbone.io","textyalign":"above"}');
+          // textyalign errors
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textyalign:left'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textyalign:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textyalign'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // rotate
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:N'), '{"bcid":"qrcode","text":"https://carbone.io","rotate":"N"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:R'), '{"bcid":"qrcode","text":"https://carbone.io","rotate":"R"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:L'), '{"bcid":"qrcode","text":"https://carbone.io","rotate":"L"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:I'), '{"bcid":"qrcode","text":"https://carbone.io","rotate":"I"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:n'), '{"bcid":"qrcode","text":"https://carbone.io","rotate":"N"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:r'), '{"bcid":"qrcode","text":"https://carbone.io","rotate":"R"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:l'), '{"bcid":"qrcode","text":"https://carbone.io","rotate":"L"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:i'), '{"bcid":"qrcode","text":"https://carbone.io","rotate":"I"}');
+          // rotate error
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:ii'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:NN'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:inverse'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'rotate'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // textcolor
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor:ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io","textcolor":"ff00ff"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor:#ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io","textcolor":"ff00ff"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor:#1FDE25'), '{"bcid":"qrcode","text":"https://carbone.io","textcolor":"1FDE25"}');
+          // textcolor errors
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor:##ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor:ff00f'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor:#ff00f'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor:abc'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'textcolor'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // barcolor
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor:ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io","barcolor":"ff00ff"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor:#ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io","barcolor":"ff00ff"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor:#1FDE25'), '{"bcid":"qrcode","text":"https://carbone.io","barcolor":"1FDE25"}');
+          // barcolor errors
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor:##ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor:ff00f'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor:#ff00f'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor:abc'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'barcolor'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // backgroundcolor
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io","backgroundcolor":"ff00ff"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:#ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io","backgroundcolor":"ff00ff"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:#1FDE25'), '{"bcid":"qrcode","text":"https://carbone.io","backgroundcolor":"1FDE25"}');
+          // backgroundcolor errors
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:##ff00ff'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:ff00f'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:#ff00f'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:abc'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor:'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'backgroundcolor'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          // eclevel - specify the error correction level ONLY FOR QRCODE
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevelQ'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'ecleel:Q'), '{"bcid":"qrcode","text":"https://carbone.io"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:h'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"H"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:H'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"H"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:m'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"M"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:M'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"M"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:l'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"L"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:L'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"L"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:q'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"Q"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'eclevel:Q'), '{"bcid":"qrcode","text":"https://carbone.io","eclevel":"Q"}');
+
+          // Mix with an option "round" which does not exist
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode',
+            'width:20', 'height:6', 'scale:5', 'includetext:true', 'textsize:2', 'textxalign:right', 'rotate:R', 'textcolor:#ffffff', 'barcolor:#D8D8D8', 'backgroundcolor:#00ff08', 'round:true'),
+            '{"bcid":"qrcode","text":"https://carbone.io","width":"20","height":"6","scale":"5","includetext":true,"textsize":"2","textxalign":"right","rotate":"R","textcolor":"ffffff","barcolor":"D8D8D8","backgroundcolor":"00ff08"}');
         });
       });
 

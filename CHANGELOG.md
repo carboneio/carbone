@@ -12,6 +12,9 @@
     - `textcolor` Color of the text as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, textcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
     - `backgroundcolor` Color of the background as hexadecimal `#RRGGBB`. Example: `{d.number:barcode(qrcode, backgroundcolor:#1FDE25)}`. Note: 6 characters required, and case insensitive.
     - `eclevel` Specify the error correction level: `L` for Low, `M` for Medium (default), `Q` for Quality and `H` for High. Option ONLY FOR QRCODES, Micro QR Code, GS1 QR Code, HIBC QR Code, or Swiss QR Code.
+  - [EE] Dynamic HTML improvement - the following styles applied on the `:html` formatter are kept on the generated document: Right-to-left text, and text/background colors.
+  - [EE] Dynamic HTML Fix - When creating a ordered or unordered list, the font-size, and font-family applied on the template are now kept in the generated document.
+
 ### v3.4.5
   - Release February 9th 2022
   - Now the parameter `converterFactoryTimeout` updates also the HTTP socket timeout accordingly

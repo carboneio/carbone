@@ -4398,6 +4398,18 @@ describe('Dynamic HTML', function () {
         const _content = '<div>This is an <b>apple</b> and <i>strawberry</i>.</div>';
         helper.assert(html.convertHTMLEntities(_content), _content);
       });
+      it('should not crash if html does not contain a string', function () {
+        helper.assert(html.convertHTMLEntities(true), 'true');
+        helper.assert(html.convertHTMLEntities(false), 'false');
+        helper.assert(html.convertHTMLEntities(undefined), '');
+        helper.assert(html.convertHTMLEntities(null), '');
+        helper.assert(html.convertHTMLEntities([]), '');
+        helper.assert(html.convertHTMLEntities({}), '');
+        helper.assert(html.convertHTMLEntities(12233), '12233');
+        helper.assert(html.convertHTMLEntities(12.33), '12.33');
+        helper.assert(html.convertHTMLEntities(0), '0');
+        helper.assert(html.convertHTMLEntities(-1), '-1');
+      });
 
       it('should keep html entities that are supported by XML format: <>\'"&', function () {
         const _content = '<div> &amp; &quot; &apos; &lt; &gt; </div>';

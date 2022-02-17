@@ -191,6 +191,7 @@ If an option is reported in different places, CLI options are picked in priority
 | currencyTarget         |   |  Currency target for money conversion. If empty, it depends on the locale. | --currencyTarget / -ct | CARBONE_EE_CURRENCYTARGET |
 | currencyRates          | `{ EUR : 1, USD : 1.14, ... }` | Currency rates, it is based on EUR which should be equals to "1". The option can only be set on the `config/config.json` file. |  | |
 | translations          | `{}` | Translation object loaded at startup. It can be overwritten by rendering requests. The option can only be set on the `config/config.json` file.  |  | |
+| converterFactoryTimeout  | 60000  | Maximum conversion/socket timeout for one render (unit: ms) |  | CARBONE_EE_CONVERTERFACTORYTIMEOUT |
 
 
 ### CLI options

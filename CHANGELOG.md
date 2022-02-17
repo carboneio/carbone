@@ -1,6 +1,30 @@
 ### v3.4.X
   - [EE] Dynamic HTML improvement - the following styles applied on the `:html` formatter are kept on the generated document: Right-to-left text, and text/background colors.
   - [EE] Dynamic HTML Fix - When creating a ordered or unordered list, the font-size, and font-family applied on the template are now kept in the generated document.
+### v3.4.5
+  - Release February 9th 2022
+  - Now the parameter `converterFactoryTimeout` updates also the HTTP socket timeout accordingly
+
+### v3.4.4
+  - Release February 7th 2022
+  - [EE] Experimental: increase the limit to 200 repetitions maximum when using the repetition feature `{d[i+1*qty]`
+
+### v3.4.3
+  - Release January 31th 2022
+  - [EE] Bump dependencies to latest version
+  - [EE] Add `options.isDebugActive`. If true, `POST /render` returns additional information in `debug` sub-object:
+    ```js
+    {
+      "renderId" : "file.pdf",
+      "debug"    : {
+        "markers" : ["{d.id}", "{d.tab[i].id}"] // all markers found in template
+      }
+    }
+    ```
+
+### v3.4.2
+  - Release January 10th 2022
+  - [EE] Fix do not crash if content passed to `:html` formatter is not a string
 
 ### v3.4.1
   - Release December 9th 2021

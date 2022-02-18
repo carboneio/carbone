@@ -1,4 +1,9 @@
 ### v3.4.X
+  - [EE] The HTTP server starts as soon as possible, before LibreOffice.
+  - [EE] Gracefully exits on SIGTERM. When the signal is received
+    - GET /status returns 503. The reverse-proxy should stop sending new requests
+    - As soon as Carbone has finished all renders, it exits after 10 seconds
+    - Whatever happens, it exists after 300 seconds.
   - [EE] Add barcode options: pass to the formatter `:barcode` options as second argument. It should keep the format "key:value", such as: `{d.number:barcode(qrcode, width:300, height:100, includetext:false)}`. Options available:
     - `width` Width a number as millimeters. Example: `{d.number:barcode(qrcode, width:300)}`
     - `height` Height a number as millimeters. Example: `{d.number:barcode(qrcode, height:10)}`

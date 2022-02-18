@@ -28,7 +28,8 @@ PrivateDevices=true
 CapabilityBoundingSet=
 
 # Kill after X seconds if soft stop does work
-# TimeoutStopSec=90 
+TimeoutStopSec=300
+# By default, it send SIGTERM
 # ExecStop=
 
 [Install]

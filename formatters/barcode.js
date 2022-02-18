@@ -13,7 +13,7 @@ const CHECK_BARCODE_OPTIONS_VALUE = {
   'barcolor': (value) => REG_HEXA_COLOR.test(value),
   'textcolor': (value) => REG_HEXA_COLOR.test(value),
   'backgroundcolor': (value) => REG_HEXA_COLOR.test(value),
-  /** ONLY FOR QRCODE, Micro QR Code, GS1 QR Code, HIBC QR Code, or Swiss QR Code */
+  // ONLY FOR QRCODE, Micro QR Code, GS1 QR Code, HIBC QR Code, or Swiss QR Code
   'eclevel': (value) =>  /^[LMQH]{1}$/i.test(value) // L = Low, M = Medium (Default), Q = Quality, H = High
 }
 

@@ -1,5 +1,6 @@
-### v3.4.X
-  - [EE] The HTTP server starts as soon as possible, before LibreOffice.
+### v3.4.6
+  - Release February 18th 2022
+  - [EE] The HTTP serer starts as soon as possible, before LibreOffice.
   - [EE] Gracefully exits on SIGTERM. When the signal is received
     - GET /status returns 503. The reverse-proxy should stop sending new requests
     - As soon as Carbone has finished all renders, it exits after 10 seconds

@@ -7,7 +7,7 @@ const assert     = require('assert');
 const carbone    = require('../lib/index');
 const sinon      = require('sinon');
 const os         = require('os');
-const { exec, spawn }   = require('child_process');
+const { exec }   = require('child_process');
 const package    = require('../package.json');
 const params     = require('../lib/params');
 const helper     = require('../lib/helper');
@@ -38,7 +38,7 @@ function getBody (port, route, method, body, token, headers) {
       toSend.body = body;
     }
 
-    if (body !== null && body.constructor === FormData) {
+    if (body.constructor === FormData) {
       toSend.headers['Content-Type'] = 'multipart/form-data;boundary=' + body.getBoundary();
     }
     else if (body !== undefined && body !== null) {
@@ -81,7 +81,7 @@ function uploadFile (port, token, callback) {
     assert.strictEqual(err, null);
     data = JSON.parse(data);
     assert.strictEqual(data.success, true);
-    callback(null, data);
+    callback();
   });
 }
 
@@ -132,7 +132,7 @@ function unlinkConfigFile () {
   fs.rmdirSync(path.join(os.tmpdir(), 'plugin'));
 }
 
-describe.only('Webserver', () => {
+describe('Webserver', () => {
   before(() => {
     writeConfigFile();
   });
@@ -1712,48 +1712,3 @@ describe.only('Webserver', () => {
   });
 });
 
-
-function genericQueue (items = [], handlerItem, handlerError, callback, options = {}) {
-
-  return {
-    items       : items,
-    currentItem : null,
-    isRunning   : false,
-
-    /**
-     * Process next item in the queue
-     * internal function
-     * @param {*} err
-     */
-    processNextItem : function (err) {
-      if (handlerError && err) {
-        handlerError(err);
-
-        if (options.stopOnError === true) {
-          return;
-        }
-      }
-
-      if (this.items.length === 0) {
-        this.isRunning = false;
-        if (callback) {
-          return callback();
-        }
-        return;
-      }
-
-      this.currentItem = this.items.shift();
-      handlerItem.call(this, this.currentItem, this.processNextItem.bind(this));
-    },
-
-    /**
-     * Start queue process
-     */
-    start : function () {
-      if (this.isRunning === false) {
-        this.isRunning = true;
-        this.processNextItem();
-      }
-    }
-  };
-}

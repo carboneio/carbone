@@ -2862,8 +2862,117 @@ describe('extracter', function () {
         {obj : '_rootd'    , attr : 'root'  , pos : 12, depth : 1, after : ' '           }
       ]);
     });
+    it('should pre-parse formatters', function () {
+      var _data = {
+        dynamicData : {
+          _root : {
+            name     : '_root',
+            type     : 'object',
+            parent   : '',
+            xmlParts : []
+          },
+          _rootd : {
+            name     : 'd',
+            type     : 'object',
+            parent   : '_root',
+            xmlParts : [
+              {obj : '_rootd', attr : 'root', pos : 12, depth : 1, after : ' ', moveTo : '_rootdcars' , formatters : ['ifEq(o)', 'showBegin()']},
+              {obj : '_rootd', attr : 'root', pos : 30, depth : 1, before : '', toDelete : true       , formatters : ['formatC(.test)']}
+            ],
+            depth : 1
+          },
+          _rootdcars : {
+            name      : 'cars',
+            type      : 'array',
+            parent    : '_rootd',
+            position  : {start : 5,end : 22, endOdd : 40},
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : '_rootdcars', attr : 'brand' , pos : 13, depth : 1                       , formatters : ['other(3)', 'count()']},
+              {obj : '_rootdcars', array : 'start', pos : 5 , depth : 1, after : '<t_row>'    },
+              {obj : '_rootdcars', array : 'end'  , pos : 22, depth : 1, before : ' </t_row>' }
+            ],
+            depth : 1
+          }
+        }
+      };
+      var _dataModified = extracter.deleteAndMoveNestedParts(_data).dynamicData;
+      helper.assert(_dataModified._rootd.xmlParts, []);
+      helper.assert(_dataModified._rootdcars.xmlParts, [
+        { obj  : '_rootdcars', attr : 'brand' , pos  : 13, depth : 1, formatters : ['other(3)', 'count()'], parsedFormatter : [
+          { str : 'other', args : ['3']},
+          { str : 'count', args : []   }
+        ]},
+        { obj : '_rootdcars', array : 'start', pos : 5 , depth : 1, after : '<t_row>'     },
+        { obj : '_rootdcars', array : 'end'  , pos : 22, depth : 1, before : ' </t_row>'  },
+        { obj : '_rootd'    , attr : 'root'  , pos : 12, depth : 1, after : ' ', formatters : ['ifEq(o)', 'showBegin()'], parsedFormatter : [
+          { str : 'ifEq'     , args : ['o']},
+          { str : 'showBegin', args : []   }
+        ]}
+      ]);
+    });
   });
 
+  describe('parseFormatter', function () {
+    it('should null if this is not a formatter', function () {
+      helper.assert(extracter.parseFormatter(''), null);
+      helper.assert(extracter.parseFormatter(null), null);
+      helper.assert(extracter.parseFormatter(), null);
+      helper.assert(extracter.parseFormatter([]), null);
+      helper.assert(extracter.parseFormatter({}), null);
+      helper.assert(extracter.parseFormatter(2), null);
+    });
+    it('should build on object describing the formatter', function () {
+      helper.assert(extracter.parseFormatter('formatC')            , { str : 'formatC', args : []});
+      helper.assert(extracter.parseFormatter('formatC()')          , { str : 'formatC', args : []});
+      helper.assert(extracter.parseFormatter(' formatC ( ) ')      , { str : 'formatC', args : []});
+      helper.assert(extracter.parseFormatter('formatC(    )')      , { str : 'formatC', args : []});
+      helper.assert(extracter.parseFormatter('formatC   (   )  ' ) , { str : 'formatC', args : []});
+      helper.assert(extracter.parseFormatter('formatC   (     ' )  , { str : 'formatC', args : []});
+      helper.assert(extracter.parseFormatter('_otherFormatter')    , { str : '_otherFormatter', args : []});
+    });
+    it('should extract arguments', function () {
+      helper.assert(extracter.parseFormatter('formatC(12, 23)')                             , { str : 'formatC', args : ['12', '23']});
+      helper.assert(extracter.parseFormatter('formatC(blabl, titi, toto)')                  , { str : 'formatC', args : ['blabl', 'titi', 'toto']});
+      helper.assert(extracter.parseFormatter('formatC (  blabl   , titi   , toto   )')      , { str : 'formatC', args : ['blabl', 'titi', 'toto']});
+    });
+    it('should keep whitespaces and commas if single quotes are used', function () {
+      helper.assert(extracter.parseFormatter("formatC ('  blabl   ', titi   ,' toto  ' )")    , { str : 'formatC', args : ['  blabl   ', 'titi', ' toto  ']});
+      helper.assert(extracter.parseFormatter("formatC ('  bla,bl   ', titi   ,', toto  ,' )") , { str : 'formatC', args : ['  bla,bl   ', 'titi', ', toto  ,']});
+      helper.assert(extracter.parseFormatter("formatC ('  bla,bl   ', titi   , )")            , { str : 'formatC', args : ['  bla,bl   ', 'titi', '']});
+      helper.assert(extracter.parseFormatter("formatC ('  bla,bl   ', titi   ,)")             , { str : 'formatC', args : ['  bla,bl   ', 'titi', '']});
+    });
+    it('should extract empty arguments', function () {
+      helper.assert(extracter.parseFormatter('formatC(,, toto,)')      , { str : 'formatC', args : ['', '', 'toto', '']});
+      helper.assert(extracter.parseFormatter("formatC (,,' toto  ' )") , { str : 'formatC', args : ['', '', ' toto  ']});
+    });
+    it('should accept single quote in the middle', function () {
+      helper.assert(extracter.parseFormatter("format('YYYY \\' MM DD')")                   , { str : 'format', args : ["YYYY \\' MM DD"]});
+      helper.assert(extracter.parseFormatter("format(' , ', '  ,  ')")                     , { str : 'format', args : [' , ', '  ,  ']});
+      helper.assert(extracter.parseFormatter("format('YYYY '' MM, DD')")                   , { str : 'format', args : ["YYYY '' MM, DD"]});
+      helper.assert(extracter.parseFormatter("format('YYYY '' MM, DD', 'a')")              , { str : 'format', args : ["YYYY '' MM, DD",  'a']});
+      helper.assert(extracter.parseFormatter("format('YYYY \" MM DD')")                    , { str : 'format', args : ['YYYY " MM DD']});
+      helper.assert(extracter.parseFormatter("format('YYYY \" MM, DD')")                   , { str : 'format', args : ['YYYY " MM, DD']});
+      helper.assert(extracter.parseFormatter("format(  'YYYY \" MM, DD'   )")              , { str : 'format', args : ['YYYY " MM, DD']});
+      helper.assert(extracter.parseFormatter("format(  ' YYYY \" MM, DD '   )")            , { str : 'format', args : [' YYYY " MM, DD ']});
+      helper.assert(extracter.parseFormatter("format(  ' YYYY \" MM, DD '  , ' s\", '  )") , { str : 'format', args : [' YYYY " MM, DD ', ' s", ']});
+    });
+    it('should accept single quote in the middle if there are no comma', function () {
+      helper.assert(extracter.parseFormatter("format(' YYYY ' MM' DD ')") , { str : 'format', args : [" YYYY ' MM' DD "]});
+    });
+    it('should keep parenthesis in the string', function () {
+      helper.assert(extracter.parseFormatter("format('(YYYY) ' (MM) DD')") , { str : 'format', args : ["(YYYY) ' (MM) DD"]});
+    });
+    it('should keep dynamic paramaters', function () {
+      helper.assert(extracter.parseFormatter('format(.size, ..id)') , { str : 'format', args : ['.size', '..id']});
+    });
+    it('should accept escaped comma', function () {
+      helper.assert(extracter.parseFormatter('format(bla%2ca)') , { str : 'format', args : ['bla%2ca']});
+    });
+    it.skip('should accept object', function () {
+      helper.assert(extracter.parseFormatter('format(toto:\'1 sdsd, 2\', bibi:12)') , { str : 'format', args : ['toto:\'1 sdsd, 2', 'bibi:12']});
+    });
+  });
 });
 
 

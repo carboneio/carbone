@@ -933,6 +933,20 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should print a counter and filter', function (done) {
+      var _xml = '<xml><t_row> {d.cars[sort,i,filter=1].brand:count()} {d.cars[sort,i,filter=1].brand} </t_row><t_row> {d.cars[sort+1,i+1,filter=1].brand} </t_row></xml>';
+      var _data = {
+        cars : [
+          {brand : 'Lumeneo'     , sort : 1, filter : 1},
+          {brand : 'Tesla motors', sort : 2, filter : 1},
+          {brand : 'Toyota'      , sort : 1, filter : 0}
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml><t_row> 1 Lumeneo </t_row><t_row> 2 Tesla motors </t_row></xml>');
+        done();
+      });
+    });
     it('should print a counter which start by 1 and 0', function (done) {
       var _xml =
          '<xml>'
@@ -1199,7 +1213,7 @@ describe('Carbone', function () {
           done();
         });
       });
-      it('should return an error if  crash if object is undefined', function (done) {
+      it('should access to sub-arrays', function (done) {
         var data = {
           param     : 3,
           subObject : {
@@ -1211,7 +1225,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObj[0].textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml></xml>');
+          helper.assert(result, '<xml>ddfdf</xml>');
           done();
         });
       });
@@ -1294,6 +1308,73 @@ describe('Carbone', function () {
             +  '</tr>'
             +  '<tr>'
             +    '<td>4200 4513</td>'
+            +  '</tr>'
+            +'</xml>';
+          assert.equal(_xmlBuilt, _expectedResult);
+          done();
+        });
+      });
+      it('should accept to access parent index in arrays with dot syntax', function (done) {
+        var _xml =
+           '<xml>'
+          +  '<tr>'
+          +    '<td>{d[i].cars[i].wheels[i].tire.nb:append(.i):append(..i):append(...i)}</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>{d[i+1].cars[i+1].wheels[i+1].tire.nb}</td>'
+          +  '</tr>'
+          +'</xml>';
+        var _data = [
+          {
+            site : {nb : 10},
+            cars : [
+              {
+                nb     : 2,
+                wheels : [
+                  {tire : {nb : '_A_'}, nb : 3},
+                  {tire : {nb : '_B_'}, nb : 4}
+                ]
+              },
+              {
+                nb     : 3,
+                wheels : [
+                  {tire : {nb : '_C_'}, nb : 5}
+                ]
+              },
+            ],
+          },{
+            site : {nb : 300},
+            cars : [{
+              nb     : 4,
+              wheels : [
+                {tire : {nb : '_D_'}, nb : 6},
+                {tire : {nb : '_E_'}, nb : 7},
+                {tire : {nb : '_F_'}, nb : 9}
+              ]
+            }
+            ],
+          }
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          var _expectedResult =
+             '<xml>'
+            +  '<tr>'
+            +    '<td>_A_000</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_B_001</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_C_010</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_D_100</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_E_101</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_F_102</td>'
             +  '</tr>'
             +'</xml>';
           assert.equal(_xmlBuilt, _expectedResult);

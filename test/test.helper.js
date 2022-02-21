@@ -244,50 +244,42 @@ describe('helper', function () {
     });
   });
 
-  describe('getValueOfPath', function () {
+  describe('getSafePathCode', function () {
+    // simulate getSafeValue, which normally must return dictionary[index] to get the content of str
+    const getSafeValue = (str) => '_'+str+'_';
     it('should do nothing if object is undefined', function () {
-      helper.assert(helper.getValueOfPath(), undefined);
+      helper.assert(helper.getSafePathCode(), undefined);
     });
-    it('should get value of attribute if (first level)', function () {
-      var _obj = {
-        id : 1
-      };
-      helper.assert(helper.getValueOfPath(_obj, 'id'), 1);
+    it('should return a safe string with optional chaining', function () {
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id'), 'root?.[_id_]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id.car.auto'), 'root?.[_id_]?.[_car_]?.[_auto_]');
     });
-    it('should do nothing if object is undefined', function () {
-      var _obj = {
-        subObj : {
-          subObj : {
-            end : {
-              label : 'bla'
-            }
-          }
-        }
-      };
-      helper.assert(helper.getValueOfPath(_obj, 'subObj.subObj.end.label'), 'bla');
+    it('should return a safe string with optional chaining and arrays', function () {
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[1]'), 'root?.[_id_]?.[1]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[243][1212]'), 'root?.[_id_]?.[243]?.[1212]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[243].bus[1212].id.bidule'), 'root?.[_id_]?.[243]?.[_bus_]?.[1212]?.[_id_]?.[_bidule_]');
     });
-    it('should be fast to sort 1 Millons of rows', function () {
-      var _nbRows = 100000;
-      var _res = 0;
-      var _obj = {
-        subObj : {
-          subObj : {
-            end : {
-              val : 10
-            },
-            val : 1
-          }
-        }
-      };
-      var _start = process.hrtime();
-      var _random = ['subObj.subObj.end.val', 'subObj.subObj.val'];
-      for (var i = 0; i < _nbRows; i++) {
-        _res += helper.getValueOfPath(_obj, _random[Math.round(Math.random())]);
-      }
-      var _diff = process.hrtime(_start);
-      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
-      console.log('\n getValueOfPath speed : ' + _elapsed  + ' ms (usually around 30 ms) '+_res+'\n');
-      helper.assert(_elapsed < (100 * helper.CPU_PERFORMANCE_FACTOR), true);
+    it('should accept whitespaces', function () {
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', '   id [1]'), 'root?.[_id_]?.[1]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', ' id  [ 243  ]  [ 1212  ]  '), 'root?.[_id_]?.[243]?.[1212]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', ' id[243] .   bus [ 1212].id .   bidule'), 'root?.[_id_]?.[243]?.[_bus_]?.[1212]?.[_id_]?.[_bidule_]');
+    });
+    it('should return error if direct array access is not safe', function () {
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[a]'), new Error('Forbidden array access in "id[a]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[]'), new Error('Forbidden array access in "id[]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id]sd'), new Error('Forbidden array access in "id]sd". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[12][b]'), new Error('Forbidden array access in "id[12][b]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id  [  12  ] [ b ]'), new Error('Forbidden array access in "id  [  12  ] [ b ]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[undefined]'), new Error('Forbidden array access in "id[undefined]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[?/2/éxs\n*¨%£_°]'), new Error('Forbidden array access in "id[?/2/éxs\n*¨%£_°]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[-121]'), new Error('Forbidden array access in "id[-121]". Only positive integers are allowed in []'));
+    });
+    it('should return error if empty attributes', function () {
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', '[1]'), new Error('Forbidden array access in "[1]". Only non-empty attributes are allowed'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', '  [1]'), new Error('Forbidden array access in "  [1]". Only non-empty attributes are allowed'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', '   '), new Error('Forbidden array access in "   ". Only non-empty attributes are allowed'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id..sd'), new Error('Forbidden array access in "id..sd". Only non-empty attributes are allowed'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[0].di....sd'), new Error('Forbidden array access in "id[0].di....sd". Only non-empty attributes are allowed'));
     });
   });
 

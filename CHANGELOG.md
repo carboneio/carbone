@@ -2,6 +2,8 @@
   - [EE] On-Premise Embedded Studio has new features. Like the SaaS version, it is possible to 
     - export to other formats than PDF
     - change language
+    - fix firefox template upload
+    - fix memory leak
 
 ### v3.4.6
   - Release February 18th 2022

@@ -21,7 +21,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0}
           ]
         }
       });
@@ -38,8 +38,8 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20},
-            {attr : 'name', formatters : [], obj : 'd', pos : 30, posOrigin : 30}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
+            {attr : 'name', formatters : [], obj : 'd', pos : 30, posOrigin : 30, markerId : 1}
           ]
         }
       });
@@ -62,7 +62,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20},
+            {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0},
           ]
         }
       });
@@ -74,7 +74,7 @@ describe('extracter', function () {
       helper.assert(extracter.splitMarkers(_markers), {
         d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
         dsite : { name     : 'site' , type     : 'object', parent   : 'd', parents  : ['d'],  xmlParts : [
-          {attr : 'name', formatters : [], obj : 'd', pos : 20, posOrigin : 20},
+          {attr : 'name', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
         ]
         }
       });
@@ -86,7 +86,7 @@ describe('extracter', function () {
       helper.assert(extracter.splitMarkers(_markers), {
         d     : { name : 'd'    , type : 'object', parent : '' , parents : []   ,  xmlParts : [] },
         dsite : { name     : 'site' , type     : 'object', parent   : 'd', parents  : ['d'],  xmlParts : [
-          {attr : 'name', formatters : [], obj : 'dothersub', pos : 20, posOrigin : 20},
+          {attr : 'name', formatters : [], obj : 'dothersub', pos : 20, posOrigin : 20, markerId : 0},
         ]
         },
         dother    : { name : 'other', type : 'object', parent : 'd'      , parents : ['d']           ,  xmlParts : [] },
@@ -103,7 +103,7 @@ describe('extracter', function () {
       helper.assert(_result.dsitecar.xmlParts, []);
       helper.assert(_result.dsitecarwheel.xmlParts, []);
       helper.assert(_result.dsitecarwheeltyre.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
+        {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0}
       ]);
     });
     it('should go up in hierarchy even with an array', function () {
@@ -115,7 +115,7 @@ describe('extracter', function () {
       helper.assert(_result.d.xmlParts, []);
       helper.assert(_result.dsite.xmlParts, []);
       helper.assert(_result.dsitecar.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
+        {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0}
       ]);
     });
     it('should go up in hierarchy, and set parents of rootdsub', function () {
@@ -128,7 +128,7 @@ describe('extracter', function () {
       helper.assert(_result.root.xmlParts, []);
       helper.assert(_result.rootd.xmlParts, []);
       helper.assert(_result.rootdcar.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'rootdsub', pos : 20, posOrigin : 20}
+        {attr : 'name', formatters : [], obj : 'rootdsub', pos : 20, posOrigin : 20, markerId : 0}
       ]);
       helper.assert(_result.rootdsub.xmlParts, []);
       helper.assert(_result.rootdsub.parent, 'rootd');
@@ -144,7 +144,7 @@ describe('extracter', function () {
       helper.assert(_result.dsite.xmlParts, []);
       helper.assert(_result.dsitecar.xmlParts, []);
       helper.assert(_result.dsitecarwheel.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'dsitecar', pos : 20, posOrigin : 20}
+        {attr : 'name', formatters : [], obj : 'dsitecar', pos : 20, posOrigin : 20, markerId : 0}
       ]);
     });
     it('should go up in hierarchy up to the root, even with two arrays', function () {
@@ -157,7 +157,7 @@ describe('extracter', function () {
       helper.assert(_result.dsite.xmlParts, []);
       helper.assert(_result.dsitecar.xmlParts, []);
       helper.assert(_result.dsitecarwheel.xmlParts, [
-        {attr : 'name', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+        {attr : 'name', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0}
       ]);
     });
     it('should go up in hierarchy up to the root, even with two arrays, and go down', function () {
@@ -170,7 +170,7 @@ describe('extracter', function () {
       helper.assert(_result.dsite.xmlParts, []);
       helper.assert(_result.dsitecar.xmlParts, []);
       helper.assert(_result.dsitecarwheel.xmlParts, [
-        {attr : 'id', formatters : [], obj : 'dsitenamesub', pos : 20, posOrigin : 20}
+        {attr : 'id', formatters : [], obj : 'dsitenamesub', pos : 20, posOrigin : 20, markerId : 0}
       ]);
       helper.assert(_result.dsitename.xmlParts, []);
       helper.assert(_result.dsitename.parent, 'dsite');
@@ -205,7 +205,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'movie', formatters : [], obj : 'd', pos : 10, posOrigin : 10}
+            {attr : 'movie', formatters : [], obj : 'd', pos : 10, posOrigin : 10, markerId : 0}
           ]
         },
         dsite : {
@@ -214,8 +214,8 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20},
-            {attr : 'id'  , formatters : [], obj : 'dsite', pos : 30, posOrigin : 30}
+            {attr : 'name', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 1},
+            {attr : 'id'  , formatters : [], obj : 'dsite', pos : 30, posOrigin : 30, markerId : 2}
           ]
         }
       });
@@ -231,10 +231,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : '',
           parents   : [],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0}
           ]
         }
       });
@@ -250,10 +250,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : '',
           parents   : [],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'sort' }],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0}
           ]
         }
       });
@@ -269,10 +269,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : '',
           parents   : [],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{attr : 'i'}],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0}
           ]
         }
       });
@@ -288,10 +288,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : '',
           parents   : [],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{attr : 'i'},{attr : 'sort'}],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0}
           ]
         }
       });
@@ -308,10 +308,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : '',
           parents   : [],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{obj : 'movie', attr : 'sort'}],
           xmlParts  : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 0}
           ],
         }
       });
@@ -329,10 +329,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : '',
           parents   : [],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 2 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'movie', formatters : [], obj : 'd', pos : 25, posOrigin : 25}
+            {attr : 'movie', formatters : [], obj : 'd', pos : 25, posOrigin : 25, markerId : 1}
           ]
         },
         dsite : {
@@ -341,7 +341,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0}
           ]
         }
       });
@@ -364,10 +364,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0}
           ]
         }
       });
@@ -394,7 +394,7 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__1', pos : 20, posOrigin : 20 }
+            { attr : 'id', formatters : [], obj : 'dsitei__1', pos : 20, posOrigin : 20, markerId : 0 }
           ],
           conditions : [
             { left : { parent : 'dsitei__1',  attr : 'i' }, operator : '==', right : '1' }
@@ -409,7 +409,7 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, posOrigin : 30 }
+            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, posOrigin : 30, markerId : 1 }
           ],
           conditions : [
             { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
@@ -439,7 +439,7 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__1303', pos : 20, posOrigin : 20 }
+            { attr : 'id', formatters : [], obj : 'dsitei__1303', pos : 20, posOrigin : 20, markerId : 0 }
           ],
           conditions : [
             { left : { parent : 'dsitei__1303',  attr : 'i' }, operator : '==', right : '1303' }
@@ -454,7 +454,7 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, posOrigin : 30 }
+            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, posOrigin : 30, markerId : 1 }
           ],
           conditions : [
             { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
@@ -488,7 +488,8 @@ describe('extracter', function () {
             formatters : [],
             obj        : 'dsitesort__310i__1',
             pos        : 20,
-            posOrigin  : 20
+            posOrigin  : 20,
+            markerId   : 0
           }],
           conditions : [{
             left : {
@@ -519,7 +520,8 @@ describe('extracter', function () {
             formatters : [],
             obj        : 'dsitelang__enbank__54i__0',
             pos        : 30,
-            posOrigin  : 30
+            posOrigin  : 30,
+            markerId   : 1
           }],
           conditions : [{
             left : {
@@ -564,10 +566,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '10'}]}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0, conditions : [{left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '10'}]}
           ]
         }
       });
@@ -590,10 +592,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '10'}]}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0, conditions : [{left : {parent : 'dsite', attr : 'sort'}, operator : '>', right : '10'}]}
           ]
         }
       });
@@ -611,7 +613,7 @@ describe('extracter', function () {
           type      : 'array',
           parent    : '',
           parents   : [],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 2 },
           iterators : [{ attr : 'i' }],
           xmlParts  : []
         },
@@ -620,10 +622,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 25 },
+          position  : { start : 20, startMarkerId : 0, end : 25, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'd', attr : 'sort'}, operator : '>', right : '10'}]}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0, conditions : [{left : {parent : 'd', attr : 'sort'}, operator : '>', right : '10'}]}
           ]
         }
       });
@@ -641,7 +643,7 @@ describe('extracter', function () {
           type      : 'array',
           parent    : '',
           parents   : [],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 2 },
           iterators : [{ attr : 'i' }],
           xmlParts  : []
         },
@@ -650,10 +652,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 25 },
+          position  : { start : 20, startMarkerId : 0, end : 25, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'd_', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'd_', attr : 'sort'}, operator : '>', right : '10'}]}
+            {attr : 'id', formatters : [], obj : 'd_', pos : 20, posOrigin : 20, markerId : 0, conditions : [{left : {parent : 'd_', attr : 'sort'}, operator : '>', right : '10'}]}
           ]
         }
       });
@@ -676,7 +678,7 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
             {attr       : 'id', formatters : [], obj        : 'dsite', pos        : 20, posOrigin  : 20,
@@ -716,11 +718,11 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 2 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20},
-            {attr : 'val', formatters : [], obj : 'dsite', pos : 21, posOrigin : 21}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0},
+            {attr : 'val', formatters : [], obj : 'dsite', pos : 21, posOrigin : 21, markerId : 1}
           ]
         },
         dsite$ : {
@@ -728,11 +730,11 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 40, end : 50 },
+          position  : { start : 40, startMarkerId : 4, end : 50, endMarkerId : 6 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40},
-            {attr : 'val', formatters : [], obj : 'dsite$', pos : 41, posOrigin : 41}
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, markerId : 4},
+            {attr : 'val', formatters : [], obj : 'dsite$', pos : 41, posOrigin : 41, markerId : 5}
           ]
         }
       });
@@ -759,10 +761,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0}
           ]
         },
         dsite$ : {
@@ -770,10 +772,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 40, end : 50 },
+          position  : { start : 40, startMarkerId : 2, end : 50, endMarkerId : 3 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40}
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, markerId : 2}
           ]
         },
         dsite$$ : {
@@ -781,10 +783,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 60, end : 70 },
+          position  : { start : 60, startMarkerId : 4, end : 70, endMarkerId : 5 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$$', pos : 60, posOrigin : 60}
+            {attr : 'id', formatters : [], obj : 'dsite$$', pos : 60, posOrigin : 60, markerId : 4}
           ]
         }
       });
@@ -809,10 +811,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
           ]
         },
         dsite$ : {
@@ -820,10 +822,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 40, end : 50 },
+          position  : { start : 40, startMarkerId : 2, end : 50, endMarkerId : 3 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, markerId : 2, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
           ]
         }
       });
@@ -848,7 +850,7 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : []
         },
@@ -858,7 +860,7 @@ describe('extracter', function () {
           parent   : 'dsite',
           parents  : ['d', 'dsite'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dsiteobj', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
+            {attr : 'id', formatters : [], obj : 'dsiteobj', pos : 20, posOrigin : 20, markerId : 0, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
           ]
         },
         dsite$ : {
@@ -866,7 +868,7 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 40, end : 50 },
+          position  : { start : 40, startMarkerId : 2, end : 50, endMarkerId : 3 },
           iterators : [{ attr : 'i' }],
           xmlParts  : []
         },
@@ -876,7 +878,7 @@ describe('extracter', function () {
           parent   : 'dsite$',
           parents  : ['d', 'dsite$'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dsite$obj', pos : 40, posOrigin : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
+            {attr : 'id', formatters : [], obj : 'dsite$obj', pos : 40, posOrigin : 40, markerId : 2, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
           ]
         },
       });
@@ -901,10 +903,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0, conditions : [{left : {parent : 'dsite', attr : 'id'}, operator : '>', right : '1'}]},
           ]
         },
         dsite$ : {
@@ -912,10 +914,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 40, end : 50 },
+          position  : { start : 40, startMarkerId : 2, end : 50, endMarkerId : 3 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, markerId : 2, conditions : [{left : {parent : 'dsite$', attr : 'val'}, operator : '>', right : '2'}]},
           ]
         }
       });
@@ -944,11 +946,11 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 2 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20},
-            {attr : 'val', formatters : [], obj : 'dsite', pos : 21, posOrigin : 21}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0},
+            {attr : 'val', formatters : [], obj : 'dsite', pos : 21, posOrigin : 21, markerId : 1}
           ]
         },
         dsite$ : {
@@ -956,11 +958,11 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 40, end : 50 },
+          position  : { start : 40, startMarkerId : 4, end : 50, endMarkerId : 6 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40},
-            {attr : 'val', formatters : [], obj : 'dsite$', pos : 41, posOrigin : 41}
+            {attr : 'id', formatters : [], obj : 'dsite$', pos : 40, posOrigin : 40, markerId : 4},
+            {attr : 'val', formatters : [], obj : 'dsite$', pos : 41, posOrigin : 41, markerId : 5}
           ]
         }
       });
@@ -978,7 +980,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'movie', formatters : [], obj : 'd', pos : 28, posOrigin : 28}
+            {attr : 'movie', formatters : [], obj : 'd', pos : 28, posOrigin : 28, markerId : 1}
           ]
         },
         dsite : {
@@ -986,10 +988,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 20, end : 30 },
+          position  : { start : 20, startMarkerId : 0, end : 30, endMarkerId : 2 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20}
+            {attr : 'id', formatters : [], obj : 'dsite', pos : 20, posOrigin : 20, markerId : 0}
           ]
         }
       });
@@ -1014,7 +1016,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 80, posOrigin : 80}
+            {attr : 'site', formatters : [], obj : 'd', pos : 80, posOrigin : 80, markerId : 8}
           ]
         },
         dmenu : {
@@ -1022,11 +1024,11 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : {start : 1, end : 40},
+          position  : {start : 1, startMarkerId : 0, end : 40, endMarkerId : 4},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dmenu', pos : 1, posOrigin : 1},
-            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10, posOrigin : 10}
+            {attr : 'id', formatters : [], obj : 'dmenu', pos : 1, posOrigin : 1, markerId : 0},
+            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10, posOrigin : 10, markerId : 1}
           ]
         },
         dmenumenuElement : {
@@ -1034,10 +1036,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'dmenu',
           parents   : ['d', 'dmenu'],
-          position  : {start : 20, end : 30},
+          position  : {start : 20, startMarkerId : 2, end : 30, endMarkerId : 3},
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dmenumenuElement', pos : 20, posOrigin : 20}
+            {attr : 'id', formatters : [], obj : 'dmenumenuElement', pos : 20, posOrigin : 20, markerId : 2}
           ]
         },
         dproduct : {
@@ -1046,7 +1048,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dproduct', pos : 90, posOrigin : 90}
+            {attr : 'id', formatters : [], obj : 'dproduct', pos : 90, posOrigin : 90, markerId : 9}
           ]
         }
       });
@@ -1104,7 +1106,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20, markerId : 2}
           ]
         },
         dmenu : {
@@ -1112,11 +1114,11 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : { start : 1, end : 50 },
+          position  : { start : 1, startMarkerId : 0, end : 50, endMarkerId : 5 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id'  , formatters : [], obj : 'dmenu', pos : 1, posOrigin : 1},
-            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10, posOrigin : 10}
+            {attr : 'id'  , formatters : [], obj : 'dmenu', pos : 1, posOrigin : 1, markerId : 0},
+            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10, posOrigin : 10, markerId : 1}
           ]
         },
         dproduct : {
@@ -1125,7 +1127,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dproduct', pos : 30, posOrigin : 30}
+            {attr : 'id', formatters : [], obj : 'dproduct', pos : 30, posOrigin : 30, markerId : 3}
           ]
         },
         // eslint-disable-next-line
@@ -1141,7 +1143,8 @@ describe('extracter', function () {
             formatters : [],
             obj        : 'dmenumenuElementi__0',
             pos        : 40,
-            posOrigin  : 40
+            posOrigin  : 40,
+            markerId   : 4
           }],
           conditions : [
             { left : { parent : 'dmenumenuElementi__0', attr : 'i' }, operator : '==', right : '0' }
@@ -1172,7 +1175,7 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : {start : 1, end : 3 },
+          position  : {start : 1, startMarkerId : 0, end : 3, endMarkerId : 2 },
           iterators : [{ attr : 'i' }],
           xmlParts  : []
         },
@@ -1181,10 +1184,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'dmenu',
           parents   : ['d', 'dmenu'],
-          position  : {start : 1, end : 2 },
+          position  : {start : 1, startMarkerId : 0, end : 2, endMarkerId : 1 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'id', formatters : [], obj : 'dmenu_', pos : 1, posOrigin : 1}
+            {attr : 'id', formatters : [], obj : 'dmenu_', pos : 1, posOrigin : 1, markerId : 0}
           ]
         },
         dproduct : {
@@ -1193,7 +1196,7 @@ describe('extracter', function () {
           parent   : 'd',
           parents  : ['d'],
           xmlParts : [
-            {attr : 'id', formatters : [], obj : 'dproduct', pos : 5, posOrigin : 5}
+            {attr : 'id', formatters : [], obj : 'dproduct', pos : 5, posOrigin : 5, markerId : 4}
           ]
         },
         ddays : {
@@ -1201,10 +1204,10 @@ describe('extracter', function () {
           type      : 'array',
           parent    : 'd',
           parents   : ['d'],
-          position  : {start : 6, end : 7 },
+          position  : {start : 6, startMarkerId : 5, end : 7, endMarkerId : 6 },
           iterators : [{ attr : 'i' }],
           xmlParts  : [
-            {attr : 'name', formatters : [], obj : 'ddays', pos : 6, posOrigin : 6}
+            {attr : 'name', formatters : [], obj : 'ddays', pos : 6, posOrigin : 6, markerId : 5}
           ]
         }
       });
@@ -1298,7 +1301,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'int' ], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'number', formatters : [ 'int' ], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
           ]
         }
       });
@@ -1314,7 +1317,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'int' ,'float', 'decimal' ], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'number', formatters : [ 'int' ,'float', 'decimal' ], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
           ]
         }
       });
@@ -1330,7 +1333,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'int' ,'float', 'decimal' ], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'number', formatters : [ 'int' ,'float', 'decimal' ], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
           ]
         }
       });
@@ -1346,7 +1349,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'parse(YYYYMMDD)'], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'number', formatters : [ 'parse(YYYYMMDD)'], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
           ]
         }
       });
@@ -1365,10 +1368,10 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site'  , formatters : []                                         , obj : 'd', pos : 10, posOrigin : 10},
-            {attr : 'number', formatters : [ 'int' ]                                  , obj : 'd', pos : 20, posOrigin : 20},
-            {attr : 'date'  , formatters : [ 'parse(Y)' ]                             , obj : 'd', pos : 30, posOrigin : 30},
-            {attr : 'date'  , formatters : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], obj : 'd', pos : 40, posOrigin : 40}
+            {attr : 'site'  , formatters : []                                         , obj : 'd', pos : 10, posOrigin : 10, markerId : 0},
+            {attr : 'number', formatters : [ 'int' ]                                  , obj : 'd', pos : 20, posOrigin : 20, markerId : 1},
+            {attr : 'date'  , formatters : [ 'parse(Y)' ]                             , obj : 'd', pos : 30, posOrigin : 30, markerId : 2},
+            {attr : 'date'  , formatters : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], obj : 'd', pos : 40, posOrigin : 40, markerId : 3}
           ]
         }
       });
@@ -1384,7 +1387,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'parse(YY,YY:MM:D.ZZ[Z]menu[i+1][i]d.bla,i=0)'], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'number', formatters : [ 'parse(YY,YY:MM:D.ZZ[Z]menu[i+1][i]d.bla,i=0)'], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
           ]
         }
       });
@@ -1400,7 +1403,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'meteo', formatters : [ 'weekday=1'], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'meteo', formatters : [ 'weekday=1'], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
           ]
         }
       });
@@ -1419,10 +1422,10 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'site', formatters : [], obj : 'd', pos : 10, posOrigin : 10},
-            {attr : 'number', formatters : [ 'int' ], obj : 'd', pos : 20, posOrigin : 20},
-            {attr : 'date', formatters : [ 'parse(Y)' ], obj : 'd', pos : 30, posOrigin : 30},
-            {attr : 'date', formatters : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], obj : 'd', pos : 40, posOrigin : 40}
+            {attr : 'site', formatters : [], obj : 'd', pos : 10, posOrigin : 10, markerId : 0},
+            {attr : 'number', formatters : [ 'int' ], obj : 'd', pos : 20, posOrigin : 20, markerId : 1},
+            {attr : 'date', formatters : [ 'parse(Y)' ], obj : 'd', pos : 30, posOrigin : 30, markerId : 2},
+            {attr : 'date', formatters : [ 'parse(YYYYMMDD)', 'format(DD/MM/YYYY)' ], obj : 'd', pos : 40, posOrigin : 40, markerId : 3}
           ]
         }
       });
@@ -1438,7 +1441,7 @@ describe('extracter', function () {
           parent   : '',
           parents  : [],
           xmlParts : [
-            {attr : 'number', formatters : [ 'parse(\'YYYY MM DD\')'], obj : 'd', pos : 20, posOrigin : 20},
+            {attr : 'number', formatters : [ 'parse(\'YYYY MM DD\')'], obj : 'd', pos : 20, posOrigin : 20, markerId : 0},
           ]
         }
       });
@@ -1472,7 +1475,7 @@ describe('extracter', function () {
             type      : 'array',
             parent    : '_root',
             parents   : [ '_root' ],
-            position  : { start : 13, end : 60 },
+            position  : { start : 13, startMarkerId : 0, end : 60, endMarkerId : 6 },
             iterators : [ { attr : 'i' } ],
             xmlParts  : []
           },
@@ -1481,18 +1484,18 @@ describe('extracter', function () {
             type     : 'object',
             parent   : '_rootd',
             parents  : [ '_root', '_rootd' ],
-            xmlParts : [ { attr : 'label', formatters : [], obj : '_rootdsite', pos : 13, posOrigin : 13 } ]
+            xmlParts : [ { attr : 'label', formatters : [], obj : '_rootdsite', pos : 13, posOrigin : 13, markerId : 0 } ]
           },
           _rootdcars : {
             name      : 'cars',
             type      : 'array',
             parent    : '_rootd',
             parents   : [ '_root', '_rootd' ],
-            position  : { start : 22, end : 69 },
+            position  : { start : 22, startMarkerId : 1, end : 69, endMarkerId : 7 },
             iterators : [ { attr : 'i' } ],
             xmlParts  : [
-              { attr : 'name', formatters : [], obj : '_rootdcars', pos : 22, posOrigin : 22 },
-              { attr : 'autonomy', formatters : [], obj : '_rootdcars', pos : 23, posOrigin : 23 }
+              { attr : 'name', formatters : [], obj : '_rootdcars', pos : 22, posOrigin : 22, markerId : 1 },
+              { attr : 'autonomy', formatters : [], obj : '_rootdcars', pos : 23, posOrigin : 23, markerId : 2 }
             ]
           },
           _rootdcarsspec : {
@@ -1501,7 +1504,7 @@ describe('extracter', function () {
             parent   : '_rootdcars',
             parents  : [ '_root', '_rootd', '_rootdcars' ],
             xmlParts : [
-              { attr : 'weight', formatters : [], obj : '_rootdcarsspec', pos : 32, posOrigin : 32 }
+              { attr : 'weight', formatters : [], obj : '_rootdcarsspec', pos : 32, posOrigin : 32, markerId : 3 }
             ]
           },
           _rootdcarswheels : {
@@ -1509,10 +1512,10 @@ describe('extracter', function () {
             type      : 'array',
             parent    : '_rootdcars',
             parents   : [ '_root', '_rootd', '_rootdcars' ],
-            position  : { start : 41, end : 88 },
+            position  : { start : 41, startMarkerId : 4, end : 88, endMarkerId : 10 },
             iterators : [ { attr : 'i' } ],
             xmlParts  : [
-              { attr : 'strengh', formatters : [], obj : '_rootdcarswheels', pos : 41, posOrigin : 41 }
+              { attr : 'strengh', formatters : [], obj : '_rootdcarswheels', pos : 41, posOrigin : 41, markerId : 4 }
             ]
           },
           _rootdcarswheelstire : {
@@ -1521,7 +1524,7 @@ describe('extracter', function () {
             parent   : '_rootdcarswheels',
             parents  : [ '_root', '_rootd', '_rootdcars', '_rootdcarswheels' ],
             xmlParts : [
-              { attr : 'brand', formatters : [], obj : '_rootdcarswheelstire', pos : 42, posOrigin : 42 }
+              { attr : 'brand', formatters : [], obj : '_rootdcarswheelstire', pos : 42, posOrigin : 42, markerId : 5 }
             ]
           }
         }
@@ -1653,8 +1656,8 @@ describe('extracter', function () {
           parent   : 'd0',
           parents  : ['d0'],
           xmlParts : [
-            {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 30, posOrigin : 30}, // if start
-            {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33, posOrigin : 30},
+            {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 30, posOrigin : 30, markerId : 1}, // if start
+            {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33, posOrigin : 30, markerId : 1},
             {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42, posOrigin : 42} // if end
           ]
         },
@@ -1703,8 +1706,8 @@ describe('extracter', function () {
             parent   : 'd0',
             parents  : ['d0'],
             xmlParts : [
-              {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 33       , posOrigin : 30 , depth : 0 , before : '</x><p>', after : ''}, // if start
-              {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33.015625, posOrigin : 30 , depth : 0 , after : '<h1></h1>'},
+              {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 33       , posOrigin : 30, markerId : 1 , depth : 0 , before : '</x><p>', after : ''}, // if start
+              {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33.015625, posOrigin : 30, markerId : 1 , depth : 0 , after : '<h1></h1>'},
               {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42       , posOrigin : 42 , depth : 0 , after : 'p</p>'  } // if end
             ]
           },
@@ -2399,7 +2402,7 @@ describe('extracter', function () {
           parents  : ['_root'],
           xmlParts : [
             {obj : '_rootd', attr : 'root', pos : 12, posOrigin : 12},
-            {obj : '_rootd', attr : 'root', pos : 30, posOrigin : 30}
+            {obj : '_rootd', attr : 'root', pos : 30, posOrigin : 30, markerId : 1}
           ]
         },
         _rootdcars : {
@@ -2434,7 +2437,7 @@ describe('extracter', function () {
             parents  : ['_root'],
             xmlParts : [
               {obj : '_rootd', attr : 'root', pos : 12, posOrigin : 12, depth : 1, moveTo : '_rootdcars', after : ' '  },
-              {obj : '_rootd', attr : 'root', pos : 30, posOrigin : 30, depth : 0, toDelete : true, before : ''        }
+              {obj : '_rootd', attr : 'root', pos : 30, posOrigin : 30, markerId : 1, depth : 0, toDelete : true, before : ''        }
             ]
           },
           _rootdcars : {

@@ -1,6 +1,13 @@
 ### v4.0.0
   
+  - Improve syntax error message:
+    - when a marker try to access an array and a object in the same time
+    - when there is a missing `[i]` marker fo one `[i+1]` marker
+    - when Carbone cannot find the section to repeat
+    - when there is a dot `.` before `[]` 
+  
   - Fix crash when repetition does not contain XML tags. For example: `<w:t>{d[i].id}, {d[i+1].id}</w:t>`
+  
   - [EE] On-Premise Embedded Studio has new features. Like the SaaS version, it is possible to 
     - export to other formats than PDF
     - change language

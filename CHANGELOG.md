@@ -1,4 +1,9 @@
 ### v4.0.0
+  - [EE] On-Premise Embedded Studio has new features. Like the SaaS version, it is possible to 
+    - export to other formats than PDF
+    - change language
+    - fix firefox template upload
+    - fix memory leak
  
   - Formatters managements has been completly rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters:
     - TODO (finish) A single quote can be escaped using the single quote twice: `anyFormatter(' one parameter with escaped quote ''   ', ' a second '' one with ')`

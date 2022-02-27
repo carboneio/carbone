@@ -2610,12 +2610,36 @@ describe('Carbone', function () {
       var opt = {
         renderPrefix : 'prefix-'
       };
-      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName) {
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName, debugInfo) {
         assert.equal(err, null);
         var _filename = path.basename(resultFilePath);
         assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        assert.strictEqual(debugInfo, null);
         assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(reportName), true);
         assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(_filename), true);
+        fs.unlinkSync(resultFilePath);
+        done();
+      });
+    });
+    it('should get debug info if isDebugActive = true', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPrefix  : 'prefix-',
+        isDebugActive : true
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName, debugInfo) {
+        assert.equal(err, null);
+        helper.assert(debugInfo, {
+          markers : [
+            '{d.field1}',
+            '{d.field2}',
+            '{c.author1}',
+            '{c.author2}'
+          ]
+        });
         fs.unlinkSync(resultFilePath);
         done();
       });

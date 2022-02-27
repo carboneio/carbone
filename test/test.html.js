@@ -13,26 +13,35 @@ describe('Dynamic HTML', function () {
       describe('ODT', function () {
         it('should do nothing if the html formatter is not included', function () {
           const _Content = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
-          assert.strictEqual(html.reorderXML(_Content, 'odt'), _Content);
+          const _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          assert.strictEqual(html.reorderXML(_Content, _options), _Content);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should throw an error is the XML is not valid, the paragraph is missing', function () {
           let _templateContent = '<office:body><office:text>{d.content:html}</office:text></office:body>';
-          assert.throws(() => html.reorderXML(_templateContent, 'odt'), 'Error');
+          const _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          assert.throws(() => html.reorderXML(_templateContent, _options), 'Error');
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate a single html formatter, retrieve the style on the paragraph and delete the empty paragraph', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           /** WITHOUT STYLE */
           let _templateContent = '<office:body><office:text><text:p>{d.content:html}</text:p></office:text></office:body>';
           let _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt}</carbone></office:text></office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
           /** WITH STYLE */
           _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
-          _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone></office:text></office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
         });
 
         it('should seperate a single html formatter with other elements', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P5">Some content before {d.content:html} and after</text:p>'+
@@ -40,13 +49,16 @@ describe('Dynamic HTML', function () {
           const _expectedContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P5">Some content before </text:p>'+
-                '<carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone>'+
                 '<text:p text:style-name="P5"> and after</text:p>'+
               '</office:text></office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
         });
 
         it('should seperate a single html formatter mixed inside a span', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P1">' +
@@ -58,15 +70,18 @@ describe('Dynamic HTML', function () {
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2">Content before</text:span>' +
                 '</text:p>' +
-                '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T2">Content after</text:span>' +
                 '</text:p>' +
               '</office:text></office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
         });
 
         it('should seperate a single html formatter mixed inside multiple spans', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P1">' +
@@ -77,12 +92,15 @@ describe('Dynamic HTML', function () {
               '</office:text></office:body>';
           const _expectedContent = '' +
               '<office:body><office:text>'+
-                '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
               '</office:text></office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
         });
 
         it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body>' +
                 '<office:text>' +
@@ -96,19 +114,22 @@ describe('Dynamic HTML', function () {
           const _expectedContent = '' +
               '<office:body>' +
                 '<office:text>' +
-                  '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
                   '<text:p text:style-name="P1">' +
                     '<text:span text:style-name="T2"></text:span>' +
                     '<text:span text:style-name="T3">Some Static content</text:span>' +
                     '<text:span text:style-name="T2"></text:span>' +
                   '</text:p>' +
-                  '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt(\'style-P1\')}</carbone>' +
                 '</office:text>' +
               '</office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
         });
 
         it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body>' +
                 '<office:text>' +
@@ -127,7 +148,7 @@ describe('Dynamic HTML', function () {
                     '<text:span text:style-name="T3">Before</text:span>' +
                     '<text:span text:style-name="T2"></text:span>' +
                   '</text:p>' +
-                  '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt(\'style-P1\')}</carbone>' +
                   '<text:p text:style-name="P1">' +
                     '<text:span text:style-name="T2"></text:span>' +
                     '<text:span text:style-name="T3">After</text:span>' +
@@ -135,10 +156,13 @@ describe('Dynamic HTML', function () {
                   '</text:p>' +
                 '</office:text>' +
               '</office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
         });
 
         it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body>' +
                 '<office:text>' +
@@ -157,13 +181,13 @@ describe('Dynamic HTML', function () {
                     '<text:span text:style-name="T3"></text:span>' +
                     '<text:span text:style-name="T2"></text:span>' +
                   '</text:p>' +
-                  '<carbone>{d.courseloop1:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
                   '<text:p text:style-name="P1">' +
                     '<text:span text:style-name="T2"></text:span>' +
                     '<text:span text:style-name="T3">Some Static content</text:span>' +
                     '<text:span text:style-name="T2"></text:span>' +
                   '</text:p>' +
-                  '<carbone>{d.courseloop2:getHTMLContentOdt(text:style-name="P1")}</carbone>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt(\'style-P1\')}</carbone>' +
                   '<text:p text:style-name="P1">' +
                     '<text:span text:style-name="T2"></text:span>' +
                     '<text:span text:style-name="T3"></text:span>' +
@@ -171,10 +195,13 @@ describe('Dynamic HTML', function () {
                   '</text:p>' +
                 '</office:text>' +
               '</office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
         });
 
         it('should seperate multiple html formatter with other elements', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P5">{d.list[i].name} some content1 {d.list[i].content:html} after content {d.value:html} end</text:p>'+
@@ -182,15 +209,18 @@ describe('Dynamic HTML', function () {
           const _expectedContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
-                '<carbone>{d.list[i].content:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<carbone>{d.list[i].content:getHTMLContentOdt(\'style-P5\')}</carbone>'+
                 '<text:p text:style-name="P5"> after content </text:p>'+
-                '<carbone>{d.value:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<carbone>{d.value:getHTMLContentOdt(\'style-P5\')}</carbone>'+
                 '<text:p text:style-name="P5"> end</text:p>'+
               '</office:text></office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
         });
 
         it('should seperate a multiple html formatter with other elements inside multiple paragrpahs', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P5">Some content before 1 {d.content1:html} and after 1</text:p>'+
@@ -199,18 +229,21 @@ describe('Dynamic HTML', function () {
           const _expectedContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P5">Some content before 1 </text:p>'+
-                '<carbone>{d.content1:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<carbone>{d.content1:getHTMLContentOdt(\'style-P5\')}</carbone>'+
                 '<text:p text:style-name="P5"> and after 1</text:p>'+
                 '<text:p text:style-name="P5">Some content before 2 </text:p>'+
-                '<carbone>{d.content2:getHTMLContentOdt(text:style-name="P5")}</carbone>'+
+                '<carbone>{d.content2:getHTMLContentOdt(\'style-P5\')}</carbone>'+
                 '<text:p text:style-name="P5"> and after 2</text:p>'+
               '</office:text></office:body>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'odt'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
         });
       });
 
       describe('DOCX', function () {
         it('should do nothing if the html formatter is not included', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
           const _templateContent = ''+
             '<w:document>'+
               '<w:body>'+
@@ -225,20 +258,18 @@ describe('Dynamic HTML', function () {
                 '</w:p>'+
               '</w:body>'+
             '</w:document>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _templateContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _templateContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate a single html formatter and delete the empty paragraph', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
           /** WITHOUT A FONT */
           let _templateContent = ''+
             '<w:document>'+
               '<w:body>'+
                 '<w:p>'+
                   '<w:r>'+
-                    '<w:rPr>'+
-                      '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
-                      '<w:sz w:val="36"/>' +
-                    '</w:rPr>'+
                     '<w:t>{d.courseloop1:html}</w:t>'+
                   '</w:r>'+
                 '</w:p>'+
@@ -247,15 +278,19 @@ describe('Dynamic HTML', function () {
           let _expectedContent = ''+
             '<w:document>'+
               '<w:body>'+
-                '<carbone>{d.courseloop1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>'+
+                '<carbone>{d.courseloop1:getHTMLContentDocx}</carbone>'+
               '</w:body>'+
             '</w:document>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
-          /** WITH A FONT */
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
+          /** WITH A FONT AND RTL */
           _templateContent = ''+
             '<w:document>'+
               '<w:body>'+
                 '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:bidi/>'+
+                  '</w:pPr>'+
                   '<w:r>'+
                     '<w:rPr>'+
                       '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print"/>' +
@@ -269,14 +304,17 @@ describe('Dynamic HTML', function () {
           _expectedContent = ''+
             '<w:document>'+
               '<w:body>'+
-                '<carbone>{d.courseloop1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>'+
+                '<carbone>{d.courseloop1:getHTMLContentDocx(\'style-ffSegoe Print-fs36-rtl\')}</carbone>'+
               '</w:body>'+
             '</w:document>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffSegoe Print-fs36-rtl')), JSON.stringify({ paragraph: '<w:bidi/>', text: '<w:rFonts w:ascii=\"Segoe Print\" w:hAnsi=\"Segoe Print\"/><w:sz w:val=\"36\"/>' }))
         });
 
 
         it('should seperate a single html formatter mixed with static content 1', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
           const _templateContent = ''+
             '<w:p w14:paraId="1AE5FC3C" w14:textId="755E3547" w:rsidR="00B03DAF" w:rsidRDefault="00B03DAF">' +
               '<w:pPr>' +
@@ -361,10 +399,12 @@ describe('Dynamic HTML', function () {
               '<w:t> Content after</w:t>' +
             '</w:r>' +
           '</w:p>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate a single html formatter mixed with static content 2', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
           const _templateContent = ''+
             '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
               '<w:pPr>' +
@@ -395,10 +435,12 @@ describe('Dynamic HTML', function () {
               '</w:r>' +
             '</w:p>' +
             '<carbone>{d.value2:getHTMLContentDocx}</carbone>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate a single html formatter mixed with static content 3', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
           const _templateContent = ''+
             '<w:p w14:paraId="34557F09" w14:textId="0A75B4FA" w:rsidR="00B03DAF" w:rsidRPr="00B03DAF" w:rsidRDefault="00B03DAF">' +
               '<w:pPr>' +
@@ -455,7 +497,8 @@ describe('Dynamic HTML', function () {
                 '<w:t> end</w:t>' +
               '</w:r>' +
             '</w:p>';
-          assert.strictEqual(html.reorderXML(_templateContent, 'docx'), _expectedContent);
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
       });
     });
@@ -618,38 +661,128 @@ describe('Dynamic HTML', function () {
       });
     });
 
-    describe('getFontStyle', function () {
-      it('should return an empty string if no style is included', function () {
-        helper.assert(html.getFontStyle('<office:text><text:p>{d.content:html}</text:p></office:text>', 'odt'), '');
-        helper.assert(html.getFontStyle('<office:body><office:text><w:p>{d.content:html}</w:p></office:text></office:body>', 'docx'), '');
-      });
+    describe('getTemplateDefaultStyles', function () {
+      describe('DOCX', function () {
 
-      it('should return DOCX font family and font size', function () {
-        helper.assert(html.getFontStyle('<w:p>' +
-          '<w:r>' +
-            '<w:rPr>' +
-              '<w:lang w:val="en-US"/>' +
-              '<w:sz w:val="18"/>' +
-              '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
-            '</w:rPr>', 'docx'), '(\'American Typewriter\', \'18\')');
-        /** Missing font size */
-        helper.assert(html.getFontStyle('<w:p>' +
+        it('should return an empty string if no style is included', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<office:body><office:text><w:p>{d.content:html}</w:p></office:text></office:body>', _options.extension), '');
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
+        });
+
+        it('should return DOCX paragraph style: RTL and Text Alignment', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+            '<w:pPr>' +
+              '<w:bidi/>' +
+              '<w:jc w:val="center"/>' +
+            '</w:pPr>' +
             '<w:r>' +
               '<w:rPr>' +
                 '<w:lang w:val="en-US"/>' +
-                '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
-              '</w:rPr>', 'docx'), '(\'American Typewriter\', null)');
-        /** Missing font family */
-        helper.assert(html.getFontStyle('<w:p>' +
+              '</w:rPr>', _options), '(\'style-rtl-textaligncenter\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-rtl-textaligncenter')), JSON.stringify({ paragraph: '<w:bidi/><w:jc w:val=\"center\"/>', text: '' }))
+        });
+
+        it('should return DOCX text style: font family, font size and colors', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
             '<w:r>' +
               '<w:rPr>' +
                 '<w:lang w:val="en-US"/>' +
                 '<w:sz w:val="18"/>' +
-              '</w:rPr>', 'docx'), '(null, \'18\')');
+                '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
+              '</w:rPr>', _options), '(\'style-ffAmerican Typewriter-fs18\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffAmerican Typewriter-fs18')), JSON.stringify({ paragraph: '', text: '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cstheme=\"minorHAnsi\"/><w:sz w:val=\"18\"/>' }))
+          /** Missing font size */
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                  '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
+                '</w:rPr>', _options), '(\'style-ffAmerican Typewriter\')');
+          assert.strictEqual(_options.htmlStylesDatabase.size, 2);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffAmerican Typewriter')), JSON.stringify({ paragraph: '', text: '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cstheme=\"minorHAnsi\"/>' }))
+          /** Missing font family */
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                  '<w:sz w:val="18"/>' +
+                '</w:rPr>', _options), '(\'style-fs18\')');
+          assert.strictEqual(_options.htmlStylesDatabase.size, 3);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-fs18')), JSON.stringify({ paragraph: '', text: '<w:sz w:val=\"18\"/>' }))
+
+          /** Colors */
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+          '<w:r>' +
+            '<w:rPr>' +
+              '<w:color w:val="FF0000"/>' +
+              '<w:highlight w:val="yellow"/>' +
+            '</w:rPr>', _options), '(\'style-tcolorFF0000-bgcoloryellow\')');
+          assert.strictEqual(_options.htmlStylesDatabase.size, 4);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-tcolorFF0000-bgcoloryellow')), JSON.stringify({ paragraph: '', text: '<w:color w:val=\"FF0000\"/><w:highlight w:val=\"yellow\"/>' }))
+        });
+      })
+
+      describe('ODT', function () {
+        it('should return an empty string if no style is included', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<office:text><text:p>{d.content:html}</text:p></office:text>', _options), '');
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
+        });
+
+        it('should return ODT paragraph style', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>', _options), '(\'style-P5\')');
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+        });
+
+        it('should return ODT text style', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          const _xmlStyle = '' +
+            '<style:style style:name="T5" style:family="text">' +
+              '<style:text-properties fo:color="#ff0000" loext:opacity="100%" style:font-name="Noteworthy" fo:font-size="16pt" fo:language="en" fo:country="US" fo:background-color="#ffff00" loext:char-shading-value="0" style:font-name-complex="Noto Sans"/>' +
+            '</style:style>';
+          helper.assert(
+            html.getTemplateDefaultStyles('<office:body><office:text><text:p text:style-name="P5"><text:span text:style-name="T5">{d.content:html}</text:span></text:p></office:text></office:body>', _options, _xmlStyle),
+            '(\'style-P5-T5\')'
+          );
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5-T5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: ' fo:color=\"#ff0000\" style:font-name=\"Noteworthy\" fo:font-size=\"16pt\" fo:background-color=\"#ffff00\" style:font-name-complex=\"Noto Sans\"' }))
+        });
+      });
+    });
+
+    describe('addHtmlDefaultStylesDatabase', function () {
+      it('should not throw an error if the database does not exist', function () {
+        html.addHtmlDefaultStylesDatabase({}, 'id', {});
       });
 
-      it('should return ODT font style', function () {
-        helper.assert(html.getFontStyle('<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>', 'odt'), '(text:style-name="P5")');
+      it('should add an element into the style database and it should not add it twice', function () {
+        let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+        let _content = { paragraph: 'test 1', text: 'test 2' }
+        html.addHtmlDefaultStylesDatabase(_options, 'style-P5-T5', _content);
+        html.addHtmlDefaultStylesDatabase(_options, 'style-P5-T5', _content);
+        assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+        assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5-T5')), JSON.stringify({ paragraph: 'test 1', text: 'test 2' }))
+      });
+    });
+
+    describe('getHtmlDefaultStylesDatabase', function () {
+      it('should not throw an error if the database does not exist and should return a valid object', function () {
+        assert.strictEqual(JSON.stringify(html.getHtmlDefaultStylesDatabase({}, 'style-P5-T5')), JSON.stringify({ paragraph: '', text: '' }))
+      });
+
+      it('should retreive an element from the style database', function () {
+        let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+        let _content = { paragraph: 'test 1', text: 'test 2' }
+        html.addHtmlDefaultStylesDatabase(_options, 'style-P5-T5', _content);
+        assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+        assert.strictEqual(JSON.stringify(html.getHtmlDefaultStylesDatabase(_options, 'style-P5-T5')), JSON.stringify({ paragraph: 'test 1', text: 'test 2' }))
       });
     });
 
@@ -706,7 +839,7 @@ describe('Dynamic HTML', function () {
   });
 
   describe('ODT reports', function () {
-    describe('preprocessODT', function () {
+    describe('preProcessODT', function () {
       it('should do nothing', () => {
         const _expectedContent = '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>';
         const _template = {
@@ -715,22 +848,31 @@ describe('Dynamic HTML', function () {
             data : '<office:body><office:text><text:p text:style-name="P5">{d.content}</text:p></office:text></office:body>'
           }]
         };
-        html.preprocessODT(_template);
+        html.preProcessODT(_template);
         helper.assert(_template.files[0].data, _expectedContent);
       });
       it('should convert html marker into a marker + post process marker [single marker]', () => {
+        const _options = {
+          extension: 'odt',
+          htmlStylesDatabase: new Map()
+        }
         const _template = {
           files : [{
             name : 'content.xml',
             data : '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>'
           }]
         };
-        const _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(text:style-name="P5")}</carbone></office:text></office:body>';
-        html.preprocessODT(_template);
+        const _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+        html.preProcessODT(_template, _options);
         helper.assert(_template.files[0].data, _expectedContent);
+        assert.strictEqual(_options.htmlStylesDatabase.size, 1);
       });
 
       it('should convert multiple html markers into a marker + post process marker [multiple markers]', () => {
+        const _options = {
+          extension: 'odt',
+          htmlStylesDatabase: new Map()
+        }
         const _template = {
           files : [{
             name : 'content.xml',
@@ -746,15 +888,16 @@ describe('Dynamic HTML', function () {
         };
         const _expectedContent = '' +
                       '<office:body>' +
-                      '<carbone>{d.value1:getHTMLContentOdt(text:style-name="P5")}</carbone>' +
+                      '<carbone>{d.value1:getHTMLContentOdt(\'style-P5\')}</carbone>' +
                       '<text:p text:style-name="P5"> {d.element}</text:p>' +
                       '<text:p text:style-name="P1"/>' +
                       '<text:p text:style-name="P5">This is some content</text:p>' +
                       '<text:p text:style-name="P1"/>' +
-                      '<carbone>{d.value3:getHTMLContentOdt(text:style-name="P3")}</carbone>' +
+                      '<carbone>{d.value3:getHTMLContentOdt(\'style-P3\')}</carbone>' +
                       '</office:body>';
-        html.preprocessODT(_template);
+        html.preProcessODT(_template, _options);
         helper.assert(_template.files[0].data, _expectedContent);
+        assert.strictEqual(_options.htmlStylesDatabase.size, 2);
       });
     });
 
@@ -800,6 +943,134 @@ describe('Dynamic HTML', function () {
           style : '' +
             '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
             '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>',
+          styleLists : ''
+        });
+      });
+
+      it('should create the content and style from an HTML descriptor and should include the style coming from the template (paragraph + text: RTL, colors, fonts)', function () {
+
+        /** Init template style, it is executed during the preprocessing */
+        const htmlDefaultStyleDatabase = new Map();
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += 'fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
+        _htmlDefaultStyleObject.paragraph += 'text:style-name="P2"';
+        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        helper.assert(html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'this', type : '', tags : [] },
+            { content : ' is a bold', type : '', tags : ['b'] },
+            { content : 'and italic', type : '', tags : ['em'] },
+            { content : ' text', type : '', tags : [] },
+          ],
+          { htmlStylesDatabase: htmlDefaultStyleDatabase },
+          _styleId /** Default style ID as a last argument */
+        ),
+        {
+          content : '' +
+            '<text:p text:style-name="P2">'+
+              '<text:span text:style-name="C010">this</text:span>'+
+              '<text:span text:style-name="C011"> is a bold</text:span>'+
+              '<text:span text:style-name="C012">and italic</text:span>'+
+              '<text:span text:style-name="C013"> text</text:span>'+
+            '</text:p>',
+          style : '' +
+            '<style:style style:name="C010" style:family="text">' +
+              '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>'+
+            '<style:style style:name="C011" style:family="text">' +
+              '<style:text-properties fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>'+
+            '<style:style style:name="C012" style:family="text">'+
+              '<style:text-properties fo:font-style="italic" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>'+
+            '<style:style style:name="C013" style:family="text">'+
+              '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>',
+          styleLists : ''
+        });
+      });
+
+      it('should create the content and style from an HTML descriptor and should include the style coming from the template (paragraph only: RTL and text alignment)', function () {
+        /** Init template style, it is executed during the preprocessing */
+        const htmlDefaultStyleDatabase = new Map();
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += ''
+        _htmlDefaultStyleObject.paragraph += 'text:style-name="P2"';
+        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        helper.assert(html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'this', type : '', tags : [] },
+            { content : ' is a bold', type : '', tags : ['b'] },
+            { content : 'and italic', type : '', tags : ['em'] },
+            { content : ' text', type : '', tags : [] },
+          ],
+          { htmlStylesDatabase: htmlDefaultStyleDatabase },
+          _styleId /** Default style ID as a last argument */
+        ),
+        {
+          content : '' +
+            '<text:p text:style-name="P2">'+
+              '<text:span>this</text:span>'+
+              '<text:span text:style-name="C011"> is a bold</text:span>'+
+              '<text:span text:style-name="C012">and italic</text:span>'+
+              '<text:span> text</text:span>'+
+            '</text:p>',
+          style : '' +
+            '<style:style style:name="C011" style:family="text">' +
+              '<style:text-properties fo:font-weight="bold"/>'+
+            '</style:style>'+
+            '<style:style style:name="C012" style:family="text">'+
+              '<style:text-properties fo:font-style="italic"/>'+
+            '</style:style>',
+          styleLists : ''
+        });
+      });
+
+      it('should create the content and style from an HTML descriptor and should include the style coming from the template (text style only: colors, fonts)', function () {
+
+        /** Init template style, it is executed during the preprocessing */
+        const htmlDefaultStyleDatabase = new Map();
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += 'fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
+        _htmlDefaultStyleObject.paragraph += '';
+        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        helper.assert(html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'this', type : '', tags : [] },
+            { content : ' is a bold', type : '', tags : ['b'] },
+            { content : 'and italic', type : '', tags : ['em'] },
+            { content : ' text', type : '', tags : [] },
+          ],
+          { htmlStylesDatabase: htmlDefaultStyleDatabase },
+          _styleId /** Default style ID as a last argument */
+        ),
+        {
+          content : '' +
+            '<text:p>'+
+              '<text:span text:style-name="C010">this</text:span>'+
+              '<text:span text:style-name="C011"> is a bold</text:span>'+
+              '<text:span text:style-name="C012">and italic</text:span>'+
+              '<text:span text:style-name="C013"> text</text:span>'+
+            '</text:p>',
+          style : '' +
+            '<style:style style:name="C010" style:family="text">' +
+              '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>'+
+            '<style:style style:name="C011" style:family="text">' +
+              '<style:text-properties fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>'+
+            '<style:style style:name="C012" style:family="text">'+
+              '<style:text-properties fo:font-style="italic" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>'+
+            '<style:style style:name="C013" style:family="text">'+
+              '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>',
           styleLists : ''
         });
       });
@@ -1233,6 +1504,38 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should create list with default font coming from the template', function () {
+        let content = '<ol><li><i>Felgen ALU</i></li><li><i>Farbe rot</i></li></ol>';
+        const _options = {
+          extension : 'odt',
+          htmlStylesDatabase: new Map()
+        };
+
+        // Prepare the style coming from the template
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += ''
+        _htmlDefaultStyleObject.paragraph += 'style:name="P2"';
+        html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
+
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options, _styleId);
+        helper.assert(res.content, '' +
+          '<text:list text:style-name="LC010">' +
+            '<text:list-item>' +
+              '<text:p style:name="P2">' +
+                '<text:span text:style-name="C012">Felgen ALU</text:span>' +
+              '</text:p>' +
+            '</text:list-item>' +
+            '<text:list-item>' +
+              '<text:p style:name="P2">' +
+                '<text:span text:style-name="C015">Farbe rot</text:span>' +
+              '</text:p>' +
+            '</text:list-item>' +
+          '</text:list>' +
+          '<text:p text:style-name="Standard"/>'
+        );
+      });
+
       it('should create a nexted list without text in the parent LI', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('' +
         '<ul>' +
@@ -1601,14 +1904,24 @@ describe('Dynamic HTML', function () {
 
       it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name + apply the previous paragraph style', () => {
         const _options = {
-          htmlDatabase : new Map()
+          htmlDatabase : new Map(),
+          extension : 'odt',
+          htmlStylesDatabase: new Map()
         };
+
+        // Prepare the style coming from the template
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += 'fo:font-style="italic" fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
+        _htmlDefaultStyleObject.paragraph += 'text:style-name="P3"';
+        html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
+
         const _content = '<em><b>This is some content</b></em>';
-        const _previousStyleParapgraph = 'text:style-name="P3"';
-        const _uniqueID = _content + _previousStyleParapgraph;
+        const _uniqueID = _content + _styleId;
         const _expected = '<text:p text:style-name="P3"><text:span text:style-name="TC00">This is some content</text:span></text:p>';
-        const _style = '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>';
-        const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content, 'text:style-name="P3"');
+        const _style = '<style:style style:name=\"TC00\" style:family=\"text\"><style:text-properties fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:color=\"#ff00ec\" style:font-name=\"American Typewriter\" fo:font-size=\"18pt\" fo:background-color=\"#00ff19\" style:font-name-complex=\"Noto Sans\"/></style:style>';
+
+        const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content, _styleId);
         const _properties = _options.htmlDatabase.get(_uniqueID);
         helper.assert(_properties, {
           content    : _expected,
@@ -1618,14 +1931,25 @@ describe('Dynamic HTML', function () {
         helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expected);
       });
 
-      it('getHtmlStyleName + getHtmlContent - should not add the same HTML content to htmlDatabase', () => {
+      it('getHtmlStyleName + getHtmlContent - should not add the same HTML content twice to htmlDatabase', () => {
         const _options = {
-          htmlDatabase : new Map()
+          htmlDatabase : new Map(),
+          extension : 'odt',
+          htmlStylesDatabase: new Map()
         };
+
+
+        // Prepare the style coming from the template
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += ''
+        _htmlDefaultStyleObject.paragraph += '';
+        html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
+
         const _content = '<em><b>This is some content</b></em>';
-        htmlFormatters.getHTMLContentOdt.call(_options, _content);
-        htmlFormatters.getHTMLContentOdt.call(_options, _content);
-        const _properties = _options.htmlDatabase.get(_content);
+        htmlFormatters.getHTMLContentOdt.call(_options, _content, _styleId);
+        // htmlFormatters.getHTMLContentOdt.call(_options, _content);
+        const _properties = _options.htmlDatabase.get(_content + _styleId);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_properties, {
           content    : '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>',
@@ -1636,10 +1960,20 @@ describe('Dynamic HTML', function () {
 
       it('getHtmlContent + hyperlink - should use the default URL_ON_ERROR link if the HTML anchor tag is invalid', () => {
         const _options = {
-          htmlDatabase : new Map()
+          htmlDatabase : new Map(),
+          extension : 'odt',
+          htmlStylesDatabase: new Map()
         };
+
+        // Prepare the style coming from the template
+        const _styleId = ''
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += ''
+        _htmlDefaultStyleObject.paragraph += '';
+        html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
+
         const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
-        htmlFormatters.getHTMLContentOdt.call(_options, _content);
+        htmlFormatters.getHTMLContentOdt.call(_options, _content, '');
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_properties, {
@@ -1651,8 +1985,18 @@ describe('Dynamic HTML', function () {
 
       it('getHtmlContent + hyperlink - should call the formatter "defaultURL" and should use the default URL_ON_ERROR link if the HTML anchor tag is invalid', () => {
         const _options = {
-          htmlDatabase : new Map()
+          htmlDatabase : new Map(),
+          extension : 'odt',
+          htmlStylesDatabase: new Map()
         };
+
+        // Prepare the style coming from the template
+        const _styleId = ''
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += ''
+        _htmlDefaultStyleObject.paragraph += '';
+        html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
+
         const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
         htmlFormatters.getHTMLContentOdt.call(_options, hyperlinksFormatters.defaultURL.call(_options, _content, 'https://carbone.io/link_on_error_test'));
         const _properties = _options.htmlDatabase.get(_content);
@@ -1692,7 +2036,11 @@ describe('Dynamic HTML', function () {
             }
           ]
         };
-        html.preProcessDocx(_template);
+        const _options = {
+          extension: 'docx',
+          htmlStylesDatabase: new Map()
+        }
+        html.preProcessDocx(_template, _options);
         helper.assert(_template.files[0].data, _expectedContent);
         helper.assert(_template.files[1].data, _expectedApp);
         helper.assert(_template.files[2].data, _expectedSettings);
@@ -1729,7 +2077,11 @@ describe('Dynamic HTML', function () {
             }
           ]
         };
-        html.preProcessDocx(_template);
+        const _options = {
+          extension: 'docx',
+          htmlStylesDatabase: new Map()
+        }
+        html.preProcessDocx(_template, _options);
         helper.assert(_template.files[0].data, _XMLexpected);
       });
 
@@ -1779,7 +2131,11 @@ describe('Dynamic HTML', function () {
             }
           ]
         };
-        html.preProcessDocx(_template);
+        const _options = {
+          extension: 'docx',
+          htmlStylesDatabase: new Map()
+        }
+        html.preProcessDocx(_template, _options);
         helper.assert(_template.files[0].data, _XMLexpected);
       });
 
@@ -1827,7 +2183,7 @@ describe('Dynamic HTML', function () {
         const _expectedXMLfooter = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:ftr>' +
-            '<carbone>{d.strikedel:getHTMLContentDocx}</carbone>' +
+            '<carbone>{d.strikedel:getHTMLContentDocx(\'style-textalignright\')}</carbone>' +
           '</w:ftr>';
         const _XMLheader = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -1862,7 +2218,11 @@ describe('Dynamic HTML', function () {
             }
           ]
         };
-        html.preProcessDocx(_template);
+        const _options = {
+          extension: 'docx',
+          htmlStylesDatabase: new Map()
+        }
+        html.preProcessDocx(_template, _options);
         helper.assert(_template.files[0].data, _expectedXMLTemplate);
         helper.assert(_template.files[1].data, _expectedXMLfooter);
         helper.assert(_template.files[2].data, _expectedXMLheader);
@@ -1897,8 +2257,8 @@ describe('Dynamic HTML', function () {
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
             '<w:body>' +
-            '<carbone>{d.mix2:getHTMLContentDocx(\'American Typewriter\', null)}</carbone>' +
-            '<carbone>{d.mix1:getHTMLContentDocx(\'Segoe Print\', null)}</carbone>' +
+              '<carbone>{d.mix2:getHTMLContentDocx(\'style-ffAmerican Typewriter\')}</carbone>' +
+              '<carbone>{d.mix1:getHTMLContentDocx(\'style-ffSegoe Print\')}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _template = {
@@ -1909,7 +2269,11 @@ describe('Dynamic HTML', function () {
             }
           ]
         };
-        html.preProcessDocx(_template);
+        const _options = {
+          extension: 'docx',
+          htmlStylesDatabase: new Map()
+        }
+        html.preProcessDocx(_template, _options);
         helper.assert(_template.files[0].data, _XMLexpected);
       });
 
@@ -1942,8 +2306,8 @@ describe('Dynamic HTML', function () {
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
             '<w:body>' +
-              '<carbone>{d.mix2:getHTMLContentDocx(null, \'18\')}</carbone>' +
-              '<carbone>{d.mix1:getHTMLContentDocx(null, \'36\')}</carbone>' +
+              '<carbone>{d.mix2:getHTMLContentDocx(\'style-fs18\')}</carbone>' +
+              '<carbone>{d.mix1:getHTMLContentDocx(\'style-fs36\')}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _template = {
@@ -1954,7 +2318,11 @@ describe('Dynamic HTML', function () {
             }
           ]
         };
-        html.preProcessDocx(_template);
+        const _options = {
+          extension: 'docx',
+          htmlStylesDatabase: new Map()
+        }
+        html.preProcessDocx(_template, _options);
         helper.assert(_template.files[0].data, _XMLexpected);
       });
 
@@ -1989,8 +2357,8 @@ describe('Dynamic HTML', function () {
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:document>' +
             '<w:body>' +
-            '<carbone>{d.mix2:getHTMLContentDocx(\'American Typewriter\', \'18\')}</carbone>' +
-            '<carbone>{d.mix1:getHTMLContentDocx(\'Segoe Print\', \'36\')}</carbone>' +
+            '<carbone>{d.mix2:getHTMLContentDocx(\'style-ffAmerican Typewriter-fs18\')}</carbone>' +
+            '<carbone>{d.mix1:getHTMLContentDocx(\'style-ffSegoe Print-fs36\')}</carbone>' +
             '</w:body>' +
           '</w:document>';
         const _template = {
@@ -2001,23 +2369,27 @@ describe('Dynamic HTML', function () {
             }
           ]
         };
-        html.preProcessDocx(_template);
+        const _options = {
+          extension: 'docx',
+          htmlStylesDatabase: new Map()
+        }
+        html.preProcessDocx(_template, _options);
         helper.assert(_template.files[0].data, _XMLexpected);
       });
 
     });
 
-    describe('buildContentDOCX', function () {
+    describe('buildXmlContentDOCX', function () {
       it('should return nothing if the descriptor is empty/undefined/null', function () {
-        helper.assert(html.buildContentDOCX([]), {content : '', listStyleAbstract : '', listStyleNum : ''});
-        helper.assert(html.buildContentDOCX(), {content : '',  listStyleAbstract : '', listStyleNum : '' });
-        helper.assert(html.buildContentDOCX(undefined), {content : '',  listStyleAbstract : '', listStyleNum : '' });
-        helper.assert(html.buildContentDOCX(null), {content : '',  listStyleAbstract : '', listStyleNum : '' });
+        helper.assert(html.buildXmlContentDOCX([]), {content : '', listStyleAbstract : '', listStyleNum : ''});
+        helper.assert(html.buildXmlContentDOCX(), {content : '',  listStyleAbstract : '', listStyleNum : '' });
+        helper.assert(html.buildXmlContentDOCX(undefined), {content : '',  listStyleAbstract : '', listStyleNum : '' });
+        helper.assert(html.buildXmlContentDOCX(null), {content : '',  listStyleAbstract : '', listStyleNum : '' });
       });
 
 
       it('should return nothing if the descriptor has only 1 element', function () {
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX([{ content : 'text', type : '', tags : ['b'] }]);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX([{ content : 'text', type : '', tags : ['b'] }]);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -2039,7 +2411,7 @@ describe('Dynamic HTML', function () {
         //   { content: ' thit is some text', tags: [] },
         //   { content: '#PE#', tags: [ ] }
         // ]
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -2065,7 +2437,7 @@ describe('Dynamic HTML', function () {
         //   { content: '#PE#', tags: [ ] },
         //   { content: 'John', tags: ['i'] }
         // ]
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -2088,7 +2460,7 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it('should convert HTML to DOCX xml 2 WITH A DEFAULT FONT FAMILY', function () {
+      it('should convert HTML to DOCX xml 2 WITHOUT DEFAULT STYLE ON THE TEMPLATE', function () {
         let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i>');
         // _descriptor = [
         //   { content: '#PB#', tags: [] },
@@ -2097,57 +2469,30 @@ describe('Dynamic HTML', function () {
         //   { content: '#PE#', tags: [ ] },
         //   { content: 'John', tags: ['i'] }
         // ]
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, {}, 'Segoe Print'); // FONT AS A LAST ARGUMENT
-        helper.assert(listStyleAbstract, '');
-        helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
-        '<w:p>'+
-          '<w:r>'+
-            '<w:rPr><w:b/><w:bCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/></w:rPr>'+
-            '<w:t xml:space="preserve">Hello</w:t>'+
-          '</w:r>'+
-          '<w:r>'+
-            '<w:rPr><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/></w:rPr>' +
-            '<w:t xml:space="preserve"> thit is some text</w:t>' +
-          '</w:r>'+
-        '</w:p>' +
-        '<w:p/>' +
-        '<w:p>'+
-          '<w:r>'+
-            '<w:rPr><w:i/><w:iCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/></w:rPr>'+
-            '<w:t xml:space="preserve">John</w:t>'+
-          '</w:r>'+
-        '</w:p>'
-        );
-      });
 
-      it('should convert HTML to DOCX xml 2 WITH A DEFAULT FONT SIZE', function () {
-        let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i>');
-        // _descriptor = [
-        //   { content: '#PB#', tags: [] },
-        //   { content: 'Hello', tags: ['strong'] },
-        //   { content: ' thit is some text', tags: [] },
-        //   { content: '#PE#', tags: [ ] },
-        //   { content: 'John', tags: ['i'] }
-        // ]
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, {}, 'null', '18'); // FONT AS A LAST ARGUMENT
+        /** Init template style, it is executed during the preprocessing */
+        const htmlDefaultStyleDatabase = new Map();
+        const _styleId = 'styleId'
+        htmlDefaultStyleDatabase.set(_styleId, html.templateDefaultStyles)
+
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId); // FONT AS A LAST ARGUMENT
+
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
         '<w:p>'+
           '<w:r>'+
-            '<w:rPr><w:b/><w:bCs/><w:sz w:val="18"/></w:rPr>'+
+            '<w:rPr><w:b/><w:bCs/></w:rPr>'+
             '<w:t xml:space="preserve">Hello</w:t>'+
           '</w:r>'+
           '<w:r>'+
-            '<w:rPr><w:sz w:val="18"/></w:rPr>' +
             '<w:t xml:space="preserve"> thit is some text</w:t>' +
           '</w:r>'+
         '</w:p>' +
         '<w:p/>' +
         '<w:p>'+
           '<w:r>'+
-            '<w:rPr><w:i/><w:iCs/><w:sz w:val="18"/></w:rPr>'+
+            '<w:rPr><w:i/><w:iCs/></w:rPr>'+
             '<w:t xml:space="preserve">John</w:t>'+
           '</w:r>'+
         '</w:p>'
@@ -2155,7 +2500,7 @@ describe('Dynamic HTML', function () {
       });
 
 
-      it('should convert HTML to DOCX xml 2 WITH A DEFAULT FONT SIZE and FONT FAMILY', function () {
+      it('should convert HTML to DOCX xml 2 WITH A ONLY A FONT SIZE and FONT FAMILY', function () {
         let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i>');
         // _descriptor = [
         //   { content: '#PB#', tags: [] },
@@ -2164,7 +2509,16 @@ describe('Dynamic HTML', function () {
         //   { content: '#PE#', tags: [ ] },
         //   { content: 'John', tags: ['i'] }
         // ]
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, {}, 'Segoe Print', '18'); // FONT AS A LAST ARGUMENT
+
+        /** Init template style, it is executed during the preprocessing */
+        const htmlDefaultStyleDatabase = new Map();
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>'
+        _htmlDefaultStyleObject.text += '<w:sz w:val="18"/>';
+        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId); // FONT AS A LAST ARGUMENT
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -2188,6 +2542,74 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should convert HTML to DOCX xml 2 WITH A DEFAULT FONT SIZE, FONT FAMILY, RTL text, centered text, and colors', function () {
+        let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i>');
+        // _descriptor = [
+        //   { content: '#PB#', tags: [] },
+        //   { content: 'Hello', tags: ['strong'] },
+        //   { content: ' thit is some text', tags: [] },
+        //   { content: '#PE#', tags: [ ] },
+        //   { content: 'John', tags: ['i'] }
+        // ]
+
+        /** Init template style, it is executed during the preprocessing */
+        const htmlDefaultStyleDatabase = new Map();
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>'
+        _htmlDefaultStyleObject.text += '<w:sz w:val="18"/>';
+        _htmlDefaultStyleObject.text += '<w:color w:val="FF0000"/>'
+        _htmlDefaultStyleObject.text += '<w:highlight w:val="yellow"/>'
+        _htmlDefaultStyleObject.paragraph = '<w:bidi/><w:jc w:val="center"/>'
+        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId); // FONT AS A LAST ARGUMENT
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content, '' +
+        '<w:p>'+
+          '<w:pPr>'+
+            '<w:bidi/><w:jc w:val="center"/>'+
+          '</w:pPr>'+
+          '<w:r>'+
+            '<w:rPr>'+
+              '<w:b/><w:bCs/>' +
+              '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>' +
+              '<w:sz w:val="18"/>' +
+              '<w:color w:val="FF0000"/>' +
+              '<w:highlight w:val="yellow"/>' +
+            '</w:rPr>'+
+            '<w:t xml:space="preserve">Hello</w:t>'+
+          '</w:r>'+
+          '<w:r>'+
+            '<w:rPr>'+
+              '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>' +
+              '<w:sz w:val="18"/>' +
+              '<w:color w:val="FF0000"/>' +
+              '<w:highlight w:val="yellow"/>' +
+            '</w:rPr>'+
+            '<w:t xml:space="preserve"> thit is some text</w:t>' +
+          '</w:r>'+
+        '</w:p>' +
+        '<w:p/>' +
+        '<w:p>'+
+          '<w:pPr>'+
+            '<w:bidi/><w:jc w:val="center"/>'+
+          '</w:pPr>'+
+          '<w:r>'+
+            '<w:rPr>'+
+              '<w:i/><w:iCs/>' +
+              '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>' +
+              '<w:sz w:val="18"/>' +
+              '<w:color w:val="FF0000"/>' +
+              '<w:highlight w:val="yellow"/>' +
+            '</w:rPr>'+
+            '<w:t xml:space="preserve">John</w:t>'+
+          '</w:r>'+
+        '</w:p>'
+        );
+      });
+
       it('should convert HTML to DOCX xml 3', function () {
         let _descriptor = html.parseHTML('<p><strong>Hello</strong> thit is some text</p><i>John</i> green blue red');
         // _descriptor = [
@@ -2198,7 +2620,7 @@ describe('Dynamic HTML', function () {
         //   { content: 'John', tags: ['i'] },
         //   { content: ' green blue red', tags: [ ] },
         // ]
-        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -2233,7 +2655,7 @@ describe('Dynamic HTML', function () {
         //   { content: ' thit is some text', tags: [] },
         //   { content: '#PE#', tags: [ ] },
         // ]
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -2284,7 +2706,7 @@ describe('Dynamic HTML', function () {
         //     tags: [ ]
         //   },
         // ]
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -2306,7 +2728,7 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 5', function () {
         let _descriptor = html.parseHTML('<p><strong><p>Professional Accreditation</p></strong></p><p><em>La <p>Trobes</p></em></p>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -2333,7 +2755,7 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 6 string followed by a list', function () {
         let _descriptor = html.parseHTML('You’ll learn<ul><li>Understand</li></ul>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(content, '' +
           '<w:p>'+
             '<w:r>'+
@@ -2378,7 +2800,7 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 7: simple unordered list', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(content, '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
@@ -2407,13 +2829,22 @@ describe('Dynamic HTML', function () {
         '</w:num>');
       });
 
-      it('should convert HTML to DOCX xml 7: simple unordered list WITH A FONT', function () {
+      it('should convert HTML to DOCX xml 7: simple unordered list WITH A FONT AND RTL', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, {}, 'American Typewriter');
+
+        // set style
+        const htmlDefaultStyleDatabase = new Map();
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        const _styleId = 'styleID'
+        _htmlDefaultStyleObject.paragraph = '<w:bidi/>'
+        _htmlDefaultStyleObject.text += '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/>'
+        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId);
         helper.assert(content, '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
         );
         helper.assert(listStyleAbstract, '' +
         '<w:abstractNum w:abstractNumId="1000">' +
@@ -2440,7 +2871,7 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 8: NESTED LIST 1 level', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea</li></ul></li><li>Milk</li></ul>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(content, '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
@@ -2485,7 +2916,7 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 8: NESTED LIST 1 level but without text in the "li" attribute', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><ul><li>Black tea</li><li>Green tea</li></ul><li>Milk</li></ul>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(content, '' +
                     '<w:p>'+
                       '<w:pPr>'+
@@ -2572,7 +3003,7 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 9: NESTED LIST 3 level', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><ul><li>Soft Green</li><li>light Green</li></ul></ul></li></ul></li><li>Milk</li></ul>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(content, '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
@@ -2644,7 +3075,7 @@ describe('Dynamic HTML', function () {
       });
 
       it('should generate a simple ordered list', function () {
-        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>Coffee</li><li>Tea</li><li>Milk</li></ol>'));
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li>Coffee</li><li>Tea</li><li>Milk</li></ol>'));
         helper.assert(content, '' +
           '<w:p>' +
             '<w:pPr>' +
@@ -2703,7 +3134,7 @@ describe('Dynamic HTML', function () {
       });
 
       it('should generate 3 different list and should generate the corresponding list style for numbering.xml', function () {
-        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>Coffee</li></ol><ul><li>Tea</li></ul><ol><li>Milk</li></ol>'));
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li>Coffee</li></ol><ul><li>Tea</li></ul><ol><li>Milk</li></ol>'));
         helper.assert(content, '' +
           '<w:p>' +
             '<w:pPr>' +
@@ -2799,7 +3230,7 @@ describe('Dynamic HTML', function () {
       });
 
       it('should create nested list at the same level and should not create extra style of the list', function () {
-        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>Hello<ul><li>Tea</li></ul></li><li>Hello2<ul><li>Tea</li></ul></li></ol>'));
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li>Hello<ul><li>Tea</li></ul></li><li>Hello2<ul><li>Tea</li></ul></li></ol>'));
         helper.assert(content, '' +
         '<w:p>' +
           '<w:pPr>' +
@@ -2878,7 +3309,7 @@ describe('Dynamic HTML', function () {
 
       it('should create nested list without text on the first element', function () {
         // eslint-disable-next-line no-unused-vars
-        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li><ol><li>Tea</li></ol></li></ol>'));
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li><ol><li>Tea</li></ol></li></ol>'));
         helper.assert(content, '' +
           '<w:p>' +
             '<w:pPr>' +
@@ -2905,7 +3336,7 @@ describe('Dynamic HTML', function () {
 
       it('should create nested list with text on the first element and a break line', function () {
         // eslint-disable-next-line no-unused-vars
-        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ol><li>This is some content<br/><ol><li>Tea</li></ol></li></ol>'));
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li>This is some content<br/><ol><li>Tea</li></ol></li></ol>'));
         helper.assert(content, '' +
           '<w:p>' +
             '<w:pPr>' +
@@ -2938,7 +3369,7 @@ describe('Dynamic HTML', function () {
 
       it('should create nested list with text on the first element and a break line', function () {
         // eslint-disable-next-line no-unused-vars
-        let { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML('<ul><li><p>The introduction</p></li></ul>'));
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ul><li><p>The introduction</p></li></ul>'));
         helper.assert(content, '' +
           '<w:p>' +
             '<w:pPr>' +
@@ -2971,7 +3402,7 @@ describe('Dynamic HTML', function () {
             '</a>' +
           '</li>' +
         '</ul>';
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(html.parseHTML(htmlContent), _options);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML(htmlContent), _options);
         helper.assert(content, '' +
         '<w:p>'+
           '<w:pPr>'+
@@ -3060,7 +3491,7 @@ describe('Dynamic HTML', function () {
 
       it('should convert HTML to DOCX xml 11', function () {
         const _descriptor = html.parseHTML('You will learn<br />');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(content, '<w:p><w:r><w:t xml:space="preserve">You will learn</w:t></w:r><w:r><w:br/></w:r></w:p>');
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
@@ -3071,7 +3502,7 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -3094,7 +3525,7 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io"><p>Carbone Website</p></a>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -3117,7 +3548,7 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone<br>Website</a>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -3147,7 +3578,7 @@ describe('Dynamic HTML', function () {
           hyperlinkDatabase : new Map()
         };
         const _descriptor = html.parseHTML('<a href="carbone.io">Carbone Website</a><p><a href="carbone.io/documentation.html">Carbone Documentation</a></p><a href="carbone.io">Carbone Site Again</a>');
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor, _options);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '' +
@@ -3188,7 +3619,7 @@ describe('Dynamic HTML', function () {
           { content : 'bold', type : '', tags : ['b'] },
           { content : 'and italic', type : '', tags : ['em'] }
         ];
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content,
@@ -3216,7 +3647,7 @@ describe('Dynamic HTML', function () {
           { content : 'and italic', type : '', tags : ['em'] },
           { content : ' text', type : '', tags : [] },
         ];
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '<w:p>'+
@@ -3254,7 +3685,7 @@ describe('Dynamic HTML', function () {
           { content : 'text', type : '', tags : ['div', 'b', 's'] },
           { content : '.', type : '', tags : [] },
         ];
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content,
@@ -3316,7 +3747,7 @@ describe('Dynamic HTML', function () {
           { content : '', type : '#break#', tags : [] },
           { content : 'a tree', type : '', tags : ['i'] },
         ];
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content, '<w:p>'+
@@ -3353,7 +3784,7 @@ describe('Dynamic HTML', function () {
           { content : '', type : '#break#', tags : [] },
           { content : '.', type : '', tags : [] }
         ];
-        const { content, listStyleAbstract, listStyleNum } = html.buildContentDOCX(_descriptor);
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content,
@@ -3495,12 +3926,23 @@ describe('Dynamic HTML', function () {
           listStyleAbstract : '',
           listStyleNum      : ''
         };
+
         const _options = {
-          htmlDatabase : new Map()
+          htmlDatabase : new Map(),
+          extension: 'docx',
+          htmlStylesDatabase: new Map()
         };
+
+        // Prepare the style coming from the template
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cs=\"American Typewriter\" w:eastAsia=\"American Typewriter\"/>'
+        _htmlDefaultStyleObject.paragraph += '';
+        html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
+
         const _content = '<strong>This is some content</strong>';
-        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content, 'American Typewriter');
-        const _properties = _options.htmlDatabase.get(_content + 'American Typewriter');
+        const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content, _styleId);
+        const _properties = _options.htmlDatabase.get(_content + _styleId);
         helper.assert(_properties, _expected);
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
@@ -3955,6 +4397,18 @@ describe('Dynamic HTML', function () {
       it('should do nothing if the HTML content does not contain HTML entities', function () {
         const _content = '<div>This is an <b>apple</b> and <i>strawberry</i>.</div>';
         helper.assert(html.convertHTMLEntities(_content), _content);
+      });
+      it('should not crash if html does not contain a string', function () {
+        helper.assert(html.convertHTMLEntities(true), 'true');
+        helper.assert(html.convertHTMLEntities(false), 'false');
+        helper.assert(html.convertHTMLEntities(undefined), '');
+        helper.assert(html.convertHTMLEntities(null), '');
+        helper.assert(html.convertHTMLEntities([]), '');
+        helper.assert(html.convertHTMLEntities({}), '');
+        helper.assert(html.convertHTMLEntities(12233), '12233');
+        helper.assert(html.convertHTMLEntities(12.33), '12.33');
+        helper.assert(html.convertHTMLEntities(0), '0');
+        helper.assert(html.convertHTMLEntities(-1), '-1');
       });
 
       it('should keep html entities that are supported by XML format: <>\'"&', function () {

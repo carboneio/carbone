@@ -1,5 +1,22 @@
 const bwipjs = require('bwip-js');
 
+const REG_HEXA_COLOR = /^#?[0-9A-F]{6}$/i;
+const CHECK_BARCODE_OPTIONS_VALUE = {
+  'width': (value) => !isNaN(value) && parseInt(value) > 0, // width as millimeters
+  'height': (value) => !isNaN(value) && parseInt(value) > 0, // height as millimeters
+  'scale': (value) => !isNaN(value) && parseInt(value) > 0 && parseInt(value) <= 10,
+  'includetext': (value) => ['true', 'false'].includes(value), // Show the barcode value
+  'textsize': (value) => !isNaN(value) && parseInt(value) > 0, // The font size of the text in points.
+  'textxalign': (value) => ['left', 'center', 'right', 'justify'].includes(value),
+  'textyalign': (value) => ['below', 'center', 'above'].includes(value),
+  'rotate': (value) => /^[NRLI]{1}$/i.test(value),
+  'barcolor': (value) => REG_HEXA_COLOR.test(value),
+  'textcolor': (value) => REG_HEXA_COLOR.test(value),
+  'backgroundcolor': (value) => REG_HEXA_COLOR.test(value),
+  // ONLY FOR QRCODE, Micro QR Code, GS1 QR Code, HIBC QR Code, or Swiss QR Code
+  'eclevel': (value) =>  /^[LMQH]{1}$/i.test(value) // L = Low, M = Medium (Default), Q = Quality, H = High
+}
+
 let barcodesMethods = new Map();
 barcodesMethods.set('ean13', _ean13);
 barcodesMethods.set('ean8', _ean8);
@@ -313,9 +330,33 @@ function barcode (data, type) {
   }
   this.isBarcodeImage = false;
 
-  // BARCODE as an IMAGE - New system
+  // BARCODE as an IMAGE
+  let _options = {}
+  const _args = [...arguments];
+  // parse options
+  for (i = 2; i < _args.length; i++) {
+    // Each options should have the format "width:10".
+    // The option is already clean without extra space.
+    const _barcodeOption = _args[i].split(':');
+    // Check if the option exists and the value is valid
+    if (_barcodeOption.length == 2 &&
+        Object.prototype.hasOwnProperty.call(CHECK_BARCODE_OPTIONS_VALUE, _barcodeOption[0]) &&
+        CHECK_BARCODE_OPTIONS_VALUE[_barcodeOption[0]](_barcodeOption[1]) === true) {
+      // If the option is an hexadecimal color beginning with an hashtag '#', it must be removed for bwipjs, otherwhise the color is not considered
+      if ((_barcodeOption[0] === 'barcolor' || _barcodeOption[0] === 'backgroundcolor' || _barcodeOption[0] === 'textcolor') && _barcodeOption[1][0] === "#") {
+        _barcodeOption[1] = _barcodeOption[1].slice(1);
+      }
+      // If the option is "rotate", the option must be uppercase
+      if (_barcodeOption[0] === 'rotate' || _barcodeOption[0] === 'eclevel') {
+        _barcodeOption[1] = _barcodeOption[1].toUpperCase();
+      }
+      // If it is a boolean as a string, convert into a real boolean, otherwhise return the string value. bwipjs takes numbers as strings
+      _options[_barcodeOption[0]] = _barcodeOption[1] === 'true' ? true : (_barcodeOption[1] === 'false' ? false : _barcodeOption[1]);
+    }
+  }
+
   try {
-    return JSON.stringify({bcid : type, text : data });
+    return JSON.stringify({bcid : type, text : data, ..._options });
   }
   catch (err) {
     return '';

@@ -8,12 +8,13 @@ const carboneConfig = {
 };
 
 const carboneRenderObj = {
-  data         : {},
-  complement   : {},
-  enum         : {},
-  translations : {},
-  convertTo    : 'pdf',
-  lang         : 'en-US'
+  data          : {},
+  complement    : {},
+  enum          : {},
+  translations  : {},
+  isDebugActive : true,
+  convertTo     : 'pdf',
+  lang          : 'en-US'
 };
 
 const currentTemplate = {
@@ -98,6 +99,23 @@ function watchTemplate (currentLastModified, fileHandle) {
   }, 1000);
 }
 
+// fastest way to check if an object is mepty
+function isObjectEmpty (obj) {
+  for (var i in obj) {
+    return false;
+  }
+  return true;
+}
+// use Carbone debug feature to generate data from template
+function generateFakeDataIfEmpty (fakeData, fakeComplement) {
+  if  ( (!carboneRenderObj.data    || isObjectEmpty(carboneRenderObj.data)    === true)
+    &&  (!carboneRenderObj.options || isObjectEmpty(carboneRenderObj.options) === true) ) {
+    carboneRenderObj.data = fakeData;
+    carboneRenderObj.complement = fakeComplement;
+    editor.set(carboneRenderObj[codeEditor.activePan]);
+  }
+}
+
 // This function is used directly in html to change panel (enum, data, complement, etc...)
 // eslint-disable-next-line
 function changePan (newPanNode, newActiveEditorPan) {
@@ -147,6 +165,9 @@ async function refreshRender () {
 
   if (result.success) {
     const _url = `${carboneConfig.apiUrl}/render/${result.data.renderId}`;
+    if (result.data.debug && result.data.debug.sample) {
+      generateFakeDataIfEmpty(result.data.debug.sample.data, result.data.debug.sample.complement);
+    }
     // direct preview in browser if pdf
     if (carboneRenderObj.convertTo === 'pdf') {
       pdfviewer.data = _url;

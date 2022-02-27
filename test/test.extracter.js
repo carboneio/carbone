@@ -2976,6 +2976,74 @@ describe('extracter', function () {
       helper.assert(extracter.parseFormatter('format(toto:\'1 sdsd, 2\', bibi:12)') , { str : 'format', args : ['toto:\'1 sdsd, 2', 'bibi:12']});
     });
   });
+
+  describe('generateDataFromMarker', function () {
+    it('should build fake data using the descriptor', function () {
+      var _markers = {
+        d : {
+          name     : 'd',
+          type     : 'object',
+          parent   : '',
+          parents  : [],
+          xmlParts : [
+            {attr : 'site', formatters : [], obj : 'd', pos : 20, posOrigin : 20}
+          ]
+        },
+        dmenu : {
+          name      : 'menu',
+          type      : 'array',
+          parent    : 'd',
+          parents   : ['d'],
+          position  : { start : 1, end : 50 },
+          iterators : [{ attr : 'i' }],
+          xmlParts  : [
+            {attr : 'id'  , formatters : [], obj : 'dmenu', pos : 1, posOrigin : 1},
+            {attr : 'cars', formatters : [], obj : 'dmenu', pos : 10, posOrigin : 10}
+          ]
+        },
+        dproduct : {
+          name     : 'product',
+          type     : 'object',
+          parent   : 'd',
+          parents  : ['d'],
+          xmlParts : [
+            {attr : 'id', formatters : [], obj : 'dproduct', pos : 30, posOrigin : 30}
+          ]
+        },
+        // eslint-disable-next-line
+        dmenumenuElementi__0 : {
+          name      : 'menuElement',
+          type      : 'objectInArray',
+          parent    : 'dmenu',
+          parents   : ['d', 'dmenu'],
+          position  : {},
+          iterators : [],
+          xmlParts  : [{
+            attr       : 'id',
+            formatters : [],
+            obj        : 'dmenumenuElementi__0',
+            pos        : 40,
+            posOrigin  : 40
+          }],
+          conditions : [
+            { left : { parent : 'dmenumenuElementi__0', attr : 'i' }, operator : '==', right : '0' }
+          ]
+        }
+      };
+      let _res = extracter.generateDataFromMarker(_markers);
+      helper.assert(_res.d, {
+        site : 'site0',
+        menu : [{
+          id          : 'id1',
+          cars        : 'cars2',
+          menuElement : [ { id : 'id4' } ]
+        }],
+        product : {
+          id : 'id3'
+        }
+      });
+    });
+  });
 });
 
 

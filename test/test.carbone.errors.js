@@ -31,6 +31,7 @@ describe('Carbone error management', function () {
       done();
     });
   });
+  // TODO test with bindColor which adds [i] in repeated section i+1
   it.skip('should return an error when an attribute is used like an object and an array in the same time. But the object is used after the array', function (done) {
     const _xml    = '<xml> <p> {d.myArray[i].id} <b/> {d.myArray[i+1].id} </p> </xml> <p> {d.myArray.o} </p> ';
     const _data = { myArray : [{id : 1, o : 'a'}, {id : 2, o : 'b'}] };

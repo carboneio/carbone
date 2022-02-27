@@ -106,17 +106,16 @@ function arrayMap (d, objSeparator, attributeSeparator) {
  *
  * Usage example: `d[i].id:count()` will print a counter of the current row no matter the value of `id`
  *
+ * This formatter is replaced internally by `:cumCount` since version v4.0.0
+ *
  * @version 1.1.0
  *
  * @param   {String}  d       Array passed by carbone
  * @param   {String}  start   Number to start with (default: 1)
  * @return  {String}          Counter value
  */
-function count (d, loopId, start) {
-  if (start === undefined) {
-    start = 1;
-  }
-  return '__COUNT_' + loopId + '_' + start + '__';
+function count () {
+  return ''; // replaced by cumCount
 }
 
 module.exports = {

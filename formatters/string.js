@@ -191,6 +191,7 @@ function convCRLF (d) {
 }
 // this formatter is separately to inject code
 convCRLF.canInjectXML = true;
+convCRLF.isExecutionNotConditionnalyExecuted;
 
 /**
  * Slice a string with a begin and an end
@@ -286,6 +287,10 @@ function prepend (d, toPrepend) {
   return toPrepend + d;
 }
 
+function append (d, append) {
+  return d + '' + append;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -300,5 +305,6 @@ module.exports = {
   padl      : padl,
   padr      : padr,
   md5       : md5,
-  prepend   : prepend
+  prepend   : prepend,
+  append    : append
 };

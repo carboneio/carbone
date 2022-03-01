@@ -419,10 +419,39 @@ describe('helper', function () {
     after(function () {
       helper.rmDirRecursive(_testDir);
     });
+
+    it('should check if the license is valid from the license params (CLI or ENV)', function (done) {
+      const _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      const _path = path.join(_testDir, 'acme_2020-10-10.carbone-license');
+      generateLicense(_path, 123, 'carbone-ee-on-premise', 1000, privKey, _data);
+      let _license = '';
+      try {
+        _license = fs.readFileSync(_path).toString();
+      } catch(err) {
+        helper.assert(err, null);
+      }
+      helper.findCheckLicense({ license: _license }, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, true);
+        helper.assert(message, 'Valid license ');
+        helper.assert(payload.data.plan, 'eternity');
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+
     it('should read a directory and check if the license is valid', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, privKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, true);
+        helper.assert(message, 'Valid license acme_2020-10-10.carbone-license');
+        helper.assert(payload.data.plan, 'eternity');
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+    it('should read a directory and check if the license is valid', function (done) {
+      let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
+      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, privKey, _data);
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, true);
         helper.assert(message, 'Valid license acme_2020-10-10.carbone-license');
         helper.assert(payload.data.plan, 'eternity');
@@ -433,7 +462,7 @@ describe('helper', function () {
         even if this expiration date is in the future. It happens if the client cheat system clock', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 100, privKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license. Check system clock. acme_2020-10-10.carbone-license');
         helper.assert(payload.data.plan, 'eternity');
@@ -443,7 +472,7 @@ describe('helper', function () {
     it('should be a valid license (eternity plan) if the publication date of Carbone is older than license expiration date, even if expiration date is in the past', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', -1000, privKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, true);
         helper.assert(message, 'WARNING: Your license acme_2020-10-10.carbone-license has expired. Carbone-ee sill works but without support & updates');
         helper.assert(payload.data.plan, 'eternity');
@@ -453,7 +482,7 @@ describe('helper', function () {
     it('should be an invalid license (eternity plan) if the publication date of Carbone is newer than license expiration date', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', -1000, privKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
         helper.assert(payload.data.plan, 'eternity');
@@ -463,7 +492,7 @@ describe('helper', function () {
     it('should be an invalid license (not eternity plan) if expiration date is in the past', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'other' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', -1000, privKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
         helper.assert(payload, undefined);
@@ -473,7 +502,7 @@ describe('helper', function () {
     it('should be a valid trial license', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'trial' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, privKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, true);
         helper.assert(message, 'Trial license acme_2020-10-10.carbone-license');
         helper.assert(payload.data.plan, 'trial');
@@ -483,7 +512,7 @@ describe('helper', function () {
     it('should be a invalid trial license if the signature is incorrect', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'trial' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 1000, badPrivKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
         helper.assert(payload, undefined);
@@ -493,7 +522,7 @@ describe('helper', function () {
     it('should be a invalid trial license if the audience is incorrect', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'trial' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee', 1000, privKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license (not for carbone-ee-on-premise) acme_2020-10-10.carbone-license');
         helper.assert(payload, undefined);
@@ -503,7 +532,7 @@ describe('helper', function () {
     it('should be an invalid license if the signature is not correct even if the plan is eternity and the license expiration date is before carbone package date', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', -1000, badPrivKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
         helper.assert(payload, undefined);
@@ -513,7 +542,7 @@ describe('helper', function () {
     it('should be an invalid license if the signature is not correct even if the plan is eternity and the expiration date is after carbone package date', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
         helper.assert(payload, undefined);
@@ -526,7 +555,7 @@ describe('helper', function () {
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
       generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 5000, privKey   , _data);
       generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 5000, badPrivKey   , _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, true);
         helper.assert(message, 'Valid license file.carbone-license');
         helper.assert(payload.data.plan, 'eternity');
@@ -539,15 +568,17 @@ describe('helper', function () {
       generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 5000, privKey   , _data);
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
       generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
         helper.assert(payload, undefined);
         done();
       }, '2020-12-29T15:47:12.636Z');
     });
+
+
     it('should return an error if the directory does not contain a license', function (done) {
-      helper.findCheckLicense(_testDir, pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(/No/.test(message), true);
         helper.assert(payload, undefined);
@@ -555,7 +586,41 @@ describe('helper', function () {
       }, '2020-12-29T15:47:12.636Z');
     });
     it('should return an error if the directory does exists', function (done) {
-      helper.findCheckLicense(path.join(__dirname, 'sdqdazlzedz'), pubKey, (isValid, message, payload) => {
+      helper.findCheckLicense({ licenseDir: path.join(__dirname, 'sdqdazlzedz')}, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(/Cannot/.test(message), true);
+        helper.assert(payload, undefined);
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+    it('should return an error if the licenseDir Option is missing or not correct', function (done) {
+      helper.findCheckLicense({ licenseDir: undefined }, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(/Cannot/.test(message), true);
+        helper.assert(payload, undefined);
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+
+    it('should return an error if the license option is not correct', function (done) {
+      helper.findCheckLicense({ license: 'THIS IS NOT CORRECT' }, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(/Invalid license/.test(message), true);
+        helper.assert(payload, undefined);
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+
+    it('should return an error if the license option is missing or not correct', function (done) {
+      helper.findCheckLicense({ license: undefined }, pubKey, (isValid, message, payload) => {
+        helper.assert(isValid, false);
+        helper.assert(/Cannot/.test(message), true);
+        done();
+      }, '2020-12-29T15:47:12.636Z');
+    });
+
+    it('should return an error if the license and licenseDir options are missing', function (done) {
+      helper.findCheckLicense({ }, pubKey, (isValid, message, payload) => {
         helper.assert(isValid, false);
         helper.assert(/Cannot/.test(message), true);
         helper.assert(payload, undefined);

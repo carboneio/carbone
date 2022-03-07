@@ -28,6 +28,7 @@
     - change report language
     - fix firefox template upload
     - fix memory leak
+    - Now it works on Safari, without hot-reloading of the template
 
   - Formatters managements has been completly rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters:
     - TODO (finish) A single quote can be escaped using the single quote twice: `anyFormatter(' one parameter with escaped quote ''   ', ' a second '' one with ')`

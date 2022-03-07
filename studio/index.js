@@ -2,6 +2,10 @@
 
 const NATIVE_FILE_SYSTEM_IS_ACTIVE = 'showOpenFilePicker' in window;
 
+function isSafari () {
+  return /apple/i.test(navigator.vendor);
+}
+
 const carboneConfig = {
   apiVersion : 2,
   apiUrl     : window.location.origin
@@ -50,6 +54,10 @@ editor.set({});
 // PDF Viewer
 const pdfviewer = document.getElementById('pdfviewerobject');
 pdfviewer.data = '';
+if (!isSafari()) {
+  // Safari is buggy when this property is set
+  pdfviewer.type = 'application/pdf';
+}
 
 // Drag and drop
 const holder = document.getElementById('dropContainer');

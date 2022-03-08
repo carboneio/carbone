@@ -775,7 +775,10 @@ describe('Webserver', () => {
           const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
           helper.assert(data.data.debug, {
-            markers : ['{d.firstname}', '{d.lastname}']
+            markers : ['{d.firstname}', '{d.lastname}'],
+            sample  : {
+              data : { firstname : 'firstname0', lastname : 'lastname1'}
+            }
           });
           toDelete.push(data.data.renderId);
           done();

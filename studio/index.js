@@ -2,18 +2,23 @@
 
 const NATIVE_FILE_SYSTEM_IS_ACTIVE = 'showOpenFilePicker' in window;
 
+function isSafari () {
+  return /apple/i.test(navigator.vendor);
+}
+
 const carboneConfig = {
   apiVersion : 2,
   apiUrl     : window.location.origin
 };
 
 const carboneRenderObj = {
-  data         : {},
-  complement   : {},
-  enum         : {},
-  translations : {},
-  convertTo    : 'pdf',
-  lang         : 'en-US'
+  data          : {},
+  complement    : {},
+  enum          : {},
+  translations  : {},
+  isDebugActive : true,
+  convertTo     : 'pdf',
+  lang          : 'en-US'
 };
 
 const currentTemplate = {
@@ -49,6 +54,10 @@ editor.set({});
 // PDF Viewer
 const pdfviewer = document.getElementById('pdfviewerobject');
 pdfviewer.data = '';
+if (!isSafari()) {
+  // Safari is buggy when this property is set
+  pdfviewer.type = 'application/pdf';
+}
 
 // Drag and drop
 const holder = document.getElementById('dropContainer');
@@ -96,6 +105,23 @@ function watchTemplate (currentLastModified, fileHandle) {
       addTemplateAndRender(_newFile);
     }
   }, 1000);
+}
+
+// fastest way to check if an object is mepty
+function isObjectEmpty (obj) {
+  for (var i in obj) {
+    return false;
+  }
+  return true;
+}
+// use Carbone debug feature to generate data from template
+function generateFakeDataIfEmpty (fakeData, fakeComplement) {
+  if  ( (!carboneRenderObj.data    || isObjectEmpty(carboneRenderObj.data)    === true)
+    &&  (!carboneRenderObj.options || isObjectEmpty(carboneRenderObj.options) === true) ) {
+    carboneRenderObj.data = fakeData;
+    carboneRenderObj.complement = fakeComplement;
+    editor.set(carboneRenderObj[codeEditor.activePan]);
+  }
 }
 
 // This function is used directly in html to change panel (enum, data, complement, etc...)
@@ -147,6 +173,9 @@ async function refreshRender () {
 
   if (result.success) {
     const _url = `${carboneConfig.apiUrl}/render/${result.data.renderId}`;
+    if (result.data.debug && result.data.debug.sample) {
+      generateFakeDataIfEmpty(result.data.debug.sample.data, result.data.debug.sample.complement);
+    }
     // direct preview in browser if pdf
     if (carboneRenderObj.convertTo === 'pdf') {
       pdfviewer.data = _url;

@@ -1238,7 +1238,7 @@ describe('parser', function () {
         part2Start : {tag : 'br', pos : 10, selfClosing : true}
       };
       var _expectedRange = {startEven : 5,  endEven : 10, startOdd : 10, endOdd : 10};
-      var _roughStart = 6;
+      var _roughStart = 5;
       helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
     });
     it('should not over-estimate the length of the repeated parts', function () {

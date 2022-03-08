@@ -2719,7 +2719,11 @@ describe('Carbone', function () {
             '{d.field2}',
             '{c.author1}',
             '{c.author2}'
-          ]
+          ],
+          sample : {
+            data       : { field1 : 'field10' , field2 : 'field21'   },
+            complement : { author1 : 'author12', author2 : 'author23' }
+          }
         });
         fs.unlinkSync(resultFilePath);
         done();

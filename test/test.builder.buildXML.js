@@ -1173,6 +1173,18 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it.only('should accept conditions with dynamic variable. Here it stop when we found the first element which match with id the main iterators "i"', function (done) {
+    var _xml = '<xml> <t_row> {d[i=.id].brand} </t_row><t_row> {d[i=.id].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : 3},
+      {brand : 'Tesla motors', id : 1},
+      {brand : 'Toyota'      , id : 2}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
   it('should accept direct access without writing i=10', function (done) {
     var _xml = '<xml> <t_row> {d[2].brand} </t_row><t_row> {d[1].brand} </t_row></xml>';
     var _data = [
@@ -1267,6 +1279,21 @@ describe('builder.buildXML', function () {
         + '  </l>    '
         + '</d>'
       );
+      done();
+    });
+  });
+  it.only('should manage nested arrays', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row><td>{d.wheels[i].size}</td><td>{d.wheels[i]..cars[i=.i].size}</td></t_row>'
+      +  '<t_row><td>{d.wheels[i+1].size}</td><td>{d.wheels[i+1]..cars[i=.i].size}</td></t_row>'
+      +'</xml>';
+    var _data = {
+      wheels : [ {size : 'wA'}, {size : 'wB'}              ],
+      cars   : [ {size : 'cC'}, {size : 'cD'},{size : 'cE'} ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><t_row><td>wA</td><td>cC</td></t_row><t_row><td>wB</td><td>cD</td></t_row><t_row><td></td><td>cE</td></t_row></xml>');
       done();
     });
   });
@@ -1377,6 +1404,21 @@ describe('builder.buildXML', function () {
   it('should accept to use conditions in array without iterator in a loop', function (done) {
     var _xml = '<xml><t_row> {d.cars[i].brand} <tr>{d.cars[i=1].brand} </tr> </t_row><t_row> {d.cars[i+1].brand} </t_row></xml>';
     var _data = {
+      cars : [
+        {brand : 'Lumeneo'},
+        {brand : 'Tesla motors'},
+        {brand : 'Toyota'}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo <tr>Tesla motors </tr> </t_row><t_row> Tesla motors <tr>Tesla motors </tr> </t_row><t_row> Toyota <tr>Tesla motors </tr> </t_row></xml>');
+      done();
+    });
+  });
+  it.skip('should accept to use dynamic variable in arrays', function (done) {
+    var _xml = '<xml><t_row> {d.cars[i].brand} <tr>{d.cars[i=.id].brand} </tr> </t_row><t_row> {d.cars[i+1].brand} </t_row></xml>';
+    var _data = {
+      id : 1,
       cars : [
         {brand : 'Lumeneo'},
         {brand : 'Tesla motors'},

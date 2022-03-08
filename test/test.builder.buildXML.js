@@ -459,6 +459,26 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should not crash if we use direct accessors in sub-arrays within a loop', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row>{d.test.others[i].wheels[0].size}</t_row>'
+      +  '<t_row>{d.test.others[i+1].wheels[0].size}</t_row>'
+      +'</xml>';
+    var _data = {
+      test : {
+        others : [
+          { wheels : [ {size : 'A'}, {size : 'B'}] },
+          { wheels : [ {size : '1'}, {size : '2'}] }
+        ]
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml><t_row>A</t_row><t_row>1</t_row></xml>');
+      done();
+    });
+  });
   it('should not crash if the template is not correct', function (done) {
     var _xml =
        '<xml>'

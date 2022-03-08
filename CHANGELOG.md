@@ -21,6 +21,7 @@
     - when there is a dot `.` before `[]` 
   
   - Fix crash when repetition does not contain XML tags. For example: `<w:t>{d[i].id}, {d[i+1].id}</w:t>`
+  - Fix crash when repetition uses direct access of sub-arrays `{d.test.others[i].wheels[0].size} {d.test.others[i+1].wheels[0].size}`
   
   - [EE] On-Premise Embedded Studio has new features and fixes:
     - [EXPERIMENTAL]: sample `Data` and `Complement` are automatically generated using markers found in template if these field contain empty objects

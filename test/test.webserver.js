@@ -159,6 +159,7 @@ describe('Webserver', () => {
         const _currencyTarget = 'EUR';
         const _licenseDir = '/var/tmp/test/';
         const _licenseDirPrev = params.licenseDir;
+        const _license = 'LICENSE_KEY_TEST';
         const _maxDataSize = 100 * 1024 * 1024;
         assert.strictEqual(params.maxDataSize, 60 * 1024 * 1024); // default datasize 60MB
         webserver = require('../lib/webserver');
@@ -175,6 +176,7 @@ describe('Webserver', () => {
                                 '--currencySource', _currencySource,
                                 '--currencyTarget', _currencyTarget,
                                 '--licenseDir', _licenseDir,
+                                '--license', _license,
                                 '--maxDataSize', _maxDataSize], () => {
           assert.strictEqual(params.port, _port);
           assert.strictEqual(fs.existsSync(_workdir), true);
@@ -197,6 +199,8 @@ describe('Webserver', () => {
           params.currencyTarget = '';
           assert.strictEqual(params.licenseDir, _licenseDir);
           params.licenseDir = _licenseDirPrev;
+          assert.strictEqual(params.license, _license);
+          params.license = '';
           assert.strictEqual(params.maxDataSize, _maxDataSize);
           webserver.stopServer(done);
         });
@@ -211,6 +215,7 @@ describe('Webserver', () => {
         process.env.CARBONE_EE_BIND = '127.0.0.1';
         process.env.CARBONE_EE_AUTHENTICATION = 'true';
         process.env.CARBONE_EE_MAXDATASIZE = 200 * 1024 * 1024;
+        process.env.CARBONE_EE_LICENSE = 'LICENSE_KEY_TEST_2';
         webserver = require('../lib/webserver');
         webserver.handleParams([], () => {
           assert.strictEqual(params.port + '', process.env.CARBONE_EE_PORT);
@@ -221,6 +226,7 @@ describe('Webserver', () => {
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication + '', process.env.CARBONE_EE_AUTHENTICATION);
           assert.strictEqual(params.maxDataSize + '', process.env.CARBONE_EE_MAXDATASIZE);
+          assert.strictEqual(params.license + '', process.env.CARBONE_EE_LICENSE);
           // clean
           helper.rmDirRecursive(process.env.CARBONE_EE_WORKDIR);
           delete process.env.CARBONE_EE_PORT;
@@ -230,6 +236,8 @@ describe('Webserver', () => {
           delete process.env.CARBONE_EE_BIND;
           delete process.env.CARBONE_EE_AUTHENTICATION;
           delete process.env.CARBONE_EE_MAXDATASIZE;
+          delete process.env.CARBONE_EE_LICENSE;
+          params.license = '';
           webserver.stopServer(done);
         });
       });
@@ -244,7 +252,8 @@ describe('Webserver', () => {
           factories      : 4,
           attempts       : 2,
           authentication : true,
-          maxDataSize    : 120 * 1024 * 1024
+          maxDataSize    : 120 * 1024 * 1024,
+          license        : 'LICENSE_KEY_TEST_3'
         };
         fs.mkdirSync(_workdirConfig, { recursive : true });
         fs.writeFileSync(path.join(_workdirConfig, 'config.json'), JSON.stringify(_configContent));
@@ -257,6 +266,8 @@ describe('Webserver', () => {
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication, _configContent.authentication);
           assert.strictEqual(params.maxDataSize, _configContent.maxDataSize);
+          assert.strictEqual(params.license, _configContent.license);
+          params.license = '';
           helper.rmDirRecursive(_workdir);
           webserver.stopServer(done);
         });

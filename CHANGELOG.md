@@ -179,6 +179,10 @@
     ```
 
 
+### v3.4.7
+  - Release March 1st 2022
+  - [EE] Carbone-EE On-Premise accepts to read the license from environment variable `CARBONE_EE_LICENSE`, or `--license` CLI options
+
 ### v3.4.6
   - Release February 18th 2022
   - [EE] The HTTP server starts as soon as possible, before LibreOffice.

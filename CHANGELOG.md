@@ -1,10 +1,36 @@
 ### v4.0.0
-  - [EE] On-Premise Embedded Studio has new features. Like the SaaS version, it is possible to 
+  
+  - [EE] If `options.isDebugActive = true`. `POST /render` returns additional information in `debug` sub-object:
+    ```js
+    {
+      "renderId" : "file.pdf",
+      "debug"    : {
+        "markers" : ["{d.id}", "{d.tab[i].id}"] // all markers found in template
+        "sample" : {         // EXPERIMENTAL
+          "data"       : {}, // fake data generated from markers found in markers
+          "complement" : {}  // fake complement generated from markers found in markers
+        }
+      }
+    }
+    ```
+
+  - Improve syntax error message:
+    - when a marker try to access an array and a object in the same time
+    - when there is a missing `[i]` marker fo one `[i+1]` marker
+    - when Carbone cannot find the section to repeat
+    - when there is a dot `.` before `[]` 
+  
+  - Fix crash when repetition does not contain XML tags. For example: `<w:t>{d[i].id}, {d[i+1].id}</w:t>`
+  - Fix crash when repetition uses direct access of sub-arrays `{d.test.others[i].wheels[0].size} {d.test.others[i+1].wheels[0].size}`
+  
+  - [EE] On-Premise Embedded Studio has new features and fixes:
+    - [EXPERIMENTAL]: sample `Data` and `Complement` are automatically generated using markers found in template if these field contain empty objects
     - export to other formats than PDF
-    - change language
+    - change report language
     - fix firefox template upload
     - fix memory leak
- 
+    - Now it works on Safari, without hot-reloading of the template
+
   - Formatters managements has been completly rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters:
     - TODO (finish) A single quote can be escaped using the single quote twice: `anyFormatter(' one parameter with escaped quote ''   ', ' a second '' one with ')`
     - For backward-compatibility:

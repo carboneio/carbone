@@ -190,6 +190,19 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept loops without xml', function (done) {
+    const _xml  = '<w:t>{d[i].id}, {d[i+1].id}</w:t>';
+    builder.buildXML(_xml, {}, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'null');
+      helper.assert(_xmlBuilt, '<w:t></w:t>');
+      const _data = [{ id : 1}, {id : 2}];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<w:t>1, 2, </w:t>');
+        done();
+      });
+    });
+  });
   it('should accept non-XML structure', function (done) {
     var _xml = '{d[i].brand} , {d[i+1].brand}';
     var _data = [
@@ -443,6 +456,26 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
+      done();
+    });
+  });
+  it('should not crash if we use direct accessors in sub-arrays within a loop', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row>{d.test.others[i].wheels[0].size}</t_row>'
+      +  '<t_row>{d.test.others[i+1].wheels[0].size}</t_row>'
+      +'</xml>';
+    var _data = {
+      test : {
+        others : [
+          { wheels : [ {size : 'A'}, {size : 'B'}] },
+          { wheels : [ {size : '1'}, {size : '2'}] }
+        ]
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml><t_row>A</t_row><t_row>1</t_row></xml>');
       done();
     });
   });

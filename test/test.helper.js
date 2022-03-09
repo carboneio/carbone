@@ -90,6 +90,7 @@ describe('helper', function () {
   });
 
 
+
   describe('assignObjectIfAttributesExist', function () {
     it('should do nothing', function () {
       helper.assignObjectIfAttributesExist();

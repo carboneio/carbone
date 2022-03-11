@@ -1,4 +1,8 @@
 
+### v3.2.2-1
+  - Release March 11th 2022
+  - Fix: avoid crash when a marker is used on a shape instead of a sample image
+
 ### v3.2.2
   - Release May 10th 2021
   - Fix broken Excel files. It removes the alert which appears sometime when opening the file with MS Excel.

@@ -1,4 +1,4 @@
-### v3.4.x
+### v3.4.8
   - Release March 15st 2022
   - [EE] Fix: avoid crash when a marker is used on a shape instead of a sample image (v3.2.2-1)
   - [EE] Fix graceful exit on SIGTERM, keep the converter alive to finish remaining renders!

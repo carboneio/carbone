@@ -1,3 +1,8 @@
+### v3.4.x
+  - Release March 15st 2022
+  - [EE] Fix graceful exit on SIGTERM, keep the converter alive to finish remaining renders!
+    - As soon as Carbone has finished all renders, it exits after 15 seconds instead of 10 seconds
+
 ### v3.4.7
   - Release March 1st 2022
   - [EE] Carbone-EE On-Premise accepts to read the license from environment variable `CARBONE_EE_LICENSE`, or `--license` CLI options

@@ -7,7 +7,7 @@ const assert     = require('assert');
 const carbone    = require('../lib/index');
 const sinon      = require('sinon');
 const os         = require('os');
-const { exec }   = require('child_process');
+const { exec, spawn } = require('child_process');
 const package    = require('../package.json');
 const params     = require('../lib/params');
 const helper     = require('../lib/helper');
@@ -1718,6 +1718,62 @@ describe('Webserver', () => {
         // templateID / renderID
         helper.assert(webserver.sanitizeValidateId('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
         helper.assert(webserver.sanitizeValidateId('9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html'), '9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html');
+      });
+    });
+  });
+  describe('Gracefully exit', function () {
+    it('should kill a server with SIGTERM, wait remaining renders and exist after 15 seconds', (done) => {
+      let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
+      let isShutdownWithinFifteenSecond = true;
+      let body = {
+        data : {
+          firstname : 'John',
+          lastname  : 'Doe'
+        },
+        complement : {},
+        enum       : {},
+        convertTo  : 'txt'
+      };
+      const child = spawn('node', ['bin/carbone', 'webserver', '-p', '3000']);
+      function runQueries () {
+        uploadFile(3000, null, () => {
+          get.concat(getBody(3000, '/status', 'GET', {}, null), (err, res) => {
+            assert.strictEqual(res.statusCode, 200);
+            setTimeout(function () {
+              // let some time to start the converter
+              child.kill('SIGTERM');
+              setTimeout(() => isShutdownWithinFifteenSecond = false, 17000);
+              get.concat(getBody(3000, `/render/${templateId}`, 'POST', body, null), (err, res, renderReport) => {
+                assert.strictEqual(err, null);
+                setTimeout(function () {
+                  get.concat(getBody(3000, '/status', 'GET', {}, null), (err, res) => {
+                    assert.strictEqual(res.statusCode, 503);
+                    get.concat(getBody(3000, `/render/${renderReport.data.renderId}`, 'GET'), (err, res, data) => {
+                      assert.strictEqual(err, null);
+                      assert.strictEqual(res.headers['content-type'], 'text/plain; charset=UTF-8');
+                      assert.strictEqual(res.headers['content-disposition'], 'filename="report.txt"');
+                      assert.strictEqual(/John Doe/.test(data.toString()), true);
+                    });
+                  });
+                }, 2000);
+              });
+            }, 10000);
+          });
+        });
+      }
+      child.stdout.on('data', (data) => {
+        console.log(`child stdout:\n${data}`);
+        if (data.includes('Carbone webserver is started and listens on port 3000')) {
+          runQueries();
+        }
+      });
+      child.stderr.on('data', (data) => {
+        console.log(`child stdout:\n${data}`);
+      });
+      child.on('close', () => {
+        console.log('Test is done, close...');
+        assert.strictEqual(isShutdownWithinFifteenSecond, true);
+        done();
       });
     });
   });

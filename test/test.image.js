@@ -566,6 +566,20 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   describe('DOCX MS document', function () {
     describe('[Full test] DOCX', function () {
 
+      it('should not crash if a marker is placed in a shape instead of an image', function (done) {
+        const _testedReport = 'image/docx-image-in-shape';
+        const _data = {
+          image : [
+            { value : _imageFRBase64jpg },
+            { value : _imageITBase64png }
+          ]
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
+          helperTest.assert(err+'', 'null');
+          done();
+        });
+      });
+
       it('should do nothing if there is no marker inside the XML (created from LO)', function (done) {
         const _testedReport = 'image/docx-simple-without-marker';
         const _data = {

@@ -2,6 +2,7 @@
   - Release March 15st 2022
   - [EE] Fix graceful exit on SIGTERM, keep the converter alive to finish remaining renders!
     - As soon as Carbone has finished all renders, it exits after 15 seconds instead of 10 seconds
+  - [EE] Fix DOCX documents that are including dynamic images and static charts
 
 ### v3.4.7
   - Release March 1st 2022

@@ -2437,7 +2437,7 @@ describe('extracter', function () {
             parents  : ['_root'],
             xmlParts : [
               {obj : '_rootd', attr : 'root', pos : 12, posOrigin : 12, depth : 1, moveTo : '_rootdcars', after : ' '  },
-              {obj : '_rootd', attr : 'root', pos : 30, posOrigin : 30, markerId : 1, depth : 0, toDelete : true, before : ''        }
+              {obj : '_rootd', attr : 'root', pos : 30, posOrigin : 30, markerId : 1, toDelete : true }
             ]
           },
           _rootdcars : {
@@ -2523,7 +2523,7 @@ describe('extracter', function () {
             parents  : ['_root'],
             xmlParts : [
               {obj : '_rootd', attr : 'root', pos : 15, posOrigin : 15, depth : 2, moveTo : '_rootdcarswheels' },
-              {obj : '_rootd', attr : 'root', pos : 34, posOrigin : 34, depth : 0, toDelete : true        },
+              {obj : '_rootd', attr : 'root', pos : 34, posOrigin : 34, toDelete : true        },
             ]
           },
           _rootdcars : {
@@ -2535,7 +2535,7 @@ describe('extracter', function () {
             iterators : [{ attr : 'i' }],
             xmlParts  : [
               {obj : '_rootdcars', attr : 'brand' , pos : 13, posOrigin : 13, depth : 2, moveTo : '_rootdcarswheels' , after : ' '   },
-              {obj : '_rootdcars', attr : 'brand' , pos : 32, posOrigin : 32, depth : 0, toDelete : true, before : '' }, // we do not care of depth because this part is in the odd section
+              {obj : '_rootdcars', attr : 'brand' , pos : 32, posOrigin : 32, toDelete : true }, // we do not care of depth because this part is in the odd section
               {obj : '_rootdcars', array : 'start', pos : 5 , posOrigin : 12, depth : 1, after : ''           },
               {obj : '_rootdcars', array : 'end'  , pos : 25.015625, posOrigin : 32, depth : 1, before : ''          }
             ],
@@ -2550,7 +2550,7 @@ describe('extracter', function () {
             iterators : [{ attr : 'i' }],
             xmlParts  : [
               {obj : '_rootdcarswheels', attr : 'size'  , pos : 14       , posOrigin : 14, depth : 2, after : ' '},
-              {obj : '_rootdcarswheels', attr : 'size'  , pos : 33       , posOrigin : 33, depth : 0, toDelete : true },
+              {obj : '_rootdcarswheels', attr : 'size'  , pos : 33       , posOrigin : 33, toDelete : true },
               {obj : '_rootdcarswheels', array : 'start', pos : 5.015625 , posOrigin : 12, depth : 2, after : '<t_row> ' },
               {obj : '_rootdcarswheels', array : 'end'  , pos : 25       , posOrigin : 32, depth : 2, before : '  </t_row>' }
             ],
@@ -2864,6 +2864,60 @@ describe('extracter', function () {
         {obj : '_rootdcars', array : 'end'  , pos : 22, depth : 1, before : ' </t_row>'  },
         {obj : '_rootd'    , attr : 'root'  , pos : 12, depth : 1, after : ' '           }
       ]);
+    });
+    it('should remove useless object descriptor (toDelete : true) => nested repetition done in the odd parent of a wider repetition', function () {
+      var _data = {
+        dynamicData : {
+          _root : {
+            name     : '_root',
+            type     : 'object',
+            parent   : '',
+            xmlParts : []
+          },
+          _rootd : {
+            name     : 'd',
+            type     : 'object',
+            parent   : '_root',
+            xmlParts : [
+              {obj : '_rootd', attr : 'root', pos : 12, depth : 1, after : ' ', moveTo : '_rootdcars'},
+              {obj : '_rootd', attr : 'root', pos : 30, depth : 1, before : '', toDelete : true       }
+            ],
+            depth : 1
+          },
+          _rootdcars : {
+            name      : 'cars',
+            type      : 'array',
+            parent    : '_rootd',
+            position  : {start : 5,end : 22, endOdd : 40},
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : '_rootdcars', attr : 'brand' , pos : 13, depth : 1                        },
+              {obj : '_rootdcars', array : 'start', pos : 5 , depth : 1, after : '<t_row>'    },
+              {obj : '_rootdcars', array : 'end'  , pos : 22, depth : 1, before : ' </t_row>' }
+            ],
+            depth : 1
+          },
+          _rootdcarsD : {
+            name      : 'cars',
+            type      : 'array',
+            parent    : '_rootd',
+            position  : {start : 23, end : 30, endOdd : 39},
+            iterators : [{ attr : 'i' }],
+            xmlParts  : [
+              {obj : '_rootdcarsD', attr : 'brand' , pos : 25, depth : 1                        },
+              {obj : '_rootdcarsD', array : 'start', pos : 24, depth : 1, after : '<t_row>'    },
+              {obj : '_rootdcarsD', array : 'end'  , pos : 29, depth : 1, before : ' </t_row>' }
+            ],
+            depth    : 1,
+            toDelete : true
+          }
+        },
+        hierarchy : ['_root', '_rootd', '_rootdcars', '_rootdcarsD']
+      };
+      var _dataModified = extracter.deleteAndMoveNestedParts(_data);
+      helper.assert(_dataModified.dynamicData._rootd.xmlParts, []);
+      helper.assert(_dataModified.dynamicData._rootdcarsD, undefined);
+      helper.assert(_dataModified.hierarchy, ['_root', '_rootd', '_rootdcars']);
     });
     it('should pre-parse formatters', function () {
       var _data = {

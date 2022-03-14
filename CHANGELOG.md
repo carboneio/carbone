@@ -1,3 +1,6 @@
+### v3.4.X
+  - [EE] Fix DOCX documents that are including dynamic images and static charts
+
 ### v3.4.7
   - Release March 1st 2022
   - [EE] Carbone-EE On-Premise accepts to read the license from environment variable `CARBONE_EE_LICENSE`, or `--license` CLI options

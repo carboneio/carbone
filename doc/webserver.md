@@ -30,8 +30,11 @@ Carbone On-premise can be installed in different ways:
 
 1. Download the license and the Carbone On-premise binary for server/OS: Mac, Linux or Windows
 2. Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
-3. Insert the **license** in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is selected. The binary can't start if the license is outdated or invalid.
-3. Start Carbone web server or [daemonize it with systemd](#Installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#Carbone-Options-overview) to Carbone On-Premise through the CLI:
+3. Prepare the license key to be loaded, multiple solution:
+   - Set the Environment Variable `CARBONE_EE_LICENSE` with the license key as the value
+   - Or pass the CLI option `--license` followed by the license key as the value when you start the server (step 4)
+   - Or insert the **license** file in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is selected. The binary can't start if the license is outdated or invalid.
+4. Start Carbone web server or [daemonize it with systemd](#installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#carbone-options-overview) to Carbone On-Premise through the CLI:
 
 ```bash
   ./carbone webserver --port 4000 --workdir .

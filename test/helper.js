@@ -55,6 +55,10 @@ const helperTests = {
         }
       }
       assert.strictEqual(_resultFile.name, _expectedFile.name);
+      if (Buffer.isBuffer(_expectedFile.data) === false && Buffer.isBuffer(_resultFile.data) === true) {
+        _resultFile.data = _resultFile.data.toString();
+        fs.writeFileSync(path.join(__dirname, 'res.svg'), _resultFile.data);
+      }
       if (Buffer.isBuffer(_resultFile.data) === true) {
         if (_resultFile.data.equals(_expectedFile.data) === false) {
           throw Error ('Buffer of (result) '+_resultFile.name + 'is not the same as (expected) '+_expectedFile.name);
@@ -94,6 +98,9 @@ const helperTests = {
       if (_extname === '.xml' || _extname === '.rels') {
         _file.data = _data.toString();
         _file.isMarked = true;
+      }
+      if (_extname === '.svg') {
+        _file.data = _data.toString();
       }
       _report.files.push(_file);
     });

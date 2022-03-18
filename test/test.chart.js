@@ -120,7 +120,7 @@ describe('chart', function () {
 
 
   describe.only('[Full test] ODT', function () {
-    it.only('should', function (done) {
+    it('should replace markers in charts', function (done) {
       const _data = [
         { label : 'row1' , valCol1 : 10 , valCol2 : 100.1 },
         { label : 'row2' , valCol1 : 20 , valCol2 : 200.2 },
@@ -133,7 +133,7 @@ describe('chart', function () {
         done();
       });
     });
-    it('should loop', function (done) {
+    it('should replace markers in charts and loop', function (done) {
       const _data = {
         charts : [
           {

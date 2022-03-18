@@ -1536,6 +1536,28 @@ describe('parser', function () {
       });
     });
   });
+
+
+  describe('removeAndGetXMLDeclaration', function () {
+    it('should do nothing', function () {
+      helper.assert(parser.removeAndGetXMLDeclaration().xml, undefined);
+      helper.assert(parser.removeAndGetXMLDeclaration().declaration, '');
+      helper.assert(parser.removeAndGetXMLDeclaration(null).xml, null);
+      helper.assert(parser.removeAndGetXMLDeclaration(null).declaration, '');
+      helper.assert(parser.removeAndGetXMLDeclaration(Buffer.from('aa', 'utf8')).xml, Buffer.from('aa', 'utf8'));
+      helper.assert(parser.removeAndGetXMLDeclaration(Buffer.from('aa', 'utf8')).declaration, '');
+    });
+    it('should return xml without declaration, and a separate declaration', function () {
+      const _xml = ''
+                 + '<?xml version="1.0" encoding="UTF-8"?>'
+                 + '<?xml version="1.0" encoding="ISO-8859-1" ?>'
+                 + '<a><b>dd</b></a>';
+      const _res = parser.removeAndGetXMLDeclaration(_xml);
+      helper.assert(_res.xml, '<a><b>dd</b></a>');
+      helper.assert(_res.declaration, '<?xml version="1.0" encoding="UTF-8"?><?xml version="1.0" encoding="ISO-8859-1" ?>');
+    });
+  });
+
 });
 
 /**

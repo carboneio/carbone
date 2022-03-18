@@ -73,12 +73,13 @@
     ```
 
   - Improve syntax error message:
-    - when a marker try to access an array and a object in the same time
+    - when a marker tries to access an array and a object in the same time
     - when there is a missing `[i]` marker fo one `[i+1]` marker
     - when Carbone cannot find the section to repeat
     - when there is a dot `.` before `[]` 
   
   - Fix crash when repetition does not contain XML tags. For example: `<w:t>{d[i].id}, {d[i+1].id}</w:t>`
+  - Fix crash when the section i+1 is duplicated like the i-th section with nested repetition and other markers
   - Fix crash when repetition uses direct access of sub-arrays `{d.test.others[i].wheels[0].size} {d.test.others[i+1].wheels[0].size}`
   
   - [EE] On-Premise Embedded Studio has new features and fixes:
@@ -236,6 +237,10 @@
                                                      17 // YNSECT - Sales
     ```
 
+
+### v3.4.7
+  - Release March 1st 2022
+  - [EE] Carbone-EE On-Premise accepts to read the license from environment variable `CARBONE_EE_LICENSE`, or `--license` CLI options
 
 ### v3.4.6
   - Release February 18th 2022

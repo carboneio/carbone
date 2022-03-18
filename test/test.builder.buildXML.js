@@ -501,7 +501,25 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it.skip('should bi-directionnal loop', function (done) {
+  it('should do bi-directionnal loop (main array vertical, nested array horizontal)', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row><td>{d.cars[i].wheels[i].size  }</td><td>{d.cars[i].wheels[i+1].size  }</td></t_row>'
+      +  '<t_row><td>{d.cars[i+1].wheels[i].size}</td><td>{d.cars[i+1].wheels[i+1].size}</td></t_row>'
+      +'</xml>';
+    var _data = {
+      cars : [
+        {wheels : [ {size : 'A'}, {size : 'B'}               ]},
+        {wheels : [ {size : 'C'}, {size : 'D'},{size : 'E'} ]}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
+      done();
+    });
+  });
+  it.skip('should do bi-directionnal loop (main array horizontal, nested array vertical)', function (done) {
     var _xml =
        '<xml>'
       +  '<t_row><td>{d.cars[i].wheels[i].size  }</td><td>{d.cars[i+1].wheels[i].size  }</td></t_row>'
@@ -514,8 +532,26 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      console.log(err.stack);
+      assert.equal(err+'', 'null');
       assert.equal(_xmlBuilt, 'TODO');
+      done();
+    });
+  });
+  it('should do hozironal loop with markers in XML', function (done) {
+    const _xml = '<xml>'
+               +   '<t_row> <td color="{d.id}">{d.cars[i].colA}</td><td color="{d.id}">{d.cars[i+1].colA}</td> </t_row>'
+               +   '<t_row> <td color="{d.id}">{d.cars[i].colB}</td><td color="{d.id}">{d.cars[i+1].colB}</td> </t_row>'
+               + '</xml>';
+    const _data = {
+      id   : 'aa',
+      cars : [
+        { colA : 'a1', colB : 'b1' },
+        { colA : 'a2', colB : 'b2' }
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml><t_row> <td color="aa">a1</td><td color="aa">a2</td> </t_row><t_row> <td color="aa">b1</td><td color="aa">b2</td> </t_row></xml>');
       done();
     });
   });

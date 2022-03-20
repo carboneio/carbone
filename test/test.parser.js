@@ -398,6 +398,21 @@ describe('parser', function () {
     });
   });
 
+  describe('removeFormatters', function () {
+    it('should remove formatters from markers', function () {
+      assert.equal(parser.removeFormatters(), undefined);
+      assert.equal(parser.removeFormatters(null), null);
+      assert.equal(parser.removeFormatters('{d.id}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.id:simpleFormatter}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort].id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort=\':sd\'].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort=\':sd\'].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort:formatter].id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort:formatter].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, id.sort:formatter].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, id.sort:formatter].id}');
+    });
+  });
+
   describe('flattenXML', function () {
     it('should transform XML into an array of object and find the corresponding XML tag (match)', function () {
       helper.assert(parser.flattenXML('<xml></xml>'), [
@@ -1536,6 +1551,54 @@ describe('parser', function () {
       });
     });
   });
+
+
+  describe('removeAndGetXMLDeclaration', function () {
+    it('should do nothing', function () {
+      helper.assert(parser.removeAndGetXMLDeclaration().xml, undefined);
+      helper.assert(parser.removeAndGetXMLDeclaration().declaration, '');
+      helper.assert(parser.removeAndGetXMLDeclaration(null).xml, null);
+      helper.assert(parser.removeAndGetXMLDeclaration(null).declaration, '');
+      helper.assert(parser.removeAndGetXMLDeclaration(Buffer.from('aa', 'utf8')).xml, Buffer.from('aa', 'utf8'));
+      helper.assert(parser.removeAndGetXMLDeclaration(Buffer.from('aa', 'utf8')).declaration, '');
+    });
+    it('should return xml without declaration, and a separate declaration', function () {
+      const _xml = ''
+                 + '<?xml version="1.0" encoding="UTF-8"?>'
+                 + '<?xml version="1.0" encoding="ISO-8859-1" ?>'
+                 + '<a><b>dd</b></a>';
+      const _res = parser.removeAndGetXMLDeclaration(_xml);
+      helper.assert(_res.xml, '<a><b>dd</b></a>');
+      helper.assert(_res.declaration, '<?xml version="1.0" encoding="UTF-8"?><?xml version="1.0" encoding="ISO-8859-1" ?>');
+    });
+  });
+
+  describe('removeMarkers', function () {
+    it('should do nothing', function () {
+      helper.assert(parser.removeMarkers(), undefined);
+    });
+    it('should replace markers by 0 by default', function () {
+      const _xml = '<xml version="{1.0}" encoding="UTF-8"/>'
+                 + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+                 + '<a><b>dd{d.id} {c.now} {#ssd = d.id}</b></a>';
+      helper.assert(parser.removeMarkers(_xml), ''
+        + '<xml version="{1.0}" encoding="UTF-8"/>'
+        + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+        + '<a><b>dd0 0 0</b></a>'
+      );
+    });
+    it('should replace markers by custom string', function () {
+      const _xml = '<xml version="{1.0}" encoding="UTF-8"/>'
+                 + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+                 + '<a><b>dd{d.id} {c.now} {#ssd = d.id}</b></a>';
+      helper.assert(parser.removeMarkers(_xml, 'azerty'), ''
+        + '<xml version="{1.0}" encoding="UTF-8"/>'
+        + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+        + '<a><b>ddazerty azerty azerty</b></a>'
+      );
+    });
+  });
+
 });
 
 /**

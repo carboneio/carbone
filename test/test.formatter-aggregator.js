@@ -671,6 +671,64 @@ describe('Aggregatted operations', function () {
 
     // TODO test aggregator with repeater?
   });
+
+  describe('Custom tests', function () {
+    it('should accept global aggregation marker, and then a loop', function (done) {
+      var _xml = '<xml> <a id="{d.cars[].brand:aggCount}"/> <t_row id="{d.cars[i].brand:cumCount}">{d.cars[i].brand}</t_row><t_row>{d.cars[i+1].brand}</t_row></xml>';
+      var _data = {
+        id   : 3,
+        cars : [
+          { brand : 'Lumeneo' },
+          { brand : 'Tesla motors'},
+          { brand : 'Toyota' }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> <a id="3"/> <t_row id="1">Lumeneo</t_row><t_row id="2">Tesla motors</t_row><t_row id="3">Toyota</t_row></xml>');
+        done();
+      });
+    });
+    it('should cumCount in the right order, even if cumCount is used on a object', function (done) {
+      var _xml = '<xml> <a id="{d.cars[].brand:aggCount}"/> <t_row id="{c.now:cumCount}">{d.cars[sort].brand}</t_row><t_row>{d.cars[sort+1].brand}</t_row></xml>';
+      var _data = {
+        id   : 3,
+        cars : [
+          { brand : 'Lumeneo'      , sort : 2 },
+          { brand : 'Tesla motors' , sort : 1 },
+          { brand : 'Toyota'       , sort : 0 }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> <a id="3"/> <t_row id="1">Toyota</t_row><t_row id="2">Tesla motors</t_row><t_row id="3">Lumeneo</t_row></xml>');
+        done();
+      });
+    });
+    it('should count two times, with two independant loops', function (done) {
+      var _xml =  '<xml>'
+                + '<a id="{d.cars[].brand:aggCount}"/> <r id="{d.cars[i].brand:cumCount}">{d.cars[i].brand}</r><r>{d.cars[i+1].brand}</r>'
+                + '<a id="{d.cars[].brand:aggCount}"/> <r id="{d.cars[i].brand:cumCount}">{d.cars[i].brand}</r><r>{d.cars[i+1].brand}</r>'
+                + '</xml>';
+      var _data = {
+        id   : 3,
+        cars : [
+          { brand : 'Lumeneo' },
+          { brand : 'Tesla motors'},
+          { brand : 'Toyota' }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml>'
+                               + '<a id="3"/> <r id="1">Lumeneo</r><r id="2">Tesla motors</r><r id="3">Toyota</r>'
+                               + '<a id="3"/> <r id="1">Lumeneo</r><r id="2">Tesla motors</r><r id="3">Toyota</r>'
+                               + '</xml>'
+        );
+        done();
+      });
+    });
+  });
 });
 
 

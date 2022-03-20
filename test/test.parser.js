@@ -1573,6 +1573,32 @@ describe('parser', function () {
     });
   });
 
+  describe('removeMarkers', function () {
+    it('should do nothing', function () {
+      helper.assert(parser.removeMarkers(), undefined);
+    });
+    it('should replace markers by 0 by default', function () {
+      const _xml = '<xml version="{1.0}" encoding="UTF-8"/>'
+                 + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+                 + '<a><b>dd{d.id} {c.now} {#ssd = d.id}</b></a>';
+      helper.assert(parser.removeMarkers(_xml), ''
+        + '<xml version="{1.0}" encoding="UTF-8"/>'
+        + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+        + '<a><b>dd0 0 0</b></a>'
+      );
+    });
+    it('should replace markers by custom string', function () {
+      const _xml = '<xml version="{1.0}" encoding="UTF-8"/>'
+                 + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+                 + '<a><b>dd{d.id} {c.now} {#ssd = d.id}</b></a>';
+      helper.assert(parser.removeMarkers(_xml, 'azerty'), ''
+        + '<xml version="{1.0}" encoding="UTF-8"/>'
+        + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+        + '<a><b>ddazerty azerty azerty</b></a>'
+      );
+    });
+  });
+
 });
 
 /**

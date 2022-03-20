@@ -398,6 +398,21 @@ describe('parser', function () {
     });
   });
 
+  describe('removeFormatters', function () {
+    it('should remove formatters from markers', function () {
+      assert.equal(parser.removeFormatters(), undefined);
+      assert.equal(parser.removeFormatters(null), null);
+      assert.equal(parser.removeFormatters('{d.id}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.id:simpleFormatter}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort].id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort=\':sd\'].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort=\':sd\'].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort:formatter].id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort:formatter].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, id.sort:formatter].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, id.sort:formatter].id}');
+    });
+  });
+
   describe('flattenXML', function () {
     it('should transform XML into an array of object and find the corresponding XML tag (match)', function () {
       helper.assert(parser.flattenXML('<xml></xml>'), [

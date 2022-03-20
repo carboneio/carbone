@@ -180,6 +180,13 @@
     ```
 
 
+### v3.4.8
+  - Release March 15st 2022
+  - [EE] Fix: avoid crash when a marker is used on a shape instead of a sample image (v3.2.2-1)
+  - [EE] Fix graceful exit on SIGTERM, keep the converter alive to finish remaining renders!
+    - As soon as Carbone has finished all renders, it exits after 15 seconds instead of 10 seconds
+  - [EE] Fix DOCX documents that are including dynamic images and static charts
+
 ### v3.4.7
   - Release March 1st 2022
   - [EE] Carbone-EE On-Premise accepts to read the license from environment variable `CARBONE_EE_LICENSE`, or `--license` CLI options
@@ -319,6 +326,10 @@
 ### v3.2.3
   - Release May 21th 2021
   - Accepts letter `W` to get the week number in `formatD` formatter
+
+### v3.2.2-1
+  - Release March 11th 2022
+  - Fix: avoid crash when a marker is used on a shape instead of a sample image
 
 ### v3.2.2
   - Release May 10th 2021

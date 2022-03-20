@@ -566,6 +566,20 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   describe('DOCX MS document', function () {
     describe('[Full test] DOCX', function () {
 
+      it('should not crash if a marker is placed in a shape instead of an image', function (done) {
+        const _testedReport = 'image/docx-image-in-shape';
+        const _data = {
+          image : [
+            { value : _imageFRBase64jpg },
+            { value : _imageITBase64png }
+          ]
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
+          helperTest.assert(err+'', 'null');
+          done();
+        });
+      });
+
       it('should do nothing if there is no marker inside the XML (created from LO)', function (done) {
         const _testedReport = 'image/docx-simple-without-marker';
         const _data = {
@@ -852,7 +866,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(_template.files[0].data, _expectedContent);
       });
 
-      it ('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml', function () {
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml', function () {
         const _template = {
           files : [{
             name : 'word/_rels/document.xml.rels',
@@ -875,13 +889,15 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           extension : 'png'
         });
         image.postProcessDocx(_template, null, _options);
-        helperTest.assert(_template.files[0].data, _expectedContent);
-        helperTest.assert(_template.files[1].data, _expectedContentType);
-        helperTest.assert(_template.files[2], {
+
+        helperTest.assert(_template.files[0], {
           name   : 'word/media/CarboneImage0.png',
           parent : '',
           data   : '1234'
         });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+        helperTest.assert(_template.files[2].data, _expectedContentType);
+
       });
 
       it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml even if the temporary image type is in uppercase', function () {
@@ -907,13 +923,13 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           extension : 'jpg'
         });
         image.postProcessDocx(_template, null, _options);
-        helperTest.assert(_template.files[0].data, _expectedContent);
-        helperTest.assert(_template.files[1].data, _expectedContentType);
-        helperTest.assert(_template.files[2], {
+        helperTest.assert(_template.files[0], {
           name   : 'word/media/CarboneImage0.jpg',
           parent : '',
           data   : '1234'
         });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+        helperTest.assert(_template.files[2].data, _expectedContentType);
       });
 
       it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define a different media path because the template is coming from word online', function () {
@@ -934,12 +950,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           extension : 'gif'
         });
         image.postProcessDocx(_template, null, _options);
-        helperTest.assert(_template.files[0].data, _expectedContent);
-        helperTest.assert(_template.files[1], {
+        helperTest.assert(_template.files[0], {
           name   : 'media/CarboneImage0.gif',
           parent : '',
           data   : '1234'
         });
+        helperTest.assert(_template.files[1].data, _expectedContent);
       });
 
       it('should add multiple images references into "word/_rels/document.xml.rels" by using imageDatabase', function () {
@@ -972,22 +988,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           extension : 'svg'
         });
         image.postProcessDocx(_template, null, _options);
-        helperTest.assert(_template.files[0].data, _expectedContent);
-        helperTest.assert(_template.files[1], {
+        helperTest.assert(_template.files[0], {
           name   : 'word/media/CarboneImage0.png',
           parent : '',
           data   : '1234'
         });
-        helperTest.assert(_template.files[2], {
+        helperTest.assert(_template.files[1], {
           name   : 'word/media/CarboneImage1.jpg',
           parent : '',
           data   : '5678'
         });
-        helperTest.assert(_template.files[3], {
+        helperTest.assert(_template.files[2], {
           name   : 'word/media/CarboneImage2.svg',
           parent : '',
           data   : '9101112'
         });
+        helperTest.assert(_template.files[3].data, _expectedContent);
       });
 
       it('should add image references into the document, header and footer by using imageDatabase and should save the new image only one time on the object `template.files`', function () {
@@ -1014,7 +1030,13 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           }]
         };
         const _expectedTemplate = {
-          files : [{
+          files : [
+          {
+            name   : 'word/media/CarboneImage0.png',
+            parent : '',
+            data   : '1234'
+          },
+          {
             name : 'word/_rels/document.xml.rels',
             data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
           },
@@ -1033,11 +1055,6 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           {
             name : 'word/_rels/footer2.xml.rels',
             data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
-          },
-          {
-            name   : 'word/media/CarboneImage0.png',
-            parent : '',
-            data   : '1234'
           }]
         };
         const _options = {

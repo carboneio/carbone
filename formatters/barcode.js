@@ -1,4 +1,6 @@
 const bwipjs = require('bwip-js');
+const drawsvg = require('./_barcodeSVG');
+
 
 const REG_HEXA_COLOR = /^#?[0-9A-F]{6}$/i;
 const CHECK_BARCODE_OPTIONS_VALUE = {
@@ -408,12 +410,22 @@ function generateBarcodeImage (jsonStringBarcodeData, callback) {
   catch (err) {
     return callback('Barcode read values: ' + err.toString());
   }
-  return bwipjs.toBuffer(
-    {
-      ...initBarcodeValuesBasedOnType(_barcodeData.bcid),
-      ..._barcodeData,
-    },
-    function (err, png) {
+
+  let opts = {
+    ...initBarcodeValuesBasedOnType(_barcodeData.bcid),
+    ..._barcodeData,
+  };
+  bwipjs.fixupOptions(opts);
+  // The drawing needs FontLib to extract glyph paths.
+  let _svg = bwipjs.render(opts, drawsvg(opts, bwipjs.FontLib));
+
+  return callback(null, {
+    data      : new Buffer.from(_svg, 'utf-8'),
+    extension : 'svg',
+    mimetype  : 'image/svg+xml',
+  });
+
+  return bwipjs.toBuffer(opts, function (err, png) {
       if (err) {
         // `err` may be a string or Error object
         return callback('Barcode generation error: ' + err.toString());

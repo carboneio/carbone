@@ -89,11 +89,23 @@ const helperTests = {
     _files.forEach(file => {
       var _data = fs.readFileSync(file);
       var _extname = path.extname(file);
+      var _relativePath = path.relative(_dirname, file);
+      var _parent = '';
+      var _indexOfEmbeddings = _relativePath.indexOf('embeddings/');
+      if (_indexOfEmbeddings !== -1) {
+        if (_extname === '.xlsx') {
+          _report.embeddings.push(_relativePath);
+          return;
+        }
+        var _indexOfEmbeddedFile = _relativePath.indexOf('/', _indexOfEmbeddings + 11);
+        _parent = _relativePath.slice(0, _indexOfEmbeddedFile) + '.xlsx';
+        _relativePath = _relativePath.slice(_indexOfEmbeddedFile + 1);
+      }
       var _file = {
-        name     : path.relative(_dirname, file),
+        name     : _relativePath,
         data     : _data,
         isMarked : false,
-        parent   : ''
+        parent   : _parent
       };
       if (_extname === '.xml' || _extname === '.rels') {
         _file.data = _data.toString();

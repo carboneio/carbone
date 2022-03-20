@@ -1,5 +1,7 @@
 
-### v4.0.0
+### v4.0.0-alpha.0
+
+  WARNING: Native charts in LibreOffice and Word still need a lot of work before being stable for production
 
   - [EE] ⚡️ Carbone supports dynamic charts with two methods:
     - 1 - using native charts of MS Word or LibreOffice
@@ -8,11 +10,8 @@
     ### Method n°1, how to inject your data in native charts?
       - Insert a chart with native tools of LibreOffice or MS Word in your document
       - Use traditional Carbone markers to create loops in chart's data to inject your JSON data
-      - If necessary, use the special marker `bindChart` to tell Carbone that the value `X` in the chart must be replaced by the marker `Y`
+      - If necessary, use the special marker `bind` to tell Carbone that the value `X` in the chart must be replaced by the marker `Y`
     
-    Here is an example in MS Office: ![bindChart in MS Office](./doc/chartMS.png)
-    Here is an example in LibreOffice: ![bindChart in LibreOffice](./doc/chartLO.png)
-
     ### Method n°2, how to do advanced charts with Apache ECharts objects?
       - Insert a sample image in your template.
       - Place a marker in alt text , like a dynamic image : `{d.chartObj:chart}` with the formatter `:chart`.
@@ -90,7 +89,7 @@
     - fix memory leak
     - Now it works on Safari, without hot-reloading of the template
 
-  - Formatters managements has been completly rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters:
+  - Formatters managements has been completely rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters:
     - TODO (finish) A single quote can be escaped using the single quote twice: `anyFormatter(' one parameter with escaped quote ''   ', ' a second '' one with ')`
     - For backward-compatibility:
       - Text containing single quotes are accepted if it does not contain a comma `,` before or after the single quote: `anyFormatter(' text ,containing ' sin,gle ' quote  ')`
@@ -105,13 +104,8 @@
       - `..i` matches with the index of `cars[i]` 
       - `...i` matches with the index of `d[i]` 
 
-  - ⚡️ New aggregator formatters : `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount`
+  - [EE] ⚡️ New aggregator formatters : `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount`
 
-  // TODO retourner une erreur si aggSum(.argument) du tableau en cours 
-  // TODO, ne pas autoriser les if qui sont à la fois AVANT et APR7S un sum (propagation galère à gérer)
-  // TODO test aggregator with repeater?
-  // TODO test with string and bad number (parseFloat)
-  // TODO tets cumCOunt avec parenthèse vide et vérfieir que .i ..I
     *Data*
       ```js
         { brand : 'Lu' , qty : 1  , sort : 1 },
@@ -145,97 +139,25 @@
       - `{d.cars[sort>1].qty:mul(.sort):aggCount:formatC}` => 6.00 €
 
 
-  - 🤩 Aggregators can also be used in a loop to compute sub-totals and cumulative totals (or "running totals"), with custom grouping clause (partition)
-    - By default if not grouping clause is defined:
-      - Sum by departments of all people's salary:
-        - `{d.departments[i].people[].salary:aggSum}`
-        - `{d.departments[i].people[].salary:aggSum(.i)}` (alternative)
-      - Global sum of all departments, all people's salary
-        - `{d.departments[i].people[i].salary:aggSum}`
-        - `{d.departments[i].people[i].salary:aggSum(0)}` (alternative)
-      - Cumulative total (or "running total") by departments of all people's salary:
-        - `{d.departments[i].people[].salary:cumSum}`
-      - Cumulative total (or "running total") of all departments, all people's salary
-        - `{d.departments[i].people[i].salary:cumSum}`
+    - [EE] 🤩 Aggregators can also be used in a loop to compute sub-totals and cumulative totals (or "running totals"), with custom grouping clause (partition)
+      - By default if not grouping clause is defined:
+        - Sum by departments of all people's salary:
+          - `{d.departments[i].people[].salary:aggSum}`
+          - `{d.departments[i].people[].salary:aggSum(.i)}` (alternative)
+        - Global sum of all departments, all people's salary
+          - `{d.departments[i].people[i].salary:aggSum}`
+          - `{d.departments[i].people[i].salary:aggSum(0)}` (alternative)
+        - Cumulative total (or "running total") by departments of all people's salary:
+          - `{d.departments[i].people[].salary:cumSum}`
+        - Cumulative total (or "running total") of all departments, all people's salary
+          - `{d.departments[i].people[i].salary:cumSum}`
 
-    - Otherwise, you can set the partition you want `aggSum(...departmenent, .employee)`
+      - You can change the partition with dynamic parameters like that
+        - Sum by people by age, regardless of departments
+          - `{d.departments[i].people[i].salary:aggSum(.age)}`
+        - Sum by people by age and gender, regardless of departments
+          - `{d.departments[i].people[i].salary:aggSum(.age, .gender)}`
 
-
-    *Data*
-      ```js
-        [
-          {
-            id : 'CARBONE', tax  : 2,
-            depts : [
-              { name : 'IT'    , jobs : [ {salary : 10}, {salary : 20}                ]},
-              { name : 'Sales' , jobs : [ {salary : 5 }, {salary : 2 }, {salary : 7}  ]}
-            ]
-          },
-          {
-            id : 'YNSECT',  tax  : 3,
-            depts : [
-              { name : 'IT'        , jobs : [ {salary : 2} , {salary : 8}                ]},
-              { name : 'Marketing' , jobs : [ {salary : 1} , {salary : 3}, {salary : 6}  ]},
-              { name : 'Sales'     , jobs : [ {salary : 3}                               ]}
-            ]
-          }
-        ]
-      ```
-
-    *Template => Result*
-
-    - Sub-total of `salary` per company, per department:
-      > En interne, remplacé par `aggSum(..i, ...i)` 
-
-    ```js
-      // TEMPLATE                            // RESULT
-      {d[i].depts[i].jobs[].salary:aggSum}   30 // CARBONE - IT
-      {d[i+1].depts[i+1]}                    14 // CARBONE - Sales
-                                             10 // YNSECT - IT
-                                             10 // YNSECT - Marketing
-                                             3  // YNSECT - Sales
-    ```
-    
-    - All this sy,ntax are equals:
-      - `{d[i].depts[i].jobs[].salary:aggSum}`          // Faire ça en dernier
-      - `{d[i].depts[i].jobs[].salary:aggSum(.i, ..i)}` // TODO mauvaise idée, car si on utilsie un sort et sort+1 !!!
-      - `{d[i].depts[i].jobs[i].salary:aggSum(..i, ...i)}`
-
-
-    - Sub-total of `salary` per department, any company
-
-    ```js
-      // TEMPLATE                                    // RESULT
-      {d[i].depts[i].jobs[].salary:aggSum(..name)}   40 // CARBONE - IT  
-      {d[i+1].depts[i+1]}                            17 // CARBONE - Sales
-                                                     40 // YNSECT - IT
-                                                     10 // YNSECT - Marketing
-                                                     17 // YNSECT - Sales
-    ```
-
-    - Cumulative sum (or "Running total") of `salary`
-      > En interne, remplacé par `aggSum(0):getCurrentValue` 
-
-    ```js
-      // TEMPLATE                            // RESULT
-      {d[i].depts[i].jobs[].salary:cumSum}   30 // CARBONE - IT
-      {d[i+1].depts[i+1]}                    44 // CARBONE - Sales
-                                             54 // YNSECT - IT
-                                             64 // YNSECT - Marketing
-                                             67 // YNSECT - Sales
-    ```
-
-    - Cumulative sum (or "Running total") of `salary` per department, any company
-      > En interne, remplacé par `aggSum(..name):getCurrentValue` 
-
-    ```js
-      // TEMPLATE                                    // RESULT
-      {d[i].depts[i].jobs[].salary:cumSum(..name)}   30 // CARBONE - IT         
-      {d[i+1].depts[i+1]}                            14 // CARBONE - Sales
-                                                     40 // YNSECT - IT
-                                                     10 // YNSECT - Marketing
-                                                     17 // YNSECT - Sales
-    ```
 
 
 ### v3.4.7

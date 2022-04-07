@@ -12,7 +12,10 @@ function writeTemplate (req, res, templateId, templatePathTemp) {
     return res.send({
       success : true,
       data    : {
-        templateId : templateId
+        templateId : templateId,
+        extension  : req.headers['carbone-template-extension'],
+        mimetype   : req.headers['carbone-template-mimetype'],
+        size       : req.headers['carbone-template-size']
       }
     });
   });

@@ -33,7 +33,7 @@ function deleteTemplate (req, res, templateId, callback) {
   return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
 }
 
-function afterRender (req, res, err, reportPath, reportName, callback) {
+function afterRender (req, res, err, reportPath, reportName, statObject, callback) {
   if (err) {
     return callback(err);
   }
@@ -44,7 +44,8 @@ function afterRender (req, res, err, reportPath, reportName, callback) {
       return res.send({
         success : true,
         data    : {
-          renderId : reportName
+          renderId  : reportName,
+          templateId: statObject.templateId
         }
       });
     });

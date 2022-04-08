@@ -132,7 +132,7 @@ function unlinkConfigFile () {
   fs.rmdirSync(path.join(os.tmpdir(), 'plugin'));
 }
 
-describe.only('Webserver', () => {
+describe('Webserver', () => {
   before(() => {
     writeConfigFile();
   });

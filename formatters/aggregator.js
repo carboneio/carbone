@@ -82,7 +82,7 @@ aggSum.canBeCalledInPrecomputedLoop = true;
  */
 function aggSumGet (d, ...partitionBy) {
   const _id = generateAggregatorId(this.id, ...partitionBy);
-  return this.aggDatabase.get(_id);
+  return this.aggDatabase.get(_id) ?? 0;
 }
 
 /**
@@ -131,7 +131,8 @@ aggAvg.canBeCalledInPrecomputedLoop = true;
 function aggAvgGet (d, ...partitionBy) {
   const _id = generateAggregatorId(this.id, ...partitionBy);
   const _val = this.aggDatabase.get(_id);
-  return _val.sum / _val.nb;
+  const _res = _val ? (_val.sum / _val.nb) : 0;
+  return _res;
 }
 
 
@@ -180,7 +181,7 @@ aggMin.canBeCalledInPrecomputedLoop = true;
  */
 function aggMinGet (d, ...partitionBy) {
   const _id = generateAggregatorId(this.id, ...partitionBy);
-  return this.aggDatabase.get(_id);
+  return this.aggDatabase.get(_id) ?? 0;
 }
 
 
@@ -212,7 +213,7 @@ aggMax.canBeCalledInPrecomputedLoop = true;
  */
 function aggMaxGet (d, ...partitionBy) {
   const _id = generateAggregatorId(this.id, ...partitionBy);
-  return this.aggDatabase.get(_id);
+  return this.aggDatabase.get(_id) ?? 0;
 }
 
 /* ************************************************************************************************************** */
@@ -242,7 +243,7 @@ aggCount.canBeCalledInPrecomputedLoop = true;
  */
 function aggCountGet (d, ...partitionBy) {
   const _id = generateAggregatorId(this.id, ...partitionBy);
-  return this.aggDatabase.get(_id);
+  return this.aggDatabase.get(_id) ?? 0;
 }
 
 

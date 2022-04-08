@@ -538,6 +538,24 @@ describe('Aggregatted operations', function () {
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
 
+      it('should not crash if the filter is not defined', function (done) {
+        const _xml =
+           '<x>  '
+          +  '<r><d>{d.companies[i].size}</d></r>'
+          +  '<r><d>{d.companies[i+1].size}</d></r>'
+          +  '<r><d></d><d>{d.companies[sortqssq>1].size:__TESTED_FORMATTER__}</d></r>'
+          +'</x>';
+        let _expected = [
+          [ 'cumCount', '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>1</d></r></x>'],
+          [ 'aggSum'  , '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>0</d></r></x>'],
+          [ 'aggAvg'  , '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>0</d></r></x>'],
+          [ 'aggMin'  , '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>0</d></r></x>'],
+          [ 'aggMax'  , '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>0</d></r></x>'],
+          [ 'aggCount', '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>0</d></r></x>'],
+        ];
+        executeTest(_xml, dataThreeLoops, _expected, done);
+      });
+
       it('should accept formatters', function (done) {
         const _xml =
            '<x>  '

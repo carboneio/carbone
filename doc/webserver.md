@@ -428,7 +428,6 @@ The `statistics` argument return an object with:
 ```json
 {
   "renderId": "",
-  "templateId": "",
   "template": "filename",
   "user"      : "if authentication enabled, the user ID is returned, it is coming from the JWT token",
   "options"   : "Rendering options as an object",

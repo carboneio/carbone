@@ -452,7 +452,7 @@ describe('Webserver', () => {
             assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'titi' + data.data.renderId)), true);
             assert.strictEqual(data.data.renderId.startsWith('REPORT'), true);
             assert.strictEqual(data.data.renderId.endsWith('.html'), true);
-            assert.strictEqual(data.data.templateId, templateId); // templateId coming from the stats object
+            assert.strictEqual(data.data.templateId.includes(templateId), true); // templateId coming from the stats object
 
             get.concat({
               url     : 'http://localhost:4001/render/' + data.data.renderId,

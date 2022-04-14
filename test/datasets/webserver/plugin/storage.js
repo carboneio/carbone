@@ -37,14 +37,12 @@ function afterRender (req, res, err, reportPath, reportName, statObject, callbac
   if (err) {
     return callback(err);
   }
-
   fs.readFile(reportPath, (err, content) => {
     fs.writeFile(path.join(os.tmpdir(), 'titi' + reportName), content, () => {
       return res.send({
         success : true,
         data    : {
-          renderId  : reportName,
-          templateId: statObject.template
+          renderId  : reportName
         }
       });
     });

@@ -405,7 +405,7 @@ To override render writing, add the function `afterRender` in the `storage.js` f
 ```js
 function afterRender (req, res, err, reportPath, reportName, statistics, next) {
   // Write or rename your render
-
+  // TemplateID available: req.params.templateId
   return next(null)
 }
 

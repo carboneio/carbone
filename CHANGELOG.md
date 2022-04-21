@@ -1,4 +1,8 @@
 
+### v4.0.0-alpha.1
+
+  - Fix crash when a condition is used just before a filtered loop
+
 ### v4.0.0-alpha.0
 
   WARNING: Native charts in LibreOffice and Word still need a lot of work before being stable for production

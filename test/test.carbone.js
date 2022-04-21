@@ -715,6 +715,51 @@ describe('Carbone', function () {
         done();
       });
     });
+
+    it('should not crash if a condition is used just before an array loop, which contains a filter', function (done) {
+      var _xml = ''
+        + '<doc>'
+        + '  <body>'
+        + '    <a>{d.condition:ifIN(a):hideBegin}</a>'
+        + '    <b>{d.subArray[i,type!=b].type}</b>'
+        + '    <c>{d.subArray[i+1].type}</c>'
+        + '    <d>{d.condition:hideEnd}</d>'
+        + '  </body>'
+        + '</doc>'
+      ;
+      var _data = {
+        condition : 'a',
+        subArray  : [{ type : 'b' }]
+      };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<doc>  <body>      </body></doc>');
+        done();
+      });
+    });
+
+    it('should not crash if a condition is used just before an array loop, without filter', function (done) {
+      var _xml = ''
+        + '<doc>'
+        + '  <body>'
+        + '    <a>{d.condition:ifIN(a):hideBegin}</a>'
+        + '    <b>{d.subArray[i].type}</b>'
+        + '    <c>{d.subArray[i+1].type}</c>'
+        + '    <d>{d.condition:hideEnd}</d>'
+        + '  </body>'
+        + '</doc>'
+      ;
+      var _data = {
+        condition : 'a',
+        subArray  : [{ type : 'b' }]
+      };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<doc>  <body>      </body></doc>');
+        done();
+      });
+    });
+
     it('formatters should be independant. The propagation of one set of cascaded formatters should not alter the propagation of another set of formatters', function (done) {
       var data = {
         param : 3,

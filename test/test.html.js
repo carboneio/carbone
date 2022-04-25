@@ -57,6 +57,27 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
         });
 
+        it.only('should find and seperate a single html formatter inside a <text:h> tag', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          const _template = '' +
+            '<office:body><office:text>'+
+              '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showBegin}{d.A[i].B} Summary: {d.A[i].O:html()}{d.A[i].O:ifNEM():showEnd}</text:h>' +
+              '<text:h text:style-name="P2" text:outline-level="1">{d.A[i+1]}</text:h>' +
+            '</office:text></office:body>';
+          const _expected = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showBegin}{d.A[i].B} Summary: </text:h>' +
+                '<carbone>{d.A[i].O:getHTMLContentOdt(\'style-P2\')}</carbone>' +
+                '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showEnd}</text:h>' +
+                '<text:h text:style-name="P2" text:outline-level="1">{d.A[i+1]}</text:h>' +
+              '</office:text>' +
+            '</office:body>'
+          assert.strictEqual(html.reorderXML(_template, _options), _expected);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P2')), JSON.stringify({ paragraph: 'text:style-name="P2"', text: '' }))
+        })
+
         it('should seperate a single html formatter mixed inside a span', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +

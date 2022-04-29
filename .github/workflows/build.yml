@@ -34,14 +34,14 @@ jobs:
       # Prepare and build
       - run: sudo npm i -g pkg@${{env.PKG_VERSION}}
       - run: npm ci --production
-      - run: node script/updatePackage.js
+      # - run: node script/updatePackage.js
       - run: pkg -t ${{env.BUILD_TARGET}} -o ${{env.BUILD_PREFIX}} .
       # Commit
-      - run: git add "package.json"
-      - run: git commit -n -m "Save date in package.json"
-      - run: git push
-      - run: git tag ${{env.CARBONE_EE_TAG}}
-      - run: git push origin ${{env.CARBONE_EE_TAG}}
+      # - run: git add "package.json"
+      # - run: git commit -n -m "Save date in package.json"
+      # - run: git push
+      # - run: git tag ${{env.CARBONE_EE_TAG}}
+      # - run: git push origin ${{env.CARBONE_EE_TAG}}
 
       - name: Create Release
         id: create_release

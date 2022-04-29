@@ -43,16 +43,16 @@ jobs:
       # - run: git tag ${{env.CARBONE_EE_TAG}}
       # - run: git push origin ${{env.CARBONE_EE_TAG}}
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.CARBONE_EE_TAG }}
-          release_name: "v${{ env.PACKAGE_VERSION }}"
-          draft: false
-          prerelease: false
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ env.CARBONE_EE_TAG }}
+      #     release_name: "v${{ env.PACKAGE_VERSION }}"
+      #     draft: false
+      #     prerelease: false
 
       # We use hub CLI because actions/upload-release-asset@v1 does not support to upload multiple release files in one job
       - name: Upload

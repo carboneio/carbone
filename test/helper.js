@@ -43,6 +43,9 @@ const helperTests = {
   assertFullReport : function  (carboneResult, expectedDirname, getHiddenFiles = false) {
     var _expected = helperTests.openUnzippedDocument(expectedDirname, 'expected', getHiddenFiles);
     var _max = Math.max(carboneResult.files.length, _expected.files.length);
+    carboneResult.files.sort(sortFilename);
+    _expected.files.sort(sortFilename);
+
     for (var i = 0; i < _max; i++) {
       var _resultFile   = carboneResult.files[i] || {};
       var _expectedFile = _expected.files[i] || {};
@@ -119,5 +122,12 @@ const helperTests = {
     return _report;
   }
 };
+
+function sortFilename (a, b) {
+  if (a.parent === b.parent) {
+    return (a.name < b.name) ? 1 : -1;
+  }
+  return (a.parent < b.parent) ? 1 : -1;
+}
 
 module.exports = helperTests;

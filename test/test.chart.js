@@ -18,7 +18,7 @@ const echartLineSVG             = fs.readFileSync('test/datasets/chart/echartLin
 const echartLineSVGDefaultColor = fs.readFileSync('test/datasets/chart/echartLineDefaultColor.svg', 'utf8');
 const echartLineSVGWaldenColor  = fs.readFileSync('test/datasets/chart/echartLineWaldenColor.svg', 'utf8');
 
-describe('chart', function () {
+describe.only('chart', function () {
 
   describe('generateChartImage', function () {
     it('should generate SVG', function (done) {
@@ -98,6 +98,24 @@ describe('chart', function () {
       assert.throws(() => {
         chartLib.generateDocxRowCountFormatter(['{d[i].valCol2}', '{d.cars[i+1].valCol2}' ]);
       }, { message : 'Unable to detect loop in charts between markers: {d[i].valCol2}, {d.cars[i+1].valCol2}' });
+    });
+    it('should accept nested array with same iterators', function () {
+      const _markers = [
+        '{d.charts[i].data[i].label}',
+        '{d.charts[i].data[i+1].label}'
+      ];
+      const _res = chartLib.generateDocxRowCountFormatter(_markers);
+      helperTest.assert(_res.rowCount, '{d.charts[i].data[i].label:cumCount:sub(1)}');
+      helperTest.assert(_res.totalCount, '{d.charts[i].data[].label:aggCount}');
+    });
+    it('should accept whitepaces', function () {
+      const _markers = [
+        '      {d.charts[i].data[i].label}        ',
+        '      {d.charts[i].data[i+1].label}      '
+      ];
+      const _res = chartLib.generateDocxRowCountFormatter(_markers);
+      helperTest.assert(_res.rowCount, '{d.charts[i].data[i].label:cumCount:sub(1)}');
+      helperTest.assert(_res.totalCount, '{d.charts[i].data[].label:aggCount}');
     });
   });
 
@@ -243,41 +261,39 @@ describe('chart', function () {
   });
 
   describe('[Full test] DOCX', function () {
-    // TODO replace bind in Excel aussi
     it('should update a simple chart with rounding issue (4.4000000000000004 instead of 4.4) for bound values', function (done) {
       const _data = [
         { label : 'row1' , valCol1 : 10 , valCol2 : 100.1 },
         { label : 'row2' , valCol1 : 20 , valCol2 : 200.2 },
         { label : 'row3' , valCol1 : 30 , valCol2 : 300.3 }
       ];
-      const _testedReport = 'chart/docx-simple';
+      const _testedReport = 'chart/docx-simple-with-bind';
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');
         helperTest.assertFullReport(res, _testedReport);
         done();
       });
     });
-    // TODO replace bind in Excel aussi
-    it('should accept that i+1 row is not complete', function (done) {
-      const _data = [
-        { label : 'row1' , valCol1 : 10 , valCol2 : 100.1 },
-        { label : 'row2' , valCol1 : 20 , valCol2 : 200.2 },
-        { label : 'row3' , valCol1 : 30 , valCol2 : 300.3 }
-      ];
-      const _testedReport = 'chart/docx-simple-partial-loop';
-      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
-        helperTest.assert(err+'', 'null');
-        helperTest.assertFullReport(res, _testedReport);
-        done();
-      });
-    });
-    it.only('Ashould accept charts without bind values', function (done) {
-      const _data = [
-        { label : 'row1' , valCol1 : 10 , valCol2 : 100.1 },
-        { label : 'row2' , valCol1 : 20 , valCol2 : 200.2 },
-        { label : 'row3' , valCol1 : 30 , valCol2 : 300.3 }
-      ];
-      const _testedReport = 'chart/docx-simple-no-bind';
+    it('should do loops, and read markers directly from XLSX (without bindChart)', function (done) {
+      const _data = {
+        charts : [
+          {
+            data : [
+              { label : 'row1' , valCol1 : 10 , valCol2 : 100.1 },
+              { label : 'row2' , valCol1 : 20 , valCol2 : 200.2 },
+              { label : 'row3' , valCol1 : 30 , valCol2 : 300.3 }
+            ]
+          },
+          {
+            data : [
+              { label : 'chart2_1' , valCol1 : 40 , valCol2 : 400.1 },
+              { label : 'chart2_2' , valCol1 : 50 , valCol2 : 500.2 },
+              { label : 'chart2_3' , valCol1 : 60 , valCol2 : 600.3 }
+            ]
+          }
+        ]
+      };
+      const _testedReport = 'chart/docx-loop';
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');
         helperTest.assertFullReport(res, _testedReport);
@@ -285,7 +301,88 @@ describe('chart', function () {
       });
     });
   });
+
+  describe('getDocxRelatedFiles', function () {
+    it.skip('TODOAA', function () {
+      const _testedReport = 'chart/docx-simple-no-bind';
+      const _relatedFiles = chartLib.getDocxRelatedFiles(helperTest.openTemplate(_testedReport), 'chart1');
+      helperTest.assert(_relatedFiles, 'null');
+    });
+  });
+
+  describe('finishDocxChart', function () {
+    it('add counters', function () {
+      const _simplifiedXML = ''
+        + '<c:chartSpace>'
+        + '  <c:val>'
+        + '    <c:numRef> <c:f>Feuil1!$A$2:$A$3</c:f>'
+        + '      <c:numCache>'
+        + '        <c:formatCode> General </c:formatCode>'
+        + '        <c:ptCount val="CARBONE_REPLACE_BY_T"/>'
+        + '        <c:pt idx="CARBONE_REPLACE_BY_C"> <c:v> 1 </c:v> </c:pt>'
+        + '        <c:pt idx="CARBONE_REPLACE_BY_C"> <c:v> 2 </c:v> </c:pt>'
+        + '        <c:pt idx="CARBONE_REPLACE_BY_C"> <c:v> 3 </c:v> </c:pt>'
+        + '      </c:numCache>'
+        + '    </c:numRef>'
+        + '  </c:val>'
+        + '  <c:val>'
+        + '    <c:numRef> <c:f>Feuil1!$C$2:$C$3</c:f>'
+        + '      <c:numCache>'
+        + '        <c:formatCode> General </c:formatCode>'
+        + '        <c:ptCount val="CARBONE_REPLACE_BY_T"/>'
+        + '        <c:pt idx="CARBONE_REPLACE_BY_C"> <c:v> 400.1 </c:v> </c:pt>'
+        + '        <c:pt idx="CARBONE_REPLACE_BY_C"> <c:v> 200.1 </c:v> </c:pt>'
+        + '        <c:pt idx="CARBONE_REPLACE_BY_C"> <c:v> 100.1 </c:v> </c:pt>'
+        + '        <c:pt idx="CARBONE_REPLACE_BY_C"> <c:v> 100.1 </c:v> </c:pt>'
+        + '      </c:numCache>'
+        + '    </c:numRef>'
+        + '  </c:val>'
+        + '  <c:externalData r:id="rId3"> <c:autoUpdate val="0"/> </c:externalData>'
+        + '</c:chartSpace>';
+      const _expectedXML = ''
+        + '<c:chartSpace>'
+        + '  <c:val>'
+        + '    <c:numRef> <c:f>Feuil1!$A$2:$A$3</c:f>'
+        + '      <c:numCache>'
+        + '        <c:formatCode> General </c:formatCode>'
+        + '        <c:ptCount val="3"/>'
+        + '        <c:pt idx="0"> <c:v> 1 </c:v> </c:pt>'
+        + '        <c:pt idx="1"> <c:v> 2 </c:v> </c:pt>'
+        + '        <c:pt idx="2"> <c:v> 3 </c:v> </c:pt>'
+        + '      </c:numCache>'
+        + '    </c:numRef>'
+        + '  </c:val>'
+        + '  <c:val>'
+        + '    <c:numRef> <c:f>Feuil1!$C$2:$C$3</c:f>'
+        + '      <c:numCache>'
+        + '        <c:formatCode> General </c:formatCode>'
+        + '        <c:ptCount val="4"/>'
+        + '        <c:pt idx="0"> <c:v> 400.1 </c:v> </c:pt>'
+        + '        <c:pt idx="1"> <c:v> 200.1 </c:v> </c:pt>'
+        + '        <c:pt idx="2"> <c:v> 100.1 </c:v> </c:pt>'
+        + '        <c:pt idx="3"> <c:v> 100.1 </c:v> </c:pt>'
+        + '      </c:numCache>'
+        + '    </c:numRef>'
+        + '  </c:val>'
+        + '  <c:externalData r:id="rId3"> <c:autoUpdate val="0"/> </c:externalData>'
+        + '</c:chartSpace>';
+      helperTest.assert(chartLib.finishDocxChart(_simplifiedXML), _expectedXML);
+    });
+  });
+
+
+  describe('getDocxObjectIdFromRel', function () {
+    it('get chart Id from Docx rel', function () {
+      const _testedReport = 'chart/docx-simple-with-bind';
+      helperTest.assert(chartLib.getDocxObjectIdFromRel(helperTest.openTemplate(_testedReport), 'charts/chart1.xml'), 'rId4');
+    });
+    it('get object id of another element', function () {
+      const _testedReport = 'chart/docx-simple-with-bind';
+      helperTest.assert(chartLib.getDocxObjectIdFromRel(helperTest.openTemplate(_testedReport), 'theme/theme1.xml'), 'rId6');
+    });
+    it('get return an empty string if object is not found', function () {
+      const _testedReport = 'chart/docx-simple-with-bind';
+      helperTest.assert(chartLib.getDocxObjectIdFromRel(helperTest.openTemplate(_testedReport), 'sdqsdqsd/tqsdheme1.xml'), '');
+    });
+  });
 });
-
-
-

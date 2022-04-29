@@ -97,7 +97,7 @@
           <table:table-rows>
             <table:table-row>
               <table:table-cell office:value-type="string">
-                <text:p>{d[i].label} {bind(91) = d[i].valCol1}</text:p>
+                <text:p>{d[i].label} {bindChart(91) = d[i].valCol1}</text:p>
               </table:table-cell>
               <table:table-cell office:value-type="float" office:value="91">
                 <text:p>91</text:p>
@@ -108,7 +108,7 @@
             </table:table-row>
             <table:table-row>
               <table:table-cell office:value-type="string">
-                <text:p>{d[i+1].label} {bind(32) = d[i].valCol2}</text:p>
+                <text:p>{d[i+1].label} {bindChart(32) = d[i].valCol2}</text:p>
               </table:table-cell>
               <table:table-cell office:value-type="float" office:value="24">
                 <text:p>24</text:p>

@@ -1,5 +1,5 @@
 
-### v4.0.0-alpha.2
+### v4.0.0-alpha.1
 
   - [EE] BREAKING CHANGE: the specific marker `{bind` becomes `{bindChart`. Example: `{bindChart(91) = d[i].valCol1}` 
   - [EE] DOCX Charts improvements
@@ -8,10 +8,6 @@
     - Supports only Column, Line, Pie charts
     - Carbone markers must be written with all `i` and `i+1` rows and columns in related Excel spreadsheet.
     - Using the specific marker `{bindChart` is not mandatory for DOCX because MS Word accepts Carbone markers in chart values
-
-
-### v4.0.0-alpha.1
-
   - Fix crash when a condition is used just before a filtered loop
 
 ### v4.0.0-alpha.0

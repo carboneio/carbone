@@ -1,3 +1,6 @@
+### v3.5.X
+  - Fix ODT templates that are including dynamic hyperlinks with query parameters
+
 ### v3.5.1
   - Release May 4st 2022
   - Rollback fix in v3.4.9

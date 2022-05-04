@@ -1,3 +1,9 @@
+### v3.5.0
+  - Release May 4st 2022
+  - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.
+      - Example: `{d.val:add(.otherQty  +  .vat  *  .price - 10 / 2)`
+      - Only mathematical operators `+, *, -, /` are allowed without parenthesis
+
 ### v3.4.9
   - Release April 27st 2022
   - Fix crash with very complex JSON map

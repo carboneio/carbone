@@ -1,3 +1,7 @@
+### v3.5.1
+  - Release May 4st 2022
+  - Rollback fix in v3.4.9
+
 ### v3.5.0
   - Release May 4st 2022
   - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.

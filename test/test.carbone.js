@@ -1501,6 +1501,19 @@ describe('Carbone', function () {
             });
           });
         });
+        it('should not crash if there is a division per zero', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:add(.failed/0)}</xml>';
+          const _expectedResult = '<xml>Infinity</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
       });
     });
 

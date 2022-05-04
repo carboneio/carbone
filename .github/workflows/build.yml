@@ -36,23 +36,25 @@ jobs:
       - run: npm ci --production
       - run: node script/updatePackage.js
       - run: pkg -t ${{env.BUILD_TARGET}} -o ${{env.BUILD_PREFIX}} .
-      # Commit
-      - run: git add "package.json"
-      - run: git commit -n -m "Save date in package.json"
-      - run: git push
-      - run: git tag ${{env.CARBONE_EE_TAG}}
-      - run: git push origin ${{env.CARBONE_EE_TAG}}
+#      # Commit
+#      - run: git add "package.json"
+#      - run: git commit -n -m "Save date in package.json"
+#      - run: git push
+#      - run: git tag ${{env.CARBONE_EE_TAG}}
+#      - run: git push origin ${{env.CARBONE_EE_TAG}}
+#
+#      - name: Create Release
+#        id: create_release
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: ${{ env.CARBONE_EE_TAG }}
+#          release_name: "v${{ env.PACKAGE_VERSION }}"
+#          draft: false
+#          prerelease: false
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.CARBONE_EE_TAG }}
-          release_name: "v${{ env.PACKAGE_VERSION }}"
-          draft: false
-          prerelease: false
+      - run: sleep 30s
 
       # We use hub CLI because actions/upload-release-asset@v1 does not support to upload multiple release files in one job
       - name: Upload

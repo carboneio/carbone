@@ -201,6 +201,7 @@ function add (d, value) {
   }
   return d;
 }
+add.isAcceptingMathExpression = true;
 
 /**
  * Substract two numbers
@@ -219,6 +220,7 @@ function sub (d, value) {
   }
   return d;
 }
+sub.isAcceptingMathExpression = true;
 
 /**
  * Multiply two numbers
@@ -237,6 +239,7 @@ function mul (d, value) {
   }
   return d;
 }
+mul.isAcceptingMathExpression = true;
 
 /**
  * Divide two numbers
@@ -255,6 +258,7 @@ function div (d, value) {
   }
   return d;
 }
+div.isAcceptingMathExpression = true;
 
 module.exports = {
   formatN  : formatN,

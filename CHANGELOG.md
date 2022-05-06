@@ -1,5 +1,9 @@
+### v3.5.2
+  - Release May 6th 2022
+  - [EE] Add file verification on template upload
+
 ### v3.5.1
-  - Release May 4st 2022
+  - Release May 4th 2022
   - Rollback fix in v3.4.9
 
 ### v3.5.0

@@ -18,7 +18,7 @@ const echartLineSVG             = fs.readFileSync('test/datasets/chart/echartLin
 const echartLineSVGDefaultColor = fs.readFileSync('test/datasets/chart/echartLineDefaultColor.svg', 'utf8');
 const echartLineSVGWaldenColor  = fs.readFileSync('test/datasets/chart/echartLineWaldenColor.svg', 'utf8');
 
-describe.only('chart', function () {
+describe('chart', function () {
 
   describe('generateChartImage', function () {
     it('should generate SVG', function (done) {

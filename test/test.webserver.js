@@ -390,7 +390,7 @@ describe('Webserver', () => {
         toDelete = [];
       });
 
-      it('should upload the template and use authentication and storage plugin', (done) => {
+      it('should upload the template as form-data and use authentication and storage plugin', (done) => {
         let form = new FormData();
 
         form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
@@ -400,6 +400,9 @@ describe('Webserver', () => {
           data = JSON.parse(data);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          assert.strictEqual(data.data.extension, 'html');
+          assert.strictEqual(data.data.mimetype, 'text/html');
+          assert.strictEqual(data.data.size, 102);
           let exists = fs.existsSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           assert.strictEqual(exists, true);
           fs.unlinkSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
@@ -410,6 +413,24 @@ describe('Webserver', () => {
             // assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'afterFile2')).toString(), 'AFTER FILE 2');
             done();
           }, 100);
+        });
+      });
+
+      it('should upload the template as base64 and use authentication and storage plugin', (done) => {
+        let _data = {
+          template : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'})
+        };
+        get.concat(getBody(4001, '/template', 'POST', _data, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(data.success, true);
+          assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          assert.strictEqual(data.data.extension, 'html');
+          assert.strictEqual(data.data.mimetype, 'text/html');
+          assert.strictEqual(data.data.size, 102);
+          let exists = fs.existsSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+          assert.strictEqual(exists, true);
+          toDelete.push('PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          done();
         });
       });
 
@@ -1527,6 +1548,20 @@ describe('Webserver', () => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Content-Type header should be multipart/form-data (preferred) or application/json (base64 mode)');
+          done();
+        });
+      });
+
+      it('should not be able to upload not supported file templates', (done) => {
+        let form = new FormData();
+
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'helperDirTest', 'create.sql')));
+
+        get.concat(getBody(4000, '/template', 'POST', form), (err, res, data) => {
+          assert.strictEqual(err, null);
+          data = JSON.parse(data);
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file');
           done();
         });
       });

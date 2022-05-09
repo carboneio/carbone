@@ -5,6 +5,97 @@ var count   = require('../formatters/array').count;
 
 describe('parser', function () {
 
+  describe('parseMathematicalExpression', function () {
+    it('should parse simple mathematical expression and generate safe code', function () {
+      const _varParser = (v) => {
+        helper.assert(['.a', '.b'].includes(v), true);
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.a + .b', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_a_)+parseFloat(_b_)');
+    });
+    it('should parse more complex mathematical expression and generate safe code using safeCodeFn', function () {
+      const _varParser = (v) => {
+        helper.assert(['.aaa', '.b', '...parent[0].sub.id', '.toto', '223.234', '.part.id'].includes(v), true);
+        if (v[0] === '.') {
+          return '_'+ v.slice(1) + '_';
+        }
+        return v;
+      };
+      const _resultCode = parser.parseMathematicalExpression('.aaa +    .b   * ...parent[0].sub.id    -  .toto + 223.234 / .part.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_aaa_)+parseFloat(_b_)*parseFloat(_..parent[0].sub.id_)-parseFloat(_toto_)+parseFloat(223.234)/parseFloat(_part.id_)');
+    });
+    it('should return nothing if there is nothing to parse', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      helper.assert(parser.parseMathematicalExpression('  ', _varParser), '');
+      helper.assert(parser.parseMathematicalExpression(undefined, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression(null, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression({}, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression([], _varParser), '');
+    });
+    it('should return one variable if there is one variable', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_id_)');
+    });
+    it('should return one float', function () {
+      const _varParser = (v) => {
+        return v;
+      };
+      const _resultCode = parser.parseMathematicalExpression('11233.23', _varParser);
+      helper.assert(_resultCode, 'parseFloat(11233.23)');
+    });
+    it('should return one negative float', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('-1123', _varParser);
+      helper.assert(_resultCode, '-parseFloat(_1123_)');
+    });
+    it('should not crash', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('sdsdsd( i\\\'d', _varParser);
+      helper.assert(_resultCode, '');
+    });
+    it('should accept dash in variable name', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.color-dash-bidule', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_.color-dash-bidule_)');
+    });
+    it('should accept dash in multiple variables', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.color-dash-bidule - .other-bidule', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_.color-dash-bidule_)-parseFloat(_.other-bidule_)');
+    });
+    it('should return an error when mathematical expression is not correct', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      /* eslint-disable */
+      assert.throws(() => { parser.parseMathematicalExpression('/10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "/10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('*10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "*10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('+10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "+10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('///10'     , _varParser); }, {  message : 'Bad Mathematical Expression in "///10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 ++'     , _varParser); }, {  message : 'Bad Mathematical Expression in "10 ++"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 +'      , _varParser); }, {  message : 'Bad Mathematical Expression in "10 +"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10*'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10*"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10/'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10/"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10-'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10-"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 ++ 10'  , _varParser); }, {  message : 'Bad Mathematical Expression in "10 ++ 10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 //// 10', _varParser); }, {  message : 'Bad Mathematical Expression in "10 //// 10"' });
+      /* eslint-enable */
+    });
+  });
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object. It should replace the marker by a reserved character', function (done) {

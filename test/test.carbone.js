@@ -1544,6 +1544,103 @@ describe('Carbone', function () {
           });
         });
       });
+
+      describe('Mathematical expressions', function () {
+        it('should accept mathematicals expressions, should still accept simple negative number', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(100):div(.passed + .failed)}  {d.passed:mul(100):div(.passed):add(-13.34):add(   -  1)}</xml>';
+          const _expectedResult = '<xml>83.33333333333333  85.66</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should still accept simple numbers and expressions', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(100.5):div(10.34):sub(5.2):add(3.1)}  {d.passed:mul(.failed):div(.passed):sub(.failed):add(.passed)}</xml>';
+          const _expectedResult = '<xml>95.0953578336557  10</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expression in mul, div, sub and add formatters', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(.passed + .failed + 3)}</xml>';
+          const _expectedResult = '<xml>150</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expression in mul, div, sub and add formatters', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(.passed + .failed + 3):div(.passed + .failed + 2):sub(.passed - .failed - 5):add(.passed + .failed + 3.2)}</xml>';
+          const _expectedResult = '<xml>22.91428571428571</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expressions (complex)', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(-100):add(-.passed - .failed - 100/2)}</xml>';
+          const _expectedResult = '<xml>-1062</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should return an error if the mathematical expressions is not correct', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(***100**):add(/.passed):sub(*12):div(+++12)}</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'Error: Bad Mathematical Expression in "***100**"');
+            helper.assert(result, null);
+            carbone.renderXML('<xml>{d.passed:add(/.passed)}</xml>', _data, function (err, result) {
+              helper.assert(err+'', 'Error: Bad Mathematical Expression in "/.passed"');
+              helper.assert(result, null);
+              done();
+            });
+          });
+        });
+        it('should not crash if there is a division per zero', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:add(.failed/0)}</xml>';
+          const _expectedResult = '<xml>Infinity</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+      });
     });
 
     describe('security test', function () {

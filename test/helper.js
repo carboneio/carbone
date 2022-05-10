@@ -60,7 +60,6 @@ const helperTests = {
       assert.strictEqual(_resultFile.name, _expectedFile.name);
       if (Buffer.isBuffer(_expectedFile.data) === false && Buffer.isBuffer(_resultFile.data) === true) {
         _resultFile.data = _resultFile.data.toString();
-        fs.writeFileSync(path.join(__dirname, 'res.svg'), _resultFile.data);
       }
       if (Buffer.isBuffer(_resultFile.data) === true) {
         if (_resultFile.data.equals(_expectedFile.data) === false) {

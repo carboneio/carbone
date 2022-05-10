@@ -1,6 +1,9 @@
-### v4.0.0-alpha.2
+### v4.0.0-beta.1
   - [EE] Include 3.5.2
-  - [EE] Fix crash when DOCX/ODT templates contain empty files
+  - [EE] Dynamic chart: 
+    - Fix crash when DOCX/ODT templates contain empty files
+    - Fix bad behavior when ODT template contains images with dynamic charts
+    - Fix chart binding when values contain white spaces
 
 ### v4.0.0-alpha.1
 

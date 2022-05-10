@@ -258,6 +258,37 @@ describe('chart', function () {
         done();
       });
     });
+    it('should replace markers in multiple charts, and should not consider break <draw:frame> which contains images, should accept whitespaces in bound values', function (done) {
+      const _data = {
+        charts : [
+          {
+            data : [
+              { label : 'row1' , valCol1 : 10 , valCol2 : 100.1 },
+              { label : 'row2' , valCol1 : 20 , valCol2 : 200.2 },
+              { label : 'row3' , valCol1 : 30 , valCol2 : 300.3 }
+            ]
+          },
+          {
+            data : [
+              { label : 'chart2_1' , valCol1 : 40 , valCol2 : 400.1 },
+              { label : 'chart2_2' , valCol1 : 50 , valCol2 : 500.2 },
+              { label : 'chart2_3' , valCol1 : 60 , valCol2 : 600.3 }
+            ]
+          }
+        ]
+      };
+      _data.charts2 = JSON.parse(JSON.stringify(_data.charts));
+      _data.charts2[0].data[0].label = '2row1';
+      _data.charts2[0].data[0].valCol1 = 1000;
+      _data.charts2[1].data[2].label = '2chartt2_3';
+      _data.charts2[1].data[2].valCol1 = 60000;
+      const _testedReport = 'chart/odt-multiple-loop';
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
   describe('[Full test] DOCX', function () {

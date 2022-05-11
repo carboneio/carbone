@@ -4,6 +4,7 @@
     - Fix crash when DOCX/ODT templates contain empty files
     - Fix bad behavior when ODT template contains images with dynamic charts
     - Fix chart binding when values contain white spaces
+    - Fix ODT charts when images are used for background
 
 ### v4.0.0-alpha.1
 

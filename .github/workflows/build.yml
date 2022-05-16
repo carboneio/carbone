@@ -54,6 +54,9 @@ jobs:
           draft: false
           prerelease: false
 
+      # Let Github creates its release before uploading to avoid errors
+      - run: sleep 30s
+
       # We use hub CLI because actions/upload-release-asset@v1 does not support to upload multiple release files in one job
       - name: Upload
         env:

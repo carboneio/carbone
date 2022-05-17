@@ -1,6 +1,11 @@
+### v3.5.X
+  - [EE] Fix Dynamic HTML (`:html` formatter):
+    - it can be rendered into "heading" styled text
+
 ### v3.5.2
   - Release May 6th 2022
   - [EE] Add file verification on template upload
+
 
 ### v3.5.1
   - Release May 4th 2022

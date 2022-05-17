@@ -21,7 +21,7 @@ describe('Dynamic HTML', function () {
         it('should throw an error is the XML is not valid, the paragraph is missing', function () {
           let _templateContent = '<office:body><office:text>{d.content:html}</office:text></office:body>';
           const _options = { extension : 'odt', htmlStylesDatabase: new Map() };
-          assert.throws(() => html.reorderXML(_templateContent, _options), 'Error');
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _templateContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
@@ -57,7 +57,7 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
         });
 
-        it.only('should find and seperate a single html formatter inside a <text:h> tag', function () {
+        it('should find and seperate a single html formatter inside a <text:h> tag', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _template = '' +
             '<office:body><office:text>'+
@@ -76,6 +76,51 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(html.reorderXML(_template, _options), _expected);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
           assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P2')), JSON.stringify({ paragraph: 'text:style-name="P2"', text: '' }))
+        })
+
+        it('should find and seperate a html formatter inside <text:h> <text:p> tags 1', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          const _template = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P3">{d.text:html}</text:p>' +
+              '<text:h text:style-name="Heading_20_1" text:outline-level="1">{d.text:html}</text:h>' +
+            '</office:text></office:body>';
+          const _expected = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P3\')}</carbone>' +
+                '<carbone>{d.text:getHTMLContentOdt}</carbone>' +
+              '</office:text>' +
+            '</office:body>'
+          assert.strictEqual(html.reorderXML(_template, _options), _expected);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3')), JSON.stringify({ paragraph: 'text:style-name="P3"', text: '' }))
+        })
+
+        it('should find and seperate a html formatter inside <text:h> <text:p> tags 2', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          const _template = '' +
+            '<office:body><office:text>'+
+              '<text:p text:style-name="P3">{d.text:html}</text:p>' +
+              '<text:p text:style-name="P2"/>' +
+              '<text:h text:style-name="Heading_20_1" text:outline-level="1">{d.text:html}</text:h>' +
+              '<text:p text:style-name="P2"/>' +
+              '<text:h text:style-name="P1" text:outline-level="3">{d.text:html}</text:h>' +
+            '</office:text></office:body>';
+          const _expected = '' +
+            '<office:body>' +
+              '<office:text>' +
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P3\')}</carbone>' +
+                '<text:p text:style-name="P2"/>' +
+                '<carbone>{d.text:getHTMLContentOdt}</carbone>' +
+                '<text:p text:style-name="P2"/>' +
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+              '</office:text>' +
+            '</office:body>'
+          assert.strictEqual(html.reorderXML(_template, _options), _expected);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 2);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3')), JSON.stringify({ paragraph: 'text:style-name="P3"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
         })
 
         it('should seperate a single html formatter mixed inside a span', function () {
@@ -651,13 +696,25 @@ describe('Dynamic HTML', function () {
 
     describe('findStartingParagraph', function () {
       it('should throw an error is the XML is not valid, the paragraph is missing', function () {
+        /** DOCX Error */
         let _templateContent = '<office:body><office:text>{d.content:html}</office:text></office:body>';
-        assert.throws(() => html.findStartingParagraph('<w:p', _templateContent, 30), 'Error');
+        helper.assert(html.findStartingParagraph(['<text:p', '<text:h'], '<office:body><office:text><w:u>{d.content:html}</w:u></office:text></office:body>', 30), {
+          "paragraphStartPos": -1,
+          "tagToSearchIndex": -1
+        });
+        /** ODT Should return an error */
+        helper.assert(html.findStartingParagraph(['<text:p', '<text:h'], '<office:text><text:o>{d.content:html}</text:o></office:text>', 30), {
+          "paragraphStartPos": -1,
+          "tagToSearchIndex": -1
+        });
       });
 
       it('should find the position of the paragraph ODT/DOCX', function () {
-        /** DOCX */
-        helper.assert(html.findStartingParagraph('<w:p', '<office:body><office:text><w:p>{d.content:html}</w:p></office:text></office:body>', 40), 26);
+        // /** DOCX */
+        helper.assert(html.findStartingParagraph('<w:p', '<office:body><office:text><w:p>{d.content:html}</w:p></office:text></office:body>', 40), {
+          "paragraphStartPos": 26,
+          "tagToSearchIndex": 0
+        });
         helper.assert(html.findStartingParagraph('<w:p', '' +
             '<office:text>' +
               '<w:p w:rsidRDefault="00B03DAF">' +
@@ -675,10 +732,27 @@ describe('Dynamic HTML', function () {
                 '</w:r>' +
               '</w:p>' +
             '</office:text>'
-        , 120), 13);
-        /** ODT */
-        helper.assert(html.findStartingParagraph('<text:p', '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>', 50), 26);
-        helper.assert(html.findStartingParagraph('<text:p', '<office:text><text:p>{d.content:html}</text:p></office:text>', 30), 13);
+        , 120), {
+          "paragraphStartPos": 13,
+          "tagToSearchIndex": 0
+        });
+        // /** ODT */
+        helper.assert(html.findStartingParagraph('<text:p', '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>', 50), {
+          "paragraphStartPos": 26,
+          "tagToSearchIndex": 0
+        });
+        helper.assert(html.findStartingParagraph('<text:p', '<office:text><text:p>{d.content:html}</text:p></office:text>', 30), {
+          "paragraphStartPos": 13,
+          "tagToSearchIndex": 0
+        });
+        helper.assert(html.findStartingParagraph(['<text:p', '<text:h'], '<office:body><office:text><text:h text:style-name="P5">{d.content:html}</text:h></office:text></office:body>', 50), {
+          "paragraphStartPos": 26,
+          "tagToSearchIndex": 1
+        });
+        helper.assert(html.findStartingParagraph(['<text:p', '<text:h'], '<office:text><text:h>{d.content:html}</text:h></office:text>', 30), {
+          "paragraphStartPos": 13,
+          "tagToSearchIndex": 1
+        });
       });
     });
 

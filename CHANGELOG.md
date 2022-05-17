@@ -1,3 +1,7 @@
+### v3.5.X
+  - [EE] Fix Dynamic HTML (`:html` formatter):
+    - it can be rendered into "heading" styled text
+
 ### v3.5.1
   - Release May 4st 2022
   - Rollback fix in v3.4.9

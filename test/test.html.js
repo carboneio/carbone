@@ -4058,6 +4058,7 @@ describe('Dynamic HTML', function () {
       it('should parse HTML content and return a descriptors [SIMPLE]', function () {
         helper.assert(html.parseHTML('This is a simple text'), [ { content : 'This is a simple text', type : '', tags : [] } ]);
         helper.assert(html.parseHTML('<b>Bold content</b>'), [ { content : 'Bold content', type : '', tags : ['b'] } ]);
+        helper.assert(html.parseHTML('<strong><strong>Bold content</strong></strong>'), [ { content : 'Bold content', type : '', tags : ['strong'] } ]);
         helper.assert(html.parseHTML('<b>Bold</b> content'), [ { content : 'Bold', type : '', tags : ['b'] }, { content : ' content', type : '', tags : [] } ]);
         helper.assert(html.parseHTML('Bold <b>content</b>'), [ { content : 'Bold ', type : '', tags : [] }, { content : 'content', type : '', tags : ['b'] } ]);
         helper.assert(html.parseHTML('Bold <b title="value1">content</b>'), [ { content : 'Bold ', type : '', tags : [] }, { content : 'content', type : '', tags : ['b'] } ]);

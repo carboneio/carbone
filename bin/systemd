@@ -1,0 +1,42 @@
+[Unit]
+Description=CARBONE_SERVICE_NAME
+After=network.target
+# StartLimitIntervalSec=0
+
+[Service]
+WorkingDirectory=CARBONE_WORKDIR
+User=CARBONE_USER
+ExecStart=CARBONE_BIN_PATH webserver
+Restart=always
+# Configure watchdog
+WatchdogSec=60
+# Allow watchdog notification coming from a subprocess 
+NotifyAccess=all
+RestartSec=1
+Environment=NODE_ENV=prod
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=full
+LockPersonality=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+CapabilityBoundingSet=
+
+# Kill after X seconds if soft stop does work
+TimeoutStopSec=300
+# By default, it send SIGTERM
+# ExecStop=
+
+[Install]
+WantedBy=multi-user.target
+
+# [Slice]
+# MemoryAccounting=true
+# MemoryLimit=100M
+# MemoryMax=100M
+# MemoryHigh=50M

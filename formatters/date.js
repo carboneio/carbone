@@ -196,6 +196,7 @@ function parse (d, patternIn) {
 module.exports = {
   formatD,
   convDate,
+  convert : convDate, // deprecated but used by Easilys
   addD,
   subD,
   startOfD,

@@ -8,6 +8,7 @@ var converter = require('../lib/converter');
 var params = require('../lib/params');
 var exec = require('child_process').exec;
 var tempPath = path.join(__dirname, 'temp');
+var pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 
 var defaultOptions = {
   pipeNamePrefix : '_carbone',
@@ -135,6 +136,135 @@ describe('Converter', function () {
         assert.equal(_result.slice(0, 4).toString(), '%PDF');
         assert.equal(_result.slice(8, 70).toString(), _expected.slice(8, 70).toString());
         done();
+      });
+    });
+    it('should render and not open a pdf with a bad password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      var _outputPath = path.join(tempPath, 'output142.pdf');
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', _outputPath, function (err, resultPath) {
+        assert.equal(err, null);
+        var _result   = fs.readFileSync(resultPath);
+        assert.equal(_result.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : _result, password : 'ThisIsABadPassWord' });
+        loadingTask.promise.then(() => {
+          done(new Error('The password is wrong and it is not possible to open the report'));
+        }, () => {
+          done();
+        });
+      }, {
+        EncryptFile          : true,
+        DocumentOpenPassword : 'Password1234'
+      });
+    });
+    it('should render and open a pdf with a password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      const _password = 'P4ssW0rd';
+      var _outputPath = path.join(tempPath, 'output161.pdf');
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', _outputPath, function (err, resultPath) {
+        assert.equal(err, null);
+        var _result  = fs.readFileSync(resultPath);
+        assert.equal(_result.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : _result, password : _password });
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad Password'));
+        });
+      }, {
+        EncryptFile          : true,
+        DocumentOpenPassword : _password
+      });
+    });
+    it('should render JPG images at different pixel size', function (done) {
+      const _magicNumberJPG = 'ffd8ff';
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      var _outputPath = path.join(tempPath, 'output181.jpg');
+      converter.convertFile(_filePath, 'writer_jpg_Export', '', _outputPath, function (err, bufferSmallImagePath) {
+        var _bufferSmallImage = fs.readFileSync(bufferSmallImagePath);
+        assert.strictEqual(err, null);
+        helper.assert(_bufferSmallImage.slice(0, 3).toString('hex'), _magicNumberJPG);
+        var _outputPathBig = path.join(tempPath, 'output186.jpg');
+        converter.convertFile(_filePath, 'writer_jpg_Export', '', _outputPathBig, function (err, bufferBigImagePath) {
+          var _bufferBigImage = fs.readFileSync(bufferBigImagePath);
+          assert.strictEqual(err, null);
+          helper.assert(_bufferBigImage.slice(0, 3).toString('hex'), _magicNumberJPG);
+          helper.assert(_bufferSmallImage.length < _bufferBigImage.length, true);
+          done();
+        }, {
+          PixelWidth  : 500,
+          PixelHeight : 500
+        });
+      }, {
+        PixelWidth  : 100,
+        PixelHeight : 100
+      });
+    });
+
+    it('should render JPG images with 2 different quality', function (done) {
+      const _magicNumberJPG = 'ffd8ff';
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      var _outputPathLow = path.join(tempPath, 'output206.jpg');
+      converter.convertFile(_filePath, 'writer_jpg_Export', '', _outputPathLow, function (err, bufferLowQualityPath) {
+        assert.strictEqual(err, null);
+        var _bufferLowQuality = fs.readFileSync(bufferLowQualityPath);
+        helper.assert(_bufferLowQuality.slice(0, 3).toString('hex'), _magicNumberJPG);
+        var _outputPathMax = path.join(tempPath, 'output212.jpg');
+        converter.convertFile(_filePath, 'writer_jpg_Export', '', _outputPathMax, function (err, bufferMaxQualityPath) {
+          var _bufferMaxQuality = fs.readFileSync(bufferMaxQualityPath);
+          assert.strictEqual(err, null);
+          helper.assert(_bufferMaxQuality.slice(0, 3).toString('hex'), _magicNumberJPG);
+          helper.assert(_bufferLowQuality.length < _bufferMaxQuality.length, true);
+          done();
+        }, {
+          Quality : 100
+        });
+      }, {
+        Quality : 25
+      });
+    });
+
+    it('should render a PNG image at different compression', function (done) {
+      var _magicNumberPNG = '89504e470d0a1a0a';
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      var _outputNotCompressed = path.join(tempPath, 'output229.png');
+      converter.convertFile(_filePath, 'writer_png_Export', '', _outputNotCompressed, function (err, bufferNotCompressed) {
+        assert.strictEqual(err, null);
+        var _bufferNotCompressed = fs.readFileSync(bufferNotCompressed);
+        helper.assert(_bufferNotCompressed.slice(0, 8).toString('hex'), _magicNumberPNG);
+        var _outputCompressed = path.join(tempPath, 'output235.png');
+        converter.convertFile(_filePath, 'writer_png_Export', '', _outputCompressed, function (err, bufferCompressed) {
+          assert.strictEqual(err, null);
+          var _bufferCompressed = fs.readFileSync(bufferCompressed);
+          helper.assert(_bufferCompressed.slice(0, 8).toString('hex'), _magicNumberPNG);
+          helper.assert(_bufferCompressed.length < _bufferNotCompressed.length, true);
+          done();
+        }, {
+          Compression : 9,
+        });
+      }, {
+        Compression : 0,
+      });
+    });
+
+    it('should render and open a pdf with a number as password  (it takes 5000ms on average to finish)', function (done) {
+      var _filePath = path.resolve('./test/datasets/test_odt_render_static.odt');
+      const _password = '1234533';
+      var _outputPath = path.join(tempPath, 'output252.pdf');
+      converter.convertFile(_filePath, 'writer_pdf_Export', '', _outputPath, function (err, result) {
+        assert.equal(err, null);
+        var _result = fs.readFileSync(result);
+        assert.equal(_result.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : _result, password : _password });
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad Password'));
+        });
+      }, {
+        EncryptFile          : true,
+        DocumentOpenPassword : _password
       });
     });
     it('should restart automatically the conversion factory if it crashes', function (done) {

@@ -1,0 +1,68 @@
+name: Release Enterprise Edition
+
+on: workflow_dispatch
+
+jobs:
+  BUILD:
+    env:
+      PKG_VERSION: 5.5.2
+      BUILD_TARGET: "node16-linux-x64,node16-macos-x64"
+
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node_version: ['16.13.2']
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node using cache (faster)
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+      
+      # Get package version. Add -r to get a string without double quutes
+      - run: echo "PACKAGE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+      - run: echo "CARBONE_EE_TAG=$(echo ee-${{env.PACKAGE_VERSION}})" >> $GITHUB_ENV
+      # remove dots in filename because Github release does not accept filename with dots
+      # - run: echo "FILENAME_VERSION=$(echo ${env.PACKAGE_VERSION//./-})" >> $GITHUB_ENV
+      - run: echo "BUILD_PREFIX=$(echo ./build/carbone-ee-${{env.PACKAGE_VERSION}})" >> $GITHUB_ENV
+      
+      - run: git config user.name github-actions
+      - run: git config user.email github-actions@github.com
+
+      # Prepare and build
+      - run: sudo npm i -g pkg@${{env.PKG_VERSION}}
+      - run: npm ci --production
+      # - run: node script/updatePackage.js
+      - run: pkg -t ${{env.BUILD_TARGET}} -o ${{env.BUILD_PREFIX}} .
+      # Commit
+      # - run: git add "package.json"
+      # - run: git commit -n -m "Save date in package.json"
+      # - run: git push
+      # - run: git tag ${{env.CARBONE_EE_TAG}}
+      # - run: git push origin ${{env.CARBONE_EE_TAG}}
+
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ env.CARBONE_EE_TAG }}
+      #     release_name: "v${{ env.PACKAGE_VERSION }}"
+      #     draft: false
+      #     prerelease: false
+
+      # Let Github creates its release before uploading to avoid errors
+      - run: sleep 30s
+
+      # We use hub CLI because actions/upload-release-asset@v1 does not support to upload multiple release files in one job
+      - name: Upload
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag_name="${{ env.CARBONE_EE_TAG }}"
+          hub release edit $(find build/ -type f -name "carbone-ee*" -printf "-a %p ") -m "" "$tag_name"
+
+

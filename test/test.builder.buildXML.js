@@ -190,6 +190,19 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept loops without xml', function (done) {
+    const _xml  = '<w:t>{d[i].id}, {d[i+1].id}</w:t>';
+    builder.buildXML(_xml, {}, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'null');
+      helper.assert(_xmlBuilt, '<w:t></w:t>');
+      const _data = [{ id : 1}, {id : 2}];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<w:t>1, 2, </w:t>');
+        done();
+      });
+    });
+  });
   it('should accept non-XML structure', function (done) {
     var _xml = '{d[i].brand} , {d[i+1].brand}';
     var _data = [
@@ -446,6 +459,26 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should not crash if we use direct accessors in sub-arrays within a loop', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row>{d.test.others[i].wheels[0].size}</t_row>'
+      +  '<t_row>{d.test.others[i+1].wheels[0].size}</t_row>'
+      +'</xml>';
+    var _data = {
+      test : {
+        others : [
+          { wheels : [ {size : 'A'}, {size : 'B'}] },
+          { wheels : [ {size : '1'}, {size : '2'}] }
+        ]
+      }
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml><t_row>A</t_row><t_row>1</t_row></xml>');
+      done();
+    });
+  });
   it('should not crash if the template is not correct', function (done) {
     var _xml =
        '<xml>'
@@ -468,7 +501,25 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it.skip('should bi-directionnal loop', function (done) {
+  it('should do bi-directionnal loop (main array vertical, nested array horizontal)', function (done) {
+    var _xml =
+       '<xml>'
+      +  '<t_row><td>{d.cars[i].wheels[i].size  }</td><td>{d.cars[i].wheels[i+1].size  }</td></t_row>'
+      +  '<t_row><td>{d.cars[i+1].wheels[i].size}</td><td>{d.cars[i+1].wheels[i+1].size}</td></t_row>'
+      +'</xml>';
+    var _data = {
+      cars : [
+        {wheels : [ {size : 'A'}, {size : 'B'}               ]},
+        {wheels : [ {size : 'C'}, {size : 'D'},{size : 'E'} ]}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml><t_row><td>A</td><td>B</td></t_row><t_row><td>C</td><td>D</td><td>E</td></t_row></xml>');
+      done();
+    });
+  });
+  it.skip('should do bi-directionnal loop (main array horizontal, nested array vertical)', function (done) {
     var _xml =
        '<xml>'
       +  '<t_row><td>{d.cars[i].wheels[i].size  }</td><td>{d.cars[i+1].wheels[i].size  }</td></t_row>'
@@ -481,8 +532,26 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      console.log(err.stack);
+      assert.equal(err+'', 'null');
       assert.equal(_xmlBuilt, 'TODO');
+      done();
+    });
+  });
+  it('should do hozironal loop with markers in XML', function (done) {
+    const _xml = '<xml>'
+               +   '<t_row> <td color="{d.id}">{d.cars[i].colA}</td><td color="{d.id}">{d.cars[i+1].colA}</td> </t_row>'
+               +   '<t_row> <td color="{d.id}">{d.cars[i].colB}</td><td color="{d.id}">{d.cars[i+1].colB}</td> </t_row>'
+               + '</xml>';
+    const _data = {
+      id   : 'aa',
+      cars : [
+        { colA : 'a1', colB : 'b1' },
+        { colA : 'a2', colB : 'b2' }
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml><t_row> <td color="aa">a1</td><td color="aa">a2</td> </t_row><t_row> <td color="aa">b1</td><td color="aa">b2</td> </t_row></xml>');
       done();
     });
   });
@@ -1872,6 +1941,78 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should replace rId by md5 hash with id prepend', function (done) {
+    var formatters = require('../formatters/string.js');
+    var _xml = '<Relationships>{d.<Relationship Id="{d.dog:md5:prepend(id)}" Target="{d.dog}"/>toto}</Relationships>';
+    var _expect = '<Relationships>toto<Relationship Id="id319f27934db5dd8f03070e75989ca667" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg"/></Relationships>';
+    var _options = {
+      formatters : {
+        md5     : formatters.md5,
+        prepend : formatters.prepend
+      }
+    };
+    var _data = {
+      dog  : 'https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg',
+      toto : 'toto'
+    };
+    builder.buildXML(parser.removeXMLInsideMarkers(_xml), _data, _options, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, _expect);
+      done();
+    });
+  });
+  describe('EXPERIMENTAL: repeat rows with repeaters', function () {
+    it('should automatically repeat the xml if a repeater is used in i+1', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1*qty].brand} </t_row></xml>';
+      var _data = [
+        {brand : 'Lumeneo'     , qty : 1},
+        {brand : 'Tesla motors', qty : 0},
+        {brand : 'Toyota'      , qty : 3}
+      ];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row></xml>');
+        done();
+      });
+    });
+    it('should works if there are whitespaces arround attribute', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1 *  qty  ].brand} </t_row></xml>';
+      var _data = [
+        {brand : 'Lumeneo'     , qty : 1},
+        {brand : 'Tesla motors', qty : 0},
+        {brand : 'Toyota'      , qty : 3}
+      ];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row></xml>');
+        done();
+      });
+    });
+    it('should show nothing if the value is empty', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1 *  qty  ].brand} </t_row></xml>';
+      var _data = [
+        {brand : 'Lumeneo'     , qty : -10},
+        {brand : 'Tesla motors', qty : -1},
+        {brand : 'Toyota'      , qty : -2}
+      ];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> </xml>');
+        done();
+      });
+    });
+    it('should limit the loop to 200', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1 *  qty  ].brand} </t_row></xml>';
+      var _data = [
+        {brand : 'Lumeneo'     , qty : 201},
+        {brand : 'Toyota'      , qty : 3}
+      ];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'Error: The repeater cannot be above 200');
+        helper.assert(_xmlBuilt, null);
+        done();
+      });
+    });
+  });
   /* it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [
@@ -1890,81 +2031,6 @@ describe('builder.buildXML', function () {
       { "pos": 13723,  "name": "d[i+1].date" }
     ]
   */
-  describe('count recognition', function () {
-
-    it('should return 0, 1, 2 (rowShow: true)', function () {
-      var _loopIds = {};
-      var _part1 = {
-        str     : '__COUNT_0_0__',
-        rowShow : true
-      };
-      var _part2 = {
-        str     : '__COUNT_0_0__',
-        rowShow : true
-      };
-      var _part3 = {
-        str     : '__COUNT_0_0__',
-        rowShow : true
-      };
-      builder.getLoopIteration(_loopIds, _part1);
-      helper.assert(_part1.str, '0');
-      builder.getLoopIteration(_loopIds, _part2);
-      helper.assert(_part2.str, '1');
-      builder.getLoopIteration(_loopIds, _part3);
-      helper.assert(_part3.str, '2');
-    });
-
-    it('should return 1, 2 (rowShow: true, false, true)', function () {
-      var _loopIds = {};
-      var _part1 = {
-        str     : '__COUNT_0_1__',
-        rowShow : true
-      };
-      var _part2 = {
-        str     : '__COUNT_0_1__',
-        rowShow : false
-      };
-      var _part3 = {
-        str     : '__COUNT_0_1__',
-        rowShow : true
-      };
-      builder.getLoopIteration(_loopIds, _part1);
-      helper.assert(_part1.str, '1');
-      builder.getLoopIteration(_loopIds, _part2);
-      helper.assert(_part2.str, _part2.str);
-      builder.getLoopIteration(_loopIds, _part3);
-      helper.assert(_part3.str, '2');
-    });
-
-    it('should return 1337, 1338 (rowShow: true, false, true) (with xml outside)', function () {
-      var _loopIds = {};
-      var _part1 = {
-        str     : '<tag>__COUNT_42_1337__</tag>',
-        rowShow : true
-      };
-      var _part2 = {
-        str     : '<tag>__COUNT_42_1337__</tag>',
-        rowShow : false
-      };
-      var _part3 = {
-        str     : '<tag>__COUNT_42_1337__</tag>',
-        rowShow : true
-      };
-      var _part4 = {
-        str     : 'random part',
-        rowShow : true
-      };
-      builder.getLoopIteration(_loopIds, _part1);
-      helper.assert(_part1.str, '<tag>1337</tag>');
-      builder.getLoopIteration(_loopIds, _part2);
-      helper.assert(_part2.str, _part2.str);
-      builder.getLoopIteration(_loopIds, _part3);
-      helper.assert(_part3.str, '<tag>1338</tag>');
-      builder.getLoopIteration(_loopIds, _part4);
-      helper.assert(_part4.str, _part4.str);
-    });
-
-  });
 
   describe('d.object[i] should accept to iterate on object attribute', function () {
 
@@ -2064,6 +2130,39 @@ describe('builder.buildXML', function () {
       builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
         helper.assert(err+'', 'null');
         helper.assert(_xmlBuilt, '<xml><tr>paul : 10</tr><tr>jack : 20</tr><tr>bob : 30</tr><tr>neo : 50</tr><tr>trinity : 40</tr></xml>');
+        done();
+      });
+    });
+  });
+
+  describe('post-injection of data', function () {
+    it('should accept formatters which returns another formatter which can be called at the end of the process', function (done) {
+      var _xml    = '<xml> {d.titleA:postProcess()} <b/> {d.titleB:postProcess()} <b/> {d.titleC:postProcess()} </xml>';
+      var _data   = {
+        titleA : 'a',
+        titleB : 'b',
+        titleC : 'c'
+      };
+      // first formater called
+      function postProcess (value) {
+        this.sum++;
+        return {
+          // second formatter called at the end of the process
+          fn : function (postValue, runningSum) {
+            return postValue + ' ' + runningSum + ' ' + this.sum;
+          },
+          args : [value, this.sum]
+        };
+      }
+      var _option = {
+        formatters : {
+          postProcess : postProcess
+        },
+        imageDatabase : new Map(),
+        sum           : 0
+      };
+      builder.buildXML(_xml, _data, _option, function (err, _xmlBuilt) {
+        helper.assert(_xmlBuilt, '<xml> a 1 3 <b/> b 2 3 <b/> c 3 3 </xml>');
         done();
       });
     });

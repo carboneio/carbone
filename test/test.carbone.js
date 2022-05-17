@@ -9,6 +9,8 @@ var converter = require('../lib/converter');
 var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
+var pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
+var os = require('os');
 
 describe('Carbone', function () {
 
@@ -254,6 +256,58 @@ describe('Carbone', function () {
     });
   });
 
+  describe('barcode Formatter', function () {
+
+    it('should return an empty string with a wrong parameter', function (done) {
+      var _xml = '<xml> {d.ean13code:barcode(\'ean1\')} </xml>';
+      var _data = { ean13code : '9780201134476' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should return an empty string with a false ean13 barcode', function (done) {
+      var _xml = '<xml> {d.ean13code:barcode(\'ean13\')} </xml>';
+      var _data = { ean13code : '978020113447' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should return an empty string with a false ean8 barcode', function (done) {
+      var _xml = '<xml> {d.ean8code:barcode(\'ean8\')} </xml>';
+      var _data = { ean8code : '978020' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>  </xml>');
+        done();
+      });
+    });
+
+    it('should format the ean13 barcode to EAN13.ttf code font', function (done) {
+      var _xml = '<xml> {d.ean13code1:barcode(\'ean13\')} {d.ean13code2:barcode(\'ean13\')} </xml>';
+      var _data = { ean13code1 : '9780201134476', ean13code2 : '2001000076727' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> 9HSKCKB*bdeehg+ 2AALKAK*ahghch+ </xml>');
+        done();
+      });
+    });
+
+    it('should format the ean8 barcode to EAN13.ttf code font', function (done) {
+      var _xml = '<xml> {d.ean8code1:barcode(\'ean8\')} {d.ean8code2:barcode(\'ean8\')} </xml>';
+      var _data = { ean8code1 : '35967101', ean8code2 : '96385074'};
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml> :DFJG*hbab+ :JGDI*fahe+ </xml>');
+        done();
+      });
+    });
+  });
 
 
 
@@ -661,6 +715,51 @@ describe('Carbone', function () {
         done();
       });
     });
+
+    it('should not crash if a condition is used just before an array loop, which contains a filter', function (done) {
+      var _xml = ''
+        + '<doc>'
+        + '  <body>'
+        + '    <a>{d.condition:ifIN(a):hideBegin}</a>'
+        + '    <b>{d.subArray[i,type!=b].type}</b>'
+        + '    <c>{d.subArray[i+1].type}</c>'
+        + '    <d>{d.condition:hideEnd}</d>'
+        + '  </body>'
+        + '</doc>'
+      ;
+      var _data = {
+        condition : 'a',
+        subArray  : [{ type : 'b' }]
+      };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<doc>  <body>      </body></doc>');
+        done();
+      });
+    });
+
+    it('should not crash if a condition is used just before an array loop, without filter', function (done) {
+      var _xml = ''
+        + '<doc>'
+        + '  <body>'
+        + '    <a>{d.condition:ifIN(a):hideBegin}</a>'
+        + '    <b>{d.subArray[i].type}</b>'
+        + '    <c>{d.subArray[i+1].type}</c>'
+        + '    <d>{d.condition:hideEnd}</d>'
+        + '  </body>'
+        + '</doc>'
+      ;
+      var _data = {
+        condition : 'a',
+        subArray  : [{ type : 'b' }]
+      };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<doc>  <body>      </body></doc>');
+        done();
+      });
+    });
+
     it('formatters should be independant. The propagation of one set of cascaded formatters should not alter the propagation of another set of formatters', function (done) {
       var data = {
         param : 3,
@@ -876,6 +975,20 @@ describe('Carbone', function () {
       };
       carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
         assert.equal(_xmlBuilt, '<xml><t_row> 1 Lumeneo </t_row><t_row> 2 Toyota </t_row><t_row> 3 Tesla motors </t_row></xml>');
+        done();
+      });
+    });
+    it('should print a counter and filter', function (done) {
+      var _xml = '<xml><t_row> {d.cars[sort,i,filter=1].brand:count()} {d.cars[sort,i,filter=1].brand} </t_row><t_row> {d.cars[sort+1,i+1,filter=1].brand} </t_row></xml>';
+      var _data = {
+        cars : [
+          {brand : 'Lumeneo'     , sort : 1, filter : 1},
+          {brand : 'Tesla motors', sort : 2, filter : 1},
+          {brand : 'Toyota'      , sort : 1, filter : 0}
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml><t_row> 1 Lumeneo </t_row><t_row> 2 Tesla motors </t_row></xml>');
         done();
       });
     });
@@ -1145,7 +1258,7 @@ describe('Carbone', function () {
           done();
         });
       });
-      it('should return an error if  crash if object is undefined', function (done) {
+      it('should access to sub-arrays', function (done) {
         var data = {
           param     : 3,
           subObject : {
@@ -1157,7 +1270,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObj[0].textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml></xml>');
+          helper.assert(result, '<xml>ddfdf</xml>');
           done();
         });
       });
@@ -1240,6 +1353,73 @@ describe('Carbone', function () {
             +  '</tr>'
             +  '<tr>'
             +    '<td>4200 4513</td>'
+            +  '</tr>'
+            +'</xml>';
+          assert.equal(_xmlBuilt, _expectedResult);
+          done();
+        });
+      });
+      it('should accept to access parent index in arrays with dot syntax', function (done) {
+        var _xml =
+           '<xml>'
+          +  '<tr>'
+          +    '<td>{d[i].cars[i].wheels[i].tire.nb:append(.i):append(..i):append(...i)}</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>{d[i+1].cars[i+1].wheels[i+1].tire.nb}</td>'
+          +  '</tr>'
+          +'</xml>';
+        var _data = [
+          {
+            site : {nb : 10},
+            cars : [
+              {
+                nb     : 2,
+                wheels : [
+                  {tire : {nb : '_A_'}, nb : 3},
+                  {tire : {nb : '_B_'}, nb : 4}
+                ]
+              },
+              {
+                nb     : 3,
+                wheels : [
+                  {tire : {nb : '_C_'}, nb : 5}
+                ]
+              },
+            ],
+          },{
+            site : {nb : 300},
+            cars : [{
+              nb     : 4,
+              wheels : [
+                {tire : {nb : '_D_'}, nb : 6},
+                {tire : {nb : '_E_'}, nb : 7},
+                {tire : {nb : '_F_'}, nb : 9}
+              ]
+            }
+            ],
+          }
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          var _expectedResult =
+             '<xml>'
+            +  '<tr>'
+            +    '<td>_A_000</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_B_001</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_C_010</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_D_100</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_E_101</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_F_102</td>'
             +  '</tr>'
             +'</xml>';
           assert.equal(_xmlBuilt, _expectedResult);
@@ -1361,6 +1541,103 @@ describe('Carbone', function () {
                 });
               });
             });
+          });
+        });
+      });
+
+      describe('Mathematical expressions', function () {
+        it('should accept mathematicals expressions, should still accept simple negative number', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(100):div(.passed + .failed)}  {d.passed:mul(100):div(.passed):add(-13.34):add(   -  1)}</xml>';
+          const _expectedResult = '<xml>83.33333333333333  85.66</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should still accept simple numbers and expressions', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(100.5):div(10.34):sub(5.2):add(3.1)}  {d.passed:mul(.failed):div(.passed):sub(.failed):add(.passed)}</xml>';
+          const _expectedResult = '<xml>95.0953578336557  10</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expression in mul, div, sub and add formatters', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(.passed + .failed + 3)}</xml>';
+          const _expectedResult = '<xml>150</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expression in mul, div, sub and add formatters', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(.passed + .failed + 3):div(.passed + .failed + 2):sub(.passed - .failed - 5):add(.passed + .failed + 3.2)}</xml>';
+          const _expectedResult = '<xml>22.91428571428571</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expressions (complex)', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(-100):add(-.passed - .failed - 100/2)}</xml>';
+          const _expectedResult = '<xml>-1062</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should return an error if the mathematical expressions is not correct', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(***100**):add(/.passed):sub(*12):div(+++12)}</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'Error: Bad Mathematical Expression in "***100**"');
+            helper.assert(result, null);
+            carbone.renderXML('<xml>{d.passed:add(/.passed)}</xml>', _data, function (err, result) {
+              helper.assert(err+'', 'Error: Bad Mathematical Expression in "/.passed"');
+              helper.assert(result, null);
+              done();
+            });
+          });
+        });
+        it('should not crash if there is a division per zero', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:add(.failed/0)}</xml>';
+          const _expectedResult = '<xml>Infinity</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
           });
         });
       });
@@ -2579,12 +2856,40 @@ describe('Carbone', function () {
       var opt = {
         renderPrefix : 'prefix-'
       };
-      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName) {
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName, debugInfo) {
         assert.equal(err, null);
         var _filename = path.basename(resultFilePath);
         assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
-        assert.strictEqual(reportName, undefined);
+        assert.strictEqual(debugInfo, null);
+        assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(reportName), true);
         assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(_filename), true);
+        fs.unlinkSync(resultFilePath);
+        done();
+      });
+    });
+    it('should get debug info if isDebugActive = true', function (done) {
+      var data = {
+        field1 : 'field_1',
+        field2 : 'field_2'
+      };
+      var opt = {
+        renderPrefix  : 'prefix-',
+        isDebugActive : true
+      };
+      carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName, debugInfo) {
+        assert.equal(err, null);
+        helper.assert(debugInfo, {
+          markers : [
+            '{d.field1}',
+            '{d.field2}',
+            '{c.author1}',
+            '{c.author2}'
+          ],
+          sample : {
+            data       : { field1 : 'field10' , field2 : 'field21'   },
+            complement : { author1 : 'author12', author2 : 'author23' }
+          }
+        });
         fs.unlinkSync(resultFilePath);
         done();
       });
@@ -3368,6 +3673,116 @@ describe('Carbone', function () {
         var _expected = '**\n*1*field_1\n*2*field_2\n';
         helper.assert(result.toString(), _expected);
         done();
+      });
+    });
+    it('should render and open a pdf with a password (complete) (it takes 5000ms on average)', function (done) {
+      const _password = 'Ro0T1234';
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'pdf',
+          formatOptions : {
+            EncryptFile          : true,
+            DocumentOpenPassword : _password
+          }
+        }
+      };
+      // test_word_render_2003_XML.xml;
+      carbone.render('test_spreadsheet.ods', data, _options, (err, result) => {
+        helper.assert(err, null);
+        assert.equal(result.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : _password});
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad password.'));
+        });
+      });
+    });
+    it('should render a jpg wih specific resolutions and quality', function (done) {
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'jpg',
+          formatOptions : {
+            Quality     : 90,
+            PixelWidth  : 100,
+            PixelHeight : 100,
+            ColorMode   : 0
+          }
+        }
+      };
+      carbone.render('test_odt_render_static.odt', data, _options, (err, image) => {
+        helper.assert(err, null);
+        helper.assert(image.slice(0, 3).toString('hex'), 'ffd8ff');
+
+        _options.convertTo.formatOptions.PixelWidth = 50;
+        carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerRes) => {
+          helper.assert(err, null);
+          helper.assert(imageLowerRes.slice(0, 3).toString('hex'), 'ffd8ff');
+          helper.assert(imageLowerRes.length < image.length, true);
+
+          _options.convertTo.formatOptions.Quality = 50;
+          carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerQuality) => {
+            helper.assert(err, null);
+            helper.assert(imageLowerQuality.slice(0, 3).toString('hex'), 'ffd8ff');
+            helper.assert(imageLowerQuality.length < imageLowerRes.length, true);
+            done();
+          });
+        });
+      });
+    });
+    it('should render a png wih specific resolution and compression', function (done) {
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'png',
+          formatOptions : {
+            Compression : 1,
+            PixelWidth  : 100,
+            PixelHeight : 100,
+            Interlaced  : 0
+          }
+        }
+      };
+      carbone.render('test_odt_render_static.odt', data, _options, (err, image) => {
+        helper.assert(err, null);
+        helper.assert(image.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+
+        _options.convertTo.formatOptions.PixelWidth = 50;
+        carbone.render('test_odt_render_static.odt', data, _options, (err, imageLowerRes) => {
+          helper.assert(err, null);
+          helper.assert(imageLowerRes.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+          helper.assert(imageLowerRes.length < image.length, true);
+
+          _options.convertTo.formatOptions.Interlaced = 1;
+          carbone.render('test_odt_render_static.odt', data, _options, (err, imageInterlaced) => {
+            helper.assert(err, null);
+            helper.assert(imageInterlaced.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+            helper.assert(imageInterlaced.length > imageLowerRes.length, true);
+
+            _options.convertTo.formatOptions.Compression = 9;
+            carbone.render('test_odt_render_static.odt', data, _options, (err, imageCompressed) => {
+              helper.assert(err, null);
+              helper.assert(imageCompressed.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
+              helper.assert(imageCompressed.length < imageInterlaced.length, true);
+              done();
+            });
+          });
+        });
       });
     });
   });

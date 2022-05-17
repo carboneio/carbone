@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ooo="http://openoffice.org/2004/office" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.3">
+  <office:scripts/>
+  <office:font-face-decls>
+    <style:font-face style:name="Arial Unicode MS1" svg:font-family="&apos;Arial Unicode MS&apos;" style:font-family-generic="swiss"/>
+    <style:font-face style:name="Liberation Serif" svg:font-family="&apos;Liberation Serif&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+    <style:font-face style:name="Liberation Sans" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="swiss" style:font-pitch="variable"/>
+    <style:font-face style:name="Arial Unicode MS" svg:font-family="&apos;Arial Unicode MS&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+    <style:font-face style:name="PingFang SC" svg:font-family="&apos;PingFang SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+    <style:font-face style:name="Songti SC" svg:font-family="&apos;Songti SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  </office:font-face-decls>
+  <office:automatic-styles>
+    <style:style style:name="Table1" style:family="table">
+      <style:table-properties style:width="17cm" fo:break-before="auto" fo:break-after="auto" table:align="margins" fo:keep-with-next="auto" style:may-break-between-rows="true" table:border-model="collapsing"/>
+    </style:style>
+    <style:style style:name="Table1.A" style:family="table-column">
+      <style:table-column-properties style:column-width="9.7cm" style:rel-column-width="37391*"/>
+    </style:style>
+    <style:style style:name="Table1.B" style:family="table-column">
+      <style:table-column-properties style:column-width="7.301cm" style:rel-column-width="28144*"/>
+    </style:style>
+    <style:style style:name="Table1.1" style:family="table-row">
+      <style:table-row-properties fo:keep-together="auto"/>
+    </style:style>
+    <style:style style:name="Table1.A1" style:family="table-cell">
+      <style:table-cell-properties fo:background-color="#ce181e" fo:padding="0.199cm" fo:border-left="0.75pt solid #ce181e" fo:border-right="none" fo:border-top="0.75pt solid #ce181e" fo:border-bottom="none" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:name="Table1.B1" style:family="table-cell">
+      <style:table-cell-properties fo:background-color="#ce181e" fo:padding="0.199cm" fo:border-left="none" fo:border-right="0.75pt solid #ce181e" fo:border-top="0.75pt solid #ce181e" fo:border-bottom="none" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:name="Table1.A2" style:family="table-cell">
+      <style:table-cell-properties fo:background-color="transparent" fo:padding="0.199cm" fo:border-left="0.75pt solid #ce181e" fo:border-right="none" fo:border-top="none" fo:border-bottom="none" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:name="Table1.B2" style:family="table-cell" style:data-style-name="N10000">
+      <style:table-cell-properties fo:background-color="transparent" fo:padding="0.199cm" fo:border-left="none" fo:border-right="0.75pt solid #ce181e" fo:border-top="none" fo:border-bottom="none" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:name="Table1.A3" style:family="table-cell">
+      <style:table-cell-properties fo:background-color="#fcd3c1" fo:padding="0.199cm" fo:border-left="0.75pt solid #ce181e" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.75pt solid #ce181e" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:name="Table1.B3" style:family="table-cell" style:data-style-name="N10000">
+      <style:table-cell-properties fo:background-color="#fcd3c1" fo:padding="0.199cm" fo:border-left="none" fo:border-right="0.75pt solid #ce181e" fo:border-top="none" fo:border-bottom="0.75pt solid #ce181e" style:writing-mode="page">
+        <style:background-image/>
+      </style:table-cell-properties>
+    </style:style>
+    <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Header">
+      <style:paragraph-properties fo:text-align="end" style:justify-single-word="false"/>
+      <style:text-properties officeooo:rsid="00070eea" officeooo:paragraph-rsid="00070eea"/>
+    </style:style>
+    <style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard">
+      <style:text-properties officeooo:rsid="00036162" officeooo:paragraph-rsid="00036162"/>
+    </style:style>
+    <style:style style:name="P3" style:family="paragraph" style:parent-style-name="Standard">
+      <style:text-properties officeooo:rsid="00036162" officeooo:paragraph-rsid="0004d9f1"/>
+    </style:style>
+    <style:style style:name="P4" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties fo:color="#000000" loext:opacity="100%" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-size="12pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" officeooo:rsid="00036162" officeooo:paragraph-rsid="00062b29" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="bold" style:text-overline-style="none" style:text-overline-color="font-color"/>
+    </style:style>
+    <style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties officeooo:paragraph-rsid="0004d9f1"/>
+    </style:style>
+    <style:style style:name="P6" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties fo:color="#ffffff" loext:opacity="100%" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-size="12pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" officeooo:rsid="0004d9f1" officeooo:paragraph-rsid="0004d9f1" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="bold" style:text-overline-style="none" style:text-overline-color="font-color"/>
+    </style:style>
+    <style:style style:name="P7" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties fo:color="#000000" loext:opacity="100%" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-size="12pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-overline-style="none" style:text-overline-color="font-color"/>
+    </style:style>
+    <style:style style:name="P8" style:family="paragraph" style:parent-style-name="Table_20_Contents">
+      <style:paragraph-properties fo:text-align="start" style:justify-single-word="false"/>
+      <style:text-properties fo:color="#000000" loext:opacity="100%" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-size="12pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="bold" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="bold" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="bold" style:text-overline-style="none" style:text-overline-color="font-color"/>
+    </style:style>
+    <style:style style:name="T1" style:family="text">
+      <style:text-properties officeooo:rsid="0004d9f1"/>
+    </style:style>
+    <style:style style:name="T2" style:family="text">
+      <style:text-properties fo:color="#000000" loext:opacity="100%" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-size="12pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" officeooo:rsid="00036162" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-overline-style="none" style:text-overline-color="font-color"/>
+    </style:style>
+    <style:style style:name="T3" style:family="text">
+      <style:text-properties fo:color="#000000" loext:opacity="100%" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-size="12pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" officeooo:rsid="0004d9f1" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-overline-style="none" style:text-overline-color="font-color"/>
+    </style:style>
+    <style:style style:name="T4" style:family="text">
+      <style:text-properties fo:color="#000000" loext:opacity="100%" style:text-outline="false" style:text-line-through-style="none" style:text-line-through-type="none" style:font-name="Liberation Sans" fo:font-size="12pt" fo:font-style="normal" fo:text-shadow="none" style:text-underline-style="none" fo:font-weight="normal" officeooo:rsid="00062b29" style:font-size-asian="12pt" style:font-style-asian="normal" style:font-weight-asian="normal" style:font-size-complex="12pt" style:font-style-complex="normal" style:font-weight-complex="normal" style:text-overline-style="none" style:text-overline-color="font-color"/>
+    </style:style>
+    <style:style style:name="T5" style:family="text">
+      <style:text-properties style:font-name="Liberation Sans" fo:font-size="18.2000007629395pt" fo:font-weight="bold" officeooo:rsid="0004d9f1" style:font-name-asian="PingFang SC" style:font-size-asian="18.2000007629395pt" style:font-weight-asian="bold" style:font-name-complex="Arial Unicode MS" style:font-size-complex="18.2000007629395pt" style:font-weight-complex="bold"/>
+    </style:style>
+    <style:style style:name="T6" style:family="text">
+      <style:text-properties style:font-name="Liberation Sans" fo:font-size="18.2000007629395pt" fo:font-weight="bold" officeooo:rsid="00062b29" style:font-name-asian="PingFang SC" style:font-size-asian="18.2000007629395pt" style:font-weight-asian="bold" style:font-name-complex="Arial Unicode MS" style:font-size-complex="18.2000007629395pt" style:font-weight-complex="bold"/>
+    </style:style>
+    <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Graphics">
+      <style:graphic-properties style:run-through="foreground" style:wrap="none" style:vertical-pos="top" style:vertical-rel="text" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+    </style:style>
+    <style:style style:name="fr2" style:family="graphic" style:parent-style-name="Graphics">
+      <style:graphic-properties style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph" style:mirror="none" fo:clip="rect(0cm, 0cm, 0cm, 0cm)" draw:luminance="0%" draw:contrast="0%" draw:red="0%" draw:green="0%" draw:blue="0%" draw:gamma="100%" draw:color-inversion="false" draw:image-opacity="100%" draw:color-mode="standard"/>
+    </style:style>
+    <number:number-style style:name="N10000" number:language="fr" number:country="FR">
+      <number:number number:min-integer-digits="1"/>
+    </number:number-style>
+  </office:automatic-styles>
+  <office:body>
+    <office:text>
+      <office:forms form:automatic-focus="false" form:apply-design-mode="false"/>
+      <text:sequence-decls>
+        <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
+      </text:sequence-decls>
+      <text:h text:style-name="Heading_20_1" text:outline-level="1">tesla
+        <text:span text:style-name="T1"></text:span>
+        <text:span text:style-name="T5"></text:span>
+        <text:span text:style-name="T6"></text:span>
+        <text:span text:style-name="T1"></text:span>
+      </text:h>
+      <text:p text:style-name="P2"/>
+      <text:p text:style-name="P3"/>
+      <table:table table:name="Table1" table:style-name="Table1" table:template-name="Box List Red">
+        <table:table-column table:style-name="Table1.A"/>
+        <table:table-column table:style-name="Table1.B"/>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+            <text:p text:style-name="P6">Country</text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B1" office:value-type="string">
+            <text:p text:style-name="P6">Image</text:p>
+          </table:table-cell>
+        </table:table-row>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell table:style-name="Table1.A2" office:value-type="string">
+            <text:p text:style-name="P5">
+              <text:span text:style-name="T2">de</text:span>
+              <text:span text:style-name="T3"></text:span>
+              <text:span text:style-name="T4"></text:span>
+              <text:span text:style-name="T3"></text:span>
+            </text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B2">
+            <text:p text:style-name="P7">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-1" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
+                <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
+                <svg:title></svg:title>
+              </draw:frame>
+            </text:p>
+          </table:table-cell>
+        </table:table-row>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell table:style-name="Table1.A2" office:value-type="string">
+            <text:p text:style-name="P5">
+              <text:span text:style-name="T2">fr</text:span>
+              <text:span text:style-name="T3"></text:span>
+              <text:span text:style-name="T4"></text:span>
+              <text:span text:style-name="T3"></text:span>
+            </text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B2">
+            <text:p text:style-name="P7">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-2" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
+                <draw:image xlink:href="Pictures/CarboneImage1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
+                <svg:title></svg:title>
+              </draw:frame>
+            </text:p>
+          </table:table-cell>
+        </table:table-row>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell table:style-name="Table1.A2" office:value-type="string">
+            <text:p text:style-name="P5">
+              <text:span text:style-name="T2">it</text:span>
+              <text:span text:style-name="T3"></text:span>
+              <text:span text:style-name="T4"></text:span>
+              <text:span text:style-name="T3"></text:span>
+            </text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B2">
+            <text:p text:style-name="P7">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-3" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.313cm" draw:z-index="1">
+                <draw:image xlink:href="Pictures/CarboneImage2.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
+                <svg:title></svg:title>
+              </draw:frame>
+            </text:p>
+          </table:table-cell>
+        </table:table-row>
+      </table:table>
+      <text:p text:style-name="P3"/>
+      <text:p text:style-name="Standard"/>
+      <text:h text:style-name="Heading_20_1" text:outline-level="1">toyota
+        <text:span text:style-name="T1"></text:span>
+        <text:span text:style-name="T5"></text:span>
+        <text:span text:style-name="T6"></text:span>
+        <text:span text:style-name="T1"></text:span>
+      </text:h>
+      <text:p text:style-name="P2"/>
+      <text:p text:style-name="P3"/>
+      <table:table table:name="Table1" table:style-name="Table1" table:template-name="Box List Red">
+        <table:table-column table:style-name="Table1.A"/>
+        <table:table-column table:style-name="Table1.B"/>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell table:style-name="Table1.A1" office:value-type="string">
+            <text:p text:style-name="P6">Country</text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B1" office:value-type="string">
+            <text:p text:style-name="P6">Image</text:p>
+          </table:table-cell>
+        </table:table-row>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell table:style-name="Table1.A2" office:value-type="string">
+            <text:p text:style-name="P5">
+              <text:span text:style-name="T2">fr</text:span>
+              <text:span text:style-name="T3"></text:span>
+              <text:span text:style-name="T4"></text:span>
+              <text:span text:style-name="T3"></text:span>
+            </text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B2">
+            <text:p text:style-name="P7">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-4" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
+                <draw:image xlink:href="Pictures/CarboneImage1.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
+                <svg:title></svg:title>
+              </draw:frame>
+            </text:p>
+          </table:table-cell>
+        </table:table-row>
+        <table:table-row table:style-name="Table1.1">
+          <table:table-cell table:style-name="Table1.A2" office:value-type="string">
+            <text:p text:style-name="P5">
+              <text:span text:style-name="T2">de</text:span>
+              <text:span text:style-name="T3"></text:span>
+              <text:span text:style-name="T4"></text:span>
+              <text:span text:style-name="T3"></text:span>
+            </text:p>
+          </table:table-cell>
+          <table:table-cell table:style-name="Table1.B2">
+            <text:p text:style-name="P7">
+              <draw:frame draw:style-name="fr1" draw:name="carbone-image-5" text:anchor-type="as-char" svg:width="1.969cm" svg:height="1.221cm" draw:z-index="1">
+                <draw:image xlink:href="Pictures/CarboneImage0.jpeg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg"/>
+                <svg:title></svg:title>
+              </draw:frame>
+            </text:p>
+          </table:table-cell>
+        </table:table-row>
+      </table:table>
+      <text:p text:style-name="P3"/>
+      <text:p text:style-name="Standard"/>
+    </office:text>
+  </office:body>
+</office:document-content>

@@ -3,10 +3,15 @@
   "env": {
     "browser" : false,
     "es6"     : true,
+    "es2017"  : true,
+    "es2020"  : true,
     "node"    : true,
     "mocha"   : true
   },
   "plugins" : [],
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
   "extends": "eslint:recommended",
   "rules": {
     "one-var"                       : [ "warn" , "never"     ], // Disallow declaration of multiple var in one line

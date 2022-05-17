@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image2.jpeg"/>
+  <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+  <Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.jpeg" Id="rIdCarbone0"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage1.jpeg" Id="rIdCarbone1"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage2.png" Id="rIdCarbone2"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage3.jpeg" Id="rIdCarbone3"/>
+</Relationships>

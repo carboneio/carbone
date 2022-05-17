@@ -1,3 +1,5 @@
+var toMd5 = require('./md5');
+
 
 const LINEBREAK = {
   odt  : '<text:line-break/>',
@@ -189,6 +191,7 @@ function convCRLF (d) {
 }
 // this formatter is separately to inject code
 convCRLF.canInjectXML = true;
+convCRLF.isExecutionNotConditionnalyExecuted;
 
 /**
  * Slice a string with a begin and an end
@@ -276,6 +279,18 @@ function padr (d, targetLength, padString) {
   return d;
 }
 
+function md5 (d) {
+  return toMd5(d);
+}
+
+function prepend (d, toPrepend) {
+  return toPrepend + d;
+}
+
+function append (d, append) {
+  return d + '' + append;
+}
+
 
 /**
  * Returns the length of a string or array.
@@ -308,6 +323,9 @@ module.exports = {
   substr    : substr,
   slice     : substr,
   padl      : padl,
+  padr      : padr,
   len       : len,
-  padr      : padr
+  md5       : md5,
+  prepend   : prepend,
+  append    : append
 };

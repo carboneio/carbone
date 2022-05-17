@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image2.jpeg"/>
+  <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image3.jpeg"/>
+  <Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image4.jpeg"/>
+  <Relationship Id="rId6" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image5.jpeg"/>
+  <Relationship Id="rId7" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image6.jpeg"/>
+  <Relationship Id="rId8" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image7.jpeg"/>
+  <Relationship Id="rId9" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+  <Relationship Id="rId10" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.jpg" Id="rIdCarbone0"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage1.jpeg" Id="rIdCarbone1"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage2.jpeg" Id="rIdCarbone2"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage3.emf" Id="rIdCarbone3"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage4.png" Id="rIdCarbone4"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage5.emf" Id="rIdCarbone5"/>
+  <Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage6.jpeg" Id="rIdCarbone6"/>
+</Relationships>

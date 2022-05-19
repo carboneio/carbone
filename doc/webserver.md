@@ -29,7 +29,7 @@ Carbone On-premise can be installed in different ways:
 ### Basic Installation
 
 1. Download the license and the Carbone On-premise binary for server/OS: Mac, Linux or Windows
-2. Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
+2. Install LibreOffice (Optional, if you need to generate PDF, you must install Libre Office) [Link to instructions](#how-and-why-install-libreoffice).
 3. Prepare the license key to be loaded, multiple solution:
    - Set the Environment Variable `CARBONE_EE_LICENSE` with the license key as the value
    - Or pass the CLI option `--license` followed by the license key as the value when you start the server (step 4)
@@ -43,8 +43,6 @@ Carbone On-premise can be installed in different ways:
 If an error appears during the start up, you must verify:
 - if your license is valid
 - if CLI options and values are valid
-
-You must install LibreOffice to generate PDF documents, [read instructions](#how-and-why-install-libreoffice).
 
 ### Installation from systemd
 

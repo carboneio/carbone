@@ -138,6 +138,24 @@ describe('file', function () {
       });
     });
   });
+  
+  describe('isZippedBuffer', function () {
+    it('should return true if the file is zipped', function (done) {
+      var buffer = fs.readFileSync(path.resolve('./test/datasets/test_word_render_A.docx'));
+      file.isZippedBuffer(buffer, function (err, isZipped) {
+        helper.assert(isZipped, true);
+        done();
+      });
+    });
+    it('should return false if the file is not zipped', function (done) {
+      var buffer = fs.readFileSync(path.resolve('./test/datasets/test_word_render_2003_XML.xml'));
+      file.isZippedBuffer(buffer, function (err, isZipped) {
+        helper.assert(isZipped, false);
+        done();
+      });
+    });
+  });
+  
 
   describe('unzip', function () {
     it('should unzip a file and return a array which contain its content', function (done) {

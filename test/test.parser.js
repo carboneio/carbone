@@ -805,7 +805,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables from the xml even if there are some xml tags everywhere', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/> =  id<bla>=2    }</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/> =  id<bla>=2    }</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -814,7 +815,8 @@ describe('parser', function () {
       });
     });
     it('should work if there are whitespaces and xml in the variable name and xml tags around each braces', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#de <br> f <br> =<br>id=2  <br>}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#de <br> f <br> =<br>id=2  <br>}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><br><br><br></div></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -823,7 +825,8 @@ describe('parser', function () {
       });
     });
     it('should extract multiple variables ', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def =<br/>  id<bla>=2  }</div>{ <br> # <bla> my_Var2= <br/>  test<bla>[1=5]}</xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def =<br/>  id<bla>=2  }</div>{ <br> # <bla> my_Var2= <br/>  test<bla>[1=5]}</xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div><br><bla><br/><bla></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -834,7 +837,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables with parameters. It should replace parameters by $0, $1, ...', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b)=id=$a,g=$b}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b)=id=$a,g=$b}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -843,7 +847,8 @@ describe('parser', function () {
       });
     });
     it('should not confuse two parameters which begin with the same word', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$ab)=id=$a,g=$ab}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$ab)=id=$a,g=$ab}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -852,7 +857,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables with parameters even if there are xml tags everywhere', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> = id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> = id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><tr><tr><tr/><tr/><td><td><tf></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -1550,7 +1556,11 @@ describe('parser', function () {
       helper.assert(parser.isCarboneMarker('<text:span text:style-name="T3">{c.element</text:span>}'), false);
       helper.assert(parser.isCarboneMarker('  {d.value}'), false);
       helper.assert(parser.isCarboneMarker('  {   $  mealOf(2)}'), false);
+    });
 
+    it('should ignore markers which contain not printable chars (come from binary file)', function () {
+      helper.assert(parser.isCarboneMarker('{d.value\u000C}'), false);
+      helper.assert(parser.isCarboneMarker('{d.\u0000value\u000C}'), false);
     });
 
     it('should not find Carbone markers', function () {

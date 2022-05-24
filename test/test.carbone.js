@@ -3043,6 +3043,25 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should not crash if a binary file is used as a template (reDoS)', function (done) {
+      carbone.render('test_reDoS_binary.doc', {}, function (err) {
+        assert.equal(err, null);
+        done();
+      });
+    });
+    it('should not crash if a template is used with weird variables (reDoS)', function (done) {
+      carbone.render('test_reDoS_template.def', {}, function (err) {
+        assert.equal(err, 'Error: impossible to parse variable #def.nonEmptySchema:_schema:(it.opts.a?(typeof_schema');
+        done();
+      });
+    });
+    it('should not crash if a template is not a zip, but still a binary file (reDoS)', function (done) {
+      carbone.render('test_reDoS_binary_not_zip.tar', {}, function (err) {
+        assert.equal(err, 'Error: impossible to parse variable #def.nonEmptySchema:_schema:(it.opts.a?(typeof_schema');
+        done();
+      });
+    });
+
     it('should return an error if hardRefresh is set to true on unknown files for LibreOffice', function (done) {
       var data = {
         field1 : 'field_1',

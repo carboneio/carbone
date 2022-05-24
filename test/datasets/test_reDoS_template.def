@@ -1,0 +1,6 @@
+{{## def.nonEmptySchema:_schema:
+  (it.opts.a
+    ? (typeof _schema == 'object' && Object.keys(_schema).length > 0)
+      || _schema === false
+    : it.util.e(_schema, it.RULES.all))
+#}}

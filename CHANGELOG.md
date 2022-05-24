@@ -1,6 +1,7 @@
-- Accept regular formatters after conditional formatters
 
 ### v4.0.0-beta.1
+  - [EE] Accept formatters after conditional formatters. For example:
+    - `{bindColor(fde9a9, hexa) = d.value:ifLT(10):show(FF00FF):ifLT(20):show(005FCF):elseShow(FFDD00)}`
   - Fix multiple reDoS and optimize parsing of some templates
   - [EE] Include 3.5.2
   - [EE] Dynamic chart: 

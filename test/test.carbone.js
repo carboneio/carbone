@@ -1892,7 +1892,7 @@ describe('Carbone', function () {
           done();
         });
       });
-      it.only('should accept to use other formatters with conditional blocks', function (done) {
+      it.skip('TODO (make a choice for formatC) should accept to use other formatters with conditional blocks', function (done) {
         var _xml = '<xml> {d.val:ifEQ(null):show(--):formatC}  {d.val:ifEQ(3):show(--):elseShow(.other):formatC} {d.other:ifLT(10):formatC:elseShow(--)}  {d.other:ifLT(1):formatC:elseShow(--)} </xml>';
         var _data = {
           val   : null,

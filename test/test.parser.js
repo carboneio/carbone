@@ -724,6 +724,19 @@ describe('parser', function () {
         done();
       });
     });
+    it('should be fast to translate (reDoS attack)', function (done) {
+      const _xmlReDoS = '<w:t>{d.a}</w:t>        <w:t>{</w:t>            <w:r>              <w:rPr>                <w:sz w:val="16"/>                <w:szCs w:val="16"/>                <w:lang w:val="en-MY"/>              </w:rPr>              <w:t >d.</w:t>              <w:rPr>              </w:rPr>              <w:t >b</w:t>';
+      var _start = process.hrtime();
+      parser.translate(_xmlReDoS, {}, function (err, xmlTranslated) {
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, _xmlReDoS);
+        const _diff    = process.hrtime(_start);
+        const _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+        console.log('\n sortXmlParts speed : ' + _elapsed + ' ms (usually around 0.1 ms)\n');
+        helper.assert(_elapsed < (20 * helper.CPU_PERFORMANCE_FACTOR), true);
+        done();
+      });
+    });
     /* Should be activated if we encoded others special characters (non operators special characters)
     it('should translate this sentence with special characters', function(done){
       var _objLang = {

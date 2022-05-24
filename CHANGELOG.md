@@ -1,4 +1,5 @@
 ### v4.0.0-beta.1
+  - Fix multiple reDoS
   - [EE] Include 3.5.2
   - [EE] Dynamic chart: 
     - Fix crash when DOCX/ODT templates contain empty files

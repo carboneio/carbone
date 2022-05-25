@@ -947,17 +947,17 @@ describe('formatter', function () {
 
   describe('LEN', function () {
     it('should return the string length or array length', function () {
-      helper.assert(conditionFormatter.len('This is a string'), 16);
-      helper.assert(conditionFormatter.len(''), 0);
-      helper.assert(conditionFormatter.len('樂而不淫 建章曰'), 8);
-      helper.assert(conditionFormatter.len('This is a longer string lenght'), 30);
-      helper.assert(conditionFormatter.len([0, 1, 2, 3]), 4);
-      helper.assert(conditionFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
-      helper.assert(conditionFormatter.len([]), 0);
-      helper.assert(conditionFormatter.len({name : 'John'}), 0);
-      helper.assert(conditionFormatter.len(undefined), 0);
-      helper.assert(conditionFormatter.len(null), 0);
-      helper.assert(conditionFormatter.len(-1), 0);
+      helper.assert(stringFormatter.len('This is a string'), 16);
+      helper.assert(stringFormatter.len(''), 0);
+      helper.assert(stringFormatter.len('樂而不淫 建章曰'), 8);
+      helper.assert(stringFormatter.len('This is a longer string lenght'), 30);
+      helper.assert(stringFormatter.len([0, 1, 2, 3]), 4);
+      helper.assert(stringFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
+      helper.assert(stringFormatter.len([]), 0);
+      helper.assert(stringFormatter.len({name : 'John'}), 0);
+      helper.assert(stringFormatter.len(undefined), 0);
+      helper.assert(stringFormatter.len(null), 0);
+      helper.assert(stringFormatter.len(-1), 0);
     });
   });
 

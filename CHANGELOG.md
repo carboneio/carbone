@@ -182,6 +182,10 @@
 
 
 
+### v3.5.3
+  - Release May 25th 2022
+  - [EE] Accept `convCRLF` before `:html` formatter to convert `\r\n` to `<br>` 
+
 ### v3.5.2
   - Release May 6th 2022
   - [EE] Add file verification on template upload

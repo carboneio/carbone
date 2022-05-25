@@ -112,6 +112,11 @@ describe('formatter', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'docx'}, 'qsdqsd \n'), 'qsdqsd </w:t><w:br/><w:t>');
     });
   });
+  describe('convCRLFH', function () {
+    it('should convert LF and CR to <br>', function () {
+      helper.assert(stringFormatter.convCRLFH.call({}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <br> sd <br> qsd <br> sq');
+    });
+  });
   describe('ifEmpty', function () {
     it('should show a message if data is empty. It should stop propagation to next formatter', function () {
       var _context = {};

@@ -291,6 +291,26 @@ function append (d, append) {
   return d + '' + append;
 }
 
+
+/**
+ * Returns the length of a string or array.
+ *
+ * @version 2.0.0
+ * @example ["Hello World"]
+ * @example [""]
+ * @example [[1, 2, 3, 4, 5]]
+ * @example [[1, "Hello"]]
+ *
+ * @param {Mixed} d Array or String
+ * @returns {Number} Length of the element
+ */
+function len (d) {
+  if (typeof d === 'string' || Array.isArray(d)) {
+    return d.length;
+  }
+  return 0;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -304,6 +324,7 @@ module.exports = {
   slice     : substr,
   padl      : padl,
   padr      : padr,
+  len       : len,
   md5       : md5,
   prepend   : prepend,
   append    : append

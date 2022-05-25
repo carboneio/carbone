@@ -910,9 +910,9 @@ describe('formatter', function () {
         });
         it('Should show + AND + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 1997);
+          callWithContext(conditionFormatter.ifLTE, _context, stringFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 1997);
           callWithContext(conditionFormatter.and, _context);
-          callWithContext(conditionFormatter.ifGT, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 10);
+          callWithContext(conditionFormatter.ifGT, _context, stringFormatter.len('This Is a long string with numbers 12345'), 10);
           helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
           helper.assert(_context.isConditionTrue, true);
           helper.assert(_context.isAndOperator, true);
@@ -921,9 +921,9 @@ describe('formatter', function () {
 
         it('Should elseShow + AND + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 10);
+          callWithContext(conditionFormatter.ifLTE, _context, stringFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 10);
           callWithContext(conditionFormatter.and, _context);
-          callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 41);
+          callWithContext(conditionFormatter.ifGTE, _context, stringFormatter.len('This Is a long string with numbers 12345'), 41);
           callWithContext(conditionFormatter.show, _context);
           helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'Apple'), 'Apple');
           helper.assert(_context.isConditionTrue, false);
@@ -933,9 +933,9 @@ describe('formatter', function () {
 
         it('Should show + OR + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLT, _context, conditionFormatter.len(['car', 'train', 'plane']), 2);
+          callWithContext(conditionFormatter.ifLT, _context, stringFormatter.len(['car', 'train', 'plane']), 2);
           callWithContext(conditionFormatter.or, _context);
-          callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('Hello12345'), 10);
+          callWithContext(conditionFormatter.ifGTE, _context, stringFormatter.len('Hello12345'), 10);
           helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
           helper.assert(_context.isConditionTrue, true);
           helper.assert(_context.isAndOperator, false);
@@ -947,17 +947,17 @@ describe('formatter', function () {
 
   describe('LEN', function () {
     it('should return the string length or array length', function () {
-      helper.assert(conditionFormatter.len('This is a string'), 16);
-      helper.assert(conditionFormatter.len(''), 0);
-      helper.assert(conditionFormatter.len('樂而不淫 建章曰'), 8);
-      helper.assert(conditionFormatter.len('This is a longer string lenght'), 30);
-      helper.assert(conditionFormatter.len([0, 1, 2, 3]), 4);
-      helper.assert(conditionFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
-      helper.assert(conditionFormatter.len([]), 0);
-      helper.assert(conditionFormatter.len({name : 'John'}), 0);
-      helper.assert(conditionFormatter.len(undefined), 0);
-      helper.assert(conditionFormatter.len(null), 0);
-      helper.assert(conditionFormatter.len(-1), 0);
+      helper.assert(stringFormatter.len('This is a string'), 16);
+      helper.assert(stringFormatter.len(''), 0);
+      helper.assert(stringFormatter.len('樂而不淫 建章曰'), 8);
+      helper.assert(stringFormatter.len('This is a longer string lenght'), 30);
+      helper.assert(stringFormatter.len([0, 1, 2, 3]), 4);
+      helper.assert(stringFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
+      helper.assert(stringFormatter.len([]), 0);
+      helper.assert(stringFormatter.len({name : 'John'}), 0);
+      helper.assert(stringFormatter.len(undefined), 0);
+      helper.assert(stringFormatter.len(null), 0);
+      helper.assert(stringFormatter.len(-1), 0);
     });
   });
 

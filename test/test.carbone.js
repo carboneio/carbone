@@ -1881,6 +1881,29 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should accept to use other formatters with conditional blocks', function (done) {
+        var _xml = '<xml> {d.val:ifEQ(3):show(30):add(2)} {d.val:ifEQ(3):show(30):ifLT(4):show(40):add(2)} </xml>';
+        var _data = {
+          val : 3
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> 32 32 </xml>');
+          done();
+        });
+      });
+      it.skip('TODO (make a choice for formatC) should accept to use other formatters with conditional blocks', function (done) {
+        var _xml = '<xml> {d.val:ifEQ(null):show(--):formatC}  {d.val:ifEQ(3):show(--):elseShow(.other):formatC} {d.other:ifLT(10):formatC:elseShow(--)}  {d.other:ifLT(1):formatC:elseShow(--)} </xml>';
+        var _data = {
+          val   : null,
+          other : 4.34
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> TODO (current) --  4.34 4.34 €  --</xml>');
+          done();
+        });
+      });
       it('should accept condition markers next to another condition marker', function (done) {
         var _xml = '<xml> {d.val:showBegin}hey{d.val:showEnd}{d.val:showBegin}joe{d.val:showEnd} </xml>';
         var _data = {

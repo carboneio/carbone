@@ -1,7 +1,9 @@
 
 ### v4.0.0-beta.1
-  - [EE] Accept formatters after conditional formatters. For example:
-    - `{bindColor(fde9a9, hexa) = d.value:ifLT(10):show(FF00FF):ifLT(20):show(005FCF):elseShow(FFDD00)}`
+  - Release May 25th 2022
+  - [EE] Accept formatters after conditional formatters. It solves many issues, such as dynamic colors with conditions:
+    - `{d.value:ifLT(10):show(0):formatN}` : `formatN` works even if the condition `ifLT(10)` is true
+    - `{bindColor(fde9a9, hexa) = d.value:ifLT(10):show(FF00FF):ifLT(20):show(005FCF):elseShow(FFDD00)}`: conditional colors works!
   - Fix multiple reDoS and optimize parsing of some templates
   - [EE] Include 3.5.2
   - [EE] Dynamic chart: 
@@ -11,7 +13,6 @@
     - Fix ODT charts when images are used for background
 
 ### v4.0.0-alpha.1
-
   - [EE] BREAKING CHANGE: the specific marker `{bind` becomes `{bindChart`. Example: `{bindChart(91) = d[i].valCol1}` 
   - [EE] DOCX Charts improvements
     - Manage loops to repeat multiple charts in DOCX template made by MS Office

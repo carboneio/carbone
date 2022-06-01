@@ -1,4 +1,8 @@
 
+### v4.0.0-beta.2
+  - Release June 1st 2022
+  - Fix crash with very complex JSON map
+
 ### v4.0.0-beta.1
   - Release May 25th 2022
   - [EE] Accept formatters after conditional formatters. It solves many issues, such as dynamic colors with conditions:

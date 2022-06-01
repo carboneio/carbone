@@ -2778,6 +2778,111 @@ describe('extracter', function () {
         hierarchy   : ['d', 'cars1', 'cars02', 'cars3', 'menu1', 'menu2', 'menu3']
       });
     });
+    it('should place objects before arrays, even with a parent array', function () {
+      var _data = {
+        staticData  : {},
+        dynamicData : {
+          _root : {
+            name   : '_root',
+            type   : 'object',
+            parent : '',
+          },
+          _rootd : {
+            name   : 'd',
+            type   : 'object',
+            parent : '_root',
+          },
+          _rootdarr1 : {
+            name   : 'arr1',
+            type   : 'array',
+            parent : '_rootd',
+            depth  : 1
+          },
+          _rootdarr1arr0 : {
+            name   : 'obj1',
+            type   : 'array',
+            parent : '_rootdarr1',
+            depth  : 2
+          },
+          _rootdarr1obj1obj2 : {
+            name   : 'obj2',
+            type   : 'object',
+            parent : '_rootdarr1arr0',
+          },
+          _rootdarr1obj1arr2 : {
+            name   : 'arr2',
+            type   : 'array',
+            parent : '_rootdarr1arr0',
+            depth  : 3
+          },
+          _rootdarr1obj1obj3 : {
+            name   : 'obj3',
+            type   : 'object',
+            parent : '_rootdarr1arr0',
+          },
+          _rootdarr1obj1obj3parent : {
+            name   : 'parent',
+            type   : 'object',
+            parent : '_rootdarr1obj1obj3',
+          },
+          _rootdarr1obj1arr3 : {
+            name   : 'arr3',
+            type   : 'array',
+            parent : '_rootdarr1arr0',
+            depth  : 3
+          },
+          _rootdarr1obj1arr3arr4 : {
+            name   : 'arr4',
+            type   : 'array',
+            parent : '_rootdarr1obj1arr3',
+            depth  : 4
+          },
+          _rootdarr1obj1arr3arr4arr5 : {
+            name   : 'arr5',
+            type   : 'array',
+            parent : '_rootdarr1obj1arr3arr4',
+            depth  : 5
+          },
+          _rootdarr1obj1arr3arr4arr6 : {
+            name   : 'arr6',
+            type   : 'array',
+            parent : '_rootdarr1obj1arr3arr4',
+            depth  : 5
+          },
+          _rootdarr1obj1arr3arr4arr6obj2 : {
+            name   : 'obj2',
+            type   : 'object',
+            parent : '_rootdarr1obj1arr3arr4arr6',
+          },
+          _rootdarr1obj1arr3arr4arr6obj4 : {
+            name   : 'obj4',
+            type   : 'object',
+            parent : '_rootdarr1obj1arr3arr4arr6',
+          }
+        }
+      };
+      helper.assert(extracter.buildSortedHierarchy(_data), {
+        staticData  : {},
+        dynamicData : _data.dynamicData,
+        hierarchy   : [
+          '_root',
+          '_rootd',
+          '_rootdarr1',
+          '_rootdarr1arr0',
+          '_rootdarr1obj1obj2',
+          '_rootdarr1obj1obj3',
+          '_rootdarr1obj1obj3parent',
+          '_rootdarr1obj1arr2',
+          '_rootdarr1obj1arr3',
+          '_rootdarr1obj1arr3arr4',
+          '_rootdarr1obj1arr3arr4arr5',
+          '_rootdarr1obj1arr3arr4arr6',
+          '_rootdarr1obj1arr3arr4arr6obj2',
+          '_rootdarr1obj1arr3arr4arr6obj4',
+        ]
+      });
+    });
+
   });
 
   // Many complex cases are tested indirectly in other tests

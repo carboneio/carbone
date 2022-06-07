@@ -108,7 +108,7 @@ const getHTMLContentDocx = function (htmlContent, styleId) {
  */
 const getHTMLContentDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties !== undefined && _htmlProperties.content ? _htmlProperties.content : '';
+  return _htmlProperties?.content?.get(this) ?? '';
 };
 
 module.exports = {

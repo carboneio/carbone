@@ -715,6 +715,51 @@ describe('Carbone', function () {
         done();
       });
     });
+
+    it('should not crash if a condition is used just before an array loop, which contains a filter', function (done) {
+      var _xml = ''
+        + '<doc>'
+        + '  <body>'
+        + '    <a>{d.condition:ifIN(a):hideBegin}</a>'
+        + '    <b>{d.subArray[i,type!=b].type}</b>'
+        + '    <c>{d.subArray[i+1].type}</c>'
+        + '    <d>{d.condition:hideEnd}</d>'
+        + '  </body>'
+        + '</doc>'
+      ;
+      var _data = {
+        condition : 'a',
+        subArray  : [{ type : 'b' }]
+      };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<doc>  <body>      </body></doc>');
+        done();
+      });
+    });
+
+    it('should not crash if a condition is used just before an array loop, without filter', function (done) {
+      var _xml = ''
+        + '<doc>'
+        + '  <body>'
+        + '    <a>{d.condition:ifIN(a):hideBegin}</a>'
+        + '    <b>{d.subArray[i].type}</b>'
+        + '    <c>{d.subArray[i+1].type}</c>'
+        + '    <d>{d.condition:hideEnd}</d>'
+        + '  </body>'
+        + '</doc>'
+      ;
+      var _data = {
+        condition : 'a',
+        subArray  : [{ type : 'b' }]
+      };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<doc>  <body>      </body></doc>');
+        done();
+      });
+    });
+
     it('formatters should be independant. The propagation of one set of cascaded formatters should not alter the propagation of another set of formatters', function (done) {
       var data = {
         param : 3,
@@ -930,6 +975,20 @@ describe('Carbone', function () {
       };
       carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
         assert.equal(_xmlBuilt, '<xml><t_row> 1 Lumeneo </t_row><t_row> 2 Toyota </t_row><t_row> 3 Tesla motors </t_row></xml>');
+        done();
+      });
+    });
+    it('should print a counter and filter', function (done) {
+      var _xml = '<xml><t_row> {d.cars[sort,i,filter=1].brand:count()} {d.cars[sort,i,filter=1].brand} </t_row><t_row> {d.cars[sort+1,i+1,filter=1].brand} </t_row></xml>';
+      var _data = {
+        cars : [
+          {brand : 'Lumeneo'     , sort : 1, filter : 1},
+          {brand : 'Tesla motors', sort : 2, filter : 1},
+          {brand : 'Toyota'      , sort : 1, filter : 0}
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml><t_row> 1 Lumeneo </t_row><t_row> 2 Tesla motors </t_row></xml>');
         done();
       });
     });
@@ -1199,7 +1258,7 @@ describe('Carbone', function () {
           done();
         });
       });
-      it('should return an error if  crash if object is undefined', function (done) {
+      it('should access to sub-arrays', function (done) {
         var data = {
           param     : 3,
           subObject : {
@@ -1211,7 +1270,7 @@ describe('Carbone', function () {
         };
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObj[0].textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<xml></xml>');
+          helper.assert(result, '<xml>ddfdf</xml>');
           done();
         });
       });
@@ -1294,6 +1353,73 @@ describe('Carbone', function () {
             +  '</tr>'
             +  '<tr>'
             +    '<td>4200 4513</td>'
+            +  '</tr>'
+            +'</xml>';
+          assert.equal(_xmlBuilt, _expectedResult);
+          done();
+        });
+      });
+      it('should accept to access parent index in arrays with dot syntax', function (done) {
+        var _xml =
+           '<xml>'
+          +  '<tr>'
+          +    '<td>{d[i].cars[i].wheels[i].tire.nb:append(.i):append(..i):append(...i)}</td>'
+          +  '</tr>'
+          +  '<tr>'
+          +    '<td>{d[i+1].cars[i+1].wheels[i+1].tire.nb}</td>'
+          +  '</tr>'
+          +'</xml>';
+        var _data = [
+          {
+            site : {nb : 10},
+            cars : [
+              {
+                nb     : 2,
+                wheels : [
+                  {tire : {nb : '_A_'}, nb : 3},
+                  {tire : {nb : '_B_'}, nb : 4}
+                ]
+              },
+              {
+                nb     : 3,
+                wheels : [
+                  {tire : {nb : '_C_'}, nb : 5}
+                ]
+              },
+            ],
+          },{
+            site : {nb : 300},
+            cars : [{
+              nb     : 4,
+              wheels : [
+                {tire : {nb : '_D_'}, nb : 6},
+                {tire : {nb : '_E_'}, nb : 7},
+                {tire : {nb : '_F_'}, nb : 9}
+              ]
+            }
+            ],
+          }
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          var _expectedResult =
+             '<xml>'
+            +  '<tr>'
+            +    '<td>_A_000</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_B_001</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_C_010</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_D_100</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_E_101</td>'
+            +  '</tr>'
+            +  '<tr>'
+            +    '<td>_F_102</td>'
             +  '</tr>'
             +'</xml>';
           assert.equal(_xmlBuilt, _expectedResult);
@@ -1752,6 +1878,29 @@ describe('Carbone', function () {
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           assert.equal(err+'', 'null');
           assert.equal(_xmlBuilt, '<xml>   <b></b>  </xml>');
+          done();
+        });
+      });
+      it('should accept to use other formatters with conditional blocks', function (done) {
+        var _xml = '<xml> {d.val:ifEQ(3):show(30):add(2)} {d.val:ifEQ(3):show(30):ifLT(4):show(40):add(2)} </xml>';
+        var _data = {
+          val : 3
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> 32 32 </xml>');
+          done();
+        });
+      });
+      it.skip('TODO (make a choice for formatC) should accept to use other formatters with conditional blocks', function (done) {
+        var _xml = '<xml> {d.val:ifEQ(null):show(--):formatC}  {d.val:ifEQ(3):show(--):elseShow(.other):formatC} {d.other:ifLT(10):formatC:elseShow(--)}  {d.other:ifLT(1):formatC:elseShow(--)} </xml>';
+        var _data = {
+          val   : null,
+          other : 4.34
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> TODO (current) --  4.34 4.34 €  --</xml>');
           done();
         });
       });
@@ -2735,7 +2884,11 @@ describe('Carbone', function () {
             '{d.field2}',
             '{c.author1}',
             '{c.author2}'
-          ]
+          ],
+          sample : {
+            data       : { field1 : 'field10' , field2 : 'field21'   },
+            complement : { author1 : 'author12', author2 : 'author23' }
+          }
         });
         fs.unlinkSync(resultFilePath);
         done();
@@ -2890,6 +3043,25 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should not crash if a binary file is used as a template (reDoS)', function (done) {
+      carbone.render('test_reDoS_binary.doc', {}, function (err) {
+        assert.equal(err, null);
+        done();
+      });
+    });
+    it('should not crash if a template is used with weird variables (reDoS)', function (done) {
+      carbone.render('test_reDoS_template.def', {}, function (err) {
+        assert.equal(err, 'Error: impossible to parse variable #def.nonEmptySchema:_schema:(it.opts.a?(typeof_schema');
+        done();
+      });
+    });
+    it('should not crash if a template is not a zip, but still a binary file (reDoS)', function (done) {
+      carbone.render('test_reDoS_binary_not_zip.tar', {}, function (err) {
+        assert.equal(err, 'Error: impossible to parse variable #def.nonEmptySchema:_schema:(it.opts.a?(typeof_schema');
+        done();
+      });
+    });
+
     it('should return an error if hardRefresh is set to true on unknown files for LibreOffice', function (done) {
       var data = {
         field1 : 'field_1',

@@ -40,6 +40,22 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
         });
 
+        it('should accept convCRLF before :html, and replace it by an internal formatter which replace "\n" by "<br>"', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          /** WITHOUT STYLE */
+          let _templateContent = '<office:body><office:text><text:p>{d.content:convCRLF:html}</text:p></office:text></office:body>';
+          let _expectedContent = '<office:body><office:text><carbone>{d.content:convCRLFH:getHTMLContentOdt}</carbone></office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
+          /** WITH STYLE */
+          _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:convCRLF:html}</text:p></office:text></office:body>';
+          _expectedContent = '<office:body><office:text><carbone>{d.content:convCRLFH:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+          assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+        });
+
+
         it('should seperate a single html formatter with other elements', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
@@ -2176,6 +2192,44 @@ describe('Dynamic HTML', function () {
           extension: 'docx',
           htmlStylesDatabase: new Map()
         }
+        html.preProcessDocx(_template, _options);
+        helper.assert(_template.files[0].data, _XMLexpected);
+      });
+
+      it('should accept convCRLF before :html, and replace it by an internal formatter which replace', function () {
+        const _XMLtemplate = '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+          '<w:document>' +
+            '<w:body>' +
+              '<w:p >' +
+                '<w:r>' +
+                  '<w:rPr>' +
+                    '<w:lang w:val="en-US"/>' +
+                  '</w:rPr>' +
+                  '<w:t>{d.mix1:convCRLF():html}</w:t>' +
+                '</w:r>' +
+              '</w:p>' +
+            '</w:body>' +
+          '</w:document>';
+        const _XMLexpected = '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+          '<w:document>' +
+            '<w:body>' +
+              '<carbone>{d.mix1:convCRLFH():getHTMLContentDocx}</carbone>' +
+            '</w:body>' +
+          '</w:document>';
+        const _template = {
+          files : [
+            {
+              name : 'word/document.xml',
+              data : _XMLtemplate,
+            }
+          ]
+        };
+        const _options = {
+          extension          : 'docx',
+          htmlStylesDatabase : new Map()
+        };
         html.preProcessDocx(_template, _options);
         helper.assert(_template.files[0].data, _XMLexpected);
       });

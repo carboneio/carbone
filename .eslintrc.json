@@ -3,12 +3,14 @@
   "env": {
     "browser" : false,
     "es6"     : true,
+    "es2017"  : true,
+    "es2020"  : true,
     "node"    : true,
     "mocha"   : true
   },
   "plugins" : [],
   "parserOptions": {
-    "ecmaVersion": 2018
+    "ecmaVersion": 2020
   },
   "extends": "eslint:recommended",
   "rules": {

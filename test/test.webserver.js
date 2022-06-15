@@ -504,6 +504,16 @@ describe('Webserver', () => {
         });
       });
 
+      it('should delete a template that does not exist on the plugin storage', (done) => {
+        const _request = getBody(4001, '/template/template_not_exists', 'DELETE', null, token);
+        get.concat(_request, (err, res, data) => {
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
+          done();
+        });
+      });
+
       it('should delete a template in the user location choice with the header Expect:100-continue', (done) => {
         exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'PREFIX_abcdef')}`, () => {
           const _request = getBody(4001, '/template/abcdef', 'DELETE', null, token);
@@ -1645,15 +1655,6 @@ describe('Webserver', () => {
             assert.strictEqual(data.message, 'Template deleted');
             done();
           });
-        });
-      });
-
-      it('should return an error if template does not exist', (done) => {
-        get.concat(getBody(4000, '/template/nopenopenope', 'DELETE'), (err, res, data) => {
-          data = JSON.parse(data.toString());
-          assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
-          done();
         });
       });
 

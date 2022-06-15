@@ -1,4 +1,4 @@
-### v3.5.5
+### v3.5.4
   - [EE] Do not return an error when `DEL /template` is called and the template is already deleted on local storage. It may be already deleted by the plugin.
 
 ### v3.5.3

@@ -1,3 +1,5 @@
+### v4.0.0-beta.3
+- Use lossless image compression by default to speed up PDF rendering and improve image quality
 
 ### v4.0.0-beta.2
   - Release June 1st 2022

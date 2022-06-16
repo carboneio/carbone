@@ -1161,6 +1161,20 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it.only('it should filter with null or undefined values', function (done) {
+    var _xml = '<xml> <t_row> {d[brand=null, brand=undefined].id} </t_row><t_row> {d[brand=null,brand=undefined].id} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : 1},
+      {brand : null, id : 2},
+      {brand : 'Toyota'      , id : 3},
+      {brand : undefined      , id : 4},
+      {brand : 'tesla'      , id : 5}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> 2 </t_row><t_row> 4 </t_row></xml>');
+      done();
+    });
+  });
   it('should accept conditions on the main iterators "i"', function (done) {
     var _xml = '<xml> <t_row> {d[i=2].brand} </t_row><t_row> {d[i=1].brand} </t_row></xml>';
     var _data = [

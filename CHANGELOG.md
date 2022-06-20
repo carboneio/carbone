@@ -1,3 +1,9 @@
+
+  - [EE] BETA: `bindColor` formatter replaces background and line colors of shapes in DOCX only.
+    - The `bindColor` marker must be written in the document (NOT in alt text of the shape)
+    - The replaced color in the template must be RGB. Select "RGB sliders" tool to defined the color in MS Word.
+
+
 ### v3.5.4
   - Release June 15th 2022
   - [EE] Do not return an error when `DEL /template` is called and the template is already deleted on local storage. It may be already deleted by the plugin.

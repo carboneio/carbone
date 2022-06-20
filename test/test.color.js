@@ -1047,6 +1047,89 @@ describe('Dynamic colors', function () {
   });
 
   describe('DOCX', function () {
+    describe('preprocess docx for shape', function () {
+      it('should replace color in graphics, background and lines of shapes ', function () {
+        // const _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr><w:color w:val="{d.color6:getAndConvertColorDocx(hsl, textColor)}"/></w:rPr></w:pPr><w:r><w:rPr><w:b w:val="false"/><w:color w:val="{d.color6:getAndConvertColorDocx(hsl, textColor)}"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>{d.lastname}</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val="Normal"/><w:bidi w:val="0"/><w:spacing w:lineRule="atLeast" w:line="279"/><w:jc w:val="left"/><w:rPr></w:rPr></w:pPr><w:r><w:rPr></w:rPr><w:t></w:t></w:r><w:r><w:rPr></w:rPr><w:t></w:t></w:r><w:r><w:rPr></w:rPr><w:t></w:t></w:r></w:p></w:body></w:document>';
+        const _xml = ''
+          + '<?xml version="1.0" encoding="UTF-8" standalone="yes"?> '
+          + '<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" mc:Ignorable="w14 w15 w16se w16cid w16 w16cex w16sdtdh wp14"> '
+          + '  <w:body> {bindColor(FF0000, hexa) = d.color6} {bindColor(2F528F, hexa) = d.color2}'
+          + '    <w:p w14:paraId="02EB8E4E" w14:textId="6205B6F0" w:rsidR="005D578A" w:rsidRDefault="005D578A"> '
+          + '      <w:r> '
+          + '        <mc:AlternateContent> '
+          + '          <mc:Choice Requires="wps"> '
+          + '            <w:drawing> '
+          + '              <wp:anchor distT="0" distB="0" distL="114300" distR="114300" simplePos="0" relativeHeight="251659264" behindDoc="0" locked="0" layoutInCell="1" allowOverlap="1" wp14:anchorId="10480C67" wp14:editId="6383CAFF"> '
+          + '                <wp:docPr id="1" name="Oval 1" descr=""/> '
+          + '                <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"> '
+          + '                  <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"> '
+          + '                    <wps:wsp> '
+          + '                      <wps:spPr> '
+          + '                        <a:solidFill> '
+          + '                          <a:srgbClr val="FF0000"/> '
+          + '                        </a:solidFill> '
+          + '                        <a:ln> '
+          + '                          <a:solidFill> '
+          + '                            <a:srgbClr val="2F528F"/> '
+          + '                          </a:solidFill> '
+          + '                        </a:ln> '
+          + '                      </wps:spPr> '
+          + '                    </wps:wsp> '
+          + '                  </a:graphicData> '
+          + '                </a:graphic> '
+          + '              </wp:anchor> '
+          + '            </w:drawing> '
+          + '          </mc:Choice> '
+          + '        </mc:AlternateContent> '
+          + '      </w:r> '
+          + '    </w:p> '
+          + '  </w:body> '
+          + '</w:document>' ;
+        const _expectedXML = ''
+          + '<?xml version="1.0" encoding="UTF-8" standalone="yes"?> '
+          + '<w:document xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape" mc:Ignorable="w14 w15 w16se w16cid w16 w16cex w16sdtdh wp14"> '
+          + '  <w:body>  '
+          + '    <w:p w14:paraId="02EB8E4E" w14:textId="6205B6F0" w:rsidR="005D578A" w:rsidRDefault="005D578A"> '
+          + '      <w:r> '
+          + '        <mc:AlternateContent> '
+          + '          <mc:Choice Requires="wps"> '
+          + '            <w:drawing> '
+          + '              <wp:anchor distT="0" distB="0" distL="114300" distR="114300" simplePos="0" relativeHeight="251659264" behindDoc="0" locked="0" layoutInCell="1" allowOverlap="1" wp14:anchorId="10480C67" wp14:editId="6383CAFF"> '
+          + '                <wp:docPr id="1" name="Oval 1" descr=""/> '
+          + '                <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"> '
+          + '                  <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"> '
+          + '                    <wps:wsp> '
+          + '                      <wps:spPr> '
+          + '                        <a:solidFill> '
+          + '                          <a:srgbClr val="{d.color6:getAndConvertColorDocx(hexa, textColor)}"/> '
+          + '                        </a:solidFill> '
+          + '                        <a:ln> '
+          + '                          <a:solidFill> '
+          + '                            <a:srgbClr val="{d.color2:getAndConvertColorDocx(hexa, textColor)}"/> '
+          + '                          </a:solidFill> '
+          + '                        </a:ln> '
+          + '                      </wps:spPr> '
+          + '                    </wps:wsp> '
+          + '                  </a:graphicData> '
+          + '                </a:graphic> '
+          + '              </wp:anchor> '
+          + '            </w:drawing> '
+          + '          </mc:Choice> '
+          + '        </mc:AlternateContent> '
+          + '      </w:r> '
+          + '    </w:p> '
+          + '  </w:body> '
+          + '</w:document>';
+        const _template = {
+          files : [{
+            name : 'word/document.xml',
+            data : parser.removeXMLInsideMarkers(_xml)
+          }]
+        };
+        color.preProcessDocx(_template);
+        helper.assert(_template.files[0].data.split('> '), _expectedXML.split('> '));
+      });
+    });
     describe('preprocess docx', function () {
       it("should do nothing if the xml doesn't contain bindColor markers", function () {
         const _expectedXML = parser.removeXMLInsideMarkers('<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:p><w:r><w:rPr><w:b w:val="false"/><w:color w:val="FF0000"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:highlight w:val="yellow"/></w:rPr><w:t>{d.name}</w:t></w:r></w:p></w:body></w:document>');

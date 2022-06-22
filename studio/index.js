@@ -173,7 +173,7 @@ async function refreshRender () {
 
   if (result.success) {
     const _url = `${carboneConfig.apiUrl}/render/${result.data.renderId}`;
-    if (result.data.debug && result.data.debug.sample) {
+    if (result.data.debug && result.data.debug.sample && isObjectEmpty(result.data.debug.sample) === false) {
       generateFakeDataIfEmpty(result.data.debug.sample.data, result.data.debug.sample.complement);
     }
     // direct preview in browser if pdf

@@ -1,8 +1,8 @@
-
-  - [EE] BETA: `bindColor` formatter replaces background and line colors of shapes in DOCX only.
+### v4.0.0
+  - [EE] Fix stateless studio crash when template does not contain any Carbone markers
+  - [EE] `bindColor` formatter replaces background and line colors of shapes in DOCX only.
     - The `bindColor` marker must be written in the document (NOT in alt text of the shape)
     - The replaced color in the template must be RGB. Select "RGB sliders" tool to defined the color in MS Word.
-
 
 ### v4.0.0-beta.3
 - Use lossless image compression by default to speed up PDF rendering and improve image quality

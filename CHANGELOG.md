@@ -1,12 +1,11 @@
 ### v4.0.0
+  - Release June 24st 2022
   - [EE] Fix chart in DOCX when there is no loops (filtered array)
   - [EE] Fix stateless studio crash when template does not contain any Carbone markers
   - [EE] `bindColor` formatter replaces background and line colors of shapes in DOCX only.
     - The `bindColor` marker must be written in the document (NOT in alt text of the shape)
     - The replaced color in the template must be RGB. Select "RGB sliders" tool to defined the color in MS Word.
-
-### v4.0.0-beta.3
-- Use lossless image compression by default to speed up PDF rendering and improve image quality
+  - Use lossless image compression by default to speed up PDF rendering and improve image quality
 
 ### v4.0.0-beta.2
   - Release June 1st 2022
@@ -41,7 +40,7 @@
 
   - [EE] ⚡️ Carbone supports dynamic charts with two methods:
     - 1 - using native charts of MS Word or LibreOffice
-    - 2 - or using [Apache ECharts 5.3.1](https://echarts.apache.org/examples/en/index.html) object descriptors to generate advanced cha2
+    - 2 - or using [Apache ECharts 5.3.3](https://echarts.apache.org/examples/en/index.html) object descriptors to generate advanced cha2
 
     ### Method n°1, how to inject your data in native charts?
       - Insert a chart with native tools of LibreOffice or MS Word in your document
@@ -125,10 +124,8 @@
     - fix memory leak
     - Now it works on Safari, without hot-reloading of the template
 
-  - Formatters managements has been completely rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters:
-    - TODO (finish) A single quote can be escaped using the single quote twice: `anyFormatter(' one parameter with escaped quote ''   ', ' a second '' one with ')`
-    - For backward-compatibility:
-      - Text containing single quotes are accepted if it does not contain a comma `,` before or after the single quote: `anyFormatter(' text ,containing ' sin,gle ' quote  ')`
+  - Formatters managements has been completely rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters. 
+    For backward-compatibility: text containing single quotes are accepted if it does not contain a comma `,` before or after the single quote: `anyFormatter(' text ,containing ' sin,gle ' quote  ')`
 
   - Dynamic parameters passed in formatters with the dot `.` syntax has been improved:
     - Add the possibility to access sub arrays with positive integers: `.sort[12].id`

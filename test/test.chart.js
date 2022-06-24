@@ -1,8 +1,5 @@
 const assert = require('assert');
 const fs = require('fs');
-const builder = require('../lib/builder');
-const helper = require('../lib/helper');
-const parser = require('../lib/parser');
 const chartFormatter = require('../formatters/chart');
 const chartLib = require('../lib/chart');
 const helperTest = require('./helper');
@@ -14,7 +11,7 @@ const echartCalendar            = require('./datasets/chart/echartCalendar.js');
 const echartCalendarSVGen       = fs.readFileSync('test/datasets/chart/echartCalendarEn.svg', 'utf8');
 const echartLine                = require('./datasets/chart/echartLine.js');
 const echartLineNoColor         = require('./datasets/chart/echartLineNoColor.js');
-const echartLineSVG             = fs.readFileSync('test/datasets/chart/echartLine.svg', 'utf8');
+// const echartLineSVG             = fs.readFileSync('test/datasets/chart/echartLine.svg', 'utf8');
 const echartLineSVGDefaultColor = fs.readFileSync('test/datasets/chart/echartLineDefaultColor.svg', 'utf8');
 const echartLineSVGWaldenColor  = fs.readFileSync('test/datasets/chart/echartLineWaldenColor.svg', 'utf8');
 
@@ -210,7 +207,7 @@ describe('chart', function () {
     it.skip('should return an error if chart type is provided but not supported', function (done) {
       const _data = { type : 'echarts@4', width : 600, height : 400, option : echartLine };
       const _testedReport = 'chart/odt-echarts-simple';
-      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
         helperTest.assert(err+'', 'Chart type not supported');
         done();
       });

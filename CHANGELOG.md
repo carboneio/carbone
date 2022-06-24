@@ -1,13 +1,35 @@
 ### v4.0.0
-  - Release June 24st 2022
+  - Release June 25st 2022
+  - [EE] ⚡️ Main features summary (see v4.0.0-alpha.0 for details)
+    - Support dynamic charts in LibreOffice and Word + echarts
+    - Improved debug message output
+    - New aggregator formatters: `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount`
+    - Accept more complex parameters in formatters: expression with arrays, Mathematical formulas (v3.5.0)
+    - Improved On-Premise Embedded Studio: multi-language, change export file format, automatic JSON generation from template
+    - Accept formatters after conditional formatters (v4.0.0-beta.1). For example, `bindColor` can be used with conditions
   - [EE] Fix chart in DOCX when there is no loops (filtered array)
   - [EE] Fix stateless studio crash when template does not contain any Carbone markers
-  - [EE] `bindColor` formatter replaces background and line colors of shapes in DOCX only.
+  - [EE] 🌈 `bindColor` formatter replaces background and line colors of shapes in DOCX only.
     - The `bindColor` marker must be written in the document (NOT in alt text of the shape)
     - The replaced color in the template must be RGB. Select "RGB sliders" tool to defined the color in MS Word.
   - [EE] Use lossless image compression by default to speed up PDF rendering and improve image quality
   - [EE] Remove experimental support of images in HTML with `:html` formatter for ODT template added in v4.0.0-beta.3 (postpone in 4.1)
-
+  - [EE] Barcode improvements (dependency update):
+    - The horizontal alignment of text in matrix symbols was fixed.
+    - Various fixes were made for the encoding of Data Matrix, DotCode and Micro QR Code symbols.
+    - The encoding of QR Code symbols was optimized.
+    - The encoding of Rectangular Micro QR Code symbols was aligned with the final release of the specification.
+    - The linear render now uses filled polygons rather than stroked lines.
+    - Code 93 Extended was amended to not shift encode "$%+/" symbols.
+    - Support was added for USPS FIM E marks.
+    - Support for AI (715) was added to the GS1 linter.
+    - Ultracode tile colours are now defined as RGB rather than CMYK. New tile colour patterns are defined for the upcoming revision.
+    - A bug in the encoding of certain Aztec Code symbols was fixed.
+    - A bug in the encoding of certain Dotcode symbols was fixed.
+    - A bug in the encoding of QR Code symbols containing Kanji compression was fixed.
+    - The rMQR encoding was optimised, potentially resulting in smaller symbols.
+    - The colours for Ultracode symbols were changed to RGB values rather than CMYK.
+    - The metrics for Ultracode symbols was updated and a raw mode was added.
 
 ### v4.0.0-beta.2
   - Release June 1st 2022

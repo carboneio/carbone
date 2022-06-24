@@ -5,7 +5,9 @@
   - [EE] `bindColor` formatter replaces background and line colors of shapes in DOCX only.
     - The `bindColor` marker must be written in the document (NOT in alt text of the shape)
     - The replaced color in the template must be RGB. Select "RGB sliders" tool to defined the color in MS Word.
-  - Use lossless image compression by default to speed up PDF rendering and improve image quality
+  - [EE] Use lossless image compression by default to speed up PDF rendering and improve image quality
+  - [EE] Remove experimental support of images in HTML with `:html` formatter for ODT template added in v4.0.0-beta.3 (postpone in 4.1)
+
 
 ### v4.0.0-beta.2
   - Release June 1st 2022

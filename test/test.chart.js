@@ -1,4 +1,3 @@
-const assert = require('assert');
 const fs = require('fs');
 const chartFormatter = require('../formatters/chart');
 const chartLib = require('../lib/chart');
@@ -54,67 +53,6 @@ describe('chart', function () {
     });
   });
 
-  describe('generateRowCountFormatter', function () {
-    it('should generate two markers to count rows and do the global sum', function () {
-      const _markers = [
-        '{d[i].valCol2}',
-        '{d[i+1].valCol2}'
-      ];
-      const _res = chartLib.generateDocxRowCountFormatter(_markers);
-      helperTest.assert(_res.rowCount, '{d[i].valCol2:cumCount:sub(1)}');
-      helperTest.assert(_res.totalCount, '{d[].valCol2:aggCount}');
-    });
-    it('should remove formatters', function () {
-      const _markers = [
-        '{d[i].valCol2:formatN:sub(1)}',
-        '{d[i+1].valCol2}'
-      ];
-      const _res = chartLib.generateDocxRowCountFormatter(_markers);
-      helperTest.assert(_res.rowCount, '{d[i].valCol2:cumCount:sub(1)}');
-      helperTest.assert(_res.totalCount, '{d[].valCol2:aggCount}');
-    });
-    it('should accept multiple iterators and filters', function () {
-      const _markers = [
-        '{d[i, sort, id.sort>0].valCol2:formatN:sub(1)}',
-        '{d[i+1, sort+1, id.sort>0].valCol2}'
-      ];
-      const _res = chartLib.generateDocxRowCountFormatter(_markers);
-      helperTest.assert(_res.rowCount, '{d[i,sort, id.sort>0].valCol2:cumCount:sub(1)}');
-      helperTest.assert(_res.totalCount, '{d[ id.sort>0].valCol2:aggCount}');
-    });
-    it.skip('should accept multiple arrays and filters', function () {
-      const _markers = [
-        '{d.cars[i, sort, id.sort>0].wheels[sort].valCol2:formatN:sub(1)}',
-        '{d.cars[i+1, sort+1, id.sort>0].wheels[sort+1].valCol2}'
-      ];
-      const _res = chartLib.generateDocxRowCountFormatter(_markers);
-      helperTest.assert(_res.rowCount, '{d.cars[i,sort, id.sort>0].wheels[sort].valCol2:cumCount:sub(1)}');
-      helperTest.assert(_res.totalCount, '{d.cars[ id.sort>0].wheels[].valCol2:aggCount}');
-    });
-    it('should returns an error if markers are not a loop', function () {
-      assert.throws(() => {
-        chartLib.generateDocxRowCountFormatter(['{d[i].valCol2}', '{d.cars[i+1].valCol2}' ]);
-      }, { message : 'Unable to detect loop in charts between markers: {d[i].valCol2}, {d.cars[i+1].valCol2}' });
-    });
-    it('should accept nested array with same iterators', function () {
-      const _markers = [
-        '{d.charts[i].data[i].label}',
-        '{d.charts[i].data[i+1].label}'
-      ];
-      const _res = chartLib.generateDocxRowCountFormatter(_markers);
-      helperTest.assert(_res.rowCount, '{d.charts[i].data[i].label:cumCount:sub(1)}');
-      helperTest.assert(_res.totalCount, '{d.charts[i].data[].label:aggCount}');
-    });
-    it('should accept whitepaces', function () {
-      const _markers = [
-        '      {d.charts[i].data[i].label}        ',
-        '      {d.charts[i].data[i+1].label}      '
-      ];
-      const _res = chartLib.generateDocxRowCountFormatter(_markers);
-      helperTest.assert(_res.rowCount, '{d.charts[i].data[i].label:cumCount:sub(1)}');
-      helperTest.assert(_res.totalCount, '{d.charts[i].data[].label:aggCount}');
-    });
-  });
 
   describe('parseSpreadSheetRange', function () {
     it('should not crash', function () {
@@ -356,15 +294,7 @@ describe('chart', function () {
     });
   });
 
-  describe('getDocxRelatedFiles', function () {
-    it.skip('TODOAA', function () {
-      const _testedReport = 'chart/docx-simple-no-bind';
-      const _relatedFiles = chartLib.getDocxRelatedFiles(helperTest.openTemplate(_testedReport), 'chart1');
-      helperTest.assert(_relatedFiles, 'null');
-    });
-  });
-
-  describe('finishDocxChart', function () {
+  describe('updateChartRowsAndColumnsCounter', function () {
     it('add counters', function () {
       const _simplifiedXML = ''
         + '<c:chartSpace>'
@@ -420,7 +350,7 @@ describe('chart', function () {
         + '  </c:val>'
         + '  <c:externalData r:id="rId3"> <c:autoUpdate val="0"/> </c:externalData>'
         + '</c:chartSpace>';
-      helperTest.assert(chartLib.finishDocxChart(_simplifiedXML), _expectedXML);
+      helperTest.assert(chartLib.updateChartRowsAndColumnsCounter(_simplifiedXML), _expectedXML);
     });
   });
 

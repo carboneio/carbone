@@ -1,4 +1,5 @@
 ### v4.0.0
+  - [EE] Fix chart in DOCX when there is no loops (filtered array)
   - [EE] Fix stateless studio crash when template does not contain any Carbone markers
   - [EE] `bindColor` formatter replaces background and line colors of shapes in DOCX only.
     - The `bindColor` marker must be written in the document (NOT in alt text of the shape)

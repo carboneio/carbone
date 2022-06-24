@@ -318,6 +318,19 @@ describe('chart', function () {
         done();
       });
     });
+    it('should accept charts without loops i -> i+1 (array filter)', function (done) {
+      const _data = [
+        { label : 'row1' , valCol1 : 10 },
+        { label : 'row2' , valCol1 : 20 },
+        { label : 'row3' , valCol1 : 30 }
+      ];
+      const _testedReport = 'chart/docx-filtered-loop';
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
     it('should do loops, and read markers directly from XLSX (without bindChart)', function (done) {
       const _data = {
         charts : [

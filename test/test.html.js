@@ -5,7 +5,7 @@ const helper = require('../lib/helper');
 const assert = require('assert');
 const hyperlinks = require('../lib/hyperlinks');
 
-describe('Dynamic HTML', function () {
+describe.only('Dynamic HTML', function () {
 
   describe('Preprocess - functions used by ODT and DOCX reports', function () {
 
@@ -1960,11 +1960,9 @@ describe('Dynamic HTML', function () {
         const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content);
         /** The null content is transformed into an empty string */
         const _properties = _options.htmlDatabase.get('');
-        helper.assert(_properties, {
-          content    : _expectedContent,
-          style      : '',
-          styleLists : ''
-        });
+        helper.assert(_properties.content.get(_content), _expectedContent);
+        helper.assert(_properties.style, '')
+        helper.assert(_properties.styleLists, '')
         helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expectedContent);
         helper.assert(_postProcess.fn.call(_options, null), '');
         helper.assert(_postProcess.fn.call(_options, 'randomKey'), '');
@@ -1980,11 +1978,9 @@ describe('Dynamic HTML', function () {
         const _expectedStyle = '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>';
         const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
-        helper.assert(_properties, {
-          content    : _expectedContent,
-          style      : _expectedStyle,
-          styleLists : ''
-        });
+        helper.assert(_properties.content.get(_content), _expectedContent);
+        helper.assert(_properties.style, _expectedStyle)
+        helper.assert(_properties.styleLists, '')
         helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expectedContent);
       });
 
@@ -2009,8 +2005,10 @@ describe('Dynamic HTML', function () {
         };
         htmlFormatters.getHTMLContentOdt.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
-        helper.assert(_properties, _expected);
         helper.assert(_options.htmlDatabase.size, 1);
+        helper.assert(_properties.content.get(_content), _expected.content);
+        helper.assert(_properties.style, _expected.style)
+        helper.assert(_properties.styleLists, _expected.styleLists)
       });
 
       it('getHtmlStyleName - should add multiple styles element to htmlDatabase + get new style name + apply the previous paragraph style', () => {
@@ -2034,11 +2032,9 @@ describe('Dynamic HTML', function () {
 
         const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content, _styleId);
         const _properties = _options.htmlDatabase.get(_uniqueID);
-        helper.assert(_properties, {
-          content    : _expected,
-          style      : _style,
-          styleLists : ''
-        });
+        helper.assert(_properties.content.get(_content), _expected);
+        helper.assert(_properties.style, _style)
+        helper.assert(_properties.styleLists, '')
         helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expected);
       });
 
@@ -2059,14 +2055,12 @@ describe('Dynamic HTML', function () {
 
         const _content = '<em><b>This is some content</b></em>';
         htmlFormatters.getHTMLContentOdt.call(_options, _content, _styleId);
-        // htmlFormatters.getHTMLContentOdt.call(_options, _content);
+
         const _properties = _options.htmlDatabase.get(_content + _styleId);
         helper.assert(_options.htmlDatabase.size, 1);
-        helper.assert(_properties, {
-          content    : '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>',
-          style      : '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>',
-          styleLists : ''
-        });
+        helper.assert(_properties.content.get(_content), '<text:p><text:span text:style-name="TC00">This is some content</text:span></text:p>');
+        helper.assert(_properties.style, '<style:style style:name="TC00" style:family="text"><style:text-properties fo:font-style="italic" fo:font-weight="bold"/></style:style>')
+        helper.assert(_properties.styleLists, '')
       });
 
       it('getHtmlContent + hyperlink - should use the default URL_ON_ERROR link if the HTML anchor tag is invalid', () => {
@@ -2087,11 +2081,9 @@ describe('Dynamic HTML', function () {
         htmlFormatters.getHTMLContentOdt.call(_options, _content, '');
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_options.htmlDatabase.size, 1);
-        helper.assert(_properties, {
-          content    : `<text:p><text:a xlink:type="simple" xlink:href="${hyperlinks.URL_ON_ERROR}"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>`,
-          style      : '',
-          styleLists : ''
-        });
+        helper.assert(_properties.content.get(_content), `<text:p><text:a xlink:type="simple" xlink:href="${hyperlinks.URL_ON_ERROR}"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>`);
+        helper.assert(_properties.style, '')
+        helper.assert(_properties.styleLists, '')
       });
 
       it('getHtmlContent + hyperlink - should call the formatter "defaultURL" and should use the default URL_ON_ERROR link if the HTML anchor tag is invalid', () => {
@@ -2109,14 +2101,13 @@ describe('Dynamic HTML', function () {
         html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
 
         const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
-        htmlFormatters.getHTMLContentOdt.call(_options, hyperlinksFormatters.defaultURL.call(_options, _content, 'https://carbone.io/link_on_error_test'));
+        const _postProcessFormatter = htmlFormatters.getHTMLContentOdt.call(_options, hyperlinksFormatters.defaultURL.call(_options, _content, 'https://carbone.io/link_on_error_test'));
         const _properties = _options.htmlDatabase.get(_content);
         helper.assert(_options.htmlDatabase.size, 1);
-        helper.assert(_properties, {
-          content    : '<text:p><text:a xlink:type="simple" xlink:href="https://carbone.io/link_on_error_test"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>',
-          style      : '',
-          styleLists : ''
-        });
+        helper.assert(_properties.content.get(_content), '<text:p><text:a xlink:type="simple" xlink:href="https://carbone.io/link_on_error_test"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>');
+        helper.assert(_properties.style, '')
+        helper.assert(_properties.styleLists, '')
+        helper.assert(_postProcessFormatter.fn.apply(_options, _postProcessFormatter.args), '<text:p><text:a xlink:type="simple" xlink:href="https://carbone.io/link_on_error_test"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>');
       });
     });
   });
@@ -2530,10 +2521,22 @@ describe('Dynamic HTML', function () {
 
     describe('buildXmlContentDOCX', function () {
       it('should return nothing if the descriptor is empty/undefined/null', function () {
-        helper.assert(html.buildXmlContentDOCX([]), {content : '', listStyleAbstract : '', listStyleNum : ''});
-        helper.assert(html.buildXmlContentDOCX(), {content : '',  listStyleAbstract : '', listStyleNum : '' });
-        helper.assert(html.buildXmlContentDOCX(undefined), {content : '',  listStyleAbstract : '', listStyleNum : '' });
-        helper.assert(html.buildXmlContentDOCX(null), {content : '',  listStyleAbstract : '', listStyleNum : '' });
+        let _res1 = html.buildXmlContentDOCX([]);
+        helper.assert(_res1.listStyleAbstract, '');
+        helper.assert(_res1.listStyleNum, '');
+        helper.assert(_res1.content.get(), '');
+        let _res2 = html.buildXmlContentDOCX();
+        helper.assert(_res2.listStyleAbstract, '');
+        helper.assert(_res2.listStyleNum, '');
+        helper.assert(_res2.content.get(), '');
+        let _res3 = html.buildXmlContentDOCX(undefined);
+        helper.assert(_res3.listStyleAbstract, '');
+        helper.assert(_res3.listStyleNum, '');
+        helper.assert(_res3.content.get(), '');
+        let _res4 = html.buildXmlContentDOCX(null);
+        helper.assert(_res4.listStyleAbstract, '');
+        helper.assert(_res4.listStyleNum, '');
+        helper.assert(_res4.content.get(), '');
       });
 
 
@@ -2541,7 +2544,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX([{ content : 'text', type : '', tags : ['b'] }]);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>' +
             '<w:rPr>' +
@@ -2563,7 +2566,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -2589,7 +2592,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -2628,7 +2631,7 @@ describe('Dynamic HTML', function () {
 
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -2670,7 +2673,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId); // FONT AS A LAST ARGUMENT
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
@@ -2715,7 +2718,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId); // FONT AS A LAST ARGUMENT
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:pPr>'+
             '<w:bidi/><w:jc w:val="center"/>'+
@@ -2772,7 +2775,7 @@ describe('Dynamic HTML', function () {
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -2807,7 +2810,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:i/><w:iCs/></w:rPr>'+
@@ -2858,7 +2861,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
             '<w:t xml:space="preserve">Professional Accreditation</w:t>'+
@@ -2880,7 +2883,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
             '<w:rPr><w:b/><w:bCs/></w:rPr>'+
@@ -2905,7 +2908,7 @@ describe('Dynamic HTML', function () {
       it('should convert HTML to DOCX xml 6 string followed by a list', function () {
         let _descriptor = html.parseHTML('You’ll learn<ul><li>Understand</li></ul>');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p>'+
             '<w:r>'+
               '<w:t xml:space="preserve">You’ll learn</w:t>'+
@@ -2950,7 +2953,7 @@ describe('Dynamic HTML', function () {
       it('should convert HTML to DOCX xml 7: simple unordered list', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
@@ -2990,7 +2993,7 @@ describe('Dynamic HTML', function () {
         htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
 
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId);
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
@@ -3021,7 +3024,7 @@ describe('Dynamic HTML', function () {
       it('should convert HTML to DOCX xml 8: NESTED LIST 1 level', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea</li></ul></li><li>Milk</li></ul>');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Black tea</w:t></w:r></w:p>' +
@@ -3066,7 +3069,7 @@ describe('Dynamic HTML', function () {
       it('should convert HTML to DOCX xml 8: NESTED LIST 1 level but without text in the "li" attribute', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><ul><li>Black tea</li><li>Green tea</li></ul><li>Milk</li></ul>');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
                     '<w:p>'+
                       '<w:pPr>'+
                         '<w:numPr>'+
@@ -3153,7 +3156,7 @@ describe('Dynamic HTML', function () {
       it('should convert HTML to DOCX xml 9: NESTED LIST 3 level', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea<ul><li>Black tea</li><li>Green tea<ul><li>Dark Green</li><ul><li>Soft Green</li><li>light Green</li></ul></ul></li></ul></li><li>Milk</li></ul>');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="1"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">Black tea</w:t></w:r></w:p>' +
@@ -3225,7 +3228,7 @@ describe('Dynamic HTML', function () {
 
       it('should generate a simple ordered list', function () {
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li>Coffee</li><li>Tea</li><li>Milk</li></ol>'));
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
@@ -3284,7 +3287,7 @@ describe('Dynamic HTML', function () {
 
       it('should generate 3 different list and should generate the corresponding list style for numbering.xml', function () {
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li>Coffee</li></ol><ul><li>Tea</li></ul><ol><li>Milk</li></ol>'));
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
@@ -3380,7 +3383,7 @@ describe('Dynamic HTML', function () {
 
       it('should create nested list at the same level and should not create extra style of the list', function () {
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li>Hello<ul><li>Tea</li></ul></li><li>Hello2<ul><li>Tea</li></ul></li></ol>'));
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>' +
           '<w:pPr>' +
             '<w:numPr>' +
@@ -3459,7 +3462,7 @@ describe('Dynamic HTML', function () {
       it('should create nested list without text on the first element', function () {
         // eslint-disable-next-line no-unused-vars
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li><ol><li>Tea</li></ol></li></ol>'));
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
@@ -3486,7 +3489,7 @@ describe('Dynamic HTML', function () {
       it('should create nested list with text on the first element and a break line', function () {
         // eslint-disable-next-line no-unused-vars
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ol><li>This is some content<br/><ol><li>Tea</li></ol></li></ol>'));
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
@@ -3519,7 +3522,7 @@ describe('Dynamic HTML', function () {
       it('should create nested list with text on the first element and a break line', function () {
         // eslint-disable-next-line no-unused-vars
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<ul><li><p>The introduction</p></li></ul>'));
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
           '<w:p>' +
             '<w:pPr>' +
               '<w:numPr>' +
@@ -3552,7 +3555,7 @@ describe('Dynamic HTML', function () {
           '</li>' +
         '</ul>';
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML(htmlContent), _options);
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:pPr>'+
             '<w:numPr>'+
@@ -3641,7 +3644,7 @@ describe('Dynamic HTML', function () {
       it('should convert HTML to DOCX xml 11', function () {
         const _descriptor = html.parseHTML('You will learn<br />');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
-        helper.assert(content, '<w:p><w:r><w:t xml:space="preserve">You will learn</w:t></w:r><w:r><w:br/></w:r></w:p>');
+        helper.assert(content.get(), '<w:p><w:r><w:t xml:space="preserve">You will learn</w:t></w:r><w:r><w:br/></w:r></w:p>');
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
       });
@@ -3654,7 +3657,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
            '<w:r>' +
@@ -3677,7 +3680,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
            '<w:r>' +
@@ -3700,7 +3703,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
            '<w:r>' +
@@ -3730,7 +3733,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '' +
+        helper.assert(content.get(), '' +
         '<w:p>' +
           '<w:hyperlink r:id="CarboneHyperlinkId0">' +
            '<w:r>' +
@@ -3771,7 +3774,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content,
+        helper.assert(content.get(),
           '<w:p>'+
             '<w:r>' +
               '<w:rPr>' +
@@ -3799,7 +3802,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '<w:p>'+
+        helper.assert(content.get(), '<w:p>'+
             '<w:r>' +
               '<w:t xml:space="preserve">this</w:t>' +
             '</w:r>' +
@@ -3837,7 +3840,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content,
+        helper.assert(content.get(),
           '<w:p>'+
             '<w:r>'+
               '<w:rPr>'+
@@ -3899,7 +3902,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content, '<w:p>'+
+        helper.assert(content.get(), '<w:p>'+
               '<w:r>' +
                 '<w:t xml:space="preserve">This is </w:t>' +
               '</w:r>' +
@@ -3936,7 +3939,7 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
-        helper.assert(content,
+        helper.assert(content.get(),
           '<w:p>'+
             '<w:r>' +
               '<w:t xml:space="preserve">This </w:t>' +
@@ -3996,8 +3999,11 @@ describe('Dynamic HTML', function () {
         const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
         /** Null is converted into an empty string */
         const _properties = _options.htmlDatabase.get('');
-        helper.assert(_properties, _expected);
         helper.assert(_options.htmlDatabase.size, 2);
+        helper.assert(_properties.id, 1)
+        helper.assert(_properties.content.get(_content), _expected.content);
+        helper.assert(_properties.listStyleAbstract, '')
+        helper.assert(_properties.listStyleNum, '')
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), '');
         helper.assert(_postProcessContent.fn.call(_options, 'this contentID doesnt exist'), '');
         helper.assert(_postProcessContent.fn.call(_options, null), '');
@@ -4017,7 +4023,10 @@ describe('Dynamic HTML', function () {
         const _content = '<strong>This is some content</strong>';
         const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
-        helper.assert(_properties, _expected);
+        helper.assert(_properties.id, _expected.id);
+        helper.assert(_properties.content.get(_content), _expected.content);
+        helper.assert(_properties.listStyleAbstract, '')
+        helper.assert(_properties.listStyleNum, '')
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
       });
@@ -4036,7 +4045,10 @@ describe('Dynamic HTML', function () {
         const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
         const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
-        helper.assert(_properties, _expected);
+        helper.assert(_properties.id, _expected.id);
+        helper.assert(_properties.content.get(_content), _expected.content);
+        helper.assert(_properties.listStyleAbstract, '')
+        helper.assert(_properties.listStyleNum, '')
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
         const _it = _options.hyperlinkDatabase.keys();
@@ -4060,7 +4072,10 @@ describe('Dynamic HTML', function () {
         const _content = '<a href="tusklacom">TUSKLA WEBSITE</a>';
         const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, hyperlinksFormatters.defaultURL.call(_options,  _content, _expectedURL));
         const _properties = _options.htmlDatabase.get(_content);
-        helper.assert(_properties, _expected);
+        helper.assert(_properties.id, _expected.id);
+        helper.assert(_properties.content.get(_content), _expected.content);
+        helper.assert(_properties.listStyleAbstract, '')
+        helper.assert(_properties.listStyleNum, '')
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
         const _it = _options.hyperlinkDatabase.keys();
@@ -4092,7 +4107,10 @@ describe('Dynamic HTML', function () {
         const _content = '<strong>This is some content</strong>';
         const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content, _styleId);
         const _properties = _options.htmlDatabase.get(_content + _styleId);
-        helper.assert(_properties, _expected);
+        helper.assert(_properties.id, _expected.id);
+        helper.assert(_properties.content.get(_content), _expected.content);
+        helper.assert(_properties.listStyleAbstract, '')
+        helper.assert(_properties.listStyleNum, '')
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
       });
@@ -4116,7 +4134,10 @@ describe('Dynamic HTML', function () {
         };
         htmlFormatters.getHTMLContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
-        helper.assert(_properties, _expected);
+        helper.assert(_properties.id, _expected.id);
+        helper.assert(_properties.content.get(_content), _expected.content);
+        helper.assert(_properties.listStyleAbstract, '')
+        helper.assert(_properties.listStyleNum, '')
         helper.assert(_options.htmlDatabase.size, 1);
       });
 
@@ -4135,7 +4156,10 @@ describe('Dynamic HTML', function () {
         };
         const _postProcessContent = htmlFormatters.getHTMLContentDocx.call(_options, _content);
         const _properties = _options.htmlDatabase.get(_content);
-        helper.assert(_properties, _expected);
+        helper.assert(_properties.id, _expected.id);
+        helper.assert(_properties.content.get(_content), _expected.content);
+        helper.assert(_properties.listStyleAbstract, '')
+        helper.assert(_properties.listStyleNum, '')
         helper.assert(_options.htmlDatabase.size, 1);
         helper.assert(_postProcessContent.fn.call(_options, _postProcessContent.args[0]), _expected.content);
       });

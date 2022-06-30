@@ -165,6 +165,8 @@ function unaccent (d) {
 /**
  * Convert carriage return `\\r\\n` and line feed `\\n` to XML-specific code in rendered document
  *
+ * Since v3.5.3, it can be used before `:html` formatter to convert `\n` to `<br>` tags
+ *
  * Compatible with odt, and docx (beta)
  *
  * @version 1.1.0
@@ -191,6 +193,21 @@ function convCRLF (d) {
 }
 // this formatter is separately to inject code
 convCRLF.canInjectXML = true;
+
+/**
+ * Specific formatter used to replace, when convCRLF is used before :html formatter
+ *
+ * @private
+ *
+ * @param   {String} d
+ * @return  {string} replaced "\r\n" by html tag "<br>"
+ */
+function convCRLFH (d) {
+  if (typeof d === 'string') {
+    return d.replace(/\r?\n/g, '<br>');
+  }
+  return d;
+}
 
 /**
  * Slice a string with a begin and an end
@@ -300,5 +317,7 @@ module.exports = {
   padl      : padl,
   padr      : padr,
   md5       : md5,
-  prepend   : prepend
+  prepend   : prepend,
+  // private
+  convCRLFH : convCRLFH
 };

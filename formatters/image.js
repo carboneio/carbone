@@ -295,11 +295,9 @@ function scaleImage (urlOrBase64, measure, value, unit, imageFit) {
 function setImageSizePostProcessing (urlOrBase64, measure) {
   var _imageData = this.imageDatabase.get(urlOrBase64);
   if (measure === 'width') {
-    console.log(_imageData.imageWidth)
     return _imageData.imageWidth;
   }
   else if (measure === 'height') {
-    console.log(_imageData.imageHeight)
     return _imageData.imageHeight;
   }
   return '';

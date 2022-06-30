@@ -1016,18 +1016,12 @@ describe.only('Dynamic HTML', function () {
       const _uniqueID = 'C01';
       it('should do nothing if the descriptor is empty', function () {
         const res = html.buildXMLContentOdt(_uniqueID, []);
-        helper.assert(res.content, '');
+        helper.assert(res.content.get(), '');
         helper.assert(res.style, '');
       });
 
       it('should create the content and style from an HTML descriptor', function () {
-        helper.assert(html.buildXMLContentOdt(_uniqueID,
-          [
-            { content : 'bold', type : '', tags : ['b'] },
-            { content : 'and italic', type : '', tags : ['em'] }
-          ]
-        ),
-        {
+        const _expected = {
           content : '' +
             '<text:p><text:span text:style-name="C010">bold</text:span>' +
             '<text:span text:style-name="C011">and italic</text:span></text:p>',
@@ -1035,17 +1029,16 @@ describe.only('Dynamic HTML', function () {
             '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
             '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>',
           styleLists : ''
-        });
+        };
+        const res = html.buildXMLContentOdt(_uniqueID, [
+          { content : 'bold', type : '', tags : ['b'] },
+          { content : 'and italic', type : '', tags : ['em'] }
+        ]);
+        helper.assert(res.content.get(), _expected.content);
+        helper.assert(res.style, _expected.style);
+        helper.assert(res.styleLists, _expected.styleLists);
 
-        helper.assert(html.buildXMLContentOdt(_uniqueID,
-          [
-            { content : 'this', type : '', tags : [] },
-            { content : ' is a bold', type : '', tags : ['b'] },
-            { content : 'and italic', type : '', tags : ['em'] },
-            { content : ' text', type : '', tags : [] },
-          ]
-        ),
-        {
+        const _expected2 = {
           content : '' +
             '<text:p><text:span>this</text:span>' +
             '<text:span text:style-name="C011"> is a bold</text:span>' +
@@ -1055,30 +1048,31 @@ describe.only('Dynamic HTML', function () {
             '<style:style style:name="C011" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>' +
             '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>',
           styleLists : ''
-        });
+        };
+        const res2 = html.buildXMLContentOdt(_uniqueID, [
+          { content : 'this', type : '', tags : [] },
+          { content : ' is a bold', type : '', tags : ['b'] },
+          { content : 'and italic', type : '', tags : ['em'] },
+          { content : ' text', type : '', tags : [] },
+        ]);
+        helper.assert(res2.content.get(), _expected2.content);
+        helper.assert(res2.style, _expected2.style);
+        helper.assert(res2.styleLists, _expected2.styleLists);
       });
 
       it('should create the content and style from an HTML descriptor and should include the style coming from the template (paragraph + text: RTL, colors, fonts)', function () {
 
         /** Init template style, it is executed during the preprocessing */
-        const htmlDefaultStyleDatabase = new Map();
+        const _options = {
+          htmlStylesDatabase: new Map()
+        }
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
         _htmlDefaultStyleObject.text += 'fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
         _htmlDefaultStyleObject.paragraph += 'text:style-name="P2"';
-        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+        _options.htmlStylesDatabase.set(_styleId, _htmlDefaultStyleObject)
 
-        helper.assert(html.buildXMLContentOdt(_uniqueID,
-          [
-            { content : 'this', type : '', tags : [] },
-            { content : ' is a bold', type : '', tags : ['b'] },
-            { content : 'and italic', type : '', tags : ['em'] },
-            { content : ' text', type : '', tags : [] },
-          ],
-          { htmlStylesDatabase: htmlDefaultStyleDatabase },
-          _styleId /** Default style ID as a last argument */
-        ),
-        {
+        const _expected = {
           content : '' +
             '<text:p text:style-name="P2">'+
               '<text:span text:style-name="C010">this</text:span>'+
@@ -1100,29 +1094,44 @@ describe.only('Dynamic HTML', function () {
               '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
             '</style:style>',
           styleLists : ''
-        });
+        }
+
+        const _res = html.buildXMLContentOdt(_uniqueID,
+          [
+            { content : 'this', type : '', tags : [] },
+            { content : ' is a bold', type : '', tags : ['b'] },
+            { content : 'and italic', type : '', tags : ['em'] },
+            { content : ' text', type : '', tags : [] },
+          ], _options, _styleId /** Default style ID as a last argument */)
+
+        helper.assert(_res.content.get(), _expected.content);
+        helper.assert(_res.style, _expected.style);
+        helper.assert(_res.styleLists, _expected.styleLists);
       });
 
       it('should create the content and style from an HTML descriptor and should include the style coming from the template (paragraph only: RTL and text alignment)', function () {
         /** Init template style, it is executed during the preprocessing */
-        const htmlDefaultStyleDatabase = new Map();
+        const _options = {
+          htmlStylesDatabase: new Map()
+        }
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
         _htmlDefaultStyleObject.text += ''
         _htmlDefaultStyleObject.paragraph += 'text:style-name="P2"';
-        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+        _options.htmlStylesDatabase.set(_styleId, _htmlDefaultStyleObject)
 
-        helper.assert(html.buildXMLContentOdt(_uniqueID,
+        let _res = html.buildXMLContentOdt(_uniqueID,
           [
             { content : 'this', type : '', tags : [] },
             { content : ' is a bold', type : '', tags : ['b'] },
             { content : 'and italic', type : '', tags : ['em'] },
             { content : ' text', type : '', tags : [] },
           ],
-          { htmlStylesDatabase: htmlDefaultStyleDatabase },
+          _options,
           _styleId /** Default style ID as a last argument */
-        ),
-        {
+        )
+
+        let _expected = {
           content : '' +
             '<text:p text:style-name="P2">'+
               '<text:span>this</text:span>'+
@@ -1138,7 +1147,11 @@ describe.only('Dynamic HTML', function () {
               '<style:text-properties fo:font-style="italic"/>'+
             '</style:style>',
           styleLists : ''
-        });
+        };
+
+        helper.assert(_res.content.get(), _expected.content);
+        helper.assert(_res.style, _expected.style);
+        helper.assert(_res.styleLists, _expected.styleLists);
       });
 
       it('should create the content and style from an HTML descriptor and should include the style coming from the template (text style only: colors, fonts)', function () {
@@ -1151,7 +1164,7 @@ describe.only('Dynamic HTML', function () {
         _htmlDefaultStyleObject.paragraph += '';
         htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
 
-        helper.assert(html.buildXMLContentOdt(_uniqueID,
+        let _res = html.buildXMLContentOdt(_uniqueID,
           [
             { content : 'this', type : '', tags : [] },
             { content : ' is a bold', type : '', tags : ['b'] },
@@ -1160,8 +1173,8 @@ describe.only('Dynamic HTML', function () {
           ],
           { htmlStylesDatabase: htmlDefaultStyleDatabase },
           _styleId /** Default style ID as a last argument */
-        ),
-        {
+        );
+        let _expected = {
           content : '' +
             '<text:p>'+
               '<text:span text:style-name="C010">this</text:span>'+
@@ -1183,7 +1196,11 @@ describe.only('Dynamic HTML', function () {
               '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
             '</style:style>',
           styleLists : ''
-        });
+        };
+
+        helper.assert(_res.content.get(), _expected.content);
+        helper.assert(_res.style, _expected.style);
+        helper.assert(_res.styleLists, _expected.styleLists);
       });
 
       it('should create the content and style from an HTML descriptor that contains unknown tags', function () {
@@ -1220,31 +1237,30 @@ describe.only('Dynamic HTML', function () {
             '<style:style style:name="C015" style:family="text"><style:text-properties fo:font-weight="bold" fo:font-style="italic" style:text-line-through-style="solid"/></style:style>' +
             '<style:style style:name="C017" style:family="text"><style:text-properties fo:font-weight="bold" style:text-line-through-style="solid"/></style:style>';
         const res = html.buildXMLContentOdt(_uniqueID, descriptor);
-        helper.assert(res.content, expectedContent);
+        helper.assert(res.content.get(), expectedContent);
         helper.assert(res.style, expectedStyle);
+        helper.assert(res.styleLists, '');
       });
 
       it('should create the content and style from an HTML descriptor that contains BREAK LINE', function () {
 
-        helper.assert(html.buildXMLContentOdt(_uniqueID,
+        let _res1 = html.buildXMLContentOdt(_uniqueID,
           [
             { content : 'This is ', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
             { content : 'a tree', type : '', tags : ['i'] },
           ]
-        ),
-        {
-          content : '' +
+        )
+        helper.assert(_res1.content.get(), '' +
             '<text:p>'+
               '<text:span>This is </text:span>'+
               '<text:line-break/>'+
               '<text:span text:style-name="C012">a tree</text:span>'+
-            '</text:p>',
-          style      : '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>',
-          styleLists : ''
-        });
+            '</text:p>');
+        helper.assert(_res1.style, '<style:style style:name="C012" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>');
+        helper.assert(_res1.styleLists, '');
 
-        helper.assert(html.buildXMLContentOdt(_uniqueID,
+        let _res2 = html.buildXMLContentOdt(_uniqueID,
           [
             { content : 'This ', type : '', tags : [] },
             { content : '', type : '#break#', tags : [] },
@@ -1259,27 +1275,26 @@ describe.only('Dynamic HTML', function () {
             { content : '', type : '#break#', tags : [] },
             { content : '.', type : '', tags : [] }
           ]
-        ),
-        {
-          content : '' +
-            '<text:p><text:span>This </text:span>' +
-            '<text:line-break/>' +
-            '<text:span> is</text:span>' +
-            '<text:line-break/>' +
-            '<text:span>a</text:span>' +
-            '<text:line-break/>' +
-            '<text:span>simple</text:span>' +
-            '<text:line-break/>' +
-            '<text:line-break/>' +
-            '<text:span> text</text:span>' +
-            '<text:line-break/>' +
-            '<text:span>.</text:span></text:p>',
-          style      : '',
-          styleLists : ''
-        });
+        );
+        helper.assert(_res2.style, '');
+        helper.assert(_res2.styleLists, '');
+        helper.assert(_res2.content.get(), '' +
+          '<text:p><text:span>This </text:span>' +
+          '<text:line-break/>' +
+          '<text:span> is</text:span>' +
+          '<text:line-break/>' +
+          '<text:span>a</text:span>' +
+          '<text:line-break/>' +
+          '<text:span>simple</text:span>' +
+          '<text:line-break/>' +
+          '<text:line-break/>' +
+          '<text:span> text</text:span>' +
+          '<text:line-break/>' +
+          '<text:span>.</text:span></text:p>'
+        );
 
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><strong>Bold content</strong> Content without style. <br /><br>After double new lines</p><br/>'));
-        helper.assert(res.content, '' +
+        let _res3 = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><strong>Bold content</strong> Content without style. <br /><br>After double new lines</p><br/>'));
+        helper.assert(_res3.content.get(), '' +
           '<text:p>' +
             '<text:span text:style-name="C011">Bold content</text:span>' +
             '<text:span> Content without style. </text:span>' +
@@ -1294,7 +1309,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should create hyperlinks', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com">Carbone Website</a>'), {});
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:p>' +
             '<text:a xlink:type="simple" xlink:href="https://carbone.com">' +
               '<text:span>Carbone Website</text:span>' +
@@ -1303,7 +1318,7 @@ describe.only('Dynamic HTML', function () {
         );
 
         res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('Some content before <a href="carbone.com">Carbone Website something <b>bold</b> and <i>italic</i></a> Content after'), {});
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:p>' +
             '<text:span>Some content before </text:span>' +
             '<text:a xlink:type="simple" xlink:href="https://carbone.com">' +
@@ -1323,7 +1338,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should generate a link with a nested paragraph and should not print the paragraph', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.io"><p>Carbone Website</p></a>'), {});
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:p>' +
             '<text:a xlink:type="simple" xlink:href="https://carbone.io">' +
               '<text:span>Carbone Website</text:span>' +
@@ -1334,7 +1349,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should generate a simple unordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>'));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
@@ -1368,7 +1383,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should generate a simple ordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li></ol>'));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
@@ -1391,7 +1406,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should generate a nested ordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li><ol><li>Americano</li></ol></ol>'));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
@@ -1428,7 +1443,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should generate a nested ordered and unordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li><ul><li>Americano</li></ul></ol>'));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
@@ -1465,7 +1480,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should generate a simple unordered list with a nested paragraph', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li><strong><p>Biochemistry, molecular and cell biology</p></strong></li></ul>'));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
@@ -1478,7 +1493,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should create a nested unordered list && should not add an extra break line at the end of the nested list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee<ul><li>Mocha</li><li>Cappucino</li><li>Americano</li></ul></li><li>Tea</li><li>Milk</li></ul>'));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
@@ -1533,7 +1548,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should generate a simple unordered list with a break line and styles', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Banana with some text<br/>Second line</li><li>Pineapple with a <b>bold</b> and <u>underlined</u> style</li></ul>'));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
             '<text:list text:style-name="LC010">' +
               '<text:list-item>'+
                 '<text:p>'+
@@ -1570,7 +1585,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should create a list preceded by a string, a middle string and a next string', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('Before<ul><li>Content1</li></ul>Middle<ol><li>Content2</li></ol>End'));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
             '<text:p>'+
               '<text:span>Before</text:span>'+
             '</text:p>'+
@@ -1630,7 +1645,7 @@ describe.only('Dynamic HTML', function () {
         html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
 
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options, _styleId);
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">' +
             '<text:list-item>' +
               '<text:p style:name="P2">' +
@@ -1655,7 +1670,7 @@ describe.only('Dynamic HTML', function () {
           '<li>Water</li>' +
         '</ul>'));
 
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
             '<text:list text:style-name="LC010">'+ // Parent List
               '<text:list-item>'+
                 '<text:p>'+
@@ -1697,7 +1712,7 @@ describe.only('Dynamic HTML', function () {
                     '<li>An URL to <a href="carbone.io">carbone.io</a> and a <a href="carbone.io/documentation.html"><i>link with a style</i></a></li>' +
                   '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), {});
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:p><text:span>This is a list:</text:span><text:line-break/></text:p>' +
           '<text:list text:style-name="LC012">' +
             '<text:list-item>' +
@@ -1729,7 +1744,7 @@ describe.only('Dynamic HTML', function () {
                     '<li>Pear</li>' +
                   '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">' +
             '<text:list-item>' +
               '<text:p>' +
@@ -1767,7 +1782,7 @@ describe.only('Dynamic HTML', function () {
           '<li>Water</li>' +
         '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
         '<text:list text:style-name="LC010">'+
           '<text:list-item>'+
             '<text:p>'+
@@ -1826,7 +1841,7 @@ describe.only('Dynamic HTML', function () {
                     '<li>Pear</li>' +
                   '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
               '<text:p>'+
@@ -1862,7 +1877,7 @@ describe.only('Dynamic HTML', function () {
                     '</li>' +
                   '</ul>';
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">' +
             '<text:list-item>' +
               '<text:p>' +

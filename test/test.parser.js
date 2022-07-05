@@ -5,6 +5,97 @@ var count   = require('../formatters/array').count;
 
 describe('parser', function () {
 
+  describe('parseMathematicalExpression', function () {
+    it('should parse simple mathematical expression and generate safe code', function () {
+      const _varParser = (v) => {
+        helper.assert(['.a', '.b'].includes(v), true);
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.a + .b', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_a_)+parseFloat(_b_)');
+    });
+    it('should parse more complex mathematical expression and generate safe code using safeCodeFn', function () {
+      const _varParser = (v) => {
+        helper.assert(['.aaa', '.b', '...parent[0].sub.id', '.toto', '223.234', '.part.id'].includes(v), true);
+        if (v[0] === '.') {
+          return '_'+ v.slice(1) + '_';
+        }
+        return v;
+      };
+      const _resultCode = parser.parseMathematicalExpression('.aaa +    .b   * ...parent[0].sub.id    -  .toto + 223.234 / .part.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_aaa_)+parseFloat(_b_)*parseFloat(_..parent[0].sub.id_)-parseFloat(_toto_)+parseFloat(223.234)/parseFloat(_part.id_)');
+    });
+    it('should return nothing if there is nothing to parse', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      helper.assert(parser.parseMathematicalExpression('  ', _varParser), '');
+      helper.assert(parser.parseMathematicalExpression(undefined, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression(null, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression({}, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression([], _varParser), '');
+    });
+    it('should return one variable if there is one variable', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_id_)');
+    });
+    it('should return one float', function () {
+      const _varParser = (v) => {
+        return v;
+      };
+      const _resultCode = parser.parseMathematicalExpression('11233.23', _varParser);
+      helper.assert(_resultCode, 'parseFloat(11233.23)');
+    });
+    it('should return one negative float', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('-1123', _varParser);
+      helper.assert(_resultCode, '-parseFloat(_1123_)');
+    });
+    it('should not crash', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('sdsdsd( i\\\'d', _varParser);
+      helper.assert(_resultCode, '');
+    });
+    it('should accept dash in variable name', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.color-dash-bidule', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_.color-dash-bidule_)');
+    });
+    it('should accept dash in multiple variables', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.color-dash-bidule - .other-bidule', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_.color-dash-bidule_)-parseFloat(_.other-bidule_)');
+    });
+    it('should return an error when mathematical expression is not correct', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      /* eslint-disable */
+      assert.throws(() => { parser.parseMathematicalExpression('/10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "/10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('*10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "*10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('+10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "+10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('///10'     , _varParser); }, {  message : 'Bad Mathematical Expression in "///10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 ++'     , _varParser); }, {  message : 'Bad Mathematical Expression in "10 ++"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 +'      , _varParser); }, {  message : 'Bad Mathematical Expression in "10 +"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10*'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10*"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10/'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10/"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10-'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10-"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 ++ 10'  , _varParser); }, {  message : 'Bad Mathematical Expression in "10 ++ 10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 //// 10', _varParser); }, {  message : 'Bad Mathematical Expression in "10 //// 10"' });
+      /* eslint-enable */
+    });
+  });
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object. It should replace the marker by a reserved character', function (done) {
@@ -398,6 +489,23 @@ describe('parser', function () {
     });
   });
 
+  describe('removeFormatters', function () {
+    it('should remove formatters from markers', function () {
+      assert.equal(parser.removeFormatters(), undefined);
+      assert.equal(parser.removeFormatters(null), null);
+      assert.equal(parser.removeFormatters('{d.id}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.id:simpleFormatter}'), '{d.id}');
+      assert.equal(parser.removeFormatters('     {d.id:simpleFormatter}    '), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort].id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort=\':sd\'].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort=\':sd\'].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort:formatter].id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort:formatter].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, id.sort:formatter].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, id.sort:formatter].id}');
+      assert.equal(parser.removeFormatters('    {d.cars[i].wheels[i, id.sort:formatter].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}    '), '{d.cars[i].wheels[i, id.sort:formatter].id}');
+    });
+  });
+
   describe('flattenXML', function () {
     it('should transform XML into an array of object and find the corresponding XML tag (match)', function () {
       helper.assert(parser.flattenXML('<xml></xml>'), [
@@ -616,6 +724,19 @@ describe('parser', function () {
         done();
       });
     });
+    it('should be fast to translate (reDoS attack)', function (done) {
+      const _xmlReDoS = '<w:t>{d.a}</w:t>        <w:t>{</w:t>            <w:r>              <w:rPr>                <w:sz w:val="16"/>                <w:szCs w:val="16"/>                <w:lang w:val="en-MY"/>              </w:rPr>              <w:t >d.</w:t>              <w:rPr>              </w:rPr>              <w:t >b</w:t>';
+      var _start = process.hrtime();
+      parser.translate(_xmlReDoS, {}, function (err, xmlTranslated) {
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, _xmlReDoS);
+        const _diff    = process.hrtime(_start);
+        const _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+        console.log('\n sortXmlParts speed : ' + _elapsed + ' ms (usually around 0.1 ms)\n');
+        helper.assert(_elapsed < (20 * helper.CPU_PERFORMANCE_FACTOR), true);
+        done();
+      });
+    });
     /* Should be activated if we encoded others special characters (non operators special characters)
     it('should translate this sentence with special characters', function(done){
       var _objLang = {
@@ -684,7 +805,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables from the xml even if there are some xml tags everywhere', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/> =  id<bla>=2    }</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/> =  id<bla>=2    }</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -693,7 +815,8 @@ describe('parser', function () {
       });
     });
     it('should work if there are whitespaces and xml in the variable name and xml tags around each braces', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#de <br> f <br> =<br>id=2  <br>}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#de <br> f <br> =<br>id=2  <br>}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><br><br><br></div></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -702,7 +825,8 @@ describe('parser', function () {
       });
     });
     it('should extract multiple variables ', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def =<br/>  id<bla>=2  }</div>{ <br> # <bla> my_Var2= <br/>  test<bla>[1=5]}</xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def =<br/>  id<bla>=2  }</div>{ <br> # <bla> my_Var2= <br/>  test<bla>[1=5]}</xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div><br><bla><br/><bla></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -713,7 +837,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables with parameters. It should replace parameters by $0, $1, ...', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b)=id=$a,g=$b}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b)=id=$a,g=$b}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -722,7 +847,8 @@ describe('parser', function () {
       });
     });
     it('should not confuse two parameters which begin with the same word', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$ab)=id=$a,g=$ab}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$ab)=id=$a,g=$ab}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -731,7 +857,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables with parameters even if there are xml tags everywhere', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> = id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> = id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><tr><tr><tr/><tr/><td><td><tf></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -1429,7 +1556,11 @@ describe('parser', function () {
       helper.assert(parser.isCarboneMarker('<text:span text:style-name="T3">{c.element</text:span>}'), false);
       helper.assert(parser.isCarboneMarker('  {d.value}'), false);
       helper.assert(parser.isCarboneMarker('  {   $  mealOf(2)}'), false);
+    });
 
+    it('should ignore markers which contain not printable chars (come from binary file)', function () {
+      helper.assert(parser.isCarboneMarker('{d.value\u000C}'), false);
+      helper.assert(parser.isCarboneMarker('{d.\u0000value\u000C}'), false);
     });
 
     it('should not find Carbone markers', function () {
@@ -1536,6 +1667,54 @@ describe('parser', function () {
       });
     });
   });
+
+
+  describe('removeAndGetXMLDeclaration', function () {
+    it('should do nothing', function () {
+      helper.assert(parser.removeAndGetXMLDeclaration().xml, undefined);
+      helper.assert(parser.removeAndGetXMLDeclaration().declaration, '');
+      helper.assert(parser.removeAndGetXMLDeclaration(null).xml, null);
+      helper.assert(parser.removeAndGetXMLDeclaration(null).declaration, '');
+      helper.assert(parser.removeAndGetXMLDeclaration(Buffer.from('aa', 'utf8')).xml, Buffer.from('aa', 'utf8'));
+      helper.assert(parser.removeAndGetXMLDeclaration(Buffer.from('aa', 'utf8')).declaration, '');
+    });
+    it('should return xml without declaration, and a separate declaration', function () {
+      const _xml = ''
+                 + '<?xml version="1.0" encoding="UTF-8"?>'
+                 + '<?xml version="1.0" encoding="ISO-8859-1" ?>'
+                 + '<a><b>dd</b></a>';
+      const _res = parser.removeAndGetXMLDeclaration(_xml);
+      helper.assert(_res.xml, '<a><b>dd</b></a>');
+      helper.assert(_res.declaration, '<?xml version="1.0" encoding="UTF-8"?><?xml version="1.0" encoding="ISO-8859-1" ?>');
+    });
+  });
+
+  describe('removeMarkers', function () {
+    it('should do nothing', function () {
+      helper.assert(parser.removeMarkers(), undefined);
+    });
+    it('should replace markers by 0 by default', function () {
+      const _xml = '<xml version="{1.0}" encoding="UTF-8"/>'
+                 + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+                 + '<a><b>dd{d.id} {c.now} {#ssd = d.id}</b></a>';
+      helper.assert(parser.removeMarkers(_xml), ''
+        + '<xml version="{1.0}" encoding="UTF-8"/>'
+        + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+        + '<a><b>dd0 0 0</b></a>'
+      );
+    });
+    it('should replace markers by custom string', function () {
+      const _xml = '<xml version="{1.0}" encoding="UTF-8"/>'
+                 + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+                 + '<a><b>dd{d.id} {c.now} {#ssd = d.id}</b></a>';
+      helper.assert(parser.removeMarkers(_xml, 'azerty'), ''
+        + '<xml version="{1.0}" encoding="UTF-8"/>'
+        + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+        + '<a><b>ddazerty azerty azerty</b></a>'
+      );
+    });
+  });
+
 });
 
 /**

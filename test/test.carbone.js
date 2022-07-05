@@ -715,6 +715,51 @@ describe('Carbone', function () {
         done();
       });
     });
+
+    it('should not crash if a condition is used just before an array loop, which contains a filter', function (done) {
+      var _xml = ''
+        + '<doc>'
+        + '  <body>'
+        + '    <a>{d.condition:ifIN(a):hideBegin}</a>'
+        + '    <b>{d.subArray[i,type!=b].type}</b>'
+        + '    <c>{d.subArray[i+1].type}</c>'
+        + '    <d>{d.condition:hideEnd}</d>'
+        + '  </body>'
+        + '</doc>'
+      ;
+      var _data = {
+        condition : 'a',
+        subArray  : [{ type : 'b' }]
+      };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<doc>  <body>      </body></doc>');
+        done();
+      });
+    });
+
+    it('should not crash if a condition is used just before an array loop, without filter', function (done) {
+      var _xml = ''
+        + '<doc>'
+        + '  <body>'
+        + '    <a>{d.condition:ifIN(a):hideBegin}</a>'
+        + '    <b>{d.subArray[i].type}</b>'
+        + '    <c>{d.subArray[i+1].type}</c>'
+        + '    <d>{d.condition:hideEnd}</d>'
+        + '  </body>'
+        + '</doc>'
+      ;
+      var _data = {
+        condition : 'a',
+        subArray  : [{ type : 'b' }]
+      };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<doc>  <body>      </body></doc>');
+        done();
+      });
+    });
+
     it('formatters should be independant. The propagation of one set of cascaded formatters should not alter the propagation of another set of formatters', function (done) {
       var data = {
         param : 3,
@@ -1499,6 +1544,103 @@ describe('Carbone', function () {
           });
         });
       });
+
+      describe('Mathematical expressions', function () {
+        it('should accept mathematicals expressions, should still accept simple negative number', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(100):div(.passed + .failed)}  {d.passed:mul(100):div(.passed):add(-13.34):add(   -  1)}</xml>';
+          const _expectedResult = '<xml>83.33333333333333  85.66</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should still accept simple numbers and expressions', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(100.5):div(10.34):sub(5.2):add(3.1)}  {d.passed:mul(.failed):div(.passed):sub(.failed):add(.passed)}</xml>';
+          const _expectedResult = '<xml>95.0953578336557  10</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expression in mul, div, sub and add formatters', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(.passed + .failed + 3)}</xml>';
+          const _expectedResult = '<xml>150</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expression in mul, div, sub and add formatters', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(.passed + .failed + 3):div(.passed + .failed + 2):sub(.passed - .failed - 5):add(.passed + .failed + 3.2)}</xml>';
+          const _expectedResult = '<xml>22.91428571428571</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should accept mathematicals expressions (complex)', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(-100):add(-.passed - .failed - 100/2)}</xml>';
+          const _expectedResult = '<xml>-1062</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+        it('should return an error if the mathematical expressions is not correct', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:mul(***100**):add(/.passed):sub(*12):div(+++12)}</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'Error: Bad Mathematical Expression in "***100**"');
+            helper.assert(result, null);
+            carbone.renderXML('<xml>{d.passed:add(/.passed)}</xml>', _data, function (err, result) {
+              helper.assert(err+'', 'Error: Bad Mathematical Expression in "/.passed"');
+              helper.assert(result, null);
+              done();
+            });
+          });
+        });
+        it('should not crash if there is a division per zero', function (done) {
+          const _data = {
+            passed : 10,
+            failed : 2
+          };
+          const _template = '<xml>{d.passed:add(.failed/0)}</xml>';
+          const _expectedResult = '<xml>Infinity</xml>';
+          carbone.renderXML(_template, _data, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, _expectedResult);
+            done();
+          });
+        });
+      });
     });
 
     describe('security test', function () {
@@ -1736,6 +1878,29 @@ describe('Carbone', function () {
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           assert.equal(err+'', 'null');
           assert.equal(_xmlBuilt, '<xml>   <b></b>  </xml>');
+          done();
+        });
+      });
+      it('should accept to use other formatters with conditional blocks', function (done) {
+        var _xml = '<xml> {d.val:ifEQ(3):show(30):add(2)} {d.val:ifEQ(3):show(30):ifLT(4):show(40):add(2)} </xml>';
+        var _data = {
+          val : 3
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> 32 32 </xml>');
+          done();
+        });
+      });
+      it.skip('TODO (make a choice for formatC) should accept to use other formatters with conditional blocks', function (done) {
+        var _xml = '<xml> {d.val:ifEQ(null):show(--):formatC}  {d.val:ifEQ(3):show(--):elseShow(.other):formatC} {d.other:ifLT(10):formatC:elseShow(--)}  {d.other:ifLT(1):formatC:elseShow(--)} </xml>';
+        var _data = {
+          val   : null,
+          other : 4.34
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml> TODO (current) --  4.34 4.34 €  --</xml>');
           done();
         });
       });
@@ -2878,6 +3043,25 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should not crash if a binary file is used as a template (reDoS)', function (done) {
+      carbone.render('test_reDoS_binary.doc', {}, function (err) {
+        assert.equal(err, null);
+        done();
+      });
+    });
+    it('should not crash if a template is used with weird variables (reDoS)', function (done) {
+      carbone.render('test_reDoS_template.def', {}, function (err) {
+        assert.equal(err, 'Error: impossible to parse variable #def.nonEmptySchema:_schema:(it.opts.a?(typeof_schema');
+        done();
+      });
+    });
+    it('should not crash if a template is not a zip, but still a binary file (reDoS)', function (done) {
+      carbone.render('test_reDoS_binary_not_zip.tar', {}, function (err) {
+        assert.equal(err, 'Error: impossible to parse variable #def.nonEmptySchema:_schema:(it.opts.a?(typeof_schema');
+        done();
+      });
+    });
+
     it('should return an error if hardRefresh is set to true on unknown files for LibreOffice', function (done) {
       var data = {
         field1 : 'field_1',

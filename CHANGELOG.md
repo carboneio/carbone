@@ -1,5 +1,121 @@
 ### v4.0.0
-  
+  - Release June 25st 2022
+  - [EE] ⚡️ Main features summary (see v4.0.0-alpha.0 for details)
+    - Support dynamic charts in LibreOffice and Word + echarts
+    - Improved debug message output
+    - New aggregator formatters: `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount`
+    - Accept more complex parameters in formatters: expression with arrays, Mathematical formulas (v3.5.0)
+    - Improved On-Premise Embedded Studio: multi-language, change export file format, automatic JSON generation from template
+    - Accept formatters after conditional formatters (v4.0.0-beta.1). For example, `bindColor` can be used with conditions
+  - [EE] Fix chart in DOCX when there is no loops (filtered array)
+  - [EE] Fix stateless studio crash when template does not contain any Carbone markers
+  - [EE] 🌈 `bindColor` formatter replaces background and line colors of shapes in DOCX only.
+    - The `bindColor` marker must be written in the document (NOT in alt text of the shape)
+    - The replaced color in the template must be RGB. Select "RGB sliders" tool to defined the color in MS Word.
+  - [EE] Use lossless image compression by default to speed up PDF rendering and improve image quality
+  - [EE] Remove experimental support of images in HTML with `:html` formatter for ODT template added in v4.0.0-beta.3 (postpone in 4.1)
+  - [EE] Barcode improvements (dependency update):
+    - The horizontal alignment of text in matrix symbols was fixed.
+    - Various fixes were made for the encoding of Data Matrix, DotCode and Micro QR Code symbols.
+    - The encoding of QR Code symbols was optimized.
+    - The encoding of Rectangular Micro QR Code symbols was aligned with the final release of the specification.
+    - The linear render now uses filled polygons rather than stroked lines.
+    - Code 93 Extended was amended to not shift encode "$%+/" symbols.
+    - Support was added for USPS FIM E marks.
+    - Support for AI (715) was added to the GS1 linter.
+    - Ultracode tile colours are now defined as RGB rather than CMYK. New tile colour patterns are defined for the upcoming revision.
+    - A bug in the encoding of certain Aztec Code symbols was fixed.
+    - A bug in the encoding of certain Dotcode symbols was fixed.
+    - A bug in the encoding of QR Code symbols containing Kanji compression was fixed.
+    - The rMQR encoding was optimised, potentially resulting in smaller symbols.
+    - The colours for Ultracode symbols were changed to RGB values rather than CMYK.
+    - The metrics for Ultracode symbols was updated and a raw mode was added.
+
+### v4.0.0-beta.2
+  - Release June 1st 2022
+  - Fix crash with very complex JSON map
+
+### v4.0.0-beta.1
+  - Release May 25th 2022
+  - [EE] Accept formatters after conditional formatters. It solves many issues, such as dynamic colors with conditions:
+    - `{d.value:ifLT(10):show(0):formatN}` : `formatN` works even if the condition `ifLT(10)` is true
+    - `{bindColor(fde9a9, hexa) = d.value:ifLT(10):show(FF00FF):ifLT(20):show(005FCF):elseShow(FFDD00)}`: conditional colors works!
+  - Fix multiple reDoS and optimize parsing of some templates
+  - [EE] Include 3.5.2
+  - [EE] Dynamic chart: 
+    - Fix crash when DOCX/ODT templates contain empty files
+    - Fix bad behavior when ODT template contains images with dynamic charts
+    - Fix chart binding when values contain white spaces
+    - Fix ODT charts when images are used for background
+
+### v4.0.0-alpha.1
+  - [EE] BREAKING CHANGE: the specific marker `{bind` becomes `{bindChart`. Example: `{bindChart(91) = d[i].valCol1}` 
+  - [EE] DOCX Charts improvements
+    - Manage loops to repeat multiple charts in DOCX template made by MS Office
+    - Update embedded spreadsheet
+    - Supports only Column, Line, Pie charts
+    - Carbone markers must be written with all `i` and `i+1` rows and columns in related Excel spreadsheet.
+    - Using the specific marker `{bindChart` is not mandatory for DOCX because MS Word accepts Carbone markers in chart values
+  - Fix crash when a condition is used just before a filtered loop
+
+### v4.0.0-alpha.0
+
+  WARNING: Native charts in LibreOffice and Word still need a lot of work before being stable for production
+
+  - [EE] ⚡️ Carbone supports dynamic charts with two methods:
+    - 1 - using native charts of MS Word or LibreOffice
+    - 2 - or using [Apache ECharts 5.3.3](https://echarts.apache.org/examples/en/index.html) object descriptors to generate advanced cha2
+
+    ### Method n°1, how to inject your data in native charts?
+      - Insert a chart with native tools of LibreOffice or MS Word in your document
+      - Use traditional Carbone markers to create loops in chart's data to inject your JSON data
+      - If necessary, use the special marker `bind` to tell Carbone that the value `X` in the chart must be replaced by the marker `Y`
+    
+    ### Method n°2, how to do advanced charts with Apache ECharts objects?
+      - Insert a sample image in your template.
+      - Place a marker in alt text , like a dynamic image : `{d.chartObj:chart}` with the formatter `:chart`.
+        The formatter `:chart` is optional if the `chartObj` object contains the attribute `"type" : "echarts@v5"`.
+        In that case, Carbone automatically considers it is a chart object instead of a dynamic image.
+      - `chartObj` must contains a compatible [Echarts option](https://echarts.apache.org/en/option.html).
+        Here is an example to draw [this chart](https://echarts.apache.org/examples/en/editor.html?c=line-simple):
+
+      ```json
+        {
+          "myChart" : {
+            "type"    : "echarts@v5", // default
+            "width"   : 600,          // default
+            "height"  : 400,          // default
+            "theme"   : null,         // default or object `theme` generated by https://echarts.apache.org/en/theme-builder.html
+            "option"  : {
+              "xAxis": {
+                "type": "category",
+                "data": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+              },
+              "yAxis": {
+                "type": "value"
+              },
+              "series": [{
+                "data": [150, 230, 224, 218, 135, 147, 260],
+                "type": "line"
+              }]
+            }
+          }
+        }
+      ```
+    
+    Currently, Carbone supports only "echarts@v5" but we may support newer versions and other libraries in the future.
+    By default, Carbone considers "echarts@v5".
+   
+    Some charts have some translation: Locales supported : cs, de, en, es, fi, fr, it, ja, ko, pl, pt-br, ro, ru, si, th, zh
+   
+    Rendering charts with Apache Echarts is extremely powerful and works well if all these conditions are met
+      - ECharts supports what you ask
+      - The template supports the rendered SVG (docx/xslx/pptx does not support SVG images)
+      - Your chart configuration does not need external dependencies (maps, js code, themes), which are not available in Carbone
+   
+    If you meet some limitation, please feel free to contact us on our chat to solve the issue.
+
+
   - [EE] If `options.isDebugActive = true`. `POST /render` returns additional information in `debug` sub-object:
     ```js
     {
@@ -15,12 +131,13 @@
     ```
 
   - Improve syntax error message:
-    - when a marker try to access an array and a object in the same time
+    - when a marker tries to access an array and a object in the same time
     - when there is a missing `[i]` marker fo one `[i+1]` marker
     - when Carbone cannot find the section to repeat
     - when there is a dot `.` before `[]` 
   
   - Fix crash when repetition does not contain XML tags. For example: `<w:t>{d[i].id}, {d[i+1].id}</w:t>`
+  - Fix crash when the section i+1 is duplicated like the i-th section with nested repetition and other markers
   - Fix crash when repetition uses direct access of sub-arrays `{d.test.others[i].wheels[0].size} {d.test.others[i+1].wheels[0].size}`
   
   - [EE] On-Premise Embedded Studio has new features and fixes:
@@ -31,10 +148,8 @@
     - fix memory leak
     - Now it works on Safari, without hot-reloading of the template
 
-  - Formatters managements has been completly rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters:
-    - TODO (finish) A single quote can be escaped using the single quote twice: `anyFormatter(' one parameter with escaped quote ''   ', ' a second '' one with ')`
-    - For backward-compatibility:
-      - Text containing single quotes are accepted if it does not contain a comma `,` before or after the single quote: `anyFormatter(' text ,containing ' sin,gle ' quote  ')`
+  - Formatters managements has been completely rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters. 
+    For backward-compatibility: text containing single quotes are accepted if it does not contain a comma `,` before or after the single quote: `anyFormatter(' text ,containing ' sin,gle ' quote  ')`
 
   - Dynamic parameters passed in formatters with the dot `.` syntax has been improved:
     - Add the possibility to access sub arrays with positive integers: `.sort[12].id`
@@ -46,13 +161,8 @@
       - `..i` matches with the index of `cars[i]` 
       - `...i` matches with the index of `d[i]` 
 
-  - ⚡️ New aggregator formatters : `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount`
+  - [EE] ⚡️ New aggregator formatters : `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount`
 
-  // TODO retourner une erreur si aggSum(.argument) du tableau en cours 
-  // TODO, ne pas autoriser les if qui sont à la fois AVANT et APR7S un sum (propagation galère à gérer)
-  // TODO test aggregator with repeater?
-  // TODO test with string and bad number (parseFloat)
-  // TODO tets cumCOunt avec parenthèse vide et vérfieir que .i ..I
     *Data*
       ```js
         { brand : 'Lu' , qty : 1  , sort : 1 },
@@ -86,98 +196,64 @@
       - `{d.cars[sort>1].qty:mul(.sort):aggCount:formatC}` => 6.00 €
 
 
-  - 🤩 Aggregators can also be used in a loop to compute sub-totals and cumulative totals (or "running totals"), with custom grouping clause (partition)
-    - By default if not grouping clause is defined:
-      - Sum by departments of all people's salary:
-        - `{d.departments[i].people[].salary:aggSum}`
-        - `{d.departments[i].people[].salary:aggSum(.i)}` (alternative)
-      - Global sum of all departments, all people's salary
-        - `{d.departments[i].people[i].salary:aggSum}`
-        - `{d.departments[i].people[i].salary:aggSum(0)}` (alternative)
-      - Cumulative total (or "running total") by departments of all people's salary:
-        - `{d.departments[i].people[].salary:cumSum}`
-      - Cumulative total (or "running total") of all departments, all people's salary
-        - `{d.departments[i].people[i].salary:cumSum}`
+    - [EE] 🤩 Aggregators can also be used in a loop to compute sub-totals and cumulative totals (or "running totals"), with custom grouping clause (partition)
+      - By default if not grouping clause is defined:
+        - Sum by departments of all people's salary:
+          - `{d.departments[i].people[].salary:aggSum}`
+          - `{d.departments[i].people[].salary:aggSum(.i)}` (alternative)
+        - Global sum of all departments, all people's salary
+          - `{d.departments[i].people[i].salary:aggSum}`
+          - `{d.departments[i].people[i].salary:aggSum(0)}` (alternative)
+        - Cumulative total (or "running total") by departments of all people's salary:
+          - `{d.departments[i].people[].salary:cumSum}`
+        - Cumulative total (or "running total") of all departments, all people's salary
+          - `{d.departments[i].people[i].salary:cumSum}`
 
-    - Otherwise, you can set the partition you want `aggSum(...departmenent, .employee)`
-
-
-    *Data*
-      ```js
-        [
-          {
-            id : 'CARBONE', tax  : 2,
-            depts : [
-              { name : 'IT'    , jobs : [ {salary : 10}, {salary : 20}                ]},
-              { name : 'Sales' , jobs : [ {salary : 5 }, {salary : 2 }, {salary : 7}  ]}
-            ]
-          },
-          {
-            id : 'YNSECT',  tax  : 3,
-            depts : [
-              { name : 'IT'        , jobs : [ {salary : 2} , {salary : 8}                ]},
-              { name : 'Marketing' , jobs : [ {salary : 1} , {salary : 3}, {salary : 6}  ]},
-              { name : 'Sales'     , jobs : [ {salary : 3}                               ]}
-            ]
-          }
-        ]
-      ```
-
-    *Template => Result*
-
-    - Sub-total of `salary` per company, per department:
-      > En interne, remplacé par `aggSum(..i, ...i)` 
-
-    ```js
-      // TEMPLATE                            // RESULT
-      {d[i].depts[i].jobs[].salary:aggSum}   30 // CARBONE - IT
-      {d[i+1].depts[i+1]}                    14 // CARBONE - Sales
-                                             10 // YNSECT - IT
-                                             10 // YNSECT - Marketing
-                                             3  // YNSECT - Sales
-    ```
-    
-    - All this sy,ntax are equals:
-      - `{d[i].depts[i].jobs[].salary:aggSum}`          // Faire ça en dernier
-      - `{d[i].depts[i].jobs[].salary:aggSum(.i, ..i)}` // TODO mauvaise idée, car si on utilsie un sort et sort+1 !!!
-      - `{d[i].depts[i].jobs[i].salary:aggSum(..i, ...i)}`
+      - You can change the partition with dynamic parameters like that
+        - Sum by people by age, regardless of departments
+          - `{d.departments[i].people[i].salary:aggSum(.age)}`
+        - Sum by people by age and gender, regardless of departments
+          - `{d.departments[i].people[i].salary:aggSum(.age, .gender)}`
 
 
-    - Sub-total of `salary` per department, any company
 
-    ```js
-      // TEMPLATE                                    // RESULT
-      {d[i].depts[i].jobs[].salary:aggSum(..name)}   40 // CARBONE - IT  
-      {d[i+1].depts[i+1]}                            17 // CARBONE - Sales
-                                                     40 // YNSECT - IT
-                                                     10 // YNSECT - Marketing
-                                                     17 // YNSECT - Sales
-    ```
+### v3.5.4
+  - Release June 15th 2022
+  - [EE] Do not return an error when `DEL /template` is called and the template is already deleted on local storage. It may be already deleted by the plugin.
 
-    - Cumulative sum (or "Running total") of `salary`
-      > En interne, remplacé par `aggSum(0):getCurrentValue` 
+### v3.5.3
+  - Release May 25th 2022
+  - [EE] Accept `convCRLF` before `:html` formatter to convert `\r\n` to `<br>` 
 
-    ```js
-      // TEMPLATE                            // RESULT
-      {d[i].depts[i].jobs[].salary:cumSum}   30 // CARBONE - IT
-      {d[i+1].depts[i+1]}                    44 // CARBONE - Sales
-                                             54 // YNSECT - IT
-                                             64 // YNSECT - Marketing
-                                             67 // YNSECT - Sales
-    ```
+### v3.5.2
+  - Release May 6th 2022
+  - [EE] Add file verification on template upload
 
-    - Cumulative sum (or "Running total") of `salary` per department, any company
-      > En interne, remplacé par `aggSum(..name):getCurrentValue` 
+### v3.5.1
+  - Release May 4th 2022
+  - Rollback fix in v3.4.9
 
-    ```js
-      // TEMPLATE                                    // RESULT
-      {d[i].depts[i].jobs[].salary:cumSum(..name)}   30 // CARBONE - IT         
-      {d[i+1].depts[i+1]}                            14 // CARBONE - Sales
-                                                     40 // YNSECT - IT
-                                                     10 // YNSECT - Marketing
-                                                     17 // YNSECT - Sales
-    ```
+### v3.5.0
+  - Release May 4st 2022
+  - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.
+      - Example: `{d.val:add(.otherQty  +  .vat  *  .price - 10 / 2)`
+      - Only mathematical operators `+, *, -, /` are allowed, without parenthesis
+      - Multiplication and division operators (`*`, `/`) has higher precedence than the addition/substration operator (`+`, `-`) and thus will be evaluated first.
 
+### v3.4.9
+  - Release April 27st 2022
+  - Fix crash with very complex JSON map
+
+### v3.4.8
+  - Release March 15st 2022
+  - [EE] Fix: avoid crash when a marker is used on a shape instead of a sample image (v3.2.2-1)
+  - [EE] Fix graceful exit on SIGTERM, keep the converter alive to finish remaining renders!
+    - As soon as Carbone has finished all renders, it exits after 15 seconds instead of 10 seconds
+  - [EE] Fix DOCX documents that are including dynamic images and static charts
+
+### v3.4.7
+  - Release March 1st 2022
+  - [EE] Carbone-EE On-Premise accepts to read the license from environment variable `CARBONE_EE_LICENSE`, or `--license` CLI options
 
 ### v3.4.6
   - Release February 18th 2022
@@ -314,6 +390,10 @@
 ### v3.2.3
   - Release May 21th 2021
   - Accepts letter `W` to get the week number in `formatD` formatter
+
+### v3.2.2-1
+  - Release March 11th 2022
+  - Fix: avoid crash when a marker is used on a shape instead of a sample image
 
 ### v3.2.2
   - Release May 10th 2021

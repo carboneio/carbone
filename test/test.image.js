@@ -566,6 +566,20 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   describe('DOCX MS document', function () {
     describe('[Full test] DOCX', function () {
 
+      it('should not crash if a marker is placed in a shape instead of an image', function (done) {
+        const _testedReport = 'image/docx-image-in-shape';
+        const _data = {
+          image : [
+            { value : _imageFRBase64jpg },
+            { value : _imageITBase64png }
+          ]
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
+          helperTest.assert(err+'', 'null');
+          done();
+        });
+      });
+
       it('should do nothing if there is no marker inside the XML (created from LO)', function (done) {
         const _testedReport = 'image/docx-simple-without-marker';
         const _data = {
@@ -852,7 +866,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(_template.files[0].data, _expectedContent);
       });
 
-      it ('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml', function () {
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml', function () {
         const _template = {
           files : [{
             name : 'word/_rels/document.xml.rels',
@@ -875,13 +889,15 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           extension : 'png'
         });
         image.postProcessDocx(_template, null, _options);
-        helperTest.assert(_template.files[0].data, _expectedContent);
-        helperTest.assert(_template.files[1].data, _expectedContentType);
-        helperTest.assert(_template.files[2], {
+
+        helperTest.assert(_template.files[0], {
           name   : 'word/media/CarboneImage0.png',
           parent : '',
           data   : '1234'
         });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+        helperTest.assert(_template.files[2].data, _expectedContentType);
+
       });
 
       it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and update the content_type.xml even if the temporary image type is in uppercase', function () {
@@ -907,13 +923,13 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           extension : 'jpg'
         });
         image.postProcessDocx(_template, null, _options);
-        helperTest.assert(_template.files[0].data, _expectedContent);
-        helperTest.assert(_template.files[1].data, _expectedContentType);
-        helperTest.assert(_template.files[2], {
+        helperTest.assert(_template.files[0], {
           name   : 'word/media/CarboneImage0.jpg',
           parent : '',
           data   : '1234'
         });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+        helperTest.assert(_template.files[2].data, _expectedContentType);
       });
 
       it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define a different media path because the template is coming from word online', function () {
@@ -934,12 +950,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           extension : 'gif'
         });
         image.postProcessDocx(_template, null, _options);
-        helperTest.assert(_template.files[0].data, _expectedContent);
-        helperTest.assert(_template.files[1], {
+        helperTest.assert(_template.files[0], {
           name   : 'media/CarboneImage0.gif',
           parent : '',
           data   : '1234'
         });
+        helperTest.assert(_template.files[1].data, _expectedContent);
       });
 
       it('should add multiple images references into "word/_rels/document.xml.rels" by using imageDatabase', function () {
@@ -972,22 +988,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           extension : 'svg'
         });
         image.postProcessDocx(_template, null, _options);
-        helperTest.assert(_template.files[0].data, _expectedContent);
-        helperTest.assert(_template.files[1], {
+        helperTest.assert(_template.files[0], {
           name   : 'word/media/CarboneImage0.png',
           parent : '',
           data   : '1234'
         });
-        helperTest.assert(_template.files[2], {
+        helperTest.assert(_template.files[1], {
           name   : 'word/media/CarboneImage1.jpg',
           parent : '',
           data   : '5678'
         });
-        helperTest.assert(_template.files[3], {
+        helperTest.assert(_template.files[2], {
           name   : 'word/media/CarboneImage2.svg',
           parent : '',
           data   : '9101112'
         });
+        helperTest.assert(_template.files[3].data, _expectedContent);
       });
 
       it('should add image references into the document, header and footer by using imageDatabase and should save the new image only one time on the object `template.files`', function () {
@@ -1014,7 +1030,13 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           }]
         };
         const _expectedTemplate = {
-          files : [{
+          files : [
+          {
+            name   : 'word/media/CarboneImage0.png',
+            parent : '',
+            data   : '1234'
+          },
+          {
             name : 'word/_rels/document.xml.rels',
             data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
           },
@@ -1033,11 +1055,6 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           {
             name : 'word/_rels/footer2.xml.rels',
             data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
-          },
-          {
-            name   : 'word/media/CarboneImage0.png',
-            parent : '',
-            data   : '1234'
           }]
         };
         const _options = {
@@ -1676,7 +1693,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
             'Content-Type' : 'image/jpeg',
           });
-        image.downloadImage('https://google.com/image-flag-fr.jpg', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/jpeg');
@@ -1690,7 +1707,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
             'Content-Type' : 'image/png',
           });
-        image.downloadImage('https://google.com/image-flag-it.png', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-it.png', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/png');
@@ -1704,7 +1721,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
             'Content-Type' : 'image/png',
           });
-        image.downloadImage('https://google.com/image-flag-it.png?size=10&color=blue', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-it.png?size=10&color=blue', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/png');
@@ -1718,7 +1735,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
             'Content-Type' : 'image/png; charset=UTF-8',
           });
-        image.downloadImage('https://google.com/blabla?size=10&color=blue', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/blabla?size=10&color=blue', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/png');
@@ -1732,7 +1749,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
             'Content-Type' : 'application/json',
           });
-        image.downloadImage('https://google.com/image-flag-it.png', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-it.png', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/png');
@@ -1746,7 +1763,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
             'Content-Type' : 'text/plain',
           });
-        image.downloadImage('https://google.com/image-flag-fr.jpg', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/jpeg');
@@ -1759,7 +1776,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         nock('https://google.com')
           .get('/image-flag-fr.txt')
           .replyWithFile(200, __dirname + '/datasets/image/imageFR_base64_jpg.txt');
-        image.downloadImage('https://google.com/image-flag-fr.txt', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-fr.txt', {}, {}, function (err, imageInfo) {
           assert(err.includes('Error Carbone: the file is not an image'));
           assert(imageInfo+'' === 'undefined');
           done();
@@ -1767,19 +1784,19 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
 
       it('should return an error when the imageLinkOrBase64 is either undefined, null or empty', function (done) {
-        image.downloadImage(undefined, {}, function (err, imageInfo) {
+        image.downloadImage(undefined, {}, {}, function (err, imageInfo) {
           assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
           helperTest.assert(imageInfo+'', 'undefined');
 
-          image.downloadImage(null, {}, function (err, imageInfo) {
+          image.downloadImage(null, {}, {}, function (err, imageInfo) {
             assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
             helperTest.assert(imageInfo+'', 'undefined');
 
-            image.downloadImage('', {}, function (err, imageInfo) {
+            image.downloadImage('', {}, {}, function (err, imageInfo) {
               assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
               helperTest.assert(imageInfo+'', 'undefined');
 
-              image.downloadImage({id : 1}, {}, function (err, imageInfo) {
+              image.downloadImage({id : 1}, {}, {}, function (err, imageInfo) {
                 assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
                 helperTest.assert(imageInfo+'', 'undefined');
                 done();
@@ -1790,7 +1807,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
 
       it ('should return an error when the location url does not exist', function (done) {
-        image.downloadImage('https://carbone.io/fowjfioewj', {}, function (err, imageInfo) {
+        image.downloadImage('https://carbone.io/fowjfioewj', {}, {}, function (err, imageInfo) {
           assert(err.includes('can not download the image from the url'));
           helperTest.assert(imageInfo+'', 'undefined');
           done();
@@ -1798,7 +1815,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
 
       it('should return an error when imageLinkOrBase64 argument is invalid (the error is returned by image.parseBase64Picture)', function (done) {
-        image.downloadImage('this_is_random_text', {}, function (err, imageInfo) {
+        image.downloadImage('this_is_random_text', {}, {}, function (err, imageInfo) {
           assert(err.includes('Error'));
           helperTest.assert(imageInfo+'', 'undefined');
           done();
@@ -1813,7 +1830,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           nock('https://google.com')
             .get('/random-image.jpeg')
             .replyWithError({code : errorCode});
-          image.downloadImage('https://google.com/random-image.jpeg', {}, function (err, imageInfo) {
+          image.downloadImage('https://google.com/random-image.jpeg', {}, {}, function (err, imageInfo) {
             helperTest.assert(err.code, errorCode);
             assert(imageInfo+'', 'undefined');
           });
@@ -1826,7 +1843,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .get('/random-image.jpeg')
           .delay(6000)
           .reply(200, '<html></html>');
-        image.downloadImage('https://google.com/random-image.jpeg', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/random-image.jpeg', {}, {}, function (err, imageInfo) {
           helperTest.assert(err.message, 'Request timed out');
           assert(imageInfo+'', 'undefined');
           done();
@@ -1840,7 +1857,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             extension : 'jpeg'
           }
         };
-        image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        image.downloadImage('$base64dog', data, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.mimetype === 'image/jpeg');
           assert(imageInfo.extension === 'jpeg');
@@ -1856,7 +1873,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             extension : 'bmp'
           }
         };
-        image.downloadImage('$base64cat', data, function (err, imageInfo) {
+        image.downloadImage('$base64cat', data, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.mimetype === 'image/bmp');
           assert(imageInfo.extension === 'bmp');
@@ -1872,7 +1889,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             extension : 'txt'
           }
         };
-        image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        image.downloadImage('$base64dog', data, {}, function (err, imageInfo) {
           assert(err.includes('the base64 provided is not an image'));
           assert(imageInfo + '' === 'undefined');
           done();
@@ -1886,7 +1903,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             extension : 'jpeg'
           }
         };
-        image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        image.downloadImage('$base64dog', data, {}, function (err, imageInfo) {
           assert(err.includes('the base64 provided is empty'));
           assert(imageInfo + '' === 'undefined');
           done();

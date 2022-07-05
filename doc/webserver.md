@@ -30,8 +30,11 @@ Carbone On-premise can be installed in different ways:
 
 1. Download the license and the Carbone On-premise binary for server/OS: Mac, Linux or Windows
 2. Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
-3. Insert the **license** in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is selected. The binary can't start if the license is outdated or invalid.
-3. Start Carbone web server or [daemonize it with systemd](#Installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#Carbone-Options-overview) to Carbone On-Premise through the CLI:
+3. Prepare the license key to be loaded, multiple solution:
+   - Set the Environment Variable `CARBONE_EE_LICENSE` with the license key as the value
+   - Or pass the CLI option `--license` followed by the license key as the value when you start the server (step 4)
+   - Or insert the **license** file in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is selected. The binary can't start if the license is outdated or invalid.
+4. Start Carbone web server or [daemonize it with systemd](#installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#carbone-options-overview) to Carbone On-Premise through the CLI:
 
 ```bash
   ./carbone webserver --port 4000 --workdir .
@@ -178,6 +181,7 @@ If an option is reported in different places, CLI options are picked in priority
 | port           | 4000             | Service PORT                                                 | --port / -p  | CARBONE_EE_PORT |
 | workdir        | Actual directory | Define the place to store elements,  it creates 6 directories:<br />- `template`  : where carbone keeps templates (cache)<br />- `render`    : temp directory where report are generated,<br />- `asset`     : internal used only, <br />- `config`    : config, licenses and ES512 keys for authentication,<br />- `logs`      : [NOT IMPLEMENTED YET] formatted output logs,  and<br />- `plugin `   : where to put custom plugin | --workdir / -w | CARBONE_EE_WORKDIR  |
 | licenseDir     | "config/"        | Absolute directory path to licenses | --licenseDir / -L |  CARBONE_EE_LICENSEDIR |
+| license        |                  | License as a string, if the option is used, `licenseDir` option is skipped | --license / -l | CARBONE_EE_LICENSE |
 | factories      | 1                | Multithread parameter, number of LibreOffice converter       | --factories / -f |  CARBONE_EE_FACTORIES |
 | attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try | --attemps / -a | CARBONE_EE_ATTEMPTS  |
 | authentication | false            | [Authentification documentation at the following link](#authentication-option) | --authentication / -A |  CARBONE_EE_AUTHENTICATION |
@@ -325,9 +329,21 @@ mv /path/to/carbone/binary ./carbone
 
 When Carbone On-premise is executed for the first time, default folders are created automatically ([explanation here](#Carbone-Options-overview)). Custom plugins should be inserted in the `plugin` folder.
 
-### Override write template
+### Override template storage
 
-To override template writing, the file `storage.js` in the `plugin` folder has to be created. The function to export is `writeTemplate` and is described as follow:
+To override template storage, create the file `storage.js` in the `plugin` folder.
+It will be possible to upload your template into an Object Storage, S3 API or other storage systems.
+Export a function called `writeTemplate` with 5 arguments:
+- `req`: The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on.
+- `res`: The res object represents the HTTP response that a server sends when it gets an HTTP request
+- `templateId`: Unique template ID as a sha256 hash
+- `templatePathTemp`: Absolute path of the uploaded template
+- `callback`: callback function
+
+Additional file informations are available the request header:
+- `req.headers['carbone-template-extension']`: file extension (eg: 'xml')
+- `req.headers['carbone-template-mimetype']`: file mimetype (eg: 'application/xml')
+- `req.headers['carbone-template-size']`: file size in bytes
 
 ```js
 const fs = require('fs');
@@ -389,7 +405,7 @@ To override render writing, add the function `afterRender` in the `storage.js` f
 ```js
 function afterRender (req, res, err, reportPath, reportName, statistics, next) {
   // Write or rename your render
-
+  // TemplateID available: req.params.templateId
   return next(null)
 }
 
@@ -407,6 +423,16 @@ res.send({
     newField: reportName
   }
 });
+```
+The `statistics` argument return an object with:
+```json
+{
+  "renderId": "",
+  "template": "filename",
+  "user"      : "if authentication enabled, the user ID is returned, it is coming from the JWT token",
+  "options"   : "Rendering options as an object",
+  "jsonSize"  : "size of the JSON data-set as bytes"
+}
 ```
 
 ### Override read render

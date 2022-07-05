@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document-meta xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.3">
+  <office:meta>
+    <meta:creation-date>
+      2020-11-15T08:17:57.728335339
+    </meta:creation-date>
+    <dc:date>
+      2022-05-10T07:55:46.890212481
+    </dc:date>
+    <meta:editing-duration>
+      PT45M17S
+    </meta:editing-duration>
+    <meta:editing-cycles>
+      7
+    </meta:editing-cycles>
+    <meta:generator>
+      LibreOffice/7.3.2.2$MacOSX_X86_64 LibreOffice_project/49f2b1bff42cfccbd8f788c8dc32c1c309559be0
+    </meta:generator>
+    <meta:document-statistic meta:table-count="0" meta:image-count="2" meta:object-count="2" meta:page-count="2" meta:paragraph-count="5" meta:word-count="3" meta:character-count="32" meta:non-whitespace-character-count="32"/>
+  </office:meta>
+</office:document-meta>

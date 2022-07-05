@@ -419,24 +419,6 @@ function hideEnd () {
   return '';
 }
 
-/**
- * Returns the length of a string or array.
- *
- * @version 2.0.0
- * @example ["Hello World"]
- * @example [""]
- * @example [[1, 2, 3, 4, 5]]
- * @example [[1, "Hello"]]
- *
- * @param {Mixed} d Array or String
- * @returns {Number} Length of the element
- */
-function len (d) {
-  if (typeof d === 'string' || Array.isArray(d)) {
-    return d.length;
-  }
-  return 0;
-}
 
 /**
  * Test if data is empty (null, undefined, [], {}, ...). The new formatter `ifEM` should be used instead of this one.
@@ -584,6 +566,5 @@ module.exports = {
   show,
   elseShow,
   and,
-  or,
-  len
+  or
 };

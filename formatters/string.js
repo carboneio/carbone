@@ -165,6 +165,8 @@ function unaccent (d) {
 /**
  * Convert carriage return `\\r\\n` and line feed `\\n` to XML-specific code in rendered document
  *
+ * Since v3.5.3, it can be used before `:html` formatter to convert `\n` to `<br>` tags
+ *
  * Compatible with odt, and docx (beta)
  *
  * @version 1.1.0
@@ -192,6 +194,21 @@ function convCRLF (d) {
 // this formatter is separately to inject code
 convCRLF.canInjectXML = true;
 convCRLF.isExecutionNotConditionnalyExecuted;
+
+/**
+ * Specific formatter used to replace, when convCRLF is used before :html formatter
+ *
+ * @private
+ *
+ * @param   {String} d
+ * @return  {string} replaced "\r\n" by html tag "<br>"
+ */
+function convCRLFH (d) {
+  if (typeof d === 'string') {
+    return d.replace(/\r?\n/g, '<br>');
+  }
+  return d;
+}
 
 /**
  * Slice a string with a begin and an end
@@ -291,6 +308,26 @@ function append (d, append) {
   return d + '' + append;
 }
 
+
+/**
+ * Returns the length of a string or array.
+ *
+ * @version 2.0.0
+ * @example ["Hello World"]
+ * @example [""]
+ * @example [[1, 2, 3, 4, 5]]
+ * @example [[1, "Hello"]]
+ *
+ * @param {Mixed} d Array or String
+ * @returns {Number} Length of the element
+ */
+function len (d) {
+  if (typeof d === 'string' || Array.isArray(d)) {
+    return d.length;
+  }
+  return 0;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -304,7 +341,10 @@ module.exports = {
   slice     : substr,
   padl      : padl,
   padr      : padr,
+  len       : len,
   md5       : md5,
   prepend   : prepend,
-  append    : append
+  append    : append,
+  // private
+  convCRLFH : convCRLFH
 };

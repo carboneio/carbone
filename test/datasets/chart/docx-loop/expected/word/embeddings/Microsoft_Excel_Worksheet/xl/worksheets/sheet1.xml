@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac xr xr2 xr3" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:xr2="http://schemas.microsoft.com/office/spreadsheetml/2015/revision2" xmlns:xr3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" xr:uid="{8F2F9E29-E308-4F4D-B5B6-36D4E8108F29}">
+    <dimension ref="A1:D5"/>
+    <sheetViews>
+        <sheetView tabSelected="1" workbookViewId="0">
+            <selection activeCell="A3" sqref="A3"/>
+        </sheetView>
+    </sheetViews>
+    <sheetFormatPr baseColWidth="10" defaultRowHeight="16" x14ac:dyDescent="0.2"/>
+    <cols>
+        <col min="1" max="1" width="60.1640625" customWidth="1"/>
+        <col min="2" max="2" width="15.33203125" customWidth="1"/>
+        <col min="3" max="3" width="20.83203125" customWidth="1"/>
+    </cols>
+    <sheetData>
+        <row   x14ac:dyDescent="0.2">
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t>
+                        Colonne1
+                    </t>
+                </is>
+            </c>
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t>
+                        Col1
+                    </t>
+                </is>
+            </c>
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t>
+                        Col2
+                    </t>
+                </is>
+            </c>
+            <c  s="1"/>
+        </row>
+        <row   x14ac:dyDescent="0.2">
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t>
+                        0
+                    </t>
+                </is>
+            </c>
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t>
+                        0
+                    </t>
+                </is>
+            </c>
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t xml:space="preserve">
+                        0
+                    </t>
+                </is>
+            </c>
+            <c  s="1"/>
+        </row>
+        <row   x14ac:dyDescent="0.2">
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t xml:space="preserve">
+                        0
+                    </t>
+                </is>
+            </c>
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t>
+                        0
+                    </t>
+                </is>
+            </c>
+            <c  s="1" t="inlineStr">
+                <is>
+                    <t xml:space="preserve">
+                        0
+                    </t>
+                </is>
+            </c>
+            <c  s="1"/>
+        </row>
+        <row   x14ac:dyDescent="0.2">
+            <c  s="1"/>
+            <c  s="1"/>
+            <c  s="1"/>
+            <c  s="1"/>
+        </row>
+        <row   x14ac:dyDescent="0.2">
+            <c  s="1"/>
+            <c  s="1"/>
+            <c  s="1"/>
+            <c  s="1"/>
+        </row>
+    </sheetData>
+    <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
+    <tableParts count="1">
+        <tablePart r:id="rId1"/>
+    </tableParts>
+</worksheet>

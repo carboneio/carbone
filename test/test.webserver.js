@@ -5,9 +5,8 @@ const path       = require('path');
 const FormData   = require('form-data');
 const assert     = require('assert');
 const carbone    = require('../lib/index');
-const sinon      = require('sinon');
 const os         = require('os');
-const { exec }   = require('child_process');
+const { exec, spawn } = require('child_process');
 const package    = require('../package.json');
 const params     = require('../lib/params');
 const helper     = require('../lib/helper');
@@ -159,6 +158,7 @@ describe('Webserver', () => {
         const _currencyTarget = 'EUR';
         const _licenseDir = '/var/tmp/test/';
         const _licenseDirPrev = params.licenseDir;
+        const _license = 'LICENSE_KEY_TEST';
         const _maxDataSize = 100 * 1024 * 1024;
         assert.strictEqual(params.maxDataSize, 60 * 1024 * 1024); // default datasize 60MB
         webserver = require('../lib/webserver');
@@ -175,6 +175,7 @@ describe('Webserver', () => {
                                 '--currencySource', _currencySource,
                                 '--currencyTarget', _currencyTarget,
                                 '--licenseDir', _licenseDir,
+                                '--license', _license,
                                 '--maxDataSize', _maxDataSize], () => {
           assert.strictEqual(params.port, _port);
           assert.strictEqual(fs.existsSync(_workdir), true);
@@ -197,6 +198,8 @@ describe('Webserver', () => {
           params.currencyTarget = '';
           assert.strictEqual(params.licenseDir, _licenseDir);
           params.licenseDir = _licenseDirPrev;
+          assert.strictEqual(params.license, _license);
+          params.license = '';
           assert.strictEqual(params.maxDataSize, _maxDataSize);
           webserver.stopServer(done);
         });
@@ -211,6 +214,7 @@ describe('Webserver', () => {
         process.env.CARBONE_EE_BIND = '127.0.0.1';
         process.env.CARBONE_EE_AUTHENTICATION = 'true';
         process.env.CARBONE_EE_MAXDATASIZE = 200 * 1024 * 1024;
+        process.env.CARBONE_EE_LICENSE = 'LICENSE_KEY_TEST_2';
         webserver = require('../lib/webserver');
         webserver.handleParams([], () => {
           assert.strictEqual(params.port + '', process.env.CARBONE_EE_PORT);
@@ -221,6 +225,7 @@ describe('Webserver', () => {
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication + '', process.env.CARBONE_EE_AUTHENTICATION);
           assert.strictEqual(params.maxDataSize + '', process.env.CARBONE_EE_MAXDATASIZE);
+          assert.strictEqual(params.license + '', process.env.CARBONE_EE_LICENSE);
           // clean
           helper.rmDirRecursive(process.env.CARBONE_EE_WORKDIR);
           delete process.env.CARBONE_EE_PORT;
@@ -230,6 +235,8 @@ describe('Webserver', () => {
           delete process.env.CARBONE_EE_BIND;
           delete process.env.CARBONE_EE_AUTHENTICATION;
           delete process.env.CARBONE_EE_MAXDATASIZE;
+          delete process.env.CARBONE_EE_LICENSE;
+          params.license = '';
           webserver.stopServer(done);
         });
       });
@@ -244,7 +251,8 @@ describe('Webserver', () => {
           factories      : 4,
           attempts       : 2,
           authentication : true,
-          maxDataSize    : 120 * 1024 * 1024
+          maxDataSize    : 120 * 1024 * 1024,
+          license        : 'LICENSE_KEY_TEST_3'
         };
         fs.mkdirSync(_workdirConfig, { recursive : true });
         fs.writeFileSync(path.join(_workdirConfig, 'config.json'), JSON.stringify(_configContent));
@@ -257,6 +265,8 @@ describe('Webserver', () => {
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication, _configContent.authentication);
           assert.strictEqual(params.maxDataSize, _configContent.maxDataSize);
+          assert.strictEqual(params.license, _configContent.license);
+          params.license = '';
           helper.rmDirRecursive(_workdir);
           webserver.stopServer(done);
         });
@@ -379,7 +389,7 @@ describe('Webserver', () => {
         toDelete = [];
       });
 
-      it('should upload the template and use authentication and storage plugin', (done) => {
+      it('should upload the template as form-data and use authentication and storage plugin', (done) => {
         let form = new FormData();
 
         form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
@@ -389,6 +399,9 @@ describe('Webserver', () => {
           data = JSON.parse(data);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          assert.strictEqual(data.data.extension, 'html');
+          assert.strictEqual(data.data.mimetype, 'text/html');
+          assert.strictEqual(data.data.size, 102);
           let exists = fs.existsSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           assert.strictEqual(exists, true);
           fs.unlinkSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
@@ -399,6 +412,24 @@ describe('Webserver', () => {
             // assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'afterFile2')).toString(), 'AFTER FILE 2');
             done();
           }, 100);
+        });
+      });
+
+      it('should upload the template as base64 and use authentication and storage plugin', (done) => {
+        let _data = {
+          template : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'})
+        };
+        get.concat(getBody(4001, '/template', 'POST', _data, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(data.success, true);
+          assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          assert.strictEqual(data.data.extension, 'html');
+          assert.strictEqual(data.data.mimetype, 'text/html');
+          assert.strictEqual(data.data.size, 102);
+          let exists = fs.existsSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+          assert.strictEqual(exists, true);
+          toDelete.push('PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          done();
         });
       });
 
@@ -469,6 +500,16 @@ describe('Webserver', () => {
             assert.strictEqual(data.message, 'Template deleted');
             done();
           });
+        });
+      });
+
+      it('should delete a template that does not exist on the plugin storage', (done) => {
+        const _request = getBody(4001, '/template/template_not_exists', 'DELETE', null, token);
+        get.concat(_request, (err, res, data) => {
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
+          done();
         });
       });
 
@@ -701,19 +742,12 @@ describe('Webserver', () => {
 
     describe('Render template', () => {
       let toDelete = [];
-      let spyRender = null;
 
       before((done) => {
         uploadFile(4000, null, done);
       });
 
-      beforeEach(() => {
-        spyRender = sinon.spy(carbone, 'render');
-      });
-
       afterEach(() => {
-        spyRender.restore();
-
         for (let i = 0; i < toDelete.length; i++) {
           if (fs.existsSync(path.join(os.tmpdir(), 'render', toDelete[i]))) {
             fs.unlinkSync(path.join(os.tmpdir(), 'render', toDelete[i]));
@@ -890,16 +924,23 @@ describe('Webserver', () => {
           enum       : {}
         };
 
+        const _originalCarboneRender = carbone.render;
+        let _originalCarboneArguments = {};
+        carbone.render = (...args) => {
+          _originalCarboneArguments = args;
+          _originalCarboneRender.apply(null, args);
+        };
         get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          carbone.render = _originalCarboneRender; // restore original carbone.render
           assert.strictEqual(data.success, true);
-          const renderOptions = spyRender.firstCall.args;
-          assert.deepStrictEqual(renderOptions[2].convertTo, {
+          assert.deepStrictEqual(_originalCarboneArguments[2].convertTo, {
             formatName    : 'pdf',
             formatOptions : {
-              EncryptFile           : false,
-              DocumentOpenPassword  : 'Pass',
-              ReduceImageResolution : false,
-              Watermark             : 'My Watermark'
+              EncryptFile            : false,
+              DocumentOpenPassword   : 'Pass',
+              ReduceImageResolution  : false,
+              UseLosslessCompression : true,
+              Watermark              : 'My Watermark'
             }
           });
           toDelete.push(data.data.renderId);
@@ -1520,6 +1561,20 @@ describe('Webserver', () => {
         });
       });
 
+      it('should not be able to upload not supported file templates', (done) => {
+        let form = new FormData();
+
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'helperDirTest', 'create.sql')));
+
+        get.concat(getBody(4000, '/template', 'POST', form), (err, res, data) => {
+          assert.strictEqual(err, null);
+          data = JSON.parse(data);
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file');
+          done();
+        });
+      });
+
       it('should upload the template and inject data in the hash', (done) => {
         let form = new FormData();
 
@@ -1599,15 +1654,6 @@ describe('Webserver', () => {
             assert.strictEqual(data.message, 'Template deleted');
             done();
           });
-        });
-      });
-
-      it('should return an error if template does not exist', (done) => {
-        get.concat(getBody(4000, '/template/nopenopenope', 'DELETE'), (err, res, data) => {
-          data = JSON.parse(data.toString());
-          assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
-          done();
         });
       });
 
@@ -1710,6 +1756,62 @@ describe('Webserver', () => {
         // templateID / renderID
         helper.assert(webserver.sanitizeValidateId('9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'), '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
         helper.assert(webserver.sanitizeValidateId('9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html'), '9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html');
+      });
+    });
+  });
+  describe('Gracefully exit', function () {
+    it('should kill a server with SIGTERM, wait remaining renders and exist after 15 seconds', (done) => {
+      let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
+      let isShutdownWithinFifteenSecond = true;
+      let body = {
+        data : {
+          firstname : 'John',
+          lastname  : 'Doe'
+        },
+        complement : {},
+        enum       : {},
+        convertTo  : 'txt'
+      };
+      const child = spawn('node', ['bin/carbone', 'webserver', '-p', '3000']);
+      function runQueries () {
+        uploadFile(3000, null, () => {
+          get.concat(getBody(3000, '/status', 'GET', {}, null), (err, res) => {
+            assert.strictEqual(res.statusCode, 200);
+            setTimeout(function () {
+              // let some time to start the converter
+              child.kill('SIGTERM');
+              setTimeout(() => isShutdownWithinFifteenSecond = false, 17000);
+              get.concat(getBody(3000, `/render/${templateId}`, 'POST', body, null), (err, res, renderReport) => {
+                assert.strictEqual(err, null);
+                setTimeout(function () {
+                  get.concat(getBody(3000, '/status', 'GET', {}, null), (err, res) => {
+                    assert.strictEqual(res.statusCode, 503);
+                    get.concat(getBody(3000, `/render/${renderReport.data.renderId}`, 'GET'), (err, res, data) => {
+                      assert.strictEqual(err, null);
+                      assert.strictEqual(res.headers['content-type'], 'text/plain; charset=UTF-8');
+                      assert.strictEqual(res.headers['content-disposition'], 'filename="report.txt"');
+                      assert.strictEqual(/John Doe/.test(data.toString()), true);
+                    });
+                  });
+                }, 2000);
+              });
+            }, 10000);
+          });
+        });
+      }
+      child.stdout.on('data', (data) => {
+        console.log(`child stdout:\n${data}`);
+        if (data.includes('Carbone webserver is started and listens on port 3000')) {
+          runQueries();
+        }
+      });
+      child.stderr.on('data', (data) => {
+        console.log(`child stdout:\n${data}`);
+      });
+      child.on('close', () => {
+        console.log('Test is done, close...');
+        assert.strictEqual(isShutdownWithinFifteenSecond, true);
+        done();
       });
     });
   });

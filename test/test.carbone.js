@@ -1274,6 +1274,56 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should accept direct access of an other array, with sub-objects, within a loop with [.i] syntax', function (done) {
+        var _xml = ''
+          + '<d>'
+          + '  <l>'
+          + '    <acc>{d[i].groups[i].label}</acc>'
+          + '    <sub>{d[i].groups[i].label:print(..direct[.i].sub.id)}</sub>'
+          + '  </l>'
+          + '  <l>'
+          + '    {d[i].groups[i+1]}'
+          + '  </l>'
+          + '  <l>'
+          + '    {d[i+1]}'
+          + '  </l>'
+          + '</d>'
+        ;
+        var _data = [
+          {
+            groups : [ { label : 10 }, {label : 11 } ],
+            direct : [ { sub : { id : 'aa' }}, { sub : { id : 'cc' }} ]
+          },
+          {
+            groups : [ { label : 20 }, { label : 30 } ],
+            direct : [ { sub : { id : 'zz' }} ]
+          }
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, ''
+            + '<d>'
+            + '  <l>'
+            + '    <acc>10</acc>'
+            + '    <sub>aa</sub>'
+            + '  </l>'
+            + '  <l>'
+            + '    <acc>11</acc>'
+            + '    <sub>cc</sub>'
+            + '  </l>  '
+            + '  <l>'
+            + '    <acc>20</acc>'
+            + '    <sub>zz</sub>'
+            + '  </l>'
+            + '  <l>'
+            + '    <acc>30</acc>'
+            + '    <sub></sub>'
+            + '  </l>    '
+            + '</d>'
+          );
+          done();
+        });
+      });
       it.skip('should not try to reach the object attribute if the attribute is between double quotes and simple quotes', function (done) {
         var data = {
           param       : 3,

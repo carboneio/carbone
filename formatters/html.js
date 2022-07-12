@@ -53,6 +53,7 @@ const getHTMLContentOdt = function (htmlContent, templateDefaultStyleId) {
  */
 const getHTMLContentOdtPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
+  console.log(_htmlProperties?.content?.get(this));
   return _htmlProperties?.content?.get(this) ?? '';
 };
 

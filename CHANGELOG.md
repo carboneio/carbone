@@ -1,3 +1,6 @@
+### v4.1.0
+  - New interval/duration formatters: `formatI`
+
 ### v4.0.0
   - Release June 25st 2022
   - [EE] ⚡️ Main features summary (see v4.0.0-alpha.0 for details)

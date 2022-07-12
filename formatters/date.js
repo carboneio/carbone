@@ -40,6 +40,24 @@ function formatD (d, patternOut, patternIn) {
   return d;
 }
 
+
+
+function formatI (d, patternOut, patternIn) {
+  if (d !== null && typeof d !== 'undefined') {
+    const _duration = dayjs.duration(d, patternIn);
+    if (patternOut === 'human') {
+      return _duration.locale(this.lang).humanize();
+    }
+    else if (patternOut === 'human+') {
+      return _duration.locale(this.lang).humanize(true);
+    }
+    return _duration.as(patternOut);
+  }
+  return d;
+}
+
+
+
 /**
  *
  * Add a time to a date. Available units: day, week,	month, quarter, year, hour, minute, second and millisecond.
@@ -195,6 +213,7 @@ function parse (d, patternIn) {
 
 module.exports = {
   formatD,
+  formatI,
   convDate,
   convert : convDate, // deprecated but used by Easilys
   addD,

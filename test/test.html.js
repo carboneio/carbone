@@ -4636,6 +4636,107 @@ describe.only('Dynamic HTML', function () {
         helper.assert(html.convertHTMLEntities(_content), _expected);
       });
     });
+
+    describe.only('getNewContentBuilder', function() {
+      it('should return a content builder', () => {
+        const _contentBuilder = html.getNewContentBuilder()
+        helper.assert(JSON.stringify(_contentBuilder.elements), '[]');
+        helper.assert(typeof _contentBuilder.add, 'function');
+        helper.assert(typeof _contentBuilder.get, 'function');
+      })
+
+      it('should add a string into the content object', () => {
+        const _contentBuilder = html.getNewContentBuilder();
+        const _expected = [
+          {
+            "data": "<xml>test</xml>",
+            "type": "string"
+          }
+        ]
+        _contentBuilder.add(_expected[0].data)
+        helper.assert(_contentBuilder.elements, _expected);
+        helper.assert(_contentBuilder.get(), _expected[0].data)
+      })
+
+      it('should add 2 strings, a number, and should concat as one element into the content object', () => {
+        const _contentBuilder = html.getNewContentBuilder();
+        const _expected = [
+          {
+            "data": "<xml>test</xml><xml2>test2</xml2>3",
+            "type": "string"
+          }
+        ]
+        _contentBuilder.add('<xml>test</xml>')
+        _contentBuilder.add('<xml2>test2</xml2>')
+        _contentBuilder.add(3)
+
+        helper.assert(_contentBuilder.elements, _expected);
+        helper.assert(_contentBuilder.get(), _expected[0].data)
+      })
+
+      it('should add 2 strings, a function, into the content object', () => {
+        const _contentBuilder = html.getNewContentBuilder();
+        const _expectedFunction = {
+          fn : function () { return '<xml2>test2</xml2>'; }
+        }
+        const _expected = [
+          {
+            "data": "<xml>test</xml>",
+            "type": "string"
+          },
+          {
+            "data": _expectedFunction,
+            "type": "object"
+          },
+          {
+            "data": "<xml3>test3</xml3>",
+            "type": "string"
+          }
+        ]
+        _contentBuilder.add('<xml>test</xml>')
+        _contentBuilder.add(_expectedFunction)
+        _contentBuilder.add('<xml3>test3</xml3>')
+
+        helper.assert(_contentBuilder.elements[0], _expected[0]);
+        helper.assert(_contentBuilder.elements[1].type, 'object');
+        helper.assert(typeof _contentBuilder.elements[1].data.fn, 'function');
+        helper.assert(_contentBuilder.elements[2], _expected[2]);
+        helper.assert(_contentBuilder.get(), "<xml>test</xml><xml2>test2</xml2><xml3>test3</xml3>")
+      })
+
+      it('should add 2 strings, a function, into the content object and should pass options and arguments', () => {
+        const _contentBuilder = html.getNewContentBuilder();
+        const _expectedFunction = {
+          fn : function (args1, args2) {
+            return `<xml2>${this.args0}</xml2>${args1}${args2}`;
+          },
+          args: ['Apple', 'Banana']
+        }
+        const _expected = [
+          {
+            "data": "<xml>test</xml>",
+            "type": "string"
+          },
+          {
+            "data": _expectedFunction,
+            "type": "object"
+          },
+          {
+            "data": "<xml3>test3</xml3>",
+            "type": "string"
+          }
+        ]
+        _contentBuilder.add('<xml>test</xml>')
+        _contentBuilder.add(_expectedFunction)
+        _contentBuilder.add('<xml3>test3</xml3>')
+
+        helper.assert(_contentBuilder.elements[0], _expected[0]);
+        helper.assert(_contentBuilder.elements[1].type, 'object');
+        helper.assert(typeof _contentBuilder.elements[1].data.fn, 'function');
+        helper.assert(_contentBuilder.elements[2], _expected[2]);
+        helper.assert(_contentBuilder.get( { args0: 'tree' } ), "<xml>test</xml><xml2>tree</xml2>AppleBanana<xml3>test3</xml3>")
+      })
+    });
   });
 });
 

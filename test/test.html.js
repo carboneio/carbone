@@ -2042,6 +2042,43 @@ describe.only('Dynamic HTML', function () {
         // helper.assert(_ita.next().value, 'https://carbone.io/documentation.html');
         // helper.assert(_ita.next().value, undefined);
       });
+
+      it('should create a client HTML (courseloop 4)', function () {
+        const _options = {
+          defaultUrlOnError: 'https://carbone.io/error'
+        }
+
+        const _html = '' +
+          '<ul>' +
+            '<li>' +
+              '<p>Text <a href="proposal-landing#/b45e8fbddbfe4890590396888a96191e" rel="nofollow">Link</a></p>' +
+            '</li>' +
+            '<li>' +
+              '<p>Second text</p>' +
+            '</li>' +
+          '</ul>';
+
+        const _descriptor = html.parseHTML(_html);
+        let res = html.buildXMLContentOdt(_uniqueID, _descriptor, _options);
+        helper.assert(res.content.get(_options), '' +
+          '<text:list text:style-name="LC010">'+
+            '<text:list-item>'+
+            '<text:p>'+
+              '<text:span>Text </text:span>'+
+              '<text:a xlink:type="simple" xlink:href="https://carbone.io/error">'+
+                '<text:span>Link</text:span>'+
+              '</text:a>'+
+            '</text:p>'+
+            '</text:list-item>'+
+            '<text:list-item>'+
+            '<text:p>'+
+              '<text:span>Second text</text:span>'+
+            '</text:p>'+
+            '</text:list-item>'+
+          '</text:list>'+
+          '<text:p text:style-name="Standard"/>'
+        );
+      });
     });
 
     describe('postprocessODT', function () {

@@ -1896,6 +1896,124 @@ describe.only('Dynamic HTML', function () {
           '<text:p text:style-name="Standard"/>'
         );
       });
+
+      it('should add an ending paragraph and a new line', function () {
+        const { content } = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p>content'));
+        console.log(content.get());
+        helper.assert(content.get(), '<text:p><text:span>content</text:span></text:p><text:p text:style-name="Standard"/>');
+      });
+
+      it('should skip empty paragraphs', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><p>   <p>content'));
+        console.log(res.content.get());
+        helper.assert(res.content.get(), '<text:p><text:span>content</text:span></text:p><text:p text:style-name="Standard"/>');
+      });
+
+      it('should skip paragraphs before a list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><p>   <ol><li>content</li></ol>'));
+        console.log(res.content.get());
+        helper.assert(res.content.get(), '<text:list text:style-name="LC013"><text:list-item><text:p><text:span>content</text:span></text:p></text:list-item></text:list><text:p text:style-name="Standard"/>');
+
+        res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><p>   <ul><li>content</li></ul>'));
+        console.log(res.content.get());
+        helper.assert(res.content.get(), '<text:list text:style-name="LC013"><text:list-item><text:p><text:span>content</text:span></text:p></text:list-item></text:list><text:p text:style-name="Standard"/>');
+      });
+
+      it('should create an image', function () {
+        let content = '<p>Before picture<p><img src="https://carbone.io/cat" width="300" height="50" alt="cat"></p><b>After picture</b></p>';
+        const _options = {
+          uniqueId: 0,
+          imageDatabase: new Map()
+        }
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options);
+        const _iti = _options.imageDatabase.keys();
+        helper.assert(_iti.next().value, 'https://carbone.io/cat');
+        helper.assert(_iti.next().value, undefined);
+        _options.imageDatabase.set('https://carbone.io/cat', {id: 0, extension: 'png', imageWidth: 100, imageHeight: 200});
+        console.log(res.content.get(_options));
+        helper.assert(res.content.get(_options), '' +
+          '<text:p>' +
+            '<text:span>Before picture</text:span>' +
+          '</text:p>' +
+          '<text:p text:style-name="Standard"/>' +
+          '<text:p>' +
+            '<draw:frame draw:name="carbone-html-image-0" text:anchor-type="as-char" svg:width="100cm" svg:height="200cm" draw:z-index="0">' +
+              '<draw:image xlink:href="Pictures/CarboneImage0.png" draw:mime-type="" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+            '</draw:frame>' +
+          '</text:p>' +
+          '<text:p text:style-name="Standard"/>' +
+          '<text:p>' +
+            '<text:span text:style-name="C015">After picture</text:span>' +
+          '</text:p>'
+        );
+      });
+      it('should create an image inside a list', function () {
+        let content = '<ul><li>Text before<img src="https://carbone.io/cat" alt="cat"/>After</li></ul>';
+        const _options = {
+          uniqueId: 0,
+          imageDatabase: new Map()
+        }
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options);
+        const _iti = _options.imageDatabase.keys();
+        helper.assert(_iti.next().value, 'https://carbone.io/cat');
+        helper.assert(_iti.next().value, undefined);
+        _options.imageDatabase.set('https://carbone.io/cat', {id: 0, extension: 'png', imageWidth: 100, imageHeight: 200});
+        console.log(res.content.get(_options));
+        helper.assert(res.content.get(_options), '' +
+        '<text:list text:style-name="LC010">'+
+          '<text:list-item>'+
+            '<text:p>'+
+              '<text:span>Text before</text:span>'+
+              '<draw:frame draw:name="carbone-html-image-0" text:anchor-type="as-char" svg:width="100cm" svg:height="200cm" draw:z-index="0">'+
+                '<draw:image xlink:href="Pictures/CarboneImage0.png" draw:mime-type="" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>'+
+              '</draw:frame>'+
+              '<text:span>After</text:span>'+
+            '</text:p>'+
+          '</text:list-item>'+
+        '</text:list>'+
+        '<text:p text:style-name="Standard"/>'
+        );
+
+        // const _ita = _options.hyperlinkDatabase.keys();
+        // helper.assert(_ita.next().value, 'https://carbone.io/documentation.html');
+        // helper.assert(_ita.next().value, undefined);
+      });
+
+      it('should create an image inside a list and an anchor', function () {
+        let content = '<ul><li>Text before <a href="https://carbone.io/documentation.html"> link <img src="https://carbone.io/cat" alt="cat"></a></li></ul>';
+        const _options = {
+          uniqueId: 0,
+          imageDatabase: new Map()
+        }
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options);
+        const _iti = _options.imageDatabase.keys();
+        helper.assert(_iti.next().value, 'https://carbone.io/cat');
+        helper.assert(_iti.next().value, undefined);
+        _options.imageDatabase.set('https://carbone.io/cat', {id: 0, extension: 'png', imageWidth: 100, imageHeight: 200});
+        console.log(res.content.get(_options));
+        helper.assert(res.content.get(_options), '' +
+          '<text:list text:style-name="LC010">'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:span>Text before </text:span>'+
+                '<text:a xlink:type="simple" xlink:href="https://carbone.io/documentation.html">'+
+                  '<text:span> link </text:span>'+
+                  '<draw:a xlink:type="simple" xlink:href="https://carbone.io/documentation.html">'+
+                    '<draw:frame draw:name="carbone-html-image-0" text:anchor-type="as-char" svg:width="100cm" svg:height="200cm" draw:z-index="0">'+
+                      '<draw:image xlink:href="Pictures/CarboneImage0.png" draw:mime-type="" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>'+
+                    '</draw:frame>'+
+                  '</draw:a>'+
+                '</text:a>'+
+              '</text:p>'+
+            '</text:list-item>'+
+          '</text:list>'+
+          '<text:p text:style-name="Standard"/>'
+        );
+
+        // const _ita = _options.hyperlinkDatabase.keys();
+        // helper.assert(_ita.next().value, 'https://carbone.io/documentation.html');
+        // helper.assert(_ita.next().value, undefined);
+      });
     });
 
     describe('postprocessODT', function () {
@@ -2911,6 +3029,8 @@ describe.only('Dynamic HTML', function () {
             '<w:rPr><w:i/><w:iCs/></w:rPr>'+
             '<w:t xml:space="preserve">La </w:t>'+
           '</w:r>' +
+        '</w:p><w:p/>' +
+        '<w:p>' +
           '<w:r>'+
             '<w:rPr><w:i/><w:iCs/></w:rPr>'+
             '<w:t xml:space="preserve">Trobes</w:t>'+
@@ -3664,6 +3784,32 @@ describe.only('Dynamic HTML', function () {
         helper.assert(listStyleNum, '');
       });
 
+      it('should convert HTML to DOCX by adding an new line after the final paragraph', function () {
+        const _descriptor = html.parseHTML('<p>content');
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
+        helper.assert(content.get(), '<w:p><w:r><w:t xml:space="preserve">content</w:t></w:r></w:p><w:p/>');
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+      });
+
+      it('should skipping empty paragraphs', function () {
+        const _descriptor = html.parseHTML('<p><p>   <p>content');
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor);
+        helper.assert(content.get(), '<w:p><w:r><w:t xml:space="preserve">content</w:t></w:r></w:p><w:p/>');
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+      });
+
+      it('should skip paragraphs before a list (the paragraph added is coming from the list)', function () {
+        let res = html.buildXmlContentDOCX(html.parseHTML('<p><p>   <ol><li>content</li></ol>'));
+        console.log(res.content.get());
+        helper.assert(res.content.get(), '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">content</w:t></w:r></w:p><w:p/>');
+
+        res = html.buildXmlContentDOCX(html.parseHTML('<p><p>   <ul><li>content</li></ul>'));
+        console.log(res.content.get());
+        helper.assert(res.content.get(), '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">content</w:t></w:r></w:p><w:p/>');
+      });
+
       it('should convert HTML to DOCX xml 12 hyperlink simple', function () {
         const _options = {
           hyperlinkDatabase : new Map()
@@ -3994,6 +4140,134 @@ describe.only('Dynamic HTML', function () {
           '</w:p>'
         );
 
+      });
+
+      it('should convert HTML with images to DOCX simple (width height are transformed into EMU)', function () {
+        const _options = {
+          imageDatabase : new Map()
+        };
+        const _descriptor = html.parseHTML('<p>Before picture<p><img src="https://carbone.io/cat" width="300" height="50" alt="cat"></p><b>After picture</b></p>');
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content.get(_options), '' +
+          '<w:p><w:r><w:t xml:space=\"preserve\">Before picture</w:t></w:r></w:p><w:p/>' +
+          '<w:p>' +
+            '<w:drawing>' +
+              '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
+                '<wp:extent cx="2857500" cy="476250"/>' +
+                '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                '<wp:docPr id="1000" name="" descr=""/>' +
+                '<wp:cNvGraphicFramePr>' +
+                  '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                '</wp:cNvGraphicFramePr>' +
+                '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                  '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                    '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                      '<pic:nvPicPr>' +
+                        '<pic:cNvPr id="1000" name="" descr=""></pic:cNvPr>' +
+                        '<pic:cNvPicPr>' +
+                          '<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>' +
+                        '</pic:cNvPicPr>' +
+                      '</pic:nvPicPr>' +
+                      '<pic:blipFill>' +
+                        '<a:blip r:embed="rIdCarbone0"></a:blip>' +
+                        '<a:stretch>' +
+                          '<a:fillRect/>' +
+                        '</a:stretch>' +
+                      '</pic:blipFill>' +
+                      '<pic:spPr bwMode="auto">' +
+                        '<a:xfrm>' +
+                          '<a:off x="0" y="0"/>' +
+                          '<a:ext cx="2857500" cy="476250"/>' +
+                        '</a:xfrm>' +
+                        '<a:prstGeom prst="rect">' +
+                          '<a:avLst/>' +
+                        '</a:prstGeom>' +
+                      '</pic:spPr>' +
+                    '</pic:pic>' +
+                  '</a:graphicData>' +
+                '</a:graphic>' +
+              '</wp:inline>' +
+            '</w:drawing>' +
+          '</w:p><w:p/>' +
+          '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space=\"preserve\">After picture</w:t></w:r></w:p>'
+        );
+        const _it = _options.imageDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io/cat');
+        helper.assert(_it.next().value, undefined);
+      });
+
+      it('should convert HTML with images to DOCX inside a list and anchor (without width and height)', function () {
+        const _options = {
+          imageDatabase : new Map(),
+          hyperlinkDatabase: new Map()
+        };
+        const _descriptor = html.parseHTML('<ul><li><a href="https://carbone.io/documentation.html"><img src="https://carbone.io/cat" alt="cat"></a></li></ul>');
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '<w:abstractNum w:abstractNumId="1000"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum>');
+        helper.assert(listStyleNum, '<w:num w:numId="1000"><w:abstractNumId w:val="1000"/></w:num>');
+        helper.assert(content.get(_options), '' +
+          '<w:p>' +
+            /** PARAGRAPH AS LIST */
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            /** HYPERLINK */
+            '<w:hyperlink r:id="CarboneHyperlinkId0">' +
+              /** IMAGE */
+              '<w:drawing>' +
+                '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
+                  /** -1 are normal as not width/height are passed as attributes */
+                  '<wp:extent cx="-1" cy="-1"/>' +
+                  '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                  '<wp:docPr id="1000" name="" descr=""/>' +
+                  '<wp:cNvGraphicFramePr>' +
+                    '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                  '</wp:cNvGraphicFramePr>' +
+                  '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                    '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                      '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                        '<pic:nvPicPr>' +
+                          '<pic:cNvPr id="1000" name="" descr=""></pic:cNvPr>' +
+                          '<pic:cNvPicPr>' +
+                            '<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>' +
+                          '</pic:cNvPicPr>' +
+                        '</pic:nvPicPr>' +
+                        '<pic:blipFill>' +
+                          '<a:blip r:embed="rIdCarbone0"></a:blip>' +
+                          '<a:stretch>' +
+                            '<a:fillRect/>' +
+                          '</a:stretch>' +
+                        '</pic:blipFill>' +
+                        '<pic:spPr bwMode="auto">' +
+                          '<a:xfrm>' +
+                            '<a:off x="0" y="0"/>' +
+                            /** -1 are normal as not width/height are passed as attributes */
+                            '<a:ext cx="-1" cy="-1"/>' +
+                          '</a:xfrm>' +
+                          '<a:prstGeom prst="rect">' +
+                            '<a:avLst/>' +
+                          '</a:prstGeom>' +
+                        '</pic:spPr>' +
+                      '</pic:pic>' +
+                    '</a:graphicData>' +
+                  '</a:graphic>' +
+                '</wp:inline>' +
+              '</w:drawing>' +
+            '</w:hyperlink>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+        const _iti = _options.imageDatabase.keys();
+        helper.assert(_iti.next().value, 'https://carbone.io/cat');
+        helper.assert(_iti.next().value, undefined);
+        const _ita = _options.hyperlinkDatabase.keys();
+        helper.assert(_ita.next().value, 'https://carbone.io/documentation.html');
+        helper.assert(_ita.next().value, undefined);
       });
     });
 
@@ -4560,6 +4834,125 @@ describe.only('Dynamic HTML', function () {
           ]
         );
       });
+
+      it('should parse image HTML content', function () {
+        /** SHOULD NOT Parse as the SRC attribute is missing */
+        helper.assert(html.parseHTML('<img alt=\"cat\">'), [  ]);
+        /** Parse the SRC attribute */
+        helper.assert(html.parseHTML('<img src="https://carbone.io/cat" alt=\"cat\">'), [ { content : '', type : '#image#', tags : [], src: "https://carbone.io/cat", width: -1, height: -1 } ]);
+        /** Parse the SRC, WIDTH, and HEIGHT attributes */
+        helper.assert(html.parseHTML('<img src="https://carbone.io/cat" width="300" height="50" alt=\"cat\">'), [ { content : '', type : '#image#', tags : [], src: "https://carbone.io/cat", width: 300, height: 50 } ]);
+        /** Parse the HTML mixed with paragraphs */
+        helper.assert(html.parseHTML('<p>This is some content before</p><img src="https://carbone.io/cat" width="1500" height="2000" alt="cat"><p>After</p>'),
+          [
+            { content: '', type: '#PB#', tags: [] },
+            { content: 'This is some content before', type: '', tags: [] },
+            { content: '', type: '#PE#', tags: [] },
+            {
+              content: '',
+              type: '#image#',
+              tags: [],
+              src: 'https://carbone.io/cat',
+              width: 1500,
+              height: 2000
+            },
+            { content: '', type: '#PB#', tags: [] },
+            { content: 'After', type: '', tags: [] },
+            { content: '', type: '#PE#', tags: [] }
+          ]
+        );
+        /** Parse the HTML mixed with anchor and list */
+         helper.assert(html.parseHTML('<ul><li><a href="http://www.google.com" class="image"> <img src="https://carbone.io/cat" alt="Facebook Icon"/></a></li></ul>'),
+         [
+          { content: '', type: '#ULB#', tags: [] },
+          { content: '', type: '#LIB#', tags: [] },
+          {
+            content: '',
+            type: '#AB#',
+            href: 'http://www.google.com',
+            tags: []
+          },
+          { content: ' ', type: '', tags: [] },
+          {
+            content: '',
+            type: '#image#',
+            tags: [],
+            src: 'https://carbone.io/cat',
+            width: -1,
+            height: -1
+          },
+          { content: '', type: '#AE#', tags: [] },
+          { content: '', type: '#LIE#', tags: [] },
+          { content: '', type: '#ULE#', tags: [] }
+        ]
+       );
+      });
+    });
+
+
+    describe('cleanInvalidParagraph', function () {
+
+      it('should not skip paragraph', function () {
+        let descriptor = html.parseHTML('<p>  ')
+        html.cleanInvalidParagraph(descriptor)
+        helper.assert(descriptor, [
+          { content: '', type: '#PB#', tags: [] },
+          { content: '  ', type: '', tags: [] }
+        ])
+
+        descriptor = html.parseHTML('<p> content</p>')
+        html.cleanInvalidParagraph(descriptor)
+        helper.assert(descriptor, [
+          { content: '', type: '#PB#', tags: [] },
+          { content: ' content', type: '', tags: [] },
+          { content: '', type: '#PE#', tags: [] },
+        ])
+      })
+
+      it('should skip empty paragraphs', function () {
+        const _descriptor = html.parseHTML('<p><p><p>content</p>')
+        html.cleanInvalidParagraph(_descriptor);
+        helper.assert(_descriptor, [
+          { content: '', type: '#PB#', tags: [], toSkip: 1 },
+          { content: '', type: '#PB#', tags: [], toSkip: 2 },
+          { content: '', type: '#PB#', tags: [] },
+          { content: 'content', type: '', tags: [] },
+          { content: '', type: '#PE#', tags: [] }
+        ]);
+      });
+
+      it('should mark invalid paragraphs if it is followed by space', function () {
+        const _descriptor = html.parseHTML('<p>      <p>content</p>')
+        html.cleanInvalidParagraph(_descriptor);
+        helper.assert(_descriptor.length, 5)
+        helper.assert(_descriptor[0].toSkip, 2)
+        helper.assert(_descriptor[0].type, html.types.PARAGRAPH_BEGIN)
+        helper.assert(_descriptor[2]?.toSkip, undefined)
+        helper.assert(_descriptor[2].type, html.types.PARAGRAPH_BEGIN)
+        helper.assert(_descriptor[2]?.toSkip, undefined)
+        helper.assert(_descriptor[3]?.toSkip, undefined)
+      });
+
+      it('should mark invalid paragraphs if it is followed by a list', function () {
+        const _descriptor = html.parseHTML('<p>  <ul></ul></p>')
+        html.cleanInvalidParagraph(_descriptor);
+        helper.assert(_descriptor, [
+          { content: '', type: '#PB#', tags: [], toSkip: 2 },
+          { content: '  ', type: '', tags: [] },
+          { content: '', type: '#ULB#', tags: [] },
+          { content: '', type: '#ULE#', tags: [] },
+          { content: '', type: '#PE#', tags: [] }
+        ])
+        const _descriptor2 = html.parseHTML('<p>  <ol></ol></p>')
+        html.cleanInvalidParagraph(_descriptor2);
+        helper.assert(_descriptor2, [
+          { content: '', type: '#PB#', tags: [], toSkip: 2 },
+          { content: '  ', type: '', tags: [] },
+          { content: '', type: '#OLB#', tags: [] },
+          { content: '', type: '#OLE#', tags: [] },
+          { content: '', type: '#PE#', tags: [] }
+        ])
+      });
     });
 
     describe('buildXMLStyle', function () {
@@ -4637,7 +5030,7 @@ describe.only('Dynamic HTML', function () {
       });
     });
 
-    describe.only('getNewContentBuilder', function() {
+    describe('getNewContentBuilder', function() {
       it('should return a content builder', () => {
         const _contentBuilder = html.getNewContentBuilder()
         helper.assert(JSON.stringify(_contentBuilder.elements), '[]');

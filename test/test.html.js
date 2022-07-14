@@ -1920,6 +1920,27 @@ describe.only('Dynamic HTML', function () {
       });
 
       it('should create an image', function () {
+        let content = '<img src="https://carbone.io/cat" width="300" height="50" alt="cat">';
+        const _options = {
+          uniqueId: 0,
+          imageDatabase: new Map()
+        }
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options);
+        const _iti = _options.imageDatabase.keys();
+        helper.assert(_iti.next().value, 'https://carbone.io/cat');
+        helper.assert(_iti.next().value, undefined);
+        _options.imageDatabase.set('https://carbone.io/cat', {id: 0, extension: 'png', imageWidth: 100, imageHeight: 200});
+        console.log(res.content.get(_options));
+        helper.assert(res.content.get(_options), '' +
+          '<text:p>' +
+            '<draw:frame draw:name="carbone-html-image-0" text:anchor-type="as-char" svg:width="100cm" svg:height="200cm" draw:z-index="0">' +
+              '<draw:image xlink:href="Pictures/CarboneImage0.png" draw:mime-type="" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>' +
+            '</draw:frame>' +
+          '</text:p>'
+        );
+      });
+
+      it('should create an image mixed with paragraphs', function () {
         let content = '<p>Before picture<p><img src="https://carbone.io/cat" width="300" height="50" alt="cat"></p><b>After picture</b></p>';
         const _options = {
           uniqueId: 0,
@@ -4142,7 +4163,61 @@ describe.only('Dynamic HTML', function () {
 
       });
 
-      it('should convert HTML with images to DOCX simple (width height are transformed into EMU)', function () {
+      it('should convert HTML with images and parapgraphs (width height are transformed into EMU)', function () {
+        const _options = {
+          imageDatabase : new Map()
+        };
+        const _descriptor = html.parseHTML('<img src="https://carbone.io/cat" width="300" height="50" alt="cat">');
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content.get(_options), '' +
+          '<w:p>' +
+            '<w:drawing>' +
+              '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
+                '<wp:extent cx="2857500" cy="476250"/>' +
+                '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                '<wp:docPr id="1000" name="" descr=""/>' +
+                '<wp:cNvGraphicFramePr>' +
+                  '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                '</wp:cNvGraphicFramePr>' +
+                '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                  '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                    '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                      '<pic:nvPicPr>' +
+                        '<pic:cNvPr id="1000" name="" descr=""></pic:cNvPr>' +
+                        '<pic:cNvPicPr>' +
+                          '<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>' +
+                        '</pic:cNvPicPr>' +
+                      '</pic:nvPicPr>' +
+                      '<pic:blipFill>' +
+                        '<a:blip r:embed="rIdCarbone0"></a:blip>' +
+                        '<a:stretch>' +
+                          '<a:fillRect/>' +
+                        '</a:stretch>' +
+                      '</pic:blipFill>' +
+                      '<pic:spPr bwMode="auto">' +
+                        '<a:xfrm>' +
+                          '<a:off x="0" y="0"/>' +
+                          '<a:ext cx="2857500" cy="476250"/>' +
+                        '</a:xfrm>' +
+                        '<a:prstGeom prst="rect">' +
+                          '<a:avLst/>' +
+                        '</a:prstGeom>' +
+                      '</pic:spPr>' +
+                    '</pic:pic>' +
+                  '</a:graphicData>' +
+                '</a:graphic>' +
+              '</wp:inline>' +
+            '</w:drawing>' +
+          '</w:p>'
+        );
+        const _it = _options.imageDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io/cat');
+        helper.assert(_it.next().value, undefined);
+      });
+
+      it('should convert HTML with images and parapgraphs (width height are transformed into EMU)', function () {
         const _options = {
           imageDatabase : new Map()
         };

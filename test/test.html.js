@@ -1899,23 +1899,19 @@ describe.only('Dynamic HTML', function () {
 
       it('should add an ending paragraph and a new line', function () {
         const { content } = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p>content'));
-        console.log(content.get());
         helper.assert(content.get(), '<text:p><text:span>content</text:span></text:p><text:p text:style-name="Standard"/>');
       });
 
       it('should skip empty paragraphs', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><p>   <p>content'));
-        console.log(res.content.get());
         helper.assert(res.content.get(), '<text:p><text:span>content</text:span></text:p><text:p text:style-name="Standard"/>');
       });
 
       it('should skip paragraphs before a list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><p>   <ol><li>content</li></ol>'));
-        console.log(res.content.get());
         helper.assert(res.content.get(), '<text:list text:style-name="LC013"><text:list-item><text:p><text:span>content</text:span></text:p></text:list-item></text:list><text:p text:style-name="Standard"/>');
 
         res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p><p>   <ul><li>content</li></ul>'));
-        console.log(res.content.get());
         helper.assert(res.content.get(), '<text:list text:style-name="LC013"><text:list-item><text:p><text:span>content</text:span></text:p></text:list-item></text:list><text:p text:style-name="Standard"/>');
       });
 
@@ -1930,7 +1926,6 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_iti.next().value, 'https://carbone.io/cat');
         helper.assert(_iti.next().value, undefined);
         _options.imageDatabase.set('https://carbone.io/cat', {id: 0, extension: 'png', imageWidth: 100, imageHeight: 200});
-        console.log(res.content.get(_options));
         helper.assert(res.content.get(_options), '' +
           '<text:p>' +
             '<draw:frame draw:name="carbone-html-image-0" text:anchor-type="as-char" svg:width="100cm" svg:height="200cm" draw:z-index="0">' +
@@ -1951,7 +1946,6 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_iti.next().value, 'https://carbone.io/cat');
         helper.assert(_iti.next().value, undefined);
         _options.imageDatabase.set('https://carbone.io/cat', {id: 0, extension: 'png', imageWidth: 100, imageHeight: 200});
-        console.log(res.content.get(_options));
         helper.assert(res.content.get(_options), '' +
           '<text:p>' +
             '<text:span>Before picture</text:span>' +
@@ -1979,7 +1973,6 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_iti.next().value, 'https://carbone.io/cat');
         helper.assert(_iti.next().value, undefined);
         _options.imageDatabase.set('https://carbone.io/cat', {id: 0, extension: 'png', imageWidth: 100, imageHeight: 200});
-        console.log(res.content.get(_options));
         helper.assert(res.content.get(_options), '' +
         '<text:list text:style-name="LC010">'+
           '<text:list-item>'+
@@ -2011,7 +2004,6 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_iti.next().value, 'https://carbone.io/cat');
         helper.assert(_iti.next().value, undefined);
         _options.imageDatabase.set('https://carbone.io/cat', {id: 0, extension: 'png', imageWidth: 100, imageHeight: 200});
-        console.log(res.content.get(_options));
         helper.assert(res.content.get(_options), '' +
           '<text:list text:style-name="LC010">'+
             '<text:list-item>'+
@@ -3823,11 +3815,9 @@ describe.only('Dynamic HTML', function () {
 
       it('should skip paragraphs before a list (the paragraph added is coming from the list)', function () {
         let res = html.buildXmlContentDOCX(html.parseHTML('<p><p>   <ol><li>content</li></ol>'));
-        console.log(res.content.get());
         helper.assert(res.content.get(), '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">content</w:t></w:r></w:p><w:p/>');
 
         res = html.buildXmlContentDOCX(html.parseHTML('<p><p>   <ul><li>content</li></ul>'));
-        console.log(res.content.get());
         helper.assert(res.content.get(), '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">content</w:t></w:r></w:p><w:p/>');
       });
 
@@ -4965,18 +4955,18 @@ describe.only('Dynamic HTML', function () {
     });
 
 
-    describe('cleanInvalidParagraph', function () {
+    describe('skipEmptyParagraphs', function () {
 
       it('should not skip paragraph', function () {
         let descriptor = html.parseHTML('<p>  ')
-        html.cleanInvalidParagraph(descriptor)
+        html.skipEmptyParagraphs(descriptor)
         helper.assert(descriptor, [
           { content: '', type: '#PB#', tags: [] },
           { content: '  ', type: '', tags: [] }
         ])
 
         descriptor = html.parseHTML('<p> content</p>')
-        html.cleanInvalidParagraph(descriptor)
+        html.skipEmptyParagraphs(descriptor)
         helper.assert(descriptor, [
           { content: '', type: '#PB#', tags: [] },
           { content: ' content', type: '', tags: [] },
@@ -4986,7 +4976,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should skip empty paragraphs', function () {
         const _descriptor = html.parseHTML('<p><p><p>content</p>')
-        html.cleanInvalidParagraph(_descriptor);
+        html.skipEmptyParagraphs(_descriptor);
         helper.assert(_descriptor, [
           { content: '', type: '#PB#', tags: [], toSkip: 1 },
           { content: '', type: '#PB#', tags: [], toSkip: 2 },
@@ -4998,7 +4988,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should mark invalid paragraphs if it is followed by space', function () {
         const _descriptor = html.parseHTML('<p>      <p>content</p>')
-        html.cleanInvalidParagraph(_descriptor);
+        html.skipEmptyParagraphs(_descriptor);
         helper.assert(_descriptor.length, 5)
         helper.assert(_descriptor[0].toSkip, 2)
         helper.assert(_descriptor[0].type, html.types.PARAGRAPH_BEGIN)
@@ -5010,7 +5000,7 @@ describe.only('Dynamic HTML', function () {
 
       it('should mark invalid paragraphs if it is followed by a list', function () {
         const _descriptor = html.parseHTML('<p>  <ul></ul></p>')
-        html.cleanInvalidParagraph(_descriptor);
+        html.skipEmptyParagraphs(_descriptor);
         helper.assert(_descriptor, [
           { content: '', type: '#PB#', tags: [], toSkip: 2 },
           { content: '  ', type: '', tags: [] },
@@ -5019,7 +5009,7 @@ describe.only('Dynamic HTML', function () {
           { content: '', type: '#PE#', tags: [] }
         ])
         const _descriptor2 = html.parseHTML('<p>  <ol></ol></p>')
-        html.cleanInvalidParagraph(_descriptor2);
+        html.skipEmptyParagraphs(_descriptor2);
         helper.assert(_descriptor2, [
           { content: '', type: '#PB#', tags: [], toSkip: 2 },
           { content: '  ', type: '', tags: [] },

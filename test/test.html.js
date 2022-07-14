@@ -1396,21 +1396,6 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
-      it.only('should create a list even with spaces before and between lists elements', function () {
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('    <ul>     <li>Carbone Website</li></ul>'), {});
-        helper.assert(res.content.get(), '' +
-        '<text:list text:style-name="LC010">'+
-          '<text:list-item>'+
-            '<text:p>'+
-              'Carbone Website'+
-            '</text:p>'+
-          '</text:list-item>'+
-        '</text:list>'+
-        '<text:p text:style-name="Standard"/>'
-        );
-      });
-
-
       it('should generate a simple ordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ol><li>Coffee</li></ol>'));
         helper.assert(res.content.get(), '' +

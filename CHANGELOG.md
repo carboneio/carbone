@@ -1,11 +1,11 @@
 ### v3.5.X
-  - [EE] Dynamic HTML update (`:html` formatter):
-    - New: image tags `<img>` are supported and rendered into DOCX/ODT/PDF documents.
+  - [EE] Dynamic HTML Updates (`:html` formatter):
+    - New: the image tag `<img>` is supported and rendered into DOCX/ODT/PDF documents.
       - The image source attribute can be an URL or Data-URL, such as `<img src=""/>`
       - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`. Values must be pixels. If `width` or `height` attributes are missing, the size of 5cm (1.96in) is applied by default while retaining the image aspect ratio.
     - New: The HTML content can now be rendered into "heading" styled text on your text editor.
     - Fixed: Paragraph spacing are now rendering correctly in different scenarios: `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`
-    - Fixed: Hyperlinks tags inside lists was creating error for ODT templates.
+    - Fixed: Hyperlinks tags inside lists are now rendered without errors (ODT templates).
 
 
 ### v3.5.4

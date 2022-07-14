@@ -1,6 +1,12 @@
 ### v3.5.X
-  - [EE] Fix Dynamic HTML (`:html` formatter):
-    - it can be rendered into "heading" styled text
+  - [EE] Dynamic HTML update (`:html` formatter):
+    - New: image tags `<img>` are supported and rendered into DOCX/ODT/PDF documents.
+      - The image source attribute can be an URL or Data-URL, such as `<img src=""/>`
+      - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`. Values must be pixels. If `width` or `height` attributes are missing, the size of 5cm (1.96in) is applied by default while retaining the image aspect ratio.
+    - New: The HTML content can now be rendered into "heading" styled text on your text editor.
+    - Fixed: Paragraph spacing are now rendering correctly in different scenarios: `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`
+    - Fixed: Hyperlinks tags inside lists was creating error for ODT templates.
+
 
 ### v3.5.4
   - Release June 15th 2022
@@ -8,7 +14,7 @@
 
 ### v3.5.3
   - Release May 25th 2022
-  - [EE] Accept `convCRLF` before `:html` formatter to convert `\r\n` to `<br>` 
+  - [EE] Accept `convCRLF` before `:html` formatter to convert `\r\n` to `<br>`
 
 ### v3.5.2
   - Release May 6th 2022

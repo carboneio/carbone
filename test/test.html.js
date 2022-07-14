@@ -1336,6 +1336,22 @@ describe.only('Dynamic HTML', function () {
         );
       });
 
+      it('should create hyperlinks inside a list', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li><a href="carbone.com">Carbone Website</a></li></ul>'), {});
+        helper.assert(res.content.get(), '' +
+        '<text:list text:style-name="LC010">'+
+          '<text:list-item>'+
+            '<text:p>'+
+              '<text:a xlink:type="simple" xlink:href="https://carbone.com">'+
+                '<text:span>Carbone Website</text:span>'+
+              '</text:a>'+
+            '</text:p>'+
+          '</text:list-item>'+
+        '</text:list>'+
+        '<text:p text:style-name="Standard"/>'
+        );
+      });
+
       it('should generate a link with a nested paragraph and should not print the paragraph', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.io"><p>Carbone Website</p></a>'), {});
         helper.assert(res.content.get(), '' +
@@ -1377,6 +1393,20 @@ describe.only('Dynamic HTML', function () {
               '</style:list-level-properties>'+
             '</text:list-level-style-bullet>'+
           '</text:list-style>'
+        );
+      });
+
+      it.only('should create a list even with spaces before and between lists elements', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('    <ul>     <li>Carbone Website</li></ul>'), {});
+        helper.assert(res.content.get(), '' +
+        '<text:list text:style-name="LC010">'+
+          '<text:list-item>'+
+            '<text:p>'+
+              'Carbone Website'+
+            '</text:p>'+
+          '</text:list-item>'+
+        '</text:list>'+
+        '<text:p text:style-name="Standard"/>'
         );
       });
 
@@ -3684,6 +3714,76 @@ describe.only('Dynamic HTML', function () {
           '</w:p>' +
           '<w:p/>'
         );
+      });
+
+      it('should a list with on hyperlink', function () {
+        const _options = {
+          hyperlinkDatabase : new Map()
+        };
+        let htmlContent = '<ul>' +
+          '<li>Banana</li>' +
+          '<li>' +
+            '<a href="carbone.io/test_website">' +
+              'Carbone Website' +
+            '</a>' +
+          '</li>' +
+        '</ul>';
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML(htmlContent), _options);
+        helper.assert(content.get(), '' +
+          '<w:p>'+
+            '<w:pPr>'+
+              '<w:numPr>'+
+                '<w:ilvl w:val="0"/>'+
+                '<w:numId w:val="1000"/>'+
+              '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+              '<w:t xml:space="preserve">Banana</w:t>'+
+            '</w:r>'+
+          '</w:p>'+
+          '<w:p>'+
+            '<w:pPr>'+
+              '<w:numPr>'+
+                '<w:ilvl w:val="0"/>'+
+                '<w:numId w:val="1000"/>'+
+              '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:hyperlink r:id="CarboneHyperlinkId0">'+
+              '<w:r>'+
+                '<w:rPr>'+
+                  '<w:rStyle w:val="Hyperlink"/>'+
+                '</w:rPr>'+
+                '<w:t xml:space="preserve">Carbone Website</w:t>'+
+              '</w:r>'+
+            '</w:hyperlink>'+
+          '</w:p>'+
+        '<w:p/>'
+        );
+        helper.assert(listStyleAbstract, '' +
+          '<w:abstractNum w:abstractNumId="1000">' +
+            '<w:multiLevelType w:val="hybridMultilevel"/>' +
+            '<w:lvl w:ilvl="0">' +
+              '<w:start w:val="1"/>' +
+              '<w:numFmt w:val="bullet"/>' +
+              '<w:lvlText w:val=""/>' +
+              '<w:lvlJc w:val="left"/>' +
+              '<w:pPr>' +
+                '<w:ind w:left="720" w:hanging="360"/>' +
+              '</w:pPr>' +
+              '<w:rPr>' +
+                '<w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/>' +
+              '</w:rPr>' +
+            '</w:lvl>' +
+          '</w:abstractNum>'
+        );
+        helper.assert(listStyleNum, '' +
+          '<w:num w:numId="1000">' +
+            '<w:abstractNumId w:val="1000"/>' +
+          '</w:num>'
+        );
+        const _it = _options.hyperlinkDatabase.keys();
+        helper.assert(_it.next().value, 'https://carbone.io/test_website');
+        helper.assert(_it.next().value, undefined);
       });
 
 

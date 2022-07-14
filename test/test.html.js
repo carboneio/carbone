@@ -5094,6 +5094,15 @@ describe.only('Dynamic HTML', function () {
           { content: ' content', type: '', tags: [] },
           { content: '', type: '#PE#', tags: [] },
         ])
+
+        /** Non breaking space */
+        descriptor = html.parseHTML('<p>\xa0</p>')
+        html.skipEmptyParagraphs(descriptor)
+        helper.assert(descriptor, [
+          { content: '', type: '#PB#', tags: [] },
+          { content: '\xa0', type: '', tags: [] },
+          { content: '', type: '#PE#', tags: [] },
+        ])
       })
 
       it('should skip empty paragraphs', function () {

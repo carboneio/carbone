@@ -3183,7 +3183,6 @@ describe.only('Dynamic HTML', function () {
 
       it('should render an unordered list with font size', function () {
         const _descriptor = html.parseHTML('<ol><li><i>Coffee</i></li><li><i>Tea</i></li></ol>');
-        console.log(_descriptor)
 
         const _options = {
           htmlStylesDatabase: new Map()
@@ -4353,11 +4352,11 @@ describe.only('Dynamic HTML', function () {
         helper.assert(listStyleNum, '');
         helper.assert(content.get(_options), '' +
           '<w:p>' +
-            '<w:drawing>' +
+            '<w:r><w:drawing>' +
               '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
                 '<wp:extent cx="2857500" cy="476250"/>' +
                 '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
-                '<wp:docPr id="1000" name="" descr=""/>' +
+                '<wp:docPr id="1000" name="" descr=""></wp:docPr>' +
                 '<wp:cNvGraphicFramePr>' +
                   '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
                 '</wp:cNvGraphicFramePr>' +
@@ -4389,7 +4388,7 @@ describe.only('Dynamic HTML', function () {
                   '</a:graphicData>' +
                 '</a:graphic>' +
               '</wp:inline>' +
-            '</w:drawing>' +
+            '</w:drawing></w:r>' +
           '</w:p>'
         );
         const _it = _options.imageDatabase.keys();
@@ -4407,12 +4406,12 @@ describe.only('Dynamic HTML', function () {
         helper.assert(listStyleNum, '');
         helper.assert(content.get(_options), '' +
           '<w:p><w:r><w:t xml:space=\"preserve\">Before picture</w:t></w:r></w:p><w:p/>' +
-          '<w:p>' +
+          '<w:p><w:r>' +
             '<w:drawing>' +
               '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
                 '<wp:extent cx="2857500" cy="476250"/>' +
                 '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
-                '<wp:docPr id="1000" name="" descr=""/>' +
+                '<wp:docPr id="1000" name="" descr=""></wp:docPr>' +
                 '<wp:cNvGraphicFramePr>' +
                   '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
                 '</wp:cNvGraphicFramePr>' +
@@ -4444,7 +4443,7 @@ describe.only('Dynamic HTML', function () {
                   '</a:graphicData>' +
                 '</a:graphic>' +
               '</wp:inline>' +
-            '</w:drawing>' +
+            '</w:drawing></w:r>' +
           '</w:p><w:p/>' +
           '<w:p><w:r><w:rPr><w:b/><w:bCs/></w:rPr><w:t xml:space=\"preserve\">After picture</w:t></w:r></w:p>'
         );
@@ -4453,33 +4452,28 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_it.next().value, undefined);
       });
 
-      it('should convert HTML with images to DOCX inside a list and anchor (without width and height)', function () {
+      it('should convert HTML with images to DOCX with an hyperlink (anchor)', function () {
         const _options = {
           imageDatabase : new Map(),
           hyperlinkDatabase: new Map()
         };
-        const _descriptor = html.parseHTML('<ul><li><a href="https://carbone.io/documentation.html"><img src="https://carbone.io/cat" alt="cat"></a></li></ul>');
+        const _descriptor = html.parseHTML('<a href="https://carbone.io/documentation.html"><img src="https://carbone.io/cat" alt="cat"></a>');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
-        helper.assert(listStyleAbstract, '<w:abstractNum w:abstractNumId="1000"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum>');
-        helper.assert(listStyleNum, '<w:num w:numId="1000"><w:abstractNumId w:val="1000"/></w:num>');
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
         helper.assert(content.get(_options), '' +
           '<w:p>' +
-            /** PARAGRAPH AS LIST */
-            '<w:pPr>' +
-              '<w:numPr>' +
-                '<w:ilvl w:val="0"/>' +
-                '<w:numId w:val="1000"/>' +
-              '</w:numPr>' +
-            '</w:pPr>' +
             /** HYPERLINK */
             '<w:hyperlink r:id="CarboneHyperlinkId0">' +
               /** IMAGE */
-              '<w:drawing>' +
+              '<w:r><w:drawing>' +
                 '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
                   /** -1 are normal as not width/height are passed as attributes */
                   '<wp:extent cx="-1" cy="-1"/>' +
                   '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
-                  '<wp:docPr id="1000" name="" descr=""/>' +
+                  '<wp:docPr id="1000" name="" descr="">' +
+                    '<a:hlinkClick xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" r:id=\"CarboneHyperlinkId0\"/>' +
+                  '</wp:docPr>' +
                   '<wp:cNvGraphicFramePr>' +
                     '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
                   '</wp:cNvGraphicFramePr>' +
@@ -4487,7 +4481,9 @@ describe.only('Dynamic HTML', function () {
                     '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
                       '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
                         '<pic:nvPicPr>' +
-                          '<pic:cNvPr id="1000" name="" descr=""></pic:cNvPr>' +
+                          '<pic:cNvPr id="1000" name="" descr="">' +
+                            '<a:hlinkClick r:id=\"CarboneHyperlinkId0\"/>' +
+                          '</pic:cNvPr>' +
                           '<pic:cNvPicPr>' +
                             '<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>' +
                           '</pic:cNvPicPr>' +
@@ -4512,7 +4508,83 @@ describe.only('Dynamic HTML', function () {
                     '</a:graphicData>' +
                   '</a:graphic>' +
                 '</wp:inline>' +
-              '</w:drawing>' +
+              '</w:drawing></w:r>' +
+            '</w:hyperlink>' +
+          '</w:p>'
+        );
+        const _iti = _options.imageDatabase.keys();
+        helper.assert(_iti.next().value, 'https://carbone.io/cat');
+        helper.assert(_iti.next().value, undefined);
+        const _ita = _options.hyperlinkDatabase.keys();
+        helper.assert(_ita.next().value, 'https://carbone.io/documentation.html');
+        helper.assert(_ita.next().value, undefined);
+      });
+
+
+      it('should convert HTML with images to DOCX inside a list and anchor (without width and height)', function () {
+        const _options = {
+          imageDatabase : new Map(),
+          hyperlinkDatabase: new Map()
+        };
+        const _descriptor = html.parseHTML('<ul><li><a href="https://carbone.io/documentation.html"><img src="https://carbone.io/cat" alt="cat"></a></li></ul>');
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
+        helper.assert(listStyleAbstract, '<w:abstractNum w:abstractNumId="1000"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum>');
+        helper.assert(listStyleNum, '<w:num w:numId="1000"><w:abstractNumId w:val="1000"/></w:num>');
+        helper.assert(content.get(_options), '' +
+          '<w:p>' +
+            /** PARAGRAPH AS LIST */
+            '<w:pPr>' +
+              '<w:numPr>' +
+                '<w:ilvl w:val="0"/>' +
+                '<w:numId w:val="1000"/>' +
+              '</w:numPr>' +
+            '</w:pPr>' +
+            /** HYPERLINK */
+            '<w:hyperlink r:id="CarboneHyperlinkId0">' +
+              /** IMAGE */
+              '<w:r><w:drawing>' +
+                '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
+                  /** -1 are normal as not width/height are passed as attributes */
+                  '<wp:extent cx="-1" cy="-1"/>' +
+                  '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                  '<wp:docPr id="1000" name="" descr="">' +
+                    '<a:hlinkClick xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" r:id=\"CarboneHyperlinkId0\"/>' +
+                  '</wp:docPr>' +
+                  '<wp:cNvGraphicFramePr>' +
+                    '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                  '</wp:cNvGraphicFramePr>' +
+                  '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                    '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                      '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                        '<pic:nvPicPr>' +
+                          '<pic:cNvPr id="1000" name="" descr="">' +
+                            '<a:hlinkClick r:id=\"CarboneHyperlinkId0\"/>' +
+                          '</pic:cNvPr>' +
+                          '<pic:cNvPicPr>' +
+                            '<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>' +
+                          '</pic:cNvPicPr>' +
+                        '</pic:nvPicPr>' +
+                        '<pic:blipFill>' +
+                          '<a:blip r:embed="rIdCarbone0"></a:blip>' +
+                          '<a:stretch>' +
+                            '<a:fillRect/>' +
+                          '</a:stretch>' +
+                        '</pic:blipFill>' +
+                        '<pic:spPr bwMode="auto">' +
+                          '<a:xfrm>' +
+                            '<a:off x="0" y="0"/>' +
+                            /** -1 are normal as not width/height are passed as attributes */
+                            '<a:ext cx="-1" cy="-1"/>' +
+                          '</a:xfrm>' +
+                          '<a:prstGeom prst="rect">' +
+                            '<a:avLst/>' +
+                          '</a:prstGeom>' +
+                        '</pic:spPr>' +
+                      '</pic:pic>' +
+                    '</a:graphicData>' +
+                  '</a:graphic>' +
+                '</wp:inline>' +
+              '</w:drawing></w:r>' +
             '</w:hyperlink>' +
           '</w:p>' +
           '<w:p/>'

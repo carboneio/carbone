@@ -4,9 +4,9 @@
       - The image source attribute can be an URL or Data-URL, such as `<img src=""/>`
       - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`. Values must be pixels. If `width` or `height` attributes are missing, the size of 5cm (1.96in) is applied by default while retaining the image aspect ratio.
     - New: The HTML content can now be rendered into "heading" styled text on your text editor.
-    - Fixed: Paragraph spacing are now rendering correctly in different scenarios: `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`
-    - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors ( templates).
-    - Fixed for DOCX templates: Numbers and bullets for list keep the same text size
+    - Fixed: Paragraph spacing are now rendering correctly (e.g. `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`)
+    - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors (templates).
+    - Fixed for DOCX templates: bullets of numbered and unordered lists size the same as the text
 
 
 ### v3.5.4

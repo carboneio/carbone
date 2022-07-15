@@ -3181,6 +3181,74 @@ describe.only('Dynamic HTML', function () {
         '</w:num>');
       });
 
+      it('should render an unordered list with font size', function () {
+        const _descriptor = html.parseHTML('<ol><li><i>Coffee</i></li><li><i>Tea</i></li></ol>');
+        console.log(_descriptor)
+
+        const _options = {
+          htmlStylesDatabase: new Map()
+        }
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += '<w:sz w:val="18"/>';
+        _options.htmlStylesDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options, _styleId);
+        helper.assert(content.get(), '' +
+          '<w:p>' +
+            '<w:pPr>'+
+              '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
+              '<w:rPr>' +
+                /** Inject the text size inside the list property */
+                '<w:sz w:val="18"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:i/><w:iCs/>' +
+                '<w:sz w:val="18"/>' +
+              '</w:rPr>' +
+              '<w:t xml:space="preserve">Coffee</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p>' +
+            '<w:pPr>'+
+              '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
+              '<w:rPr>' +
+                /** Inject the text size inside the list property */
+                '<w:sz w:val="18"/>' +
+              '</w:rPr>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:i/><w:iCs/>' +
+                '<w:sz w:val="18"/>' +
+              '</w:rPr>' +
+              '<w:t xml:space="preserve">Tea</w:t>' +
+            '</w:r>' +
+          '</w:p><w:p/>'
+        );
+        helper.assert(listStyleAbstract, '' +
+        '<w:abstractNum w:abstractNumId="1000">' +
+          '<w:multiLevelType w:val="hybridMultilevel"/>' +
+          '<w:lvl w:ilvl="0">' +
+            '<w:start w:val="1"/>' +
+            '<w:numFmt w:val="decimal\"/>' +
+            '<w:lvlText w:val="%1."/>' +
+            '<w:lvlJc w:val="left"/>' +
+            '<w:pPr>' +
+              '<w:ind w:left="720" w:hanging="360"/>' +
+            '</w:pPr>' +
+          '</w:lvl>' +
+        '</w:abstractNum>'
+        );
+        helper.assert(listStyleNum, '' +
+          '<w:num w:numId="1000">' +
+            '<w:abstractNumId w:val="1000"/>' +
+          '</w:num>');
+      });
+
+
       it('should convert HTML to DOCX xml 7: simple unordered list WITH A FONT AND RTL', function () {
         const _descriptor = html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>');
 
@@ -3194,9 +3262,9 @@ describe.only('Dynamic HTML', function () {
 
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId);
         helper.assert(content.get(), '' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
         );
         helper.assert(listStyleAbstract, '' +
         '<w:abstractNum w:abstractNumId="1000">' +

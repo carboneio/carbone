@@ -1,3 +1,13 @@
+### v4.1.0
+  - [EE] `:html` formatter updates:
+    - New: the image tag `<img>` is supported and rendered into DOCX/ODT/PDF documents.
+      - The image source attribute can be an URL or Data-URL, such as `<img src=""/>`
+      - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`. Values must be pixels. If `width` or `height` attributes are missing, the size of 5cm (1.96in) is applied by default while retaining the image aspect ratio.
+    - New: The HTML content can now be rendered into "heading" styled text on your text editor.
+    - Fixed: Paragraph spacing are now rendering correctly (e.g. `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`)
+    - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors (templates).
+    - Fixed for DOCX templates: bullets of numbered and unordered lists size the same as the text
+
 ### v4.0.0
   - Release June 25st 2022
   - [EE] ⚡️ Main features summary (see v4.0.0-alpha.0 for details)
@@ -42,14 +52,14 @@
     - `{bindColor(fde9a9, hexa) = d.value:ifLT(10):show(FF00FF):ifLT(20):show(005FCF):elseShow(FFDD00)}`: conditional colors works!
   - Fix multiple reDoS and optimize parsing of some templates
   - [EE] Include 3.5.2
-  - [EE] Dynamic chart: 
+  - [EE] Dynamic chart:
     - Fix crash when DOCX/ODT templates contain empty files
     - Fix bad behavior when ODT template contains images with dynamic charts
     - Fix chart binding when values contain white spaces
     - Fix ODT charts when images are used for background
 
 ### v4.0.0-alpha.1
-  - [EE] BREAKING CHANGE: the specific marker `{bind` becomes `{bindChart`. Example: `{bindChart(91) = d[i].valCol1}` 
+  - [EE] BREAKING CHANGE: the specific marker `{bind` becomes `{bindChart`. Example: `{bindChart(91) = d[i].valCol1}`
   - [EE] DOCX Charts improvements
     - Manage loops to repeat multiple charts in DOCX template made by MS Office
     - Update embedded spreadsheet
@@ -70,7 +80,7 @@
       - Insert a chart with native tools of LibreOffice or MS Word in your document
       - Use traditional Carbone markers to create loops in chart's data to inject your JSON data
       - If necessary, use the special marker `bind` to tell Carbone that the value `X` in the chart must be replaced by the marker `Y`
-    
+
     ### Method n°2, how to do advanced charts with Apache ECharts objects?
       - Insert a sample image in your template.
       - Place a marker in alt text , like a dynamic image : `{d.chartObj:chart}` with the formatter `:chart`.
@@ -102,17 +112,17 @@
           }
         }
       ```
-    
+
     Currently, Carbone supports only "echarts@v5" but we may support newer versions and other libraries in the future.
     By default, Carbone considers "echarts@v5".
-   
+
     Some charts have some translation: Locales supported : cs, de, en, es, fi, fr, it, ja, ko, pl, pt-br, ro, ru, si, th, zh
-   
+
     Rendering charts with Apache Echarts is extremely powerful and works well if all these conditions are met
       - ECharts supports what you ask
       - The template supports the rendered SVG (docx/xslx/pptx does not support SVG images)
       - Your chart configuration does not need external dependencies (maps, js code, themes), which are not available in Carbone
-   
+
     If you meet some limitation, please feel free to contact us on our chat to solve the issue.
 
 
@@ -134,12 +144,12 @@
     - when a marker tries to access an array and a object in the same time
     - when there is a missing `[i]` marker fo one `[i+1]` marker
     - when Carbone cannot find the section to repeat
-    - when there is a dot `.` before `[]` 
-  
+    - when there is a dot `.` before `[]`
+
   - Fix crash when repetition does not contain XML tags. For example: `<w:t>{d[i].id}, {d[i+1].id}</w:t>`
   - Fix crash when the section i+1 is duplicated like the i-th section with nested repetition and other markers
   - Fix crash when repetition uses direct access of sub-arrays `{d.test.others[i].wheels[0].size} {d.test.others[i+1].wheels[0].size}`
-  
+
   - [EE] On-Premise Embedded Studio has new features and fixes:
     - [EXPERIMENTAL]: sample `Data` and `Complement` are automatically generated using markers found in template if these field contain empty objects
     - export to other formats than PDF
@@ -148,7 +158,7 @@
     - fix memory leak
     - Now it works on Safari, without hot-reloading of the template
 
-  - Formatters managements has been completely rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters. 
+  - Formatters managements has been completely rewritten, to make it faster and more reliable. Here are acceptable syntax for formatters.
     For backward-compatibility: text containing single quotes are accepted if it does not contain a comma `,` before or after the single quote: `anyFormatter(' text ,containing ' sin,gle ' quote  ')`
 
   - Dynamic parameters passed in formatters with the dot `.` syntax has been improved:
@@ -157,9 +167,9 @@
     - Improved access performance by a factor of 10
     - Add the possibility to access array iterators of currently visited arrays. The number of dots equals the number of previous `i`.
       Example: In  `{d[i].cars[i].other.wheels[i].tire.subObject:add(.i):add(..i):add(...i)}`
-      - `.i` matches with the index of `wheels[i]` 
-      - `..i` matches with the index of `cars[i]` 
-      - `...i` matches with the index of `d[i]` 
+      - `.i` matches with the index of `wheels[i]`
+      - `..i` matches with the index of `cars[i]`
+      - `...i` matches with the index of `d[i]`
 
   - [EE] ⚡️ New aggregator formatters : `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount`
 
@@ -214,19 +224,6 @@
           - `{d.departments[i].people[i].salary:aggSum(.age)}`
         - Sum by people by age and gender, regardless of departments
           - `{d.departments[i].people[i].salary:aggSum(.age, .gender)}`
-
-
-
-### v3.5.X
-  - [EE] Dynamic HTML Updates (`:html` formatter):
-    - New: the image tag `<img>` is supported and rendered into DOCX/ODT/PDF documents.
-      - The image source attribute can be an URL or Data-URL, such as `<img src=""/>`
-      - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`. Values must be pixels. If `width` or `height` attributes are missing, the size of 5cm (1.96in) is applied by default while retaining the image aspect ratio.
-    - New: The HTML content can now be rendered into "heading" styled text on your text editor.
-    - Fixed: Paragraph spacing are now rendering correctly (e.g. `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`)
-    - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors (templates).
-    - Fixed for DOCX templates: bullets of numbered and unordered lists size the same as the text
-
 
 ### v3.5.4
   - Release June 15th 2022

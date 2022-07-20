@@ -1774,7 +1774,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
             'Content-Type' : 'image/jpeg',
           });
-        image.downloadImage('https://google.com/image-flag-fr.jpg', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/jpeg');
@@ -1788,7 +1788,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
             'Content-Type' : 'image/png',
           });
-        image.downloadImage('https://google.com/image-flag-it.png', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-it.png', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/png');
@@ -1802,7 +1802,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
             'Content-Type' : 'image/png',
           });
-        image.downloadImage('https://google.com/image-flag-it.png?size=10&color=blue', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-it.png?size=10&color=blue', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/png');
@@ -1816,7 +1816,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
             'Content-Type' : 'image/png; charset=UTF-8',
           });
-        image.downloadImage('https://google.com/blabla?size=10&color=blue', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/blabla?size=10&color=blue', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/png');
@@ -1830,7 +1830,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageIT.png', {
             'Content-Type' : 'application/json',
           });
-        image.downloadImage('https://google.com/image-flag-it.png', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-it.png', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/png');
@@ -1844,7 +1844,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
             'Content-Type' : 'text/plain',
           });
-        image.downloadImage('https://google.com/image-flag-fr.jpg', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.data.length > 0);
           helperTest.assert(imageInfo.mimetype, 'image/jpeg');
@@ -1857,7 +1857,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         nock('https://google.com')
           .get('/image-flag-fr.txt')
           .replyWithFile(200, __dirname + '/datasets/image/imageFR_base64_jpg.txt');
-        image.downloadImage('https://google.com/image-flag-fr.txt', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/image-flag-fr.txt', {}, {}, function (err, imageInfo) {
           assert(err.includes('Error Carbone: the file is not an image'));
           assert(imageInfo+'' === 'undefined');
           done();
@@ -1865,19 +1865,19 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
 
       it('should return an error when the imageLinkOrBase64 is either undefined, null or empty', function (done) {
-        image.downloadImage(undefined, {}, function (err, imageInfo) {
+        image.downloadImage(undefined, {}, {}, function (err, imageInfo) {
           assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
           helperTest.assert(imageInfo+'', 'undefined');
 
-          image.downloadImage(null, {}, function (err, imageInfo) {
+          image.downloadImage(null, {}, {}, function (err, imageInfo) {
             assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
             helperTest.assert(imageInfo+'', 'undefined');
 
-            image.downloadImage('', {}, function (err, imageInfo) {
+            image.downloadImage('', {}, {}, function (err, imageInfo) {
               assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
               helperTest.assert(imageInfo+'', 'undefined');
 
-              image.downloadImage({id : 1}, {}, function (err, imageInfo) {
+              image.downloadImage({id : 1}, {}, {}, function (err, imageInfo) {
                 assert(err.includes('Carbone error: the image URL or Base64 is undefined.'));
                 helperTest.assert(imageInfo+'', 'undefined');
                 done();
@@ -1888,7 +1888,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
 
       it ('should return an error when the location url does not exist', function (done) {
-        image.downloadImage('https://carbone.io/fowjfioewj', {}, function (err, imageInfo) {
+        image.downloadImage('https://carbone.io/fowjfioewj', {}, {}, function (err, imageInfo) {
           assert(err.includes('can not download the image from the url'));
           helperTest.assert(imageInfo+'', 'undefined');
           done();
@@ -1896,7 +1896,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
 
       it('should return an error when imageLinkOrBase64 argument is invalid (the error is returned by image.parseBase64Picture)', function (done) {
-        image.downloadImage('this_is_random_text', {}, function (err, imageInfo) {
+        image.downloadImage('this_is_random_text', {}, {}, function (err, imageInfo) {
           assert(err.includes('Error'));
           helperTest.assert(imageInfo+'', 'undefined');
           done();
@@ -1911,7 +1911,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           nock('https://google.com')
             .get('/random-image.jpeg')
             .replyWithError({code : errorCode});
-          image.downloadImage('https://google.com/random-image.jpeg', {}, function (err, imageInfo) {
+          image.downloadImage('https://google.com/random-image.jpeg', {}, {}, function (err, imageInfo) {
             helperTest.assert(err.code, errorCode);
             assert(imageInfo+'', 'undefined');
           });
@@ -1924,7 +1924,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .get('/random-image.jpeg')
           .delay(6000)
           .reply(200, '<html></html>');
-        image.downloadImage('https://google.com/random-image.jpeg', {}, function (err, imageInfo) {
+        image.downloadImage('https://google.com/random-image.jpeg', {}, {}, function (err, imageInfo) {
           helperTest.assert(err.message, 'Request timed out');
           assert(imageInfo+'', 'undefined');
           done();
@@ -1938,7 +1938,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             extension : 'jpeg'
           }
         };
-        image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        image.downloadImage('$base64dog', data, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.mimetype === 'image/jpeg');
           assert(imageInfo.extension === 'jpeg');
@@ -1954,7 +1954,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             extension : 'bmp'
           }
         };
-        image.downloadImage('$base64cat', data, function (err, imageInfo) {
+        image.downloadImage('$base64cat', data, {}, function (err, imageInfo) {
           helperTest.assert(err+'', 'null');
           assert(imageInfo.mimetype === 'image/bmp');
           assert(imageInfo.extension === 'bmp');
@@ -1970,7 +1970,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             extension : 'txt'
           }
         };
-        image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        image.downloadImage('$base64dog', data, {}, function (err, imageInfo) {
           assert(err.includes('the base64 provided is not an image'));
           assert(imageInfo + '' === 'undefined');
           done();
@@ -1984,7 +1984,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             extension : 'jpeg'
           }
         };
-        image.downloadImage('$base64dog', data, function (err, imageInfo) {
+        image.downloadImage('$base64dog', data, {}, function (err, imageInfo) {
           assert(err.includes('the base64 provided is empty'));
           assert(imageInfo + '' === 'undefined');
           done();

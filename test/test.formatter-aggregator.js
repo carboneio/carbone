@@ -485,6 +485,17 @@ describe('Aggregatted operations', function () {
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
+
+      it.only('[CUM] should count the total of elements aggregation, without itetaror in 3 lists', function (done) {
+        const _xml =
+           '<x>'
+          +     '<d>{d.companies[].services[].people[].salary:__TESTED_FORMATTER__}</d>'
+          +'</x>';
+        let _expected = [
+          [ 'aggCount'  , '<x><d>5</d></x>' ],
+        ];
+        executeTest(_xml, dataThreeLoops, _expected, done);
+      });
       // TOOD limit only this known usage
       it('[CUM] should accept to aggregate reduced array [] and to do a cumulative sum in the same time (aggSum:cumSum)', function (done) {
         const _xml =

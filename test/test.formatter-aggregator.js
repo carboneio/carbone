@@ -486,7 +486,7 @@ describe('Aggregatted operations', function () {
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
 
-      it.only('[CUM] should count the total of elements aggregation, without itetaror in 3 lists', function (done) {
+      it.only('should count the total of elements aggregation, without itetaror in 3 lists', function (done) {
         const _xml =
            '<x>'
           +     '<d>{d.companies[].services[].people[].salary:__TESTED_FORMATTER__}</d>'

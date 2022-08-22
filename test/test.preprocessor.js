@@ -111,7 +111,7 @@ describe('preprocessor', function () {
       });
 
       describe('hideRow formatter', function () {
-        it('should detect the hideRow and replace it by hideBegin/hideEnd formatter within the table XML', function (done) {
+        it('should replace the hideRow by hideBegin/hideEnd formatter within the table XML', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
               '<table:table-row>' +
@@ -149,7 +149,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it.only('should replace the hideRow by hideBegin/hideEnd formatters into 2 different rows', function (done) {
+        it.skip('should replace the hideRow by hideBegin/hideEnd formatters into 2 different rows', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
               '<table:table-row>' +
@@ -199,7 +199,53 @@ describe('preprocessor', function () {
           });
         });
 
-        it('should detect the hideRow and replace it by hideBegin/hideEnd formatter within the table XML', function (done) {
+        it.skip('should replace the hideRow by hideBegin/hideEnd formatters into 2 different rows', function (done) {
+          const _templateContent = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].name}{d.list[i].name:ifEM:hideRow}</text:p>' +
+                '</table:table-cell>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hideRow}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+            '</table:table>';
+
+          const _expectedResult = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<carbone>{d.list[i].name:ifEM:hideBegin}</carbone>'+
+              '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>'+
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].name}</text:p>' +
+                '</table:table-cell>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].desc}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>'+
+              '<carbone>{d.list[i].name:ifEM:hideEnd}</carbone>'+
+            '</table:table>';
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.odt',
+            extension  : 'odt',
+            embeddings : [],
+            files      : [
+              { name : 'content.xml', parent : '', data : _templateContent}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            // console.log(res);
+            helper.assert(res?.files[0]?.data, _expectedResult);
+            done();
+          });
+        });
+
+        it('should detect the hideRow and replace it by hideBegin/hideEnd formatter within the table XML (whole table)', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
               '<table:table-column table:style-name="Table1.A" table:number-columns-repeated="2"/>' +

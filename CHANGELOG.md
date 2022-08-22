@@ -27,6 +27,7 @@
     - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors (templates).
     - Fixed for DOCX templates: bullets of numbered and unordered lists size the same as the text
   - [EE] Fix dynamic hyperlinks with query parameters for ODT templates
+  - [EE] Fix broken Docx files when shapes were duplicated by Carbone
 
 ### v4.0.0
   - Release June 25st 2022

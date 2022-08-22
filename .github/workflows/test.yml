@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   # Automatic trigger
   pull_request:
-    branches: [ master, main, enterprise-edition-master ]
+    branches: [ master, main, enterprise-edition-master, v4 ]
     # trigger the workflow only when the pull request title change, or someone is assigned
     types: [edited, assigned]
   

@@ -41,7 +41,52 @@ function formatD (d, patternOut, patternIn) {
 }
 
 
-
+/**
+ * Format intervals / duration. List of format name :
+ *   - `human+`
+ *   - `human`
+ *   - `millisecond(s)` or `ms`
+ *   - `second(s)` or `s`
+ *   - `minute(s)` or `m`
+ *   - `hour(s)` or `h`
+ *   - `year(s)` or `y`
+ *   - `month(s)` or `M`
+ *   - `week(s)` or `w`
+ *   - `day(s)` or `d`
+ *
+ * @version 4.1.0
+ *
+ * @exampleContext {"lang":"en", "timezone":"Europe/Paris"}
+ * @example [2000, "second"]
+ * @example [2000, "seconds"]
+ * @example [2000, "s"]
+ * @example [3600000, "minute"]
+ * @example [3600000, "hour"]
+ * @example [2419200000, "days"]
+ *
+ * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
+ * @example [2000, "human"]
+ * @example [2000, "human+"]
+ * @example [-2000, "human+"]
+ *
+ * @exampleContext {"lang":"en", "timezone":"Europe/Paris"}
+ * @example [2000, "human"]
+ * @example [2000, "human+"]
+ * @example [-2000, "human+"]
+ *
+ * @exampleContext {"lang":"en", "timezone":"Europe/Paris"}
+ * @example [60, "ms", "minute"]
+ * @example [4, "ms", "weeks"]
+ *
+ * @exampleContext {"lang":"en", "timezone":"Europe/Paris"}
+ * @example ["P1M", "ms"]
+ * @example ["P1Y2M3DT4H5M6S, "hour"]
+ *
+ * @param  {String|Number} d   Interval to format in milliseconds (by default), or ISO format (ex. P1Y2M3DT4H5M6S)
+ * @param  {String} patternOut output format: human, human+, milliseconds, seconds, ...
+ * @param  {String} patternIn  [optional] input unit: milliseconds, seconds, ...
+ * @return {String}            return formatted interval
+ */
 function formatI (d, patternOut, patternIn) {
   if (d !== null && typeof d !== 'undefined') {
     const _duration = dayjs.duration(d, patternIn);

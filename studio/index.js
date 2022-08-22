@@ -149,6 +149,21 @@ async function addTemplateAndRender (file) {
     // onChange event, the file can be empty at first click in Firefox
     return;
   }
+  // if JSON file, update current left panel
+  if (file.type === 'application/json') {
+    const reader = new FileReader();
+    reader.onload = function () {
+      try {
+        carboneRenderObj[codeEditor.activePan] = JSON.parse(reader.result);
+      }
+      catch (e) {
+        setConsoleMessage('error', 'Invalid JSON');
+      }
+      editor.set(carboneRenderObj[codeEditor.activePan]);
+    };
+    reader.readAsText(file);
+    return;
+  }
   setConsoleMessage('info', 'Uploading template...');
   const result = await addTemplate(file);
 

@@ -1,4 +1,23 @@
 ### v4.1.0
+  - Release August 22st 2022
+  - [EE] `convCRLF` converts `\n` and `\r\n` to new lines in ODS
+  - [EE] New On-Premise Embedded Studio features:
+    - Drag and drop a JSON file and the studio automatically updates current left panel (data, complement, enum or translation)
+    - Drag and drop a template file and the studio automatically upload the template and update the preview
+    - Add HTML export
+  - New interval/duration formatters: `d.duration:formatI(patternOut, patternIn)`. 
+    It accepts duration in milliseconds (by default), or ISO format (ex. P1Y2M3DT4H5M6S).
+    - `patternOut` and `patternIn` can be `millisecond(s)` or `ms`, `second(s)` or `s`, `minute(s)` or `m`,
+      `hour(s)` or `h`,`year(s)` or `y`, `month(s)` or `M`, `week(s)` or `w`, `day(s)` or `d`.
+    - `patternOut` can be human and human+.
+    Here are examples with `d.duration = 3600000`: 
+    - `{d.duration:formatI(ms)}`  => `3600000`
+    - `{d.duration:formatI(s)}`  => `3600`
+    - `{d.duration:formatI(minute)}`  => `60`
+    - `{d.duration:formatI(hour)}`  => `1`
+    - `{d.duration:formatI(human)}`  => `an hour`
+    - `{d.duration:formatI(human+)}`  => `in an hour`
+    - `{d.duration:formatI(hour, second)}`  => `1000`
   - [EE] `:html` formatter updates:
     - New: the image tag `<img>` is supported and rendered into DOCX/ODT/PDF documents.
       - The image source attribute can be an URL or Data-URL, such as `<img src=""/>`

@@ -14,7 +14,7 @@ jobs:
   TEST:
     # https://docs.github.com/en/actions/learn-github-actions/environment-variables
     env:
-      LIBREOFFICE_VERSION: 7.0.4.2
+      LIBREOFFICE_VERSION: 7.4.0.3
     
     # Execute tests only if tests are launched manually (workflow_dispatch) or if the pull request title does not contain "WIP:".
     # 
@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node: [ '16.15.0' ]
+        node: [ '16.16.0' ]
     name: Node on Ubuntu-20.04
     steps:
       # Checkout source code of the project

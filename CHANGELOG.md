@@ -1,5 +1,12 @@
 ### v4.1.0
+  - Release August 22st 2022
+  - [EE] `convCRLF` converts `\n` and `\r\n` to new lines in ODS
+  - [EE] New On-Premise Embedded Studio features:
+    - Drag and drop a JSON file and the studio automatically updates current left panel (data, complement, enum or translation)
+    - Drag and drop a template file and the studio automatically upload the template and update the preview
+    - Add HTML export
   - New interval/duration formatters: `formatI`
+
 
 ### v4.0.0
   - Release June 25st 2022

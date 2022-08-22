@@ -3,7 +3,7 @@
   - [EE] `convCRLF` converts `\n` and `\r\n` to new lines in ODS
   - [EE] New On-Premise Embedded Studio features:
     - Drag and drop a JSON file and the studio automatically updates current left panel (data, complement, enum or translation)
-    - Drag and drop a template file and the studio automatically upload the template and update the preview
+    - Drag and drop a template file and the studio automatically uploads the template and updates the preview
     - Add HTML export
   - New interval/duration formatters: `d.duration:formatI(patternOut, patternIn)`.
     It accepts duration in milliseconds (by default), or ISO format (ex. P1Y2M3DT4H5M6S).
@@ -21,7 +21,8 @@
   - [EE] `:html` formatter updates:
     - New: the image tag `<img>` is supported and rendered into DOCX/ODT/PDF documents.
       - The image source attribute can be an URL or Data-URL, such as `<img src=""/>`
-      - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`. Values must be pixels. If `width` or `height` attributes are missing, the size of 5cm (1.96in) is applied by default while retaining the image aspect ratio.
+      - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`. 
+        Values must be pixels. If `width` or `height` attributes are missing, the size of 5cm (1.96in) is applied by default while retaining the image aspect ratio.
     - New: The HTML content can now be rendered into "heading" styled text on your text editor.
     - Fixed: Paragraph spacing are now rendering correctly (e.g. `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`)
     - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors (templates).

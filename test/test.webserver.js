@@ -5,7 +5,6 @@ const path       = require('path');
 const FormData   = require('form-data');
 const assert     = require('assert');
 const carbone    = require('../lib/index');
-const sinon      = require('sinon');
 const os         = require('os');
 const { exec, spawn } = require('child_process');
 const package    = require('../package.json');
@@ -390,7 +389,7 @@ describe('Webserver', () => {
         toDelete = [];
       });
 
-      it('should upload the template and use authentication and storage plugin', (done) => {
+      it('should upload the template as form-data and use authentication and storage plugin', (done) => {
         let form = new FormData();
 
         form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
@@ -400,6 +399,9 @@ describe('Webserver', () => {
           data = JSON.parse(data);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          assert.strictEqual(data.data.extension, 'html');
+          assert.strictEqual(data.data.mimetype, 'text/html');
+          assert.strictEqual(data.data.size, 102);
           let exists = fs.existsSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
           assert.strictEqual(exists, true);
           fs.unlinkSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
@@ -410,6 +412,24 @@ describe('Webserver', () => {
             // assert.strictEqual(fs.readFileSync(path.join(os.tmpdir(), 'afterFile2')).toString(), 'AFTER FILE 2');
             done();
           }, 100);
+        });
+      });
+
+      it('should upload the template as base64 and use authentication and storage plugin', (done) => {
+        let _data = {
+          template : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'})
+        };
+        get.concat(getBody(4001, '/template', 'POST', _data, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(data.success, true);
+          assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          assert.strictEqual(data.data.extension, 'html');
+          assert.strictEqual(data.data.mimetype, 'text/html');
+          assert.strictEqual(data.data.size, 102);
+          let exists = fs.existsSync(path.join(os.tmpdir(), 'PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47'));
+          assert.strictEqual(exists, true);
+          toDelete.push('PREFIX_9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+          done();
         });
       });
 
@@ -480,6 +500,16 @@ describe('Webserver', () => {
             assert.strictEqual(data.message, 'Template deleted');
             done();
           });
+        });
+      });
+
+      it('should delete a template that does not exist on the plugin storage', (done) => {
+        const _request = getBody(4001, '/template/template_not_exists', 'DELETE', null, token);
+        get.concat(_request, (err, res, data) => {
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
+          done();
         });
       });
 
@@ -712,19 +742,12 @@ describe('Webserver', () => {
 
     describe('Render template', () => {
       let toDelete = [];
-      let spyRender = null;
 
       before((done) => {
         uploadFile(4000, null, done);
       });
 
-      beforeEach(() => {
-        spyRender = sinon.spy(carbone, 'render');
-      });
-
       afterEach(() => {
-        spyRender.restore();
-
         for (let i = 0; i < toDelete.length; i++) {
           if (fs.existsSync(path.join(os.tmpdir(), 'render', toDelete[i]))) {
             fs.unlinkSync(path.join(os.tmpdir(), 'render', toDelete[i]));
@@ -786,7 +809,10 @@ describe('Webserver', () => {
           const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
           helper.assert(data.data.debug, {
-            markers : ['{d.firstname}', '{d.lastname}']
+            markers : ['{d.firstname}', '{d.lastname}'],
+            sample  : {
+              data : { firstname : 'firstname0', lastname : 'lastname1'}
+            }
           });
           toDelete.push(data.data.renderId);
           done();
@@ -898,16 +924,23 @@ describe('Webserver', () => {
           enum       : {}
         };
 
+        const _originalCarboneRender = carbone.render;
+        let _originalCarboneArguments = {};
+        carbone.render = (...args) => {
+          _originalCarboneArguments = args;
+          _originalCarboneRender.apply(null, args);
+        };
         get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          carbone.render = _originalCarboneRender; // restore original carbone.render
           assert.strictEqual(data.success, true);
-          const renderOptions = spyRender.firstCall.args;
-          assert.deepStrictEqual(renderOptions[2].convertTo, {
+          assert.deepStrictEqual(_originalCarboneArguments[2].convertTo, {
             formatName    : 'pdf',
             formatOptions : {
-              EncryptFile           : false,
-              DocumentOpenPassword  : 'Pass',
-              ReduceImageResolution : false,
-              Watermark             : 'My Watermark'
+              EncryptFile            : false,
+              DocumentOpenPassword   : 'Pass',
+              ReduceImageResolution  : false,
+              UseLosslessCompression : true,
+              Watermark              : 'My Watermark'
             }
           });
           toDelete.push(data.data.renderId);
@@ -1528,6 +1561,20 @@ describe('Webserver', () => {
         });
       });
 
+      it('should not be able to upload not supported file templates', (done) => {
+        let form = new FormData();
+
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'helperDirTest', 'create.sql')));
+
+        get.concat(getBody(4000, '/template', 'POST', form), (err, res, data) => {
+          assert.strictEqual(err, null);
+          data = JSON.parse(data);
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file');
+          done();
+        });
+      });
+
       it('should upload the template and inject data in the hash', (done) => {
         let form = new FormData();
 
@@ -1607,15 +1654,6 @@ describe('Webserver', () => {
             assert.strictEqual(data.message, 'Template deleted');
             done();
           });
-        });
-      });
-
-      it('should return an error if template does not exist', (done) => {
-        get.concat(getBody(4000, '/template/nopenopenope', 'DELETE'), (err, res, data) => {
-          data = JSON.parse(data.toString());
-          assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
-          done();
         });
       });
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="xr xr3" xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:xr3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" id="1" xr:uid="{FDCB9223-BFF9-CE47-BE81-39F63F4952F3}" name="Tableau1" displayName="Tableau1" ref="A1:C3" totalsRowShown="0" tableBorderDxfId="0">
+  <tableColumns count="3">
+    <tableColumn id="1" xr3:uid="{BEE49621-F642-E14C-977E-103B329A2AA5}" name="Colonne1"/>
+    <tableColumn id="2" xr3:uid="{D1118DA7-6ABB-8F4A-B5EE-FAF599E430A9}" name="Col1"/>
+    <tableColumn id="3" xr3:uid="{05FA13E8-160B-AD47-84F6-79A72C6EE5E5}" name="Col2"/>
+  </tableColumns>
+  <tableStyleInfo showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/>
+</table>

@@ -188,12 +188,19 @@ describe('preprocessor', function () {
             helper.assert(tmpl.files[0].name, 'my_file.xml');
             helper.assert(tmpl.files[0].data, 'some text');
             helper.assert(tmpl.files[0].parent, '');
-            // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
-            // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
-            // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
             helper.assert(tmpl.files[1].name, 'xl/worksheets/sheet1.xml');
             helper.assert(tmpl.files[1].data, _sheetAfter);
             helper.assert(tmpl.files[1].parent, 'embedded/spreadsheet.xlsx');
+            helper.assert(tmpl.embeddedXlsxCellValues, {
+              'embedded/spreadsheet.xlsx' : {
+                A1 : 'Nom',
+                B1 : 'Id',
+                C1 : 'TOTAL',
+                A2 : 'tata',
+                A3 : '{d.name}',
+                B3 : '{d.id}'
+              }
+            });
             done();
           });
         });
@@ -216,18 +223,30 @@ describe('preprocessor', function () {
             helper.assert(tmpl.files[0].name, 'my_file.xml');
             helper.assert(tmpl.files[0].data, 'some text');
             helper.assert(tmpl.files[0].parent, '');
-            // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
-            // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
-            // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
             helper.assert(tmpl.files[1].name, 'xl/worksheets/sheet1.xml');
             helper.assert(tmpl.files[1].data, _sheetAfter);
             helper.assert(tmpl.files[1].parent, 'embedded/spreadsheet.xlsx');
-            // tmpl.files[2].name.should.be.eql('xl/sharedStrings.xml');
-            // tmpl.files[2].data.should.be.eql(_sharedStringAfter2);
-            // tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
             helper.assert(tmpl.files[2].name, 'xl/worksheets/sheet1.xml');
             helper.assert(tmpl.files[2].data, _sheetAfter2);
             helper.assert(tmpl.files[2].parent, 'embedded/spreadsheet2.xlsx');
+            helper.assert(tmpl.embeddedXlsxCellValues, {
+              'embedded/spreadsheet2.xlsx' : {
+                A1 : 'Nom',
+                B1 : 'Id',
+                C1 : 'TOTAL',
+                A2 : 'tata',
+                A3 : '{d.name}',
+                B3 : '{d.type}'
+              },
+              'embedded/spreadsheet.xlsx' : {
+                A1 : 'Nom',
+                B1 : 'Id',
+                C1 : 'TOTAL',
+                A2 : 'tata',
+                A3 : '{d.name}',
+                B3 : '{d.id}'
+              }
+            });
             done();
           });
         });

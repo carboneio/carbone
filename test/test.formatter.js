@@ -111,6 +111,9 @@ describe('formatter', function () {
     it('should convert LF and CR in docx', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'docx'}, 'qsdqsd \n'), 'qsdqsd </w:t><w:br/><w:t>');
     });
+    it('should add a paragraph in ODS', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'ods'}, 'qsdqsd \n'), 'qsdqsd </text:p><text:p>');
+    });
   });
   describe('convCRLFH', function () {
     it('should convert LF and CR to <br>', function () {

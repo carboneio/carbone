@@ -1309,7 +1309,7 @@ describe('Dynamic HTML', function () {
 
       it('should create hyperlinks', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com/?name=john&lastname=wick">Carbone Website</a>'), {});
-        helper.assert(res.content, '' +
+        helper.assert(res.content.get(), '' +
           '<text:p>' +
             '<text:a xlink:type="simple" xlink:href="https://carbone.com/?name=john&amp;lastname=wick">' +
               '<text:span>Carbone Website</text:span>' +

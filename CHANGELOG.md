@@ -1,3 +1,7 @@
+### v4.1.0
+  - Release August 22st 2022
+  - Fix broken Docx files when shapes were duplicated by Carbone
+
 ### v4.0.0
   - Release June 25st 2022
   - [EE] ⚡️ Main features summary (see v4.0.0-alpha.0 for details)

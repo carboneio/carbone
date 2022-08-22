@@ -217,6 +217,17 @@ function generateImageDocxIdPostProcessing (urlOrBase64) {
 }
 
 /**
+ * It is called only for Docx document to create an unique ID for each drawing element (can be picture or shapes)
+ *
+ * @private
+ *
+ * @return {String} the drawing ID of <wp:docPr
+ */
+function generateImageDocxGlobalId () {
+  return 999 + this.uniqueId++;
+}
+
+/**
  * Generate image a reference id for XLSX documents
  *
  * Called by the builder. At this time, we do not know if this image
@@ -307,6 +318,7 @@ module.exports = {
   generateOpenDocumentImageHref     : generateOpenDocumentImageHref,
   generateOpenDocumentImageMimeType : generateOpenDocumentImageMimeType,
   generateImageDocxId               : generateImageDocxId,
+  generateImageDocxGlobalId         : generateImageDocxGlobalId,
   generateOpenDocumentUniqueNumber  : generateOpenDocumentUniqueNumber,
   generateImageDocxReference        : generateImageDocxReference,
   generateImageXlsxReference        : generateImageXlsxReference,

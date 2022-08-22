@@ -1308,10 +1308,10 @@ describe('Dynamic HTML', function () {
       });
 
       it('should create hyperlinks', function () {
-        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com">Carbone Website</a>'), {});
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com/?name=john&lastname=wick">Carbone Website</a>'), {});
         helper.assert(res.content.get(), '' +
           '<text:p>' +
-            '<text:a xlink:type="simple" xlink:href="https://carbone.com">' +
+            '<text:a xlink:type="simple" xlink:href="https://carbone.com/?name=john&amp;lastname=wick">' +
               '<text:span>Carbone Website</text:span>' +
             '</text:a>' +
           '</text:p>'
@@ -3886,7 +3886,7 @@ describe('Dynamic HTML', function () {
             '<u>This is an underline text</u>' +
             '<br/>' +
             'with <i>some</i> content' +
-            '<a href="carbone.io/test_website">' +
+            '<a href="carbone.io/test_website?name=john&lastname=wick">' +
               'and a <u>link</u>' +
             '</a>' +
           '</li>' +
@@ -3974,7 +3974,7 @@ describe('Dynamic HTML', function () {
           '</w:num>'
         );
         const _it = _options.hyperlinkDatabase.keys();
-        helper.assert(_it.next().value, 'https://carbone.io/test_website');
+        helper.assert(_it.next().value, 'https://carbone.io/test_website?name=john&amp;lastname=wick');
         helper.assert(_it.next().value, undefined);
       });
 

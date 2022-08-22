@@ -5,12 +5,12 @@
     - Drag and drop a JSON file and the studio automatically updates current left panel (data, complement, enum or translation)
     - Drag and drop a template file and the studio automatically upload the template and update the preview
     - Add HTML export
-  - New interval/duration formatters: `d.duration:formatI(patternOut, patternIn)`. 
+  - New interval/duration formatters: `d.duration:formatI(patternOut, patternIn)`.
     It accepts duration in milliseconds (by default), or ISO format (ex. P1Y2M3DT4H5M6S).
     - `patternOut` and `patternIn` can be `millisecond(s)` or `ms`, `second(s)` or `s`, `minute(s)` or `m`,
       `hour(s)` or `h`,`year(s)` or `y`, `month(s)` or `M`, `week(s)` or `w`, `day(s)` or `d`.
     - `patternOut` can be human and human+.
-    Here are examples with `d.duration = 3600000`: 
+    Here are examples with `d.duration = 3600000`:
     - `{d.duration:formatI(ms)}`  => `3600000`
     - `{d.duration:formatI(s)}`  => `3600`
     - `{d.duration:formatI(minute)}`  => `60`
@@ -26,6 +26,7 @@
     - Fixed: Paragraph spacing are now rendering correctly (e.g. `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`)
     - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors (templates).
     - Fixed for DOCX templates: bullets of numbered and unordered lists size the same as the text
+  - [EE] Fix dynamic hyperlinks with query parameters for ODT templates
 
 ### v4.0.0
   - Release June 25st 2022
@@ -255,7 +256,6 @@
 ### v3.5.2
   - Release May 6th 2022
   - [EE] Add file verification on template upload
-
 
 ### v3.5.1
   - Release May 4th 2022

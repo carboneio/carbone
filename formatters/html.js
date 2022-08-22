@@ -53,7 +53,8 @@ const getHTMLContentOdt = function (htmlContent, templateDefaultStyleId) {
  */
 const getHTMLContentOdtPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties !== undefined && _htmlProperties.content ? _htmlProperties.content : '';
+  console.log(_htmlProperties?.content?.get(this));
+  return _htmlProperties?.content?.get(this) ?? '';
 };
 
 /** ======================= DOCX ======================== */
@@ -107,7 +108,7 @@ const getHTMLContentDocx = function (htmlContent, styleId) {
  */
 const getHTMLContentDocxPostProcess = function (contentId) {
   const _htmlProperties = this.htmlDatabase.get(contentId);
-  return _htmlProperties !== undefined && _htmlProperties.content ? _htmlProperties.content : '';
+  return _htmlProperties?.content?.get(this) ?? '';
 };
 
 module.exports = {

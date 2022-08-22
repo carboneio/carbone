@@ -8,7 +8,7 @@ const hyperlinks = require('../lib/hyperlinks');
  */
 function generateHyperlinkReference (hyperlink = '') {
   /** Check the URL */
-  hyperlink = hyperlinks.validateURL(hyperlink, this.defaultUrlOnError, 'docx');
+  hyperlink = hyperlinks.validateURL(hyperlink, this.defaultUrlOnError);
   hyperlinks.addLinkDatabase(this, hyperlink);
   return {
     fn   : generateHyperkinReferencePostProcessing,

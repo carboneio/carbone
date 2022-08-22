@@ -939,7 +939,33 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(_template.files[2].data, _expectedContentType);
       });
 
-      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define a different media path because the template is coming from word online', function () {
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define the image into the directory `media` if images relationship does not already exist', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="utf-8"?></Relationships>',
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="utf-8"?><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.gif" Id="rIdCarbone0"/></Relationships>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.gif', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'gif'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helperTest.assert(_template.files[0], {
+          name   : 'word/media/CarboneImage0.gif',
+          parent : '',
+          data   : '1234'
+        });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+      });
+
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase ', function () {
         const _template = {
           files : [{
             name : 'word/_rels/document.xml.rels',
@@ -1533,6 +1559,61 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 100);
           helperTest.assert(_imageInfo.imageHeight, 80);
+          done();
+        });
+
+        it('should compute the new image width/height as cm based on the image size and should keep the ratio', function (done) {
+          let _imageInfo = {
+            imageUnit      : 'cm',
+            newImageWidth  : 5,
+            newImageHeight : 4.2
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 5);
+          helperTest.assert(_imageInfo.imageHeight, 4.2);
+          done();
+        });
+
+        it('should compute the new image width/height as cm based on the image size, should keep the ratio and should be less than 5cm', function (done) {
+          let _imageInfo = {
+            imageUnit      : 'cm',
+            newImageWidth  : 10,
+            newImageHeight : 5
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 5);
+          helperTest.assert(_imageInfo.imageHeight, 2.5);
+
+          let _imageInfo2 = {
+            imageUnit      : 'cm',
+            newImageWidth  : 5,
+            newImageHeight : 10
+          };
+          image._computeImageSize(_imageInfo2);
+          helperTest.assert(_imageInfo2.imageWidth, 2.5);
+          helperTest.assert(_imageInfo2.imageHeight, 5);
+          done();
+        });
+
+        it('should compute the new image width/height as EMU based on the image size, should keep the ratio and should be less than 5cm', function (done) {
+          let _imageInfo = {
+            imageUnit      : 'emu',
+            newImageWidth  : 1800000,
+            newImageHeight : 3600000
+          };
+          image._computeImageSize(_imageInfo);
+          console.log(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 900000);
+          helperTest.assert(_imageInfo.imageHeight, 1800000);
+
+          let _imageInfo2 = {
+            imageUnit      : 'emu',
+            newImageWidth  : 3600000,
+            newImageHeight : 1800000
+          };
+          image._computeImageSize(_imageInfo2);
+          helperTest.assert(_imageInfo2.imageWidth, 1800000);
+          helperTest.assert(_imageInfo2.imageHeight, 900000);
           done();
         });
       });

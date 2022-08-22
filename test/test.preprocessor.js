@@ -109,6 +109,180 @@ describe('preprocessor', function () {
           done();
         });
       });
+
+      describe('hideRow formatter', function () {
+        it('should detect the hideRow and replace it by hideBegin/hideEnd formatter within the table XML', function (done) {
+          const _templateContent = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hideRow}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+            '</table:table>';
+
+          const _expectedResult = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>'+
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].desc}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>'+
+            '</table:table>';
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.odt',
+            extension  : 'odt',
+            embeddings : [],
+            files      : [
+              { name : 'content.xml', parent : '', data : _templateContent}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            // console.log(res);
+            helper.assert(res?.files[0]?.data, _expectedResult);
+            done();
+          });
+        });
+
+        it.only('should replace the hideRow by hideBegin/hideEnd formatters into 2 different rows', function (done) {
+          const _templateContent = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].name}{d.list[i].name:ifEM:hideRow}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hideRow}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+            '</table:table>';
+
+          const _expectedResult = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+            '<carbone>{d.list[i].name:ifEM:hideBegin}</carbone>'+
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].name}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<carbone>{d.list[i].name:ifEM:hideEnd}</carbone>'+
+              '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>'+
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].desc}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>'+
+            '</table:table>';
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.odt',
+            extension  : 'odt',
+            embeddings : [],
+            files      : [
+              { name : 'content.xml', parent : '', data : _templateContent}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            // console.log(res);
+            helper.assert(res?.files[0]?.data, _expectedResult);
+            done();
+          });
+        });
+
+        it('should detect the hideRow and replace it by hideBegin/hideEnd formatter within the table XML', function (done) {
+          const _templateContent = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-column table:style-name="Table1.A" table:number-columns-repeated="2"/>' +
+              '<table:table-column table:style-name="Table1.C"/>' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.A1" office:value-type="string">' +
+                  '<text:p text:style-name="P1">Name</text:p>' +
+                '</table:table-cell>' +
+                '<table:table-cell table:style-name="Table1.A1" office:value-type="string">' +
+                  '<text:p text:style-name="P1">price</text:p>' +
+                '</table:table-cell>' +
+                '<table:table-cell table:style-name="Table1.C1" office:value-type="string">' +
+                  '<text:p text:style-name="P1">Description</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.A2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].name}</text:p>' +
+                '</table:table-cell>' +
+                '<table:table-cell table:style-name="Table1.A2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].price}</text:p>' +
+                '</table:table-cell>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hideRow}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<table:table-row table:style-name="Table1.3">' +
+                '<table:table-cell table:style-name="Table1.A2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i+1]}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+            '</table:table>'
+
+          const _expectedResult = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-column table:style-name="Table1.A" table:number-columns-repeated="2"/>' +
+              '<table:table-column table:style-name="Table1.C"/>' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.A1" office:value-type="string">' +
+                  '<text:p text:style-name="P1">Name</text:p>' +
+                '</table:table-cell>' +
+                '<table:table-cell table:style-name="Table1.A1" office:value-type="string">' +
+                  '<text:p text:style-name="P1">price</text:p>' +
+                '</table:table-cell>' +
+                '<table:table-cell table:style-name="Table1.C1" office:value-type="string">' +
+                  '<text:p text:style-name="P1">Description</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>' +
+                '<table:table-row>' +
+                  '<table:table-cell table:style-name="Table1.A2" office:value-type="string">' +
+                    '<text:p text:style-name="P1">{d.list[i].name}</text:p>' +
+                  '</table:table-cell>' +
+                  '<table:table-cell table:style-name="Table1.A2" office:value-type="string">' +
+                    '<text:p text:style-name="P1">{d.list[i].price}</text:p>' +
+                  '</table:table-cell>' +
+                  '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                    '<text:p text:style-name="P1">{d.list[i].desc}</text:p>' +
+                  '</table:table-cell>' +
+                '</table:table-row>' +
+              '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' +
+              '<table:table-row table:style-name="Table1.3">' +
+                '<table:table-cell table:style-name="Table1.A2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i+1]}</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+            '</table:table>';
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.odt',
+            extension  : 'odt',
+            embeddings : [],
+            files      : [
+              { name : 'content.xml', parent : '', data : _templateContent}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            helper.assert(res.files[0].data, _expectedResult);
+            done();
+          });
+        });
+      });
     });
     describe('XSLX preprocessing', function () {
       var _sharedStringBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'

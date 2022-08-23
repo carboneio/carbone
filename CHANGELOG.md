@@ -1,11 +1,11 @@
 ### v4.1.0
   - Release August 22st 2022
-  - [EE] `convCRLF` converts `\n` and `\r\n` to new lines in ODS
-  - [EE] New On-Premise Embedded Studio features:
+  - [EE] New: `convCRLF` prints `\\n` and `\\r\\n` as new lines in ODS template instead of strings
+  - [EE] New: On-Premise Embedded Studio features:
     - Drag and drop a JSON file and the studio automatically updates current left panel (data, complement, enum or translation)
     - Drag and drop a template file and the studio automatically uploads the template and updates the preview
     - Add HTML export
-  - New interval/duration formatters: `d.duration:formatI(patternOut, patternIn)`.
+  - New: interval/duration formatters: `d.duration:formatI(patternOut, patternIn)`.
     It accepts duration in milliseconds (by default), or ISO format (ex. P1Y2M3DT4H5M6S).
     - `patternOut` and `patternIn` can be `millisecond(s)` or `ms`, `second(s)` or `s`, `minute(s)` or `m`,
       `hour(s)` or `h`,`year(s)` or `y`, `month(s)` or `M`, `week(s)` or `w`, `day(s)` or `d`.
@@ -21,14 +21,14 @@
   - [EE] `:html` formatter updates:
     - New: the image tag `<img>` is supported and rendered into DOCX/ODT/PDF documents.
       - The image source attribute can be an URL or Data-URL, such as `<img src=""/>`
-      - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`. 
+      - The image size is rendered based on `width` and `height` attributes provided by the HTML tag, such as `<img src="" width="300" height="100"/>`.
         Values must be pixels. If `width` or `height` attributes are missing, the size of 5cm (1.96in) is applied by default while retaining the image aspect ratio.
     - New: The HTML content can now be rendered into "heading" styled text on your text editor.
     - Fixed: Paragraph spacing are now rendering correctly (e.g. `<p> <ul> <li>content </li> </ul>`, `<p><p>  <p>content`)
-    - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors (templates).
-    - Fixed for DOCX templates: bullets of numbered and unordered lists size the same as the text
-  - [EE] Fix dynamic hyperlinks with query parameters for ODT templates
-  - [EE] Fix broken Docx files when shapes were duplicated by Carbone
+    - Fixed for ODT templates: Hyperlinks tags inside lists are now rendered without errors.
+    - Fixed for DOCX templates: ordered and unordered lists size the same as the text
+  - [EE] Fixed dynamic hyperlinks with query parameters for ODT templates
+  - [EE] Fixed broken Docx files when shapes were duplicated by Carbone
 
 ### v4.0.0
   - Release June 25st 2022

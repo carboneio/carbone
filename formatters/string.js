@@ -164,13 +164,14 @@ function unaccent (d) {
 
 
 /**
- * Convert carriage return `\\r\\n` and line feed `\\n` to XML-specific code in rendered document
+ * It renders carriage return `\\r\\n` and line feed `\\n` into documents instead of printing them as a string.
+ * Importante notes:
+ * - Feature supported for DOCX, PDF, ODT, and ODS files.
+ * - ODS supports is experimental for now, contact the support if you find issues.
+ * - Since `v3.5.3`, using the `:convCRLF` formatter before `:html` converts `\\n` to `<br>` tags. Usage example: `{d.content:convCRLF:html}`
+
  *
- * Since v3.5.3, it can be used before `:html` formatter to convert `\n` to `<br>` tags
- *
- * Compatible with odt, and docx (beta)
- *
- * @version 1.1.0
+ * @version 4.1.0 UPDATED
  *
  * @exampleContext { "extension" : "odt" }
  * @example [ "my blue \\n car"   ]

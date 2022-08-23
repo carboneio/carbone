@@ -80,7 +80,7 @@ function formatD (d, patternOut, patternIn) {
  *
  * @exampleContext {"lang":"en", "timezone":"Europe/Paris"}
  * @example ["P1M", "ms"]
- * @example ["P1Y2M3DT4H5M6S, "hour"]
+ * @example ["P1Y2M3DT4H5M6S", "hour"]
  *
  * @param  {String|Number} d   Interval to format in milliseconds (by default), or ISO format (ex. P1Y2M3DT4H5M6S)
  * @param  {String} patternOut output format: human, human+, milliseconds, seconds, ...

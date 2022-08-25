@@ -110,7 +110,7 @@ describe('preprocessor', function () {
         });
       });
 
-      describe('hideRow formatter', function () {
+      describe.only('hideRow formatter', function () {
         it('should replace the hideRow by hideBegin/hideEnd formatter within the table XML', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
@@ -149,7 +149,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it.skip('should replace the hideRow by hideBegin/hideEnd formatters into 2 different rows', function (done) {
+        it('should replace the hideRow by hideBegin/hideEnd formatters into 2 different rows', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
               '<table:table-row>' +
@@ -199,7 +199,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it.skip('should replace the hideRow by hideBegin/hideEnd formatters into 2 different rows', function (done) {
+        it.only('should replace multiple hideRow by hideBegin/hideEnd formatters before and after the same row', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
               '<table:table-row>' +
@@ -227,6 +227,135 @@ describe('preprocessor', function () {
               '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>'+
               '<carbone>{d.list[i].name:ifEM:hideEnd}</carbone>'+
             '</table:table>';
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.odt',
+            extension  : 'odt',
+            embeddings : [],
+            files      : [
+              { name : 'content.xml', parent : '', data : _templateContent}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            // console.log(res);
+            helper.assert(res?.files[0]?.data, _expectedResult);
+            done();
+          });
+        });
+
+        it.skip('should replace the hideRow by hideBegin/hideEnd formatters even if the row includes a table BEFORE the hideRow', function (done) {
+          const _templateContent = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-column table:style-name="Table1.A"/>' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.A1" office:value-type="string">' +
+                  '<text:p text:style-name="P2">{d.list[i].desc} </text:p>' +
+                  '<table:table table:name="Table2" table:style-name="Table2">' +
+                    '<table:table-column table:style-name="Table2.A"/>' +
+                    '<table:table-row>' +
+                      '<table:table-cell table:style-name="Table2.A1" office:value-type="string">' +
+                        '<text:p text:style-name="P3">Test <text:span text:style-name="T3">row in the middle</text:span>' +
+                        '</text:p>' +
+                      '</table:table-cell>' +
+                    '</table:table-row>' +
+                  '</table:table>' +
+                  '<text:p text:style-name="P2">' +
+                    '<text:span text:style-name="T1">{d.list[i].desc:ifEM:hideRow}</text:span>' +
+                  '</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+            '</table:table>'
+
+          const _expectedResult = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-column table:style-name="Table1.A"/>' +
+              '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.A1" office:value-type="string">' +
+                  '<text:p text:style-name="P2">{d.list[i].desc} </text:p>' +
+                  '<table:table table:name="Table2" table:style-name="Table2">' +
+                    '<table:table-column table:style-name="Table2.A"/>' +
+                    '<table:table-row>' +
+                      '<table:table-cell table:style-name="Table2.A1" office:value-type="string">' +
+                        '<text:p text:style-name="P3">Test <text:span text:style-name="T3">row in the middle</text:span>' +
+                        '</text:p>' +
+                      '</table:table-cell>' +
+                    '</table:table-row>' +
+                  '</table:table>' +
+                  '<text:p text:style-name="P2">' +
+                    '<text:span text:style-name="T1"></text:span>' +
+                  '</text:p>' +
+                '</table:table-cell>' +
+              '</table:table-row>' +
+              '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' +
+            '</table:table>'
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.odt',
+            extension  : 'odt',
+            embeddings : [],
+            files      : [
+              { name : 'content.xml', parent : '', data : _templateContent}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            // console.log(res);
+            helper.assert(res?.files[0]?.data, _expectedResult);
+            done();
+          });
+        });
+
+        it.skip('should replace the hideRow by hideBegin/hideEnd formatters even if the row includes a table AFTER the hideRow', function (done) {
+          const _templateContent = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">'+
+              '<table:table-column table:style-name="Table1.A"/>'+
+              '<table:table-row>'+
+                '<table:table-cell table:style-name="Table1.A1" office:value-type="string">'+
+                  '<text:p text:style-name="P2">{d.list[i].desc} </text:p>'+
+                  '<text:p text:style-name="P2">'+
+                    '<text:span text:style-name="T1">{d.list[i].desc:ifEM:hideRow}</text:span>'+
+                  '</text:p>'+
+                  '<table:table table:name="Table2" table:style-name="Table2">'+
+                    '<table:table-column table:style-name="Table2.A"/>'+
+                    '<table:table-row>'+
+                      '<table:table-cell table:style-name="Table2.A1" office:value-type="string">'+
+                        '<text:p text:style-name="P4">Row after</text:p>'+
+                      '</table:table-cell>'+
+                    '</table:table-row>'+
+                  '</table:table>'+
+                  '<text:p text:style-name="P2"/>'+
+                '</table:table-cell>'+
+              '</table:table-row>'+
+            '</table:table>'
+
+          const _expectedResult = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">'+
+              '<table:table-column table:style-name="Table1.A"/>'+
+              '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>' +
+              '<table:table-row>'+
+                '<table:table-cell table:style-name="Table1.A1" office:value-type="string">'+
+                  '<text:p text:style-name="P2">{d.list[i].desc} </text:p>'+
+                  '<text:p text:style-name="P2">'+
+                    '<text:span text:style-name="T1"></text:span>'+
+                  '</text:p>'+
+                  '<table:table table:name="Table2" table:style-name="Table2">'+
+                    '<table:table-column table:style-name="Table2.A"/>'+
+                    '<table:table-row>'+
+                      '<table:table-cell table:style-name="Table2.A1" office:value-type="string">'+
+                        '<text:p text:style-name="P4">Row after</text:p>'+
+                      '</table:table-cell>'+
+                    '</table:table-row>'+
+                  '</table:table>'+
+                  '<text:p text:style-name="P2"/>'+
+                '</table:table-cell>'+
+              '</table:table-row>'+
+              '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' +
+            '</table:table>'
+
 
           var _report = {
             isZipped   : true,

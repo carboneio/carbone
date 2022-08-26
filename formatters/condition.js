@@ -570,5 +570,6 @@ module.exports = {
   elseShow,
   and,
   or,
-  len
+  len,
+  hideRow : () => ''
 };

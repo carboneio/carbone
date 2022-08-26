@@ -110,7 +110,34 @@ describe('preprocessor', function () {
         });
       });
 
-      describe.only('hideRow formatter', function () {
+      describe('hideRow formatter', function () {
+        it.skip('should do nothing if the XML if not valid', function (done) {
+          const _templateContent = '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hideRow}</text:p>' +
+                '</table:table-cell>' +
+              // '</table:table-row>' + // MISSING A TABLE ROW
+            '</table:table>';
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.odt',
+            extension  : 'odt',
+            embeddings : [],
+            files      : [
+              { name : 'content.xml', parent : '', data : _templateContent}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            // console.log(res);
+            helper.assert(res?.files[0]?.data, _templateContent);
+            done();
+          });
+        });
+
         it('should replace the hideRow by hideBegin/hideEnd formatter within the table XML', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
@@ -199,7 +226,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it.only('should replace multiple hideRow by hideBegin/hideEnd formatters before and after the same row', function (done) {
+        it('should replace multiple hideRow by hideBegin/hideEnd formatters before and after the same row', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
               '<table:table-row>' +
@@ -245,7 +272,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it.skip('should replace the hideRow by hideBegin/hideEnd formatters even if the row includes a table BEFORE the hideRow', function (done) {
+        it('should replace the hideRow by hideBegin/hideEnd formatters even if the row includes a table BEFORE the hideRow', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">' +
               '<table:table-column table:style-name="Table1.A"/>' +
@@ -309,7 +336,7 @@ describe('preprocessor', function () {
           });
         });
 
-        it.skip('should replace the hideRow by hideBegin/hideEnd formatters even if the row includes a table AFTER the hideRow', function (done) {
+        it('should replace the hideRow by hideBegin/hideEnd formatters even if the row includes a table AFTER the hideRow', function (done) {
           const _templateContent = '' +
             '<table:table table:name="Table1" table:style-name="Table1">'+
               '<table:table-column table:style-name="Table1.A"/>'+

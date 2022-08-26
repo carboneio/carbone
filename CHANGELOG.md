@@ -1,3 +1,6 @@
+### v4.X.X
+ - [EE] New conditional formatter: `hideRow`. Must be inserted only on table cells and will hide the row based on a condition. Such as: `{d.fruits:ifEM:hideRow}` meaning, if the fruit list is empty, hide the row. It is supported for ODT/PDF files for now.
+
 ### v4.1.0
   - Release August 22st 2022
   - [EE] New: `convCRLF` prints `\\n` and `\\r\\n` as new lines in ODS template instead of strings

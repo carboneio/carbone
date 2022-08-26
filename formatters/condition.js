@@ -344,6 +344,8 @@ function show (d, message) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+show.isUpdatingPropagation = true;
 
 /**
  * Print a message if the condition is false. It should be used with other formatters to print conditional content.
@@ -359,6 +361,8 @@ function elseShow (d, message) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+elseShow.isUpdatingPropagation = true;
 
 /**
  * Show a text block between showBegin and showEnd if the condition is true
@@ -374,6 +378,9 @@ function showBegin (d) {
   }
   return '';
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+showBegin.isUpdatingPropagation = true;
+
 
 /**
  * show a text block between showBegin and showEnd if the condition is true
@@ -399,6 +406,8 @@ function hideBegin (d) {
   }
   return '';
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+hideBegin.isUpdatingPropagation = true;
 
 /**
  * hide text block between hideBegin and hideEnd if the condition is true
@@ -410,24 +419,6 @@ function hideEnd () {
   return '';
 }
 
-/**
- * Returns the length of a string or array.
- *
- * @version 2.0.0
- * @example ["Hello World"]
- * @example [""]
- * @example [[1, 2, 3, 4, 5]]
- * @example [[1, "Hello"]]
- *
- * @param {Mixed} d Array or String
- * @returns {Number} Length of the element
- */
-function len (d) {
-  if (typeof d === 'string' || Array.isArray(d)) {
-    return d.length;
-  }
-  return 0;
-}
 
 /**
  * Test if data is empty (null, undefined, [], {}, ...). The new formatter `ifEM` should be used instead of this one.
@@ -462,6 +453,8 @@ function ifEmpty (d, message, continueOnSuccess) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+ifEmpty.isUpdatingPropagation = true;
 
 /**
  * Test if a value equals a variable. The new formatter `ifEQ` should be used instead of this one.
@@ -493,6 +486,8 @@ function ifEqual (d, value, messageIfTrue, continueOnSuccess) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+ifEqual.isUpdatingPropagation = true;
 
 /**
  * Test if a string or an array contains a value. The new formatter `ifIN` should be used instead of this one.
@@ -524,6 +519,8 @@ function ifContain (d, value, messageIfTrue, continueOnSuccess) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+ifContain.isUpdatingPropagation = true;
 
 /**
  * Detect conditional block begin/end
@@ -570,6 +567,5 @@ module.exports = {
   elseShow,
   and,
   or,
-  len,
   hideRow : () => ''
 };

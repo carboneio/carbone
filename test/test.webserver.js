@@ -5,7 +5,6 @@ const path       = require('path');
 const FormData   = require('form-data');
 const assert     = require('assert');
 const carbone    = require('../lib/index');
-const sinon      = require('sinon');
 const os         = require('os');
 const { exec, spawn } = require('child_process');
 const package    = require('../package.json');
@@ -743,19 +742,12 @@ describe('Webserver', () => {
 
     describe('Render template', () => {
       let toDelete = [];
-      let spyRender = null;
 
       before((done) => {
         uploadFile(4000, null, done);
       });
 
-      beforeEach(() => {
-        spyRender = sinon.spy(carbone, 'render');
-      });
-
       afterEach(() => {
-        spyRender.restore();
-
         for (let i = 0; i < toDelete.length; i++) {
           if (fs.existsSync(path.join(os.tmpdir(), 'render', toDelete[i]))) {
             fs.unlinkSync(path.join(os.tmpdir(), 'render', toDelete[i]));
@@ -817,7 +809,10 @@ describe('Webserver', () => {
           const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
           helper.assert(data.data.debug, {
-            markers : ['{d.firstname}', '{d.lastname}']
+            markers : ['{d.firstname}', '{d.lastname}'],
+            sample  : {
+              data : { firstname : 'firstname0', lastname : 'lastname1'}
+            }
           });
           toDelete.push(data.data.renderId);
           done();
@@ -929,16 +924,23 @@ describe('Webserver', () => {
           enum       : {}
         };
 
+        const _originalCarboneRender = carbone.render;
+        let _originalCarboneArguments = {};
+        carbone.render = (...args) => {
+          _originalCarboneArguments = args;
+          _originalCarboneRender.apply(null, args);
+        };
         get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          carbone.render = _originalCarboneRender; // restore original carbone.render
           assert.strictEqual(data.success, true);
-          const renderOptions = spyRender.firstCall.args;
-          assert.deepStrictEqual(renderOptions[2].convertTo, {
+          assert.deepStrictEqual(_originalCarboneArguments[2].convertTo, {
             formatName    : 'pdf',
             formatOptions : {
-              EncryptFile           : false,
-              DocumentOpenPassword  : 'Pass',
-              ReduceImageResolution : false,
-              Watermark             : 'My Watermark'
+              EncryptFile            : false,
+              DocumentOpenPassword   : 'Pass',
+              ReduceImageResolution  : false,
+              UseLosslessCompression : true,
+              Watermark              : 'My Watermark'
             }
           });
           toDelete.push(data.data.renderId);

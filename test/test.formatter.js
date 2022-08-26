@@ -104,12 +104,89 @@ describe('formatter', function () {
       );
     });
   });
+  describe('formatI', function () {
+    it('should transform duration (patternOut), which are by default in milliseconds (patternIn)', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'millisecond' ), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'milliseconds'), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'ms'          ), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'second'      ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'seconds'     ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 's'           ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'minute'      ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'minutes'     ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'm'           ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'hour'        ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'hours'       ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'h'           ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'year'        ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'years'       ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'y'           ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'month'       ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'months'      ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'M'           ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'week'        ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'weeks'       ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'w'           ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'day'         ), 28);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'days'        ), 28);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'd'           ), 28);
+    });
+    it('should return null if patternOur is unknown ', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 0         ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , ''        ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , undefined ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , null      ), null);
+    });
+    it('should accept other units for patternIn', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'millisecond' ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'milliseconds'), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'ms'          ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'second'      ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'seconds'     ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  's'           ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'minute'      ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'minutes'     ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'm'           ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'hour'        ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'hours'       ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'h'           ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'year'        ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'years'       ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'y'           ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'month'       ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'months'      ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'M'           ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'week'        ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'weeks'       ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'w'           ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'day'         ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'days'        ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'd'           ), 1000 * 3600 * 24 * 28  );
+    });
+    it('should also accept ISO units for patternIn if not defined, and if the value starts with "P..."', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 'P1M'            , 'ms'    ), 1000 * 3600 * 24 * 30 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 'P1Y2M3DT4H5M6S' , 'hour'  ), 10276.085 );
+    });
+    it('should humanize if patternOut contain humain or humain+ and manage locale', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                           , 'human' ) , 'a few seconds' );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600                    , 'human' ) , 'an hour'       );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600                    , 'human+') , 'in an hour'    );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, -1000 * 3600                   , 'human+') , 'an hour ago'   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, -1000 * 3600 * 24 * 365 * 4    , 'human+') , '4 years ago'   );
+      helper.assert(dateFormatter.formatI.call({lang : 'fr'}, -1000 * 3600 * 24 * 365 * 4    , 'human+') , 'il y a 4 ans'  );
+      helper.assert(dateFormatter.formatI.call({lang : 'fr-FR'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'il y a 4 ans'  );
+      helper.assert(dateFormatter.formatI.call({lang : 'es-ES'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'hace 4 años'   );
+    });
+  });
   describe('convCRLF', function () {
     it('should convert LF and CR in odt', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'odt'}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <text:line-break/> sd <text:line-break/> qsd <text:line-break/> sq');
     });
     it('should convert LF and CR in docx', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'docx'}, 'qsdqsd \n'), 'qsdqsd </w:t><w:br/><w:t>');
+    });
+    it('should add a paragraph in ODS', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'ods'}, 'qsdqsd \n'), 'qsdqsd </text:p><text:p>');
     });
   });
   describe('convCRLFH', function () {
@@ -915,9 +992,9 @@ describe('formatter', function () {
         });
         it('Should show + AND + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 1997);
+          callWithContext(conditionFormatter.ifLTE, _context, stringFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 1997);
           callWithContext(conditionFormatter.and, _context);
-          callWithContext(conditionFormatter.ifGT, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 10);
+          callWithContext(conditionFormatter.ifGT, _context, stringFormatter.len('This Is a long string with numbers 12345'), 10);
           helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
           helper.assert(_context.isConditionTrue, true);
           helper.assert(_context.isAndOperator, true);
@@ -926,9 +1003,9 @@ describe('formatter', function () {
 
         it('Should elseShow + AND + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 10);
+          callWithContext(conditionFormatter.ifLTE, _context, stringFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 10);
           callWithContext(conditionFormatter.and, _context);
-          callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 41);
+          callWithContext(conditionFormatter.ifGTE, _context, stringFormatter.len('This Is a long string with numbers 12345'), 41);
           callWithContext(conditionFormatter.show, _context);
           helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'Apple'), 'Apple');
           helper.assert(_context.isConditionTrue, false);
@@ -938,9 +1015,9 @@ describe('formatter', function () {
 
         it('Should show + OR + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLT, _context, conditionFormatter.len(['car', 'train', 'plane']), 2);
+          callWithContext(conditionFormatter.ifLT, _context, stringFormatter.len(['car', 'train', 'plane']), 2);
           callWithContext(conditionFormatter.or, _context);
-          callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('Hello12345'), 10);
+          callWithContext(conditionFormatter.ifGTE, _context, stringFormatter.len('Hello12345'), 10);
           helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
           helper.assert(_context.isConditionTrue, true);
           helper.assert(_context.isAndOperator, false);
@@ -952,17 +1029,17 @@ describe('formatter', function () {
 
   describe('LEN', function () {
     it('should return the string length or array length', function () {
-      helper.assert(conditionFormatter.len('This is a string'), 16);
-      helper.assert(conditionFormatter.len(''), 0);
-      helper.assert(conditionFormatter.len('樂而不淫 建章曰'), 8);
-      helper.assert(conditionFormatter.len('This is a longer string lenght'), 30);
-      helper.assert(conditionFormatter.len([0, 1, 2, 3]), 4);
-      helper.assert(conditionFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
-      helper.assert(conditionFormatter.len([]), 0);
-      helper.assert(conditionFormatter.len({name : 'John'}), 0);
-      helper.assert(conditionFormatter.len(undefined), 0);
-      helper.assert(conditionFormatter.len(null), 0);
-      helper.assert(conditionFormatter.len(-1), 0);
+      helper.assert(stringFormatter.len('This is a string'), 16);
+      helper.assert(stringFormatter.len(''), 0);
+      helper.assert(stringFormatter.len('樂而不淫 建章曰'), 8);
+      helper.assert(stringFormatter.len('This is a longer string lenght'), 30);
+      helper.assert(stringFormatter.len([0, 1, 2, 3]), 4);
+      helper.assert(stringFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
+      helper.assert(stringFormatter.len([]), 0);
+      helper.assert(stringFormatter.len({name : 'John'}), 0);
+      helper.assert(stringFormatter.len(undefined), 0);
+      helper.assert(stringFormatter.len(null), 0);
+      helper.assert(stringFormatter.len(-1), 0);
     });
   });
 

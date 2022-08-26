@@ -29,12 +29,13 @@ Carbone On-premise can be installed in different ways:
 ### Basic Installation
 
 1. Download the license and the Carbone On-premise binary for server/OS: Mac, Linux or Windows
-2. Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
-3. Prepare the license key to be loaded, multiple solution:
+2. On your terminal run `chmod +x carbone-ee` in order to execute the binary.
+3. Install LibreOffice (Optional, if you need to generate PDF, you must install Libre Office) [Link to instructions](#how-and-why-install-libreoffice).
+4. Prepare the license key to be loaded, multiple solution:
    - Set the Environment Variable `CARBONE_EE_LICENSE` with the license key as the value
    - Or pass the CLI option `--license` followed by the license key as the value when you start the server (step 4)
    - Or insert the **license** file in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is selected. The binary can't start if the license is outdated or invalid.
-4. Start Carbone web server or [daemonize it with systemd](#installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#carbone-options-overview) to Carbone On-Premise through the CLI:
+5. Start Carbone web server or [daemonize it with systemd](#installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#carbone-options-overview) to Carbone On-Premise through the CLI:
 
 ```bash
   ./carbone webserver --port 4000 --workdir .
@@ -43,8 +44,6 @@ Carbone On-premise can be installed in different ways:
 If an error appears during the start up, you must verify:
 - if your license is valid
 - if CLI options and values are valid
-
-You must install LibreOffice to generate PDF documents, [read instructions](#how-and-why-install-libreoffice).
 
 ### Installation from systemd
 
@@ -81,14 +80,14 @@ You must install LibreOffice to generate PDF documents, [read instructions](#how
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.1.5.2/deb/x86_64/LibreOffice_7.1.5.2_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.4.0.3/deb/x86_64/LibreOffice_7.4.0.3_Linux_x86-64_deb.tar.gz
 
   # Install required dependencies on ubuntu server for LibreOffice 7.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_7.1.5.2_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_7.1.5.2_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_7.4.0.3_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_7.4.0.3_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb

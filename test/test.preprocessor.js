@@ -486,6 +486,50 @@ describe('preprocessor', function () {
         });
       });
     });
+    describe('DOCX preprocessing', function () {
+      it('should insert markers to generate unique ids for shapes and images', function (done) {
+        // eslint-disable-next-line
+        var _xml = (isExpected = false) => { return ''
+          + '<w:r>'
+          + '  <mc:AlternateContent>'
+          + '    <mc:Choice Requires="wps">'
+          + '      <w:drawing>'
+          + '        <wp:inline>'
+          + (isExpected ? '<wp:docPr desc="name" id="{c.now:generateImageDocxGlobalId}" name="Rectangle 1"/>' : '<wp:docPr desc="name" id="10" name="Rectangle 1"/>')
+          + '          <wp:cNvGraphicFramePr/>'
+          + '          <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
+          + '            <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">'
+          + '              <wps:wsp>'
+          + '                </wps:bodyPr>'
+          + '              </wps:wsp>'
+          + '            </a:graphicData>'
+          + '          </a:graphic>'
+          + '        </wp:inline>'
+          + '      </w:drawing>'
+          + '    </mc:Choice>'
+          + '  </mc:AlternateContent>'
+          + '</w:r>';
+        };
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.docx',
+          embeddings : [],
+          extension  : 'docx',
+          files      : [
+            {name : 'word/document.xml' , parent : '', data : _xml()},
+            {name : 'word/other.xml'    , parent : '', data : _xml()} // not in other files for the moment
+          ]
+        };
+        preprocessor.execute(_report, function (err, tmpl) {
+          helper.assert(err + '', 'null');
+          assert.equal(tmpl.files[0].name, 'word/document.xml');
+          assert.equal(tmpl.files[0].data, _xml(true));
+          assert.equal(tmpl.files[1].data, _xml(false));
+          done();
+        });
+      });
+    });
     describe('XSLX preprocessing', function () {
       var _sharedStringBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
                               + '<t>{d.name}</t></si><si><t>{d.id}</t></si></sst>';
@@ -564,12 +608,19 @@ describe('preprocessor', function () {
             helper.assert(tmpl.files[0].name, 'my_file.xml');
             helper.assert(tmpl.files[0].data, 'some text');
             helper.assert(tmpl.files[0].parent, '');
-            // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
-            // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
-            // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
             helper.assert(tmpl.files[1].name, 'xl/worksheets/sheet1.xml');
             helper.assert(tmpl.files[1].data, _sheetAfter);
             helper.assert(tmpl.files[1].parent, 'embedded/spreadsheet.xlsx');
+            helper.assert(tmpl.embeddedXlsxCellValues, {
+              'embedded/spreadsheet.xlsx' : {
+                A1 : 'Nom',
+                B1 : 'Id',
+                C1 : 'TOTAL',
+                A2 : 'tata',
+                A3 : '{d.name}',
+                B3 : '{d.id}'
+              }
+            });
             done();
           });
         });
@@ -592,18 +643,30 @@ describe('preprocessor', function () {
             helper.assert(tmpl.files[0].name, 'my_file.xml');
             helper.assert(tmpl.files[0].data, 'some text');
             helper.assert(tmpl.files[0].parent, '');
-            // tmpl.files[1].name.should.be.eql('xl/sharedStrings.xml');
-            // tmpl.files[1].data.should.be.eql(_sharedStringAfter);
-            // tmpl.files[1].parent.should.be.eql('embedded/spreadsheet.xlsx');
             helper.assert(tmpl.files[1].name, 'xl/worksheets/sheet1.xml');
             helper.assert(tmpl.files[1].data, _sheetAfter);
             helper.assert(tmpl.files[1].parent, 'embedded/spreadsheet.xlsx');
-            // tmpl.files[2].name.should.be.eql('xl/sharedStrings.xml');
-            // tmpl.files[2].data.should.be.eql(_sharedStringAfter2);
-            // tmpl.files[2].parent.should.be.eql('embedded/spreadsheet2.xlsx');
             helper.assert(tmpl.files[2].name, 'xl/worksheets/sheet1.xml');
             helper.assert(tmpl.files[2].data, _sheetAfter2);
             helper.assert(tmpl.files[2].parent, 'embedded/spreadsheet2.xlsx');
+            helper.assert(tmpl.embeddedXlsxCellValues, {
+              'embedded/spreadsheet2.xlsx' : {
+                A1 : 'Nom',
+                B1 : 'Id',
+                C1 : 'TOTAL',
+                A2 : 'tata',
+                A3 : '{d.name}',
+                B3 : '{d.type}'
+              },
+              'embedded/spreadsheet.xlsx' : {
+                A1 : 'Nom',
+                B1 : 'Id',
+                C1 : 'TOTAL',
+                A2 : 'tata',
+                A3 : '{d.name}',
+                B3 : '{d.id}'
+              }
+            });
             done();
           });
         });

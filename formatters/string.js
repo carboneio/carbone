@@ -3,6 +3,7 @@ var toMd5 = require('./md5');
 
 const LINEBREAK = {
   odt  : '<text:line-break/>',
+  ods  : '</text:p><text:p>',
   docx : '</w:t><w:br/><w:t>'
 };
 
@@ -163,13 +164,14 @@ function unaccent (d) {
 
 
 /**
- * Convert carriage return `\\r\\n` and line feed `\\n` to XML-specific code in rendered document
+ * It renders carriage return `\\r\\n` and line feed `\\n` into documents instead of printing them as a string.
+ * Importante notes:
+ * - Feature supported for DOCX, PDF, ODT, and ODS files.
+ * - ODS supports is experimental for now, contact the support if you find issues.
+ * - Since `v3.5.3`, using the `:convCRLF` formatter before `:html` converts `\\n` to `<br>` tags. Usage example: `{d.content:convCRLF:html}`
+
  *
- * Since v3.5.3, it can be used before `:html` formatter to convert `\n` to `<br>` tags
- *
- * Compatible with odt, and docx (beta)
- *
- * @version 1.1.0
+ * @version 4.1.0 UPDATED
  *
  * @exampleContext { "extension" : "odt" }
  * @example [ "my blue \\n car"   ]
@@ -193,6 +195,7 @@ function convCRLF (d) {
 }
 // this formatter is separately to inject code
 convCRLF.canInjectXML = true;
+convCRLF.isExecutionNotConditionnalyExecuted;
 
 /**
  * Specific formatter used to replace, when convCRLF is used before :html formatter
@@ -303,6 +306,30 @@ function prepend (d, toPrepend) {
   return toPrepend + d;
 }
 
+function append (d, append) {
+  return d + '' + append;
+}
+
+
+/**
+ * Returns the length of a string or array.
+ *
+ * @version 2.0.0
+ * @example ["Hello World"]
+ * @example [""]
+ * @example [[1, 2, 3, 4, 5]]
+ * @example [[1, "Hello"]]
+ *
+ * @param {Mixed} d Array or String
+ * @returns {Number} Length of the element
+ */
+function len (d) {
+  if (typeof d === 'string' || Array.isArray(d)) {
+    return d.length;
+  }
+  return 0;
+}
+
 module.exports = {
   lowerCase : lowerCase,
   upperCase : upperCase,
@@ -316,8 +343,10 @@ module.exports = {
   slice     : substr,
   padl      : padl,
   padr      : padr,
+  len       : len,
   md5       : md5,
   prepend   : prepend,
+  append    : append,
   // private
   convCRLFH : convCRLFH
 };

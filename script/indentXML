@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+
+/* Helper to indent XML in test/dataset */
+
+const xmlFormat = require('xml-beautifier');
+const helper    = require('../lib/helper');
+const fs        = require('fs');
+const path      = require('path');
+const readline  = require('readline');
+const rl        = readline.createInterface({
+  input  : process.stdin,
+  output : process.stdout
+});
+
+const _path = process.argv[2];
+
+if (!_path) {
+  console.log('Usage:\nProvide a path like this:\n>  script/indentXML test/datasets/chart/docx-loop');
+  console.log('Abandon');
+  process.exit();
+}
+
+const _files = helper.walkDirSync(_path);
+console.table(_files);
+
+rl.question('Confirm indentation of these files [y,n]? (default : y) ', (answer) => {
+  rl.close();
+  if (answer !== 'y' && answer !== '') {
+    console.log('Abandon');
+    process.exit();
+  }
+  _files.forEach(filePath => {
+    const _data = fs.readFileSync(filePath);
+    const _extname = path.extname(filePath);
+    if (_extname === '.xml' || _extname === '.rels') {
+      const _fileStr = _data.toString();
+      const _fileFormatted = xmlFormat(_fileStr.replace(/(\r\n|\n|\r)/g, ' '), '  ');
+      console.log('- formatting ' + filePath);
+      fs.writeFileSync(filePath, _fileFormatted);
+    }
+  });
+  console.log('Done');
+});

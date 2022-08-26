@@ -499,18 +499,18 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     it('[utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
       helper.assert(hyperlinks.validateURL('carbone.io'), 'https://carbone.io');
       helper.assert(hyperlinks.validateURL('www.carbone.com.au'), 'https://www.carbone.com.au');
-      helper.assert(hyperlinks.validateURL('www.carbone.com.au/?key=value&name=john'), 'https://www.carbone.com.au/?key=value&name=john');
-      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick'), 'http://carbone.io/?name=john&lastname=wick');
-      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick'), 'https://carbone.io/?name=john&lastname=wick');
+      helper.assert(hyperlinks.validateURL('www.carbone.com.au/?key=value&name=john'), 'https://www.carbone.com.au/?key=value&amp;name=john');
+      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick'), 'http://carbone.io/?name=john&amp;lastname=wick');
+      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick'), 'https://carbone.io/?name=john&amp;lastname=wick');
       helper.assert(hyperlinks.validateURL('example.com:3000'), 'https://example.com:3000');
-      helper.assert(hyperlinks.validateURL('example.com:3000/?key=value&name=john'), 'https://example.com:3000/?key=value&name=john');
+      helper.assert(hyperlinks.validateURL('example.com:3000/?key=value&name=john'), 'https://example.com:3000/?key=value&amp;name=john');
       helper.assert(hyperlinks.validateURL('my_test.asp/?name=st%C3%A5le&amp;car=saab'), 'https://my_test.asp/?name=st%C3%A5le&amp;car=saab');
       helper.assert(hyperlinks.validateURL('http://my_test.asp/?name=st%C3%A5le&amp;car=saab'), 'http://my_test.asp/?name=st%C3%A5le&amp;car=saab');
       helper.assert(hyperlinks.validateURL('https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B'), 'https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
       helper.assert(hyperlinks.validateURL('https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1'), 'https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1');
       helper.assert(hyperlinks.validateURL('carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\''), 'https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\'');
       helper.assert(hyperlinks.validateURL('https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\''), 'https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\'');
-      helper.assert(hyperlinks.validateURL('https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c'), 'https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c');
+      helper.assert(hyperlinks.validateURL('https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c'), 'https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&amp;token=6bc57ba6-3056-4563-8d21-f1687737142c');
     });
 
     it('[utils] validateURL - \n \
@@ -533,15 +533,15 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37', 'https://carbone.io/url_on_error.html'), 'https://carbone.io/url_on_error.html');
     });
 
-    it('[utils] validateURL + DOCX && \n \
+    it('[utils] validateURL && \n \
         should correct the URL and convert "&" caracter to "&amp;" encoded caracter && \n \
         should return the default Error URL when the URL is invalid && \n \
         should return a different default Error URL when the URL is invalid', () => {
-      helper.assert(hyperlinks.validateURL('carbone.io', '', 'docx'), 'https://carbone.io');
-      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick', '', 'docx'), 'http://carbone.io/?name=john&amp;lastname=wick');
-      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick&key=code', '', 'docx'), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
-      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', '', 'docx'), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', 'https://www.carbone.com.au', 'docx'), 'https://www.carbone.com.au');
+      helper.assert(hyperlinks.validateURL('carbone.io', ''), 'https://carbone.io');
+      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick', ''), 'http://carbone.io/?name=john&amp;lastname=wick');
+      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick&key=code', ''), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
+      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', ''), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', 'https://www.carbone.com.au'), 'https://www.carbone.com.au');
     });
 
     it('[utils] formatter "addLinkDatabase" should add to the hyperlinkDatabase and return the hyperlink properties', () => {

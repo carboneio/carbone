@@ -218,6 +218,88 @@ describe('preprocessor', function () {
             });
           });
 
+          it('should replace the hideRow by hideBegin/hideEnd formatter even if the rows has `trP`  ', function (done) {
+            const _templateContent = '' +
+              '<w:tbl>'+
+                '<w:tr w:rsidR="00CF4F0C" w14:paraId="7814680B" w14:textId="77777777" w:rsidTr="00CF4F0C">'+
+                  `<w:trPr>` + // SPECIAL TAG FOR ROW PROPERTIES
+                    `<w:cantSplit/>` +
+                    `<w:tblHeader/>` +
+                  `</w:trPr>` +
+                  '<w:tc>'+
+                    '<w:tcPr>'+
+                      '<w:tcW w:w="9350" w:type="dxa"/>'+
+                    '</w:tcPr>'+
+                    '<w:p w14:paraId="380A2403" w14:textId="4D89F94B" w:rsidR="00CF4F0C" w:rsidRPr="00CF4F0C" w:rsidRDefault="00CF4F0C" w:rsidP="00CF4F0C">'+
+                      '<w:pPr>'+
+                        '<w:tabs>'+
+                          '<w:tab w:val="left" w:pos="455"/>'+
+                        '</w:tabs>'+
+                        '<w:rPr>'+
+                          '<w:lang w:val="en-US"/>'+
+                        '</w:rPr>'+
+                      '</w:pPr>'+
+                      '<w:r>'+
+                        '<w:rPr>'+
+                          '<w:lang w:val="en-US"/>'+
+                        '</w:rPr>'+
+                        '<w:t>{d.desc}{d.desc:ifEM:hideRow}</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+              '</w:tbl>'
+
+            const _expectedResult = '' +
+              '<w:tbl>'+
+                '<carbone>{d.desc:ifEM:hideBegin}</carbone>' +
+                '<w:tr w:rsidR="00CF4F0C" w14:paraId="7814680B" w14:textId="77777777" w:rsidTr="00CF4F0C">'+
+                  `<w:trPr>` +
+                    `<w:cantSplit/>` +
+                    `<w:tblHeader/>` +
+                  `</w:trPr>` +
+                  '<w:tc>'+
+                    '<w:tcPr>'+
+                      '<w:tcW w:w="9350" w:type="dxa"/>'+
+                    '</w:tcPr>'+
+                    '<w:p w14:paraId="380A2403" w14:textId="4D89F94B" w:rsidR="00CF4F0C" w:rsidRPr="00CF4F0C" w:rsidRDefault="00CF4F0C" w:rsidP="00CF4F0C">'+
+                      '<w:pPr>'+
+                        '<w:tabs>'+
+                          '<w:tab w:val="left" w:pos="455"/>'+
+                        '</w:tabs>'+
+                        '<w:rPr>'+
+                          '<w:lang w:val="en-US"/>'+
+                        '</w:rPr>'+
+                      '</w:pPr>'+
+                      '<w:r>'+
+                        '<w:rPr>'+
+                          '<w:lang w:val="en-US"/>'+
+                        '</w:rPr>'+
+                        '<w:t>{d.desc}</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+                '<carbone>{d.desc:ifEM:hideEnd}</carbone>' +
+              '</w:tbl>'
+
+            var _report = {
+              isZipped   : true,
+              filename   : 'template.docx',
+              extension  : 'docx',
+              embeddings : [],
+              files      : [
+                { name : 'document.xml', parent : '', data : _templateContent}
+              ]
+            };
+            preprocessor.execute(_report, function (err, res) {
+              helper.assert(err + '', 'null');
+              // console.log(res);
+              helper.assert(res?.files[0]?.data, _expectedResult);
+              done();
+            });
+          });
+
           it('should replace the hideRow by hideBegin/hideEnd formatters into 2 different rows', function (done) {
             const _templateContent = '' +
               '<w:tbl>'+

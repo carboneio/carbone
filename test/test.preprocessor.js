@@ -651,6 +651,105 @@ describe('preprocessor', function () {
               done();
             });
           });
+
+          it.only('should replace a hideRow at the root table, and a second embed into a child table', function (done) {
+            const _templateContent = '' +
+            '<w:tbl>'+
+              '<w:tr w:rsidR="009F5344" w14:paraId="2ED0E191" w14:textId="77777777" w:rsidTr="009F5344">'+
+                '<w:tc>'+
+                  '<w:p w14:paraId="1FD37E5C" w14:textId="0FA34AEB" w:rsidR="00D31EF7" w:rsidRDefault="00D31EF7">'+
+                    '<w:r>'+
+                      '<w:rPr>'+
+                        '<w:lang w:val="en-US"/>'+
+                      '</w:rPr>'+
+                      '<w:t>{d.title}</w:t>'+
+                    '</w:r>'+
+                  '</w:p>'+
+                  '<w:tbl>'+
+                    '<w:tr w:rsidR="009F5344" w14:paraId="42E6BCD0" w14:textId="77777777" w:rsidTr="009F5344">'+
+                      '<w:tc>'+
+                        '<w:p w14:paraId="18D51DD9" w14:textId="479843EF" w:rsidR="009F5344" w:rsidRPr="00D31EF7" w:rsidRDefault="004D1A97">'+
+                          '<w:r w:rsidRPr="00D31EF7">'+
+                            '<w:t>{d.desc}</w:t>'+
+                          '</w:r>'+
+                          '<w:r w:rsidR="009F5344" w:rsidRPr="00D31EF7">'+
+                            '<w:t>{d.desc:ifEM:hideRow}</w:t>'+ // HIDE ROW EMBED INTO A CHILD TABLE
+                          '</w:r>'+
+                        '</w:p>'+
+                      '</w:tc>'+
+                    '</w:tr>'+
+                  '</w:tbl>'+
+                  '<w:p w14:paraId="015ED9A9" w14:textId="63AF0518" w:rsidR="009F5344" w:rsidRPr="009F5344" w:rsidRDefault="009F5344">'+
+                    '<w:r>'+
+                      '<w:rPr>'+
+                        '<w:lang w:val="en-US"/>'+
+                      '</w:rPr>'+
+                      '<w:t>{d.show:ifEQ(false):hideRow}</w:t>'+ // SECOND HIDEROW AT THE ROOT OF THE TABLE
+                    '</w:r>'+
+                  '</w:p>'+
+                '</w:tc>'+
+              '</w:tr>'+
+            '</w:tbl>'
+
+
+            const _expectedResult = '' +
+              '<w:tbl>'+
+                '<carbone>{d.show:ifEQ(false):hideBegin}</carbone>'+
+                '<w:tr w:rsidR="009F5344" w14:paraId="2ED0E191" w14:textId="77777777" w:rsidTr="009F5344">'+
+                  '<w:tc>'+
+                    '<w:p w14:paraId="1FD37E5C" w14:textId="0FA34AEB" w:rsidR="00D31EF7" w:rsidRDefault="00D31EF7">'+
+                      '<w:r>'+
+                        '<w:rPr>'+
+                          '<w:lang w:val="en-US"/>'+
+                        '</w:rPr>'+
+                        '<w:t>{d.title}</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                    '<w:tbl>'+
+                      '<carbone>{d.desc:ifEM:hideBegin}</carbone>'+
+                      '<w:tr w:rsidR="009F5344" w14:paraId="42E6BCD0" w14:textId="77777777" w:rsidTr="009F5344">'+
+                        '<w:tc>'+
+                          '<w:p w14:paraId="18D51DD9" w14:textId="479843EF" w:rsidR="009F5344" w:rsidRPr="00D31EF7" w:rsidRDefault="004D1A97">'+
+                            '<w:r w:rsidRPr="00D31EF7">'+
+                              '<w:t>{d.desc}</w:t>'+
+                            '</w:r>'+
+                            '<w:r w:rsidR="009F5344" w:rsidRPr="00D31EF7">'+
+                              '<w:t></w:t>'+
+                            '</w:r>'+
+                          '</w:p>'+
+                        '</w:tc>'+
+                      '</w:tr>'+
+                      '<carbone>{d.desc:ifEM:hideEnd}</carbone>'+
+                    '</w:tbl>'+
+                    '<w:p w14:paraId="015ED9A9" w14:textId="63AF0518" w:rsidR="009F5344" w:rsidRPr="009F5344" w:rsidRDefault="009F5344">'+
+                      '<w:r>'+
+                        '<w:rPr>'+
+                          '<w:lang w:val="en-US"/>'+
+                        '</w:rPr>'+
+                        '<w:t></w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+                '<carbone>{d.show:ifEQ(false):hideEnd}</carbone>'+
+              '</w:tbl>'
+
+            var _report = {
+              isZipped   : true,
+              filename   : 'template.docx',
+              extension  : 'docx',
+              embeddings : [],
+              files      : [
+                { name : 'document.xml', parent : '', data : _templateContent}
+              ]
+            };
+            preprocessor.execute(_report, function (err, res) {
+              helper.assert(err + '', 'null');
+              // console.log(res);
+              helper.assert(res?.files[0]?.data, _expectedResult);
+              done();
+            });
+          });
         });
 
         describe('ODT', function () {

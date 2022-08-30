@@ -110,6 +110,50 @@ describe('preprocessor', function () {
         });
       });
     });
+    describe('DOCX preprocessing', function () {
+      it('should insert markers to generate unique ids for shapes and images', function (done) {
+        // eslint-disable-next-line
+        var _xml = (isExpected = false) => { return ''
+          + '<w:r>'
+          + '  <mc:AlternateContent>'
+          + '    <mc:Choice Requires="wps">'
+          + '      <w:drawing>'
+          + '        <wp:inline>'
+          + (isExpected ? '<wp:docPr desc="name" id="{c.now:generateImageDocxGlobalId}" name="Rectangle 1"/>' : '<wp:docPr desc="name" id="10" name="Rectangle 1"/>')
+          + '          <wp:cNvGraphicFramePr/>'
+          + '          <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
+          + '            <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">'
+          + '              <wps:wsp>'
+          + '                </wps:bodyPr>'
+          + '              </wps:wsp>'
+          + '            </a:graphicData>'
+          + '          </a:graphic>'
+          + '        </wp:inline>'
+          + '      </w:drawing>'
+          + '    </mc:Choice>'
+          + '  </mc:AlternateContent>'
+          + '</w:r>';
+        };
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.docx',
+          embeddings : [],
+          extension  : 'docx',
+          files      : [
+            {name : 'word/document.xml' , parent : '', data : _xml()},
+            {name : 'word/other.xml'    , parent : '', data : _xml()} // not in other files for the moment
+          ]
+        };
+        preprocessor.execute(_report, function (err, tmpl) {
+          helper.assert(err + '', 'null');
+          assert.equal(tmpl.files[0].name, 'word/document.xml');
+          assert.equal(tmpl.files[0].data, _xml(true));
+          assert.equal(tmpl.files[1].data, _xml(false));
+          done();
+        });
+      });
+    });
     describe('XSLX preprocessing', function () {
       var _sharedStringBefore = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6"><si><t>Nom</t></si><si><t xml:space="preserve">Id </t></si><si><t>TOTAL</t></si><si><t>tata</t></si><si>'
                               + '<t>{d.name}</t></si><si><t>{d.id}</t></si></sst>';

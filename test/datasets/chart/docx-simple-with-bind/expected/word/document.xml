@@ -10,7 +10,7 @@
           <wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="3CE103A0" wp14:editId="2CADC384">
             <wp:extent cx="5486400" cy="3200400"/>
             <wp:effectExtent l="0" t="0" r="12700" b="12700"/>
-            <wp:docPr id="1" name="Chart 1"/>
+            <wp:docPr id="1000" name="Chart 1"/>
             <wp:cNvGraphicFramePr/>
             <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
               <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">

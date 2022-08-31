@@ -1,3 +1,7 @@
+### v4.2.0
+  - Fix parsing of markers when empty string are used between two single quotes.
+    Ex. `{d.text:print(''):print('HIGK LMN')}` prints `HIGK LMN` instead of `HIGKLMN`
+
 ### v4.1.0
   - Release August 22st 2022
   - [EE] New: `convCRLF` prints `\\n` and `\\r\\n` as new lines in ODS template instead of strings

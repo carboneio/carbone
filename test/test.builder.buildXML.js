@@ -1242,7 +1242,7 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it.only('should accept conditions with dynamic variable. Here it stop when we found the first element which match with id the main iterators "i"', function (done) {
+  it('should accept conditions with dynamic variable. Here it stop when we found the first element which match with id the main iterators "i"', function (done) {
     var _xml = '<xml> <t_row> {d[i=.id].brand} </t_row><t_row> {d[i=.id].brand} </t_row></xml>';
     var _data = [
       {brand : 'Lumeneo'     , id : 3},
@@ -1251,6 +1251,54 @@ describe('builder.buildXML', function () {
     ];
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept conditions with dynamic variable with infinite depth of object (right operand)', function (done) {
+    var _xml = '<xml> <t_row> {d[i=.id.a.b].brand} </t_row><t_row> {d[i=.id.a.b].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : { a : { b : 3}}},
+      {brand : 'Tesla motors', id : { a : { b : 1}}},
+      {brand : 'Toyota'      , id : { a : { b : 2}}}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept conditions with infinite depth of object (left operand), with or without .dot syntax for left operand (legacy)', function (done) {
+    var _xml = '<xml> <t_row> {d[.id.a.b=2].brand} </t_row><t_row> {d[id.a.b=1].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : { a : { b : 3}}},
+      {brand : 'Tesla motors', id : { a : { b : 1}}},
+      {brand : 'Toyota'      , id : { a : { b : 2}}}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Toyota </t_row><t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept conditions with dynamic variable with infinite depth of object (left operand and right operand), with or without .dot syntax for left operand (legacy)', function (done) {
+    var _xml = '<xml> <t_row> {d[.id.a.b=.other.a.b].brand} </t_row> <t_row> {d[id.a.b=.other.a.b].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : { a : { b : 3}}, other : { a : { b : 0}}},
+      {brand : 'Tesla motors', id : { a : { b : 1}}, other : { a : { b : 1}}},
+      {brand : 'Toyota'      , id : { a : { b : 2}}, other : { a : { b : 2}}}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row> <t_row> Tesla motors </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept conditions with dynamic variable with infinite depth of object (left operand and right operand), with or without .dot syntax for left operand (legacy)', function (done) {
+    var _xml = '<xml> <t_row> {d[.id.a.b=1, .other.a.b=2].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : { a : { b : 3}}, other : { a : { b : 0}}},
+      {brand : 'Tesla motors', id : { a : { b : 1}}, other : { a : { b : 2}}},
+      {brand : 'Toyota'      , id : { a : { b : 2}}, other : { a : { b : 2}}}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> Tesla motors </t_row></xml>');
       done();
     });
   });
@@ -1351,7 +1399,7 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it.only('should manage nested arrays', function (done) {
+  it.skip('should manage nested arrays', function (done) {
     var _xml =
        '<xml>'
       +  '<t_row><td>{d.wheels[i].size}</td><td>{d.wheels[i]..cars[i=.i].size}</td></t_row>'
@@ -1484,10 +1532,10 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it.skip('should accept to use dynamic variable in arrays', function (done) {
-    var _xml = '<xml><t_row> {d.cars[i].brand} <tr>{d.cars[i=.id].brand} </tr> </t_row><t_row> {d.cars[i+1].brand} </t_row></xml>';
+  it('should accept to use dynamic variable in array filter, and go up in hierarchy', function (done) {
+    var _xml = '<xml><t_row> {d.cars[i].brand} <tr>{d.cars[i, i=..id].brand} </tr> </t_row><t_row> {d.cars[i+1].brand} </t_row></xml>';
     var _data = {
-      id : 1,
+      id   : 1,
       cars : [
         {brand : 'Lumeneo'},
         {brand : 'Tesla motors'},
@@ -1495,7 +1543,39 @@ describe('builder.buildXML', function () {
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo <tr>Tesla motors </tr> </t_row><t_row> Tesla motors <tr>Tesla motors </tr> </t_row><t_row> Toyota <tr>Tesla motors </tr> </t_row></xml>');
+      assert.equal(_xmlBuilt, '<xml><t_row> Lumeneo <tr> </tr> </t_row><t_row> Tesla motors <tr>Tesla motors </tr> </t_row><t_row> Toyota <tr> </tr> </t_row></xml>');
+      done();
+    });
+  });
+  it('should accept to use complex dynamic variable in array filters, and go up in hierarchy', function (done) {
+    var _xml = '<xml><t_row> {d.cars[i, .condition.o.x = ..id.a.b].brand} </t_row><t_row> {d.cars[i+1, .condition.o.x=..id.a.b].brand} </t_row></xml>';
+    var _data = {
+      id   : { a : { b : 2}},
+      cars : [
+        {brand : 'Lumeneo'     , condition : { o : { x : 1}}},
+        {brand : 'Tesla motors', condition : { o : { x : 2}}},
+        {brand : 'Toyota'      , condition : { o : { x : 3}}},
+        {brand : 'Other'       , condition : { o : { x : 2}}}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml><t_row> Tesla motors </t_row><t_row> Other </t_row></xml>');
+      done();
+    });
+  });
+  it('should return an error when filters contains square brackets', function (done) {
+    var _xml = '<xml><t_row> {d.cars[i, .condition.o.x = ..id.a[0].b].brand} </t_row><t_row> {d.cars[i+1, .condition.o.x=..id.a[0].b].brand} </t_row></xml>';
+    var _data = {
+      id   : { a : [{ b : 2}]},
+      cars : [
+        {brand : 'Lumeneo'     , condition : { o : { x : 1}}},
+        {brand : 'Tesla motors', condition : { o : { x : 2}}},
+        {brand : 'Toyota'      , condition : { o : { x : 3}}},
+        {brand : 'Other'       , condition : { o : { x : 2}}}
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err) {
+      helper.assert(err+'', 'Error: Carbone does not accept square brackets inside array filters in {d.cars[i,.condition.o.x=..id.a[0].b].brand}. Please contact the support to add this feature.');
       done();
     });
   });

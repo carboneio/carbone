@@ -424,7 +424,7 @@ describe('preprocessor', function () {
                         '<w:t>{d.name}{d.name:ifEM:hideRow}</w:t>'+
                       '</w:r>'+
                       '<w:r>'+
-                        '<w:t>{d.desc:ifEM:hideRow}</w:t>'+
+                        '<w:t>{d.desc}{d.desc:ifEM:hideRow}</w:t>'+
                       '</w:r>'+
                     '</w:p>'+
                   '</w:tc>'+
@@ -442,7 +442,7 @@ describe('preprocessor', function () {
                         '<w:t>{d.name}</w:t>'+
                       '</w:r>'+
                       '<w:r>'+
-                        '<w:t></w:t>'+
+                        '<w:t>{d.desc}</w:t>'+
                       '</w:r>'+
                     '</w:p>'+
                   '</w:tc>'+
@@ -652,7 +652,7 @@ describe('preprocessor', function () {
             });
           });
 
-          it.only('should replace a hideRow at the root table, and a second embed into a child table', function (done) {
+          it('should replace a hideRow at the root table, and a second embed into a child table', function (done) {
             const _templateContent = '' +
             '<w:tbl>'+
               '<w:tr w:rsidR="009F5344" w14:paraId="2ED0E191" w14:textId="77777777" w:rsidTr="009F5344">'+

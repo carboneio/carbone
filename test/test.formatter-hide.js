@@ -186,6 +186,35 @@ describe.only('hide formatter', function () {
 
     describe('ODT', function () {
 
+      it('should replace the hide(img) by hideBegin/hideEnd - basic paragraph', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+
+            '<office:body>'+
+              '<office:text>'+
+                '<text:p text:style-name="P1">This is a first paragraph</text:p>'+
+                (expected ? '<carbone>{d.name:ifEM:hideBegin}</carbone>' : '') +
+                '<text:p text:style-name="P1">'+
+                  '{d.name}' +
+                  (expected ? '' : '{d.name:ifEM:hide(p)}') +
+                '</text:p>'+
+                (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '')+
+                '<text:p text:style-name="P1">This is a third paragraph</text:p>'+
+              '</office:text>'+
+            '</office:body>'
+          }
+
+          var _template = {
+            files      : [
+              { name : 'content.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleHideFormatter(_template, 'odt');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+      });
+
     })
 
   });

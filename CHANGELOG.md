@@ -1,5 +1,12 @@
 ### v4.X.X
- - [EE] New conditional formatter: `hideRow`. Must be inserted only on table cells and will hide the row based on a condition. Such as: `{d.fruits:ifEM:hideRow}` meaning, if the fruit list is empty, hide the row. It is supported for DOCX/ODT/PDF files for now.
+ - [EE] New conditional formatter: `hide` use to hide documents elements: images, paragraphs, table rows, shapes and charts. The rendering is always accurate and simplier to use compared to `hideBegin/hideEnd` or `showBegin/showEnd`. The first argument passed to `:hide(argument1)` is the element to hide, it can be:
+    - `p` to hide paragraphs, usage: `{d.text:ifEM:hide(p)}`. The marker must be inside a paragraph and everything inside the paragraph are removed if the condition is validated.
+    - `row` to hide a table row, usage: `{d.data:ifEM:hide(row)}`.
+    - `img` to hide pictures, usage: `{d.img:ifEM:hide(img)}`.
+    - `chart` to hide charts, usage: `{d.dataset:ifEM:hide(chart)}`.
+    - `shape` to hide shape (square, circle, arrows, etc...), usage: `{d.dataset:ifEM:hide(chart)}`.
+
+ Must be inserted only on table cells and will hide the row based on a condition. Such as: `{d.fruits:ifEM:hideRow}` meaning, if the fruit list is empty, hide the row. It is supported for DOCX/ODT/PDF files for now.
 
 ### v4.1.0
   - Release August 22st 2022

@@ -7,6 +7,37 @@ describe.only('hide formatter', function () {
 
     describe('DOCX', function () {
 
+      it('should do nothing if the argument is missing or the type does not exist', function (done) {
+        const content = () => {
+          return '' +
+            '<w:body>' +
+              '<w:p w14:paraId="5C4E8B45" w14:textId="08330C66" w:rsidR="005A25A6" w:rsidRDefault="00C301BD">'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:lang w:val="en-US"/>'+
+                  '</w:rPr>'+
+                  `<w:t>{d.name}{d.name:ifEM:hide}{d.name:ifEM:hide(notExisting)}</w:t>`+
+                '</w:r>'+
+              '</w:p>'+
+            '</w:body>'
+        }
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.docx',
+          extension  : 'docx',
+          embeddings : [],
+          files      : [
+            { name : 'document.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, content());
+          done();
+        });
+      });
+
       it('should replace the hide(p) by hideBegin/hideEnd - basic paragraph', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -36,7 +67,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          console.log(res.files);
           helper.assert(res?.files[0]?.data, content(true));
           done();
         });
@@ -87,7 +117,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          console.log(res.files);
           helper.assert(res?.files[0]?.data, content(true));
           done();
         });
@@ -148,7 +177,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          console.log(res.files);
           helper.assert(res?.files[0]?.data, content(true));
           done();
         });
@@ -165,39 +193,81 @@ describe.only('hide formatter', function () {
   describe('hide(img)', function() {
 
     describe('DOCX', function () {
-      it.skip('should replace the hide(img) by hideBegin/hideEnd - basic image', function (done) {
+
+      it('should replace the hide(img) by hideBegin/hideEnd - basic image', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
           return '' +
-            '<w:body>' +
-              (expected ? '<carbone>{d.name:ifEM:hideBegin}</carbone>' : '') +
-              '<w:p w14:paraId="5C4E8B45" w14:textId="08330C66" w:rsidR="005A25A6" w:rsidRDefault="00C301BD">'+
-                '<w:r>'+
-                  '<w:rPr>'+
-                    '<w:lang w:val="en-US"/>'+
-                  '</w:rPr>'+
-                  `<w:t>{d.name}${expected ? '' : '{d.name:ifEM:hide(p)}'}</w:t>`+
-                '</w:r>'+
-              '</w:p>'+
-              (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '') +
-            '</w:body>'
-        }
+            '<w:p w14:paraId="2B951670" w14:textId="0E5FAB2B" w:rsidR="00944B35" w:rsidRDefault="00944B35" w:rsidP="00CF4F0C">' +
+              '<w:pPr>' +
+                '<w:tabs>' +
+                  '<w:tab w:val="left" w:pos="455"/>' +
+                '</w:tabs>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:noProof/>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                (expected ? '<carbone>{d.image:ifEM:hideBegin}</carbone>' : '') +
+                '<w:drawing>' +
+                  '<wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="07363890" wp14:editId="6DB89906">' +
+                    '<wp:extent cx="2070946" cy="2162628"/>' +
+                    '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                    `<wp:docPr id="1" name="Picture 1" descr="{d.image}&#xA;${expected ? '' : '{d.image:ifEM:hide(img)}'}"/>` +
+                    '<wp:cNvGraphicFramePr>' +
+                      '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                    '</wp:cNvGraphicFramePr>' +
+                    '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                      '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                        '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                          '<pic:nvPicPr>' +
+                            `<pic:cNvPr id="1" name="Picture 1" descr="{d.image}&#xA;${expected ? '' : '{d.image:ifEM:hide(img)}'}"/>` +
+                            '<pic:cNvPicPr/>' +
+                          '</pic:nvPicPr>' +
+                          '<pic:blipFill>' +
+                            '<a:blip r:embed="rId4" cstate="print">' +
+                              '<a:extLst>' +
+                                '<a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}">' +
+                                  '<a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/>' +
+                                '</a:ext>' +
+                              '</a:extLst>' +
+                            '</a:blip>' +
+                            '<a:stretch>' +
+                              '<a:fillRect/>' +
+                            '</a:stretch>' +
+                          '</pic:blipFill>' +
+                          '<pic:spPr>' +
+                            '<a:xfrm>' +
+                              '<a:off x="0" y="0"/>' +
+                              '<a:ext cx="2082898" cy="2175109"/>' +
+                            '</a:xfrm>' +
+                            '<a:prstGeom prst="rect">' +
+                              '<a:avLst/>' +
+                            '</a:prstGeom>' +
+                          '</pic:spPr>' +
+                        '</pic:pic>' +
+                      '</a:graphicData>' +
+                    '</a:graphic>' +
+                  '</wp:inline>' +
+                '</w:drawing>' +
+                (expected ? '<carbone>{d.image:ifEM:hideEnd}</carbone>' : '') +
+              '</w:r>' +
+            '</w:p>'
+          }
 
-        var _report = {
-          isZipped   : true,
-          filename   : 'template.docx',
-          extension  : 'docx',
-          embeddings : [],
-          files      : [
-            { name : 'document.xml', parent : '', data : content()}
-          ]
-        };
-        preprocessor.execute(_report, function (err, res) {
-          helper.assert(err + '', 'null');
-          console.log(res.files);
-          helper.assert(res?.files[0]?.data, content(true));
+          var _template = {
+            extension  : 'docx',
+            files      : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleHideFormatter(_template, 'docx');
+          helper.assert(_template.files[0]?.data, content(true));
           done();
-        });
       });
     })
 
@@ -210,7 +280,152 @@ describe.only('hide formatter', function () {
   describe('hide(shape)', function() {
 
     describe('DOCX', function () {
+      it('should replace the hide(img) by hideBegin/hideEnd - basic shape', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<w:p w14:paraId="70AD7C98" w14:textId="316E2D46" w:rsidR="00197A10" w:rsidRDefault="00E071DB">'+
+              '<w:r>'+
+                (expected ? '<carbone>{d.test:ifEM:hideBegin}</carbone>' : '') +
+                '<mc:AlternateContent>'+
+                  '<mc:Choice Requires="wps">'+
+                    '<w:drawing>'+
+                      '<wp:anchor distT="0" distB="0" distL="114300" distR="114300" simplePos="0" relativeHeight="251659264" behindDoc="0" locked="0" layoutInCell="1" allowOverlap="1" wp14:anchorId="6ACBA7B9" wp14:editId="399B63E8">'+
+                        '<wp:simplePos x="0" y="0"/>'+
+                        '<wp:positionH relativeFrom="column">'+
+                          '<wp:posOffset>+187569</wp:posOffset>'+
+                        '</wp:positionH>'+
+                        '<wp:positionV relativeFrom="paragraph">'+
+                          '<wp:posOffset>60130</wp:posOffset>'+
+                        '</wp:positionV>'+
+                        '<wp:extent cx="3587262" cy="1887415"/>'+
+                        '<wp:effectExtent l="0" t="0" r="6985" b="17780"/>'+
+                        '<wp:wrapNone/>'+
+                        `<wp:docPr id="1" name="Rectangle 1" descr="${expected ? '' : '{d.test:ifEM:hide(shape)}'}"/>`+
+                        '<wp:cNvGraphicFramePr/>'+
+                        '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'+
+                          '<a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">'+
+                            '<wps:wsp>'+
+                              '<wps:cNvSpPr/>'+
+                              '<wps:spPr>'+
+                                '<a:xfrm>'+
+                                  '<a:off x="0" y="0"/>'+
+                                  '<a:ext cx="3587262" cy="1887415"/>'+
+                                '</a:xfrm>'+
+                                '<a:prstGeom prst="rect">'+
+                                  '<a:avLst/>'+
+                                '</a:prstGeom>'+
+                              '</wps:spPr>'+
+                              '<wps:style>'+
+                                '<a:lnRef idx="2">'+
+                                  '<a:schemeClr val="accent1">'+
+                                    '<a:shade val="50000"/>'+
+                                  '</a:schemeClr>'+
+                                '</a:lnRef>'+
+                                '<a:fillRef idx="1">'+
+                                  '<a:schemeClr val="accent1"/>'+
+                                '</a:fillRef>'+
+                                '<a:effectRef idx="0">'+
+                                  '<a:schemeClr val="accent1"/>'+
+                                '</a:effectRef>'+
+                                '<a:fontRef idx="minor">'+
+                                  '<a:schemeClr val="lt1"/>'+
+                                '</a:fontRef>'+
+                              '</wps:style>'+
+                              '<wps:bodyPr rot="0" spcFirstLastPara="0" vertOverflow="overflow" horzOverflow="overflow" vert="horz" wrap="square" lIns="91440" tIns="45720" rIns="91440" bIns="45720" numCol="1" spcCol="0" rtlCol="0" fromWordArt="0" anchor="ctr" anchorCtr="0" forceAA="0" compatLnSpc="1">'+
+                                '<a:prstTxWarp prst="textNoShape">'+
+                                  '<a:avLst/>'+
+                                '</a:prstTxWarp>'+
+                                '<a:noAutofit/>'+
+                              '</wps:bodyPr>'+
+                            '</wps:wsp>'+
+                          '</a:graphicData>'+
+                        '</a:graphic>'+
+                      '</wp:anchor>'+
+                    '</w:drawing>'+
+                  '</mc:Choice>'+
+                  '<mc:Fallback>'+
+                    '<w:pict>'+
+                      `<v:rect alt="${expected ? '' : '{d.test:ifEM:hide(shape)}'}"/>` +
+                    '</w:pict>'+
+                  '</mc:Fallback>'+
+                '</mc:AlternateContent>'+
+                (expected ? '<carbone>{d.test:ifEM:hideEnd}</carbone>' : '') +
+              '</w:r>'+
+            '</w:p>'
 
+
+            '<w:p w14:paraId="2B951670" w14:textId="0E5FAB2B" w:rsidR="00944B35" w:rsidRDefault="00944B35" w:rsidP="00CF4F0C">' +
+              '<w:pPr>' +
+                '<w:tabs>' +
+                  '<w:tab w:val="left" w:pos="455"/>' +
+                '</w:tabs>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:noProof/>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+
+                '<w:drawing>' +
+                  '<wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="07363890" wp14:editId="6DB89906">' +
+                    '<wp:extent cx="2070946" cy="2162628"/>' +
+                    '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                    `<wp:docPr id="1" name="Picture 1" descr="{d.image}&#xA;${expected ? '' : '{d.image:ifEM:hide(img)}'}"/>` +
+                    '<wp:cNvGraphicFramePr>' +
+                      '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                    '</wp:cNvGraphicFramePr>' +
+                    '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                      '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                        '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                          '<pic:nvPicPr>' +
+                            `<pic:cNvPr id="1" name="Picture 1" descr="{d.image}&#xA;${expected ? '' : '{d.image:ifEM:hide(img)}'}"/>` +
+                            '<pic:cNvPicPr/>' +
+                          '</pic:nvPicPr>' +
+                          '<pic:blipFill>' +
+                            '<a:blip r:embed="rId4" cstate="print">' +
+                              '<a:extLst>' +
+                                '<a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}">' +
+                                  '<a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/>' +
+                                '</a:ext>' +
+                              '</a:extLst>' +
+                            '</a:blip>' +
+                            '<a:stretch>' +
+                              '<a:fillRect/>' +
+                            '</a:stretch>' +
+                          '</pic:blipFill>' +
+                          '<pic:spPr>' +
+                            '<a:xfrm>' +
+                              '<a:off x="0" y="0"/>' +
+                              '<a:ext cx="2082898" cy="2175109"/>' +
+                            '</a:xfrm>' +
+                            '<a:prstGeom prst="rect">' +
+                              '<a:avLst/>' +
+                            '</a:prstGeom>' +
+                          '</pic:spPr>' +
+                        '</pic:pic>' +
+                      '</a:graphicData>' +
+                    '</a:graphic>' +
+                  '</wp:inline>' +
+                '</w:drawing>' +
+                (expected ? '<carbone>{d.image:ifEM:hideEnd}</carbone>' : '') +
+              '</w:r>' +
+            '</w:p>'
+          }
+
+          var _template = {
+            extension  : 'docx',
+            files      : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleHideFormatter(_template, 'docx');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+      });
     })
 
     describe('ODT', function () {
@@ -258,7 +473,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _templateContent);
           done();
         });
@@ -332,7 +546,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -414,7 +627,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -528,7 +740,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -583,7 +794,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -677,7 +887,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -766,7 +975,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -865,7 +1073,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -894,7 +1101,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _templateContent);
           done();
         });
@@ -932,7 +1138,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -982,7 +1187,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -1028,7 +1232,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -1092,7 +1295,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });
@@ -1157,7 +1359,6 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          // console.log(res);
           helper.assert(res?.files[0]?.data, _expectedResult);
           done();
         });

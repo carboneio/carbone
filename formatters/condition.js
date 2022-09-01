@@ -567,5 +567,5 @@ module.exports = {
   elseShow,
   and,
   or,
-  hideRow : () => ''
+  hide : () => ''
 };

@@ -186,7 +186,7 @@ describe.only('hide formatter', function () {
 
     describe('ODT', function () {
 
-      it('should replace the hide(img) by hideBegin/hideEnd - basic paragraph', function (done) {
+      it('should replace the hide(p) by hideBegin/hideEnd - basic paragraph', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
           return '' +
@@ -301,7 +301,32 @@ describe.only('hide formatter', function () {
     })
 
     describe('ODT', function () {
+      it('should replace the hide(img) by hideBegin/hideEnd - basic image', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<text:p text:style-name="P4">'+
+              '<text:span text:style-name="T3">'+
+                '<text:s/>'+
+              '</text:span>'+
+              (expected ? '<carbone>{d.image:ifEM:hideBegin}</carbone>' : '') +
+              '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="4.78cm" svg:height="4.992cm" draw:z-index="0">'+
+                '<draw:image xlink:href="Pictures/10000001000003000000032247707408E6138C7C.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/png"/>'+
+                `<svg:title>{d.image}${ expected ? '' : '{d.image:ifEM:hide(img)}' }</svg:title>`+
+              '</draw:frame>'+
+              (expected ? '<carbone>{d.image:ifEM:hideEnd}</carbone>' : '')+
+            '</text:p>'
+          }
 
+          var _template = {
+            files      : [
+              { name : 'content.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleHideFormatter(_template, 'odt');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+      });
     })
 
   });
@@ -309,7 +334,7 @@ describe.only('hide formatter', function () {
   describe('hide(shape)', function() {
 
     describe('DOCX', function () {
-      it('should replace the hide(img) by hideBegin/hideEnd - basic shape', function (done) {
+      it('should replace the hide by hideBegin/hideEnd - basic shape', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
           return '' +
@@ -458,7 +483,34 @@ describe.only('hide formatter', function () {
     })
 
     describe('ODT', function () {
+      it('should replace the hide(shape) by hideBegin/hideEnd - basic shape', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<text:p text:style-name="P1">'+
+              (expected ? '<carbone>{d.text:ifEM:hideBegin}</carbone>' : '') +
+              '<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0" draw:name="Shape 1" draw:style-name="gr1" svg:width="10.268cm" svg:height="2.689cm" svg:x="4.789cm" svg:y="0.302cm">'+
+                '<text:p text:style-name="P2">Text box content:</text:p>'+
+                '<text:p text:style-name="P2">{d.text}</text:p>'+
+                `<text:p text:style-name="P2">${ expected ? '' : '{d.text:ifEM:hide(shape)}' }</text:p>`+
+                '<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>'+
+              '</draw:custom-shape>'+
+              (expected ? '<carbone>{d.text:ifEM:hideEnd}</carbone>' : '')+
+              '<text:span text:style-name="T1">'+
+                '<text:s/>'+
+              '</text:span>'+
+            '</text:p>'
+          }
 
+          var _template = {
+            files      : [
+              { name : 'content.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleHideFormatter(_template, 'odt');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+      });
     })
 
   });

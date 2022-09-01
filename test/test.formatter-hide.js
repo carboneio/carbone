@@ -518,11 +518,97 @@ describe.only('hide formatter', function () {
   describe('hide(chart)', function() {
 
     describe('DOCX', function () {
+      it('should replace the hide(chart) by hideBegin/hideEnd - basic chart', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<w:p w14:paraId="01E183C6" w14:textId="5AECA843" w:rsidR="001C5093" w:rsidRPr="00944B35" w:rsidRDefault="001C5093" w:rsidP="00CF4F0C">' +
+              '<w:pPr>' +
+                '<w:tabs>' +
+                  '<w:tab w:val="left" w:pos="455"/>' +
+                '</w:tabs>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:noProof/>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>' +
+                (expected ? '<carbone>{d.shape:ifEM:hideBegin}</carbone>' : '') +
+                '<w:drawing>' +
+                  '<wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="440009B3" wp14:editId="634DC711">' +
+                    '<wp:extent cx="5486400" cy="3200400"/>' +
+                    '<wp:effectExtent l="0" t="0" r="12700" b="12700"/>' +
+                    `<wp:docPr id="3" name="Chart 3" descr="${expected ? '' : '{d.shape:ifEM:hide(chart)}'}"/>` +
+                    '<wp:cNvGraphicFramePr/>' +
+                    '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                      '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart">' +
+                        '<c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId4"/>' +
+                      '</a:graphicData>' +
+                    '</a:graphic>' +
+                  '</wp:inline>' +
+                '</w:drawing>' +
+                (expected ? '<carbone>{d.shape:ifEM:hideEnd}</carbone>' : '') +
+              '</w:r>' +
+            '</w:p>'
+          }
 
+          var _template = {
+            extension  : 'docx',
+            files      : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleHideFormatter(_template, 'docx');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+      });
     })
 
     describe('ODT', function () {
+      it('should replace the hide(chart) by hideBegin/hideEnd - basic chart', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<text:p text:style-name="P3">'+
+              (expected ? '<carbone>{d.chart:ifEM:hideBegin}</carbone>' : '') +
+              (expected ? '<carbone>{d.text:ifEM:hideBegin}</carbone>' : '') +
+              `<draw:frame draw:style-name="fr1" draw:name="${ expected ? '' : '{d.chart:ifEM:hide(chart)}' }" text:anchor-type="char" svg:width="15.998cm" svg:height="8.999cm" draw:z-index="2">`+
+                '<draw:object xlink:href="./Object 1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>'+
+                '<draw:image xlink:href="./ObjectReplacements/Object 1" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad"/>'+
+                `<svg:title>${ expected ? '' : '{d.text:ifEM:hide(chart)}' }</svg:title>`+
+                `<svg:desc>${ expected ? '' : '{d.chart:ifEM:hide(chart)}' }</svg:desc>`+
+              '</draw:frame>'+
+              (expected ? '<carbone>{d.text:ifEM:hideEnd}</carbone>' : '')+
+              (expected ? '<carbone>{d.chart:ifEM:hideEnd}</carbone>' : '') +
+            '</text:p>'
 
+            '<text:p text:style-name="P5">' +
+
+              '<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0" draw:name="Shape 1" draw:style-name="gr1" svg:width="10.268cm" svg:height="2.689cm" svg:x="4.789cm" svg:y="0.302cm">' +
+                '<text:p text:style-name="P1">Text box content:</text:p>' +
+                '<text:p text:style-name="P1">{d.text}</text:p>' +
+                '<text:p text:style-name="P4">' +
+                  `<text:span text:style-name="T1"></text:span>` +
+                '</text:p>' +
+                '<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>' +
+              '</draw:custom-shape>' +
+
+              '<text:s/>' +
+            '</text:p>'
+          }
+
+          var _template = {
+            files      : [
+              { name : 'content.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleHideFormatter(_template, 'odt');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+      });
     })
 
   });

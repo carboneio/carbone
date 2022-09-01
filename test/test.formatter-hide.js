@@ -1,7 +1,7 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
 
-describe.only('hide formatter', function () {
+describe('hide formatter', function () {
 
   describe('hide(p)', function() {
 

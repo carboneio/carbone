@@ -61,6 +61,10 @@ describe('builder', function () {
       builder.getFormatterString(_getSafeValue, '_str', 0, '_options', [], [], [ extracter.parseFormatter("format('(YYYY) ' (MM) DD')") ], _testedFormatters);
       helper.assert(_safeAccessor.getDictionary(), ["(YYYY) ' (MM) DD"]);
     });
+    it('should accept empty string', function () {
+      builder.getFormatterString(_getSafeValue, '_str', 0, '_options', [], [], [ extracter.parseFormatter("format('', ' ')") ], _testedFormatters);
+      helper.assert(_safeAccessor.getDictionary(), ['', ' ']);
+    });
     it('should return a call of a function for a formatter with two arguments', function () {
       builder.getFormatterString(_getSafeValue, '_str', 0, '_options', [], [], [ extracter.parseFormatter('formatter(2, 3)') ], _testedFormatters);
       helper.assert(_safeAccessor.getDictionary(), ['2', '3']);

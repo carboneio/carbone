@@ -898,6 +898,42 @@ describe('Carbone', function () {
         helper.assert(result, _expectedXML);
       });
     });
+    it('should accept formatter with empty string (second parameter of arrayMap), and it should not remove whitespaces in conditions after -> it tests parser.removeWhitespace', function (done) {
+      let data = {
+        arr : [
+          { source : 'ABCDEFG' },
+          { source : 'HIGK LMN' }
+        ]
+      };
+      let _xml = "<a>{d.arr:arrayMap(',',' ','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')}</a>"
+               + "<a>{d.arr:arrayMap(',','','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')}</a>"
+               + "<a>{d.arr:arrayMap(',',' ','source')}</a>"
+               + "<a>{d.arr:arrayMap(',','','source')}</a>";
+      carbone.renderXML(_xml, data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<a>true</a><a>true</a><a>ABCDEFG,HIGK LMN</a><a>ABCDEFG,HIGK LMN</a>');
+        carbone.renderXML("{d.arr:print(''):print('HIGK LMN')}", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, 'HIGK LMN');
+          done();
+        });
+      });
+    });
+    it('should accept formatter with empty string (second parameter of arrayMap) -> it tests extracter.parseFormatter', function (done) {
+      let data = {
+        arr : [
+          { source : 'ABCD', other : 'EFG' },
+          { source : 'HIGK', other : 'LMN' }
+        ]
+      };
+      let _xml = "<a>{d.arr:arrayMap(',',' ', 'source', 'other')}</a>"
+               + "<b>{d.arr:arrayMap(',','', 'source', 'other')}</b>";
+      carbone.renderXML(_xml, data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<a>ABCD EFG,HIGK LMN</a><b>ABCDEFG,HIGKLMN</b>');
+        done();
+      });
+    });
     it('options.lang should dynamically force the lang of translation markers {t()} and use translations of carbone', function (done) {
       var data = {
         param : '20160131'

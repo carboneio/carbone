@@ -1,4 +1,6 @@
 ### v4.2.0
+  - Fix parsing of markers when empty string are used between two single quotes.
+    Ex. `{d.text:print(''):print('HIGK LMN')}` prints `HIGK LMN` instead of `HIGKLMN`
   - Returns an error if a square bracket is used in array accessor `[...]`
   - Accepts dynamic parameters in array filters, with infinite path depth
     *Data*

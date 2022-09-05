@@ -570,6 +570,12 @@ describe('parser', function () {
     it('should remove whitespaces everywhere except between simple quotes', function () {
       assert.equal(parser.removeWhitespace(' <trinity>  \'the matrix  has  you\'  <neo> <the> id=5  '), '<trinity>\'the matrix  has  you\'<neo><the>id=5');
     });
+    it('should not remove whitespaces in `ifIN` if there is an empty string in one formatter (second parameter of arrayMap)', function () {
+      // with whitespace
+      assert.equal(parser.removeWhitespace("d.arr:arrayMap(',',' ','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')"), "d.arr:arrayMap(',',' ','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')");
+      // without whitespace
+      assert.equal(parser.removeWhitespace("d.arr:arrayMap(',','','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')"), "d.arr:arrayMap(',','','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')");
+    });
     it('should accept escaped simple quotes', function () {
       assert.equal(parser.removeWhitespace(' <trinity>  \'the matrix \\\' has  you\'  <neo> <the> id=5  '), '<trinity>\'the matrix \\\' has  you\'<neo><the>id=5');
     });

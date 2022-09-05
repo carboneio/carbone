@@ -1,4 +1,36 @@
-### v4.X.X
+### v4.2.0
+  - Fix parsing of markers when empty string are used between two single quotes.
+    Ex. `{d.text:print(''):print('HIGK LMN')}` prints `HIGK LMN` instead of `HIGKLMN`
+  - Returns an error if a square bracket is used in array accessor `[...]`
+  - Accepts dynamic parameters in array filters, with infinite path depth
+    *Data*
+      ```js
+        {
+          parent : {
+            qty : 5,
+            arr : [{
+              id : 1
+            }]
+          },
+          subArray : [{
+            text : 1000,
+            sub : {
+              b : {
+                c : 1
+              }
+            }
+          }]
+        }
+      ```
+    - `{d.subArray[.sub.b.c = 1].text}`: filter using infinite object path depth. Alternative syntax without a dot is also accepted (`{d.subArray[sub.b.c = 1]}`) for backward compatibility
+    - `{d.subArray[i = .sub.b.c].text}`: filter using dynamic values on the right operand
+    - `{d.subArray[i = ..parent.qty].text}`: filter using dynamic values from parent objects on the right operand
+    - `{d.subArray[.sub.b.c = ..parent.qty].text}`: filter using complex path for the left and right operand in the same time
+
+    This feature is really powerful but some syntax are not supported yet:
+    - `{d.subArray[i = .i].text}`: using `.i` to join two arrays is not supported
+    - `{d.subArray[i = ..parent.arr[0].id].text}`: accessing a specific array element is not supported
+    - `{d.subArray[i = ..parent.arr[.i].id]text}`: accessing a specific array element according to the current iterator is not supported
  - [EE] New `hide` conditional formatter for DOCX/ODT/PDF to hide document elements: **images**, **paragraphs**, table **rows**, **shapes** and **charts**. The rendering is always accurate and simplier to use compared to `hideBegin/hideEnd` or `showBegin/showEnd`. The first argument passed to `:hide(argument1)` is the element to hide, it can be:
     - `p` to hide paragraphs, usage: `{d.text:ifEM:hide(p)}`. The marker must be inside a paragraph. Every elements inside the paragraph are also removed if the condition is validated.
     - `row` to hide a table row, usage: `{d.data:ifEM:hide(row)}`. The marker must be inside a table row. Every element inside the row are also removed if the condition is validated.

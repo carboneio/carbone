@@ -3,7 +3,7 @@ var helper = require('../lib/helper');
 
 describe.only('hide formatter', function () {
 
-  describe('hide(p)', function() {
+  describe('hide(p)', function () {
 
     describe('DOCX', function () {
 
@@ -16,11 +16,11 @@ describe.only('hide formatter', function () {
                   '<w:rPr>'+
                     '<w:lang w:val="en-US"/>'+
                   '</w:rPr>'+
-                  `<w:t>{d.name}{d.name:ifEM:hide}{d.name:ifEM:hide(notExisting)}</w:t>`+
+                  '<w:t>{d.name}{d.name:ifEM:hide}{d.name:ifEM:hide(notExisting)}</w:t>'+
                 '</w:r>'+
               '</w:p>'+
-            '</w:body>'
-        }
+            '</w:body>';
+        };
 
         var _report = {
           isZipped   : true,
@@ -53,8 +53,8 @@ describe.only('hide formatter', function () {
                 '</w:r>'+
               '</w:p>'+
               (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '') +
-            '</w:body>'
-        }
+            '</w:body>';
+        };
 
         var _report = {
           isZipped   : true,
@@ -103,8 +103,8 @@ describe.only('hide formatter', function () {
                 '</w:r>'+
               '</w:p>'+
               (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '') +
-            '</w:body>'
-        }
+            '</w:body>';
+        };
 
         var _report = {
           isZipped   : true,
@@ -163,8 +163,8 @@ describe.only('hide formatter', function () {
                 '</w:r>'+
               '</w:p>'+
               (expected ? '<carbone>{d.label:ifEM:hideEnd}</carbone>' : '') +
-            '</w:body>'
-        }
+            '</w:body>';
+        };
 
         var _report = {
           isZipped   : true,
@@ -182,7 +182,7 @@ describe.only('hide formatter', function () {
         });
       });
 
-    })
+    });
 
     describe('ODT', function () {
 
@@ -202,17 +202,17 @@ describe.only('hide formatter', function () {
                 (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '')+
                 '<text:p text:style-name="P1">This is a third paragraph</text:p>'+
               '</office:text>'+
-            '</office:body>'
-          }
+            '</office:body>';
+        };
 
-          var _template = {
-            files      : [
-              { name : 'content.xml', parent : '', data : content()}
-            ]
-          };
-          preprocessor.handleHideFormatter(_template, 'odt');
-          helper.assert(_template.files[0]?.data, content(true));
-          done();
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleHideFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
 
       it('should replace the hide(p) by hideBegin/hideEnd - basic paragraph, argument with single/double quotes, and extra space', function (done) {
@@ -235,24 +235,24 @@ describe.only('hide formatter', function () {
                 (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '')+
                 '<text:p text:style-name="P1">This is a third paragraph</text:p>'+
               '</office:text>'+
-            '</office:body>'
-          }
+            '</office:body>';
+        };
 
-          var _template = {
-            files      : [
-              { name : 'content.xml', parent : '', data : content()}
-            ]
-          };
-          preprocessor.handleHideFormatter(_template, 'odt');
-          helper.assert(_template.files[0]?.data, content(true));
-          done();
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleHideFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
 
-    })
+    });
 
   });
 
-  describe('hide(img)', function() {
+  describe('hide(img)', function () {
 
     describe('DOCX', function () {
 
@@ -318,20 +318,20 @@ describe.only('hide formatter', function () {
                 '</w:drawing>' +
                 (expected ? '<carbone>{d.image:ifEM:hideEnd}</carbone>' : '') +
               '</w:r>' +
-            '</w:p>'
-          }
+            '</w:p>';
+        };
 
-          var _template = {
-            extension  : 'docx',
-            files      : [
-              { name : 'document.xml', parent : '', data : content()}
-            ]
-          };
-          preprocessor.handleHideFormatter(_template, 'docx');
-          helper.assert(_template.files[0]?.data, content(true));
-          done();
+        var _template = {
+          extension : 'docx',
+          files     : [
+            { name : 'document.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleHideFormatter(_template, 'docx');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
-    })
+    });
 
     describe('ODT', function () {
       it('should replace the hide(img) by hideBegin/hideEnd - basic image', function (done) {
@@ -348,23 +348,23 @@ describe.only('hide formatter', function () {
                 `<svg:title>{d.image}${ expected ? '' : '{d.image:ifEM:hide(img)}' }</svg:title>`+
               '</draw:frame>'+
               (expected ? '<carbone>{d.image:ifEM:hideEnd}</carbone>' : '')+
-            '</text:p>'
-          }
+            '</text:p>';
+        };
 
-          var _template = {
-            files      : [
-              { name : 'content.xml', parent : '', data : content()}
-            ]
-          };
-          preprocessor.handleHideFormatter(_template, 'odt');
-          helper.assert(_template.files[0]?.data, content(true));
-          done();
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleHideFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
-    })
+    });
 
   });
 
-  describe('hide(shape)', function() {
+  describe('hide(shape)', function () {
 
     describe('DOCX', function () {
       it('should replace the hide by hideBegin/hideEnd - basic shape', function (done) {
@@ -439,81 +439,20 @@ describe.only('hide formatter', function () {
                 '</mc:AlternateContent>'+
                 (expected ? '<carbone>{d.test:ifEM:hideEnd}</carbone>' : '') +
               '</w:r>'+
-            '</w:p>'
+            '</w:p>';
+        };
 
-
-            '<w:p w14:paraId="2B951670" w14:textId="0E5FAB2B" w:rsidR="00944B35" w:rsidRDefault="00944B35" w:rsidP="00CF4F0C">' +
-              '<w:pPr>' +
-                '<w:tabs>' +
-                  '<w:tab w:val="left" w:pos="455"/>' +
-                '</w:tabs>' +
-                '<w:rPr>' +
-                  '<w:lang w:val="en-US"/>' +
-                '</w:rPr>' +
-              '</w:pPr>' +
-              '<w:r>' +
-                '<w:rPr>' +
-                  '<w:noProof/>' +
-                  '<w:lang w:val="en-US"/>' +
-                '</w:rPr>' +
-
-                '<w:drawing>' +
-                  '<wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="07363890" wp14:editId="6DB89906">' +
-                    '<wp:extent cx="2070946" cy="2162628"/>' +
-                    '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
-                    `<wp:docPr id="1" name="Picture 1" descr="{d.image}&#xA;${expected ? '' : '{d.image:ifEM:hide(img)}'}"/>` +
-                    '<wp:cNvGraphicFramePr>' +
-                      '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
-                    '</wp:cNvGraphicFramePr>' +
-                    '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
-                      '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
-                        '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
-                          '<pic:nvPicPr>' +
-                            `<pic:cNvPr id="1" name="Picture 1" descr="{d.image}&#xA;${expected ? '' : '{d.image:ifEM:hide(img)}'}"/>` +
-                            '<pic:cNvPicPr/>' +
-                          '</pic:nvPicPr>' +
-                          '<pic:blipFill>' +
-                            '<a:blip r:embed="rId4" cstate="print">' +
-                              '<a:extLst>' +
-                                '<a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}">' +
-                                  '<a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/>' +
-                                '</a:ext>' +
-                              '</a:extLst>' +
-                            '</a:blip>' +
-                            '<a:stretch>' +
-                              '<a:fillRect/>' +
-                            '</a:stretch>' +
-                          '</pic:blipFill>' +
-                          '<pic:spPr>' +
-                            '<a:xfrm>' +
-                              '<a:off x="0" y="0"/>' +
-                              '<a:ext cx="2082898" cy="2175109"/>' +
-                            '</a:xfrm>' +
-                            '<a:prstGeom prst="rect">' +
-                              '<a:avLst/>' +
-                            '</a:prstGeom>' +
-                          '</pic:spPr>' +
-                        '</pic:pic>' +
-                      '</a:graphicData>' +
-                    '</a:graphic>' +
-                  '</wp:inline>' +
-                '</w:drawing>' +
-                (expected ? '<carbone>{d.image:ifEM:hideEnd}</carbone>' : '') +
-              '</w:r>' +
-            '</w:p>'
-          }
-
-          var _template = {
-            extension  : 'docx',
-            files      : [
-              { name : 'document.xml', parent : '', data : content()}
-            ]
-          };
-          preprocessor.handleHideFormatter(_template, 'docx');
-          helper.assert(_template.files[0]?.data, content(true));
-          done();
+        var _template = {
+          extension : 'docx',
+          files     : [
+            { name : 'document.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleHideFormatter(_template, 'docx');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
-    })
+    });
 
     describe('ODT', function () {
       it('should replace the hide(shape) by hideBegin/hideEnd - basic shape', function (done) {
@@ -532,23 +471,23 @@ describe.only('hide formatter', function () {
               '<text:span text:style-name="T1">'+
                 '<text:s/>'+
               '</text:span>'+
-            '</text:p>'
-          }
+            '</text:p>';
+        };
 
-          var _template = {
-            files      : [
-              { name : 'content.xml', parent : '', data : content()}
-            ]
-          };
-          preprocessor.handleHideFormatter(_template, 'odt');
-          helper.assert(_template.files[0]?.data, content(true));
-          done();
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleHideFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
-    })
+    });
 
   });
 
-  describe('hide(chart)', function() {
+  describe('hide(chart)', function () {
 
     describe('DOCX', function () {
       it('should replace the hide(chart) by hideBegin/hideEnd - basic chart', function (done) {
@@ -585,20 +524,20 @@ describe.only('hide formatter', function () {
                 '</w:drawing>' +
                 (expected ? '<carbone>{d.shape:ifEM:hideEnd}</carbone>' : '') +
               '</w:r>' +
-            '</w:p>'
-          }
+            '</w:p>';
+        };
 
-          var _template = {
-            extension  : 'docx',
-            files      : [
-              { name : 'document.xml', parent : '', data : content()}
-            ]
-          };
-          preprocessor.handleHideFormatter(_template, 'docx');
-          helper.assert(_template.files[0]?.data, content(true));
-          done();
+        var _template = {
+          extension : 'docx',
+          files     : [
+            { name : 'document.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleHideFormatter(_template, 'docx');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
-    })
+    });
 
     describe('ODT', function () {
       it('should replace the hide(chart) by hideBegin/hideEnd - basic chart', function (done) {
@@ -616,37 +555,23 @@ describe.only('hide formatter', function () {
               '</draw:frame>'+
               (expected ? '<carbone>{d.text:ifEM:hideEnd}</carbone>' : '')+
               (expected ? '<carbone>{d.chart:ifEM:hideEnd}</carbone>' : '') +
-            '</text:p>'
+            '</text:p>';
+        };
 
-            '<text:p text:style-name="P5">' +
-
-              '<draw:custom-shape text:anchor-type="paragraph" draw:z-index="0" draw:name="Shape 1" draw:style-name="gr1" svg:width="10.268cm" svg:height="2.689cm" svg:x="4.789cm" svg:y="0.302cm">' +
-                '<text:p text:style-name="P1">Text box content:</text:p>' +
-                '<text:p text:style-name="P1">{d.text}</text:p>' +
-                '<text:p text:style-name="P4">' +
-                  `<text:span text:style-name="T1"></text:span>` +
-                '</text:p>' +
-                '<draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>' +
-              '</draw:custom-shape>' +
-
-              '<text:s/>' +
-            '</text:p>'
-          }
-
-          var _template = {
-            files      : [
-              { name : 'content.xml', parent : '', data : content()}
-            ]
-          };
-          preprocessor.handleHideFormatter(_template, 'odt');
-          helper.assert(_template.files[0]?.data, content(true));
-          done();
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleHideFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
-    })
+    });
 
   });
 
-  describe('hide(row)', function() {
+  describe('hide(row)', function () {
     describe('DOCX', function () {
       it('should do nothing if the XML if not valid', function (done) {
         const _templateContent = '' +
@@ -659,7 +584,7 @@ describe.only('hide formatter', function () {
                   '</w:r>'+
                 '</w:p>'+
               '</w:tc>'+
-            // '</w:tr>'+ Missing end row tag
+        // '</w:tr>'+ Missing end row tag
           '</w:tbl>';
 
         var _report = {
@@ -704,7 +629,7 @@ describe.only('hide formatter', function () {
                 '</w:p>'+
               '</w:tc>'+
             '</w:tr>'+
-          '</w:tbl>'
+          '</w:tbl>';
 
         const _expectedResult = '' +
           '<w:tbl>'+
@@ -733,7 +658,7 @@ describe.only('hide formatter', function () {
               '</w:tc>'+
             '</w:tr>'+
             '<carbone>{d.desc:ifEM:hideEnd}</carbone>' +
-          '</w:tbl>'
+          '</w:tbl>';
 
         var _report = {
           isZipped   : true,
@@ -755,10 +680,10 @@ describe.only('hide formatter', function () {
         const _templateContent = '' +
           '<w:tbl>'+
             '<w:tr w:rsidR="00CF4F0C" w14:paraId="7814680B" w14:textId="77777777" w:rsidTr="00CF4F0C">'+
-              `<w:trPr>` + // SPECIAL TAG FOR ROW PROPERTIES
-                `<w:cantSplit/>` +
-                `<w:tblHeader/>` +
-              `</w:trPr>` +
+              '<w:trPr>' + // SPECIAL TAG FOR ROW PROPERTIES
+                '<w:cantSplit/>' +
+                '<w:tblHeader/>' +
+              '</w:trPr>' +
               '<w:tc>'+
                 '<w:tcPr>'+
                   '<w:tcW w:w="9350" w:type="dxa"/>'+
@@ -781,16 +706,16 @@ describe.only('hide formatter', function () {
                 '</w:p>'+
               '</w:tc>'+
             '</w:tr>'+
-          '</w:tbl>'
+          '</w:tbl>';
 
         const _expectedResult = '' +
           '<w:tbl>'+
             '<carbone>{d.desc:ifEM:hideBegin}</carbone>' +
             '<w:tr w:rsidR="00CF4F0C" w14:paraId="7814680B" w14:textId="77777777" w:rsidTr="00CF4F0C">'+
-              `<w:trPr>` +
-                `<w:cantSplit/>` +
-                `<w:tblHeader/>` +
-              `</w:trPr>` +
+              '<w:trPr>' +
+                '<w:cantSplit/>' +
+                '<w:tblHeader/>' +
+              '</w:trPr>' +
               '<w:tc>'+
                 '<w:tcPr>'+
                   '<w:tcW w:w="9350" w:type="dxa"/>'+
@@ -814,7 +739,7 @@ describe.only('hide formatter', function () {
               '</w:tc>'+
             '</w:tr>'+
             '<carbone>{d.desc:ifEM:hideEnd}</carbone>' +
-          '</w:tbl>'
+          '</w:tbl>';
 
         var _report = {
           isZipped   : true,
@@ -1035,7 +960,7 @@ describe.only('hide formatter', function () {
                 '</w:p>' +
               '</w:tc>' +
             '</w:tr>' +
-          '</w:tbl>'
+          '</w:tbl>';
 
         const _expectedResult = '' +
           '<w:tbl>' +
@@ -1074,7 +999,7 @@ describe.only('hide formatter', function () {
               '</w:tc>' +
             '</w:tr>' +
             '<carbone>{d.desc:ifEM:hideEnd}</carbone>' +
-          '</w:tbl>'
+          '</w:tbl>';
 
         var _report = {
           isZipped   : true,
@@ -1125,7 +1050,7 @@ describe.only('hide formatter', function () {
                 '</w:tbl>'+
               '</w:tc>'+
             '</w:tr>'+
-          '</w:tbl>'
+          '</w:tbl>';
 
 
         const _expectedResult = '' +
@@ -1162,7 +1087,7 @@ describe.only('hide formatter', function () {
               '</w:tc>'+
             '</w:tr>'+
             '<carbone>{d.desc:ifEM:hideEnd}</carbone>' +
-          '</w:tbl>'
+          '</w:tbl>';
 
         var _report = {
           isZipped   : true,
@@ -1217,7 +1142,7 @@ describe.only('hide formatter', function () {
               '</w:p>'+
             '</w:tc>'+
           '</w:tr>'+
-        '</w:tbl>'
+        '</w:tbl>';
 
 
         const _expectedResult = '' +
@@ -1260,7 +1185,7 @@ describe.only('hide formatter', function () {
               '</w:tc>'+
             '</w:tr>'+
             '<carbone>{d.show:ifEQ(false):hideEnd}</carbone>'+
-          '</w:tbl>'
+          '</w:tbl>';
 
         var _report = {
           isZipped   : true,
@@ -1287,7 +1212,7 @@ describe.only('hide formatter', function () {
               '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
                 '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hide(row)}</text:p>' +
               '</table:table-cell>' +
-            // '</table:table-row>' + // MISSING A TABLE ROW
+        // '</table:table-row>' + // MISSING A TABLE ROW
           '</table:table>';
 
         var _report = {
@@ -1458,7 +1383,7 @@ describe.only('hide formatter', function () {
                 '</text:p>' +
               '</table:table-cell>' +
             '</table:table-row>' +
-          '</table:table>'
+          '</table:table>';
 
         const _expectedResult = '' +
           '<table:table table:name="Table1" table:style-name="Table1">' +
@@ -1482,7 +1407,7 @@ describe.only('hide formatter', function () {
               '</table:table-cell>' +
             '</table:table-row>' +
             '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' +
-          '</table:table>'
+          '</table:table>';
 
         var _report = {
           isZipped   : true,
@@ -1521,7 +1446,7 @@ describe.only('hide formatter', function () {
                 '<text:p text:style-name="P2"/>'+
               '</table:table-cell>'+
             '</table:table-row>'+
-          '</table:table>'
+          '</table:table>';
 
         const _expectedResult = '' +
           '<table:table table:name="Table1" table:style-name="Table1">'+
@@ -1545,7 +1470,7 @@ describe.only('hide formatter', function () {
               '</table:table-cell>'+
             '</table:table-row>'+
             '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' +
-          '</table:table>'
+          '</table:table>';
 
 
         var _report = {
@@ -1596,7 +1521,7 @@ describe.only('hide formatter', function () {
                 '<text:p text:style-name="P1">{d.list[i+1]}</text:p>' +
               '</table:table-cell>' +
             '</table:table-row>' +
-          '</table:table>'
+          '</table:table>';
 
         const _expectedResult = '' +
           '<table:table table:name="Table1" table:style-name="Table1">' +

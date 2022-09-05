@@ -162,8 +162,8 @@ describe('builder', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'sort'}, operator : '>', right : '10'}
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
-      assert.equal(_actual, 'if((_gV0 && _gV0[dictionary[0]]>dictionary[1])){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0?.[dictionary[0]]>dictionary[1])){\n code;\n }\n');
       helper.assert(_safeAccessor.getDictionary(), ['sort', '10']);
     });
     it('should accept multiple conditions', function () {
@@ -171,67 +171,67 @@ describe('builder', function () {
         {left : {parent : 'myObj',attr : 'sort'}, operator : '>', right : '10'},
         {left : {parent : 'myObj',attr : 'id'}, operator : '<', right : '15'}
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
-      assert.equal(_actual, 'if((_gV0 && _gV0[dictionary[0]]>dictionary[1] && _gV0[dictionary[2]]<dictionary[3])){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0?.[dictionary[0]]>dictionary[1] && _gV0?.[dictionary[2]]<dictionary[3])){\n code;\n }\n');
       helper.assert(_safeAccessor.getDictionary(), ['sort', '10', 'id', '15']);
     });
     it('should accept than the left part of the condition is in an object', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
-      assert.equal(_actual, 'var _gV0=_gV1[dictionary[0]];\nif((_gV0 && _gV0[dictionary[1]]>dictionary[2])){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0?.[dictionary[0]]?.[dictionary[1]]>dictionary[2])){\n code;\n }\n');
       helper.assert(_safeAccessor.getDictionary(), ['menu', 'sort', '10']);
     });
     it('should add a prefix on the declared variable', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
-      assert.equal(_actual, 'var _gV0=_gV1[dictionary[0]];\nif((_gV0 && _gV0[dictionary[1]]>dictionary[2])){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0?.[dictionary[0]]?.[dictionary[1]]>dictionary[2])){\n code;\n }\n');
     });
     it('should handle the reserved index iterator "i"', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'i'}, operator : '>', right : '10'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
-      assert.equal(_actual, 'if((_gV0_i >10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0_i >parseInt(dictionary[0], 10))){\n code;\n }\n');
     });
     it('should handle the reserved index iterator "i" and negative values', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : '-10'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
-      assert.equal(_actual, 'if((_gV0_i =_gV0_array_length -10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0_i =_gV0_array_length -10)){\n code;\n }\n');
     });
     it('should not inject JS if the index contains weird characters (negative index)', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : '-10;console.log'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
-      assert.equal(_actual, 'if((_gV0_i =_gV0_array_length -10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0_i =_gV0_array_length -10)){\n code;\n }\n');
     });
     it('should not inject JS if the index contains weird characters (not int)', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : ';-10;console.log'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
-      assert.equal(_actual, 'if((_gV0_i =NaN)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0_i =parseInt(dictionary[0], 10))){\n code;\n }\n');
     });
     it('should not inject JS if the index contains weird characters (positive index)', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'i'}, operator : '=', right : '10;console.log'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', 'prefix');
-      assert.equal(_actual, 'if((_gV0_i =10)){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0_i =parseInt(dictionary[0], 10))){\n code;\n }\n');
     });
     it('should not declare the same variable twice if there are two conditions on the same variable', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '<', right : '20'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
-      assert.equal(_actual, 'var _gV0=_gV1[dictionary[0]];\nif((_gV0 && _gV0[dictionary[1]]>dictionary[2] && _gV0[dictionary[1]]<dictionary[3])){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
+      assert.equal(_actual, 'if((_gV0?.[dictionary[0]]?.[dictionary[1]]>dictionary[2] && _gV0?.[dictionary[0]]?.[dictionary[1]]<dictionary[3])){\n code;\n }\n');
       helper.assert(_safeAccessor.getDictionary(), ['menu', 'sort', '10', '20']);
     });
     it('should inverse the condition', function () {
@@ -239,20 +239,19 @@ describe('builder', function () {
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '<', right : '20'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code', '', true);
-      assert.equal(_actual, 'var _gV0=_gV1[dictionary[0]];\nif(!(_gV0 && _gV0[dictionary[1]]>dictionary[2] && _gV0[dictionary[1]]<dictionary[3])){\n code;\n }');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code', true);
+      assert.equal(_actual, 'if(!(_gV0?.[dictionary[0]]?.[dictionary[1]]>dictionary[2] && _gV0?.[dictionary[0]]?.[dictionary[1]]<dictionary[3])){\n code;\n }\n');
+      helper.assert(_safeAccessor.getDictionary(), ['menu', 'sort', '10', '20']);
     });
     it('should accept multiple conditions nested in an object', function () {
       var _conditions = [
         {left : {parent : 'myObj',attr : 'menu.sort'}, operator : '>', right : '10'},
         {left : {parent : 'myObj',attr : 'car.sort'}, operator : '<', right : '20'},
       ];
-      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, _conditions, 'code');
+      var _actual = builder.getFilterString(_getSafeVar, _getSafeValue, [], [], _conditions, 'code');
       assert.equal(_actual,
-        'var _gV0=_gV1[dictionary[0]];\n'+
-        'var _gV2=_gV1[dictionary[3]];\n'+
-        'if((_gV0 && _gV0[dictionary[1]]>dictionary[2] && _gV2 && _gV2[dictionary[1]]<dictionary[4])){\n'+
-        ' code;\n }'
+        'if((_gV0?.[dictionary[0]]?.[dictionary[1]]>dictionary[2] && _gV0?.[dictionary[3]]?.[dictionary[1]]<dictionary[4])){\n'+
+        ' code;\n }\n'
       );
       helper.assert(_safeAccessor.getDictionary(), ['menu', 'sort', '10', 'car', '20']);
     });

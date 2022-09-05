@@ -1,6 +1,37 @@
 ### v4.2.0
   - Fix parsing of markers when empty string are used between two single quotes.
     Ex. `{d.text:print(''):print('HIGK LMN')}` prints `HIGK LMN` instead of `HIGKLMN`
+  - Returns an error if a square bracket is used in array accessor `[...]`
+  - Accepts dynamic parameters in array filters, with infinite path depth
+    *Data*
+      ```js
+        {
+          parent : {
+            qty : 5,
+            arr : [{
+              id : 1
+            }]
+          },
+          subArray : [{
+            text : 1000,
+            sub : {
+              b : {
+                c : 1
+              }
+            }
+          }]
+        }
+      ```
+    - `{d.subArray[.sub.b.c = 1].text}`: filter using infinite object path depth. Alternative syntax without a dot is also accepted (`{d.subArray[sub.b.c = 1]}`) for backward compatibility
+    - `{d.subArray[i = .sub.b.c].text}`: filter using dynamic values on the right operand
+    - `{d.subArray[i = ..parent.qty].text}`: filter using dynamic values from parent objects on the right operand
+    - `{d.subArray[.sub.b.c = ..parent.qty].text}`: filter using complex path for the left and right operand in the same time
+
+    This feature is really powerful but some syntax are not supported yet:
+    - `{d.subArray[i = .i].text}`: using `.i` to join two arrays is not supported
+    - `{d.subArray[i = ..parent.arr[0].id].text}`: accessing a specific array element is not supported
+    - `{d.subArray[i = ..parent.arr[.i].id]text}`: accessing a specific array element according to the current iterator is not supported
+
 
 ### v4.1.0
   - Release August 22st 2022

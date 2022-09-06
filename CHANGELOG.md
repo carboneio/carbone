@@ -1,3 +1,6 @@
+### v4.X.X
+  - [EE] Improved: ODS templates support loops of dynamic images. Setting the image anchor "To cell" is required.
+
 ### v4.2.0
   - Fix parsing of markers when empty string are used between two single quotes.
     Ex. `{d.text:print(''):print('HIGK LMN')}` prints `HIGK LMN` instead of `HIGKLMN`

@@ -166,7 +166,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         image : _imageLogoBase64jpg
       }];
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
-        helperTest.assert(err+'', 'Error: The template contains a list of floating images, you must change the images anchor-type to \"as character\" where the marker \"d[i].image\" is bound.');
+        helperTest.assert(err+'', 'Error: The template contains a list of floating images, you must change the images anchor-type to "as character" where the marker "d[i].image" is bound.');
         helperTest.assert(res, null);
         done();
       });
@@ -462,6 +462,51 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           ]
         };
         let expectedXML = '<draw:frame draw:style-name="fr1" draw:name="carbone-image-{d.image:generateOpenDocumentUniqueNumber()}" text:anchor-type="as-char" svg:width="6.92cm" svg:height="4.616cm" draw:z-index="0"><draw:image xlink:href="{d.image:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" loext:mime-type="{d.image:generateOpenDocumentImageMimeType()}"/><svg:desc></svg:desc></draw:frame>';
+        image.preProcessLo(template);
+        helperTest.assert(template.files[0].data, expectedXML);
+        done();
+      });
+      it('should support ODS content that includes a loop of image (anchor set to "To cell")', function (done) {
+        let template = {
+          extension : 'ods',
+          files     : [
+            {
+              name : 'content.xml',
+              data : '' +
+              '<table:table-row table:style-name="ro1">'+
+                '<table:table-cell>'+
+                  '<draw:frame draw:z-index="0" draw:name="Image 1" draw:style-name="gr1" draw:text-style-name="P1" svg:width="1.0835in" svg:height="0.648in" svg:x="0.0465in" svg:y="0.0839in">'+
+                    '<draw:image xlink:href="Pictures/10000000000000640000003E7BCFF6B890FF3254.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg">'+
+                      '<text:p/>'+
+                    '</draw:image>'+
+                    '<svg:title>{d.list[i].img:imageFit(contain)}</svg:title>'+
+                  '</draw:frame>'+
+                '</table:table-cell>'+
+              '</table:table-row>'+
+              '<table:table-row table:style-name="ro1">'+
+                '<table:table-cell office:value-type="string" calcext:value-type="string">'+
+                  '<text:p>{d.list[i+1].img}</text:p>'+
+                '</table:table-cell>'+
+              '</table:table-row>'
+            }
+          ]
+        };
+        let expectedXML = '' +
+          '<table:table-row table:style-name="ro1">'+
+            '<table:table-cell>'+
+              '<draw:frame draw:z-index="0" draw:name="carbone-image-{d.list[i].img:generateOpenDocumentUniqueNumber()}" draw:style-name="gr1" draw:text-style-name="P1" svg:width="{d.list[i].img:scaleImage(width, 1.0835, in, contain)}in" svg:height="{d.list[i].img:scaleImage(height, 0.648, in, contain)}in" svg:x="0.0465in" svg:y="0.0839in">'+
+                '<draw:image xlink:href="{d.list[i].img:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg">'+
+                  '<text:p/>'+
+                '</draw:image>'+
+                '<svg:title></svg:title>'+
+              '</draw:frame>'+
+            '</table:table-cell>'+
+          '</table:table-row>'+
+          '<table:table-row table:style-name="ro1">'+
+            '<table:table-cell office:value-type="string" calcext:value-type="string">'+
+              '<text:p>{d.list[i+1].img}</text:p>'+
+            '</table:table-cell>'+
+          '</table:table-row>';
         image.preProcessLo(template);
         helperTest.assert(template.files[0].data, expectedXML);
         done();
@@ -1064,31 +1109,31 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         };
         const _expectedTemplate = {
           files : [
-          {
-            name   : 'word/media/CarboneImage0.png',
-            parent : '',
-            data   : '1234'
-          },
-          {
-            name : 'word/_rels/document.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
-          },
-          {
-            name : 'word/_rels/header1.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
-          },
-          {
-            name : 'word/_rels/header2.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
-          },
-          {
-            name : 'word/_rels/footer1.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
-          },
-          {
-            name : 'word/_rels/footer2.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
-          }]
+            {
+              name   : 'word/media/CarboneImage0.png',
+              parent : '',
+              data   : '1234'
+            },
+            {
+              name : 'word/_rels/document.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+            },
+            {
+              name : 'word/_rels/header1.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+            },
+            {
+              name : 'word/_rels/header2.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+            },
+            {
+              name : 'word/_rels/footer1.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+            },
+            {
+              name : 'word/_rels/footer2.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+            }]
         };
         const _options = {
           imageDatabase : new Map()
@@ -1448,7 +1493,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the INCH size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            imageUnit           : 'in',
+            imageUnit      : 'in',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
@@ -1460,7 +1505,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      describe("_computeImageSize", function () {
+      describe('_computeImageSize', function () {
         it("_computeImageSize EMU 1: should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
             imageUnit      : 'emu',
@@ -1477,11 +1522,11 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it("_computeImageSize EMU 2: should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            imageUnit           : 'emu',
+            imageUnit      : 'emu',
             newImageWidth  : 2857500,
             newImageHeight : 1905000,
-            imageWidth     :  952500,
-            imageHeight    :  590550
+            imageWidth     : 952500,
+            imageHeight    : 590550
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 885825);
@@ -1523,8 +1568,8 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             imageUnit      : 'in',
             newImageWidth  : 8.6952,
             newImageHeight : 10.6713,
-            imageWidth     :  2.8984,
-            imageHeight    :  1.4492
+            imageWidth     : 2.8984,
+            imageHeight    : 1.4492
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 1.181); // 1.1808

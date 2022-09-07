@@ -36,7 +36,7 @@
     - `row` to hide a table row, usage: `{d.data:ifEM:hide(row)}`. The marker must be inside a table row. Every element inside the row are also removed if the condition is validated.
     - `img` to hide pictures, usage: `{d.img:ifEM:hide(img)}`. The marker must be included within the image' title, description or alternative text.
     - `chart` to hide charts, usage: `{d.dataset:ifEM:hide(chart)}`. The marker must be included within the chart' alternative text.
-    - `shape` to hide shape (square, circle, arrows, etc...), usage: `{d.dataset:ifEM:hide(chart)}`. The marker must be included within the shape' title, description or alternative text.
+    - `shape` to hide shape (square, circle, arrows, etc...), usage: `{d.dataset:ifEM:hide(shape)}`. The marker must be included within the shape' title, description or alternative text.
 
 ### v4.1.0
   - Release August 22st 2022

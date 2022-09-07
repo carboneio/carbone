@@ -7,9 +7,8 @@ describe('hide formatter', function () {
 
     describe('DOCX', function () {
 
-      it('should do nothing if the argument is missing or the type does not exist', function (done) {
-        const content = (expected) => {
-          expected = expected ?? false;
+      it('should return an error if the argument of hide is unknown', function (done) {
+        const content = () => {
           return '' +
             '<w:body>' +
               '<w:p w14:paraId="5C4E8B45" w14:textId="08330C66" w:rsidR="005A25A6" w:rsidRDefault="00C301BD">'+
@@ -17,7 +16,7 @@ describe('hide formatter', function () {
                   '<w:rPr>'+
                     '<w:lang w:val="en-US"/>'+
                   '</w:rPr>'+
-                  `<w:t>{d.name}${ expected === true ? '' : '{d.name:ifEM:hide}{d.name:ifEM:hide(notExisting)}'} </w:t>`+
+                  '<w:t>{d.name}{d.name:ifEM:hide}{c.name:ifEM:hide(shap)} </w:t>'+
                 '</w:r>'+
               '</w:p>'+
             '</w:body>';
@@ -33,8 +32,8 @@ describe('hide formatter', function () {
           ]
         };
         preprocessor.execute(_report, function (err, res) {
-          helper.assert(err + '', 'null');
-          helper.assert(res?.files[0]?.data, content(true));
+          helper.assert(err + '', 'Error: Unknown parameter in formatter hide() of "{c.name:ifEM:hide(shap)}". Do you mean ":hide(shape)"?');
+          helper.assert(res?.files[0]?.data, content(false));
           done();
         });
       });

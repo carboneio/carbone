@@ -566,5 +566,6 @@ module.exports = {
   show,
   elseShow,
   and,
-  or
+  or,
+  hide : () => ''
 };

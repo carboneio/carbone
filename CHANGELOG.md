@@ -1,9 +1,10 @@
 
 ### v4.2.0
+  - Release September 8st 2022
   - Fix parsing of markers when empty string are used between two single quotes.
     Ex. `{d.text:print(''):print('HIGK LMN')}` prints `HIGK LMN` instead of `HIGKLMN`
   - Returns an error if a square bracket is used in array accessor `[...]`
-  - Accepts dynamic parameters in array filters, with infinite path depth
+  - Accepts dynamic parameters in array filters, with infinite path depth. Example:
     *Data*
       ```js
         {
@@ -31,7 +32,7 @@
     - `{d.subArray[i = .i].text}`: using `.i` to join two arrays is not supported
     - `{d.subArray[i = ..parent.arr[0].id].text}`: accessing a specific array element is not supported
     - `{d.subArray[i = ..parent.arr[.i].id]text}`: accessing a specific array element according to the current iterator is not supported
-  - [EE] New `hide` conditional formatter for DOCX/ODT/PDF to hide document elements: **images**, **paragraphs**, table **rows**, **shapes** and **charts**. The rendering is always accurate and simplier to use compared to `hideBegin/hideEnd` or `showBegin/showEnd`. The first argument passed to `:hide(argument1)` is the element to hide, it can be:
+  - [EE] New `hide` conditional formatter for DOCX/ODT/PDF to hide document elements: **images**, **paragraphs**, table **rows**, **shapes** and **charts**. The rendering is always accurate and simpler to use compared to `hideBegin/hideEnd` or `showBegin/showEnd`. The first argument passed to `:hide(argument1)` is the element to hide, it can be:
     - `p` to hide paragraphs, usage: `{d.text:ifEM:hide(p)}`. The marker must be inside a paragraph. Every elements inside the paragraph are also removed if the condition is validated.
     - `row` to hide a table row, usage: `{d.data:ifEM:hide(row)}`. The marker must be inside a table row. Every element inside the row are also removed if the condition is validated.
     - `img` to hide pictures, usage: `{d.img:ifEM:hide(img)}`. The marker must be included within the image' title, description or alternative text.

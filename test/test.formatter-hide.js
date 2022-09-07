@@ -1,14 +1,15 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
 
-describe.only('hide formatter', function () {
+describe('hide formatter', function () {
 
   describe('hide(p)', function () {
 
     describe('DOCX', function () {
 
       it('should do nothing if the argument is missing or the type does not exist', function (done) {
-        const content = () => {
+        const content = (expected) => {
+          expected = expected ?? false;
           return '' +
             '<w:body>' +
               '<w:p w14:paraId="5C4E8B45" w14:textId="08330C66" w:rsidR="005A25A6" w:rsidRDefault="00C301BD">'+
@@ -16,7 +17,7 @@ describe.only('hide formatter', function () {
                   '<w:rPr>'+
                     '<w:lang w:val="en-US"/>'+
                   '</w:rPr>'+
-                  '<w:t>{d.name}{d.name:ifEM:hide}{d.name:ifEM:hide(notExisting)}</w:t>'+
+                  `<w:t>{d.name}${ expected === true ? '' : '{d.name:ifEM:hide}{d.name:ifEM:hide(notExisting)}'} </w:t>`+
                 '</w:r>'+
               '</w:p>'+
             '</w:body>';
@@ -33,7 +34,7 @@ describe.only('hide formatter', function () {
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          helper.assert(res?.files[0]?.data, content());
+          helper.assert(res?.files[0]?.data, content(true));
           done();
         });
       });
@@ -574,18 +575,21 @@ describe.only('hide formatter', function () {
   describe('hide(row)', function () {
     describe('DOCX', function () {
       it('should do nothing if the XML if not valid', function (done) {
-        const _templateContent = '' +
-          '<w:tbl>'+
-            '<w:tr>'+
-              '<w:tc>'+
-                '<w:p>'+
-                  '<w:r>'+
-                    '<w:t>{d.desc} {d.desc:ifEM:hide(row)}</w:t>'+
-                  '</w:r>'+
-                '</w:p>'+
-              '</w:tc>'+
-        // '</w:tr>'+ Missing end row tag
-          '</w:tbl>';
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<w:tbl>'+
+              '<w:tr>'+
+                '<w:tc>'+
+                  '<w:p>'+
+                    '<w:r>'+
+                      `<w:t>{d.desc} ${ expected === true ? '' : '{d.desc:ifEM:hide(row)}' }</w:t>`+
+                    '</w:r>'+
+                  '</w:p>'+
+                '</w:tc>'+
+          // '</w:tr>'+ Missing end row tag
+            '</w:tbl>';
+        };
 
         var _report = {
           isZipped   : true,
@@ -593,12 +597,12 @@ describe.only('hide formatter', function () {
           extension  : 'odt',
           embeddings : [],
           files      : [
-            { name : 'content.xml', parent : '', data : _templateContent}
+            { name : 'content.xml', parent : '', data : content()}
           ]
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          helper.assert(res?.files[0]?.data, _templateContent);
+          helper.assert(res?.files[0]?.data, content(true));
           done();
         });
       });
@@ -1206,14 +1210,17 @@ describe.only('hide formatter', function () {
 
     describe('ODT', function () {
       it('should do nothing if the XML if not valid', function (done) {
-        const _templateContent = '' +
-          '<table:table table:name="Table1" table:style-name="Table1">' +
-            '<table:table-row>' +
-              '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
-                '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hide(row)}</text:p>' +
-              '</table:table-cell>' +
-        // '</table:table-row>' + // MISSING A TABLE ROW
-          '</table:table>';
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<table:table table:name="Table1" table:style-name="Table1">' +
+              '<table:table-row>' +
+                '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                  `<text:p text:style-name="P1">{d.list[i].desc}${ expected ? '' : '{d.list[i].desc:ifEM:hide(row)}' }</text:p>` +
+                '</table:table-cell>' +
+          // '</table:table-row>' + // MISSING A TABLE ROW
+            '</table:table>';
+        };
 
         var _report = {
           isZipped   : true,
@@ -1221,12 +1228,12 @@ describe.only('hide formatter', function () {
           extension  : 'odt',
           embeddings : [],
           files      : [
-            { name : 'content.xml', parent : '', data : _templateContent}
+            { name : 'content.xml', parent : '', data : content()}
           ]
         };
         preprocessor.execute(_report, function (err, res) {
           helper.assert(err + '', 'null');
-          helper.assert(res?.files[0]?.data, _templateContent);
+          helper.assert(res?.files[0]?.data, content(true));
           done();
         });
       });

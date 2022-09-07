@@ -1,4 +1,3 @@
-### v4.X.X
 
 ### v4.2.0
   - Fix parsing of markers when empty string are used between two single quotes.

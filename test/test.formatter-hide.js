@@ -1579,5 +1579,198 @@ describe('hide formatter', function () {
         });
       });
     });
+
+    describe('Hide row option ":hide(row, nbrRowToHide)" - ODS format', () => {
+      it('should hide 2 table rows with "hide(row, 2)"', function (done) {
+        const _templateContent = '' +
+          '<table:table table:name="Table1" table:style-name="Table1">' +
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hide(row, 2)}</text:p>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                '<text:p text:style-name="P1">{d.list[i].name}</text:p>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+          '</table:table>';
+
+        const _expectedResult = '' +
+          '<table:table table:name="Table1" table:style-name="Table1">' +
+            '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>'+
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                '<text:p text:style-name="P1">{d.list[i].desc}</text:p>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                '<text:p text:style-name="P1">{d.list[i].name}</text:p>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+            '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>'+
+          '</table:table>';
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.odt',
+          extension  : 'odt',
+          embeddings : [],
+          files      : [
+            { name : 'content.xml', parent : '', data : _templateContent}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, _expectedResult);
+          done();
+        });
+      });
+
+      it('should hide 1 table row with "hide(row, 2)" because the table has 1 row, even if the option to hide 2 rows is provided', function (done) {
+        const _templateContent = '' +
+          '<table:table table:name="Table1" table:style-name="Table1">' +
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                '<text:p text:style-name="P1">{d.list[i].desc}{d.list[i].desc:ifEM:hide(row, 2)}</text:p>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+          '</table:table>';
+
+        const _expectedResult = '' +
+          '<table:table table:name="Table1" table:style-name="Table1">' +
+            '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>'+
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table1.C2" office:value-type="string">' +
+                '<text:p text:style-name="P1">{d.list[i].desc}</text:p>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+            '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>'+
+          '</table:table>';
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.odt',
+          extension  : 'odt',
+          embeddings : [],
+          files      : [
+            { name : 'content.xml', parent : '', data : _templateContent}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, _expectedResult);
+          done();
+        });
+      });
+
+      it('should hide 1 table row with "hide(row, 2)" because the table has 1 row, even if the option to hide 2 rows is provided AND the table is chained with another table', function (done) {
+        const _templateContent = '' +
+          '<table:table table:name="Table1" table:style-name="Table1">'+
+            '<table:table-row>'+
+              '<table:table-cell table:style-name="Table1.A1" office:value-type="string">'+
+                '<text:p text:style-name="P1">{d.value}{d.value:ifEM:hide(row, 2)}</text:p>'+
+              '</table:table-cell>'+
+            '</table:table-row>'+
+          '</table:table>'+
+          '<table:table table:name="Table2" table:style-name="Table2">'+
+            '<table:table-row>'+
+              '<table:table-cell table:style-name="Table2.A1" office:value-type="string">'+
+                '<text:p text:style-name="Table_20_Contents"/>'+
+              '</table:table-cell>'+
+            '</table:table-row>'+
+          '</table:table>';
+
+        const _expectedResult = '' +
+          '<table:table table:name="Table1" table:style-name="Table1">'+
+            '<carbone>{d.value:ifEM:hideBegin}</carbone>'+
+            '<table:table-row>'+
+              '<table:table-cell table:style-name="Table1.A1" office:value-type="string">'+
+                '<text:p text:style-name="P1">{d.value}</text:p>'+
+              '</table:table-cell>'+
+            '</table:table-row>'+
+            '<carbone>{d.value:ifEM:hideEnd}</carbone>'+
+          '</table:table>'+
+          '<table:table table:name="Table2" table:style-name="Table2">'+
+            '<table:table-row>'+
+              '<table:table-cell table:style-name="Table2.A1" office:value-type="string">'+
+                '<text:p text:style-name="Table_20_Contents"/>'+
+              '</table:table-cell>'+
+            '</table:table-row>'+
+          '</table:table>';
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.odt',
+          extension  : 'odt',
+          embeddings : [],
+          files      : [
+            { name : 'content.xml', parent : '', data : _templateContent}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, _expectedResult);
+          done();
+        });
+      });
+
+      it('should hide 3 table row of 4 with "hide(row, 2)" even if the first row contains a child table', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+          '<table:table table:name="Table2" table:style-name="Table2">' +
+            '<table:table-column table:style-name="Table2.A"/>' +
+            `${ expected ? '<carbone>{d.value:ifEM:hideBegin}</carbone>' : '' }` +
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table2.A1" office:value-type="string">' +
+                `<text:p text:style-name="P5">${expected ? '' : '{d.value:ifEM:hide(row, 3)}' }</text:p>` +
+                '<table:table table:name="Table4" table:style-name="Table4">' +
+                  '<table:table-column table:style-name="Table4.A"/>' +
+                  '<table:table-row>' +
+                    '<table:table-cell table:style-name="Table4.A1" office:value-type="string">' +
+                      '<text:p text:style-name="P7">Inner Table</text:p>' +
+                    '</table:table-cell>' +
+                  '</table:table-row>' +
+                '</table:table>' +
+                '<text:p text:style-name="P5"/>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table2.A2" office:value-type="string">' +
+                '<text:p text:style-name="Table_20_Contents"/>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table2.A2" office:value-type="string">' +
+                '<text:p text:style-name="Table_20_Contents"/>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+            `${ expected ? '<carbone>{d.value:ifEM:hideEnd}</carbone>' : '' }` +
+            '<table:table-row>' +
+              '<table:table-cell table:style-name="Table2.A2" office:value-type="string">' +
+                '<text:p text:style-name="Table_20_Contents"/>' +
+              '</table:table-cell>' +
+            '</table:table-row>' +
+          '</table:table>';
+        };
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.odt',
+          extension  : 'odt',
+          embeddings : [],
+          files      : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, content(true));
+          done();
+        });
+      });
+    });
   });
 });

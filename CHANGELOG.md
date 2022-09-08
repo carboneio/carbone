@@ -35,6 +35,7 @@
   - [EE] New `hide` conditional formatter for DOCX/ODT/PDF to hide document elements: **images**, **paragraphs**, table **rows**, **shapes** and **charts**. The rendering is always accurate and simpler to use compared to `hideBegin/hideEnd` or `showBegin/showEnd`. The first argument passed to `:hide(argument1)` is the element to hide, it can be:
     - `p` to hide paragraphs, usage: `{d.text:ifEM:hide(p)}`. The marker must be inside a paragraph. Every elements inside the paragraph are also removed if the condition is validated.
     - `row` to hide a table row, usage: `{d.data:ifEM:hide(row)}`. The marker must be inside a table row. Every element inside the row are also removed if the condition is validated.
+      - Optional: Set the number of rows to hide with a second argument, such as: `{d.data:ifEM:hide(row, 3)}`, meaning the current and next two rows will be removed if the condition is validated. By default, the formatter `:hide(row)` hides only the current row.
     - `img` to hide pictures, usage: `{d.img:ifEM:hide(img)}`. The marker must be included within the image' title, description or alternative text.
     - `chart` to hide charts, usage: `{d.dataset:ifEM:hide(chart)}`. The marker must be included within the chart' alternative text.
     - `shape` to hide shape (square, circle, arrows, etc...), usage: `{d.dataset:ifEM:hide(shape)}`. The marker must be included within the shape' title, description or alternative text.

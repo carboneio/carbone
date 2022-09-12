@@ -1,10 +1,10 @@
 
 ### v4.2.0
   - Release September 8st 2022
-  - Fix parsing of markers when empty string are used between two single quotes.
+  - Fixed parsing of Carbone tags when empty string are used between two single quotes.
     Ex. `{d.text:print(''):print('HIGK LMN')}` prints `HIGK LMN` instead of `HIGKLMN`
-  - Returns an error if a square bracket is used in array accessor `[...]`
-  - Accepts dynamic parameters in array filters, with infinite path depth. Example:
+  - Improved error messages if a square bracket is used in array accessor `[...]`
+  - Added: Accepts dynamic parameters in array filters, with infinite path depth. Example:
     *Data*
       ```js
         {
@@ -32,12 +32,13 @@
     - `{d.subArray[i = .i].text}`: using `.i` to join two arrays is not supported
     - `{d.subArray[i = ..parent.arr[0].id].text}`: accessing a specific array element is not supported
     - `{d.subArray[i = ..parent.arr[.i].id]text}`: accessing a specific array element according to the current iterator is not supported
-  - [EE] New `hide` conditional formatter for DOCX/ODT/PDF to hide document elements: **images**, **paragraphs**, table **rows**, **shapes** and **charts**. The rendering is always accurate and simpler to use compared to `hideBegin/hideEnd` or `showBegin/showEnd`. The first argument passed to `:hide(argument1)` is the element to hide, it can be:
-    - `p` to hide paragraphs, usage: `{d.text:ifEM:hide(p)}`. The marker must be inside a paragraph. Every elements inside the paragraph are also removed if the condition is validated.
-    - `row` to hide a table row, usage: `{d.data:ifEM:hide(row)}`. The marker must be inside a table row. Every element inside the row are also removed if the condition is validated.
-    - `img` to hide pictures, usage: `{d.img:ifEM:hide(img)}`. The marker must be included within the image' title, description or alternative text.
-    - `chart` to hide charts, usage: `{d.dataset:ifEM:hide(chart)}`. The marker must be included within the chart' alternative text.
-    - `shape` to hide shape (square, circle, arrows, etc...), usage: `{d.dataset:ifEM:hide(shape)}`. The marker must be included within the shape' title, description or alternative text.
+  - [EE] Added `hide` conditional formatter for DOCX/ODT/PDF to hide document elements: **images**, **paragraphs**, table **rows**, **shapes** and **charts**. The rendering is always accurate and simpler to use compared to `hideBegin/hideEnd` or `showBegin/showEnd`. The first argument passed to `:hide(argument1)` is the element to hide, it can be:
+    - `p` to hide paragraphs, usage: `{d.text:ifEM:hide(p)}`. The tag must be inside a paragraph. Every elements inside the paragraph are also removed if the condition is validated.
+    - `row` to hide a table row, usage: `{d.data:ifEM:hide(row)}`. The tag must be inside a table row. Every element inside the row are also removed if the condition is validated.
+      - Option `nbrRowsToHide`: Set the number of rows to hide as a second argument `{d.data:ifEM:hide(row, nbrRowsToHide)}`, such as: `{d.data:ifEM:hide(row, 3)}`, meaning the current and next two rows will be removed if the condition is validated. By default, the formatter `:hide(row)` hides only the current row.
+    - `img` to hide pictures, usage: `{d.img:ifEM:hide(img)}`. The tag must be included within the image' title, description or alternative text.
+    - `chart` to hide charts, usage: `{d.dataset:ifEM:hide(chart)}`. The tag must be included within the chart' alternative text.
+    - `shape` to hide shape (square, circle, arrows, etc...), usage: `{d.dataset:ifEM:hide(shape)}`. The tag must be included within the shape' title, description or alternative text.
   - [EE] Improved: ODS templates support loops of dynamic images. Setting the image anchor "To cell" is required.
 
 ### v4.1.0
@@ -82,9 +83,9 @@
     - Improved On-Premise Embedded Studio: multi-language, change export file format, automatic JSON generation from template
     - Accept formatters after conditional formatters (v4.0.0-beta.1). For example, `bindColor` can be used with conditions
   - [EE] Fix chart in DOCX when there is no loops (filtered array)
-  - [EE] Fix stateless studio crash when template does not contain any Carbone markers
+  - [EE] Fix stateless studio crash when template does not contain any Carbone tags
   - [EE] 🌈 `bindColor` formatter replaces background and line colors of shapes in DOCX only.
-    - The `bindColor` marker must be written in the document (NOT in alt text of the shape)
+    - The `bindColor` tag must be written in the document (NOT in alt text of the shape)
     - The replaced color in the template must be RGB. Select "RGB sliders" tool to defined the color in MS Word.
   - [EE] Use lossless image compression by default to speed up PDF rendering and improve image quality
   - [EE] Remove experimental support of images in HTML with `:html` formatter for ODT template added in v4.0.0-beta.3 (postpone in 4.1)
@@ -123,13 +124,13 @@
     - Fix ODT charts when images are used for background
 
 ### v4.0.0-alpha.1
-  - [EE] BREAKING CHANGE: the specific marker `{bind` becomes `{bindChart`. Example: `{bindChart(91) = d[i].valCol1}`
+  - [EE] BREAKING CHANGE: the specific tag `{bind` becomes `{bindChart`. Example: `{bindChart(91) = d[i].valCol1}`
   - [EE] DOCX Charts improvements
     - Manage loops to repeat multiple charts in DOCX template made by MS Office
     - Update embedded spreadsheet
     - Supports only Column, Line, Pie charts
-    - Carbone markers must be written with all `i` and `i+1` rows and columns in related Excel spreadsheet.
-    - Using the specific marker `{bindChart` is not mandatory for DOCX because MS Word accepts Carbone markers in chart values
+    - Carbone tags must be written with all `i` and `i+1` rows and columns in related Excel spreadsheet.
+    - Using the specific tag `{bindChart` is not mandatory for DOCX because MS Word accepts Carbone tags in chart values
   - Fix crash when a condition is used just before a filtered loop
 
 ### v4.0.0-alpha.0
@@ -142,12 +143,12 @@
 
     ### Method n°1, how to inject your data in native charts?
       - Insert a chart with native tools of LibreOffice or MS Word in your document
-      - Use traditional Carbone markers to create loops in chart's data to inject your JSON data
-      - If necessary, use the special marker `bind` to tell Carbone that the value `X` in the chart must be replaced by the marker `Y`
+      - Use traditional Carbone tags to create loops in chart's data to inject your JSON data
+      - If necessary, use the special tag `bind` to tell Carbone that the value `X` in the chart must be replaced by the tag `Y`
 
     ### Method n°2, how to do advanced charts with Apache ECharts objects?
       - Insert a sample image in your template.
-      - Place a marker in alt text , like a dynamic image : `{d.chartObj:chart}` with the formatter `:chart`.
+      - Place a tag in alt text , like a dynamic image : `{d.chartObj:chart}` with the formatter `:chart`.
         The formatter `:chart` is optional if the `chartObj` object contains the attribute `"type" : "echarts@v5"`.
         In that case, Carbone automatically considers it is a chart object instead of a dynamic image.
       - `chartObj` must contains a compatible [Echarts option](https://echarts.apache.org/en/option.html).
@@ -195,27 +196,27 @@
     {
       "renderId" : "file.pdf",
       "debug"    : {
-        "markers" : ["{d.id}", "{d.tab[i].id}"] // all markers found in template
+        "markers" : ["{d.id}", "{d.tab[i].id}"] // all tags found in template
         "sample" : {         // EXPERIMENTAL
-          "data"       : {}, // fake data generated from markers found in markers
-          "complement" : {}  // fake complement generated from markers found in markers
+          "data"       : {}, // fake data generated from tags found in tags
+          "complement" : {}  // fake complement generated from tags found in tags
         }
       }
     }
     ```
 
   - Improve syntax error message:
-    - when a marker tries to access an array and a object in the same time
-    - when there is a missing `[i]` marker fo one `[i+1]` marker
+    - when a tag tries to access an array and a object in the same time
+    - when there is a missing `[i]` tag fo one `[i+1]` tag
     - when Carbone cannot find the section to repeat
     - when there is a dot `.` before `[]`
 
   - Fix crash when repetition does not contain XML tags. For example: `<w:t>{d[i].id}, {d[i+1].id}</w:t>`
-  - Fix crash when the section i+1 is duplicated like the i-th section with nested repetition and other markers
+  - Fix crash when the section i+1 is duplicated like the i-th section with nested repetition and other tags
   - Fix crash when repetition uses direct access of sub-arrays `{d.test.others[i].wheels[0].size} {d.test.others[i+1].wheels[0].size}`
 
   - [EE] On-Premise Embedded Studio has new features and fixes:
-    - [EXPERIMENTAL]: sample `Data` and `Complement` are automatically generated using markers found in template if these field contain empty objects
+    - [EXPERIMENTAL]: sample `Data` and `Complement` are automatically generated using tags found in template if these field contain empty objects
     - export to other formats than PDF
     - change report language
     - fix firefox template upload
@@ -318,7 +319,7 @@
 
 ### v3.4.8
   - Release March 15st 2022
-  - [EE] Fix: avoid crash when a marker is used on a shape instead of a sample image (v3.2.2-1)
+  - [EE] Fix: avoid crash when a tag is used on a shape instead of a sample image (v3.2.2-1)
   - [EE] Fix graceful exit on SIGTERM, keep the converter alive to finish remaining renders!
     - As soon as Carbone has finished all renders, it exits after 15 seconds instead of 10 seconds
   - [EE] Fix DOCX documents that are including dynamic images and static charts
@@ -366,7 +367,7 @@
     {
       "renderId" : "file.pdf",
       "debug"    : {
-        "markers" : ["{d.id}", "{d.tab[i].id}"] // all markers found in template
+        "markers" : ["{d.id}", "{d.tab[i].id}"] // all tags found in template
       }
     }
     ```
@@ -414,7 +415,7 @@
     *Result*:  `A - A - B - B - B - D`
   - [EE] ⚡️ **Carbone supports 107 barcodes** in DOCX/ODT/XLSX/ODS templates:
     - Barcodes are inserted as a dynamic image to support more types
-    - In your template, barcodes markers must be inserted inside the title or description field of a temporary image, and then it must be followed with the barcode formatter, such as `{d.value:barcode(type)}`.
+    - In your template, barcodes tags must be inserted inside the title or description field of a temporary image, and then it must be followed with the barcode formatter, such as `{d.value:barcode(type)}`.
     - You must pass one of the following types to the `:barcode` formatter as a first argument: `ean5`, `ean2`, `ean13`, `ean8`, `upca`, `upce`, `isbn`, `ismn`, `issn`, `code128`, `gs1-128`, `ean14`, `sscc18`, `code39`, `code39ext`, `code32`, `pzn`, `code93`, `code93ext`, `interleaved2of5`, `itf14`, `identcode`, `leitcode`, `databaromni`, `databarstacked`, `databarstackedomni`, `databartruncated`, `databarlimited`, `databarexpanded`, `databarexpandedstacked`, `gs1northamericancoupon`, `pharmacode`, `pharmacode2`, `code2of5`, `industrial2of5`, `iata2of5`, `matrix2of5`, `coop2of5`, `datalogic2of5`, `code11`, `bc412`, `rationalizedCodabar`, `onecode`, `postnet`, `planet`, `royalmail`, `auspost`, `kix`, `japanpost`, `msi`, `plessey`, `telepen`, `telepennumeric`, `posicode`, `codablockf`, `code16k`, `code49`, `channelcode`, `flattermarken`, `raw`, `daft`, `symbol`, `pdf417`, `pdf417compact`, `micropdf417`, `datamatrix`, `datamatrixrectangular`, `datamatrixrectangularextension`, `mailmark`, `qrcode`, `swissqrcode`, `microqrcode`, `rectangularmicroqrcode`, `maxicode`, `azteccode`, `azteccodecompact`, `aztecrune`, `codeone`, `hanxin`, `dotcode`, `ultracode`, `gs1-cc`, `ean13composite`, `ean8composite`, `upcacomposite`, `upcecomposite`, `databaromnicomposite`, `databarstackedcomposite`, `databarstackedomnicomposite`, `databartruncatedcomposite`, `databarlimitedcomposite`, `databarexpandedcomposite`, `databarexpandedstackedcomposite`, `gs1-128composite`, `gs1datamatrix`, `gs1datamatrixrectangular`, `gs1qrcode`, `gs1dotcode`, `hibccode39`, `hibccode128`, `hibcdatamatrix`, `hibcdatamatrixrectangular`, `hibcpdf417`, `hibcmicropdf417`, `hibcqrcode`, `hibccodablockf`, `hibcazteccode`
     - The previous system, which uses a special font, is still available but is limited to `ean8`, `ean13`, `ean128`, `code39`.
 
@@ -436,9 +437,9 @@
   - [EE] HTML Formatter:
     - Fix: The HTML content is rendered without adding an empty line above it.
     - Fix: The HTML content and static content are rendered in the expected order.
-    - New: If static content and Carbone markers are mixed with an HTML formatter in the same paragraph, the html is isolated into a new paragraph and each element are seperated above or below. For example, the following template on a text editor `<paragraph>A rocket is made of {d.data:html} {d.details}, this is cool!</paragraph>` will be transform into 3 paragraphs on the generated report `<paragraph>A rocket is made of </paragraph><paragraph>{d.data:html}</paragraph><paragraph> {d.details}, this is cool!</paragraph>`.
+    - New: If static content and Carbone tags are mixed with an HTML formatter in the same paragraph, the html is isolated into a new paragraph and each element are seperated above or below. For example, the following template on a text editor `<paragraph>A rocket is made of {d.data:html} {d.details}, this is cool!</paragraph>` will be transform into 3 paragraphs on the generated report `<paragraph>A rocket is made of </paragraph><paragraph>{d.data:html}</paragraph><paragraph> {d.details}, this is cool!</paragraph>`.
     - Improved HTML rendering stability when it is mixed with lists, tables, and images.
-  - [EE] Dynamic Checkbox are supported only for ODT file. A marker should be inserted into the checkbox property "name" and it is used to set the value of the checkbox on the generated report. The checkbox is ticked (checked) when the value is a Boolean with the value "true", a non empty string, a non empty array or a non empty object. If the exported file type is a PDF, the checkbox can be edited on the generated document. An ODT document created from MS Word that include checkboxes does not work. It is also not possible to create a list of checkboxes with the expressions `[i] / [i+1]`.
+  - [EE] Dynamic Checkbox are supported only for ODT file. A tag should be inserted into the checkbox property "name" and it is used to set the value of the checkbox on the generated report. The checkbox is ticked (checked) when the value is a Boolean with the value "true", a non empty string, a non empty array or a non empty object. If the exported file type is a PDF, the checkbox can be edited on the generated document. An ODT document created from MS Word that include checkboxes does not work. It is also not possible to create a list of checkboxes with the expressions `[i] / [i+1]`.
   - Accept `null` for the attribute `complement` in `options`
 
 ### v3.2.7
@@ -465,7 +466,7 @@
 
 ### v3.2.2-1
   - Release March 11th 2022
-  - Fix: avoid crash when a marker is used on a shape instead of a sample image
+  - Fix: avoid crash when a tag is used on a shape instead of a sample image
 
 ### v3.2.2
   - Release May 10th 2021
@@ -535,7 +536,7 @@
 
 ### v3.1.3
   - Release March 29th 2021
-  - Fix: Do not break documents if the `i+1` row contains some markers coming from parent object or condition blocks (rare)
+  - Fix: Do not break documents if the `i+1` row contains some tags coming from parent object or condition blocks (rare)
   - [EE] if a font family and font size is applied to an HTML formatter `{d.content:html}`, the font & size will be applied to the whole rendered HTML
   - [EE] return an error message when image anchor is not correct in the template
 
@@ -633,17 +634,17 @@
 
   - Fix: if a path does not exist inside a formatter argument, it returns an empty string instead of the error "[[C_ERROR]] attribute_name not defined".
     It fixes some weird behaviour with ifEM formatters
-  - [EE] Feature: cells colors on ODT/DOCX report can be changed dynamically with the "bindColor" marker.
-  - [EE] ODT Improvement: the "bindColor" marker will not remove other styles than colors.
+  - [EE] Feature: cells colors on ODT/DOCX report can be changed dynamically with the "bindColor" tag.
+  - [EE] ODT Improvement: the "bindColor" tag will not remove other styles than colors.
   - Accepts to convert the first page of docx or odt templates into a JPEG file with `converTo : 'jpg'`
   - Improve HTML type detection. Accepts html5 without doctype.
-  - [EE] Fix Carbone marker inside ODT text box
+  - [EE] Fix Carbone tag inside ODT text box
   - Adding `padl` and `padr` string formatter.
   - Fix doc issue on carbone website
   - Accepts Adobe Indesign IDML file as a template
-  - [EE] Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Right click an element, select "hyperlinks", insert the marker and validate. It is working with ODS, ODT, and DOCX reports. The compatibility is limited for XLSX documents: It is not possible to create a list of hyperlinks and the marker should not be written with curly braces, example: a typical `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it is also valid.
+  - [EE] Dynamic hyperlinks: it is possible to insert hyperlinks into elements (text, image, list, tables, ...). Right click an element, select "hyperlinks", insert the tag and validate. It is working with ODS, ODT, and DOCX reports. The compatibility is limited for XLSX documents: It is not possible to create a list of hyperlinks and the tag should not be written with curly braces, example: a typical `{d.url}` should be only `d.url`. If `http://` appears before `d.url`, it is also valid.
   - Improve the parsing processing by moving the function "removeXMLInsideMarkers" before the building stage.
-  - Support officially to embed translations markers inside other markers: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
+  - Support officially to embed translations tags inside other tags: `{d.id:ifEq(2):show(  {t(Tuesday)} ) }`
   - Performance: reduce disk IO when converting document
   - Performance: deactivate image compression by default to speed up PDF conversion
   - [BREAKING CHANGE]: remove the possibility to use `convertTo.formatOptionsRaw` for CSV export. This feature was not documented
@@ -717,7 +718,7 @@
     - Text and background colors in footers and headers are supported for ODT and DOCX templates.
     - Better error management, it throws errors when:
       - bindColor is not correctly formatted
-      - 2 bindColor markers try to edit the same color
+      - 2 bindColor tags try to edit the same color
       - the background color format on DOCX documents is different than "color"
       - the color format does not exist
       - 2 different lists of colors are used to edit the same element
@@ -858,7 +859,7 @@
   - Fix: accepts dashes characters in JSON data. Before, Carbone crashes when using `{d.my-att-with-dash}`
   - Fix: avoid crashing when a XLSX template contains charts
   - Beta: supports dynamic charts rendering in XLSX if these conditions are met:
-    - first, draw a chart in MS Excel and replace your data with Carbone markers
+    - first, draw a chart in MS Excel and replace your data with Carbone tags
     - datas of the chart should be placed at the top-left corner of the spreadsheet
     - all numbers are formatted with formatN() formatter
   - Fix: accepts white-space in array filters with simple quote and double quotes
@@ -870,7 +871,7 @@
   - Upgrade some dependencies (moment, debug, yauzl) and remove useless ones (should)
   - Accepts non-alphanumeric characters in variables names, values, ... For example, `{d.i💎d}` is allowed
   - Fix many security issues and reduce memory consumption
-  - Fix crash when markers are next to each over `{d.id}{d.other}` in many situations:
+  - Fix crash when tags are next to each over `{d.id}{d.other}` in many situations:
     - with or without conditional blocks
     - with or without loops
   - Fix crash when some documents like DOCX contain images in repetition section
@@ -885,14 +886,14 @@
   - Fix: avoid crashing if a object/array is null or undefined. Print empty text instead.
   - Fix: variables, which begin by the same characters, were not detected correctly since NodeJS 11
   - [EE] Image processing completely rewritten
-  - [EE] Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` by passing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the marker as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the marker.
+  - [EE] Dynamic images improvements: it is possible to insert images into `ODT`, `ODS`, `XLSX` and `DOCX` by passing a public URL or a Data URLs. For the 2 solutions, you have to insert a temporary picture in your template and write the tag as an alternative text. Finally, during rendering, Carbone replaces the temporary picture by the correct picture provided by the tag.
 
-    The place to insert the marker on the temporary picture may change depends on the file format:
+    The place to insert the tag on the temporary picture may change depends on the file format:
 
-      - ODS file: set the marker on the image title
-      - ODT file: set the marker on the image alternative text
-      - DOCX file: set the marker either on the image title, image description, or alternative text
-      - XLSX file: set the marker either on the image title, image description, or alternative text
+      - ODS file: set the tag on the image title
+      - ODT file: set the tag on the image alternative text
+      - DOCX file: set the tag either on the image title, image description, or alternative text
+      - XLSX file: set the tag either on the image title, image description, or alternative text
 
     The accepted images type are: `png`, `jpeg`/`jpg`, `gif`, `svg`
 
@@ -952,9 +953,9 @@
 
 ### v1.1.0
   - Release February 26, 2018
-  - Fix: should find markers even if there is a opening bracket `{` before the markers
+  - Fix: should find tags even if there is a opening bracket `{` before the tags
   - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
-  - Fix: markers were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...
+  - Fix: tags were not parsed if formatters were used directly on `d` or `c` like this `{d:ifEmpty('yeah')}` ...
   - Fix: keep the first element of the array if the custom iterator is constant
   - Fix a lot of strange bugs when using a filter without iterators in arrays (ex. `{d.cities[i=0].temperature}`)
   - Optimization: gain x10 when sorting 1 Million of rows
@@ -988,10 +989,10 @@
   - Accept more input type
   - Remove deprecated formatters
   - `carbone.set` takes into account changes on `factories` and `startFactory` parameters
-  - Fix: a report without markers, except lang ones, is translated
+  - Fix: a report without tags, except lang ones, is translated
   - Fix: avoid creating LibreOffice zombies when node crashes
   - Fix: avoid using LibreOffice if `options.convertTo` equals input file extension
-  - Fix: improve markers detection to avoid removing some XML variable like `{DSDSD-232D}` used in DOCX
+  - Fix: improve tags detection to avoid removing some XML variable like `{DSDSD-232D}` used in DOCX
   - Fix: now compatible with node v4.5.0+, v6+, v8+
 
 ### v0.13.1
@@ -1015,7 +1016,7 @@
   - Replace module zipfile by yauzl: faster, lighter, asynchrone
   - XLSX templates are accepted (beta)
   - Parse embedded XLSX and DOCX documents
-  - Add a tool to search a text within a marker in all reports `carbone find :formatterName`
+  - Add a tool to search a text within a tag in all reports `carbone find :formatterName`
 
 
 ### v0.12.5
@@ -1079,7 +1080,7 @@
   - Update zipfile dependency
   - Now, the repetition algorithm can flatten an array of objects!!
     + it accepts to increment multiple arrays in the same time
-    + it repeats automatically all markers that are on the same row of all nested arrays
+    + it repeats automatically all tags that are on the same row of all nested arrays
 
     Example:
 

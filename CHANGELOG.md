@@ -1,6 +1,6 @@
 ### v4.3.0
   - Release September 12st 2022
-  - `hide` formatter becomes `drop` to avoid conflicts with `hideBegin/hideEnd/show`
+  - `hide` formatter becomes `drop` to avoid confusion with `hideBegin/hideEnd/show`. `hide` was introduced in 4.2 and is still not offically documented.
 
 ### v4.2.0
   - Release September 8st 2022

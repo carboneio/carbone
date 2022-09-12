@@ -1,6 +1,7 @@
 ### v4.3.0
   - Release September 12st 2022
   - `hide` formatter becomes `drop` to avoid confusion with `hideBegin/hideEnd/show`. `hide` was introduced in 4.2 and is still not offically documented.
+  - `drop(row, nbrRows)` accepts a second parameter to select the number of row to remove
 
 ### v4.2.0
   - Release September 8st 2022

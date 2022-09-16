@@ -35,6 +35,11 @@ var dayjs = require('dayjs');
  */
 function formatD (d, patternOut, patternIn) {
   if (d !== null && typeof d !== 'undefined') {
+    // avoid timezone when only a date is provided without time
+    // checking length is fast and seems to cover 99.9% of cases when patternIn is undefined
+    if (d.length < 13 && /[Hhms]/.test(patternIn) === false) {
+      return parse(d, patternIn).locale(this.lang).format(patternOut);
+    }
     return parse(d, patternIn).tz(this.timezone).locale(this.lang).format(patternOut);
   }
   return d;

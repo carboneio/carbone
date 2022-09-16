@@ -51,6 +51,19 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
     });
+    it('should not apply timezone if only a date is provided without time', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '20100-12-01', 'L'), '12/01/20100');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '100100-12-01', 'L'), '12/01/100100');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
+    });
+    it('should apply timezone if only a time is provided', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'HH-mm-ss', 'HH-mm-ss'), '03-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01Z', 'HH-mm-ss', 'HH-mm-ssZ'), '05-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01T01:00:00Z', 'LLL'), 'November 30, 2010 8:00 PM');
+    });
     it('should accepts real locales', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en-gb', timezone : _tz}, '20101201', 'L'), '01/12/2010');
       helper.assert(dateFormatter.formatD.call({lang : 'en'   , timezone : _tz}, '20101201', 'L'), '12/01/2010');

@@ -1,3 +1,9 @@
+### v4.4.0
+  - Fix: `formatD` ignores the timezone if only a date is parsed without the time (without hour, minute, second).
+    Example: when the timezone is `america/guayaquil` in `options.timezone`
+    -  `'2010-12-01':formatD(LL)`           returns `December 1, 2010`. Before this version Carbone returned `November 30, 2010`
+    -  `'2010-12-01T01:00:00Z':formatD(LL)` returns `November 30, 2010 8:00 PM`
+
 ### v4.3.0
   - Release September 12st 2022
   - `hide` formatter becomes `drop` to avoid confusion with `hideBegin/hideEnd/show`. `hide` was introduced in 4.2 and is still not offically documented.

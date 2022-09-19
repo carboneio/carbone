@@ -191,6 +191,49 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatI.call({lang : 'es-ES'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'hace 4 años'   );
     });
   });
+  describe('diffD', function () {
+    it('should compute the difference between two dates', function () {
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'millisecond' ), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'milliseconds'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'ms'          ), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'second'      ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'seconds'     ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 's'           ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'minute'      ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'minutes'     ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'm'           ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'hour'        ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'hours'       ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'h'           ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'year'        ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'years'       ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'y'           ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'quarter'     ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'quarters'    ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'Q'           ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'month'       ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'months'      ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'M'           ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'week'        ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'weeks'       ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'w'           ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'day'         ), 61);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'days'        ), 61);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'd'           ), 61);
+    });
+    it('should compute the difference between two dates and accept patterns for both dates', function () {
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'ms' , 'YYYY+MM+DD', 'YYYY=MM=DD'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 's'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'm'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'h'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2009+10+01', '2010=12=01', 'y'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+05+20', '2010=12=01', 'Q'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'M'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'w'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'd'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 61);
+    });
+  });
   describe('convCRLF', function () {
     it('should convert LF and CR in odt', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'odt'}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <text:line-break/> sd <text:line-break/> qsd <text:line-break/> sq');

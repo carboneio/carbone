@@ -1,4 +1,7 @@
 ### v4.4.0
+  - On-Premise version:
+    - Improve error message of HTTP API /template /render
+    - Support execution of on Windows (beta)
   - New: Compute the difference between two dates with formatter: `d.fromDate:diffD(toDate, unit, patternFrom, patternTo)`.
     - `fromDate` and `toDate` can be ISO 8601 format or any format defined with `patternFrom` and `patternTo`
     - `unit` can be `millisecond(s)` or `ms`, `second(s)` or `s`, `minute(s)` or `m`,

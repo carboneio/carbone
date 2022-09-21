@@ -1,4 +1,5 @@
 ### v4.4.0
+  - Fix: In docx templates, array filters could be ignored when the loop includes images (bug introduced in v4.1.0 to fix broken docx)
   - On-Premise version:
     - Improve error message of HTTP API /template /render
     - Support execution of on Windows (beta)

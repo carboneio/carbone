@@ -1,4 +1,6 @@
 ### v4.4.0
+  - Release September 21st 2022
+  - Add new formatter `ifTE(string)` to test if a value is a string. Only "string" is supported for now.
   - Fix: In docx templates, array filters could be ignored when the loop includes images (bug introduced in v4.1.0 to fix broken docx)
   - On-Premise version:
     - Improve error message of HTTP API /template /render

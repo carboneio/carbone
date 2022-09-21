@@ -538,6 +538,35 @@ describe('formatter', function () {
       });
     });
 
+    describe('ifTE', function () {
+      it('should turn the `isConditionTrue` to false if a data is not a string', function () {
+        const _dataSet = [
+          [0                , 'string'],
+          [22.2222          , 'string'],
+          [true             , 'string'],
+          [false            , 'string'],
+          [undefined        , 'string'],
+          [null             , 'string'],
+          [{value : 'john'} , 'string'],
+          [[1, 2, 3]        , 'string']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a string', function () {
+        const _dataSet = [
+          [''          , 'string'],
+          ['0'         , 'string'],
+          ['22.2222'   , 'string'],
+          ['true'      , 'string'],
+          ['false'     , 'string'],
+          ['undefined' , 'string'],
+          ['null'      , 'string']
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+    });
+
     describe('ifGT', function () {
       it('should matches values, string.length, array.length or object.length that are greater than a specified value', function () {
         const _dataSet = [

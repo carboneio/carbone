@@ -537,6 +537,28 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it.skip('should keep xml in the right order even if json is undefined', function (done) {
+    var _xml =
+       '<xml>'
+      +'<table>{d.cars[i]}'
+      +  '<t_col><td>{d.cars[i].wheels[line].size}</td><td>{d.cars[i].wheels[line+1].size  }</td></t_col>'
+      +  '<t_col><td>{d.cars[i].wheels[line].id}</td><td>{d.cars[i].wheels[line+1].id}</td></t_col>'
+      +  '<t_col><td>{d.cars[i].wheels[line].other}</td><td>{d.cars[i].wheels[line+1].other}</td></t_col>'
+      +'</table>'
+      +'<id>{d.cars[i+1]}'
+      +'</id>'
+      +'</xml>';
+    var _data = {
+      cars : [
+        {wheels : [ {size : 'A'}]},
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml><table><t_col><td>A</td></t_col><t_col><td></td></t_col><t_col><td></td></t_col></table></xml>');
+      done();
+    });
+  });
   it('should do hozironal loop with markers in XML', function (done) {
     const _xml = '<xml>'
                +   '<t_row> <td color="{d.id}">{d.cars[i].colA}</td><td color="{d.id}">{d.cars[i+1].colA}</td> </t_row>'

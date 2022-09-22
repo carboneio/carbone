@@ -51,6 +51,19 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
     });
+    it('should not apply timezone if only a date is provided without time', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '20100-12-01', 'L'), '12/01/20100');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '100100-12-01', 'L'), '12/01/100100');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
+    });
+    it('should apply timezone if only a time is provided', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'HH-mm-ss', 'HH-mm-ss'), '03-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01Z', 'HH-mm-ss', 'HH-mm-ssZ'), '05-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01T01:00:00Z', 'LLL'), 'November 30, 2010 8:00 PM');
+    });
     it('should accepts real locales', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en-gb', timezone : _tz}, '20101201', 'L'), '01/12/2010');
       helper.assert(dateFormatter.formatD.call({lang : 'en'   , timezone : _tz}, '20101201', 'L'), '12/01/2010');
@@ -176,6 +189,49 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatI.call({lang : 'fr'}, -1000 * 3600 * 24 * 365 * 4    , 'human+') , 'il y a 4 ans'  );
       helper.assert(dateFormatter.formatI.call({lang : 'fr-FR'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'il y a 4 ans'  );
       helper.assert(dateFormatter.formatI.call({lang : 'es-ES'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'hace 4 años'   );
+    });
+  });
+  describe('diffD', function () {
+    it('should compute the difference between two dates', function () {
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'millisecond' ), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'milliseconds'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'ms'          ), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'second'      ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'seconds'     ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 's'           ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'minute'      ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'minutes'     ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'm'           ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'hour'        ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'hours'       ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'h'           ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'year'        ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'years'       ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'y'           ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'quarter'     ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'quarters'    ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'Q'           ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'month'       ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'months'      ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'M'           ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'week'        ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'weeks'       ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'w'           ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'day'         ), 61);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'days'        ), 61);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'd'           ), 61);
+    });
+    it('should compute the difference between two dates and accept patterns for both dates', function () {
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'ms' , 'YYYY+MM+DD', 'YYYY=MM=DD'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 's'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'm'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'h'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2009+10+01', '2010=12=01', 'y'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+05+20', '2010=12=01', 'Q'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'M'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'w'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'd'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 61);
     });
   });
   describe('convCRLF', function () {
@@ -479,6 +535,35 @@ describe('formatter', function () {
           [[1, 2, 3, 4, 6, 7, 8, 9], [1, 2, 3, 6, 7, 8, 9]],
         ];
         testCondition('ifNE', _dataSet, true);
+      });
+    });
+
+    describe('ifTE', function () {
+      it('should turn the `isConditionTrue` to false if a data is not a string', function () {
+        const _dataSet = [
+          [0                , 'string'],
+          [22.2222          , 'string'],
+          [true             , 'string'],
+          [false            , 'string'],
+          [undefined        , 'string'],
+          [null             , 'string'],
+          [{value : 'john'} , 'string'],
+          [[1, 2, 3]        , 'string']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a string', function () {
+        const _dataSet = [
+          [''          , 'string'],
+          ['0'         , 'string'],
+          ['22.2222'   , 'string'],
+          ['true'      , 'string'],
+          ['false'     , 'string'],
+          ['undefined' , 'string'],
+          ['null'      , 'string']
+        ];
+        testCondition('ifTE', _dataSet, true);
       });
     });
 

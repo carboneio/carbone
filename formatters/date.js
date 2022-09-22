@@ -35,6 +35,11 @@ var dayjs = require('dayjs');
  */
 function formatD (d, patternOut, patternIn) {
   if (d !== null && typeof d !== 'undefined') {
+    // avoid timezone when only a date is provided without time
+    // checking length is fast and seems to cover 99.9% of cases when patternIn is undefined
+    if (d.length < 13 && /[Hhms]/.test(patternIn) === false) {
+      return parse(d, patternIn).locale(this.lang).format(patternOut);
+    }
     return parse(d, patternIn).tz(this.timezone).locale(this.lang).format(patternOut);
   }
   return d;
@@ -207,6 +212,46 @@ function endOfD (d, unit, patternIn) {
   return d;
 }
 
+/**
+ * Compute the difference between two dates and get an interval. List of available output units for the interval:
+ *   - `day(s)`         or `d`   Day of Week (Sunday as 0, Saturday as 6)
+ *   - `week(s)`        or `w`   Week of Year
+ *   - `quarter(s)`     or `Q`   Quarter
+ *   - `month(s)`       or `M`   Month (January as 0, December as 11)
+ *   - `year(s)`        or `y`   Year
+ *   - `hour(s)`        or `h`   Hour
+ *   - `minute(s)`      or `m`   Minute
+ *   - `second(s)`      or `s`   Second
+ *   - `millisecond(s)` or `ms`  Millisecond
+ *
+ * @version 4.4.0
+ * 
+ * @example ["20101001", "20101201" ]
+ * @example ["20101001", "20101201" , "second"]
+ * @example ["20101001", "20101201" , "s"     ]
+ * @example ["20101001", "20101201" , "m"     ]
+ * @example ["20101001", "20101201" , "h"     ]
+ * @example ["20101001", "20101201" , "weeks" ]
+ * @example ["20101001", "20101201" , "days"  ]
+ *
+ * @example ["2010+10+01", "2010=12=01", "ms" , "YYYY+MM+DD", "YYYY=MM=DD"]
+ * 
+ * @param      {String|Number}   d                from date
+ * @param      {String|Number}   toDate           to date
+ * @param      {String}          unit             The output unit: day, week, ... see the list above. Milliseconds by default.
+ * @param      {String}          patternFromDate  [optional] The pattern of `fromDate`, ISO8601 by default
+ * @param      {String}          patternToDate    [optional] The pattern of `toDate`, ISO8601 by default
+ * @return     {Number}          The difference between two dates
+ */
+function diffD (d, toDate, unit = 'ms', patternFromDate, patternToDate) {
+  if (d !== null && typeof d !== 'undefined') {
+    const _fromDate = parse(d, patternFromDate);
+    const _toDate   = parse(toDate, patternToDate);
+    return _toDate.diff(_fromDate, unit);
+  }
+  return d;
+}
+
 
 /**
  * Format dates
@@ -264,5 +309,6 @@ module.exports = {
   addD,
   subD,
   startOfD,
-  endOfD
+  endOfD,
+  diffD
 };

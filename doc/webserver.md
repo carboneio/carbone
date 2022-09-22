@@ -63,8 +63,10 @@ The service is configured to run with "carbone" user (automatically created) in 
 It is possible to overwrite values through environment variables `CARBONE_USER` and `CARBONE_WORKDIR`.
 
 You must install LibreOffice to generate PDF documents, [read instructions](#how-and-why-install-libreoffice).
+
 ## How and why install LibreOffice?
-#### on OSX
+
+#### on OSX and Windows
 
 - Install LibreOffice normally using the stable version from https://www.libreoffice.org/
 

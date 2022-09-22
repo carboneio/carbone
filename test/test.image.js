@@ -747,6 +747,47 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
+      it('generating unique ids for docPr tag should not break filters in loop', function (done) {
+        var _xml = (expected) => { return ''
+          + '<w:p>'
+          + '  <w:r>'
+          + '    <w:rPr>'
+          +       (expected ? '3' : '{d[i, type=3].type}')
+          + '    </w:rPr>'
+          + '    <w:drawing>'
+          + '      <wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="28B07B0E" wp14:editId="287BE7E9">'
+          + '        <wp:docPr id="'+(expected ? '1000' : '3')+'" name="Billede 6" descr=""/>'
+          + '        <a:graphic>'
+          +           (expected ? '3' : '{d[i, type=3].type}')
+          + '        </a:graphic>'
+          + '      </wp:inline>'
+          + '    </w:drawing>'
+          + '  </w:r>'
+          + (expected ? '' : ''
+            + '<w:r>'
+            + '    <w:t>{d[i+1, type=3].type}</w:t>'
+            + '</w:r>'
+          )
+          + '</w:p>'
+        }
+        var _report = {
+          isZipped   : false,
+          filename   : 'template.docx',
+          embeddings : [],
+          extension  : 'docx',
+          files      : [
+            {name : 'word/document.xml', parent : '' , data : _xml()   , isMarked   : true},
+            {name : 'word/other.xml'   , parent : '' , data : '<p></p>', isMarked   : true}
+          ]
+        };
+        carbone.render(_report, [{ type : 3 }, { type : 1 }], function (err, res) {
+          helperTest.assert(err + '', 'null');
+          helperTest.assert(res.files[0].name, 'word/document.xml');
+          helperTest.assert(res.files[0].data, _xml(true));
+          done();
+        });
+      });
+
       it.skip('should generate barcodes as images and as fonts', function (done) {
         const _testedReport = 'image/docx-barcodes';
         const _data = {

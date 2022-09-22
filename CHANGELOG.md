@@ -1,3 +1,22 @@
+### v4.4.0
+  - Release September 21st 2022
+  - Add new formatter `ifTE(string)` to test if a value is a string. Only "string" is supported for now.
+  - Fix: In docx templates, array filters could be ignored when the loop includes images (bug introduced in v4.1.0 to fix broken docx)
+  - On-Premise version:
+    - Improve error message of HTTP API /template /render
+    - Support execution of on Windows (beta)
+  - New: Compute the difference between two dates with formatter: `d.fromDate:diffD(toDate, unit, patternFrom, patternTo)`.
+    - `fromDate` and `toDate` can be ISO 8601 format or any format defined with `patternFrom` and `patternTo`
+    - `unit` can be `millisecond(s)` or `ms`, `second(s)` or `s`, `minute(s)` or `m`,
+      `hour(s)` or `h`,`year(s)` or `y`, `month(s)` or `M`, `week(s)` or `w`, `day(s)` or `d`, `quarter(s)` or `Q`.
+    Here are examples with `d.fromDate = 20101001`:
+    - `{d.fromDate:diffD(20101201, days)}`  => `61`
+    - `{d.fromDate:diffD(20101201, hours)}`  => `1465`
+  - Fix: `formatD` ignores the timezone if only a date is parsed without the time (without hour, minute, second).
+    Example: when the timezone is `america/guayaquil` in `options.timezone`
+    -  `'2010-12-01':formatD(LL)`           returns `December 1, 2010`. Before this version Carbone returned `November 30, 2010`
+    -  `'2010-12-01T01:00:00Z':formatD(LL)` returns `November 30, 2010 8:00 PM`
+
 ### v4.3.0
   - Release September 12st 2022
   - `hide` formatter becomes `drop` to avoid confusion with `hideBegin/hideEnd/show`. `hide` was introduced in 4.2 and is still not offically documented.

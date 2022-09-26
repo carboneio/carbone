@@ -1,5 +1,5 @@
 ### v4.4.1
-  - Release September 22st 2022
+  - Release September 26st 2022
   - On-Premise:
     - add options `xlsmEnabled` to accept export to `xlsm` format (false by default)
 

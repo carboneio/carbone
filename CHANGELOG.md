@@ -1,3 +1,8 @@
+### v4.4.1
+  - Release September 22st 2022
+  - On-Premise:
+    - add options `xlsmEnabled` to accept export to `xlsm` format (false by default)
+
 ### v4.4.0
   - Release September 21st 2022
   - Add new formatter `ifTE(string)` to test if a value is a string. Only "string" is supported for now.

@@ -1,3 +1,6 @@
+### v4.4.2
+  - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion. 
+  
 ### v4.4.1
   - Release September 26st 2022
   - On-Premise:

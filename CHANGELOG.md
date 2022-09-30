@@ -1,3 +1,8 @@
+### v4.4.2
+  - Release September 30st 2022
+  - On-Premise:
+    - Improve logs messages for webhooks
+
 ### v4.4.1
   - Release September 26st 2022
   - On-Premise:

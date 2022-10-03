@@ -356,7 +356,7 @@ function barcode (data, type) {
   }
 
   try {
-    return JSON.stringify({bcid : type, text : data, ..._options });
+    return JSON.stringify({bcid : type, text : data + '', ..._options });
   }
   catch (err) {
     return '';

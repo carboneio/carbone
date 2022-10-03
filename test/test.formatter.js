@@ -1702,6 +1702,12 @@ describe('formatter', function () {
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'SPC\n0200\n1\nCH5800791123000889012\nS\nRobert Schneider AG\nRue du Lac\n1268\n2501\nBiel\nCH\n\n199.95\nCHF\nKPia-Maria Rutschmann-Schnyder\nGrosse Marktgasse 28\n9400 Rorschach\n\n\nCH\nSCOR\nRF18539007547034\n\nEPD\n',  'swissqrcode'), '{"bcid":"swissqrcode","text":"SPC\\n0200\\n1\\nCH5800791123000889012\\nS\\nRobert Schneider AG\\nRue du Lac\\n1268\\n2501\\nBiel\\nCH\\n\\n199.95\\nCHF\\nKPia-Maria Rutschmann-Schnyder\\nGrosse Marktgasse 28\\n9400 Rorschach\\n\\n\\nCH\\nSCOR\\nRF18539007547034\\n\\nEPD\\n"}');
         });
 
+        it('should return the barcode as JSON and CAST integer values as strings', function () {
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 15854377, 'code39'), '{"bcid":"code39","text":"15854377"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 2112345678900, 'ean13'), '{"bcid":"ean13","text":"2112345678900"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 5715311709768, 'code128'), '{"bcid":"code128","text":"5715311709768"}');
+        });
+
         it('should return the barcode as JSON with options and should validate options', function () {
           // width
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:2'), '{"bcid":"qrcode","text":"https://carbone.io","width":"2"}', );

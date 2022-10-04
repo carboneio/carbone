@@ -1,8 +1,9 @@
 ### v4.4.X
-  - Fixed the `:html` formatter: Comment tags are not rendered and skipped.
 
 ### v4.4.2
   - Release September 30st 2022
+  - Fix: HTML comment tags are not rendered and skipped by `:html` formatter
+  - Improve dynamic barcodes: values as integers are accepted
   - On-Premise:
     - Improve logs messages for webhooks
   - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion.

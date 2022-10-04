@@ -1,6 +1,8 @@
+### v4.4.X
 
 ### v4.4.2
   - Release September 30st 2022
+  - Fix: HTML comment tags are not rendered and skipped by `:html` formatter
   - Improve dynamic barcodes: values as integers are accepted
   - On-Premise:
     - Improve logs messages for webhooks

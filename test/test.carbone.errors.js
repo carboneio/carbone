@@ -104,4 +104,17 @@ describe('Carbone error management', function () {
       done();
     });
   });
+  it('should return an error when a square bracket is used inside an array filter', function (done) {
+    var _xml = '<xml> <t_row> {d[brand=\'Te[sla\'].brand} </t_row></xml>';
+    var _data = [
+      {brand : 'Toyota' , id : 1},
+      {brand : 'Te[sla'  , id : 2},
+      {brand : 'Toyota' , id : 3}
+    ];
+    carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'Error: Carbone does not accept square brackets inside array filters in {d[brand=\'Te[sla\'].brand}. Please contact the support to add this feature.');
+      helper.assert(_xmlBuilt, null);
+      done();
+    });
+  });
 });

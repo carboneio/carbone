@@ -328,6 +328,36 @@ function ifNIN (d, value) {
   return d;
 }
 
+
+/**
+ * Matches values where the type equals a specified value.
+ * 
+ * Only "string" type is checked for the moment.
+ *
+ * @version 4.4.0
+ * @exampleContextFormatter [ 0        , "string" ] false
+ * @exampleContextFormatter [ [23]     , "string" ] false
+ * @exampleContextFormatter [ {"id":3} , "string" ] false
+ * @exampleContextFormatter [ null     , "string" ] false
+ * @exampleContextFormatter [ []       , "string" ] false
+ * @exampleContextFormatter [ {}       , "string" ] false
+ * @exampleContextFormatter [ "10"     , "string" ] true
+ * @exampleContextFormatter [ "homer"  , "string" ] true
+ * @exampleContextFormatter [ ""       , "string" ] true
+ *
+ * @param {Integer|String|Array} d
+ * @param {String} type can be "string". If you need to check more types, please contact the support. We will add the type within the day.
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
+function ifTE (d, type) {
+  var _result = false;
+  if (typeof(d) === type && type === 'string') {
+    _result = true;
+  }
+  this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
+  return d;
+}
+
 /**
  * Print a message if the condition is true. It should be used with other formatters to print conditional content.
  *
@@ -559,6 +589,7 @@ module.exports = {
   ifLTE,
   ifIN,
   ifNIN,
+  ifTE,
   hideBegin,
   hideEnd,
   showBegin,
@@ -566,5 +597,6 @@ module.exports = {
   show,
   elseShow,
   and,
-  or
+  or,
+  hide : () => ''
 };

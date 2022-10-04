@@ -1,7 +1,7 @@
 {
   "name": "carbone-ee",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "4.1.0",
+  "version": "4.4.2",
   "bin": "bin/carbone",
   "main": "./lib",
   "publishConfig": {
@@ -9,7 +9,7 @@
   },
   "author": "David Grelaud",
   "private": true,
-  "carbonePublicationDate": "2022-08-22T23:48:48.438Z",
+  "carbonePublicationDate": "2022-09-26T09:05:06.923Z",
   "license": "Carbone-Enterprise-Edition",
   "homepage": "https://carbone.io",
   "keywords": [

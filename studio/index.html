@@ -54,6 +54,9 @@
           <option value="pdf" >pdf</option>
           <option value="docx">docx</option>
           <option value="html">html</option>
+          {d.params.xlsmEnabled:ifEQ(true):showBegin}
+            <option value="xlsm">xlsm</option>
+          {d.params.xlsmEnabled:showEnd}
           <option value="odt" >odt</option>
           <option value="txt" >txt</option>
           <option value="xlsx">xlsx</option>

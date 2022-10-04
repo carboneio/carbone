@@ -3122,6 +3122,12 @@ describe('extracter', function () {
     it('should accept single quote in the middle if there are no comma', function () {
       helper.assert(extracter.parseFormatter("format(' YYYY ' MM' DD ')") , { str : 'format', args : [" YYYY ' MM' DD "]});
     });
+    it('should accept empty string', function () {
+      helper.assert(extracter.parseFormatter("format('', ' ')") , { str : 'format', args : ['', ' ']});
+      helper.assert(extracter.parseFormatter("format('','','')") , { str : 'format', args : ['', '', '']});
+      helper.assert(extracter.parseFormatter("format(',','','')") , { str : 'format', args : [',', '', '']});
+      helper.assert(extracter.parseFormatter("format(',','','s')") , { str : 'format', args : [',', '', 's']});
+    });
     it('should keep parenthesis in the string', function () {
       helper.assert(extracter.parseFormatter("format('(YYYY) ' (MM) DD')") , { str : 'format', args : ["(YYYY) ' (MM) DD"]});
     });

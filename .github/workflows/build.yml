@@ -6,7 +6,7 @@ jobs:
   BUILD:
     env:
       PKG_VERSION: 5.8.0
-      BUILD_TARGET: "node16-linux-x64,node16-macos-x64"
+      BUILD_TARGET: "node16-linux-x64,node16-macos-x64,node16-win-x64"
 
     runs-on: ubuntu-20.04
 

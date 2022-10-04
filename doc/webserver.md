@@ -63,8 +63,10 @@ The service is configured to run with "carbone" user (automatically created) in 
 It is possible to overwrite values through environment variables `CARBONE_USER` and `CARBONE_WORKDIR`.
 
 You must install LibreOffice to generate PDF documents, [read instructions](#how-and-why-install-libreoffice).
+
 ## How and why install LibreOffice?
-#### on OSX
+
+#### on OSX and Windows
 
 - Install LibreOffice normally using the stable version from https://www.libreoffice.org/
 
@@ -80,14 +82,14 @@ You must install LibreOffice to generate PDF documents, [read instructions](#how
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.4.0.3/deb/x86_64/LibreOffice_7.4.0.3_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.4.1.1/deb/x86_64/LibreOffice_7.4.1.1_Linux_x86-64_deb.tar.gz
 
   # Install required dependencies on ubuntu server for LibreOffice 7.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_7.4.0.3_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_7.4.0.3_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_7.4.1.1_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_7.4.1.1_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb
@@ -195,6 +197,7 @@ If an option is reported in different places, CLI options are picked in priority
 | currencyRates          | `{ EUR : 1, USD : 1.14, ... }` | Currency rates, it is based on EUR which should be equals to "1". The option can only be set on the `config/config.json` file. |  | |
 | translations          | `{}` | Translation object loaded at startup. It can be overwritten by rendering requests. The option can only be set on the `config/config.json` file.  |  | |
 | converterFactoryTimeout  | 60000  | Maximum conversion/socket timeout for one render (unit: ms) |  | CARBONE_EE_CONVERTERFACTORYTIMEOUT |
+| xlsmEnabled  | false  | Accept xlsm export | --xlsmEnabled / -xe | CARBONE_EE_XLSMENABLED |
 
 
 ### CLI options

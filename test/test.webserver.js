@@ -1062,7 +1062,7 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/render/..%2F..%2F..%2F..%2Fdatasets%2Ftemplate.html', 'POST', body), (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Unvalid ID');
+          assert.strictEqual(data.error, 'Template id or render id is not defined in the URL');
           done();
         });
       });
@@ -1473,7 +1473,7 @@ describe('Webserver', () => {
           const _resp = JSON.parse(data.toString());
           assert.strictEqual(res.statusCode, 400);
           assert.strictEqual(_resp.success, false);
-          assert.strictEqual(_resp.error, 'Unvalid ID');
+          assert.strictEqual(_resp.error, 'Template id or render id is not defined in the URL');
           assert.strictEqual(_resp.code, 'w115');
           done();
         });
@@ -1639,7 +1639,7 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/template/CON', 'GET'), (err, res, data) => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Unvalid ID');
+          assert.strictEqual(data.error, 'Template id or render id is not defined in the URL');
           done();
         });
       });
@@ -1665,7 +1665,7 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/template/' + filename + '.pdf', 'DELETE'), (err, res, data) => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Unvalid ID');
+          assert.strictEqual(data.error, 'Template id or render id is not defined in the URL');
           done();
         });
       });

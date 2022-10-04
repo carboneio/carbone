@@ -1,12 +1,15 @@
-### v4.4.X
 
-### v4.4.2
+### v4.5.0
   - Release September 30st 2022
+  - Dynamic parameters passed in formatters with a dot `.` accepts dynamic array access between brackets `[.i]`:
+    It can be used to select the corresponding element of another array: `{d.myArray[i]:myFormatter(..otherParentArray[.i].id)}`.
+    `[.i]` matches with the index of `myArray[i]`. Multiple dots (`[..i]`, `[...i]`) can be used to access other parents arrays.
+    If the index goes above `otherParentArray` length, it will return an empty string
   - Fix: HTML comment tags are not rendered and skipped by `:html` formatter
-  - Improve dynamic barcodes: values as integers are accepted
+  - Fix: barcodes accepts integer values
   - On-Premise:
     - Improve logs messages for webhooks
-  - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion.
+  - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion
 
 ### v4.4.1
   - Release September 26st 2022

@@ -1363,6 +1363,24 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should return a paragraph without comments', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p>This is a<!-- Start comment <w:LidThemeOther>DE</w:LidThemeOther> end comment --> paragraph</p>'), {});
+        helper.assert(res.content.get(), '' +
+          '<text:p>' +
+              '<text:span>This is a</text:span><text:span> paragraph</text:span>' +
+          '</text:p><text:p text:style-name="Standard"/>'
+        );
+      });
+
+      it('should return a correct paragraph even if the end comments tag is missing', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p>This is a<!-- Start comment <w:LidThemeOther>DE</w:LidThemeOther> end comment paragraph</p>'), {});
+        helper.assert(res.content.get(), '' +
+          '<text:p>' +
+              '<text:span>This is a</text:span>' +
+          '</text:p><text:p text:style-name="Standard"/>'
+        );
+      });
+
       it('should generate a simple unordered list', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<ul><li>Coffee</li><li>Tea</li><li>Milk</li></ul>'));
         helper.assert(res.content.get(), '' +
@@ -4010,6 +4028,35 @@ describe('Dynamic HTML', function () {
         helper.assert(res.content.get(), '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">content</w:t></w:r></w:p><w:p/>');
       });
 
+      it.only('should skip comments tags', function () {
+        // eslint-disable-next-line no-unused-vars
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<p>This is a<!-- Start comment <w:LidThemeOther>DE</w:LidThemeOther> end comment --> paragraph</p>'));
+        helper.assert(content.get(), '' +
+          '<w:p>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve">This is a</w:t>' +
+            '</w:r>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve"> paragraph</w:t>'+
+            '</w:r>'+
+          '</w:p>' +
+          '<w:p/>'
+        );
+      });
+
+      it.only('should skip comments tags even if the end comment tag is missing', function () {
+        // eslint-disable-next-line no-unused-vars
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<p>This is a<!-- Start comment <w:LidThemeOther>DE</w:LidThemeOther> end comment paragraph</p>'));
+        helper.assert(content.get(), '' +
+          '<w:p>' +
+            '<w:r>' +
+              '<w:t xml:space="preserve">This is a</w:t>' +
+            '</w:r>' +
+          '</w:p>' +
+          '<w:p/>'
+        );
+      });
+
       it('should convert HTML to DOCX xml 12 hyperlink simple', function () {
         const _options = {
           hyperlinkDatabase : new Map()
@@ -4958,6 +5005,15 @@ describe('Dynamic HTML', function () {
               { content : 'This is a paragraph.',  type : '', tags : [] },
               { content : '',  type : '#PE#', tags : [] },
               { content : ' end content',  type : '', tags : [] }
+            ]
+          );
+        });
+
+        it('should skip everything if the end comment tags does not exist', function () {
+          helper.assert(html.parseHTML('<p>This is a <!--  paragraph.</p>great text'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is a ',  type : '', tags : [] }
             ]
           );
         });

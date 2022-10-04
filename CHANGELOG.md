@@ -1,6 +1,6 @@
 
 ### v4.5.0
-  - Release September 30st 2022
+  - Release October 5th 2022
   - Dynamic parameters passed in formatters with a dot `.` accepts dynamic array access between brackets `[.i]`:
     It can be used to select the corresponding element of another array: `{d.myArray[i]:myFormatter(..otherParentArray[.i].id)}`.
     `[.i]` matches with the index of `myArray[i]`. Multiple dots (`[..i]`, `[...i]`) can be used to access other parents arrays.

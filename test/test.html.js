@@ -4862,6 +4862,62 @@ describe('Dynamic HTML', function () {
         helper.assert(html.parseHTML('<b>Bold <brie/><brie>content<brie/></b>'), [ { content : 'Bold ', type : '', tags : ['b'] }, { content : 'content', type : '', tags : ['b', 'brie'] } ]);
       });
 
+      it('should skip HTML comments tags', function () {
+        helper.assert(html.parseHTML('<p>This is <!-- great text --> a paragraph.</p>'),
+          [
+            { content : '',  type : '#PB#', tags : [] },
+            { content : 'This is ',  type : '', tags : [] },
+            { content : ' a paragraph.',  type : '', tags : [] },
+            { content : '',  type : '#PE#', tags : [] }
+          ]
+        );
+        helper.assert(html.parseHTML('<p><b>This is</b><!-- great text --><em>a paragraph.</em></p>'),
+          [
+            { content : '',  type : '#PB#', tags : [] },
+            { content : 'This is',  type : '', tags : ['b'] },
+            { content : 'a paragraph.',  type : '', tags : ['em'] },
+            { content : '',  type : '#PE#', tags : [] }
+          ]
+        );
+        helper.assert(html.parseHTML('<p>This is a paragraph.</p><!-- great text -->'),
+          [
+            { content : '',  type : '#PB#', tags : [] },
+            { content : 'This is a paragraph.',  type : '', tags : [] },
+            { content : '',  type : '#PE#', tags : [] }
+          ]
+        );
+        helper.assert(html.parseHTML('<!-- great text --><p>This is a paragraph.</p>'),
+          [
+            { content : '',  type : '#PB#', tags : [] },
+            { content : 'This is a paragraph.',  type : '', tags : [] },
+            { content : '',  type : '#PE#', tags : [] }
+          ]
+        );
+        helper.assert(html.parseHTML('<!-- great text --><p>This is a paragraph.</p>'),
+          [
+            { content : '',  type : '#PB#', tags : [] },
+            { content : 'This is a paragraph.',  type : '', tags : [] },
+            { content : '',  type : '#PE#', tags : [] }
+          ]
+        );
+        helper.assert(html.parseHTML('<p>This is<!-- great text <w:LsdException L 6"/> -->a paragraph.</p>'),
+          [
+            { content : '',  type : '#PB#', tags : [] },
+            { content : 'This is',  type : '', tags : [] },
+            { content : 'a paragraph.',  type : '', tags : [] },
+            { content : '',  type : '#PE#', tags : [] }
+          ]
+        );
+        helper.assert(html.parseHTML('<p>This is a paragraph.</p><!-- great text <w:LsdException L 6"/> --> end content'),
+          [
+            { content : '',  type : '#PB#', tags : [] },
+            { content : 'This is a paragraph.',  type : '', tags : [] },
+            { content : '',  type : '#PE#', tags : [] },
+            { content : ' end content',  type : '', tags : [] }
+          ]
+        );
+      });
+
       it('should accepts some weird HTML to always return a result in production', function () {
         // Missing ending marker
         helper.assert(html.parseHTML('<b>Underlined content'), [ { content : 'Underlined content', type : '', tags : [] } ]);

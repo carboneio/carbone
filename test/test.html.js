@@ -1372,6 +1372,21 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should return a paragraph without comments', function () {
+        const _content = '<p class="MsoNormal">I:\\MARKETING TDA\\Produktentwicklung\\Packanweisung\\Display\\2022-09-28 überarbeitete Packanweisung 28261 Mellow Marshmallow Meterspeckspieße 30x180g BA (1UK = 1VE à 30x180g).docx</p>' +
+                        '<!--[if gte mso 9]><xml> <w:WordDocument><w:View>Normal</w:View> <w:Zoom>0</w:Zoom> <w:TrackMoves/> <w:TrackFormatting/>' +
+                        '<w:HyphenationZone>21</w:HyphenationZone> <w:PunctuationKerning/> <w:ValidateAgainstSchemas/>' +
+                        '<w:SaveIfXMLInvalid>false</w:SaveIfXMLInvalid> <w:IgnoreMixedContent>false</w:IgnoreMixedContent>' +
+                        '<w:AlwaysShowPlaceholderText>false</w:AlwaysShowPlaceholderText> <w:DoNotPromoteQF/>' +
+                        '<w:LidThemeOther>DE</w:LidThemeOther> <w:LidThemeAsian>X-NONE</w:LidThemeAsian>-->';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(_content), {});
+        helper.assert(res.content.get(), '' +
+          '<text:p>' +
+              '<text:span>I:\\MARKETING TDA\\Produktentwicklung\\Packanweisung\\Display\\2022-09-28 überarbeitete Packanweisung 28261 Mellow Marshmallow Meterspeckspieße 30x180g BA (1UK = 1VE à 30x180g).docx</text:span>' +
+          '</text:p><text:p text:style-name="Standard"/>'
+        );
+      });
+
       it('should return a correct paragraph even if the end comments tag is missing', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p>This is a<!-- Start comment <w:LidThemeOther>DE</w:LidThemeOther> end comment paragraph</p>'), {});
         helper.assert(res.content.get(), '' +
@@ -4909,116 +4924,6 @@ describe('Dynamic HTML', function () {
         helper.assert(html.parseHTML('<b>Bold <brie/><brie>content<brie/></b>'), [ { content : 'Bold ', type : '', tags : ['b'] }, { content : 'content', type : '', tags : ['b', 'brie'] } ]);
       });
 
-      describe('HTML Comments Tags', function () {
-
-        it('should skip comment embedded within HTML tags', function () {
-          helper.assert(html.parseHTML('<p>This is <!-- great text --> a paragraph.</p>'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is ',  type : '', tags : [] },
-              { content : ' a paragraph.',  type : '', tags : [] },
-              { content : '',  type : '#PE#', tags : [] }
-            ]
-          );
-        });
-
-        it('should skip comment tags between HTML tags', function () {
-          helper.assert(html.parseHTML('<p><b>This is</b><!-- great text --><em>a paragraph.</em></p>'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is',  type : '', tags : ['b'] },
-              { content : 'a paragraph.',  type : '', tags : ['em'] },
-              { content : '',  type : '#PE#', tags : [] }
-            ]
-          );
-        });
-
-        it('should skip comment tags at the end', function () {
-          helper.assert(html.parseHTML('<p>This is a paragraph.</p><!-- great text -->'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is a paragraph.',  type : '', tags : [] },
-              { content : '',  type : '#PE#', tags : [] }
-            ]
-          );
-        });
-
-        it('should skip comment tags at the beginning', function () {
-          helper.assert(html.parseHTML('<!-- great text --><p>This is a paragraph.</p>'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is a paragraph.',  type : '', tags : [] },
-              { content : '',  type : '#PE#', tags : [] }
-            ]
-          );
-        });
-
-        /** Comment at the beginning, with tags and content insides */
-        it('should skip comment tags at the beginning, with inner HTML tags and text', function () {
-          helper.assert(html.parseHTML('<!-- great text <b> end comment --><p>This is a paragraph.</p>'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is a paragraph.',  type : '', tags : [] },
-              { content : '',  type : '#PE#', tags : [] }
-            ]
-          );
-        });
-
-        it('should skip comment tags within a paragraph, with ONE inner HTML tags and text', function () {
-          helper.assert(html.parseHTML('<p>This is<!-- great text <w:LsdException L 6"/> -->a paragraph.</p>'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is',  type : '', tags : [] },
-              { content : 'a paragraph.',  type : '', tags : [] },
-              { content : '',  type : '#PE#', tags : [] }
-            ]
-          );
-        });
-
-        /** Multiple tags and text within the comment */
-        it('should skip comment tags within a parapgraph, with multiple inner HTML tags and text', function () {
-          helper.assert(html.parseHTML('<p>This is<!-- great text <w:LsdException L 6"/>middle content <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true" Name="line number"/> end comment-->a paragraph.</p>'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is',  type : '', tags : [] },
-              { content : 'a paragraph.',  type : '', tags : [] },
-              { content : '',  type : '#PE#', tags : [] }
-            ]
-          );
-        });
-
-        it('should skip comment tags at the end, with one inner HTML tags and text', function () {
-          helper.assert(html.parseHTML('<p>This is a paragraph.</p><!-- great text <w:LsdException L 6"/> end comment --> end content'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is a paragraph.',  type : '', tags : [] },
-              { content : '',  type : '#PE#', tags : [] },
-              { content : ' end content',  type : '', tags : [] }
-            ]
-          );
-        });
-
-        it('should skip comment tags at the end, with multiple inner HTML tags and text', function () {
-          helper.assert(html.parseHTML('<p>This is a paragraph.</p><!-- great text <w:LsdException L 6"/> middle content <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true" Name="line number"/> end comment --> end content'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is a paragraph.',  type : '', tags : [] },
-              { content : '',  type : '#PE#', tags : [] },
-              { content : ' end content',  type : '', tags : [] }
-            ]
-          );
-        });
-
-        it('should skip everything if the end comment tags does not exist', function () {
-          helper.assert(html.parseHTML('<p>This is a <!--  paragraph.</p>great text'),
-            [
-              { content : '',  type : '#PB#', tags : [] },
-              { content : 'This is a ',  type : '', tags : [] }
-            ]
-          );
-        });
-      });
-
       it('should accepts some weird HTML to always return a result in production', function () {
         // Missing ending marker
         helper.assert(html.parseHTML('<b>Underlined content'), [ { content : 'Underlined content', type : '', tags : [] } ]);
@@ -5370,6 +5275,116 @@ describe('Dynamic HTML', function () {
           { content: '', type: '#ULE#', tags: [] }
         ]
        );
+      });
+
+      describe('HTML Comments Tags', function () {
+
+        it('should skip comment embedded within HTML tags', function () {
+          helper.assert(html.parseHTML('<p>This is <!-- great text --> a paragraph.</p>'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is ',  type : '', tags : [] },
+              { content : ' a paragraph.',  type : '', tags : [] },
+              { content : '',  type : '#PE#', tags : [] }
+            ]
+          );
+        });
+
+        it('should skip comment tags between HTML tags', function () {
+          helper.assert(html.parseHTML('<p><b>This is</b><!-- great text --><em>a paragraph.</em></p>'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is',  type : '', tags : ['b'] },
+              { content : 'a paragraph.',  type : '', tags : ['em'] },
+              { content : '',  type : '#PE#', tags : [] }
+            ]
+          );
+        });
+
+        it('should skip comment tags at the end', function () {
+          helper.assert(html.parseHTML('<p>This is a paragraph.</p><!-- great text -->'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is a paragraph.',  type : '', tags : [] },
+              { content : '',  type : '#PE#', tags : [] }
+            ]
+          );
+        });
+
+        it('should skip comment tags at the beginning', function () {
+          helper.assert(html.parseHTML('<!-- great text --><p>This is a paragraph.</p>'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is a paragraph.',  type : '', tags : [] },
+              { content : '',  type : '#PE#', tags : [] }
+            ]
+          );
+        });
+
+        /** Comment at the beginning, with tags and content insides */
+        it('should skip comment tags at the beginning, with inner HTML tags and text', function () {
+          helper.assert(html.parseHTML('<!-- great text <b> end comment --><p>This is a paragraph.</p>'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is a paragraph.',  type : '', tags : [] },
+              { content : '',  type : '#PE#', tags : [] }
+            ]
+          );
+        });
+
+        it('should skip comment tags within a paragraph, with ONE inner HTML tags and text', function () {
+          helper.assert(html.parseHTML('<p>This is<!-- great text <w:LsdException L 6"/> -->a paragraph.</p>'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is',  type : '', tags : [] },
+              { content : 'a paragraph.',  type : '', tags : [] },
+              { content : '',  type : '#PE#', tags : [] }
+            ]
+          );
+        });
+
+        /** Multiple tags and text within the comment */
+        it('should skip comment tags within a parapgraph, with multiple inner HTML tags and text', function () {
+          helper.assert(html.parseHTML('<p>This is<!-- great text <w:LsdException L 6"/>middle content <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true" Name="line number"/> end comment-->a paragraph.</p>'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is',  type : '', tags : [] },
+              { content : 'a paragraph.',  type : '', tags : [] },
+              { content : '',  type : '#PE#', tags : [] }
+            ]
+          );
+        });
+
+        it('should skip comment tags at the end, with one inner HTML tags and text', function () {
+          helper.assert(html.parseHTML('<p>This is a paragraph.</p><!-- great text <w:LsdException L 6"/> end comment --> end content'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is a paragraph.',  type : '', tags : [] },
+              { content : '',  type : '#PE#', tags : [] },
+              { content : ' end content',  type : '', tags : [] }
+            ]
+          );
+        });
+
+        it('should skip comment tags at the end, with multiple inner HTML tags and text', function () {
+          helper.assert(html.parseHTML('<p>This is a paragraph.</p><!-- great text <w:LsdException L 6"/> middle content <w:LsdException Locked="false" SemiHidden="true" UnhideWhenUsed="true" Name="line number"/> end comment --> end content'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is a paragraph.',  type : '', tags : [] },
+              { content : '',  type : '#PE#', tags : [] },
+              { content : ' end content',  type : '', tags : [] }
+            ]
+          );
+        });
+
+        it('should skip everything if the end comment tags does not exist', function () {
+          helper.assert(html.parseHTML('<p>This is a <!--  paragraph.</p>great text'),
+            [
+              { content : '',  type : '#PB#', tags : [] },
+              { content : 'This is a ',  type : '', tags : [] }
+            ]
+          );
+        });
       });
     });
 

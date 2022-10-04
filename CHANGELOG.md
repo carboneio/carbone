@@ -1,8 +1,10 @@
+
 ### v4.4.2
   - Release September 30st 2022
+  - Improve dynamic barcodes: values as integers are accepted
   - On-Premise:
     - Improve logs messages for webhooks
-  - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion. 
+  - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion.
 
 ### v4.4.1
   - Release September 26st 2022

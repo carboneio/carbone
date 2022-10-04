@@ -4028,7 +4028,7 @@ describe('Dynamic HTML', function () {
         helper.assert(res.content.get(), '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr></w:pPr><w:r><w:t xml:space="preserve">content</w:t></w:r></w:p><w:p/>');
       });
 
-      it.only('should skip comments tags', function () {
+      it('should skip comments tags', function () {
         // eslint-disable-next-line no-unused-vars
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<p>This is a<!-- Start comment <w:LidThemeOther>DE</w:LidThemeOther> end comment --> paragraph</p>'));
         helper.assert(content.get(), '' +
@@ -4044,7 +4044,7 @@ describe('Dynamic HTML', function () {
         );
       });
 
-      it.only('should skip comments tags even if the end comment tag is missing', function () {
+      it('should skip comments tags even if the end comment tag is missing', function () {
         // eslint-disable-next-line no-unused-vars
         let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML('<p>This is a<!-- Start comment <w:LidThemeOther>DE</w:LidThemeOther> end comment paragraph</p>'));
         helper.assert(content.get(), '' +

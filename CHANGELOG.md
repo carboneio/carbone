@@ -1,8 +1,11 @@
+### v4.4.X
+  - Fixed the `:html` formatter: Comment tags are not rendered and skipped.
+
 ### v4.4.2
   - Release September 30st 2022
   - On-Premise:
     - Improve logs messages for webhooks
-  - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion. 
+  - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion.
 
 ### v4.4.1
   - Release September 26st 2022

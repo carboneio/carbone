@@ -5,12 +5,12 @@ const helper  = require('../lib/helper');
 // sum total qty = 21
 const dataSimpleLoop = {
   cars : [
-    { brand : 'Lu' , qty : 1  , sort : 1 },
-    { brand : 'Fa' , qty : 4  , sort : 4 },
-    { brand : 'Vi' , qty : 3  , sort : 3 },
-    { brand : 'Fa' , qty : 2  , sort : 2 },
-    { brand : 'To' , qty : 1  , sort : 1 },
-    { brand : 'Vi' , qty : 10 , sort : 5 }
+    { brand : 'Lu' , qty : 1  , sort : 1, weirdQty : '1'       , negQty : '-1.5'        },
+    { brand : 'Fa' , qty : 4  , sort : 4, weirdQty : null      , negQty : null          },
+    { brand : 'Vi' , qty : 3  , sort : 3, weirdQty : undefined , negQty : undefined     },
+    { brand : 'Fa' , qty : 2  , sort : 2, weirdQty : '2'       , negQty : '-2.5'        },
+    { brand : 'To' , qty : 1  , sort : 1, weirdQty : '1'       , negQty : '-1.2'        },
+    { brand : 'Vi' , qty : 10 , sort : 5, weirdQty : '10'      , negQty : '-10.5'       }
   ]
 };
 
@@ -25,6 +25,28 @@ describe('Aggregatted operations', function () {
           [ 'aggAvg'  , '<xml> 3.5 </xml>'],
           [ 'aggMin'  , '<xml> 1 </xml>'],
           [ 'aggMax'  , '<xml> 10 </xml>'],
+          [ 'aggCount', '<xml> 6 </xml>']
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('should convert strings to integer and ignore null or undefined values', function (done) {
+        const _xml = '<xml> {d.cars[].weirdQty:__TESTED_FORMATTER__} </xml>';
+        let _expected = [
+          [ 'aggSum'  , '<xml> 14 </xml>'],
+          [ 'aggAvg'  , '<xml> 2.3333333333333335 </xml>'],
+          [ 'aggMin'  , '<xml> 1 </xml>'],
+          [ 'aggMax'  , '<xml> 10 </xml>'],
+          [ 'aggCount', '<xml> 6 </xml>']
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('should convert strings to float and ignore null or undefined values (max should not return 0 if null/undefined values)', function (done) {
+        const _xml = '<xml> {d.cars[].negQty:__TESTED_FORMATTER__} </xml>';
+        let _expected = [
+          [ 'aggSum'  , '<xml> -15.7 </xml>'],
+          [ 'aggAvg'  , '<xml> -2.6166666666666667 </xml>'],
+          [ 'aggMin'  , '<xml> -10.5 </xml>'],
+          [ 'aggMax'  , '<xml> -1.2 </xml>'],
           [ 'aggCount', '<xml> 6 </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);

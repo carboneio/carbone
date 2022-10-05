@@ -266,9 +266,16 @@ cumCount.replacedBy = _replaceCumulative;
 cumCount.canBeCalledInPrecomputedLoop = true;
 
 
+function set (d, param) {
+  const _attribute = param.replace('d.', '');
+  this.d[_attribute] = d;
+  return '';
+}
+
 module.exports = {
   aggSum,
   aggSumGet,
+  set,
   aggAvg,
   aggAvgGet,
   aggMin,

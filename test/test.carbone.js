@@ -57,6 +57,19 @@ describe('Carbone', function () {
     });
   });
 
+  describe('saveResult', function () {
+    it('Save result', function (done) {
+      var _xml = '<xml>{d.title:substr(0, 4):set(d.other)} {d.other} </xml>';
+      var _data = {title : 'boo1234'};
+      var _complement = {date : 'today'};
+      carbone.renderXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> boo1 </xml>');
+        done();
+      });
+    });
+  });
+
   describe('format date', function () {
     afterEach(function (done) {
       carbone.reset();

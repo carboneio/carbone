@@ -63,7 +63,7 @@ function _replaceCumulative (parsedFormatter) {
 function aggSum (d, ...partitionBy) {
   const _id  = generateAggregatorId(this.id, ...partitionBy);
   let _val = this.aggDatabase.get(_id) ?? 0;
-  _val += d;
+  _val += parseFloat(d ?? 0);
   this.aggDatabase.set(_id, _val);
   return _val;
 }
@@ -115,7 +115,7 @@ function aggAvg (d, ...partitionBy) {
   const _id  = generateAggregatorId(this.id, ...partitionBy);
   let _val = this.aggDatabase.get(_id) ?? { sum : 0, nb : 0 };
   _val.nb++;
-  _val.sum += d;
+  _val.sum += parseFloat(d ?? 0);
   this.aggDatabase.set(_id, _val);
   return _val.sum / _val.nb; // TODO useless in normal AVG, used only by cumulative, 
 }
@@ -165,9 +165,10 @@ cumAvg.canBeCalledInPrecomputedLoop = true;
 function aggMin (d, ...partitionBy) {
   const _id  = generateAggregatorId(this.id, ...partitionBy);
   let _val = this.aggDatabase.get(_id) ?? Number.MAX_SAFE_INTEGER;
-  if (d < _val) {
-    this.aggDatabase.set(_id, d);
-    return d;
+  const _float = parseFloat(d ?? Number.MAX_SAFE_INTEGER);
+  if (_float < _val) {
+    this.aggDatabase.set(_id, _float);
+    return _float;
   }
   return _val;
 }
@@ -199,8 +200,9 @@ function aggMinGet (d, ...partitionBy) {
 function aggMax (d, ...partitionBy) {
   const _id  = generateAggregatorId(this.id, ...partitionBy);
   let _val = this.aggDatabase.get(_id) ?? Number.MIN_SAFE_INTEGER;
-  if (d > _val) {
-    this.aggDatabase.set(_id, d);
+  const _float = parseFloat(d ?? Number.MIN_SAFE_INTEGER);
+  if (_float > _val) {
+    this.aggDatabase.set(_id, _float);
   }
 }
 aggMax.replacedBy = _replaceEmptyArguments;

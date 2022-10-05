@@ -1,5 +1,6 @@
 
 ### v4.5.1
+  - fix aggregators when filtering arrays
   - add the possibility to store values in data
   - aggregators converts string to floats. `null` or `undefined` values are converted to
     - aggSum : 0

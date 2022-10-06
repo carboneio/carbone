@@ -1,3 +1,7 @@
+### v4.5.x
+  - Added for ODP templates
+    - The `:drop(element)` formatter is supported to delete elements: p, img, row, chart, and shape
+    - Slides can be deleted thanks to the expression `:drop(slide)`, for instance: `{d.value:ifEM:drop(slide)}`. The `slide` argument is available and accepted only for `ODP` templates.
 
 ### v4.5.1
   - aggregators converts string to floats. `null` or `undefined` values are converted to

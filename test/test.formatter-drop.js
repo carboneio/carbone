@@ -184,7 +184,7 @@ describe('drop formatter', function () {
 
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
 
       it('should replace the drop(p) by hideBegin/hideEnd - basic paragraph', function (done) {
         const content = (expected) => {
@@ -333,7 +333,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
       it('should replace the drop(img) by hideBegin/hideEnd - basic image', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -454,7 +454,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
       it('should replace the drop(shape) by hideBegin/hideEnd - basic shape', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -539,7 +539,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
       it('should replace the drop(chart) by hideBegin/hideEnd - basic chart', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -1207,7 +1207,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
       it('should do nothing if the XML if not valid', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -1741,6 +1741,56 @@ describe('drop formatter', function () {
           helper.assert(res?.files[0]?.data, content(true));
           done();
         });
+      });
+    });
+  });
+
+  describe(':drop(slide)', function () {
+    describe('ODP', function () {
+      it('should replace the drop(slide) by hideBegin/hideEnd', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL1T0">' +
+              '<draw:frame presentation:style-name="pr1" draw:text-style-name="P2" draw:layer="layout" svg:width="25.199cm" svg:height="6.331cm" svg:x="1.471cm" svg:y="5.348cm" presentation:class="subtitle" presentation:user-transformed="true">' +
+                '<draw:text-box>' +
+                  '<text:p text:style-name="P1">Slide 1</text:p>' +
+                '</draw:text-box>' +
+              '</draw:frame>' +
+            '</draw:page>' +
+            `${expected ? '<carbone>{d.value:ifEM:hideBegin}</carbone>' : ''}` +
+            '<draw:page draw:name="page3" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL2T1">'+
+              '<draw:frame draw:style-name="gr2" draw:text-style-name="P5" draw:layer="layout" svg:width="27.999cm" svg:height="13.036cm" svg:x="0.035cm" svg:y="1.344cm">'+
+                '<draw:image xlink:href="Pictures/10000001000007800000037EB5139C7A2273D934.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/png">'+
+                  '<text:p/>'+
+                '</draw:image>'+
+                `<svg:desc>${expected ? '' : '{d.value:ifEM:drop(slide)}'}</svg:desc>`+
+              '</draw:frame>'+
+              '<presentation:notes draw:style-name="dp2">'+
+                '<draw:page-thumbnail draw:style-name="gr1" draw:layer="layout" svg:width="19.798cm" svg:height="11.136cm" svg:x="0.6cm" svg:y="2.257cm" draw:page-number="3" presentation:class="page"/>'+
+                '<draw:frame presentation:style-name="pr2" draw:text-style-name="P3" draw:layer="layout" svg:width="16.799cm" svg:height="13.364cm" svg:x="2.1cm" svg:y="14.107cm" presentation:class="notes" presentation:placeholder="true">'+
+                  '<draw:text-box/>'+
+                '</draw:frame>'+
+              '</presentation:notes>'+
+            '</draw:page>' +
+            `${expected ? '<carbone>{d.value:ifEM:hideEnd}</carbone>' : ''}` +
+            '<draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL1T0">' +
+              '<draw:frame presentation:style-name="pr1" draw:text-style-name="P2" draw:layer="layout" svg:width="25.199cm" svg:height="6.331cm" svg:x="1.471cm" svg:y="5.348cm" presentation:class="subtitle" presentation:user-transformed="true">' +
+                '<draw:text-box>' +
+                  '<text:p text:style-name="P1">Slide 2</text:p>' +
+                '</draw:text-box>' +
+              '</draw:frame>' +
+            '</draw:page>';
+        };
+
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleDropFormatter(_template, 'odp');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
     });
   });

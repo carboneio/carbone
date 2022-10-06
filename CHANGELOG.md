@@ -1,3 +1,9 @@
+### v4.5.x
+  - Added for the `:drop(element)` formatter:
+    - ODP templates are supported
+    - A new argument `slide` is available for ODP template only to delete slides. Usage: `{d.value:ifEM:drop(slide)}`.
+    - `drop(p, nbrParagraphs)` accepts a second parameter `nbrParagraphs` to delete multiple paragraphs at once. For instance `{d.data:ifEM:drop(p, 3)}`, meaning the current and next two paragraph will be removed if the condition is validated. By default, the formatter `:drop(p)` hides only the current paragraph.
+
 
 ### v4.5.1
   - aggregators converts string to floats. `null` or `undefined` values are converted to

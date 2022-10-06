@@ -184,7 +184,7 @@ describe('drop formatter', function () {
 
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
 
       it('should replace the drop(p) by hideBegin/hideEnd - basic paragraph', function (done) {
         const content = (expected) => {
@@ -246,6 +246,156 @@ describe('drop formatter', function () {
         preprocessor.handleDropFormatter(_template, 'odt');
         helper.assert(_template.files[0]?.data, content(true));
         done();
+      });
+
+    });
+
+    describe(':drop(p, nbrToHide)- row option to hide a number of elements', function () {
+
+      describe('DOCX', function () {
+        it('should delete 2 paragraphs', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+              '<w:body>' +
+                `${ expected ? '<carbone>{d.value:ifEM:hideBegin}</carbone>' : ''}` +
+                '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:pStyle w:val="Standard"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="26"/></w:numPr>'+
+                  '</w:pPr>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/>'+
+                    '</w:rPr>'+
+                    `<w:t>Paragraph 1${ expected ? '' : '{d.value:ifEM:drop(p, 2)}'}</w:t>`+
+                  '</w:r>'+
+                '</w:p>'+
+                '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:pStyle w:val="Standard"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="26"/></w:numPr>'+
+                  '</w:pPr>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/>'+
+                    '</w:rPr>'+
+                    '<w:t>Paragraph 2</w:t>'+
+                  '</w:r>'+
+                '</w:p>'+
+                `${ expected ? '<carbone>{d.value:ifEM:hideEnd}</carbone>' : ''}` +
+                '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:pStyle w:val="Standard"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="26"/></w:numPr>'+
+                  '</w:pPr>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/>'+
+                    '</w:rPr>'+
+                    '<w:t>Paragraph 3</w:t>'+
+                  '</w:r>'+
+                '</w:p>'+
+              '</w:body>';
+          };
+
+          var _template = {
+            files : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleDropFormatter(_template, 'docx');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+        });
+
+        it('should delete 1 paragraphs even if the argument is 3', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+              '<w:body>' +
+                `${ expected ? '<carbone>{d.value:ifEM:hideBegin}</carbone>' : ''}` +
+                '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:pStyle w:val="Standard"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="26"/></w:numPr>'+
+                  '</w:pPr>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/>'+
+                    '</w:rPr>'+
+                    `<w:t>Paragraph 1${ expected ? '' : '{d.value:ifEM:drop(p, 3)}'}</w:t>`+
+                  '</w:r>'+
+                '</w:p>'+
+                `${ expected ? '<carbone>{d.value:ifEM:hideEnd}</carbone>' : ''}` +
+              '</w:body>';
+          };
+
+          var _template = {
+            files : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleDropFormatter(_template, 'docx');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+        });
+      });
+
+      describe('ODT', function () {
+        it('should delete 2 paragraphs', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+
+              '<office:body>'+
+                '<office:text>'+
+                  '<text:p text:style-name="P1">This is a first paragraph</text:p>'+
+                  (expected ? '<carbone>{d.details:ifEM:hideBegin}</carbone>' : '') +
+                  '<text:p text:style-name="P1">'+
+                    '{d.name}' +
+                    (expected ? '' : '{d.details:ifEM:drop(    p   , 2)}') +
+                  '</text:p>'+
+                  '<text:p text:style-name="P1">Paragraph 2</text:p>'+
+                  (expected ? '<carbone>{d.details:ifEM:hideEnd}</carbone>' : '')+
+                  '<text:p text:style-name="P1">Paragraph 3</text:p>'+
+                '</office:text>'+
+              '</office:body>';
+          };
+
+          var _template = {
+            files : [
+              { name : 'content.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleDropFormatter(_template, 'odt');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+        });
+
+        it('should delete 1 paragraphs even if the number to delete is 3', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+
+              '<office:body>'+
+                '<office:text>'+
+                  '<text:p text:style-name="P1">This is a first paragraph</text:p>'+
+                  (expected ? '<carbone>{d.details:ifEM:hideBegin}</carbone>' : '') +
+                  '<text:p text:style-name="P1">'+
+                    '{d.name}' +
+                    (expected ? '' : '{d.details:ifEM:drop(    p   , 3)}') +
+                  '</text:p>'+
+                  (expected ? '<carbone>{d.details:ifEM:hideEnd}</carbone>' : '')+
+                '</office:text>'+
+              '</office:body>';
+          };
+
+          var _template = {
+            files : [
+              { name : 'content.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleDropFormatter(_template, 'odt');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+        });
       });
 
     });
@@ -333,7 +483,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
       it('should replace the drop(img) by hideBegin/hideEnd - basic image', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -454,7 +604,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
       it('should replace the drop(shape) by hideBegin/hideEnd - basic shape', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -539,7 +689,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
       it('should replace the drop(chart) by hideBegin/hideEnd - basic chart', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -1207,7 +1357,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe('ODT', function () {
+    describe('ODT / ODP', function () {
       it('should do nothing if the XML if not valid', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -1580,7 +1730,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe(':drop(row, nbrRowToHide)- row option to hide a number of elements - ODS format', () => {
+    describe(':drop(row, nbrToHide)- row option to hide a number of elements - ODS format', () => {
       it('should drop 2 table rows with "drop(row, 2)"', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -1741,6 +1891,56 @@ describe('drop formatter', function () {
           helper.assert(res?.files[0]?.data, content(true));
           done();
         });
+      });
+    });
+  });
+
+  describe(':drop(slide)', function () {
+    describe('ODP', function () {
+      it('should replace the drop(slide) by hideBegin/hideEnd', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL1T0">' +
+              '<draw:frame presentation:style-name="pr1" draw:text-style-name="P2" draw:layer="layout" svg:width="25.199cm" svg:height="6.331cm" svg:x="1.471cm" svg:y="5.348cm" presentation:class="subtitle" presentation:user-transformed="true">' +
+                '<draw:text-box>' +
+                  '<text:p text:style-name="P1">Slide 1</text:p>' +
+                '</draw:text-box>' +
+              '</draw:frame>' +
+            '</draw:page>' +
+            `${expected ? '<carbone>{d.value:ifEM:hideBegin}</carbone>' : ''}` +
+            '<draw:page draw:name="page3" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL2T1">'+
+              '<draw:frame draw:style-name="gr2" draw:text-style-name="P5" draw:layer="layout" svg:width="27.999cm" svg:height="13.036cm" svg:x="0.035cm" svg:y="1.344cm">'+
+                '<draw:image xlink:href="Pictures/10000001000007800000037EB5139C7A2273D934.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/png">'+
+                  '<text:p/>'+
+                '</draw:image>'+
+                `<svg:desc>${expected ? '' : '{d.value:ifEM:drop(slide)}'}</svg:desc>`+
+              '</draw:frame>'+
+              '<presentation:notes draw:style-name="dp2">'+
+                '<draw:page-thumbnail draw:style-name="gr1" draw:layer="layout" svg:width="19.798cm" svg:height="11.136cm" svg:x="0.6cm" svg:y="2.257cm" draw:page-number="3" presentation:class="page"/>'+
+                '<draw:frame presentation:style-name="pr2" draw:text-style-name="P3" draw:layer="layout" svg:width="16.799cm" svg:height="13.364cm" svg:x="2.1cm" svg:y="14.107cm" presentation:class="notes" presentation:placeholder="true">'+
+                  '<draw:text-box/>'+
+                '</draw:frame>'+
+              '</presentation:notes>'+
+            '</draw:page>' +
+            `${expected ? '<carbone>{d.value:ifEM:hideEnd}</carbone>' : ''}` +
+            '<draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL1T0">' +
+              '<draw:frame presentation:style-name="pr1" draw:text-style-name="P2" draw:layer="layout" svg:width="25.199cm" svg:height="6.331cm" svg:x="1.471cm" svg:y="5.348cm" presentation:class="subtitle" presentation:user-transformed="true">' +
+                '<draw:text-box>' +
+                  '<text:p text:style-name="P1">Slide 2</text:p>' +
+                '</draw:text-box>' +
+              '</draw:frame>' +
+            '</draw:page>';
+        };
+
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleDropFormatter(_template, 'odp');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
       });
     });
   });

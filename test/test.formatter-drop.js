@@ -250,6 +250,156 @@ describe('drop formatter', function () {
 
     });
 
+    describe(':drop(p, nbrToHide)- row option to hide a number of elements', function () {
+
+      describe('DOCX', function () {
+        it('should delete 2 paragraphs', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+              '<w:body>' +
+                `${ expected ? '<carbone>{d.value:ifEM:hideBegin}</carbone>' : ''}` +
+                '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:pStyle w:val="Standard"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="26"/></w:numPr>'+
+                  '</w:pPr>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/>'+
+                    '</w:rPr>'+
+                    `<w:t>Paragraph 1${ expected ? '' : '{d.value:ifEM:drop(p, 2)}'}</w:t>`+
+                  '</w:r>'+
+                '</w:p>'+
+                '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:pStyle w:val="Standard"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="26"/></w:numPr>'+
+                  '</w:pPr>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/>'+
+                    '</w:rPr>'+
+                    '<w:t>Paragraph 2</w:t>'+
+                  '</w:r>'+
+                '</w:p>'+
+                `${ expected ? '<carbone>{d.value:ifEM:hideEnd}</carbone>' : ''}` +
+                '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:pStyle w:val="Standard"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="26"/></w:numPr>'+
+                  '</w:pPr>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/>'+
+                    '</w:rPr>'+
+                    '<w:t>Paragraph 3</w:t>'+
+                  '</w:r>'+
+                '</w:p>'+
+              '</w:body>';
+          };
+
+          var _template = {
+            files : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleDropFormatter(_template, 'docx');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+        });
+
+        it('should delete 1 paragraphs even if the argument is 3', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+              '<w:body>' +
+                `${ expected ? '<carbone>{d.value:ifEM:hideBegin}</carbone>' : ''}` +
+                '<w:p>'+
+                  '<w:pPr>'+
+                    '<w:pStyle w:val="Standard"/><w:numPr><w:ilvl w:val="1"/><w:numId w:val="26"/></w:numPr>'+
+                  '</w:pPr>'+
+                  '<w:r>'+
+                    '<w:rPr>'+
+                      '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="21"/><w:szCs w:val="21"/>'+
+                    '</w:rPr>'+
+                    `<w:t>Paragraph 1${ expected ? '' : '{d.value:ifEM:drop(p, 3)}'}</w:t>`+
+                  '</w:r>'+
+                '</w:p>'+
+                `${ expected ? '<carbone>{d.value:ifEM:hideEnd}</carbone>' : ''}` +
+              '</w:body>';
+          };
+
+          var _template = {
+            files : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleDropFormatter(_template, 'docx');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+        });
+      });
+
+      describe('ODT', function () {
+        it('should delete 2 paragraphs', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+
+              '<office:body>'+
+                '<office:text>'+
+                  '<text:p text:style-name="P1">This is a first paragraph</text:p>'+
+                  (expected ? '<carbone>{d.details:ifEM:hideBegin}</carbone>' : '') +
+                  '<text:p text:style-name="P1">'+
+                    '{d.name}' +
+                    (expected ? '' : '{d.details:ifEM:drop(    p   , 2)}') +
+                  '</text:p>'+
+                  '<text:p text:style-name="P1">Paragraph 2</text:p>'+
+                  (expected ? '<carbone>{d.details:ifEM:hideEnd}</carbone>' : '')+
+                  '<text:p text:style-name="P1">Paragraph 3</text:p>'+
+                '</office:text>'+
+              '</office:body>';
+          };
+
+          var _template = {
+            files : [
+              { name : 'content.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleDropFormatter(_template, 'odt');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+        });
+
+        it('should delete 1 paragraphs even if the number to delete is 3', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+
+              '<office:body>'+
+                '<office:text>'+
+                  '<text:p text:style-name="P1">This is a first paragraph</text:p>'+
+                  (expected ? '<carbone>{d.details:ifEM:hideBegin}</carbone>' : '') +
+                  '<text:p text:style-name="P1">'+
+                    '{d.name}' +
+                    (expected ? '' : '{d.details:ifEM:drop(    p   , 3)}') +
+                  '</text:p>'+
+                  (expected ? '<carbone>{d.details:ifEM:hideEnd}</carbone>' : '')+
+                '</office:text>'+
+              '</office:body>';
+          };
+
+          var _template = {
+            files : [
+              { name : 'content.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.handleDropFormatter(_template, 'odt');
+          helper.assert(_template.files[0]?.data, content(true));
+          done();
+        });
+      });
+
+    });
+
   });
 
   describe(':drop(img)', function () {
@@ -1580,7 +1730,7 @@ describe('drop formatter', function () {
       });
     });
 
-    describe(':drop(row, nbrRowToHide)- row option to hide a number of elements - ODS format', () => {
+    describe(':drop(row, nbrToHide)- row option to hide a number of elements - ODS format', () => {
       it('should drop 2 table rows with "drop(row, 2)"', function (done) {
         const content = (expected) => {
           expected = expected ?? false;

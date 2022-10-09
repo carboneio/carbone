@@ -1599,6 +1599,30 @@ describe('formatter', function () {
     it('should divide number', function () {
       helper.assert(numberFormatter.div('120', '80'), 1.5);
     });
+
+    it('should modulo number', function () {
+      helper.assert(numberFormatter.mod(-2, 2), 0);
+      helper.assert(numberFormatter.mod(-1, 2), -1);
+      helper.assert(numberFormatter.mod(0, 2), 0);
+      helper.assert(numberFormatter.mod(1, 2), 1);
+      helper.assert(numberFormatter.mod(2, 2), 0);
+      helper.assert(numberFormatter.mod(16, 4), 0);
+      helper.assert(numberFormatter.mod(17, 4), 1);
+      helper.assert(numberFormatter.mod(18, 4), 2);
+      helper.assert(numberFormatter.mod(19, 4), 3);
+      helper.assert(numberFormatter.mod('-2', '2'), 0);
+      helper.assert(numberFormatter.mod('-1', '2'), -1);
+      helper.assert(numberFormatter.mod('0', '2'), 0);
+      helper.assert(numberFormatter.mod('1', '2'), 1);
+      helper.assert(numberFormatter.mod('2', '2'), 0);
+      helper.assert(numberFormatter.mod('16', '4'), 0);
+      helper.assert(numberFormatter.mod('17', '4'), 1);
+      helper.assert(numberFormatter.mod('18', '4'), 2);
+      helper.assert(numberFormatter.mod('19', '4'), 3);
+      helper.assert(numberFormatter.mod(1.8, 1.1), 0.7);
+      helper.assert(numberFormatter.mod(undefined, 1.1), undefined);
+      helper.assert(numberFormatter.mod(null, 1.1), null);
+    });
   });
 
   describe('Barcodes', function () {

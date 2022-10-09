@@ -57,6 +57,19 @@ describe('Carbone', function () {
     });
   });
 
+  describe(':set', function () {
+    it('should save the result in data, and it can be used later', function (done) {
+      var _xml = '<xml>{d.title:substr(0, 4):set(d.other)} {d.other} </xml>';
+      var _data = {title : 'boo1234'};
+      var _complement = {date : 'today'};
+      carbone.renderXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> boo1 </xml>');
+        done();
+      });
+    });
+  });
+
   describe('format date', function () {
     afterEach(function (done) {
       carbone.reset();
@@ -898,6 +911,42 @@ describe('Carbone', function () {
         helper.assert(result, _expectedXML);
       });
     });
+    it('should accept formatter with empty string (second parameter of arrayMap), and it should not remove whitespaces in conditions after -> it tests parser.removeWhitespace', function (done) {
+      let data = {
+        arr : [
+          { source : 'ABCDEFG' },
+          { source : 'HIGK LMN' }
+        ]
+      };
+      let _xml = "<a>{d.arr:arrayMap(',',' ','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')}</a>"
+               + "<a>{d.arr:arrayMap(',','','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')}</a>"
+               + "<a>{d.arr:arrayMap(',',' ','source')}</a>"
+               + "<a>{d.arr:arrayMap(',','','source')}</a>";
+      carbone.renderXML(_xml, data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<a>true</a><a>true</a><a>ABCDEFG,HIGK LMN</a><a>ABCDEFG,HIGK LMN</a>');
+        carbone.renderXML("{d.arr:print(''):print('HIGK LMN')}", data, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, 'HIGK LMN');
+          done();
+        });
+      });
+    });
+    it('should accept formatter with empty string (second parameter of arrayMap) -> it tests extracter.parseFormatter', function (done) {
+      let data = {
+        arr : [
+          { source : 'ABCD', other : 'EFG' },
+          { source : 'HIGK', other : 'LMN' }
+        ]
+      };
+      let _xml = "<a>{d.arr:arrayMap(',',' ', 'source', 'other')}</a>"
+               + "<b>{d.arr:arrayMap(',','', 'source', 'other')}</b>";
+      carbone.renderXML(_xml, data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<a>ABCD EFG,HIGK LMN</a><b>ABCDEFG,HIGKLMN</b>');
+        done();
+      });
+    });
     it('options.lang should dynamically force the lang of translation markers {t()} and use translations of carbone', function (done) {
       var data = {
         param : '20160131'
@@ -1271,6 +1320,56 @@ describe('Carbone', function () {
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..otherObj[0].textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml>ddfdf</xml>');
+          done();
+        });
+      });
+      it('should accept direct access of an other array, with sub-objects, within a loop with [.i] syntax', function (done) {
+        var _xml = ''
+          + '<d>'
+          + '  <l>'
+          + '    <acc>{d[i].groups[i].label}</acc>'
+          + '    <sub>{d[i].groups[i].label:print(..direct[.i].sub.id)}</sub>'
+          + '  </l>'
+          + '  <l>'
+          + '    {d[i].groups[i+1]}'
+          + '  </l>'
+          + '  <l>'
+          + '    {d[i+1]}'
+          + '  </l>'
+          + '</d>'
+        ;
+        var _data = [
+          {
+            groups : [ { label : 10 }, {label : 11 } ],
+            direct : [ { sub : { id : 'aa' }}, { sub : { id : 'cc' }} ]
+          },
+          {
+            groups : [ { label : 20 }, { label : 30 } ],
+            direct : [ { sub : { id : 'zz' }} ]
+          }
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, ''
+            + '<d>'
+            + '  <l>'
+            + '    <acc>10</acc>'
+            + '    <sub>aa</sub>'
+            + '  </l>'
+            + '  <l>'
+            + '    <acc>11</acc>'
+            + '    <sub>cc</sub>'
+            + '  </l>  '
+            + '  <l>'
+            + '    <acc>20</acc>'
+            + '    <sub>zz</sub>'
+            + '  </l>'
+            + '  <l>'
+            + '    <acc>30</acc>'
+            + '    <sub></sub>'
+            + '  </l>    '
+            + '</d>'
+          );
           done();
         });
       });

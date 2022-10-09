@@ -282,6 +282,13 @@ describe('helper', function () {
       assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id..sd'), new Error('Forbidden array access in "id..sd". Only non-empty attributes are allowed'));
       assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[0].di....sd'), new Error('Forbidden array access in "id[0].di....sd". Only non-empty attributes are allowed'));
     });
+    it('should accept dynamic array direct access with .i', function () {
+      const _currentIterators = ['it1', 'it2'];
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[.i]', _currentIterators), 'root?.[_id_]?.[it2]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[..i]', _currentIterators), 'root?.[_id_]?.[it1]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[..i].toto.titi[.i].id', _currentIterators), 'root?.[_id_]?.[it1]?.[_toto_]?.[_titi_]?.[it2]?.[_id_]');
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[...i]', _currentIterators), new Error('Forbidden array access in "id[...i]". No array iterators matching with ...i'));
+    });
   });
 
   describe('removeDuplicatedRows', function () {

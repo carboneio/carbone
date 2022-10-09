@@ -8,7 +8,7 @@ PACKAGE_VERSION=$(cat package.json | grep "version" | head -1 | awk -F: '{ print
 CARBONE_EE_TAG="ee-$PACKAGE_VERSION"
 
 # Build target
-BUILD_TARGET="node16-linux-x64,node16-macos-x64"
+BUILD_TARGET="node16-linux-x64,node16-macos-x64,node16-win-x64"
 
 # Build name
 # PACKAGE_VERSION_WITHOUT_DOT="${PACKAGE_VERSION//./-}"

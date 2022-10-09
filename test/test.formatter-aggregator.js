@@ -5,12 +5,12 @@ const helper  = require('../lib/helper');
 // sum total qty = 21
 const dataSimpleLoop = {
   cars : [
-    { brand : 'Lu' , qty : 1  , sort : 1 },
-    { brand : 'Fa' , qty : 4  , sort : 4 },
-    { brand : 'Vi' , qty : 3  , sort : 3 },
-    { brand : 'Fa' , qty : 2  , sort : 2 },
-    { brand : 'To' , qty : 1  , sort : 1 },
-    { brand : 'Vi' , qty : 10 , sort : 5 }
+    { brand : 'Lu' , qty : 1  , sort : 1, weirdQty : '1'       , negQty : '-1.5'        },
+    { brand : 'Fa' , qty : 4  , sort : 4, weirdQty : null      , negQty : null          },
+    { brand : 'Vi' , qty : 3  , sort : 3, weirdQty : undefined , negQty : undefined     },
+    { brand : 'Fa' , qty : 2  , sort : 2, weirdQty : '2'       , negQty : '-2.5'        },
+    { brand : 'To' , qty : 1  , sort : 1, weirdQty : '1'       , negQty : '-1.2'        },
+    { brand : 'Vi' , qty : 10 , sort : 5, weirdQty : '10'      , negQty : '-10.5'       }
   ]
 };
 
@@ -25,6 +25,28 @@ describe('Aggregatted operations', function () {
           [ 'aggAvg'  , '<xml> 3.5 </xml>'],
           [ 'aggMin'  , '<xml> 1 </xml>'],
           [ 'aggMax'  , '<xml> 10 </xml>'],
+          [ 'aggCount', '<xml> 6 </xml>']
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('should convert strings to integer and ignore null or undefined values', function (done) {
+        const _xml = '<xml> {d.cars[].weirdQty:__TESTED_FORMATTER__} </xml>';
+        let _expected = [
+          [ 'aggSum'  , '<xml> 14 </xml>'],
+          [ 'aggAvg'  , '<xml> 2.3333333333333335 </xml>'],
+          [ 'aggMin'  , '<xml> 1 </xml>'],
+          [ 'aggMax'  , '<xml> 10 </xml>'],
+          [ 'aggCount', '<xml> 6 </xml>']
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('should convert strings to float and ignore null or undefined values (max should not return 0 if null/undefined values)', function (done) {
+        const _xml = '<xml> {d.cars[].negQty:__TESTED_FORMATTER__} </xml>';
+        let _expected = [
+          [ 'aggSum'  , '<xml> -15.7 </xml>'],
+          [ 'aggAvg'  , '<xml> -2.6166666666666667 </xml>'],
+          [ 'aggMin'  , '<xml> -10.5 </xml>'],
+          [ 'aggMax'  , '<xml> -1.2 </xml>'],
           [ 'aggCount', '<xml> 6 </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
@@ -224,6 +246,56 @@ describe('Aggregatted operations', function () {
           [ 'aggCount', '<xml> 6 </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+    });
+
+    describe('d.cars[id>1].wheels[size=1].makers[].qty:aggSum - global aggregation without loops but with filters in [] in multiple nested arrays', function () {
+      const dataDeepDepth = {
+        cars : [
+          {
+            id     : 1,
+            wheels : [{
+              n      : 'A',
+              size   : 100,
+              makers : [{ qty : 1 }, { qty : 2 }]
+            }]
+          },
+          {
+            id     : 2,
+            wheels : [{
+              n      : 'B',
+              size   : 100,
+              makers : [{ qty : 10 }, { qty : 20 }]
+            }]
+          },
+          {
+            id     : 1,
+            wheels : [{
+              n      : 'C',
+              size   : 200,
+              makers : [{ qty : 300}, { qty : 400 }]
+            }]
+          },
+          {
+            id     : 1,
+            wheels : [{
+              n      : 'D',
+              size   : 100,
+              makers : [{ qty : 5000 }, { qty : 6000 }]
+            }]
+          },
+        ]
+      };
+      it('should do a global aggregation', function (done) {
+        const _xml = '<xml> {d.cars[id=1].wheels[size=100].makers[].qty:__TESTED_FORMATTER__} {d.cars[id=1].wheels[size=100].n} {d.cars[id=1].wheels[size=100].makers[qty>1].qty}</xml>';
+        let _expected = [
+          [ 'aggSum'   , '<xml> 11003 A 2</xml>'],
+          [ 'aggAvg'   , '<xml> 2750.75 A 2</xml>'],
+          [ 'aggMin'   , '<xml> 1 A 2</xml>'],
+          [ 'aggMax'   , '<xml> 6000 A 2</xml>'],
+          [ 'aggCount', '<xml> 4 A 2</xml>']
+        ];
+        executeTest(_xml, dataDeepDepth, _expected, done);
       });
     });
   });

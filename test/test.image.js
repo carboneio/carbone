@@ -4,6 +4,7 @@ const carbone   = require('../lib/index');
 const path      = require('path');
 const fs        = require('fs');
 const image     = require('../lib/image');
+const preprocessor  = require('../lib/preprocessor');
 const nock      = require('nock');
 const barcodeFormatter = require('../formatters/barcode');
 
@@ -165,7 +166,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         image : _imageLogoBase64jpg
       }];
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
-        helperTest.assert(err+'', 'Error: The template contains a list of floating images, you must change the images anchor-type to \"as character\" where the marker \"d[i].image\" is bound.');
+        helperTest.assert(err+'', 'Error: The template contains a list of floating images, you must change the images anchor-type to "as character" where the marker "d[i].image" is bound.');
         helperTest.assert(res, null);
         done();
       });
@@ -465,6 +466,51 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(template.files[0].data, expectedXML);
         done();
       });
+      it('should support ODS content that includes a loop of image (anchor set to "To cell")', function (done) {
+        let template = {
+          extension : 'ods',
+          files     : [
+            {
+              name : 'content.xml',
+              data : '' +
+              '<table:table-row table:style-name="ro1">'+
+                '<table:table-cell>'+
+                  '<draw:frame draw:z-index="0" draw:name="Image 1" draw:style-name="gr1" draw:text-style-name="P1" svg:width="1.0835in" svg:height="0.648in" svg:x="0.0465in" svg:y="0.0839in">'+
+                    '<draw:image xlink:href="Pictures/10000000000000640000003E7BCFF6B890FF3254.jpg" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg">'+
+                      '<text:p/>'+
+                    '</draw:image>'+
+                    '<svg:title>{d.list[i].img:imageFit(contain)}</svg:title>'+
+                  '</draw:frame>'+
+                '</table:table-cell>'+
+              '</table:table-row>'+
+              '<table:table-row table:style-name="ro1">'+
+                '<table:table-cell office:value-type="string" calcext:value-type="string">'+
+                  '<text:p>{d.list[i+1].img}</text:p>'+
+                '</table:table-cell>'+
+              '</table:table-row>'
+            }
+          ]
+        };
+        let expectedXML = '' +
+          '<table:table-row table:style-name="ro1">'+
+            '<table:table-cell>'+
+              '<draw:frame draw:z-index="0" draw:name="carbone-image-{d.list[i].img:generateOpenDocumentUniqueNumber()}" draw:style-name="gr1" draw:text-style-name="P1" svg:width="{d.list[i].img:scaleImage(width, 1.0835, in, contain)}in" svg:height="{d.list[i].img:scaleImage(height, 0.648, in, contain)}in" svg:x="0.0465in" svg:y="0.0839in">'+
+                '<draw:image xlink:href="{d.list[i].img:generateOpenDocumentImageHref()}" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/jpeg">'+
+                  '<text:p/>'+
+                '</draw:image>'+
+                '<svg:title></svg:title>'+
+              '</draw:frame>'+
+            '</table:table-cell>'+
+          '</table:table-row>'+
+          '<table:table-row table:style-name="ro1">'+
+            '<table:table-cell office:value-type="string" calcext:value-type="string">'+
+              '<text:p>{d.list[i+1].img}</text:p>'+
+            '</table:table-cell>'+
+          '</table:table-row>';
+        image.preProcessLo(template);
+        helperTest.assert(template.files[0].data, expectedXML);
+        done();
+      });
     });
 
     describe("_isImageListAnchorTypeBlockLO : Check if the anchor type of a list of images is set to 'as character' ", function () {
@@ -701,6 +747,47 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
+      it('generating unique ids for docPr tag should not break filters in loop', function (done) {
+        var _xml = (expected) => { return ''
+          + '<w:p>'
+          + '  <w:r>'
+          + '    <w:rPr>'
+          +       (expected ? '3' : '{d[i, type=3].type}')
+          + '    </w:rPr>'
+          + '    <w:drawing>'
+          + '      <wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="28B07B0E" wp14:editId="287BE7E9">'
+          + '        <wp:docPr id="'+(expected ? '1000' : '3')+'" name="Billede 6" descr=""/>'
+          + '        <a:graphic>'
+          +           (expected ? '3' : '{d[i, type=3].type}')
+          + '        </a:graphic>'
+          + '      </wp:inline>'
+          + '    </w:drawing>'
+          + '  </w:r>'
+          + (expected ? '' : ''
+            + '<w:r>'
+            + '    <w:t>{d[i+1, type=3].type}</w:t>'
+            + '</w:r>'
+          )
+          + '</w:p>'
+        }
+        var _report = {
+          isZipped   : false,
+          filename   : 'template.docx',
+          embeddings : [],
+          extension  : 'docx',
+          files      : [
+            {name : 'word/document.xml', parent : '' , data : _xml()   , isMarked   : true},
+            {name : 'word/other.xml'   , parent : '' , data : '<p></p>', isMarked   : true}
+          ]
+        };
+        carbone.render(_report, [{ type : 3 }, { type : 1 }], function (err, res) {
+          helperTest.assert(err + '', 'null');
+          helperTest.assert(res.files[0].name, 'word/document.xml');
+          helperTest.assert(res.files[0].data, _xml(true));
+          done();
+        });
+      });
+
       it.skip('should generate barcodes as images and as fonts', function (done) {
         const _testedReport = 'image/docx-barcodes';
         const _data = {
@@ -757,8 +844,9 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu, fillWidth)}" cy="{d.image:scaleImage(height, 590550, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu, fillWidth)}" cy="{d.image:scaleImage(height, 590550, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu, fillWidth)}" cy="{d.image:scaleImage(height, 590550, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu, fillWidth)}" cy="{d.image:scaleImage(height, 590550, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
         helperTest.assert(template.files[0].data, expectedXML);
         done();
       });
@@ -774,8 +862,9 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline wp14:editId="5C7CCEE1" wp14:anchorId="63CC715F"><wp:extent cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu, fillWidth)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu, fillWidth)}" /><wp:effectExtent l="0" t="0" r="0" b="0" /><wp:docPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" title="" /><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1" /></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" /><pic:cNvPicPr /></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.child.child.imageDE:generateImageDocxReference(documentName1234.xml)}"><a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a14:useLocalDpi val="0" xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" /></a:ext></a:extLst></a:blip><a:stretch><a:fillRect /></a:stretch></pic:blipFill><pic:spPr><a:xfrm rot="0" flipH="0" flipV="0"><a:off x="0" y="0" /><a:ext cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu, fillWidth)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu, fillWidth)}" /></a:xfrm><a:prstGeom prst="rect"><a:avLst /></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline wp14:editId="5C7CCEE1" wp14:anchorId="63CC715F"><wp:extent cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu, fillWidth)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu, fillWidth)}" /><wp:effectExtent l="0" t="0" r="0" b="0" /><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="" title="" /><wp:cNvGraphicFramePr><a:graphicFrameLocks noChangeAspect="1" /></wp:cNvGraphicFramePr><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="{d.tests.child.child.imageDE:generateImageDocxId()}" name="" /><pic:cNvPicPr /></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.child.child.imageDE:generateImageDocxReference(documentName1234.xml)}"><a:extLst xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a14:useLocalDpi val="0" xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" /></a:ext></a:extLst></a:blip><a:stretch><a:fillRect /></a:stretch></pic:blipFill><pic:spPr><a:xfrm rot="0" flipH="0" flipV="0"><a:off x="0" y="0" /><a:ext cx="{d.tests.child.child.imageDE:scaleImage(width, 2335161, emu, fillWidth)}" cy="{d.tests.child.child.imageDE:scaleImage(height, 1447800, emu, fillWidth)}" /></a:xfrm><a:prstGeom prst="rect"><a:avLst /></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
         helperTest.assert(template.files[0].data, expectedXML);
         done();
       });
@@ -789,8 +878,9 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu, contain)}" cy="{d.image:scaleImage(height, 590550, emu, contain)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu, contain)}" cy="{d.image:scaleImage(height, 590550, emu, contain)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:scaleImage(width, 952500, emu, contain)}" cy="{d.image:scaleImage(height, 590550, emu, contain)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 952500, emu, contain)}" cy="{d.image:scaleImage(height, 590550, emu, contain)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
         helperTest.assert(template.files[0].data, expectedXML);
         done();
       });
@@ -804,8 +894,9 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:isImage:barcode(ean13):scaleImage(width, 952500, emu, contain)}" cy="{d.image:isImage:barcode(ean13):scaleImage(height, 590550, emu, contain)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:isImage:barcode(ean13):generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:isImage:barcode(ean13):generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:isImage:barcode(ean13):generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:isImage:barcode(ean13):scaleImage(width, 952500, emu, contain)}" cy="{d.image:isImage:barcode(ean13):scaleImage(height, 590550, emu, contain)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="{d.image:isImage:barcode(ean13):scaleImage(width, 952500, emu, contain)}" cy="{d.image:isImage:barcode(ean13):scaleImage(height, 590550, emu, contain)}"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:isImage:barcode(ean13):generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:isImage:barcode(ean13):generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.image:isImage:barcode(ean13):scaleImage(width, 952500, emu, contain)}" cy="{d.image:isImage:barcode(ean13):scaleImage(height, 590550, emu, contain)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
         helperTest.assert(template.files[0].data, expectedXML);
         done();
       });
@@ -819,8 +910,9 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             }
           ]
         };
-        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="952500" cy="590550"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="952500" cy="590550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
+        let expectedXML = '<w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="952500" cy="590550"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="Image1" descr=""></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(document.xml)}"></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr bwMode="auto"><a:xfrm><a:off x="0" y="0"/><a:ext cx="952500" cy="590550"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing>';
         image.preProcessDocx(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
         helperTest.assert(template.files[0].data, expectedXML);
         done();
       });
@@ -843,9 +935,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           ]
         };
         image.preProcessDocx(template);
-        helperTest.assert(template.files[0].data, '<w:document><w:body><w:p w14:paraId="10D86908" w14:textId="594213EC" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="57033187" wp14:editId="308FFE5B"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 702021, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 6" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(document.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 721727, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:body></w:document>');
-        helperTest.assert(template.files[1].data, '<w:ftr><w:p w14:paraId="570D5375" w14:textId="1642C3D9" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB" w:rsidP="00F040CB"><w:pPr><w:pStyle w:val="Footer"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="1A6006B2" wp14:editId="70ED8A3E"><wp:extent cx="{d.image:scaleImage(width, 925689, emu, fillWidth)}" cy="{d.image:scaleImage(height, 694318, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 7" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(footer2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu, fillWidth)}" cy="{d.image:scaleImage(height, 721508, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:ftr>');
-        helperTest.assert(template.files[2].data, '<w:hdr><w:p w14:paraId="50A57CAF" w14:textId="03063553" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34" w:rsidP="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="26BB6EA6" wp14:editId="7EC70FEB"><wp:extent cx="{d.image:scaleImage(width, 925689, emu, fillWidth)}" cy="{d.image:scaleImage(height, 694318, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{d.image:generateImageDocxId()}" name="Picture 2" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu, fillWidth)}" cy="{d.image:scaleImage(height, 721508, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="75994D6B" wp14:editId="4DEE8DEE"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 702021, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{d.tests.image:generateImageDocxId()}" name="Picture 3" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 721727, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="46E11299" w14:textId="77777777" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr></w:p></w:hdr>');
+        preprocessor.generateUniqueIds(template); // called separately for shapes
+        helperTest.assert(template.files[0].data, '<w:document><w:body><w:p w14:paraId="10D86908" w14:textId="594213EC" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB"><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="57033187" wp14:editId="308FFE5B"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 702021, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="Picture 6" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(document.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 721727, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:body></w:document>');
+        helperTest.assert(template.files[1].data, '<w:ftr><w:p w14:paraId="570D5375" w14:textId="1642C3D9" w:rsidR="00F040CB" w:rsidRPr="00F040CB" w:rsidRDefault="00F040CB" w:rsidP="00F040CB"><w:pPr><w:pStyle w:val="Footer"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="1A6006B2" wp14:editId="70ED8A3E"><wp:extent cx="{d.image:scaleImage(width, 925689, emu, fillWidth)}" cy="{d.image:scaleImage(height, 694318, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="Picture 7" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(footer2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu, fillWidth)}" cy="{d.image:scaleImage(height, 721508, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p></w:ftr>');
+        helperTest.assert(template.files[2].data, '<w:hdr><w:p w14:paraId="50A57CAF" w14:textId="03063553" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34" w:rsidP="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="26BB6EA6" wp14:editId="7EC70FEB"><wp:extent cx="{d.image:scaleImage(width, 925689, emu, fillWidth)}" cy="{d.image:scaleImage(height, 694318, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="4445"/><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="Picture 2" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm flipH="1"><a:off x="0" y="0"/><a:ext cx="{d.image:scaleImage(width, 961939, emu, fillWidth)}" cy="{d.image:scaleImage(height, 721508, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve"></w:t></w:r><w:r><w:rPr><w:noProof/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0" wp14:anchorId="75994D6B" wp14:editId="4DEE8DEE"><wp:extent cx="{d.tests.image:scaleImage(width, 722136, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 702021, emu, fillWidth)}"/><wp:effectExtent l="0" t="0" r="1905" b="0"/><wp:docPr id="{c.now:generateImageDocxGlobalId}" name="Picture 3" descr=""/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="{d.tests.image:generateImageDocxId()}" name="" descr=""/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="{d.tests.image:generateImageDocxReference(header2.xml)}"><a:extLst><a:ext uri="{28A0092B-C50C-407E-A947-70E740481C1C}"><a14:useLocalDpi xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main" val="0"/></a:ext></a:extLst></a:blip><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="{d.tests.image:scaleImage(width, 742406, emu, fillWidth)}" cy="{d.tests.image:scaleImage(height, 721727, emu, fillWidth)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="46E11299" w14:textId="77777777" w:rsidR="00AD3C34" w:rsidRDefault="00AD3C34"><w:pPr><w:pStyle w:val="Header"/></w:pPr></w:p></w:hdr>');
         done();
       });
     });
@@ -932,7 +1025,33 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(_template.files[2].data, _expectedContentType);
       });
 
-      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define a different media path because the template is coming from word online', function () {
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should define the image into the directory `media` if images relationship does not already exist', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="utf-8"?></Relationships>',
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="utf-8"?><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.gif" Id="rIdCarbone0"/></Relationships>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.gif', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'gif'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helperTest.assert(_template.files[0], {
+          name   : 'word/media/CarboneImage0.gif',
+          parent : '',
+          data   : '1234'
+        });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+      });
+
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase ', function () {
         const _template = {
           files : [{
             name : 'word/_rels/document.xml.rels',
@@ -1031,31 +1150,31 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         };
         const _expectedTemplate = {
           files : [
-          {
-            name   : 'word/media/CarboneImage0.png',
-            parent : '',
-            data   : '1234'
-          },
-          {
-            name : 'word/_rels/document.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
-          },
-          {
-            name : 'word/_rels/header1.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
-          },
-          {
-            name : 'word/_rels/header2.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
-          },
-          {
-            name : 'word/_rels/footer1.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
-          },
-          {
-            name : 'word/_rels/footer2.xml.rels',
-            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
-          }]
+            {
+              name   : 'word/media/CarboneImage0.png',
+              parent : '',
+              data   : '1234'
+            },
+            {
+              name : 'word/_rels/document.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+            },
+            {
+              name : 'word/_rels/header1.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+            },
+            {
+              name : 'word/_rels/header2.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+            },
+            {
+              name : 'word/_rels/footer1.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>',
+            },
+            {
+              name : 'word/_rels/footer2.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/></Relationships>',
+            }]
         };
         const _options = {
           imageDatabase : new Map()
@@ -1415,7 +1534,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the INCH size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            imageUnit           : 'in',
+            imageUnit      : 'in',
             data           : imageData.data,
             newImageWidth  : -1,
             newImageHeight : -1
@@ -1427,7 +1546,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      describe("_computeImageSize", function () {
+      describe('_computeImageSize', function () {
         it("_computeImageSize EMU 1: should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
             imageUnit      : 'emu',
@@ -1444,11 +1563,11 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it("_computeImageSize EMU 2: should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            imageUnit           : 'emu',
+            imageUnit      : 'emu',
             newImageWidth  : 2857500,
             newImageHeight : 1905000,
-            imageWidth     :  952500,
-            imageHeight    :  590550
+            imageWidth     : 952500,
+            imageHeight    : 590550
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 885825);
@@ -1490,8 +1609,8 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             imageUnit      : 'in',
             newImageWidth  : 8.6952,
             newImageHeight : 10.6713,
-            imageWidth     :  2.8984,
-            imageHeight    :  1.4492
+            imageWidth     : 2.8984,
+            imageHeight    : 1.4492
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 1.181); // 1.1808
@@ -1526,6 +1645,61 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 100);
           helperTest.assert(_imageInfo.imageHeight, 80);
+          done();
+        });
+
+        it('should compute the new image width/height as cm based on the image size and should keep the ratio', function (done) {
+          let _imageInfo = {
+            imageUnit      : 'cm',
+            newImageWidth  : 5,
+            newImageHeight : 4.2
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 5);
+          helperTest.assert(_imageInfo.imageHeight, 4.2);
+          done();
+        });
+
+        it('should compute the new image width/height as cm based on the image size, should keep the ratio and should be less than 5cm', function (done) {
+          let _imageInfo = {
+            imageUnit      : 'cm',
+            newImageWidth  : 10,
+            newImageHeight : 5
+          };
+          image._computeImageSize(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 5);
+          helperTest.assert(_imageInfo.imageHeight, 2.5);
+
+          let _imageInfo2 = {
+            imageUnit      : 'cm',
+            newImageWidth  : 5,
+            newImageHeight : 10
+          };
+          image._computeImageSize(_imageInfo2);
+          helperTest.assert(_imageInfo2.imageWidth, 2.5);
+          helperTest.assert(_imageInfo2.imageHeight, 5);
+          done();
+        });
+
+        it('should compute the new image width/height as EMU based on the image size, should keep the ratio and should be less than 5cm', function (done) {
+          let _imageInfo = {
+            imageUnit      : 'emu',
+            newImageWidth  : 1800000,
+            newImageHeight : 3600000
+          };
+          image._computeImageSize(_imageInfo);
+          console.log(_imageInfo);
+          helperTest.assert(_imageInfo.imageWidth, 900000);
+          helperTest.assert(_imageInfo.imageHeight, 1800000);
+
+          let _imageInfo2 = {
+            imageUnit      : 'emu',
+            newImageWidth  : 3600000,
+            newImageHeight : 1800000
+          };
+          image._computeImageSize(_imageInfo2);
+          helperTest.assert(_imageInfo2.imageWidth, 1800000);
+          helperTest.assert(_imageInfo2.imageHeight, 900000);
           done();
         });
       });

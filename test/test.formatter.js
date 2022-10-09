@@ -51,6 +51,19 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
     });
+    it('should not apply timezone if only a date is provided without time', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '20100-12-01', 'L'), '12/01/20100');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '100100-12-01', 'L'), '12/01/100100');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
+    });
+    it('should apply timezone if only a time is provided', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'HH-mm-ss', 'HH-mm-ss'), '03-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01Z', 'HH-mm-ss', 'HH-mm-ssZ'), '05-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01T01:00:00Z', 'LLL'), 'November 30, 2010 8:00 PM');
+    });
     it('should accepts real locales', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en-gb', timezone : _tz}, '20101201', 'L'), '01/12/2010');
       helper.assert(dateFormatter.formatD.call({lang : 'en'   , timezone : _tz}, '20101201', 'L'), '12/01/2010');
@@ -104,12 +117,132 @@ describe('formatter', function () {
       );
     });
   });
+  describe('formatI', function () {
+    it('should transform duration (patternOut), which are by default in milliseconds (patternIn)', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'millisecond' ), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'milliseconds'), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'ms'          ), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'second'      ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'seconds'     ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 's'           ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'minute'      ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'minutes'     ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'm'           ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'hour'        ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'hours'       ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'h'           ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'year'        ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'years'       ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'y'           ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'month'       ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'months'      ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'M'           ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'week'        ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'weeks'       ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'w'           ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'day'         ), 28);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'days'        ), 28);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'd'           ), 28);
+    });
+    it('should return null if patternOur is unknown ', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 0         ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , ''        ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , undefined ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , null      ), null);
+    });
+    it('should accept other units for patternIn', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'millisecond' ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'milliseconds'), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'ms'          ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'second'      ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'seconds'     ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  's'           ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'minute'      ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'minutes'     ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'm'           ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'hour'        ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'hours'       ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'h'           ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'year'        ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'years'       ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'y'           ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'month'       ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'months'      ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'M'           ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'week'        ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'weeks'       ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'w'           ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'day'         ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'days'        ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'd'           ), 1000 * 3600 * 24 * 28  );
+    });
+    it('should also accept ISO units for patternIn if not defined, and if the value starts with "P..."', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 'P1M'            , 'ms'    ), 1000 * 3600 * 24 * 30 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 'P1Y2M3DT4H5M6S' , 'hour'  ), 10276.085 );
+    });
+    it('should humanize if patternOut contain humain or humain+ and manage locale', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                           , 'human' ) , 'a few seconds' );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600                    , 'human' ) , 'an hour'       );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600                    , 'human+') , 'in an hour'    );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, -1000 * 3600                   , 'human+') , 'an hour ago'   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, -1000 * 3600 * 24 * 365 * 4    , 'human+') , '4 years ago'   );
+      helper.assert(dateFormatter.formatI.call({lang : 'fr'}, -1000 * 3600 * 24 * 365 * 4    , 'human+') , 'il y a 4 ans'  );
+      helper.assert(dateFormatter.formatI.call({lang : 'fr-FR'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'il y a 4 ans'  );
+      helper.assert(dateFormatter.formatI.call({lang : 'es-ES'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'hace 4 años'   );
+    });
+  });
+  describe('diffD', function () {
+    it('should compute the difference between two dates', function () {
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'millisecond' ), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'milliseconds'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'ms'          ), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'second'      ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'seconds'     ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 's'           ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'minute'      ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'minutes'     ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'm'           ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'hour'        ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'hours'       ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'h'           ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'year'        ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'years'       ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'y'           ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'quarter'     ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'quarters'    ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'Q'           ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'month'       ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'months'      ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'M'           ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'week'        ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'weeks'       ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'w'           ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'day'         ), 61);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'days'        ), 61);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'd'           ), 61);
+    });
+    it('should compute the difference between two dates and accept patterns for both dates', function () {
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'ms' , 'YYYY+MM+DD', 'YYYY=MM=DD'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 's'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'm'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'h'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2009+10+01', '2010=12=01', 'y'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+05+20', '2010=12=01', 'Q'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'M'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'w'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'd'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 61);
+    });
+  });
   describe('convCRLF', function () {
     it('should convert LF and CR in odt', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'odt'}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <text:line-break/> sd <text:line-break/> qsd <text:line-break/> sq');
     });
     it('should convert LF and CR in docx', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'docx'}, 'qsdqsd \n'), 'qsdqsd </w:t><w:br/><w:t>');
+    });
+    it('should add a paragraph in ODS', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'ods'}, 'qsdqsd \n'), 'qsdqsd </text:p><text:p>');
     });
   });
   describe('convCRLFH', function () {
@@ -402,6 +535,35 @@ describe('formatter', function () {
           [[1, 2, 3, 4, 6, 7, 8, 9], [1, 2, 3, 6, 7, 8, 9]],
         ];
         testCondition('ifNE', _dataSet, true);
+      });
+    });
+
+    describe('ifTE', function () {
+      it('should turn the `isConditionTrue` to false if a data is not a string', function () {
+        const _dataSet = [
+          [0                , 'string'],
+          [22.2222          , 'string'],
+          [true             , 'string'],
+          [false            , 'string'],
+          [undefined        , 'string'],
+          [null             , 'string'],
+          [{value : 'john'} , 'string'],
+          [[1, 2, 3]        , 'string']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a string', function () {
+        const _dataSet = [
+          [''          , 'string'],
+          ['0'         , 'string'],
+          ['22.2222'   , 'string'],
+          ['true'      , 'string'],
+          ['false'     , 'string'],
+          ['undefined' , 'string'],
+          ['null'      , 'string']
+        ];
+        testCondition('ifTE', _dataSet, true);
       });
     });
 
@@ -1538,6 +1700,12 @@ describe('formatter', function () {
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '(01)03453120000011(8200)http://www.abc.net(10)ABCD1234(410)9501101020917',  'gs1qrcode'), '{"bcid":"gs1qrcode","text":"(01)03453120000011(8200)http://www.abc.net(10)ABCD1234(410)9501101020917"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, '[)>^03001^02996152382802^029840^029001^0291Z00004951^029UPSN^02906X610^029159^0291234567^0291/1^029^029Y^029634 ALPHA DR^029PITTSBURGH^029PA^029^004',  'maxicode'), '{"bcid":"maxicode","text":"[)>^03001^02996152382802^029840^029001^0291Z00004951^029UPSN^02906X610^029159^0291234567^0291/1^029^029Y^029634 ALPHA DR^029PITTSBURGH^029PA^029^004"}');
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'SPC\n0200\n1\nCH5800791123000889012\nS\nRobert Schneider AG\nRue du Lac\n1268\n2501\nBiel\nCH\n\n199.95\nCHF\nKPia-Maria Rutschmann-Schnyder\nGrosse Marktgasse 28\n9400 Rorschach\n\n\nCH\nSCOR\nRF18539007547034\n\nEPD\n',  'swissqrcode'), '{"bcid":"swissqrcode","text":"SPC\\n0200\\n1\\nCH5800791123000889012\\nS\\nRobert Schneider AG\\nRue du Lac\\n1268\\n2501\\nBiel\\nCH\\n\\n199.95\\nCHF\\nKPia-Maria Rutschmann-Schnyder\\nGrosse Marktgasse 28\\n9400 Rorschach\\n\\n\\nCH\\nSCOR\\nRF18539007547034\\n\\nEPD\\n"}');
+        });
+
+        it('should return the barcode as JSON and CAST integer values as strings', function () {
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 15854377, 'code39'), '{"bcid":"code39","text":"15854377"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 2112345678900, 'ean13'), '{"bcid":"ean13","text":"2112345678900"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 5715311709768, 'code128'), '{"bcid":"code128","text":"5715311709768"}');
         });
 
         it('should return the barcode as JSON with options and should validate options', function () {

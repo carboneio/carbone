@@ -57,8 +57,8 @@ describe('Carbone', function () {
     });
   });
 
-  describe('saveResult', function () {
-    it('Save result', function (done) {
+  describe(':set', function () {
+    it('should save the result in data, and it can be used later', function (done) {
       var _xml = '<xml>{d.title:substr(0, 4):set(d.other)} {d.other} </xml>';
       var _data = {title : 'boo1234'};
       var _complement = {date : 'today'};

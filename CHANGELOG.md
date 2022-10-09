@@ -2,6 +2,7 @@
   - ⭐️ Add the possibility to store values in data with new formatter `:set(d.value)`. Known limits: 
     - accepts only to store values at the root level of `d`, and only in `d`.
     - cannot be used in aliases
+  - Fix aggregators `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount` when used with filters (without iterators) like `{d.cars[id=1].wheels[size=100].makers[].qty:aggSum}`
 
 ### v4.5.1
   - Release October 7th 2022

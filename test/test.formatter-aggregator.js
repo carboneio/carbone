@@ -248,6 +248,56 @@ describe('Aggregatted operations', function () {
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
     });
+
+    describe('d.cars[id>1].wheels[size=1].makers[].qty:aggSum - global aggregation without loops but with filters in [] in multiple nested arrays', function () {
+      const dataDeepDepth = {
+        cars : [
+          {
+            id     : 1,
+            wheels : [{
+              n      : 'A',
+              size   : 100,
+              makers : [{ qty : 1 }, { qty : 2 }]
+            }]
+          },
+          {
+            id     : 2,
+            wheels : [{
+              n      : 'B',
+              size   : 100,
+              makers : [{ qty : 10 }, { qty : 20 }]
+            }]
+          },
+          {
+            id     : 1,
+            wheels : [{
+              n      : 'C',
+              size   : 200,
+              makers : [{ qty : 300}, { qty : 400 }]
+            }]
+          },
+          {
+            id     : 1,
+            wheels : [{
+              n      : 'D',
+              size   : 100,
+              makers : [{ qty : 5000 }, { qty : 6000 }]
+            }]
+          },
+        ]
+      };
+      it('should do a global aggregation', function (done) {
+        const _xml = '<xml> {d.cars[id=1].wheels[size=100].makers[].qty:__TESTED_FORMATTER__} {d.cars[id=1].wheels[size=100].n} {d.cars[id=1].wheels[size=100].makers[qty>1].qty}</xml>';
+        let _expected = [
+          [ 'aggSum'   , '<xml> 11003 A 2</xml>'],
+          [ 'aggAvg'   , '<xml> 2750.75 A 2</xml>'],
+          [ 'aggMin'   , '<xml> 1 A 2</xml>'],
+          [ 'aggMax'   , '<xml> 6000 A 2</xml>'],
+          [ 'aggCount', '<xml> 4 A 2</xml>']
+        ];
+        executeTest(_xml, dataDeepDepth, _expected, done);
+      });
+    });
   });
 
   describe('WITH SIMPLE LOOP', function () {

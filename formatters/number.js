@@ -274,7 +274,7 @@ div.isAcceptingMathExpression = true;
  * @return  {Number}          Result = X mod Y
  */
 function mod (d, value) {
-  if (d !== null && typeof d !== 'undefined' && parseFloat(value) !== 0) {
+  if (d !== null && typeof d !== 'undefined') {
     return parseFloat(d) % parseFloat(value);
   }
   return d;

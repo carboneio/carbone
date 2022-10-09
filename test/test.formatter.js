@@ -1601,6 +1601,7 @@ describe('formatter', function () {
     });
 
     it('should modulo number', function () {
+      helper.assert(numberFormatter.mod(-2, 0), null);
       helper.assert(numberFormatter.mod(-2, 2), 0);
       helper.assert(numberFormatter.mod(-1, 2), -1);
       helper.assert(numberFormatter.mod(0, 2), 0);

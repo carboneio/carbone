@@ -266,9 +266,27 @@ cumCount.replacedBy = _replaceCumulative;
 cumCount.canBeCalledInPrecomputedLoop = true;
 
 
+/**
+ * Store result into data object `{d.` for later use. Current limits:
+ *   - accepts only to store values at the root level of `d`, and only in `d`.
+ *   - cannot be used in aliases
+ *
+ * @version 4.5.2
+ *
+ * @param  {Mixed}  d        The value to store
+ * @param  {String} param    destination variable in data. Ex. `d.myNewVariable`
+ * @return {String}          Nothing
+ */
+function set (d, param) {
+  const _attribute = param.replace('d.', '');
+  this.d[_attribute] = d;
+  return '';
+}
+
 module.exports = {
   aggSum,
   aggSumGet,
+  set,
   aggAvg,
   aggAvgGet,
   aggMin,

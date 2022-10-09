@@ -1,4 +1,5 @@
 ### v4.5.2
+  - Release October 9th 2022
   - ⭐️ Add the possibility to store values in data with new formatter `:set(d.value)`. Known limits: 
     - accepts only to store values at the root level of `d`, and only in `d`.
     - cannot be used in aliases

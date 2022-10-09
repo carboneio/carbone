@@ -260,6 +260,27 @@ function div (d, value) {
 }
 div.isAcceptingMathExpression = true;
 
+
+/**
+ * Compute modulo
+ *
+ * @version 4.5.2
+ *
+ * @example [4 ,  2 ]
+ * @example [3 ,  2 ]
+ *
+ * @param   {Number}  d       X
+ * @param   {Number}  value   Y
+ * @return  {Number}          Result = X mod Y
+ */
+function mod (d, value) {
+  if (d !== null && typeof d !== 'undefined') {
+    return parseFloat(d) % parseFloat(value);
+  }
+  return d;
+}
+
+
 module.exports = {
   formatN  : formatN,
   formatC  : formatC,
@@ -268,6 +289,7 @@ module.exports = {
   add      : add,
   sub      : sub,
   mul      : mul,
+  mod      : mod,
   div      : div,
 
   /**

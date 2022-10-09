@@ -557,6 +557,21 @@ describe('Aggregatted operations', function () {
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
+
+      it('should count the total of elements aggregation, without itetaror in 3 lists', function (done) {
+        const _xml =
+           '<x>'
+          +     '<d>{d.companies[].services[].people[].salary:__TESTED_FORMATTER__}</d>'
+          +'</x>';
+        let _expected = [
+          [ 'aggSum'   , '<x><d>68</d></x>' ],
+          [ 'aggAvg'   , '<x><d>5.666666666666667</d></x>' ],
+          [ 'aggMin'   , '<x><d>1</d></x>' ],
+          [ 'aggMax'   , '<x><d>20</d></x>' ],
+          [ 'aggCount' , '<x><d>12</d></x>' ],
+        ];
+        executeTest(_xml, dataThreeLoops, _expected, done);
+      });
       // TOOD limit only this known usage
       it('[CUM] should accept to aggregate reduced array [] and to do a cumulative sum in the same time (aggSum:cumSum)', function (done) {
         const _xml =

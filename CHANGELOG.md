@@ -1,12 +1,24 @@
-### v4.5.x
+### v4.X.X
+  - Added the option `table` for the `:drop(element)` formatter to delete table conditionally. Available for DOCX, ODT and ODP templates. Usage: `{d.value:ifEM:drop(table)}`. The tag must be located within a table cell.
+
+### v4.5.2
+  - Release October 9th 2022
+  - ⭐️ Add the possibility to store values in data with new formatter `:set(d.value)`. Known limits:
+    - accepts only to store values at the root level of `d`, and only in `d`.
+    - cannot be used in aliases
+  - Fix aggregators `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount` when used with filters (without iterators) like `{d.cars[id=1].wheels[size=100].makers[].qty:aggSum}`
+  - New Formatters `mod()` to compute modulo
+      - Example: `{d.val:mod(2)}` returns 0 if `d.val` = 4
+
+### v4.5.1
+  - Release October 7th 2022
+  - aggregators converts string to floats. `null` or `undefined` values are converted to
   - Added for the `:drop(element)` formatter:
     - ODP templates are supported
     - A new argument `slide` is available for ODP template only to delete slides. Usage: `{d.value:ifEM:drop(slide)}`.
-    - `drop(p, nbrParagraphs)` accepts a second parameter `nbrParagraphs` to delete multiple paragraphs at once. For instance `{d.data:ifEM:drop(p, 3)}`, meaning the current and next two paragraph will be removed if the condition is validated. By default, the formatter `:drop(p)` hides only the current paragraph.
-
-
-### v4.5.1
-  - aggregators converts string to floats. `null` or `undefined` values are converted to
+    - `drop(p, nbrParagraphs)` accepts a second parameter `nbrParagraphs` to delete multiple paragraphs at once. For instance `{d.data:ifEM:drop(p, 3)}`, meaning
+      the current and next two paragraph will be removed if the condition is validated. By default, the formatter `:drop(p)` hides only the current paragraph.
+  - aggregators (`aggSum`, `aggAvg`, ...) convert string to floats. `null` or `undefined` values are converted to
     - aggSum : 0
     - aggMin : +infinity
     - aggMax : -infinity
@@ -52,6 +64,7 @@
   - Release September 12st 2022
   - `hide` formatter becomes `drop` to avoid confusion with `hideBegin/hideEnd/show`. `hide` was introduced in 4.2 and is still not offically documented.
   - `drop(row, nbrRows)` accepts a second parameter to select the number of row to remove
+  - `drop` formatter can't be used into Carbone aliases.
 
 ### v4.2.0
   - Release September 8st 2022

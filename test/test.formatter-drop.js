@@ -640,6 +640,111 @@ describe('drop formatter', function () {
   describe(':drop(chart)', function () {
 
     describe('DOCX', function () {
+      it('should replace the drop(table) by hideBegin/hideEnd around the table', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<w:body>'+
+              (expected ? '<carbone>{d.text:ifEM:hideBegin}</carbone>' : '') +
+              '<w:tbl>'+
+                '<w:tblPr>'+
+                  '<w:tblStyle w:val="TableGrid"/>'+
+                  '<w:tblW w:w="0" w:type="auto"/>'+
+                  '<w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>'+
+                '</w:tblPr>'+
+                '<w:tblGrid>'+
+                  '<w:gridCol w:w="9350"/>'+
+                '</w:tblGrid>'+
+                '<w:tr w:rsidR="00D82C8D" w14:paraId="1B7DEAEE" w14:textId="77777777" w:rsidTr="00D82C8D">'+
+                  '<w:tc>'+
+                    '<w:tcPr>'+
+                      '<w:tcW w:w="9350" w:type="dxa"/>'+
+                    '</w:tcPr>'+
+                    '<w:p w14:paraId="22B882C8" w14:textId="4150E108" w:rsidR="00D82C8D" w:rsidRPr="00D82C8D" w:rsidRDefault="00D82C8D">'+
+                      '<w:pPr>'+
+                        '<w:rPr>'+
+                          '<w:lang w:val="en-US"/>'+
+                        '</w:rPr>'+
+                      '</w:pPr>'+
+                      '<w:r>'+
+                        '<w:rPr>'+
+                          '<w:lang w:val="en-US"/>'+
+                        '</w:rPr>'+
+                        `<w:t>${ expected ? '' : '{d.text:ifEM:drop(table)}' }</w:t>`+
+                      '</w:r>'+
+                    '</w:p>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+                '<w:tr w:rsidR="00D82C8D" w14:paraId="4D8DD092" w14:textId="77777777" w:rsidTr="00D82C8D">'+
+                  '<w:tc>'+
+                    '<w:tcPr>'+
+                      '<w:tcW w:w="9350" w:type="dxa"/>'+
+                    '</w:tcPr>'+
+                    '<w:p w14:paraId="48AA6FBF" w14:textId="77777777" w:rsidR="00D82C8D" w:rsidRDefault="00D82C8D"/>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+              '</w:tbl>'+
+              (expected ? '<carbone>{d.text:ifEM:hideEnd}</carbone>' : '')+
+            '</w:body>';
+        };
+
+        var _template = {
+          extension : 'docx',
+          files     : [
+            { name : 'document.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleDropFormatter(_template, 'docx');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
+      });
+    });
+
+    describe('ODT / ODP', function () {
+      it('should replace the drop(table) by hideBegin/hideEnd around the table', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+          '<office:body>'+
+            '<office:text>'+
+              '<text:p text:style-name="P3">Content Before table</text:p>'+
+              (expected ? '<carbone>{d.text:ifEM:hideBegin}</carbone>' : '') +
+              '<table:table table:name="Table1" table:style-name="Table1">'+
+                '<table:table-column table:style-name="Table1.A" table:number-columns-repeated="5"/>'+
+                '<table:table-column table:style-name="Table1.F"/>'+
+                '<table:table-row>'+
+                  '<table:table-cell table:style-name="Table1.A1" office:value-type="string">'+
+                    `<text:p text:style-name="P1">${ expected ? '' : '{d.text:ifEM:drop(table)}' }</text:p>`+
+                  '</table:table-cell>'+
+                '</table:table-row>'+
+                '<table:table-row>'+
+                  '<table:table-cell table:style-name="Table1.A2" office:value-type="string">'+
+                    '<text:p text:style-name="Table_20_Contents"/>'+
+                  '</table:table-cell>'+
+                '</table:table-row>'+
+              '</table:table>'+
+              (expected ? '<carbone>{d.text:ifEM:hideEnd}</carbone>' : '')+
+              '<text:p text:style-name="P2">Content After Table</text:p>'+
+            '</office:text>'+
+          '</office:body>';
+        };
+
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleDropFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
+      });
+    });
+
+  });
+
+  describe(':drop(chart)', function () {
+
+    describe('DOCX', function () {
       it('should replace the drop(chart) by hideBegin/hideEnd - basic chart', function (done) {
         const content = (expected) => {
           expected = expected ?? false;

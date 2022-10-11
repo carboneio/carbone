@@ -9,7 +9,7 @@ const preprocessor  = require('../lib/preprocessor');
 const nock      = require('nock');
 const barcodeFormatter = require('../formatters/barcode');
 
-describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
+describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -611,7 +611,7 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
   });
 
   describe('PPTX MS document', function () {
-    describe.only('PPTX Full test', function () {
+    describe('PPTX Full test', function () {
       it('should render images into a document (simple tags and access to one element from a list)', function (done) {
         const _testedReport = 'image/pptx-simple';
         const _data = {
@@ -646,7 +646,166 @@ describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function
     });
 
     describe('PPTX preProcessPPTX', function () {
+      it('should preprocess the PPTX with images (made from PowerPoint)', function (done) {
 
+        const getContent = (result) => {
+          result = result || false;
+          return '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+          '<p:sld>'+
+            '<p:pic>' +
+              '<p:nvPicPr>' +
+                  result === true ? '<p:cNvPr id="5" name="Picture 4" descr="">' : '<p:cNvPr id="5" name="Picture 4" descr="{d.image}">' +
+                  '<a:extLst>' +
+                    '<a:ext uri="{FF2B5EF4-FFF2-40B4-BE49-F238E27FC236}">' +
+                      '<a16:creationId xmlns:a16="http://schemas.microsoft.com/office/drawing/2014/main" id="{75F52970-A337-F7FC-90B6-5B954AC9558F}"/>' +
+                    '</a:ext>' +
+                  '</a:extLst>' +
+                '</p:cNvPr>' +
+                '<p:cNvPicPr>' +
+                  '<a:picLocks noChangeAspect="1"/>' +
+                '</p:cNvPicPr>' +
+                '<p:nvPr/>' +
+              '</p:nvPicPr>' +
+              '<p:blipFill>' +
+                result === true ? '<a:blip r:embed="{d.image:generateImageDocxReference(slide1.xml)}"/>' : '<a:blip r:embed="rId2"/>' +
+                '<a:stretch>' +
+                  '<a:fillRect/>' +
+                '</a:stretch>' +
+              '</p:blipFill>' +
+              '<p:spPr>' +
+                '<a:xfrm>' +
+                  '<a:off x="2660007" y="924548"/>' +
+                  result === true ? '<a:ext cx="{d.image:scaleImage(width, 6871986, emu, fillWidth)}" cy="{d.image:scaleImage(height, 4581324, emu, fillWidth)}"/>' : '<a:ext cx="6871986" cy="4581324"/>' +
+                '</a:xfrm>' +
+                '<a:prstGeom prst="rect">' +
+                  '<a:avLst/>' +
+                '</a:prstGeom>' +
+              '</p:spPr>' +
+            '</p:pic>' +
+          '</p:sld>';
+        };
+
+        let template = {
+          files : [
+            {
+              name : 'ppt/slides/slide1.xml',
+              data : getContent()
+            }
+          ]
+        };
+        image.preProcessPPTX(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
+        helperTest.assert(template.files[0].data, getContent(true));
+        done();
+      });
+
+      it('should throw an error if a list is printed', function (done) {
+
+        const getContent = (version) => {
+          return '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+          '<p:sld>'+
+            '<p:pic>' +
+              '<p:nvPicPr>' +
+                  (version === 1 ? '<p:cNvPr id="5" name="Picture 4" descr="{d.list[i].test}">' : '<p:cNvPr id="5" name="Picture 4" descr="{d.list[i+1].test}">') +
+                  '<a:extLst>' +
+                    '<a:ext uri="{FF2B5EF4-FFF2-40B4-BE49-F238E27FC236}">' +
+                      '<a16:creationId xmlns:a16="http://schemas.microsoft.com/office/drawing/2014/main" id="{75F52970-A337-F7FC-90B6-5B954AC9558F}"/>' +
+                    '</a:ext>' +
+                  '</a:extLst>' +
+                '</p:cNvPr>' +
+                '<p:cNvPicPr>' +
+                  '<a:picLocks noChangeAspect="1"/>' +
+                '</p:cNvPicPr>' +
+                '<p:nvPr/>' +
+              '</p:nvPicPr>' +
+              '<p:blipFill>' +
+                '<a:blip r:embed="rId2"/>' +
+                '<a:stretch>' +
+                  '<a:fillRect/>' +
+                '</a:stretch>' +
+              '</p:blipFill>' +
+              '<p:spPr>' +
+                '<a:xfrm>' +
+                  '<a:off x="2660007" y="924548"/>' +
+                  '<a:ext cx="6871986" cy="4581324"/>' +
+                '</a:xfrm>' +
+                '<a:prstGeom prst="rect">' +
+                  '<a:avLst/>' +
+                '</a:prstGeom>' +
+              '</p:spPr>' +
+            '</p:pic>' +
+          '</p:sld>';
+        };
+
+        let template = {
+          files : [
+            {
+              name : 'ppt/slides/slide1.xml',
+              data : getContent(1)
+            }
+          ]
+        };
+        assert.throws(() => image.preProcessPPTX(template), Error('PPTX templates do not support list of images "d.list[i].test".'));
+        template.files[0].data = getContent(2);
+        assert.throws(() => image.preProcessPPTX(template), Error('PPTX templates do not support list of images "d.list[i+1].test".'));
+        done();
+      });
+
+      it.only('should preprocess the PPTX with barcodes (made from PowerPoint)', function (done) {
+
+        const getContent = (result) => {
+          result = result || false;
+          return '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+          '<p:sld>'+
+            '<p:pic>' +
+              '<p:nvPicPr>' +
+                  (result === true ? '<p:cNvPr id="5" name="Picture 4" descr="">' : '<p:cNvPr id="5" name="Picture 4" descr="{d.image:barcode(code39)}">') +
+                  '<a:extLst>' +
+                    '<a:ext uri="{FF2B5EF4-FFF2-40B4-BE49-F238E27FC236}">' +
+                      '<a16:creationId xmlns:a16="http://schemas.microsoft.com/office/drawing/2014/main" id="{75F52970-A337-F7FC-90B6-5B954AC9558F}"/>' +
+                    '</a:ext>' +
+                  '</a:extLst>' +
+                '</p:cNvPr>' +
+                '<p:cNvPicPr>' +
+                  '<a:picLocks noChangeAspect="1"/>' +
+                '</p:cNvPicPr>' +
+                '<p:nvPr/>' +
+              '</p:nvPicPr>' +
+              '<p:blipFill>' +
+                (result === true ? '<a:blip r:embed="{d.image:isImage:barcode(code39):generateImageDocxReference(slide1.xml)}"/>' : '<a:blip r:embed="rId2"/>') +
+                '<a:stretch>' +
+                  '<a:fillRect/>' +
+                '</a:stretch>' +
+              '</p:blipFill>' +
+              '<p:spPr>' +
+                '<a:xfrm>' +
+                  '<a:off x="2660007" y="924548"/>' +
+                  (result === true ? '<a:ext cx="{d.image:isImage:barcode(code39):scaleImage(width, 6871986, emu, fillWidth)}" cy="{d.image:isImage:barcode(code39):scaleImage(height, 4581324, emu, fillWidth)}"/>' : '<a:ext cx="6871986" cy="4581324"/>') +
+                '</a:xfrm>' +
+                '<a:prstGeom prst="rect">' +
+                  '<a:avLst/>' +
+                '</a:prstGeom>' +
+              '</p:spPr>' +
+            '</p:pic>' +
+          '</p:sld>';
+        };
+
+        let template = {
+          files : [
+            {
+              name : 'ppt/slides/slide1.xml',
+              data : getContent(false)
+            }
+          ]
+        };
+        image.preProcessPPTX(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
+        helperTest.assert(template.files[0].data, getContent(true));
+        done();
+      });
     });
 
     describe('PPTX postProcessPPTX', function () {

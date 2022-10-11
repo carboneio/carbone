@@ -12,7 +12,6 @@
 
 ### v4.5.1
   - Release October 7th 2022
-  - aggregators converts string to floats. `null` or `undefined` values are converted to
   - Added for the `:drop(element)` formatter:
     - ODP templates are supported
     - A new argument `slide` is available for ODP template only to delete slides. Usage: `{d.value:ifEM:drop(slide)}`.

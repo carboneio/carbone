@@ -1,6 +1,11 @@
+### v4.X.X
+  - Added for **PPTX** templates:
+    - Dynamic images are supported. Set the Carbone tag into the image alternative text. It is not possible to create a loop of images.
+    - All barcodes are supported. Set the Carbone tag into the image alternative text and chain the `:barcode(type)`, such as creating a QR Code: `{d.productCode:barcode(qrcode)}`.
+
 ### v4.5.2
   - Release October 9th 2022
-  - ⭐️ Add the possibility to store values in data with new formatter `:set(d.value)`. Known limits: 
+  - ⭐️ Add the possibility to store values in data with new formatter `:set(d.value)`. Known limits:
     - accepts only to store values at the root level of `d`, and only in `d`.
     - cannot be used in aliases
   - Fix aggregators `aggSum`, `aggAvg`, `aggMin`, `aggMax`, `aggCount` when used with filters (without iterators) like `{d.cars[id=1].wheels[size=100].makers[].qty:aggSum}`
@@ -12,7 +17,7 @@
   - Added for the `:drop(element)` formatter:
     - ODP templates are supported
     - A new argument `slide` is available for ODP template only to delete slides. Usage: `{d.value:ifEM:drop(slide)}`.
-    - `drop(p, nbrParagraphs)` accepts a second parameter `nbrParagraphs` to delete multiple paragraphs at once. For instance `{d.data:ifEM:drop(p, 3)}`, meaning 
+    - `drop(p, nbrParagraphs)` accepts a second parameter `nbrParagraphs` to delete multiple paragraphs at once. For instance `{d.data:ifEM:drop(p, 3)}`, meaning
       the current and next two paragraph will be removed if the condition is validated. By default, the formatter `:drop(p)` hides only the current paragraph.
   - aggregators (`aggSum`, `aggAvg`, ...) convert string to floats. `null` or `undefined` values are converted to
     - aggSum : 0

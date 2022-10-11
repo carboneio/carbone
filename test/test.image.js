@@ -753,7 +753,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
 
-      it.only('should preprocess the PPTX with barcodes (made from PowerPoint)', function (done) {
+      it('should preprocess the PPTX with barcodes (made from PowerPoint)', function (done) {
 
         const getContent = (result) => {
           result = result || false;
@@ -809,7 +809,53 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     });
 
     describe('PPTX postProcessPPTX', function () {
+      it('should do nothing if imageDatabase is empty', function () {
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>';
+        const _template = {
+          files : [{
+            name : 'ppt/slides/_rels/slide1.xml.rels',
+            data : _expectedContent
+          }]
+        };
+        const _options = {
+          imageDatabase : new Map()
+        };
+        image.postProcessDocx(_template, null, _options);
+        helperTest.assert(_template.files[0].data, _expectedContent);
+      });
 
+      it('should add an image references into "ppt/slides/_rels/slide1.xml.rels" by using imageDatabase and update the content_type.xml', function () {
+        const _template = {
+          files : [{
+            name : 'ppt/slides/_rels/slide1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image1.jpg"/></Relationships>',
+          },
+          {
+            name : '[Content_Types].xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image1.jpg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>';
+        const _expectedContentType = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/></Types>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('carbone.io/logo.png', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'slide1.xml' ],
+          extension : 'png'
+        });
+        image.postProcessPPTX(_template, null, _options);
+
+        helperTest.assert(_template.files[0], {
+          name   : 'ppt/media/CarboneImage0.png',
+          parent : '',
+          data   : '1234'
+        });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+        helperTest.assert(_template.files[2].data, _expectedContentType);
+      });
     });
   });
 

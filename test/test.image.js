@@ -1,3 +1,4 @@
+/* eslint-disable max-statements-per-line */
 const assert    = require('assert');
 const helperTest = require('./helper');
 const carbone   = require('../lib/index');
@@ -8,7 +9,7 @@ const preprocessor  = require('../lib/preprocessor');
 const nock      = require('nock');
 const barcodeFormatter = require('../formatters/barcode');
 
-describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
+describe.only('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
   const _imageFRBase64jpgWithoutType = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_jpg.txt'       ), 'utf8');
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
@@ -609,6 +610,50 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     });
   });
 
+  describe('PPTX MS document', function () {
+    describe.only('PPTX Full test', function () {
+      it('should render images into a document (simple tags and access to one element from a list)', function (done) {
+        const _testedReport = 'image/pptx-simple';
+        const _data = {
+          image  : _imageDEBase64jpg,
+          image2 : _imageLogoBase64jpg,
+          image3 : _imageLogoBase64jpg,
+          list   : [
+            { image4 : _imageFRBase64jpg }
+          ]
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
+          helperTest.assert(err+'', 'null');
+          done();
+        });
+      });
+
+      it('should do nothing if the template does not include Carbone tags', function (done) {
+        const _testedReport = 'image/pptx-simple-without-marker';
+        const _data = {
+          image  : _imageDEBase64jpg,
+          image2 : _imageLogoBase64jpg,
+          image3 : _imageLogoBase64jpg,
+          list   : [
+            { image4 : _imageFRBase64jpg }
+          ]
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
+          helperTest.assert(err+'', 'null');
+          done();
+        });
+      });
+    });
+
+    describe('PPTX preProcessPPTX', function () {
+
+    });
+
+    describe('PPTX postProcessPPTX', function () {
+
+    });
+  });
+
   describe('DOCX MS document', function () {
     describe('[Full test] DOCX', function () {
 
@@ -768,16 +813,16 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             + '    <w:t>{d[i+1, type=3].type}</w:t>'
             + '</w:r>'
           )
-          + '</w:p>'
-        }
+          + '</w:p>';
+        };
         var _report = {
           isZipped   : false,
           filename   : 'template.docx',
           embeddings : [],
           extension  : 'docx',
           files      : [
-            {name : 'word/document.xml', parent : '' , data : _xml()   , isMarked   : true},
-            {name : 'word/other.xml'   , parent : '' , data : '<p></p>', isMarked   : true}
+            {name : 'word/document.xml', parent : '' , data : _xml()   , isMarked : true},
+            {name : 'word/other.xml'   , parent : '' , data : '<p></p>', isMarked : true}
           ]
         };
         carbone.render(_report, [{ type : 3 }, { type : 1 }], function (err, res) {
@@ -1688,7 +1733,6 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             newImageHeight : 3600000
           };
           image._computeImageSize(_imageInfo);
-          console.log(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 900000);
           helperTest.assert(_imageInfo.imageHeight, 1800000);
 

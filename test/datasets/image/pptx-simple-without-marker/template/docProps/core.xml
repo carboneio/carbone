@@ -1,2 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>PowerPoint Presentation</dc:title><dc:creator>Steeve Payraudeau</dc:creator><cp:lastModifiedBy>Steeve Payraudeau</cp:lastModifiedBy><cp:revision>6</cp:revision><dcterms:created xsi:type="dcterms:W3CDTF">2022-10-07T05:23:05Z</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">2022-10-11T10:11:11Z</dcterms:modified></cp:coreProperties>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dc:title>
+    PowerPoint Presentation
+  </dc:title>
+  <dc:creator>
+    Steeve Payraudeau
+  </dc:creator>
+  <cp:lastModifiedBy>
+    Steeve Payraudeau
+  </cp:lastModifiedBy>
+  <cp:revision>
+    9
+  </cp:revision>
+  <dcterms:created xsi:type="dcterms:W3CDTF">
+    2022-10-07T05:23:05Z
+  </dcterms:created>
+  <dcterms:modified xsi:type="dcterms:W3CDTF">
+    2022-10-13T10:54:09Z
+  </dcterms:modified>
+</cp:coreProperties>

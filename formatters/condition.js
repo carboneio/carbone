@@ -330,9 +330,7 @@ function ifNIN (d, value) {
 
 
 /**
- * Matches values where the type equals a specified value.
- * 
- * Only "string" type is checked for the moment.
+ * Tests the type of the operand's value.
  *
  * @version 4.4.0
  * @exampleContextFormatter [ 0        , "string" ] false
@@ -346,12 +344,15 @@ function ifNIN (d, value) {
  * @exampleContextFormatter [ ""       , "string" ] true
  *
  * @param {Integer|String|Array} d
- * @param {String} type can be "string". If you need to check more types, please contact the support. We will add the type within the day.
+ * @param {String} type can be "string", "number", "boolean", "object", "array".
  * @returns It returns the initial value `d`. The state of the condition is not returned.
  */
 function ifTE (d, type) {
   var _result = false;
-  if (typeof(d) === type && type === 'string') {
+  if (type === 'array' && Array.isArray(d) === true) {
+    _result = true;
+  }
+  else if (typeof(d) === type && (type === 'string' || type === 'number' || type === 'boolean' || (type === 'object' && Array.isArray(d) === false))) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);

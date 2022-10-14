@@ -565,6 +565,98 @@ describe('formatter', function () {
         ];
         testCondition('ifTE', _dataSet, true);
       });
+
+      it('should turn the `isConditionTrue` to false if a data is not a number', function () {
+        const _dataSet = [
+          ['undefined'      , 'number'],
+          ['null'           , 'number'],
+          [true             , 'number'],
+          [false            , 'number'],
+          [undefined        , 'number'],
+          [null             , 'number'],
+          [{value : 'john'} , 'number'],
+          [[1, 2, 3]        , 'number']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a number', function () {
+        const _dataSet = [
+          [2          , 'number'],
+          [3.14       , 'number'],
+          [Infinity   , 'number'],
+          [NaN        , 'number']
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a boolean', function () {
+        const _dataSet = [
+          ['undefined'      , 'boolean'],
+          ['null'           , 'boolean'],
+          [3.14             , 'boolean'],
+          [1                , 'boolean'],
+          [undefined        , 'boolean'],
+          [null             , 'boolean'],
+          [{value : 'john'} , 'boolean'],
+          [[1, 2, 3]        , 'boolean']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a boolean', function () {
+        const _dataSet = [
+          [true          , 'boolean'],
+          [false         , 'boolean']
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a object', function () {
+        const _dataSet = [
+          ['undefined'      , 'object'],
+          ['null'           , 'object'],
+          [3.14             , 'object'],
+          [1                , 'object'],
+          [undefined        , 'object'],
+          [true             , 'object'],
+          [false            , 'object'],
+          [[1, 2, 3]        , 'object']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a object', function () {
+        const _dataSet = [
+          [{ a : 1 }  , 'object'],
+          [{}         , 'object'],
+          [null       , 'object'],
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a array', function () {
+        const _dataSet = [
+          ['undefined'      , 'array'],
+          ['null'           , 'array'],
+          [3.14             , 'array'],
+          [1                , 'array'],
+          [undefined        , 'array'],
+          [true             , 'array'],
+          [false            , 'array'],
+          [{value : 'john'} , 'array'],
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a array', function () {
+        const _dataSet = [
+          [[1, 2, 3]  , 'array'],
+          [[]         , 'array'],
+          [[{a : 1}]  , 'array'],
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
     });
 
     describe('ifGT', function () {

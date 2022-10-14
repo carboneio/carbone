@@ -1,5 +1,6 @@
 ### v4.X.X
   - Added the option `table` for the `:drop(element)` formatter to delete table conditionally. Available for DOCX, ODT and ODP templates. Usage: `{d.value:ifEM:drop(table)}`. The tag must be located within a table cell.
+  - Added types for the `ifTE(type)` formatter: `boolean`, `array`, `object`, `number`. Usage: `{d.value:ifTE(number):show('It is a number!')}`, the conditional formatter checks if the type of the value is a number.
 
 ### v4.5.2
   - Release October 9th 2022

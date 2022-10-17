@@ -1,4 +1,5 @@
 ### v4.X.X
+  - Added the option `table` for the `:drop(element)` formatter to delete table conditionally. Available for DOCX, ODT and ODP templates. Usage: `{d.value:ifEM:drop(table)}`. The tag must be located within a table cell.
   - Added for **PPTX** templates:
     - Dynamic images are supported. Set the Carbone tag into the image alternative text. It is not possible to create a loop of images.
     - All barcodes are supported. Set the Carbone tag into the image alternative text and chain the `:barcode(type)`, such as creating a QR Code: `{d.productCode:barcode(qrcode)}`.
@@ -65,6 +66,7 @@
   - Release September 12st 2022
   - `hide` formatter becomes `drop` to avoid confusion with `hideBegin/hideEnd/show`. `hide` was introduced in 4.2 and is still not offically documented.
   - `drop(row, nbrRows)` accepts a second parameter to select the number of row to remove
+  - `drop` formatter can't be used into Carbone aliases.
 
 ### v4.2.0
   - Release September 8st 2022

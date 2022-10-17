@@ -1041,6 +1041,36 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should print a counter which depends on the sorting iterator `.i` (used by Santhapat - stpi.co.th)', function (done) {
+      var _xml = ''+
+      '<xml>'+
+        '<t_row>{d.list[PIECE_MARK, i].PIECE_MARK:count(.i):ifEQ(1):show(.PIECE_MARK):elseShow(\'\')} {d.list[PIECE_MARK, i].JOINT_WELD}</t_row>'+
+        '<t_row>{d.list[PIECE_MARK+1, i+1]}</t_row>'+
+      '</xml>';
+      var _data = {
+        list : [
+          { PIECE_MARK : '225B-MD-4SC4', JOINT_WELD : 'C501' },
+          { PIECE_MARK : '225B-MD-4SC4', JOINT_WELD : 'C502' },
+          { PIECE_MARK : '225B-MD-4SC4', JOINT_WELD : 'C503' },
+          { PIECE_MARK : '225B-MD-3GB12', JOINT_WELD : 'B501' },
+          { PIECE_MARK : '225B-MD-3GB12', JOINT_WELD : 'B502' },
+          { PIECE_MARK : '225B-MD-3GB12', JOINT_WELD : 'B503' },
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '' +
+          '<xml>'+
+            '<t_row>225B-MD-3GB12 B501</t_row>'+
+            '<t_row> B502</t_row>'+
+            '<t_row> B503</t_row>'+
+            '<t_row>225B-MD-4SC4 C501</t_row>'+
+            '<t_row> C502</t_row>'+
+            '<t_row> C503</t_row>'+
+          '</xml>'
+        );
+        done();
+      });
+    });
     it('should print a counter which start by 1 and 0', function (done) {
       var _xml =
          '<xml>'
@@ -1756,7 +1786,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in variable names', function (done) {
         var data = {
           o           : { id : 2 },
-          'r🚀cket'   : { id : 3 },
+          'r🚀cket'    : { id : 3 },
           'qu\\\'ote' : { id : 4 },
           报道          : { id : 5 },
           'qu\'ote'   : { id : 6 }
@@ -1770,7 +1800,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in arrays', function (done) {
         var data = [{
           o           : { id : 2 },
-          'r🚀cket'   : { id : 3 },
+          'r🚀cket'    : { id : 3 },
           'qu\\\'ote' : { id : 4 },
           报道          : { id : 5 },
           'qu\'ote'   : { id : 6 }
@@ -1784,7 +1814,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in arrays conditions', function (done) {
         var data = [{
           o           : { id : 2, 'i💎d' : 200, 'i\\\'d' : 2000 },
-          'r🚀cket'   : { id : 3, 'i💎d' : 300, 'i\\\'d' : 3000 },
+          'r🚀cket'    : { id : 3, 'i💎d' : 300, 'i\\\'d' : 3000 },
           'qu\\\'ote' : { id : 4, 'i💎d' : 400, 'i\\\'d' : 4000 },
           报道          : { id : 5, 'i💎d' : 500, 'i\\\'d' : 5000 },
           'qu"ote'    : { id : 6, 'i💎d' : 600, 'i"d' : 600 },
@@ -1792,7 +1822,7 @@ describe('Carbone', function () {
         },
         {
           o           : { id : 12, 'i💎d' : 1200, 'i\\\'d' : 1200 },
-          'r🚀cket'   : { id : 13, 'i💎d' : 1300, 'i\\\'d' : 1300 },
+          'r🚀cket'    : { id : 13, 'i💎d' : 1300, 'i\\\'d' : 1300 },
           'qu\\\'ote' : { id : 14, 'i💎d' : 1400, 'i\\\'d' : 1400 },
           报道          : { id : 15, 'i💎d' : 1500, 'i\\\'d' : 1500 },
           'qu"ote'    : { id : 16, 'i💎d' : 1600, 'i"d' : 1600 },

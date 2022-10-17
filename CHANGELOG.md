@@ -1,5 +1,6 @@
 ### v4.X.X
   - Added the option `table` for the `:drop(element)` formatter to delete table conditionally. Available for DOCX, ODT and ODP templates. Usage: `{d.value:ifEM:drop(table)}`. The tag must be located within a table cell.
+  - Add user-agent `Carbone` when webhook is called. Print HTTP status webhook response in logs.
 
 ### v4.5.2
   - Release October 9th 2022

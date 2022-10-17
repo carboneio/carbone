@@ -4,6 +4,7 @@ const os = require('os');
 
 function beforeRender (req, res, data, options, next) {
   options.renderPrefix = 'REPORT';
+  req.isProd = true;
   next();
 }
 

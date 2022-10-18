@@ -1,4 +1,5 @@
-### v4.X.X
+### v4.6.0
+  - Release October 18th 2022
   - Added the option `table` for the `:drop(element)` formatter to delete table conditionally. Available for DOCX, ODT and ODP templates. Usage: `{d.value:ifEM:drop(table)}`. The tag must be located within a table cell.
   - Added for **PPTX** templates:
     - Dynamic images are supported. Set the Carbone tag into the image alternative text. It is not possible to create a loop of images.

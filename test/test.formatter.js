@@ -542,6 +542,10 @@ describe('formatter', function () {
       it('should turn the `isConditionTrue` to false if a data is not a string', function () {
         const _dataSet = [
           [0                , 'string'],
+          [-0               , 'string'],
+          [-21              , 'string'],
+          [NaN              , 'string'],
+          [() => {}         , 'string'],
           [22.2222          , 'string'],
           [true             , 'string'],
           [false            , 'string'],
@@ -552,7 +556,6 @@ describe('formatter', function () {
         ];
         testCondition('ifTE', _dataSet, false);
       });
-
       it('should turn the `isConditionTrue` to true if the data is a string', function () {
         const _dataSet = [
           [''          , 'string'],
@@ -560,6 +563,7 @@ describe('formatter', function () {
           ['22.2222'   , 'string'],
           ['true'      , 'string'],
           ['false'     , 'string'],
+          ['è#@&é'     , 'string'],
           ['undefined' , 'string'],
           ['null'      , 'string']
         ];
@@ -572,6 +576,11 @@ describe('formatter', function () {
           ['null'           , 'number'],
           [true             , 'number'],
           [false            , 'number'],
+          ['1.000'          , 'number'],
+          ['-1.000'         , 'number'],
+          ['a12'            , 'number'],
+          [NaN              , 'number'],
+          [() => {}         , 'number'],
           [undefined        , 'number'],
           [null             , 'number'],
           [{value : 'john'} , 'number'],
@@ -583,9 +592,9 @@ describe('formatter', function () {
       it('should turn the `isConditionTrue` to true if the data is a number', function () {
         const _dataSet = [
           [2          , 'number'],
+          [-2         , 'number'],
           [3.14       , 'number'],
-          [Infinity   , 'number'],
-          [NaN        , 'number']
+          [Infinity   , 'number']
         ];
         testCondition('ifTE', _dataSet, true);
       });
@@ -596,6 +605,12 @@ describe('formatter', function () {
           ['null'           , 'boolean'],
           [3.14             , 'boolean'],
           [1                , 'boolean'],
+          [NaN              , 'boolean'],
+          [0                , 'boolean'],
+          ['false'          , 'boolean'],
+          ['true'           , 'boolean'],
+          ['0'              , 'boolean'],
+          ['1'              , 'boolean'],
           [undefined        , 'boolean'],
           [null             , 'boolean'],
           [{value : 'john'} , 'boolean'],
@@ -619,6 +634,10 @@ describe('formatter', function () {
           [3.14             , 'object'],
           [1                , 'object'],
           [undefined        , 'object'],
+          [NaN              , 'object'],
+          [null             , 'object'],
+          [() => {}         , 'object'],
+          ['aa'             , 'object'],
           [true             , 'object'],
           [false            , 'object'],
           [[1, 2, 3]        , 'object']
@@ -629,8 +648,7 @@ describe('formatter', function () {
       it('should turn the `isConditionTrue` to true if the data is a object', function () {
         const _dataSet = [
           [{ a : 1 }  , 'object'],
-          [{}         , 'object'],
-          [null       , 'object'],
+          [{}         , 'object']
         ];
         testCondition('ifTE', _dataSet, true);
       });
@@ -641,6 +659,9 @@ describe('formatter', function () {
           ['null'           , 'array'],
           [3.14             , 'array'],
           [1                , 'array'],
+          [NaN              , 'array'],
+          [null             , 'array'],
+          ['a'              , 'array'],
           [undefined        , 'array'],
           [true             , 'array'],
           [false            , 'array'],
@@ -648,12 +669,70 @@ describe('formatter', function () {
         ];
         testCondition('ifTE', _dataSet, false);
       });
-
       it('should turn the `isConditionTrue` to true if the data is a array', function () {
         const _dataSet = [
           [[1, 2, 3]  , 'array'],
           [[]         , 'array'],
           [[{a : 1}]  , 'array'],
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('[binary] should turn the `isConditionTrue` to false if a data is not a binary', function () {
+        const _dataSet = [
+          ['undefined'      , 'binary'],
+          ['null'           , 'binary'],
+          [3.14             , 'binary'],
+          ['10'             , 'binary'],
+          [-1               , 'binary'],
+          [NaN              , 'binary'],
+          [undefined        , 'binary'],
+          [null             , 'binary'],
+          [{value : 'john'} , 'binary'],
+          [[1, 2, 3]        , 'binary']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+      it('should turn the `isConditionTrue` to true if the data is a binary', function () {
+        const _dataSet = [
+          [false    , 'binary'],
+          [true     , 'binary'],
+          ['false'  , 'binary'],
+          ['true'   , 'binary'],
+          ['0'      , 'binary'],
+          ['1'      , 'binary'],
+          [0        , 'binary'],
+          [1        , 'binary'],
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a integer', function () {
+        const _dataSet = [
+          ['undefined'      , 'integer'],
+          ['null'           , 'integer'],
+          [true             , 'integer'],
+          [false            , 'integer'],
+          ['1.000'          , 'integer'],
+          ['1000'           , 'integer'],
+          ['-1.000'         , 'integer'],
+          ['a12'            , 'integer'],
+          [NaN              , 'integer'],
+          [3.1              , 'integer'],
+          [() => {}         , 'integer'],
+          [undefined        , 'integer'],
+          [null             , 'integer'],
+          [{value : 'john'} , 'integer'],
+          [[1, 2, 3]        , 'integer']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+      it('should turn the `isConditionTrue` to true if the data is a integer', function () {
+        const _dataSet = [
+          [545454     , 'integer'],
+          [2          , 'integer'],
+          [-2         , 'integer'],
+          [0          , 'integer']
         ];
         testCondition('ifTE', _dataSet, true);
       });

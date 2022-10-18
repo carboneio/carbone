@@ -1,3 +1,4 @@
+/* eslint-disable max-statements-per-line */
 const assert    = require('assert');
 const helperTest = require('./helper');
 const carbone   = require('../lib/index');
@@ -609,6 +610,255 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     });
   });
 
+  describe('PPTX MS document', function () {
+    describe('PPTX Full test', function () {
+      it('should render images into a document (simple tags and access to one element from a list)', function (done) {
+        const _testedReport = 'image/pptx-simple';
+        const _data = {
+          image  : _imageDEBase64jpg,
+          image2 : _imageLogoBase64jpg,
+          image3 : _imageLogoBase64jpg,
+          list   : [
+            { image4 : _imageFRBase64jpg }
+          ]
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
+          helperTest.assert(err+'', 'null');
+          done();
+        });
+      });
+
+      it('should do nothing if the template does not include Carbone tags', function (done) {
+        const _testedReport = 'image/pptx-simple-without-marker';
+        const _data = {
+          image  : _imageDEBase64jpg,
+          image2 : _imageLogoBase64jpg,
+          image3 : _imageLogoBase64jpg,
+          list   : [
+            { image4 : _imageFRBase64jpg }
+          ]
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
+          helperTest.assert(err+'', 'null');
+          done();
+        });
+      });
+    });
+
+    describe('PPTX preProcessPPTX', function () {
+      it('should preprocess the PPTX with images (made from PowerPoint)', function (done) {
+
+        const getContent = (result) => {
+          result = result || false;
+          return '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+          '<p:sld>'+
+            '<p:pic>' +
+              '<p:nvPicPr>' +
+                  result === true ? '<p:cNvPr id="5" name="Picture 4" descr="">' : '<p:cNvPr id="5" name="Picture 4" descr="{d.image}">' +
+                  '<a:extLst>' +
+                    '<a:ext uri="{FF2B5EF4-FFF2-40B4-BE49-F238E27FC236}">' +
+                      '<a16:creationId xmlns:a16="http://schemas.microsoft.com/office/drawing/2014/main" id="{75F52970-A337-F7FC-90B6-5B954AC9558F}"/>' +
+                    '</a:ext>' +
+                  '</a:extLst>' +
+                '</p:cNvPr>' +
+                '<p:cNvPicPr>' +
+                  '<a:picLocks noChangeAspect="1"/>' +
+                '</p:cNvPicPr>' +
+                '<p:nvPr/>' +
+              '</p:nvPicPr>' +
+              '<p:blipFill>' +
+                result === true ? '<a:blip r:embed="{d.image:generateImageDocxReference(slide1.xml)}"/>' : '<a:blip r:embed="rId2"/>' +
+                '<a:stretch>' +
+                  '<a:fillRect/>' +
+                '</a:stretch>' +
+              '</p:blipFill>' +
+              '<p:spPr>' +
+                '<a:xfrm>' +
+                  '<a:off x="2660007" y="924548"/>' +
+                  result === true ? '<a:ext cx="{d.image:scaleImage(width, 6871986, emu, fillWidth)}" cy="{d.image:scaleImage(height, 4581324, emu, fillWidth)}"/>' : '<a:ext cx="6871986" cy="4581324"/>' +
+                '</a:xfrm>' +
+                '<a:prstGeom prst="rect">' +
+                  '<a:avLst/>' +
+                '</a:prstGeom>' +
+              '</p:spPr>' +
+            '</p:pic>' +
+          '</p:sld>';
+        };
+
+        let template = {
+          files : [
+            {
+              name : 'ppt/slides/slide1.xml',
+              data : getContent()
+            }
+          ]
+        };
+        image.preProcessPPTX(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
+        helperTest.assert(template.files[0].data, getContent(true));
+        done();
+      });
+
+      it('should throw an error if a list is printed', function (done) {
+
+        const getContent = (version) => {
+          return '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+          '<p:sld>'+
+            '<p:pic>' +
+              '<p:nvPicPr>' +
+                  (version === 1 ? '<p:cNvPr id="5" name="Picture 4" descr="{d.list[i].test}">' : '<p:cNvPr id="5" name="Picture 4" descr="{d.list[i+1].test}">') +
+                  '<a:extLst>' +
+                    '<a:ext uri="{FF2B5EF4-FFF2-40B4-BE49-F238E27FC236}">' +
+                      '<a16:creationId xmlns:a16="http://schemas.microsoft.com/office/drawing/2014/main" id="{75F52970-A337-F7FC-90B6-5B954AC9558F}"/>' +
+                    '</a:ext>' +
+                  '</a:extLst>' +
+                '</p:cNvPr>' +
+                '<p:cNvPicPr>' +
+                  '<a:picLocks noChangeAspect="1"/>' +
+                '</p:cNvPicPr>' +
+                '<p:nvPr/>' +
+              '</p:nvPicPr>' +
+              '<p:blipFill>' +
+                '<a:blip r:embed="rId2"/>' +
+                '<a:stretch>' +
+                  '<a:fillRect/>' +
+                '</a:stretch>' +
+              '</p:blipFill>' +
+              '<p:spPr>' +
+                '<a:xfrm>' +
+                  '<a:off x="2660007" y="924548"/>' +
+                  '<a:ext cx="6871986" cy="4581324"/>' +
+                '</a:xfrm>' +
+                '<a:prstGeom prst="rect">' +
+                  '<a:avLst/>' +
+                '</a:prstGeom>' +
+              '</p:spPr>' +
+            '</p:pic>' +
+          '</p:sld>';
+        };
+
+        let template = {
+          files : [
+            {
+              name : 'ppt/slides/slide1.xml',
+              data : getContent(1)
+            }
+          ]
+        };
+        assert.throws(() => image.preProcessPPTX(template), Error('PPTX templates do not support list of images "d.list[i].test".'));
+        template.files[0].data = getContent(2);
+        assert.throws(() => image.preProcessPPTX(template), Error('PPTX templates do not support list of images "d.list[i+1].test".'));
+        done();
+      });
+
+      it('should preprocess the PPTX with barcodes (made from PowerPoint)', function (done) {
+
+        const getContent = (result) => {
+          result = result || false;
+          return '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+          '<p:sld>'+
+            '<p:pic>' +
+              '<p:nvPicPr>' +
+                  (result === true ? '<p:cNvPr id="5" name="Picture 4" descr="">' : '<p:cNvPr id="5" name="Picture 4" descr="{d.image:barcode(code39)}">') +
+                  '<a:extLst>' +
+                    '<a:ext uri="{FF2B5EF4-FFF2-40B4-BE49-F238E27FC236}">' +
+                      '<a16:creationId xmlns:a16="http://schemas.microsoft.com/office/drawing/2014/main" id="{75F52970-A337-F7FC-90B6-5B954AC9558F}"/>' +
+                    '</a:ext>' +
+                  '</a:extLst>' +
+                '</p:cNvPr>' +
+                '<p:cNvPicPr>' +
+                  '<a:picLocks noChangeAspect="1"/>' +
+                '</p:cNvPicPr>' +
+                '<p:nvPr/>' +
+              '</p:nvPicPr>' +
+              '<p:blipFill>' +
+                (result === true ? '<a:blip r:embed="{d.image:isImage:barcode(code39):generateImageDocxReference(slide1.xml)}"/>' : '<a:blip r:embed="rId2"/>') +
+                '<a:stretch>' +
+                  '<a:fillRect/>' +
+                '</a:stretch>' +
+              '</p:blipFill>' +
+              '<p:spPr>' +
+                '<a:xfrm>' +
+                  '<a:off x="2660007" y="924548"/>' +
+                  (result === true ? '<a:ext cx="{d.image:isImage:barcode(code39):scaleImage(width, 6871986, emu, fillWidth)}" cy="{d.image:isImage:barcode(code39):scaleImage(height, 4581324, emu, fillWidth)}"/>' : '<a:ext cx="6871986" cy="4581324"/>') +
+                '</a:xfrm>' +
+                '<a:prstGeom prst="rect">' +
+                  '<a:avLst/>' +
+                '</a:prstGeom>' +
+              '</p:spPr>' +
+            '</p:pic>' +
+          '</p:sld>';
+        };
+
+        let template = {
+          files : [
+            {
+              name : 'ppt/slides/slide1.xml',
+              data : getContent(false)
+            }
+          ]
+        };
+        image.preProcessPPTX(template);
+        preprocessor.generateUniqueIds(template); // called separately for shapes
+        helperTest.assert(template.files[0].data, getContent(true));
+        done();
+      });
+    });
+
+    describe('PPTX postProcessPPTX', function () {
+      it('should do nothing if imageDatabase is empty', function () {
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.jpeg"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/><Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>\n</Relationships>';
+        const _template = {
+          files : [{
+            name : 'ppt/slides/_rels/slide1.xml.rels',
+            data : _expectedContent
+          }]
+        };
+        const _options = {
+          imageDatabase : new Map()
+        };
+        image.postProcessDocx(_template, null, _options);
+        helperTest.assert(_template.files[0].data, _expectedContent);
+      });
+
+      it('should add an image references into "ppt/slides/_rels/slide1.xml.rels" by using imageDatabase and update the content_type.xml', function () {
+        const _template = {
+          files : [{
+            name : 'ppt/slides/_rels/slide1.xml.rels',
+            data : '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image1.jpg"/></Relationships>',
+          },
+          {
+            name : '[Content_Types].xml',
+            data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/></Types>'
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image1.jpg"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/CarboneImage0.png" Id="rIdCarbone0"/></Relationships>';
+        const _expectedContentType = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="jpeg" ContentType="image/jpeg"/><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/></Types>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('carbone.io/logo.png', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'slide1.xml' ],
+          extension : 'png'
+        });
+        image.postProcessPPTX(_template, null, _options);
+
+        helperTest.assert(_template.files[0], {
+          name   : 'ppt/media/CarboneImage0.png',
+          parent : '',
+          data   : '1234'
+        });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+        helperTest.assert(_template.files[2].data, _expectedContentType);
+      });
+    });
+  });
+
   describe('DOCX MS document', function () {
     describe('[Full test] DOCX', function () {
 
@@ -768,16 +1018,16 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             + '    <w:t>{d[i+1, type=3].type}</w:t>'
             + '</w:r>'
           )
-          + '</w:p>'
-        }
+          + '</w:p>';
+        };
         var _report = {
           isZipped   : false,
           filename   : 'template.docx',
           embeddings : [],
           extension  : 'docx',
           files      : [
-            {name : 'word/document.xml', parent : '' , data : _xml()   , isMarked   : true},
-            {name : 'word/other.xml'   , parent : '' , data : '<p></p>', isMarked   : true}
+            {name : 'word/document.xml', parent : '' , data : _xml()   , isMarked : true},
+            {name : 'word/other.xml'   , parent : '' , data : '<p></p>', isMarked : true}
           ]
         };
         carbone.render(_report, [{ type : 3 }, { type : 1 }], function (err, res) {
@@ -1688,7 +1938,6 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             newImageHeight : 3600000
           };
           image._computeImageSize(_imageInfo);
-          console.log(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 900000);
           helperTest.assert(_imageInfo.imageHeight, 1800000);
 

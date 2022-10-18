@@ -1,5 +1,8 @@
 ### v4.X.X
   - Added the option `table` for the `:drop(element)` formatter to delete table conditionally. Available for DOCX, ODT and ODP templates. Usage: `{d.value:ifEM:drop(table)}`. The tag must be located within a table cell.
+  - Added for **PPTX** templates:
+    - Dynamic images are supported. Set the Carbone tag into the image alternative text. It is not possible to create a loop of images.
+    - All barcodes are supported. Set the Carbone tag into the image alternative text and chain the `:barcode(type)`, such as creating a QR Code: `{d.productCode:barcode(qrcode)}`.
   - Add user-agent `Carbone` when webhook is called. Print HTTP status webhook response in logs.
 
 ### v4.5.2

@@ -384,6 +384,9 @@ describe('Webserver', () => {
           if (fs.existsSync(path.join(os.tmpdir(), 'template', toDelete[i]))) {
             fs.unlinkSync(path.join(os.tmpdir(), 'template', toDelete[i]));
           }
+          if (fs.existsSync(path.join(os.tmpdir(), 'queue', toDelete[i]))) {
+            fs.unlinkSync(path.join(os.tmpdir(), 'queue', toDelete[i]));
+          }
         }
 
         toDelete = [];
@@ -527,6 +530,38 @@ describe('Webserver', () => {
         });
       });
 
+      it('should add a new item on the render queue (Webhook with plugin and authentication)', (done) => {
+        let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          }
+        };
+        const _successUrl = 'https://carbone.io/callback';
+
+        uploadFile(4001, token, () => {
+          get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token, { 'carbone-webhook-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
+            assert.strictEqual(data.success, true);
+            assert.strictEqual(data.message, 'A render ID will be sent to your callback URL when the document is generated');
+            assert.strictEqual(data.data.renderId, '');
+            fs.readdir(path.join(os.tmpdir(), 'queue'), function (err, data) {
+              assert.strictEqual(!err, true);
+              assert.strictEqual(data.length > 0, true);
+              const _queueItemData = JSON.parse(fs.readFileSync(path.join(os.tmpdir(), 'queue', data[0]), 'utf-8'));
+              assert.strictEqual(_queueItemData.successUrl, _successUrl);
+              assert.strictEqual(_queueItemData.templateAbsolutePath.length > 0, true);
+              assert.strictEqual(_queueItemData.req.url.length > 0, true);
+              assert.strictEqual(_queueItemData.req.method, 'Webhook POST');
+              assert.strictEqual(_queueItemData.req.headers['carbone-webhook-test'], 'true');
+              assert.strictEqual(_queueItemData.req.isProd, true);
+              toDelete.push(...data);
+              done();
+            });
+          });
+        });
+      });
+
     });
   });
 
@@ -554,6 +589,9 @@ describe('Webserver', () => {
       for (let i = 0; i < toDelete.length; i++) {
         if (fs.existsSync(path.join(__dirname, '..', 'template', toDelete[i]))) {
           fs.unlinkSync(path.join(__dirname, '..', 'template', toDelete[i]));
+        }
+        if (fs.existsSync(path.join(os.tmpdir(), 'queue', toDelete[i]))) {
+          fs.unlinkSync(path.join(os.tmpdir(), 'queue', toDelete[i]));
         }
       }
 

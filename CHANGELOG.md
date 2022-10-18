@@ -4,6 +4,7 @@
     - Dynamic images are supported. Set the Carbone tag into the image alternative text. It is not possible to create a loop of images.
     - All barcodes are supported. Set the Carbone tag into the image alternative text and chain the `:barcode(type)`, such as creating a QR Code: `{d.productCode:barcode(qrcode)}`.
   - Add user-agent `Carbone` when webhook is called. Print HTTP status webhook response in logs.
+  - Added types for the `ifTE(type)` formatter: `boolean`, `binary`, `array`, `object`, `number`, `integer`.  Usage: `{d.value:ifTE(number):show('It is a number!')}`, the conditional formatter checks if the type of the value is a number.
 
 ### v4.5.2
   - Release October 9th 2022

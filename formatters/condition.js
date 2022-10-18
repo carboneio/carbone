@@ -330,9 +330,7 @@ function ifNIN (d, value) {
 
 
 /**
- * Matches values where the type equals a specified value.
- * 
- * Only "string" type is checked for the moment.
+ * Tests the type of the operand's value.
  *
  * @version 4.4.0
  * @exampleContextFormatter [ 0        , "string" ] false
@@ -344,15 +342,56 @@ function ifNIN (d, value) {
  * @exampleContextFormatter [ "10"     , "string" ] true
  * @exampleContextFormatter [ "homer"  , "string" ] true
  * @exampleContextFormatter [ ""       , "string" ] true
+ * @exampleContextFormatter [ true     , "boolean ] true
+ * @exampleContextFormatter [ false    , "boolean ] true
+ * @exampleContextFormatter [ "0"      , "boolean ] false
+ * @exampleContextFormatter [ "false"  , "boolean ] false
+ * @exampleContextFormatter [ "0"      , "binary" ] true
+ * @exampleContextFormatter [ "1"      , "binary" ] true
+ * @exampleContextFormatter [ false    , "binary" ] true
+ * @exampleContextFormatter [ "false"  , "binary" ] true
+ * @exampleContextFormatter [ 10.5     , "number" ] true
+ * @exampleContextFormatter [ "10.5"   , "number" ] false
  *
  * @param {Integer|String|Array} d
- * @param {String} type can be "string". If you need to check more types, please contact the support. We will add the type within the day.
+ * @param {String} type can be "string", "number", "integer", "boolean", "binary", "object", "array"
  * @returns It returns the initial value `d`. The state of the condition is not returned.
  */
 function ifTE (d, type) {
   var _result = false;
-  if (typeof(d) === type && type === 'string') {
-    _result = true;
+  switch (type) {
+    case 'array':
+      _result = (d instanceof Array);
+      break;
+    case 'object':
+      _result = !(d instanceof Array) && (d instanceof Object) && (typeof d !== 'function');
+      break;
+    case 'string':
+    case 'boolean':
+      _result = typeof(d) === type;
+      break;
+    case 'number':
+      _result = typeof(d) === 'number' && !isNaN(d);
+      break;
+    case 'binary':
+      _result = typeof(d) === 'boolean' || d === 'true' || d === 'false' || /^[01]$/.test(d);
+      break;
+    case 'integer':
+      _result = typeof(d) === 'number' && d % 1 === 0 && !isNaN(d);
+      break;
+    /* If somebody asks:
+    case 'decimal':
+      _result = typeof(d) === 'number' || /^-?[0-9]+(\\.[0-9]+)?$/.test(d);
+      break;
+    case 'alpha':
+      _result = typeof(d) === 'string' && /^[a-zA-Z]+$/.test(d);
+      break;
+    case 'numeric':
+      _result = /^-?[0-9]+$/.test(d);
+      break;
+    case 'alphanumeric':
+      _result = typeof(d) === 'string' && /^[0-9a-zA-Z]+$/.test(d);
+      break; */
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
   return d;

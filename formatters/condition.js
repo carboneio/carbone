@@ -342,10 +342,10 @@ function ifNIN (d, value) {
  * @exampleContextFormatter [ "10"     , "string" ] true
  * @exampleContextFormatter [ "homer"  , "string" ] true
  * @exampleContextFormatter [ ""       , "string" ] true
- * @exampleContextFormatter [ true     , "boolean ] true
- * @exampleContextFormatter [ false    , "boolean ] true
- * @exampleContextFormatter [ "0"      , "boolean ] false
- * @exampleContextFormatter [ "false"  , "boolean ] false
+ * @exampleContextFormatter [ true     , "boolean" ] true
+ * @exampleContextFormatter [ false    , "boolean" ] true
+ * @exampleContextFormatter [ "0"      , "boolean" ] false
+ * @exampleContextFormatter [ "false"  , "boolean" ] false
  * @exampleContextFormatter [ "0"      , "binary" ] true
  * @exampleContextFormatter [ "1"      , "binary" ] true
  * @exampleContextFormatter [ false    , "binary" ] true

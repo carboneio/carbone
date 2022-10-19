@@ -113,7 +113,7 @@ function formatI (d, patternOut, patternIn) {
  * Add a time to a date. Available units: day, week,	month, quarter, year, hour, minute, second and millisecond.
  * Units are case insensitive, and support plural and short forms.
  *
- * @version 3.0.0 new
+ * @version 3.0.0
  *
  * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
  * @example ["2017-05-10T15:57:23.769561+03:00", "3", "day"]
@@ -140,7 +140,7 @@ function addD (d, amount, unit, patternIn) {
  * Subtract a time to a date. Available units: day, week,	month, quarter, year, hour, minute, second and millisecond.
  * Units are case insensitive, and support plural and short forms.
  *
- * @version 3.0.0 new
+ * @version 3.0.0
  *
  * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
  * @example ["2017-05-10T15:57:23.769561+03:00", "3", "day"]
@@ -166,7 +166,7 @@ function subD (d, amount, unit, patternIn) {
  *
  * Create a date and set it to the start of a unit of time.
  *
- * @version 3.0.0 new
+ * @version 3.0.0
  *
  * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
  * @example ["2017-05-10T15:57:23.769561+03:00", "day"]
@@ -191,7 +191,7 @@ function startOfD (d, unit, patternIn) {
  *
  * Create a date and set it to the end of a unit of time.
  *
- * @version 3.0.0 new
+ * @version 3.0.0
  *
  * @exampleContext {"lang":"fr", "timezone":"Europe/Paris"}
  * @example ["2017-05-10T15:57:23.769561+03:00", "day"]
@@ -225,7 +225,7 @@ function endOfD (d, unit, patternIn) {
  *   - `millisecond(s)` or `ms`  Millisecond
  *
  * @version 4.4.0
- * 
+ *
  * @example ["20101001", "20101201" ]
  * @example ["20101001", "20101201" , "second"]
  * @example ["20101001", "20101201" , "s"     ]
@@ -235,7 +235,7 @@ function endOfD (d, unit, patternIn) {
  * @example ["20101001", "20101201" , "days"  ]
  *
  * @example ["2010+10+01", "2010=12=01", "ms" , "YYYY+MM+DD", "YYYY=MM=DD"]
- * 
+ *
  * @param      {String|Number}   d                from date
  * @param      {String|Number}   toDate           to date
  * @param      {String}          unit             The output unit: day, week, ... see the list above. Milliseconds by default.

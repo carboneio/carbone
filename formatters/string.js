@@ -171,7 +171,7 @@ function unaccent (d) {
  * - Since `v3.5.3`, using the `:convCRLF` formatter before `:html` converts `\\n` to `<br>` tags. Usage example: `{d.content:convCRLF:html}`
 
  *
- * @version 4.1.0 UPDATED
+ * @version 4.1.0
  *
  * @exampleContext { "extension" : "odt" }
  * @example [ "my blue \\n car"   ]

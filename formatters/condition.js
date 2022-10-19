@@ -332,7 +332,7 @@ function ifNIN (d, value) {
 /**
  * Tests the type of the operand's value.
  *
- * @version 4.4.0
+ * @version 4.4.0 new
  * @exampleContextFormatter [ 0        , "string" ] false
  * @exampleContextFormatter [ [23]     , "string" ] false
  * @exampleContextFormatter [ {"id":3} , "string" ] false
@@ -379,7 +379,10 @@ function ifTE (d, type) {
     case 'integer':
       _result = typeof(d) === 'number' && d % 1 === 0 && !isNaN(d);
       break;
-    /* If somebody asks:
+    /**
+     * @private
+     *
+    If somebody asks:
     case 'decimal':
       _result = typeof(d) === 'number' || /^-?[0-9]+(\\.[0-9]+)?$/.test(d);
       break;

@@ -264,7 +264,7 @@ div.isAcceptingMathExpression = true;
 /**
  * Compute modulo
  *
- * @version 4.5.2
+ * @version 4.5.2 new
  *
  * @example [4 ,  2 ]
  * @example [3 ,  2 ]

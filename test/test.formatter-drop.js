@@ -1460,6 +1460,110 @@ describe('drop formatter', function () {
           done();
         });
       });
+
+      describe(':drop(row, nbrToHide)', function () {
+
+        it('should delete multiple rows', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+              '<w:tbl>'+
+                `${expected === true ? '<carbone>{d.desc:ifEM:hideBegin}</carbone>' : ''}` +
+                '<w:tr>'+
+                  '<w:trPr>'+
+                    '<w:trHeight w:val="300"/>'+
+                  '</w:trPr>'+
+                  '<w:tc>'+
+                    '<w:p>'+
+                      '<w:r>'+
+                        `<w:t>{d.desc}${expected === true ? '' : '{d.desc:ifEM:drop(row, 2)}' }</w:t>`+
+                      '</w:r>'+
+                    '</w:p>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+                '<w:tr>'+
+                  '<w:trPr>'+
+                    '<w:trHeight w:val="300"/>'+
+                  '</w:trPr>'+
+                  '<w:tc>'+
+                    '<w:p>'+
+                      '<w:r>'+
+                        '<w:t>{d.name}</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+                `${expected === true ? '<carbone>{d.desc:ifEM:hideEnd}</carbone>' : ''}` +
+              '</w:tbl>';
+          };
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.docx',
+            extension  : 'docx',
+            embeddings : [],
+            files      : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            helper.assert(res?.files[0]?.data, content(true));
+            done();
+          });
+        });
+
+        it('should delete multiple rows even if `w:bookmarkEnd` is added between rows', function (done) {
+          const content = (expected) => {
+            expected = expected ?? false;
+            return '' +
+              '<w:tbl>'+
+                `${expected === true ? '<carbone>{d.desc:ifEM:hideBegin}</carbone>' : ''}` +
+                '<w:tr>'+
+                  '<w:trPr>'+
+                    '<w:trHeight w:val="300"/>'+
+                  '</w:trPr>'+
+                  '<w:tc>'+
+                    '<w:p>'+
+                      '<w:r>'+
+                        `<w:t>{d.desc}${expected === true ? '' : '{d.desc:ifEM:drop(row, 2)}' }</w:t>`+
+                      '</w:r>'+
+                    '</w:p>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+                '<w:bookmarkEnd w:id="0"/>'+ // SPECIAL CASE
+                '<w:tr>'+
+                  '<w:trPr>'+
+                    '<w:trHeight w:val="300"/>'+
+                  '</w:trPr>'+
+                  '<w:tc>'+
+                    '<w:p>'+
+                      '<w:r>'+
+                        '<w:t>{d.name}</w:t>'+
+                      '</w:r>'+
+                    '</w:p>'+
+                  '</w:tc>'+
+                '</w:tr>'+
+                `${expected === true ? '<carbone>{d.desc:ifEM:hideEnd}</carbone>' : ''}` +
+              '</w:tbl>';
+          };
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.docx',
+            extension  : 'docx',
+            embeddings : [],
+            files      : [
+              { name : 'document.xml', parent : '', data : content()}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            helper.assert(res?.files[0]?.data, content(true));
+            done();
+          });
+        });
+      });
     });
 
     describe('ODT / ODP', function () {

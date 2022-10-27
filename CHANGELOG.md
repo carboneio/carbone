@@ -1,3 +1,6 @@
+### v4.X.X
+  - Fixed `:drop(row, nbrToDrop)` for DOCX documents: bookmarked table rows can be deleted.
+
 ### v4.6.0
   - Release October 18th 2022
   - Added the option `table` for the `:drop(element)` formatter to delete table conditionally. Available for DOCX, ODT and ODP templates. Usage: `{d.value:ifEM:drop(table)}`. The tag must be located within a table cell.

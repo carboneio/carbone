@@ -1,5 +1,9 @@
-### v4.X.X
+### v4.6.1
+  - Release October 28th 2022
   - Fixed `:drop(row, nbrToDrop)` for DOCX documents: bookmarked table rows can be deleted.
+  - negative numbers can by used when filtering with the iterator `i` 
+    - `{d.arr[i, i<-2].id}  {d.arr[i+1, i<-2].id}` print all elements except the last 2 items
+    - `{d.arr[i, i<-1].id}  {d.arr[i+1, i<-1].id}` print all elements except the last item
 
 ### v4.6.0
   - Release October 18th 2022

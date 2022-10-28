@@ -1942,6 +1942,32 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should accept negative integer when filtering with i', function (done) {
+        var _xml = '<xml> <t_row> {d[i, i<-2].brand} </t_row><t_row> {d[i+1, i<-2].brand} </t_row></xml>';
+        var _data = [
+          {brand : 'Lumeneo'     , id : 1},
+          {brand : 'Tesla motors', id : 2},
+          {brand : 'Toyota'      , id : 3}
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row></xml>');
+          done();
+        });
+      });
+      it('should accept negative integer when filtering with i', function (done) {
+        var _xml = '<xml> <t_row> {d[i, i<-1].brand} </t_row><t_row> {d[i+1, i<-1].brand} </t_row></xml>';
+        var _data = [
+          {brand : 'Lumeneo'     , id : 1},
+          {brand : 'Tesla motors', id : 2},
+          {brand : 'Toyota'      , id : 3}
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Tesla motors </t_row></xml>');
+          done();
+        });
+      });
       it('should not crash if the iterator contains string', function (done) {
         var _xml = '<xml> <t_row> {d[i=1a].brand} </t_row><t_row> {d[i=2a].brand} </t_row></xml>';
         var _data = [

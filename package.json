@@ -37,7 +37,7 @@
     "dayjs": "=1.11.4",
     "dayjs-timezone-iana-plugin": "=0.1.0",
     "debug": "=4.3.4",
-    "echarts": "5.3.3",
+    "echarts": "5.4.0",
     "formidable": "=2.0.1",
     "image-size": "=1.0.2",
     "kitten-jwt": "=1.1.1",

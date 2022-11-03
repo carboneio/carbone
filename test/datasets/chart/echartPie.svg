@@ -1,0 +1,11 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" viewBox="0 0 600 400">
+<rect width="600" height="400" x="0" y="0" id="0" fill="none" fill-opacity="1"></rect>
+<polyline points="396.2 227.2 410.7 231.3 425.7 231.3" fill="none" stroke="#5470c6"></polyline>
+<polyline points="203.8 172.8 189.3 168.7 174.3 168.7" fill="none" stroke="#91cc75"></polyline>
+<path d="M300 100A100 100 0 1 1 247.6 285.2L300 200Z" fill="#5470c6"></path>
+<path d="M247.6 285.2A100 100 0 0 1 300 100L300 200Z" fill="#91cc75"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" transform="translate(430.6555 231.3107)" fill="#333" stroke="rgb(255,255,255)" stroke-width="2" paint-order="stroke" stroke-miterlimit="2">Se &lt; &gt; arch &amp;</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(169.3445 168.6893)" fill="#333" stroke="rgb(255,255,255)" stroke-width="2" paint-order="stroke" stroke-miterlimit="2">Direct</text>
+<path d="M-5 -5l144.5 0l0 22l-144.5 0Z" transform="translate(5 5)" fill="rgb(0,0,0)" fill-opacity="0" stroke="#ccc" stroke-width="0"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:18px;font-family:sans-serif;font-weight:bold;" xml:space="preserve" y="6" transform="translate(5 5)" fill="#464646">Re &lt; &gt; ferer of a &amp; ebsite</text>
+</svg>

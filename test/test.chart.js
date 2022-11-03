@@ -31,6 +31,36 @@ describe('chart', function () {
         done();
       });
     });
+    it('should encode character in SVG (echarts bug fixed in 5.4.0)', function (done) {
+      const _echartLinePie = {
+        title : {
+          text : 'Re < > ferer of a & ebsite',
+        },
+        series : [
+          {
+            name   : 'Ac < > cesws & From',
+            type   : 'pie',
+            radius : '50%',
+            data   : [
+              { value : 1048, name : 'Se < > arch &' },
+              { value : 735, name : 'Direct' },
+            ]
+          }
+        ]
+      };
+      const _data = {
+        type   : 'echarts@v5',
+        width  : 600,
+        height : 400,
+        option : _echartLinePie
+      };
+      chartFormatter.generateChartImage(_data, {}, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assert(res.extension, 'svg');
+        helperTest.assert(res.data.toString(), fs.readFileSync('test/datasets/chart/echartPie.svg', 'utf8'));
+        done();
+      });
+    });
     it('should be able to modify the theme of the SVG', function (done) {
       const _data = {
         type   : 'echarts@v5',

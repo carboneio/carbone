@@ -1,4 +1,6 @@
+
 ### v4.6.2
+  - Release November 4th 2022
   - Fix: Encode HTML special characters when generating SVG with Echarts
 
 ### v4.6.1

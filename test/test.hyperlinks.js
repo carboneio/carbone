@@ -587,4 +587,165 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     });
   });
 
+  describe('DOCX preprocessing', function () {
+    describe('replaceBookmarkAndTableOfContentDocx', function () {
+      it('should do nothing', function () {
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(''), '');
+      });
+      it('should add markers to generate new bookmark ids and ref.', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:id="12345" w:name="_Ref118464460"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12345"/>'
+            + '<w:bookmarkStart w:id="12" w:name="_Ref78986565650"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12"/>'
+            + '<b>blabla _Ref78986565650</b>'
+            + '<w:instrText xml:space="preserve">REF _Ref78986565650 \\h</w:instrText>'
+            + '<b>blabla</b>'
+            + '<w:instrText xml:space="preserve">PAGEREF _Ref78986565650 \\h</w:instrText>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), ''
+          + '<xml>'
+          + '<w:bookmarkStart w:id="{c.now:private:cumCount}12345" w:name="_Ref118464460_{c.now:private:cumCount}"/>'
+          + '<b>blabla</b><w:bookmarkEnd w:id="{c.now:private:cumCount}12345"/>'
+          + '<w:bookmarkStart w:id="{c.now:private:cumCount}012" w:name="_Ref78986565650_{c.now:private:cumCount}"/>'
+          + '<b>blabla</b><w:bookmarkEnd w:id="{c.now:private:cumCount}012"/>'
+          + '<b>blabla _Ref78986565650</b>'
+          + '<w:instrText xml:space="preserve">REF _Ref78986565650_{c.now:private:cumCount} \\h</w:instrText>'
+          + '<b>blabla</b>'
+          + '<w:instrText xml:space="preserve">PAGEREF _Ref78986565650_{c.now:private:cumCount} \\h</w:instrText>'
+          + '</xml>'
+        );
+        helper.assert(_options.hardRefresh, false);
+      });
+      it('should add markers to generate new bookmark ids and ref.', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:name="_Ref118464460" w:id="0"/>'
+            + '<w:bookmarkStart w:name="_Ref118464461" w:id="1"/>'
+            + '<w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '<w:bookmarkStart w:name="_{d[i].id}" w:id="2"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="2"/>'
+            + '<w:bookmarkEnd w:id="0"/>'
+            + '<w:bookmarkEnd w:id="1"/>'
+            + '<w:bookmarkEnd w:id="1"/>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), ''
+          + '<xml>'
+            + '<w:bookmarkStart w:name="_Ref118464460_{c.now:private:cumCount}" w:id="{c.now:private:cumCount}000"/>'
+            + '<w:bookmarkStart w:name="_Ref118464461_{c.now:private:cumCount}" w:id="{c.now:private:cumCount}001"/>'
+            + '<w:bookmarkStart w:name="_Ref118464462_{c.now:private:cumCount}" w:id="{c.now:private:cumCount}001"/>'
+            + '<w:bookmarkStart w:name="_{d[i].id}" w:id="{c.now:private:cumCount}002"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="{c.now:private:cumCount}002"/>'
+            + '<w:bookmarkEnd w:id="{c.now:private:cumCount}000"/>'
+            + '<w:bookmarkEnd w:id="{c.now:private:cumCount}001"/>'
+            + '<w:bookmarkEnd w:id="{c.now:private:cumCount}001"/>'
+          + '</xml>'
+        );
+        helper.assert(_options.hardRefresh, false);
+      });
+      it.skip('should not replace or modify bookmarks of table of content???', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:id="12345" w:name="_Toc118464460"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12345"/>'
+            + '<w:bookmarkStart w:id="12" w:name="_Toc78986565650"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12"/>'
+            + '<b>blabla _Toc78986565650</b>'
+            + '<w:instrText xml:space="preserve">REF _Toc78986565650 \\h</w:instrText>'
+            + '<b>blabla</b>'
+            + '<w:instrText xml:space="preserve">PAGEREF _Toc78986565650 \\h</w:instrText>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), _xml);
+        helper.assert(_options.hardRefresh, false);
+      });
+      it('should remove (deactivate) carbone markers inside table of content and force hardRefresh of the document to update the table of Content', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = (expected = false) => {
+          return `
+            <w:p>
+              <w:pPr>
+                <w:pStyle w:val="TOC1"/>
+              </w:pPr>
+              <w:r>
+                <w:instrText xml:space="preserve">TOC \\o "1-3" \\h \\z \\u</w:instrText>
+              </w:r>
+              <w:hyperlink w:anchor="_Toc118845175" w:history="1">
+                <w:r>
+                  <w:rPr>
+                    <w:rStyle w:val="Hyperlink"/>
+                    <w:rFonts w:cs="Times New Roman (Headings CS)"/>
+                    <w:noProof/>
+                  </w:rPr>
+                  <w:t>${ (expected === true? 'd.tables[i].name' : '{d.tables[i].name}') }</w:t>
+                </w:r>
+                <w:r w:rsidR="001844B7">
+                  <w:instrText xml:space="preserve">PAGEREF _Toc118845175 \\h</w:instrText>
+              </w:hyperlink>
+            </w:p>`
+          ;
+        };
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml(), _options), _xml(true));
+        helper.assert(_options.hardRefresh, true);
+      });
+      it('should remove (deactivate) carbone markers inside table of content for DOCX generated by LibreOffice', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = (expected = false) => {
+          return `
+            <w:p>
+              <w:hyperlink w:anchor="__RefHeading___Toc48_1186019735">
+                <w:r>
+                  <w:rPr>
+                    <w:webHidden/>
+                    <w:rStyle w:val="IndexLink"/>
+                  </w:rPr>
+                  <w:t>${ (expected === true ? 'd.name' : '{d.name}') }</w:t>
+                  <w:tab/>
+                  <w:t>2</w:t>
+                </w:r>
+              </w:hyperlink>
+            </w:p>
+            <w:p>
+              <w:hyperlink w:anchor="__RefHeading___Toc48_1186019738">
+                <w:r>
+                  <w:rPr>
+                    <w:webHidden/>
+                    <w:rStyle w:val="IndexLink"/>
+                  </w:rPr>
+                  <w:t>${ (expected === true ? 'd.other' : '{d.other}') }</w:t>
+                  <w:tab/>
+                  <w:t>2</w:t>
+                </w:r>
+              </w:hyperlink>
+            </w:p>`
+          ;
+        };
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml(), _options), _xml(true));
+        helper.assert(_options.hardRefresh, true);
+      });
+    });
+  });
+
 });

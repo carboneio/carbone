@@ -312,6 +312,19 @@ function append (d, append) {
 
 
 /**
+ * Private formatter
+ *
+ * This formatter is neutral.
+ *
+ *
+ * @private
+ */
+function private (d) {
+  return d;
+}
+
+
+/**
  * Returns the length of a string or array.
  *
  * @version 2.0.0
@@ -347,6 +360,7 @@ module.exports = {
   md5       : md5,
   prepend   : prepend,
   append    : append,
+  private   : private,
   // private
   convCRLFH : convCRLFH
 };

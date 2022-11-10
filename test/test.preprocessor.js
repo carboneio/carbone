@@ -119,7 +119,7 @@ describe('preprocessor', function () {
           + '    <mc:Choice Requires="wps">'
           + '      <w:drawing>'
           + '        <wp:inline>'
-          + (isExpected ? '<wp:docPr desc="name" id="{c.now:private:generateImageDocxGlobalId}" name="Rectangle 1"/>' : '<wp:docPr desc="name" id="10" name="Rectangle 1"/>')
+          + (isExpected ? '<wp:docPr desc="name" id="{c.now:neutralForArrayFilter:generateImageDocxGlobalId}" name="Rectangle 1"/>' : '<wp:docPr desc="name" id="10" name="Rectangle 1"/>')
           + '          <wp:cNvGraphicFramePr/>'
           + '          <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
           + '            <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">'

@@ -312,14 +312,19 @@ function append (d, append) {
 
 
 /**
- * Private formatter
+ * Neutral for array filters
  *
- * This formatter is neutral.
+ * This formatter can be used to "ignore" Carbone tags if an array filter is used.
+ * For example:
+ *   XML: {d[i, id>0].id} {c.now:neutralForArrayFilter:somethingElse} {d[i, id>0].name}
  *
+ * Array filters works only if all Carbone tags are filtered. But `{c.now}` has no filter, so it will print all
+ * rows of the d[] array because there is at least one Carbone tag without a filter.
+ * With :neutralForArrayFilter formatter, we can tell to Carbone: "filter array rows regardless the presence of this Carbone tag"
  *
  * @private
  */
-function private (d) {
+function neutralForArrayFilter (d) {
   return d;
 }
 
@@ -360,7 +365,7 @@ module.exports = {
   md5       : md5,
   prepend   : prepend,
   append    : append,
-  private   : private,
+  neutralForArrayFilter : neutralForArrayFilter,
   // private
   convCRLFH : convCRLFH
 };

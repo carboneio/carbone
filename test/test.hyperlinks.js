@@ -592,7 +592,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       it('should do nothing', function () {
         helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(''), '');
       });
-      it('should add markers to generate new bookmark ids and ref.', function () {
+      it('should add markers to generate new bookmark ids and ref. And it should force hard refresh for some dynamic fields', function () {
         let _options = {
           hardRefresh : false
         };
@@ -622,6 +622,24 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
           + '<w:instrText xml:space="preserve">PAGEREF _Ref78986565650_{c.now:private:cumCount} \\h</w:instrText>'
           + '</xml>'
         );
+        helper.assert(_options.hardRefresh, true);
+        // test hardRefresh for other dynamic field
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'REF'), _options);
+        helper.assert(_options.hardRefresh, false);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMCHARS'), _options);
+        helper.assert(_options.hardRefresh, true);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMPAGES'), _options);
+        helper.assert(_options.hardRefresh, true);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMWORDS'), _options);
+        helper.assert(_options.hardRefresh, true);
+        // if user set hardRefresh, respect his choice
+        _options.hardRefresh = false;
+        _options.hardRefreshUser = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMWORDS'), _options);
         helper.assert(_options.hardRefresh, false);
       });
       it('should add markers to generate new bookmark ids and ref, but not if the bookmark name contains already a Carbone tag', function () {
@@ -821,18 +839,16 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
         helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml(), _options), _xml(true));
         helper.assert(_options.hardRefresh, true);
       });
-      it.skip('should blabla', function (done) {
-        const _testedReport = 'image/ods-barcodes';
-        const _data = {
-          /** Barcodes as Fonts & Images*/
-          item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
-          item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
-          item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
-          item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
-        };
-        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
-          helperTest.assert(err+'', 'null');
-          helperTest.assertFullReport(res, _testedReport);
+      it('should udpate bookmarks in DOCX document, and it should not hardRefresh if user set hardRefresh to false', function (done) {
+        const _testedReport = 'hyperlink/docx-crossreference';
+        const _data = [
+          { id : 'car1' },
+          { id : 'car2' },
+          { id : 'car3' }
+        ];
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false }, (err, res) => {
+          helper.assert(err+'', 'null');
+          helper.assertFullReport(res, _testedReport);
           done();
         });
       });

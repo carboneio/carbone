@@ -624,7 +624,7 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
         );
         helper.assert(_options.hardRefresh, false);
       });
-      it('should add markers to generate new bookmark ids and ref.', function () {
+      it('should add markers to generate new bookmark ids and ref, but not if the bookmark name contains already a Carbone tag', function () {
         let _options = {
           hardRefresh : false
         };
@@ -655,6 +655,82 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
           + '</xml>'
         );
         helper.assert(_options.hardRefresh, false);
+      });
+      it('should work with array filters (added markers should not break filters). And it should not generate Ids if the anchor has already a Carbone tag', function (done) {
+        let _data = [
+          { id : 10 },
+          { id : 20 },
+          { id : 30 },
+        ];
+        let _xml = ''
+          + '<xml>'
+          + '  <w:hyperlink w:anchor="_{d[i, id>10].id}" w:history="1">o</w:hyperlink>'
+          + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+          + '  <w:bookmarkStart w:name="_{d[i, id>10].id}" w:id="2"/>'
+          + '  <b>blabla</b>'
+          + '  <w:bookmarkEnd w:id="2"/>'
+          + '  <w:bookmarkEnd w:id="1"/>'
+          + '</xml>'
+          + '<xml>'
+          + '  {d[i+1, id>10].id}>'
+          + '</xml>'
+        ;
+        let _report = {
+          embeddings : [],
+          extension  : 'docx',
+          files      : [
+            { name : 'word/document.xml', parent : '', data : _xml, isMarked : true },
+            { name : 'word/other.xml'   , parent : '', data : _xml, isMarked : true }
+          ]
+        };
+        carbone.render(_report, _data, function (err, data) {
+          let _expectedXmlInDoc = ''
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_20" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462_2" w:id="2001"/>'
+            + '  <w:bookmarkStart w:name="_20" w:id="2002"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2002"/>'
+            + '  <w:bookmarkEnd w:id="2001"/>'
+            + '</xml>'
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_30" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462_3" w:id="3001"/>'
+            + '  <w:bookmarkStart w:name="_30" w:id="3002"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="3002"/>'
+            + '  <w:bookmarkEnd w:id="3001"/>'
+            + '</xml>'
+          ;
+          let _expectedXmlInOther = ''
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_20" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '  <w:bookmarkStart w:name="_20" w:id="2"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2"/>'
+            + '  <w:bookmarkEnd w:id="1"/>'
+            + '</xml>'
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_30" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '  <w:bookmarkStart w:name="_30" w:id="2"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2"/>'
+            + '  <w:bookmarkEnd w:id="1"/>'
+            + '</xml>'
+          ;
+          let _expected = {
+            embeddings : [],
+            extension  : 'docx',
+            files      : [
+              { name : 'word/document.xml', parent : '', data : _expectedXmlInDoc, isMarked : true },
+              { name : 'word/other.xml'   , parent : '', data : _expectedXmlInOther, isMarked : true }
+            ]
+          };
+          helper.assert(data, _expected);
+          done();
+        });
       });
       it.skip('should not replace or modify bookmarks of table of content???', function () {
         let _options = {
@@ -744,6 +820,21 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
         };
         helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml(), _options), _xml(true));
         helper.assert(_options.hardRefresh, true);
+      });
+      it.skip('should blabla', function (done) {
+        const _testedReport = 'image/ods-barcodes';
+        const _data = {
+          /** Barcodes as Fonts & Images*/
+          item  : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13'),
+          item2 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean8'),
+          item3 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code128'),
+          item4 : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'code39')
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
       });
     });
   });

@@ -1531,7 +1531,7 @@ describe('drop formatter', function () {
                     '</w:p>'+
                   '</w:tc>'+
                 '</w:tr>'+
-                '<w:bookmarkEnd w:id="0"/>'+ // SPECIAL CASE
+                '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}000"/>'+ // SPECIAL CASE
                 '<w:tr>'+
                   '<w:trPr>'+
                     '<w:trHeight w:val="300"/>'+

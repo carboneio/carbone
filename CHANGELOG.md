@@ -1,3 +1,6 @@
+### v4.7.0
+  - Release November 10th 2022
+  - Full support of table of content and bookmarks (internal hyperlinks) in DOCX templates
 
 ### v4.6.2
   - Release November 4th 2022

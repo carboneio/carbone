@@ -587,4 +587,272 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     });
   });
 
+  describe('DOCX preprocessing', function () {
+    describe('replaceBookmarkAndTableOfContentDocx', function () {
+      it('should do nothing', function () {
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(''), '');
+      });
+      it('should add markers to generate new bookmark ids and ref. And it should force hard refresh for some dynamic fields', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:id="12345" w:name="_Ref118464460"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12345"/>'
+            + '<w:bookmarkStart w:id="12" w:name="_Ref78986565650"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12"/>'
+            + '<b>blabla _Ref78986565650</b>'
+            + '<w:instrText xml:space="preserve">REF _Ref78986565650 \\h</w:instrText>'
+            + '<b>blabla</b>'
+            + '<w:instrText xml:space="preserve">PAGEREF _Ref78986565650 \\h</w:instrText>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), ''
+          + '<xml>'
+          + '<w:bookmarkStart w:id="{c.now:neutralForArrayFilter:cumCount}12345" w:name="_Ref118464460_{c.now:neutralForArrayFilter:cumCount}"/>'
+          + '<b>blabla</b><w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}12345"/>'
+          + '<w:bookmarkStart w:id="{c.now:neutralForArrayFilter:cumCount}012" w:name="_Ref78986565650_{c.now:neutralForArrayFilter:cumCount}"/>'
+          + '<b>blabla</b><w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}012"/>'
+          + '<b>blabla _Ref78986565650</b>'
+          + '<w:instrText xml:space="preserve">REF _Ref78986565650_{c.now:neutralForArrayFilter:cumCount} \\h</w:instrText>'
+          + '<b>blabla</b>'
+          + '<w:instrText xml:space="preserve">PAGEREF _Ref78986565650_{c.now:neutralForArrayFilter:cumCount} \\h</w:instrText>'
+          + '</xml>'
+        );
+        helper.assert(_options.hardRefresh, true);
+        // test hardRefresh for other dynamic field
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'REF'), _options);
+        helper.assert(_options.hardRefresh, false);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMCHARS'), _options);
+        helper.assert(_options.hardRefresh, true);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMPAGES'), _options);
+        helper.assert(_options.hardRefresh, true);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMWORDS'), _options);
+        helper.assert(_options.hardRefresh, true);
+        // if user set hardRefresh, respect his choice
+        _options.hardRefresh = false;
+        _options.hardRefreshUser = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMWORDS'), _options);
+        helper.assert(_options.hardRefresh, false);
+      });
+      it('should add markers to generate new bookmark ids and ref, but not if the bookmark name contains already a Carbone tag', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:name="_Ref118464460" w:id="0"/>'
+            + '<w:bookmarkStart w:name="_Ref118464461" w:id="1"/>'
+            + '<w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '<w:bookmarkStart w:name="_{d[i].id}" w:id="2"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="2"/>'
+            + '<w:bookmarkEnd w:id="0"/>'
+            + '<w:bookmarkEnd w:id="1"/>'
+            + '<w:bookmarkEnd w:id="1"/>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), ''
+          + '<xml>'
+            + '<w:bookmarkStart w:name="_Ref118464460_{c.now:neutralForArrayFilter:cumCount}" w:id="{c.now:neutralForArrayFilter:cumCount}000"/>'
+            + '<w:bookmarkStart w:name="_Ref118464461_{c.now:neutralForArrayFilter:cumCount}" w:id="{c.now:neutralForArrayFilter:cumCount}001"/>'
+            + '<w:bookmarkStart w:name="_Ref118464462_{c.now:neutralForArrayFilter:cumCount}" w:id="{c.now:neutralForArrayFilter:cumCount}001"/>'
+            + '<w:bookmarkStart w:name="_{d[i].id}" w:id="{c.now:neutralForArrayFilter:cumCount}002"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}002"/>'
+            + '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}000"/>'
+            + '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}001"/>'
+            + '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}001"/>'
+          + '</xml>'
+        );
+        helper.assert(_options.hardRefresh, false);
+      });
+      it('should work with array filters (added markers should not break filters). And it should not generate Ids if the anchor has already a Carbone tag', function (done) {
+        let _data = [
+          { id : 10 },
+          { id : 20 },
+          { id : 30 },
+        ];
+        let _xml = ''
+          + '<xml>'
+          + '  <w:hyperlink w:anchor="_{d[i, id>10].id}" w:history="1">o</w:hyperlink>'
+          + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+          + '  <w:bookmarkStart w:name="_{d[i, id>10].id}" w:id="2"/>'
+          + '  <b>blabla</b>'
+          + '  <w:bookmarkEnd w:id="2"/>'
+          + '  <w:bookmarkEnd w:id="1"/>'
+          + '</xml>'
+          + '<xml>'
+          + '  {d[i+1, id>10].id}>'
+          + '</xml>'
+        ;
+        let _report = {
+          embeddings : [],
+          extension  : 'docx',
+          files      : [
+            { name : 'word/document.xml', parent : '', data : _xml, isMarked : true },
+            { name : 'word/other.xml'   , parent : '', data : _xml, isMarked : true }
+          ]
+        };
+        carbone.render(_report, _data, function (err, data) {
+          let _expectedXmlInDoc = ''
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_20" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462_2" w:id="2001"/>'
+            + '  <w:bookmarkStart w:name="_20" w:id="2002"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2002"/>'
+            + '  <w:bookmarkEnd w:id="2001"/>'
+            + '</xml>'
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_30" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462_3" w:id="3001"/>'
+            + '  <w:bookmarkStart w:name="_30" w:id="3002"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="3002"/>'
+            + '  <w:bookmarkEnd w:id="3001"/>'
+            + '</xml>'
+          ;
+          let _expectedXmlInOther = ''
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_20" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '  <w:bookmarkStart w:name="_20" w:id="2"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2"/>'
+            + '  <w:bookmarkEnd w:id="1"/>'
+            + '</xml>'
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_30" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '  <w:bookmarkStart w:name="_30" w:id="2"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2"/>'
+            + '  <w:bookmarkEnd w:id="1"/>'
+            + '</xml>'
+          ;
+          let _expected = {
+            embeddings : [],
+            extension  : 'docx',
+            files      : [
+              { name : 'word/document.xml', parent : '', data : _expectedXmlInDoc, isMarked : true },
+              { name : 'word/other.xml'   , parent : '', data : _expectedXmlInOther, isMarked : true }
+            ]
+          };
+          helper.assert(data, _expected);
+          done();
+        });
+      });
+      it.skip('should not replace or modify bookmarks of table of content???', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:id="12345" w:name="_Toc118464460"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12345"/>'
+            + '<w:bookmarkStart w:id="12" w:name="_Toc78986565650"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12"/>'
+            + '<b>blabla _Toc78986565650</b>'
+            + '<w:instrText xml:space="preserve">REF _Toc78986565650 \\h</w:instrText>'
+            + '<b>blabla</b>'
+            + '<w:instrText xml:space="preserve">PAGEREF _Toc78986565650 \\h</w:instrText>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), _xml);
+        helper.assert(_options.hardRefresh, false);
+      });
+      it('should remove (deactivate) carbone markers inside table of content and force hardRefresh of the document to update the table of Content', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = (expected = false) => {
+          return `
+            <w:p>
+              <w:pPr>
+                <w:pStyle w:val="TOC1"/>
+              </w:pPr>
+              <w:r>
+                <w:instrText xml:space="preserve">TOC \\o "1-3" \\h \\z \\u</w:instrText>
+              </w:r>
+              <w:hyperlink w:anchor="_Toc118845175" w:history="1">
+                <w:r>
+                  <w:rPr>
+                    <w:rStyle w:val="Hyperlink"/>
+                    <w:rFonts w:cs="Times New Roman (Headings CS)"/>
+                    <w:noProof/>
+                  </w:rPr>
+                  <w:t>${ (expected === true? 'd.tables[i].name' : '{d.tables[i].name}') }</w:t>
+                </w:r>
+                <w:r w:rsidR="001844B7">
+                  <w:instrText xml:space="preserve">PAGEREF _Toc118845175 \\h</w:instrText>
+              </w:hyperlink>
+            </w:p>`
+          ;
+        };
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml(), _options), _xml(true));
+        helper.assert(_options.hardRefresh, true);
+      });
+      it('should remove (deactivate) carbone markers inside table of content for DOCX generated by LibreOffice', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = (expected = false) => {
+          return `
+            <w:p>
+              <w:hyperlink w:anchor="__RefHeading___Toc48_1186019735">
+                <w:r>
+                  <w:rPr>
+                    <w:webHidden/>
+                    <w:rStyle w:val="IndexLink"/>
+                  </w:rPr>
+                  <w:t>${ (expected === true ? 'd.name' : '{d.name}') }</w:t>
+                  <w:tab/>
+                  <w:t>2</w:t>
+                </w:r>
+              </w:hyperlink>
+            </w:p>
+            <w:p>
+              <w:hyperlink w:anchor="__RefHeading___Toc48_1186019738">
+                <w:r>
+                  <w:rPr>
+                    <w:webHidden/>
+                    <w:rStyle w:val="IndexLink"/>
+                  </w:rPr>
+                  <w:t>${ (expected === true ? 'd.other' : '{d.other}') }</w:t>
+                  <w:tab/>
+                  <w:t>2</w:t>
+                </w:r>
+              </w:hyperlink>
+            </w:p>`
+          ;
+        };
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml(), _options), _xml(true));
+        helper.assert(_options.hardRefresh, true);
+      });
+      it('should udpate bookmarks in DOCX document, and it should not hardRefresh if user set hardRefresh to false', function (done) {
+        const _testedReport = 'hyperlink/docx-crossreference';
+        const _data = [
+          { id : 'car1' },
+          { id : 'car2' },
+          { id : 'car3' }
+        ];
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false }, (err, res) => {
+          helper.assert(err+'', 'null');
+          helper.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+    });
+  });
+
 });

@@ -3038,11 +3038,14 @@ describe('Carbone', function () {
             '{d.field1}',
             '{d.field2}',
             '{c.author1}',
-            '{c.author2}'
+            '{c.author2}',
+            '{c.now:neutralForArrayFilter:cumCount}',
+            '{c.now:neutralForArrayFilter:cumCount}',
+            '{c.now:neutralForArrayFilter:cumCount}'
           ],
           sample : {
             data       : { field1 : 'field10' , field2 : 'field21'   },
-            complement : { author1 : 'author12', author2 : 'author23' }
+            complement : { author1 : 'author12', author2 : 'author23', now: "now6" }
           }
         });
         fs.unlinkSync(resultFilePath);

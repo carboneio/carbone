@@ -899,6 +899,18 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
+      it('should replace an image with the right aspect ratio even if the same is used in two independant headers)', function (done) {
+        const _testedReport = 'image/docx-same-image-two-headers';
+        const _data = {
+          image : _imageLogoBase64jpg
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+
       it('should replace an image (Created from MS Word Windows)(base64 jpg)', function (done) {
         const _testedReport = 'image/docx-windows-word';
         const _data = {
@@ -1693,28 +1705,28 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     describe('DOCX ODT scaling', function () {
       it('_getImageSize: should return nothing because of an empty Buffer', function (done) {
         let _imageInfo = {
-          imageUnit      : 'emu',
-          data           : new Buffer.from(''),
-          newImageWidth  : -1,
-          newImageHeight : -1
+          imageUnit             : 'emu',
+          data                  : new Buffer.from(''),
+          downloadedImageWidth  : -1,
+          downloadedImageHeight : -1
         };
         image._getImageSize(_imageInfo);
-        helperTest.assert(_imageInfo.newImageWidth, -1);
-        helperTest.assert(_imageInfo.newImageHeight, -1);
+        helperTest.assert(_imageInfo.downloadedImageWidth, -1);
+        helperTest.assert(_imageInfo.downloadedImageHeight, -1);
         done();
       });
 
       it('_getImageSize: should return the EMU size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            imageUnit      : 'emu',
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
+            imageUnit             : 'emu',
+            data                  : imageData.data,
+            downloadedImageWidth  : -1,
+            downloadedImageHeight : -1
           };
           image._getImageSize(_imageInfo, _imageInfo.imageUnit);
-          helperTest.assert(_imageInfo.newImageWidth, 952500);
-          helperTest.assert(_imageInfo.newImageHeight, 590550);
+          helperTest.assert(_imageInfo.downloadedImageWidth, 952500);
+          helperTest.assert(_imageInfo.downloadedImageHeight, 590550);
           done();
         });
       });
@@ -1723,14 +1735,14 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the EMU size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            imageUnit      : 'emu',
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
+            imageUnit             : 'emu',
+            data                  : imageData.data,
+            downloadedImageWidth  : -1,
+            downloadedImageHeight : -1
           };
           image._getImageSize(_imageInfo, _imageInfo.imageUnit);
-          helperTest.assert(_imageInfo.newImageWidth, 2857500);
-          helperTest.assert(_imageInfo.newImageHeight, 1905000);
+          helperTest.assert(_imageInfo.downloadedImageWidth, 2857500);
+          helperTest.assert(_imageInfo.downloadedImageHeight, 1905000);
           done();
         });
       });
@@ -1738,14 +1750,14 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the CM size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            imageUnit      : 'cm',
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
+            imageUnit             : 'cm',
+            data                  : imageData.data,
+            downloadedImageWidth  : -1,
+            downloadedImageHeight : -1
           };
           image._getImageSize(_imageInfo, _imageInfo.imageUnit);
-          helperTest.assert(_imageInfo.newImageWidth, 2.65);
-          helperTest.assert(_imageInfo.newImageHeight, 1.643);
+          helperTest.assert(_imageInfo.downloadedImageWidth, 2.65);
+          helperTest.assert(_imageInfo.downloadedImageHeight, 1.643);
           done();
         });
       });
@@ -1754,14 +1766,14 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the CM size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            imageUnit      : 'cm',
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
+            imageUnit             : 'cm',
+            data                  : imageData.data,
+            downloadedImageWidth  : -1,
+            downloadedImageHeight : -1
           };
           image._getImageSize(_imageInfo, _imageInfo.imageUnit);
-          helperTest.assert(_imageInfo.newImageWidth, 7.95);
-          helperTest.assert(_imageInfo.newImageHeight, 5.3);
+          helperTest.assert(_imageInfo.downloadedImageWidth, 7.95);
+          helperTest.assert(_imageInfo.downloadedImageHeight, 5.3);
           done();
         });
       });
@@ -1769,14 +1781,14 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the INCH size of a JPEG base64 image', function (done) {
         image.parseBase64Picture(_imageFRBase64jpg, function (err, imageData) {
           let _imageInfo = {
-            imageUnit      : 'in',
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
+            imageUnit             : 'in',
+            data                  : imageData.data,
+            downloadedImageWidth  : -1,
+            downloadedImageHeight : -1
           };
           image._getImageSize(_imageInfo, _imageInfo.imageUnit);
-          helperTest.assert(_imageInfo.newImageWidth, 1.0416666666666667);
-          helperTest.assert(_imageInfo.newImageHeight, 0.6458333333333334);
+          helperTest.assert(_imageInfo.downloadedImageWidth, 1.0416666666666667);
+          helperTest.assert(_imageInfo.downloadedImageHeight, 0.6458333333333334);
           done();
         });
       });
@@ -1784,14 +1796,14 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('_getImageSize: should return the INCH size of a PNG base64 image', function (done) {
         image.parseBase64Picture(_imageITBase64png, function (err, imageData) {
           let _imageInfo = {
-            imageUnit      : 'in',
-            data           : imageData.data,
-            newImageWidth  : -1,
-            newImageHeight : -1
+            imageUnit             : 'in',
+            data                  : imageData.data,
+            downloadedImageWidth  : -1,
+            downloadedImageHeight : -1
           };
           image._getImageSize(_imageInfo, _imageInfo.imageUnit);
-          helperTest.assert(_imageInfo.newImageWidth, 3.125);
-          helperTest.assert(_imageInfo.newImageHeight, 2.0833333333333335);
+          helperTest.assert(_imageInfo.downloadedImageWidth, 3.125);
+          helperTest.assert(_imageInfo.downloadedImageHeight, 2.0833333333333335);
           done();
         });
       });
@@ -1799,11 +1811,13 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       describe('_computeImageSize', function () {
         it("_computeImageSize EMU 1: should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            imageUnit      : 'emu',
-            newImageWidth  : 220,
-            newImageHeight : 100,
-            imageWidth     : 100,
-            imageHeight    : 80
+            imageUnit             : 'emu',
+            templateImageWidth    : 100,
+            templateImageHeight   : 80,
+            downloadedImageWidth  : 220,
+            downloadedImageHeight : 100,
+            imageWidth            : 100,
+            imageHeight           : 80
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 100);
@@ -1813,11 +1827,13 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it("_computeImageSize EMU 2: should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            imageUnit      : 'emu',
-            newImageWidth  : 2857500,
-            newImageHeight : 1905000,
-            imageWidth     : 952500,
-            imageHeight    : 590550
+            imageUnit             : 'emu',
+            templateImageWidth    : 952500,
+            templateImageHeight   : 590550,
+            downloadedImageWidth  : 2857500,
+            downloadedImageHeight : 1905000,
+            imageWidth            : 952500,
+            imageHeight           : 590550
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 885825);
@@ -1827,11 +1843,11 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it("_computeImageSize CM : should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            imageUnit      : 'cm',
-            newImageWidth  : 20.45,
-            newImageHeight : 15,
-            imageWidth     : 8,
-            imageHeight    : 5
+            imageUnit             : 'cm',
+            downloadedImageWidth  : 20.45,
+            downloadedImageHeight : 15,
+            templateImageWidth    : 8,
+            templateImageHeight   : 5
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 6.817);
@@ -1841,11 +1857,11 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it("_computeImageSize CM with 3 decimal : should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            imageUnit      : 'cm',
-            newImageWidth  : 33.558,
-            newImageHeight : 20.312,
-            imageWidth     : 12,
-            imageHeight    : 10
+            imageUnit             : 'cm',
+            downloadedImageWidth  : 33.558,
+            downloadedImageHeight : 20.312,
+            templateImageWidth    : 12,
+            templateImageHeight   : 10
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 12);
@@ -1856,11 +1872,11 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it("_computeImageSize IN : should compute the imageFit size as 'contain'", function (done) {
           let _imageInfo = {
-            imageUnit      : 'in',
-            newImageWidth  : 8.6952,
-            newImageHeight : 10.6713,
-            imageWidth     : 2.8984,
-            imageHeight    : 1.4492
+            imageUnit             : 'in',
+            downloadedImageWidth  : 8.6952,
+            downloadedImageHeight : 10.6713,
+            templateImageWidth    : 2.8984,
+            templateImageHeight   : 1.4492
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 1.181); // 1.1808
@@ -1870,12 +1886,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it('should compute the imageFit size as fillWidth', function (done) {
           let _imageInfo = {
-            imageFit       : 'fillWidth',
-            imageUnit      : 'emu',
-            newImageWidth  : 50,
-            newImageHeight : 100,
-            imageWidth     : 100,
-            imageHeight    : 80
+            imageFit              : 'fillWidth',
+            imageUnit             : 'emu',
+            downloadedImageWidth  : 50,
+            downloadedImageHeight : 100,
+            templateImageWidth    : 100,
+            templateImageHeight   : 80
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 100);
@@ -1885,12 +1901,12 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it('should compute the imageFit size as fill', function (done) {
           let _imageInfo = {
-            imageFit       : 'fill',
-            imageUnit      : 'emu',
-            newImageWidth  : 150,
-            newImageHeight : 250,
-            imageWidth     : 100,
-            imageHeight    : 80
+            imageFit              : 'fill',
+            imageUnit             : 'emu',
+            downloadedImageWidth  : 150,
+            downloadedImageHeight : 250,
+            templateImageWidth    : 100,
+            templateImageHeight   : 80
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 100);
@@ -1900,9 +1916,9 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it('should compute the new image width/height as cm based on the image size and should keep the ratio', function (done) {
           let _imageInfo = {
-            imageUnit      : 'cm',
-            newImageWidth  : 5,
-            newImageHeight : 4.2
+            imageUnit             : 'cm',
+            downloadedImageWidth  : 5,
+            downloadedImageHeight : 4.2
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 5);
@@ -1912,18 +1928,18 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it('should compute the new image width/height as cm based on the image size, should keep the ratio and should be less than 5cm', function (done) {
           let _imageInfo = {
-            imageUnit      : 'cm',
-            newImageWidth  : 10,
-            newImageHeight : 5
+            imageUnit             : 'cm',
+            downloadedImageWidth  : 10,
+            downloadedImageHeight : 5
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 5);
           helperTest.assert(_imageInfo.imageHeight, 2.5);
 
           let _imageInfo2 = {
-            imageUnit      : 'cm',
-            newImageWidth  : 5,
-            newImageHeight : 10
+            imageUnit             : 'cm',
+            downloadedImageWidth  : 5,
+            downloadedImageHeight : 10
           };
           image._computeImageSize(_imageInfo2);
           helperTest.assert(_imageInfo2.imageWidth, 2.5);
@@ -1933,18 +1949,18 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
         it('should compute the new image width/height as EMU based on the image size, should keep the ratio and should be less than 5cm', function (done) {
           let _imageInfo = {
-            imageUnit      : 'emu',
-            newImageWidth  : 1800000,
-            newImageHeight : 3600000
+            imageUnit             : 'emu',
+            downloadedImageWidth  : 1800000,
+            downloadedImageHeight : 3600000
           };
           image._computeImageSize(_imageInfo);
           helperTest.assert(_imageInfo.imageWidth, 900000);
           helperTest.assert(_imageInfo.imageHeight, 1800000);
 
           let _imageInfo2 = {
-            imageUnit      : 'emu',
-            newImageWidth  : 3600000,
-            newImageHeight : 1800000
+            imageUnit             : 'emu',
+            downloadedImageWidth  : 3600000,
+            downloadedImageHeight : 1800000
           };
           image._computeImageSize(_imageInfo2);
           helperTest.assert(_imageInfo2.imageWidth, 1800000);

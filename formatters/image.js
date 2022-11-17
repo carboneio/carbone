@@ -279,10 +279,10 @@ function scaleImage (urlOrBase64, measure, value, unit, imageFit) {
     _imageSourceProperties.imageUnit = unit;
   }
   if (measure === 'width' && value) {
-    _imageSourceProperties.imageWidth = parseFloat(value);
+    _imageSourceProperties.templateImageWidth = parseFloat(value);
   }
   if (measure === 'height' && value) {
-    _imageSourceProperties.imageHeight = parseFloat(value);
+    _imageSourceProperties.templateImageHeight = parseFloat(value);
   }
   addImageDatabase(this, urlOrBase64, _imageSourceProperties);
   return {

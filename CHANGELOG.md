@@ -1,3 +1,6 @@
+### v4.6.4
+  - Fix: aspect ratio of image if the same image is used twice in a second section of a document
+
 ### v4.6.3
   - Release November 10th 2022
   - Full support of table of content and bookmarks (internal hyperlinks) in DOCX templates

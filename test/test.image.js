@@ -899,6 +899,18 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
+      it('should replace an image with the right aspect ratio even if the same is used in two independant headers)', function (done) {
+        const _testedReport = 'image/docx-same-image-two-headers';
+        const _data = {
+          image : _imageLogoBase64jpg
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+
       it('should replace an image (Created from MS Word Windows)(base64 jpg)', function (done) {
         const _testedReport = 'image/docx-windows-word';
         const _data = {

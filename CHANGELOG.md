@@ -1,4 +1,5 @@
 ### v4.6.4
+  - Release November 17th 2022
   - Fix: aspect ratio of image if the same image is used twice in a second section of a document
 
 ### v4.6.3

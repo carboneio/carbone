@@ -278,11 +278,11 @@ function scaleImage (urlOrBase64, measure, value, unit, imageFit) {
   if (unit === 'cm' || unit === 'in' || unit === 'emu') {
     _imageSourceProperties.imageUnit = unit;
   }
-  if (measure === 'width' && value && !_imageSourceProperties.imageWidth) {
-    _imageSourceProperties.imageWidth = parseFloat(value);
+  if (measure === 'width' && value) {
+    _imageSourceProperties.templateImageWidth = parseFloat(value);
   }
-  if (measure === 'height' && value && !_imageSourceProperties.imageHeight ) {
-    _imageSourceProperties.imageHeight = parseFloat(value);
+  if (measure === 'height' && value) {
+    _imageSourceProperties.templateImageHeight = parseFloat(value);
   }
   addImageDatabase(this, urlOrBase64, _imageSourceProperties);
   return {

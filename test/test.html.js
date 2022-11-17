@@ -3,6 +3,7 @@ const htmlFormatters = require('../formatters/html');
 const hyperlinksFormatters = require('../formatters/hyperlinks');
 const helper = require('../lib/helper');
 const assert = require('assert');
+const image = require('../lib/image');
 const hyperlinks = require('../lib/hyperlinks');
 
 describe('Dynamic HTML', function () {
@@ -4410,6 +4411,8 @@ describe('Dynamic HTML', function () {
         };
         const _descriptor = html.parseHTML('<img src="https://carbone.io/cat" width="300" height="50" alt="cat">');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
+        // update image aspect ratio. Simulate calls which are done before the final postprocess
+        image._computeImageSize(_options.imageDatabase.get('https://carbone.io/cat'));
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content.get(_options), '' +
@@ -4464,6 +4467,8 @@ describe('Dynamic HTML', function () {
         };
         const _descriptor = html.parseHTML('<p>Before picture<p><img src="https://carbone.io/cat" width="300" height="50" alt="cat"></p><b>After picture</b></p>');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
+        // update image aspect ratio. Simulate calls which are done before the final postprocess
+        image._computeImageSize(_options.imageDatabase.get('https://carbone.io/cat'));
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content.get(_options), '' +
@@ -4521,6 +4526,12 @@ describe('Dynamic HTML', function () {
         };
         const _descriptor = html.parseHTML('<a href="https://carbone.io/documentation.html"><img src="https://carbone.io/cat" alt="cat"></a>');
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
+        // update image aspect ratio. Simulate calls which are done before the final postprocess
+        const _imageInfo = _options.imageDatabase.get('https://carbone.io/cat');
+        // simulate call to image._getImageSize(_imageInfo, 'emu');
+        _imageInfo.downloadedImageWidth = Math.floor(400 /* px */ * 914400 / 96);
+        _imageInfo.downloadedImageHeight = Math.floor(80 /* px */ * 914400 / 96);
+        image._computeImageSize(_imageInfo);
         helper.assert(listStyleAbstract, '');
         helper.assert(listStyleNum, '');
         helper.assert(content.get(_options), '' +
@@ -4530,8 +4541,7 @@ describe('Dynamic HTML', function () {
               /** IMAGE */
               '<w:r><w:drawing>' +
                 '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
-                  /** -1 are normal as not width/height are passed as attributes */
-                  '<wp:extent cx="-1" cy="-1"/>' +
+                  '<wp:extent cx="1800000" cy="360000"/>' +
                   '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
                   '<wp:docPr id="1000" name="" descr="">' +
                     '<a:hlinkClick xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" r:id=\"CarboneHyperlinkId0\"/>' +
@@ -4559,8 +4569,7 @@ describe('Dynamic HTML', function () {
                         '<pic:spPr bwMode="auto">' +
                           '<a:xfrm>' +
                             '<a:off x="0" y="0"/>' +
-                            /** -1 are normal as not width/height are passed as attributes */
-                            '<a:ext cx="-1" cy="-1"/>' +
+                            '<a:ext cx="1800000" cy="360000"/>' +
                           '</a:xfrm>' +
                           '<a:prstGeom prst="rect">' +
                             '<a:avLst/>' +
@@ -4592,6 +4601,12 @@ describe('Dynamic HTML', function () {
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options);
         helper.assert(listStyleAbstract, '<w:abstractNum w:abstractNumId="1000"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum>');
         helper.assert(listStyleNum, '<w:num w:numId="1000"><w:abstractNumId w:val="1000"/></w:num>');
+        // update image aspect ratio. Simulate calls which are done before the final postprocess
+        const _imageInfo = _options.imageDatabase.get('https://carbone.io/cat');
+        // simulate call to image._getImageSize(_imageInfo, 'emu');
+        _imageInfo.downloadedImageWidth = Math.floor(100 /* px */ * 914400 / 96);
+        _imageInfo.downloadedImageHeight = Math.floor(80 /* px */ * 914400 / 96);
+        image._computeImageSize(_imageInfo);
         helper.assert(content.get(_options), '' +
           '<w:p>' +
             /** PARAGRAPH AS LIST */
@@ -4606,8 +4621,7 @@ describe('Dynamic HTML', function () {
               /** IMAGE */
               '<w:r><w:drawing>' +
                 '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
-                  /** -1 are normal as not width/height are passed as attributes */
-                  '<wp:extent cx="-1" cy="-1"/>' +
+                  '<wp:extent cx="952500" cy="762000"/>' +
                   '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
                   '<wp:docPr id="1000" name="" descr="">' +
                     '<a:hlinkClick xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" r:id=\"CarboneHyperlinkId0\"/>' +
@@ -4635,8 +4649,7 @@ describe('Dynamic HTML', function () {
                         '<pic:spPr bwMode="auto">' +
                           '<a:xfrm>' +
                             '<a:off x="0" y="0"/>' +
-                            /** -1 are normal as not width/height are passed as attributes */
-                            '<a:ext cx="-1" cy="-1"/>' +
+                            '<a:ext cx="952500" cy="762000"/>' +
                           '</a:xfrm>' +
                           '<a:prstGeom prst="rect">' +
                             '<a:avLst/>' +

@@ -1,3 +1,7 @@
+### v4.6.5
+  - Release November 25th 2022
+  - Accept parentheses in formatters between single quotes
+
 ### v4.6.4
   - Release November 17th 2022
   - Fix aspect ratio of images if the same image is used twice in a second section of a document

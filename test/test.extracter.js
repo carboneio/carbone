@@ -2778,6 +2778,35 @@ describe('extracter', function () {
         hierarchy   : ['d', 'cars1', 'cars02', 'cars3', 'menu1', 'menu2', 'menu3']
       });
     });
+    it('should return _rootdobj1arr10obj300obj3001 before _rootdobj1arr10obj200arr2000 because the first one is an object #patch20221130', function () {
+      var _data = {
+        staticData  : {},
+        dynamicData : {
+          _root                        : { name : '_root'  , type : 'object', parent : ''                      , parents : []                                                                            , xmlParts : [] },
+          _rootd                       : { name : 'd'      , type : 'object', parent : '_root'                 , parents : ['_root']                                                                     , xmlParts : [] },
+          _rootdobj1                   : { name : 'obj1'   , type : 'object', parent : '_rootd'                , parents : ['_root', '_rootd' ]                                                          , xmlParts : [] },
+          _rootdobj1arr10              : { name : 'arr10'  , type : 'array' , parent : '_rootdobj1'            , parents : ['_root', '_rootd', '_rootdobj1' ]                                            , xmlParts : [], depth : 1 },
+          _rootdobj1arr10obj200        : { name : 'obj200' , type : 'object', parent : '_rootdobj1arr10'       , parents : ['_root', '_rootd', '_rootdobj1', '_rootdobj1arr10' ]                         , xmlParts : [] },
+          _rootdobj1arr10obj200arr2000 : { name : 'arr2000', type : 'array' , parent : '_rootdobj1arr10obj200' , parents : ['_root', '_rootd', '_rootdobj1', '_rootdobj1arr10', '_rootdobj1arr10obj200' ], xmlParts : [], depth : 2 },
+          _rootdobj1arr10obj300        : { name : 'obj300' , type : 'object', parent : '_rootdobj1arr10'       , parents : ['_root', '_rootd', '_rootdobj1', '_rootdobj1arr10' ]                         , xmlParts : [] },
+          _rootdobj1arr10obj300obj3001 : { name : 'obj3001', type : 'object', parent : '_rootdobj1arr10obj300' , parents : ['_root', '_rootd', '_rootdobj1', '_rootdobj1arr10', '_rootdobj1arr10obj300'] , xmlParts : [] }
+        }
+      };
+      helper.assert(extracter.buildSortedHierarchy(_data), {
+        staticData  : {},
+        dynamicData : _data.dynamicData,
+        hierarchy   : [
+          '_root',
+          '_rootd',
+          '_rootdobj1',
+          '_rootdobj1arr10',
+          '_rootdobj1arr10obj300',
+          '_rootdobj1arr10obj300obj3001',
+          '_rootdobj1arr10obj200',
+          '_rootdobj1arr10obj200arr2000'
+        ]
+      });
+    });
     it('should place objects before arrays, even with a parent array', function () {
       var _data = {
         staticData  : {},

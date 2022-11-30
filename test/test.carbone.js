@@ -2885,6 +2885,45 @@ describe('Carbone', function () {
           });
         });
       });
+
+      it('should not crash if two carbone tags are used, when ending by an object, and the other by an array (d.obj1.arr10[i].obj300.obj3001|arr2000)', function (done) {
+        var _xml = ''
+          + '<xml>'
+          + '  <a>carmen {d.obj1.arr10[i].include}</a>'
+          + '  <b>{d.obj1.arr10[i].obj200.arr2000[i].att20000}</b>'
+          + '  <c>{d.obj1.arr10[i].obj300.att3000}</c>'
+          + '  <d>bug </d>'
+          + '  <e>{d.obj1.arr10[i].obj300.obj3001.att30000:ifEQ(21):showBegin} show {d.obj1.arr10[i].obj300.obj3001.att30000:showEnd}</e>'
+          + '  <f>{d.obj1.arr10[i].obj200.arr2000[i+1]}</f>'
+          + '  <g>{d.obj1.arr10[i+1].obj200}</g>'
+          + '</xml>';
+        var _data = {
+          obj1 : {
+            arr10 : [
+              {
+                obj200 : {
+                  arr2000 : [
+                    {
+                      att20000 : 350
+                    }
+                  ]
+                },
+                obj300 : {
+                  att3000 : '21',
+                  obj3001 : {
+                    att30000 : 21
+                  }
+                }
+              }
+            ]
+          }
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<xml>  <a>carmen </a>  <b>350</b>  <c>21</c>  <d>bug </d>  <e> show </e>    </xml>');
+          done();
+        });
+      });
       it('should remove every possible parts in XML and accept complex conditions', function (done) {
         var _xml = ''
           + '<a>'

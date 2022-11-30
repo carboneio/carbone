@@ -1,3 +1,7 @@
+### v4.6.5
+  - Release November 30th 2022
+  - Fix bugs when using two Carbone tags which are using similar paths (d > obj > arr > obj > [arr|obj] > att) in a very complex and rare case
+
 ### v4.6.4
   - Release November 17th 2022
   - Fix aspect ratio of images if the same image is used twice in a second section of a document

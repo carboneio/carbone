@@ -660,6 +660,14 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should accept parenthesis in formatter between single quotes', function (done) {
+      var data = {};
+      carbone.renderXML('<xml>{d:ifEmpty(\'ye)ah\')} {c:ifEmpty(\'oo(ps\')}</xml>', data, {complement : {}}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>ye)ah oo(ps</xml>');
+        done();
+      });
+    });
     it('should execute formatter if the data array is empty with the formatter ifEmpty', function (done) {
       var data = [];
       carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : []}, function (err, result) {

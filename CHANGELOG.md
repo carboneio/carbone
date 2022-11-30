@@ -1,6 +1,10 @@
-### v4.6.5
+### v4.6.6
   - Release November 30th 2022
   - Fix bugs when using two Carbone tags which are using similar paths (d > obj > arr > obj > [arr|obj] > att) in a very complex and rare case
+
+### v4.6.5
+  - Release November 25th 2022
+  - Accept parentheses in formatters between single quotes
 
 ### v4.6.4
   - Release November 17th 2022

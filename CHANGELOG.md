@@ -1,3 +1,8 @@
+### v4.6.6
+  - Release November 30th 2022
+  - Fix bugs when using two Carbone tags which are using similar paths in some complex situation (d > obj > arr > obj > [arr|obj] > att). Very hard to explain here!
+  - Increase max downloaded image in parallel from 5 to 15.
+
 ### v4.6.5
   - Release November 25th 2022
   - Accept parentheses in formatters between single quotes

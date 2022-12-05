@@ -1,5 +1,5 @@
 ### v4.6.7
-  - Release November 5th 2022
+  - Release December 5th 2022
   - Fix regression of v4.6.6 when multiple loops are used on the same table.
 
 ### v4.6.6

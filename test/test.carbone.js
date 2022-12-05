@@ -2893,8 +2893,7 @@ describe('Carbone', function () {
           });
         });
       });
-
-      it('should not crash if two carbone tags are used, when ending by an object, and the other by an array (d.obj1.arr10[i].obj300.obj3001|arr2000)', function (done) {
+      it('should not crash if two carbone tags are used, when ending by an object, and the other by an array (d.obj1.arr10[i].obj300.obj3001|arr2000) #patch20221130', function (done) {
         var _xml = ''
           + '<xml>'
           + '  <a>carmen {d.obj1.arr10[i].include}</a>'
@@ -2929,6 +2928,33 @@ describe('Carbone', function () {
         carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
           assert.equal(err+'', 'null');
           assert.equal(_xmlBuilt, '<xml>  <a>carmen </a>  <b>350</b>  <c>21</c>  <d>bug </d>  <e> show </e>    </xml>');
+          done();
+        });
+      });
+      it('should work if the same table is repeated multiples times, with sub-objects, fix regression of #patch20221130 (previous test). #patch20221205', function (done) {
+        var _xml = ''
+          + '<doc>'
+          + '  <body>'
+          + '    <off>'
+          + '      <p>{d.tables[i].att1}</p>'
+          + '      <p>{d.tables[i+1]}</p>'
+          + '      <p>{d.tables[i].att1}</p>'
+          + '      <p>{d.tables[i].subArray[id=1].att10}</p>'
+          + '      <p>{d.tables[i].obj20.subArray200[i].att2000}</p>'
+          + '      <p>{d.tables[i].obj20.subArray200[i+1].att2000}</p>'
+          + '      <p>{d.tables[i].obj20.att200}</p>'
+          + '      <p>{d.tables[i+1]}</p>'
+          + '      <p>{d.tables[i].obj30.att300}</p>'
+          + '      <p>{d.tables[i+1]}</p>'
+          + '    </off>'
+          + '  </body>'
+          + '</doc>';
+        var _data = {
+          tables : 'test'
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<doc>  <body>    <off>                      </off>  </body></doc>');
           done();
         });
       });

@@ -1228,6 +1228,19 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept the same filters with different operators', function (done) {
+    var _xml = '<xml>{d.table[type=free].text} {d.table[type!=free].text}</xml>';
+    var _data = {
+      table : [
+        { type : 'free', text : '10' },
+        { type : 'afree', text : '20' }
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, '<xml>10 20</xml>');
+      done();
+    });
+  });
   it('should accept whitespaces with string filters in arrays and double quotes', function (done) {
     var _xml = '<xml> <t_row> {d[i, brand="Tesla car"].brand} </t_row><t_row> {d[i+1, brand="Tesla car"].brand} </t_row></xml>';
     var _data = [

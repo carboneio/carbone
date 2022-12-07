@@ -386,7 +386,7 @@ describe('extracter', function () {
           xmlParts : []
         },
         // eslint-disable-next-line
-        dsitei__1 : {
+        dsitei_EQ_1 : {
           name      : 'site',
           type      : 'objectInArray',
           parent    : 'd',
@@ -394,14 +394,14 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__1', pos : 20, posOrigin : 20, markerId : 0 }
+            { attr : 'id', formatters : [], obj : 'dsitei_EQ_1', pos : 20, posOrigin : 20, markerId : 0 }
           ],
           conditions : [
-            { left : { parent : 'dsitei__1',  attr : 'i' }, operator : '==', right : '1' }
+            { left : { parent : 'dsitei_EQ_1',  attr : 'i' }, operator : '==', right : '1' }
           ]
         },
         // eslint-disable-next-line
-        dsitei__0 : {
+        dsitei_EQ_0 : {
           name      : 'site',
           type      : 'objectInArray',
           parent    : 'd',
@@ -409,10 +409,10 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, posOrigin : 30, markerId : 1 }
+            { attr : 'id', formatters : [], obj : 'dsitei_EQ_0', pos : 30, posOrigin : 30, markerId : 1 }
           ],
           conditions : [
-            { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
+            { left : { parent : 'dsitei_EQ_0', attr : 'i' }, operator : '==', right : '0' }
           ]
         }
       });
@@ -431,7 +431,7 @@ describe('extracter', function () {
           xmlParts : []
         },
         // eslint-disable-next-line
-        dsitei__1303 : {
+        dsitei_EQ_1303 : {
           name      : 'site',
           type      : 'objectInArray',
           parent    : 'd',
@@ -439,14 +439,14 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__1303', pos : 20, posOrigin : 20, markerId : 0 }
+            { attr : 'id', formatters : [], obj : 'dsitei_EQ_1303', pos : 20, posOrigin : 20, markerId : 0 }
           ],
           conditions : [
-            { left : { parent : 'dsitei__1303',  attr : 'i' }, operator : '==', right : '1303' }
+            { left : { parent : 'dsitei_EQ_1303',  attr : 'i' }, operator : '==', right : '1303' }
           ]
         },
         // eslint-disable-next-line
-        dsitei__0 : {
+        dsitei_EQ_0 : {
           name      : 'site',
           type      : 'objectInArray',
           parent    : 'd',
@@ -454,10 +454,10 @@ describe('extracter', function () {
           position  : {},
           iterators : [],
           xmlParts  : [
-            { attr : 'id', formatters : [], obj : 'dsitei__0', pos : 30, posOrigin : 30, markerId : 1 }
+            { attr : 'id', formatters : [], obj : 'dsitei_EQ_0', pos : 30, posOrigin : 30, markerId : 1 }
           ],
           conditions : [
-            { left : { parent : 'dsitei__0', attr : 'i' }, operator : '==', right : '0' }
+            { left : { parent : 'dsitei_EQ_0', attr : 'i' }, operator : '==', right : '0' }
           ]
         }
       });
@@ -476,7 +476,7 @@ describe('extracter', function () {
           xmlParts : []
         },
         // eslint-disable-next-line
-        dsitesort__310i__1 : {
+        dsitesort_GT_310i_EQ_1 : {
           name      : 'site',
           type      : 'objectInArray',
           parent    : 'd',
@@ -486,21 +486,21 @@ describe('extracter', function () {
           xmlParts  : [{
             attr       : 'id',
             formatters : [],
-            obj        : 'dsitesort__310i__1',
+            obj        : 'dsitesort_GT_310i_EQ_1',
             pos        : 20,
             posOrigin  : 20,
             markerId   : 0
           }],
           conditions : [{
             left : {
-              parent : 'dsitesort__310i__1',
+              parent : 'dsitesort_GT_310i_EQ_1',
               attr   : 'i'
             },
             operator : '==',
             right    : '1'
           }, {
             left : {
-              parent : 'dsitesort__310i__1',
+              parent : 'dsitesort_GT_310i_EQ_1',
               attr   : 'sort'
             },
             operator : '>',
@@ -508,7 +508,7 @@ describe('extracter', function () {
           }]
         },
         // eslint-disable-next-line
-        dsitelang__enbank__54i__0 : {
+        dsitelang_EQ_enbank_LT_54i_EQ_0 : {
           name      : 'site',
           type      : 'objectInArray',
           parent    : 'd',
@@ -518,28 +518,28 @@ describe('extracter', function () {
           xmlParts  : [{
             attr       : 'id',
             formatters : [],
-            obj        : 'dsitelang__enbank__54i__0',
+            obj        : 'dsitelang_EQ_enbank_LT_54i_EQ_0',
             pos        : 30,
             posOrigin  : 30,
             markerId   : 1
           }],
           conditions : [{
             left : {
-              parent : 'dsitelang__enbank__54i__0',
+              parent : 'dsitelang_EQ_enbank_LT_54i_EQ_0',
               attr   : 'i'
             },
             operator : '==',
             right    : '0'
           }, {
             left : {
-              parent : 'dsitelang__enbank__54i__0',
+              parent : 'dsitelang_EQ_enbank_LT_54i_EQ_0',
               attr   : 'bank'
             },
             operator : '<',
             right    : '54'
           }, {
             left : {
-              parent : 'dsitelang__enbank__54i__0',
+              parent : 'dsitelang_EQ_enbank_LT_54i_EQ_0',
               attr   : 'lang'
             },
             operator : '==',
@@ -1131,7 +1131,7 @@ describe('extracter', function () {
           ]
         },
         // eslint-disable-next-line
-        dmenumenuElementi__0 : {
+        dmenumenuElementi_EQ_0 : {
           name      : 'menuElement',
           type      : 'objectInArray',
           parent    : 'dmenu',
@@ -1141,13 +1141,13 @@ describe('extracter', function () {
           xmlParts  : [{
             attr       : 'id',
             formatters : [],
-            obj        : 'dmenumenuElementi__0',
+            obj        : 'dmenumenuElementi_EQ_0',
             pos        : 40,
             posOrigin  : 40,
             markerId   : 4
           }],
           conditions : [
-            { left : { parent : 'dmenumenuElementi__0', attr : 'i' }, operator : '==', right : '0' }
+            { left : { parent : 'dmenumenuElementi_EQ_0', attr : 'i' }, operator : '==', right : '0' }
           ]
         }
       });
@@ -3205,7 +3205,7 @@ describe('extracter', function () {
           ]
         },
         // eslint-disable-next-line
-        dmenumenuElementi__0 : {
+        dmenumenuElementi_EQ_0 : {
           name      : 'menuElement',
           type      : 'objectInArray',
           parent    : 'dmenu',
@@ -3215,12 +3215,12 @@ describe('extracter', function () {
           xmlParts  : [{
             attr       : 'id',
             formatters : [],
-            obj        : 'dmenumenuElementi__0',
+            obj        : 'dmenumenuElementi_EQ_0',
             pos        : 40,
             posOrigin  : 40
           }],
           conditions : [
-            { left : { parent : 'dmenumenuElementi__0', attr : 'i' }, operator : '==', right : '0' }
+            { left : { parent : 'dmenumenuElementi_EQ_0', attr : 'i' }, operator : '==', right : '0' }
           ]
         }
       };

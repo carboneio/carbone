@@ -1,3 +1,7 @@
+### v4.6.8
+  - Release December 7th 2022
+  - Fix array filters when the same filter is used with different operators in multiple tags. Ex `{d[type=ok].id} {d[type!=ok].id}` 
+
 ### v4.6.7
   - Release December 5th 2022
   - Fix regression of v4.6.6 when multiple loops are used on the same table.

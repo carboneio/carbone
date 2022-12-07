@@ -778,6 +778,19 @@ describe('Aggregatted operations', function () {
   });
 
   describe('Custom tests', function () {
+    it('should accept the same filters with different operators', function (done) {
+      var _xml = '<xml>{d.table[type=free].text:aggCount} {d.table[type!=free].text:aggCount}</xml>';
+      var _data = {
+        table : [
+          { type : 'free', text : '10' },
+          { type : 'free', text : '20' }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml>2 0</xml>');
+        done();
+      });
+    });
     it('should accept global aggregation marker, and then a loop', function (done) {
       var _xml = '<xml> <a id="{d.cars[].brand:aggCount}"/> <t_row id="{d.cars[i].brand:cumCount}">{d.cars[i].brand}</t_row><t_row>{d.cars[i+1].brand}</t_row></xml>';
       var _data = {

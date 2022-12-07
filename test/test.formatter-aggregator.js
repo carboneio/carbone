@@ -791,6 +791,23 @@ describe('Aggregatted operations', function () {
         done();
       });
     });
+    it('should accept the same filters with different operators (all operators tested)', function (done) {
+      var _xml = '<xml>{d.table[type=16].text:aggCount} {d.table[type!=16].text:aggCount} {d.table[type>16].text:aggCount} {d.table[type<16].text:aggCount}</xml>';
+      var _data = {
+        table : [
+          { type : 16, text : '160' },
+          { type : 16, text : '160' },
+          { type : 15, text : '150' },
+          { type : 20, text : '200' },
+          { type : 21, text : '200' },
+          { type : 22, text : '200' }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml>2 4 3 1</xml>');
+        done();
+      });
+    });
     it('should accept global aggregation marker, and then a loop', function (done) {
       var _xml = '<xml> <a id="{d.cars[].brand:aggCount}"/> <t_row id="{d.cars[i].brand:cumCount}">{d.cars[i].brand}</t_row><t_row>{d.cars[i+1].brand}</t_row></xml>';
       var _data = {

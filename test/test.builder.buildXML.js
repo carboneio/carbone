@@ -1229,15 +1229,17 @@ describe('builder.buildXML', function () {
     });
   });
   it('should accept the same filters with different operators', function (done) {
-    var _xml = '<xml>{d.table[type=free].text} {d.table[type!=free].text}</xml>';
+    var _xml = '<xml>{d.table[type=16].text} {d.table[type!=16].text} {d.table[type>16].text} {d.table[type<16].text}</xml>';
     var _data = {
       table : [
-        { type : 'free', text : '10' },
-        { type : 'afree', text : '20' }
+        { type : 16, text : '160' },
+        { type : 15, text : '150' },
+        { type : 20, text : '200' },
+        { type : 1 , text : '10' },
       ]
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      assert.equal(_xmlBuilt, '<xml>10 20</xml>');
+      assert.equal(_xmlBuilt, '<xml>160 150 200 150</xml>');
       done();
     });
   });

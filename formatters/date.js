@@ -1,4 +1,4 @@
-var moment = require('moment');
+var dayjs = require('dayjs');
 
 
 /**
@@ -29,11 +29,11 @@ var moment = require('moment');
  */
 function formatD (d, patternOut, patternIn) {
   if (d !== null && typeof d !== 'undefined') {
-    moment.locale(this.lang);
+    dayjs.locale(this.lang);
     if (patternIn) {
-      return moment(d + '', patternIn).format(patternOut);
+      return dayjs(d + '', patternIn).format(patternOut);
     }
-    return moment(d + '').format(patternOut);
+    return dayjs(d + '').format(patternOut);
   }
   return d;
 }
@@ -62,8 +62,8 @@ function formatD (d, patternOut, patternIn) {
  */
 function convDate (d, patternIn, patternOut) {
   if (d !== null && typeof d !== 'undefined') {
-    moment.locale(this.lang);
-    return moment(d + '', patternIn).format(patternOut);
+    dayjs.locale(this.lang);
+    return dayjs(d + '', patternIn).format(patternOut);
   }
   return d;
 }

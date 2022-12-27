@@ -42,5 +42,5 @@
     "lint:fix": "eslint ./*/**.js --fix",
     "test": "node ./node_modules/mocha/bin/mocha test --timeout 100000 --exit"
   },
-  "version": "4.0.0"
+  "version": "4.1.0"
 }

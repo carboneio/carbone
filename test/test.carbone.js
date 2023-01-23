@@ -2357,13 +2357,13 @@ describe('Carbone', function () {
       });
       it('should return an error if begin or end is missing', function (done) {
         carbone.renderXML('<xml> {d.val:ifEQ(3):hideBegin} </xml>', {}, function (err) {
-          assert.equal(err+'', 'Error: Missing at least one showEnd or hideEnd');
+          assert.equal(err+'', 'Error: Missing showEnd or hideEnd of these tag: {d.val:ifEQ(3):hideBegin}');
           carbone.renderXML('<xml> {d.val:ifEQ(3):showBegin} </xml>', {}, function (err) {
-            assert.equal(err+'', 'Error: Missing at least one showEnd or hideEnd');
+            assert.equal(err+'', 'Error: Missing showEnd or hideEnd of these tag: {d.val:ifEQ(3):showBegin}');
             carbone.renderXML('<xml> {d.val:ifEQ(3):showEnd} </xml>', {}, function (err) {
-              assert.equal(err+'', 'Error: Missing at least one showBegin or hideBegin');
+              assert.equal(err+'', 'Error: Missing showBegin or hideBegin of this tag {d.val:ifEQ(3):showEnd}');
               carbone.renderXML('<xml> {d.val:ifEQ(3):hideEnd} </xml>', {}, function (err) {
-                assert.equal(err+'', 'Error: Missing at least one showBegin or hideBegin');
+                assert.equal(err+'', 'Error: Missing showBegin or hideBegin of this tag {d.val:ifEQ(3):hideEnd}');
                 done();
               });
             });

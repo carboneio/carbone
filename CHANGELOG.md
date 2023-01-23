@@ -1,3 +1,6 @@
+### v4.6.x
+  - Improve error message when there is a missing [show|hide]Begin/End
+
 ### v4.6.8
   - Release December 7th 2022
   - Fix array filters when the same filter is used with different operators in multiple tags. Ex `{d[type=ok].id} {d[type!=ok].id}` 

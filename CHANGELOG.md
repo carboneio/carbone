@@ -1,5 +1,6 @@
-### v4.6.x
+### v4.7.0
   - Improve error message when there is a missing [show|hide]Begin/End
+  - Fix: Accept PDF password with integers
   - [EE] Support Bubble charts in Docx templates.
 
 ### v4.6.8

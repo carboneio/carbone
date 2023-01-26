@@ -3954,7 +3954,7 @@ describe('Carbone', function () {
         });
       });
     });
-    it('should render and open a pdf with a password (complete) (it takes 5000ms on average)', function (done) {
+    it('should accept INTEGER password in PDF conversion', function (done) {
       const _password = 1234;
       const data = [
         { id : 1, name : 'Apple' },

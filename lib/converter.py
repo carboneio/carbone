@@ -134,6 +134,8 @@ def convert(message):
                         exportfilter.append(PropertyValue(name, 0, True, 0))
                     elif value in ('False', 'false'):
                         exportfilter.append(PropertyValue(name, 0, False, 0))
+                    elif name in ('DocumentOpenPassword', 'PermissionPassword'):
+                        exportfilter.append(PropertyValue(name, 0, value, 0))
                     else:
                         try:
                             exportfilter.append(PropertyValue(name, 0, int(value), 0))

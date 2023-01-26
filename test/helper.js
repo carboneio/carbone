@@ -49,10 +49,13 @@ const helperTests = {
     for (var i = 0; i < _max; i++) {
       var _resultFile   = carboneResult.files[i] || {};
       var _expectedFile = _expected.files[i] || {};
+      if (_resultFile.name === undefined) {
+        throw Error ('Missing file in the result.\n\nRESULT:\n' + carboneResult.files.map(e => e.name).join('\n')+ '\n\nEXPECTED:\n'+_expected.files.map(e => e.name).join('\n'));
+      }
       if (_resultFile.name !== _expectedFile.name) {
         for (var j = 0; j < _expected.files.length; j++) {
           _expectedFile = _expected.files[j];
-          if (_resultFile.name === _expectedFile.name) {
+          if (_resultFile.name === _expectedFile.name && _resultFile.parent === _expectedFile.parent) {
             break;
           }
         }

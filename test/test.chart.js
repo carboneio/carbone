@@ -322,6 +322,19 @@ describe('chart', function () {
         done();
       });
     });
+    it('should accepts bubble charts', function (done) {
+      const _data = [
+        { label : 'chart2_1' , valCol1 : 40 , valCol2 : 400.1, valCol3 : 10 },
+        { label : 'chart2_2' , valCol1 : 50 , valCol2 : 500.2, valCol3 : 20 },
+        { label : 'chart2_3' , valCol1 : 60 , valCol2 : 600.3, valCol3 : 30 }
+      ];
+      const _testedReport = 'chart/docx-bubble';
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
   describe('updateChartRowsAndColumnsCounter', function () {

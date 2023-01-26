@@ -3954,6 +3954,35 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should accept INTEGER password in PDF conversion', function (done) {
+      const _password = 1234;
+      const data = [
+        { id : 1, name : 'Apple' },
+        { id : 2, name : 'Banana' },
+        { id : 3, name : 'Jackfruit' }
+      ];
+      const _options = {
+        convertTo : {
+          formatName    : 'pdf',
+          formatOptions : {
+            EncryptFile          : true,
+            DocumentOpenPassword : _password
+          }
+        }
+      };
+      // test_word_render_2003_XML.xml;
+      carbone.render('test_spreadsheet.ods', data, _options, (err, result) => {
+        helper.assert(err, null);
+        assert.equal(result.slice(0, 4).toString(), '%PDF');
+        const loadingTask = pdfjsLib.getDocument({data : result, password : _password + ''});
+        loadingTask.promise.then((doc) => {
+          assert.equal(doc.numPages, 1);
+          done();
+        }, () => {
+          done(new Error('Bad password.'));
+        });
+      });
+    });
     it('should render a jpg wih specific resolutions and quality', function (done) {
       const data = [
         { id : 1, name : 'Apple' },

@@ -1,7 +1,8 @@
 ### v4.7.0
+  - Release January 26th 2023
   - Improve error message when there is a missing [show|hide]Begin/End
   - Fix: Accept PDF password with integers
-  - [EE] Support Bubble charts in Docx templates.
+  - [EE] Support Bubble charts in Docx templates
 
 ### v4.6.8
   - Release December 7th 2022

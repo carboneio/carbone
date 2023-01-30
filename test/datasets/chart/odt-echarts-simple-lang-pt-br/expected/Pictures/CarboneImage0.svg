@@ -1,5 +1,5 @@
 <svg width="600" height="400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" viewBox="0 0 600 400">
-<rect width="600" height="400" x="0" y="0" id="0" fill="none" fill-opacity="1"></rect>
+<rect width="600" height="400" x="0" y="0" id="0" fill="none"></rect>
 <path d="M80 120l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
 <path d="M80 140l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
 <path d="M80 160l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
@@ -60,7 +60,7 @@
 <polyline points="180 60 180 80 180 80 180 100 180 100 180 120 160 120 160 140 160 140 160 160 160 160 160 180 160 180 160 200" fill="none" stroke="#000"></polyline>
 <polyline points="99.5 60 180.5 60" fill="none" stroke="#000"></polyline>
 <polyline points="79.5 200 160.5 200" fill="none" stroke="#000"></polyline>
-<text dominant-baseline="central" text-anchor="middle" style="font-size:20px;font-family:sans-serif;font-weight:bolder;" y="-6" transform="matrix(0,-1,1,0,50,130)" fill="#ccc">2017</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:20px;font-family:sans-serif;font-weight:bolder;" y="-10" transform="matrix(0,-1,1,0,50,130)" fill="#ccc">2017</text>
 <text dominant-baseline="central" text-anchor="middle" style="font-size:12px;font-family:sans-serif;" x="130" y="49" fill="#000">Fev</text>
 <text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="70" fill="#000">D</text>
 <text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="90" fill="#000">S</text>

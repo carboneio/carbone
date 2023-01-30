@@ -1,3 +1,8 @@
+### v4.8.0
+  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`. 
+    If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
+  - Update Echarts to 5.4.1, dayjs to 1.11.7
+
 ### v4.7.0
   - Release January 26th 2023
   - Improve error message when there is a missing [show|hide]Begin/End

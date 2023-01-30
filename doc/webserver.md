@@ -492,13 +492,13 @@ const path = require('path');
  */
 function getPublicKey (req, res, payload, callback) {
   // Read the public key on disk or somewhere else
-  fs.readFile(path.join(__dirname, '..', 'config', 'key.pub'), 'utf8', (err, content) => {
+  fs.readFile(path.join(__dirname, '..', 'config', 'key.pub'), 'utf8', (err, publicKey) => {
     if (err) {
-      return callback(new Error('Cannot read public key ' + err.toString()));
+      return callback(new Error('Cannot read public key ' + err.toString()), null);
     }
 
-    // Return the public key content in the callback
-    return callback(content)
+    // Return the public key publicKey in the callback
+    return callback(null, publicKey)
   });
 }
 

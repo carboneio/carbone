@@ -3,6 +3,7 @@
     If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
   - Update Echarts to 5.4.1, dayjs to 1.11.7
   - Fix horizontal loops in DOCX tables
+  - Ignore `hardRefresh : true` if the output file type is the same as the template type, and the file type is unknown by LibreOffice (example: XML to XML)
 
 ### v4.7.0
   - Release January 26th 2023

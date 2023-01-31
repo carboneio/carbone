@@ -3292,15 +3292,15 @@ describe('Carbone', function () {
         done();
       });
     });
-
-    it('should return an error if hardRefresh is set to true on unknown files for LibreOffice', function (done) {
+    it('should ignore hardRefresh true on unknown files for LibreOffice', function (done) {
       var data = {
         field1 : 'field_1',
         field2 : 'field_2'
       };
       carbone.render('test_word_render_2003_XML.xml', data, { hardRefresh : true }, function (err, result) {
-        helper.assert(err+'', 'Format "xml" can\'t be converted to "xml".');
-        assert.equal(result, null);
+        helper.assert(err+'', 'null');
+        assert.equal(result.indexOf('field1'), -1);
+        assert.equal(result.indexOf('field2'), -1);
         done();
       });
     });

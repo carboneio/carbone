@@ -10,7 +10,7 @@ var testPath = path.join(__dirname, 'test_file');
 var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
 var pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
-var os = require('os');
+const helperTest = require('./helper');
 
 describe('Carbone', function () {
 
@@ -3741,6 +3741,19 @@ describe('Carbone', function () {
           assert.equal((_elapsed < (200 * helper.CPU_PERFORMANCE_FACTOR)), true);
           done();
         }
+      });
+    });
+    it('should fix DOCX tables when horizontal loops are used', function (done) {
+      const _data = [
+        { name : 'row1' , id : 10 },
+        { name : 'row2' , id : 20 },
+        { name : 'row3' , id : 30 }
+      ];
+      const _testedReport = 'general/docx-horizontal-loop';
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
       });
     });
   });

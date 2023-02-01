@@ -4,7 +4,22 @@ var assert = require('assert');
 
 describe('extracter', function () {
 
-
+  describe('removeLastTableGridDocx', function () {
+    it('should remove <w:tblGrid> of the last table the DOCX', function () {
+      helper.assert(extracter.removeLastTableGridDocx(''), {isFound : false, text : '' });
+      helper.assert(extracter.removeLastTableGridDocx()  , {isFound : false, text : undefined });
+      helper.assert(extracter.removeLastTableGridDocx('sdsd'), {isFound : false, text : 'sdsd' });
+      helper.assert(extracter.removeLastTableGridDocx('sdsd1<w:tblGrid> a </w:tblGrid>2zdz'), {isFound : true, text : 'sdsd12zdz' });
+      helper.assert(extracter.removeLastTableGridDocx('sd<w:tblGrid> a </w:tblGrid>sd1<w:tblGrid> a </w:tblGrid>2zdz'), {
+        isFound : true,
+        text    : 'sd<w:tblGrid> a </w:tblGrid>sd12zdz'
+      });
+      helper.assert(extracter.removeLastTableGridDocx('sd<w:tblGrid> a </w:tblGrid>sd1<w:tbl>2zdz'), {
+        isFound : true,
+        text    : 'sd<w:tblGrid> a </w:tblGrid>sd1<w:tbl>2zdz'
+      });
+    });
+  });
   describe('splitMarkers', function () {
     it('should return an empty descriptor if there are no markers', function () {
       var _markers = [];

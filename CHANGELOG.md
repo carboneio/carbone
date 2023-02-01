@@ -4,6 +4,7 @@
   - Update Echarts to 5.4.1, dayjs to 1.11.7
   - Fix horizontal loops in DOCX tables
   - Ignore `hardRefresh : true` if the output file type is the same as the template type, and the file type is unknown by LibreOffice (example: XML to XML)
+  - Fix: The parameter of the formatter should not be considered as a dynamic variable if it starts with a dot and is surrounded by quotes as in v3.x
 
 ### v4.7.0
   - Release January 26th 2023

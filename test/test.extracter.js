@@ -3178,6 +3178,9 @@ describe('extracter', function () {
     it('should keep dynamic paramaters', function () {
       helper.assert(extracter.parseFormatter('format(.size, ..id)') , { str : 'format', args : ['.size', '..id']});
     });
+    it('should add a hidden character when a dynamic parameter is written between quotes to force the builder to consider it is a string instead of a variable', function () {
+      helper.assert(extracter.parseFormatter("format('.size', '..id')") , { str : 'format', args : ['\u0001.size', '\u0001..id']});
+    });
     it('should accept escaped comma', function () {
       helper.assert(extracter.parseFormatter('format(bla%2ca)') , { str : 'format', args : ['bla%2ca']});
     });

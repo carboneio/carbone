@@ -668,6 +668,20 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should print the text between quotes, and ignore the dot (not a variable). Very important for RTL language which starts with a dot', function (done) {
+      var data = {
+        arr : [{ id : 1 }, { id : 2 }]
+      };
+      carbone.renderXML("<xml>{d.other:ifEmpty('.sdsd')}</xml>", data, {complement : {}}, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>.sdsd</xml>');
+        carbone.renderXML("<xml>{d.arr[].id:aggSum:ifEQ(3):show('.other'):elseShow('..all')}</xml>", data, {complement : {}}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>.other</xml>');
+          done();
+        });
+      });
+    });
     it('should execute formatter if the data array is empty with the formatter ifEmpty', function (done) {
       var data = [];
       carbone.renderXML('<xml>{d:ifEmpty(\'yeah\')} {c:ifEmpty(\'oops\')}</xml>', data, {complement : []}, function (err, result) {

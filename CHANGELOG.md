@@ -1,4 +1,5 @@
 ### v4.8.1
+  - Release February 3rd 2023
   - Fix regular hyperlinks in DOCX (bug introduced by v4.6.3)
 
 ### v4.8.0

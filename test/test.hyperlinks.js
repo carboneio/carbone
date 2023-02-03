@@ -852,6 +852,31 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
           done();
         });
       });
+      it('should update regular hyperlinks', function (done) {
+        const _testedReport = 'hyperlink/docx-normal';
+        const _data = {
+          id1 : 'car1',
+          id2 : 'car2',
+          id3 : 'car3'
+        };
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false }, (err, res) => {
+          helper.assert(err+'', 'null');
+          helper.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('should update regular hyperlinks in loops', function (done) {
+        const _testedReport = 'hyperlink/docx-normal-loop';
+        const _data = [
+          { id : 'car1' },
+          { id : 'car2' }
+        ];
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false }, (err, res) => {
+          helper.assert(err+'', 'null');
+          helper.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
     });
   });
 

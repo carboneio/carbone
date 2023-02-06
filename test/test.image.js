@@ -1655,7 +1655,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     });
 
     describe('XLSX preprocess xml', function () {
-      it('should replace the main document tag attributes with image markers and formatters', function (done) {
+      it('should replace the main document tag attributes with image markers and formatters <a:blip r:embed="rId1"></a:blip>', function (done) {
         let _template = {
           files : [
             {
@@ -1665,6 +1665,21 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           ]
         };
         let _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr=""></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="{d.tests.image:generateImageXlsxReference(1)}"></a:blip><a:stretch/></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>';
+        image.preProcessXLSX(_template);
+        helperTest.assert(_template.files[0].data, _expectedXML);
+        done();
+      });
+
+      it('should replace the main document tag attributes with image markers and formatters <a:blip r:embed="rId1"/>', function (done) {
+        let _template = {
+          files : [
+            {
+              name : 'xl/drawings/drawing1.xml',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr="{d.tests.image}"></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="rId1"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>'
+            }
+          ]
+        };
+        let _expectedXML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>0</xdr:col><xdr:colOff>285480</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>8640</xdr:rowOff></xdr:from><xdr:to><xdr:col>1</xdr:col><xdr:colOff>336600</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>50040</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="0" name="Image 1" descr=""></xdr:cNvPr><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="{d.tests.image:generateImageXlsxReference(1)}"/><a:srcRect/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:xfrm><a:off x="285480" y="171000"/><a:ext cx="866160" cy="529200"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln><a:noFill/></a:ln></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor></xdr:wsDr>';
         image.preProcessXLSX(_template);
         helperTest.assert(_template.files[0].data, _expectedXML);
         done();

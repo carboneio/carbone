@@ -1,3 +1,7 @@
+### v4.8.2
+  - Release February 7rd 2023
+  - Fix dynamic image injection in some XLSX files
+
 ### v4.8.1
   - Release February 3rd 2023
   - Fix regular hyperlinks in DOCX (bug introduced by v4.6.3)

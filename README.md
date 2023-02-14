@@ -29,8 +29,9 @@
 </p>
 
 
-
 <p><b>⚡️ Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using templates and your JSON data as input !</p>
+
+> 15th of February 2023 news: "Carbone just launched [on Product Hunt](https://www.producthunt.com/posts/carbone)! Feel free to support us, it will help us improving and involving the engine!"
 
 README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
 
@@ -155,14 +156,14 @@ Carbone does a lot of thing for you behind the scene:
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.0.4.2/deb/x86_64/LibreOffice_7.0.4.2_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.5.1.1/deb/x86_64/LibreOffice_7.5.1.1_Linux_x86-64_deb.tar.gz
 
   # Install required dependencies on ubuntu server for LibreOffice 7.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_7.0.4.2_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_7.0.4.2_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_7.5.1.1_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_7.5.1.1_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb

@@ -30,7 +30,7 @@
 
 
 
-<p><b>Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using your JSON data as input !</p>
+<p><b>⚡️ Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using templates and your JSON data as input !</p>
 
 README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
 
@@ -41,7 +41,6 @@ README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [Engli
 - [Features](#features)
 - [How it works?](#how-it-works)
 - [Minimum Requirements](#minimum-requirements)
-    - [Optional](#optional)
 - [Getting started](#getting-started)
   - [Basic sample](#basic-sample)
   - [PDF generation, document conversion](#pdf-generation-document-conversion)
@@ -59,15 +58,15 @@ README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [Engli
 
 ## Features
 
-  - **Extremely simple** : Use only LibreOffice™, OpenOffice™ or Microsoft Office™ to draw your report
-  - **Unlimited design** : The limit is your document editor: pagination, headers, footers, tables...
-  - **Convert documents** : thanks to the integrated document converter
-  - **Unique template engine** : Insert JSON-like markers `{d.companyName}` directly in your document
-  - **Flexible** : Use any XML documents as a template: docx, odt, ods, xlsx, html, pptx, odp, custom xml files...
-  - **Future-proof** : A powerful XML-agnostic algorithm understands what to do without knowing XML document specifications
-  - **Multilingual** : One template, multiple languages. Update translation files automatically
-  - **Format data** : Use built-in date and number formatters or create your own in Javascript
-  - **Fast** : Manage multiple LibreOffice threads for document conversion, optimized code generation for each report
+  - 🍏  **Extremely simple** : Create templates with LibreOffice™, Google Docs, Microsoft Office™, TinyMCE, CKEditor, ...
+  - 🎨 **Unlimited design** : The limit is your document editor: pagination, headers, footers, tables...
+  - 📝 **Convert documents** : thanks to the integrated document converter
+  - 📐 **Unique template engine** : Insert JSON-like markers `{d.companyName}` directly in your document
+  - ⭐️ **Flexible** : Use any XML documents as a template: docx, odt, ods, xlsx, html, pptx, odp, custom xml files...
+  - 🚀 **Future-proof** : A powerful XML-agnostic algorithm understands what to do without knowing XML document specifications
+  - 🌈 **Multilingual** : One template, multiple languages. Update translation files automatically
+  - 💎 **Format data** : Use built-in date and number formatters or create your own in Javascript
+  - 🏎 **Fast** : Manage multiple LibreOffice threads for document conversion, optimized code generation for each report
 
 ## How it works?
 
@@ -84,7 +83,7 @@ Carbone is working only on the server-side.
 
 ## Minimum Requirements
 
-- NodeJS 10.x+
+- NodeJS 12.x+
 - Runs on OSX, Linux (servers and desktop), and Windows
 
 #### Optional
@@ -258,13 +257,18 @@ To checkout out the Carbone CLI documentation, visit [carbone.io](https://carbon
 
 ## Issues
 
-If you're facing any issues, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/carboneio/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/carboneio/carbone/issues/new/choose).
+🥇 If you need **professional support**, please consider using the Cloud or On-Premise [Enterprise Edition](https://carbone.io/pricing.html) or chat with us on [Carbone.io](https://carbone.io).
+
+If you're facing any issues with this Community Edition, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/carboneio/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/carboneio/carbone/issues/new/choose).
+
 
 ## Roadmap
 
 The roadmap is pinned on the github issues list.
 
 ## Performance
+
+⚡️ Secret news of 14th Februrary 2023: we are building our own PDF converter, x200 faster than LibreOffice! Stay tuned.
 
 Report generation speed (without network latency), using a basic one-page DOCX template:
 
@@ -277,22 +281,18 @@ On a MacBook Pro Mid-2015, 2,2 Ghz i7, 16Go.
 
 There are two editions of Carbone:
 
-- Carbone Community Edition is available freely under the **Apache v2 license**
-- Carbone Enterprise Edition (hosted and on-premise) includes extra features like a user interface.
+- Carbone Community Edition is freely available under the [CCL Agreement](LICENSE.md). Roughly speaking, as long as you are not offering Carbone Community Edition Software as a hosted
+  Document-Generator-as-a-Service like [Carbone Cloud](https://carbone.io/pricing.html), you can use and modify all Community features for free.
+- Carbone Enterprise Edition (hosted and on-premise) includes additional features. [See comparison table](https://carbone.io/pricing.html#product-comparison)
 
-We want to follow the model of Gitlab. **The free version must be and must stay generous.**
-
+The Community Edition is one major version behind the Enterprise Edition. This rule may change in the future.
 
 ## Philosophy
 
 > Our ultimate goal
 
-2% percent of our hosted solution revenues will go to charity in three domains: open source software we love, education and environment.
+[2% percent](https://help.carbone.io/en-us/article/2-for-charitable-purposes-59iyg3) of our hosted solution revenues goes to charity
 
-We already know that beneficiaries will be, at least :heart:
-- LibreOffice foundation
-- PostgreSQL foundation
-- An innovative child school in France
 
 ## Contributors
 
@@ -312,3 +312,4 @@ Thanks to all Carbone contributors (random order)
   - Léo Labruyère
   - Aurélien Kermabon
   - [Steeve Payraudeau](https://github.com/steevepay)
+

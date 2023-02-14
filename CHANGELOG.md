@@ -1,11 +1,12 @@
 
 ### v3.5.1
   - Release February 14th 2023
+  - Bump dependencies
   - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.
       - Example: `{d.val:add(.otherQty  +  .vat  *  .price - 10 / 2)`
       - Only mathematical operators `+, *, -, /` are allowed, without parenthesis
       - Multiplication and division operators (`*`, `/`) has higher precedence than the addition/substration operator (`+`, `-`) and thus will be evaluated first.
-  - Gracefully exits on SIGTERM. When the signal is received
+  - Exits on SIGTERM. When the signal is received
   - Experimental: add the possibility to duplicate rows using an attribute of an object (200 repetitions maximum)
     *Data*:
       ```json

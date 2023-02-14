@@ -24,15 +24,15 @@
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin $PACKAGE_VERSION && git push github-origin $PACKAGE_VERSION"
   },
   "dependencies": {
-    "dayjs": "=1.10.7",
+    "dayjs": "=1.11.7",
     "dayjs-timezone-iana-plugin": "=0.1.0",
-    "debug": "=4.3.2",
+    "debug": "=4.3.4",
     "which": "=2.0.2",
     "yauzl": "=2.10.0",
     "yazl": "=2.5.1"
   },
   "devDependencies": {
-    "mocha": "=9.1.3"
+    "mocha": "=9.2.2"
   },
   "engines": {
     "node": ">= 12.14.0"

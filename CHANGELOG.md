@@ -1,3 +1,6 @@
+### v4.9.0
+  - Accept direct array access `d.tab[i][0]` TODO
+
 ### v4.8.2
   - Release February 7rd 2023
   - Fix dynamic image injection in some XLSX files

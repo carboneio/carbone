@@ -442,6 +442,30 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept direct array access', function (done) {
+    var _xml = '<xml> <br/> {d.tab[2][1]} <br/></xml>';
+    var _data = { tab : [
+      ['row1c1', 'row1c2', 'row1c3'],
+      ['row2c1', 'row2c2', 'row2c3'],
+      ['row3c1', 'row3c2', 'row3c3']
+    ]};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <br/> row3c2 <br/></xml>');
+      done();
+    });
+  });
+  it('should accept direct array access with loops', function (done) {
+    var _xml = '<xml> <br/> {d.tab[i][1]} <br/> {d.tab[i+1][1]} <br/></xml>';
+    var _data = { tab : [
+      ['row1c1', 'row1c2', 'row1c3'],
+      ['row2c1', 'row2c2', 'row2c3'],
+      ['row3c1', 'row3c2', 'row3c3']
+    ]};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <br/> row1c2 <br/> row2c2 <br/> row3c2 <br/> </xml>');
+      done();
+    });
+  });
   it('should manage nested arrays', function (done) {
     var _xml =
        '<xml>'

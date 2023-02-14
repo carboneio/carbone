@@ -1872,6 +1872,78 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should replace rId by md5 hash with id prepend', function (done) {
+    var formatters = require('../formatters/string.js');
+    var _xml = '<Relationships>{d.<Relationship Id="{d.dog:md5:prepend(id)}" Target="{d.dog}"/>toto}</Relationships>';
+    var _expect = '<Relationships>toto<Relationship Id="id319f27934db5dd8f03070e75989ca667" Target="https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg"/></Relationships>';
+    var _options = {
+      formatters : {
+        md5     : formatters.md5,
+        prepend : formatters.prepend
+      }
+    };
+    var _data = {
+      dog  : 'https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg',
+      toto : 'toto'
+    };
+    builder.buildXML(parser.removeXMLInsideMarkers(_xml), _data, _options, function (err, _xmlBuilt) {
+      assert.equal(_xmlBuilt, _expect);
+      done();
+    });
+  });
+  describe('EXPERIMENTAL: repeat rows with repeaters', function () {
+    it('should automatically repeat the xml if a repeater is used in i+1', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1*qty].brand} </t_row></xml>';
+      var _data = [
+        {brand : 'Lumeneo'     , qty : 1},
+        {brand : 'Tesla motors', qty : 0},
+        {brand : 'Toyota'      , qty : 3}
+      ];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row></xml>');
+        done();
+      });
+    });
+    it('should works if there are whitespaces arround attribute', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1 *  qty  ].brand} </t_row></xml>';
+      var _data = [
+        {brand : 'Lumeneo'     , qty : 1},
+        {brand : 'Tesla motors', qty : 0},
+        {brand : 'Toyota'      , qty : 3}
+      ];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> <t_row> Lumeneo </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row><t_row> Toyota </t_row></xml>');
+        done();
+      });
+    });
+    it('should show nothing if the value is empty', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1 *  qty  ].brand} </t_row></xml>';
+      var _data = [
+        {brand : 'Lumeneo'     , qty : -10},
+        {brand : 'Tesla motors', qty : -1},
+        {brand : 'Toyota'      , qty : -2}
+      ];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> </xml>');
+        done();
+      });
+    });
+    it('should limit the loop to 200', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1 *  qty  ].brand} </t_row></xml>';
+      var _data = [
+        {brand : 'Lumeneo'     , qty : 201},
+        {brand : 'Toyota'      , qty : 3}
+      ];
+      builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'Error: The repeater cannot be above 200');
+        helper.assert(_xmlBuilt, null);
+        done();
+      });
+    });
+  });
   /* it.skip('should not crash if the markes are not correct (see comment below)');*/
   /*
     [

@@ -1432,7 +1432,6 @@ describe('formatter', function () {
       helper.assert(numberFormatter.div('120', '80'), 1.5);
     });
   });
-
 });
 
 /**

@@ -1,3 +1,33 @@
+
+### v3.5.1
+  - Release February 14th 2023
+  - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.
+      - Example: `{d.val:add(.otherQty  +  .vat  *  .price - 10 / 2)`
+      - Only mathematical operators `+, *, -, /` are allowed, without parenthesis
+      - Multiplication and division operators (`*`, `/`) has higher precedence than the addition/substration operator (`+`, `-`) and thus will be evaluated first.
+  - Gracefully exits on SIGTERM. When the signal is received
+  - Experimental: add the possibility to duplicate rows using an attribute of an object (200 repetitions maximum)
+    *Data*:
+      ```json
+      [
+        { "id" : "A", "qty" : 2 },
+        { "id" : "B", "qty" : 3 },
+        { "id" : "C", "qty" : 0 },
+        { "id" : "D", "qty" : 1 }
+      ]
+      ```
+    *Template*: `{d[i].id} - {d[i+1*qty].id}`
+    *Result*:  `A - A - B - B - B - D`
+  - Add `options.isDebugActive`. If true, `POST /render` returns additional information in `debug` sub-object:
+    ```js
+    {
+      "renderId" : "file.pdf",
+      "debug"    : {
+        "markers" : ["{d.id}", "{d.tab[i].id}"] // all markers found in template
+      }
+    }
+    ```
+
 ### v3.4.1
   - Accepts "OpenDocument Text Flat XML" (.fodt) template files
   - Includes v3.3.3: fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time

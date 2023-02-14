@@ -5,6 +5,97 @@ var count   = require('../formatters/array').count;
 
 describe('parser', function () {
 
+  describe('parseMathematicalExpression', function () {
+    it('should parse simple mathematical expression and generate safe code', function () {
+      const _varParser = (v) => {
+        helper.assert(['.a', '.b'].includes(v), true);
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.a + .b', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_a_)+parseFloat(_b_)');
+    });
+    it('should parse more complex mathematical expression and generate safe code using safeCodeFn', function () {
+      const _varParser = (v) => {
+        helper.assert(['.aaa', '.b', '...parent[0].sub.id', '.toto', '223.234', '.part.id'].includes(v), true);
+        if (v[0] === '.') {
+          return '_'+ v.slice(1) + '_';
+        }
+        return v;
+      };
+      const _resultCode = parser.parseMathematicalExpression('.aaa +    .b   * ...parent[0].sub.id    -  .toto + 223.234 / .part.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_aaa_)+parseFloat(_b_)*parseFloat(_..parent[0].sub.id_)-parseFloat(_toto_)+parseFloat(223.234)/parseFloat(_part.id_)');
+    });
+    it('should return nothing if there is nothing to parse', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      helper.assert(parser.parseMathematicalExpression('  ', _varParser), '');
+      helper.assert(parser.parseMathematicalExpression(undefined, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression(null, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression({}, _varParser), '');
+      helper.assert(parser.parseMathematicalExpression([], _varParser), '');
+    });
+    it('should return one variable if there is one variable', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_id_)');
+    });
+    it('should return one float', function () {
+      const _varParser = (v) => {
+        return v;
+      };
+      const _resultCode = parser.parseMathematicalExpression('11233.23', _varParser);
+      helper.assert(_resultCode, 'parseFloat(11233.23)');
+    });
+    it('should return one negative float', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('-1123', _varParser);
+      helper.assert(_resultCode, '-parseFloat(_1123_)');
+    });
+    it('should not crash', function () {
+      const _varParser = (v) => {
+        return '_'+ v.slice(1) + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('sdsdsd( i\\\'d', _varParser);
+      helper.assert(_resultCode, '');
+    });
+    it('should accept dash in variable name', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.color-dash-bidule', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_.color-dash-bidule_)');
+    });
+    it('should accept dash in multiple variables', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('.color-dash-bidule - .other-bidule', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_.color-dash-bidule_)-parseFloat(_.other-bidule_)');
+    });
+    it('should return an error when mathematical expression is not correct', function () {
+      const _varParser = (v) => {
+        return '_' + v + '_';
+      };
+      /* eslint-disable */
+      assert.throws(() => { parser.parseMathematicalExpression('/10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "/10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('*10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "*10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('+10'       , _varParser); }, {  message : 'Bad Mathematical Expression in "+10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('///10'     , _varParser); }, {  message : 'Bad Mathematical Expression in "///10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 ++'     , _varParser); }, {  message : 'Bad Mathematical Expression in "10 ++"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 +'      , _varParser); }, {  message : 'Bad Mathematical Expression in "10 +"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10*'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10*"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10/'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10/"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10-'       , _varParser); }, {  message : 'Bad Mathematical Expression in "10-"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 ++ 10'  , _varParser); }, {  message : 'Bad Mathematical Expression in "10 ++ 10"' });
+      assert.throws(() => { parser.parseMathematicalExpression('10 //// 10', _varParser); }, {  message : 'Bad Mathematical Expression in "10 //// 10"' });
+      /* eslint-enable */
+    });
+  });
   describe('findMarkers', function () {
     it('should extract the markers from the xml, return the xml without the markers and a list of markers with their position in the xml\
         it should add the root object. It should replace the marker by a reserved character', function (done) {
@@ -1417,6 +1508,57 @@ describe('parser', function () {
       helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><table><tr><td><p></p></td></tr><tr><td><p></p></td></tr></table></xml>'), 5, 79), [[0, 76]]);
       helper.assert(parser.findSafeConditionalBlockPosition(convXML('<xml><p><p><p><p> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml>'), 17.9, 65.9), [[5, 65]]);
       helper.assert(parser.findSafeConditionalBlockPosition(convXML('<a>text</a><b></b><c></c><d>x</d><br/>'), 3.9, 28.1), [[0, 25]]);
+    });
+  });
+
+  describe('isCarboneMarker', function () {
+    it('should not find a marker', function () {
+      helper.assert(parser.isCarboneMarker(''), false);
+      helper.assert(parser.isCarboneMarker('{}'), false);
+      helper.assert(parser.isCarboneMarker('   {   c   .value}'), false);
+      helper.assert(parser.isCarboneMarker('<text:span text:style-name="T3">{}</text:span>{d.<text:span text:style-name="T3">text}</text:span>'), false);
+      helper.assert(parser.isCarboneMarker('<text:span text:style-name="T3">{c.element</text:span>}'), false);
+      helper.assert(parser.isCarboneMarker('  {d.value}'), false);
+      helper.assert(parser.isCarboneMarker('  {   $  mealOf(2)}'), false);
+
+    });
+
+    it('should not find Carbone markers', function () {
+      // normal
+      helper.assert(parser.isCarboneMarker('{d.value}'), true);
+      helper.assert(parser.isCarboneMarker('{d.el.value.table}'), true);
+      helper.assert(parser.isCarboneMarker('{   d    .  value}'), true);
+      helper.assert(parser.isCarboneMarker('{c.value}'), true);
+      helper.assert(parser.isCarboneMarker('{   c   .value}'), true);
+      // formatters
+      helper.assert(parser.isCarboneMarker('{d.value:add(2):div(10)}'), true);
+      helper.assert(parser.isCarboneMarker('{d.value:ifEQ(\'This is a text\'):show(\'Hello there\'):elseShow(\'34\')}'), true);
+      helper.assert(parser.isCarboneMarker('{d.birthday:convDate(YYYY-MM-DD, LL)}'), true);
+      helper.assert(parser.isCarboneMarker('{d.subObject.qtyB:add(.qtyC):add(..qtyA)}'), true);
+      // Loops
+      helper.assert(parser.isCarboneMarker('{d[i=1].movie}'), true);
+      helper.assert(parser.isCarboneMarker('{d.cars[i].brand}'), true);
+      helper.assert(parser.isCarboneMarker('{d.cars[i+1].brand}'), true);
+      helper.assert(parser.isCarboneMarker('{d[i+1].models[i+1].size }'), true);
+      // Loops + filters
+      helper.assert(parser.isCarboneMarker('{d[i+1, age > 19, age < 30].name}'), true);
+      helper.assert(parser.isCarboneMarker('{d[i+1, type=\'rocket\'].name}'), true);
+      // alias
+      helper.assert(parser.isCarboneMarker('{#mealOf($weekday) = d[weekday = $weekday].name}'), true);
+      helper.assert(parser.isCarboneMarker('{ #   mealOf($weekday) = d[weekday = $weekday].name}'), true);
+      helper.assert(parser.isCarboneMarker('{ #   mealOf($weekday) = d[weekday = $weekday].name}'), true);
+      helper.assert(parser.isCarboneMarker('{ #   mealOf($weekday) = d[weekday = $weekday].name}'), true);
+      helper.assert(parser.isCarboneMarker('{$mealOf(2)}'), true);
+      helper.assert(parser.isCarboneMarker('{   $  mealOf(2)}'), true);
+      // Translation
+      helper.assert(parser.isCarboneMarker('{t(\'name\')}'), true);
+      helper.assert(parser.isCarboneMarker('{t(\'apples\')}'), true);
+      helper.assert(parser.isCarboneMarker('{   t    (\'apples\')}'), true);
+      // BindColor
+      helper.assert(parser.isCarboneMarker('{bindColor(#FF0000,#hexa)=d.color}'), true);
+      helper.assert(parser.isCarboneMarker('{bindColor(red,color)=d.list[0].color}'), true);
+      helper.assert(parser.isCarboneMarker('{   bindColor(#00fa19, hsl) = d.color2}'), true);
+      helper.assert(parser.isCarboneMarker('{   bindColor(#00fa19, hsl) = d.color2}'), true);
     });
   });
 

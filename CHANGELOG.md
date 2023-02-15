@@ -1,3 +1,7 @@
+### v4.8.3
+  - Release February 15th 2023
+  - [EE] Experimental: increase the limit to 400 repetitions maximum when using the repetition feature `{d[i+1*qty]`
+
 ### v4.8.2
   - Release February 7rd 2023
   - Fix dynamic image injection in some XLSX files

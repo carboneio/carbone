@@ -1,5 +1,5 @@
 
-### v3.5.1
+### v3.5.5
   - Release February 15th 2023
   - Bump dependencies
   - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.

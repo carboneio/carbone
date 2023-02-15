@@ -31,15 +31,16 @@
 
 <p><b>⚡️ Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using templates and your JSON data as input !</p>
 
-> 15th of February 2023 news: "Carbone just launched [on Product Hunt](https://www.producthunt.com/posts/carbone)! Feel free to support us, it will help us improving and involving the engine!"
+### News
 
-README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
+15th of February 2023: Carbone just launched [on Product Hunt](https://www.producthunt.com/posts/carbone)! Feel free to support us. It will help us improve the engine!
 
-### NEWS ⚡️ 
-
-Some people ask us if the community edition is still maintained. Yes, of course! Lately we have prioritized our development for the Enterprise Edition. We have made a lot of code refactoring in Carbone v4. And we need some time to change the method to update the community edition. Feel free to contact us on the chat if you need further information on https://carbone.io/ 
+Please consider using the Cloud or On-Premise [Enterprise Edition](https://carbone.io/pricing.html) if you need **professional support**. 
+The Community Edition is one major version behind the Enterprise Edition. Feel free to contact us [on the chat](https://carbone.io) if you need further information.
 
 ## Table of content
+
+README language: 🇨🇳 [简体中文](./doc/README.zh-cn.md), 🇺🇸 [English](README.md)
 
 <!-- MarkdownTOC -->
 
@@ -262,10 +263,7 @@ To checkout out the Carbone CLI documentation, visit [carbone.io](https://carbon
 
 ## Issues
 
-🥇 If you need **professional support**, please consider using the Cloud or On-Premise [Enterprise Edition](https://carbone.io/pricing.html) or chat with us on [Carbone.io](https://carbone.io).
-
 If you're facing any issues with this Community Edition, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/carboneio/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/carboneio/carbone/issues/new/choose).
-
 
 ## Roadmap
 

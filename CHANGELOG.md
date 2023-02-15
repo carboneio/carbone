@@ -421,6 +421,10 @@
         - Sum by people by age and gender, regardless of departments
           - `{d.departments[i].people[i].salary:aggSum(.age, .gender)}`
 
+### v3.5.5
+  - Release December 7th 2022
+  - Add user-agent `Carbone` when webhook is called.
+
 ### v3.5.4
   - Release June 15th 2022
   - [EE] Do not return an error when `DEL /template` is called and the template is already deleted on local storage. It may be already deleted by the plugin.

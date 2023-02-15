@@ -1,6 +1,6 @@
 
 ### v3.5.1
-  - Release February 14th 2023
+  - Release February 15th 2023
   - Bump dependencies
   - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.
       - Example: `{d.val:add(.otherQty  +  .vat  *  .price - 10 / 2)`

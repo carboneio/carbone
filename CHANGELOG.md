@@ -1,3 +1,6 @@
+### v4.9.0
+  - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}`
+  
 ### v4.8.3
   - Release February 15th 2023
   - [EE] Experimental: increase the limit to 400 repetitions maximum when using the repetition feature `{d[i+1*qty]`

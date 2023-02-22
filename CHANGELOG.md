@@ -1,5 +1,7 @@
 ### v4.9.0
   - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}` or `{d.id:print(c.other[0].test)}`
+  - [EE] Force download of the rendered report when the query paramater `?download=true` is set
+  - [EE] Increase request timeout from 5 to 6 seconds to download images from URLs
   
 ### v4.8.3
   - Release February 15th 2023

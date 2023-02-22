@@ -1275,6 +1275,33 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should accept absolute path if d. and c. are used without quotes', function (done) {
+        var data = {
+          param     : 3,
+          subObject : {
+            id : 2
+          },
+          textToPrint : 'ddfdf'
+        };
+        var options =  {
+          complement : {
+            other : 'hello'
+          }
+        }
+        carbone.renderXML('<xml>{d.subObject.id:print(d.param)} {d.subObject.id:print(c.other)} {d.param:print(d.subObject.id)} </xml>', data, options, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>3 hello 2 </xml>');
+          carbone.renderXML('<xml>{d.subObject.id:print(\'d.param\')} {d.subObject.id:print(\'c.other\')} </xml>', data, options, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml>d.param c.other </xml>');
+            carbone.renderXML('<xml>{d.subObject.id:print(dparam)} {d.subObject.id:print(cother)} </xml>', data, options, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>dparam cother </xml>');
+              done();
+            });
+          });
+        });
+      });
       it('should accept to access direct parent objects and allow to access children objects of that parent', function (done) {
         var data = {
           param     : 3,
@@ -1375,12 +1402,12 @@ describe('Carbone', function () {
           done();
         });
       });
-      it('should accept direct access of an other array, with sub-objects, within a loop with [.i] syntax', function (done) {
+      it('should accept direct access of an other array, with sub-objects, within a loop with [.i] syntax, and with absolute path', function (done) {
         var _xml = ''
           + '<d>'
           + '  <l>'
           + '    <acc>{d[i].groups[i].label}</acc>'
-          + '    <sub>{d[i].groups[i].label:print(..direct[.i].sub.id)}</sub>'
+          + '    <sub>{d[i].groups[i].label:print(..direct[.i].sub.id)} {d[i].groups[i].label:print(c.sub[1].arr[.i].text)}</sub>'
           + '  </l>'
           + '  <l>'
           + '    {d[i].groups[i+1]}'
@@ -1400,44 +1427,45 @@ describe('Carbone', function () {
             direct : [ { sub : { id : 'zz' }} ]
           }
         ];
-        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        var _options = {
+          complement : {
+            sub : [{id : 1}, {id : 5, arr : [{text : '123'}, {text: '456'}, {text:'789'}]}]
+          }
+        }
+        carbone.renderXML(_xml, _data, _options, function (err, _xmlBuilt) {
           helper.assert(err+'', 'null');
           helper.assert(_xmlBuilt, ''
             + '<d>'
             + '  <l>'
             + '    <acc>10</acc>'
-            + '    <sub>aa</sub>'
+            + '    <sub>aa 123</sub>'
             + '  </l>'
             + '  <l>'
             + '    <acc>11</acc>'
-            + '    <sub>cc</sub>'
+            + '    <sub>cc 456</sub>'
             + '  </l>  '
             + '  <l>'
             + '    <acc>20</acc>'
-            + '    <sub>zz</sub>'
+            + '    <sub>zz 123</sub>'
             + '  </l>'
             + '  <l>'
             + '    <acc>30</acc>'
-            + '    <sub></sub>'
+            + '    <sub> 456</sub>'
             + '  </l>    '
             + '</d>'
           );
           done();
         });
       });
-      it.skip('should not try to reach the object attribute if the attribute is between double quotes and simple quotes', function (done) {
+      it('should not try to reach the object attribute if the attribute is between double quotes and simple quotes', function (done) {
         var data = {
           param       : 3,
           textToPrint : 'ddfdf'
         };
-        carbone.renderXML('<xml>{d.param:ifEqual(3, ".textToPrint")}</xml>', data, function (err, result) {
+        carbone.renderXML('<xml>{d.param:ifEqual(3, \'.textToPrint\')}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml>.textToPrint</xml>');
-          carbone.renderXML('<xml>{d.param:ifEqual(3, \'.textToPrint\')}</xml>', data, function (err, result) {
-            helper.assert(err+'', 'null');
-            helper.assert(result, '<xml>.textToPrint</xml>');
-            done();
-          });
+          done();
         });
       });
       it('should accept to access direct parent objects if two points are used', function (done) {

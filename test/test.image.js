@@ -2295,7 +2295,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('should return an error when the request timeout', function (done) {
         nock('https://google.com')
           .get('/random-image.jpeg')
-          .delay(6000)
+          .delay(7000)
           .reply(200, '<html></html>');
         image.downloadImage('https://google.com/random-image.jpeg', {}, {}, function (err, imageInfo) {
           helperTest.assert(err.message, 'Request timed out');

@@ -1416,6 +1416,28 @@ describe('Webserver', () => {
         });
       });
 
+      it('should force download of the rendered report if download=true is set in the query', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          reportName : 'renderedReport',
+          complement : {},
+          enum       : {},
+          convertTo  : 'pdf'
+        };
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          assert.strictEqual(err, null);
+          get.concat(getBody(4000, `/render/${data.data.renderId}?download=true`, 'GET'), (err, res) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(res.headers['content-type'], 'application/pdf');
+            assert.strictEqual(res.headers['content-disposition'], 'attachment; filename="renderedReport.pdf"');
+            done();
+          });
+        });
+      });
+
       it('should retrieve the render file, get the filename and get the header "access-control-expose-headers" for CORS', (done) => {
         const body = {
           data : {

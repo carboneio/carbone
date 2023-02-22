@@ -1,5 +1,13 @@
+
 ### v4.9.0
   - Accept direct array access `d.tab[i][0]` TODO
+  - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}` or `{d.id:print(c.other[0].test)}`
+  - [EE] Force download of the rendered report when the query paramater `?download=true` is set
+  - [EE] Increase request timeout from 5 to 6 seconds to download images from URLs
+  
+### v4.8.3
+  - Release February 15th 2023
+  - [EE] Experimental: increase the limit to 400 repetitions maximum when using the repetition feature `{d[i+1*qty]`
 
 ### v4.8.2
   - Release February 7rd 2023
@@ -423,6 +431,10 @@
           - `{d.departments[i].people[i].salary:aggSum(.age)}`
         - Sum by people by age and gender, regardless of departments
           - `{d.departments[i].people[i].salary:aggSum(.age, .gender)}`
+
+### v3.5.5
+  - Release December 7th 2022
+  - Add user-agent `Carbone` when webhook is called.
 
 ### v3.5.4
   - Release June 15th 2022

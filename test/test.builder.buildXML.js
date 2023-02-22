@@ -2186,11 +2186,11 @@ describe('builder.buildXML', function () {
     it('should limit the loop to 200', function (done) {
       var _xml = '<xml> <t_row> {d[i].brand} </t_row><t_row> {d[i+1 *  qty  ].brand} </t_row></xml>';
       var _data = [
-        {brand : 'Lumeneo'     , qty : 201},
+        {brand : 'Lumeneo'     , qty : 401},
         {brand : 'Toyota'      , qty : 3}
       ];
       builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-        helper.assert(err+'', 'Error: The repeater cannot be above 200');
+        helper.assert(err+'', 'Error: The repeater cannot be above 400');
         helper.assert(_xmlBuilt, null);
         done();
       });

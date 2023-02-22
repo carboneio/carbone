@@ -1294,7 +1294,11 @@ describe('Carbone', function () {
           carbone.renderXML('<xml>{d.subObject.id:print(\'d.param\')} {d.subObject.id:print(\'c.other\')} </xml>', data, options, function (err, result) {
             helper.assert(err+'', 'null');
             helper.assert(result, '<xml>d.param c.other </xml>');
-            done();
+            carbone.renderXML('<xml>{d.subObject.id:print(dparam)} {d.subObject.id:print(cother)} </xml>', data, options, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>dparam cother </xml>');
+              done();
+            });
           });
         });
       });

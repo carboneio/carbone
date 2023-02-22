@@ -1,5 +1,5 @@
 ### v4.9.0
-  - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}`
+  - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}` or `{d.id:print(c.other[0].test)}`
   
 ### v4.8.3
   - Release February 15th 2023

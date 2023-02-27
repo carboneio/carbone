@@ -712,6 +712,18 @@ describe('Carbone', function () {
         done();
       });
     });
+    it.skip('should accept filters in array of number (v5 ?)  #patch20230227', function (done) {
+      var _xml = '<xml> <tr> {d.tab[i,>100,<400]} </tr> <tr> {d.tab[i+1]} </tr> </xml>';
+      var _data = {
+        tab : [ 100, 200, 300, 500]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(err+'', 'null');
+        assert.equal(_xmlBuilt, '<xml> <tr> 200 </tr> <tr> 300 </tr>  </xml>');
+        _data.cars = [];
+        done();
+      });
+    });
     it('should print the text between quotes, and ignore the dot (not a variable). Very important for RTL language which starts with a dot', function (done) {
       var data = {
         arr : [{ id : 1 }, { id : 2 }]

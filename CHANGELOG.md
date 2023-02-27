@@ -8,7 +8,8 @@
       {d.myArray[i][i].val}
       {d.myArray[i][i+1].val}
     ```
-  - Accept to print the value of an array of string or array of numbers in a loop or not. Example:
+  - Support aggregators on array of numbers. For example:`{d.table[]:aggSum}` = 63  if `table` contains `[10, 20, 33]`. Known limitation: Array filters on array of strings/numbers are still not supported.
+  - ⚡️ Support loops on array of string/numbers. Example:
     
     Data:
     ```json
@@ -35,8 +36,8 @@
     To maintain backward compatibility with existing templates, if the template contains at least one attribute access 
     on `myArray` (Example: `{d.myArray[i].subObjectAttribue}`), Carbone considers `myArray` is an array of objects
     and it disables this feature. In this case, `{d.myArray[i]}` prints nothing and is neutral for array filters even if 
-    the array contains a printable type like a string or a number, as it was before v4.9.0. 
-    
+    the array contains a printable type like a string or a number, as it was before v4.9.0.
+
     Data:
     ```json
       { 
@@ -70,6 +71,7 @@
         -  20
     ```
 
+    Known limitation: Array filters on array of strings/numbers are still not supported.
 
   
 ### v4.8.3

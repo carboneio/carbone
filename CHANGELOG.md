@@ -1,12 +1,13 @@
 
 ### v4.9.0
   - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}` or `{d.id:print(c.other[0].test)}`
-  - [EE] Force download of the rendered report when the query paramater `?download=true` is set
+  - [EE] Force download of the rendered report when the query parameter `?download=true` is set
   - [EE] Increase request timeout from 5 to 6 seconds to download images from URLs
   - Accept loops on array of arrays (unlimited number of nested array) like this:
     ```
       {d.myArray[i][i].val}
       {d.myArray[i][i+1].val}
+      {d.myArray[i+1].val}
     ```
   - Support aggregators on array of numbers. For example:`{d.table[]:aggSum}` = 63  if `table` contains `[10, 20, 33]`. Known limitation: Array filters on array of strings/numbers are still not supported.
   - ⚡️ Support loops on array of string/numbers. Example:

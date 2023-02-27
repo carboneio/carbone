@@ -1,9 +1,76 @@
 
 ### v4.9.0
-  - Accept direct array access `d.tab[i][0]` TODO
   - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}` or `{d.id:print(c.other[0].test)}`
   - [EE] Force download of the rendered report when the query paramater `?download=true` is set
   - [EE] Increase request timeout from 5 to 6 seconds to download images from URLs
+  - Accept loops on array of arrays (unlimited number of nested array) like this:
+    ```
+      {d.myArray[i][i].val}
+      {d.myArray[i][i+1].val}
+    ```
+  - Accept to print the value of an array of string or array of numbers in a loop or not. Example:
+    
+    Data:
+    ```json
+      { 
+        "myArray" : ["yellow", 125, "blue"],
+      }
+    ```
+    Template:
+    ```
+      Direct access: {d.myArray[0]:upperCase()}
+      Loop:
+        - {d.myArray[i]}
+        - {d.myArray[i+1]}
+    ```
+    Result:
+    ```
+      Direct access: YELLOW
+      Loop:
+        - yellow
+        - 125
+        - blue
+    ```
+
+    To maintain backward compatibility with existing templates, if the template contains at least one attribute access 
+    on `myArray` (Example: `{d.myArray[i].subObjectAttribue}`), Carbone considers `myArray` is an array of objects
+    and it disables this feature. In this case, `{d.myArray[i]}` prints nothing and is neutral for array filters even if 
+    the array contains a printable type like a string or a number, as it was before v4.9.0. 
+    
+    Data:
+    ```json
+      { 
+        "otherArray" : [
+          {"id" : 10},
+          {"id" : 20},
+          125,
+          "blue"
+        ]
+      }
+    ```
+    
+    Template:
+    ```
+      Without filters:
+        - {d.myArray[i]} {d.myArray[i].id}
+        - {d.myArray[i+1]}
+      With filters:
+        - {d.myArray[i]} {d.myArray[i, id>9].id}
+        - {d.myArray[i+1]}
+    ```
+    Result:
+    ```
+      Without filters:
+        -  10
+        -  20
+        - 
+        - 
+      With filters:
+        -  10
+        -  20
+    ```
+
+
   
 ### v4.8.3
   - Release February 15th 2023

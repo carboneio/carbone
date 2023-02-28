@@ -668,6 +668,62 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should accept direct array access with array of string and with formatters #patch20230227', function (done) {
+      var _xml = '<xml> <br/> {d.tab[2]:substr(1)} <br/></xml>';
+      var _data = { tab : ['row1c1', 'row1c2', 'row1c3'] };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(_xmlBuilt, '<xml> <br/> ow1c3 <br/></xml>');
+        done();
+      });
+    });
+    it('should accept direct array access with array of array of string and with formatters #patch20230227', function (done) {
+      var _xml = '<xml> <br/> {d.tab[2][1]:substr(2)} <br/></xml>';
+      var _data = { tab : [
+        ['row1c1', 'row1c2', 'row1c3'],
+        ['row2c1', 'row2c2', 'row2c3'],
+        ['row3c1', 'row3c2', 'row3c3']
+      ]};
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(_xmlBuilt, '<xml> <br/> w3c2 <br/></xml>');
+        done();
+      });
+    });
+    it('should accept direct array access with array of array of string and loops and with formatters #patch20230227', function (done) {
+      var _xml = '<xml> <br/> {d.tab[i][1]:substr(2)} <br/> {d.tab[i+1][1]:substr(2)} <br/></xml>';
+      var _data = { tab : [
+        ['row1c1', 'row1c2', 'row1c3'],
+        ['row2c1', 'row2c2', 'row2c3'],
+        ['row3c1', 'row3c2', 'row3c3']
+      ]};
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(_xmlBuilt, '<xml> <br/> w1c2 <br/> w2c2 <br/> w3c2 <br/> </xml>');
+        done();
+      });
+    });
+    it('should accept array of string with loops and with formatters #patch20230227', function (done) {
+      var _xml = '<xml> <tr> {d.tab[i]:substr(2)} </tr> <tr> {d.tab[i+1]:substr(2)} </tr> </xml>';
+      var _data = {
+        tab : [ 'Lumeneo', 'Tesla motors']
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(err+'', 'null');
+        assert.equal(_xmlBuilt, '<xml> <tr> meneo </tr> <tr> sla motors </tr>  </xml>');
+        _data.cars = [];
+        done();
+      });
+    });
+    it.skip('should accept filters in array of number (v5 ?)  #patch20230227', function (done) {
+      var _xml = '<xml> <tr> {d.tab[i,>100,<400]} </tr> <tr> {d.tab[i+1]} </tr> </xml>';
+      var _data = {
+        tab : [ 100, 200, 300, 500]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(err+'', 'null');
+        assert.equal(_xmlBuilt, '<xml> <tr> 200 </tr> <tr> 300 </tr>  </xml>');
+        _data.cars = [];
+        done();
+      });
+    });
     it('should print the text between quotes, and ignore the dot (not a variable). Very important for RTL language which starts with a dot', function (done) {
       var data = {
         arr : [{ id : 1 }, { id : 2 }]

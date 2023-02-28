@@ -791,6 +791,26 @@ describe('Aggregatted operations', function () {
         done();
       });
     });
+    it('should accept array of numbers', function (done) {
+      var _xml = '<xml>{d.table[]:aggSum}</xml>';
+      var _data = {
+        table : [10, 20, 33]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml>63</xml>');
+        done();
+      });
+    });
+    it('should accept array of arrays', function (done) {
+      var _xml = '<xml>{d.table[][]:aggSum}</xml>';
+      var _data = {
+        table : [[10, 20, 33], [2]]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml>65</xml>');
+        done();
+      });
+    });
     it('should accept the same filters with different operators (all operators tested)', function (done) {
       var _xml = '<xml>{d.table[type=16].text:aggCount} {d.table[type!=16].text:aggCount} {d.table[type>16].text:aggCount} {d.table[type<16].text:aggCount}</xml>';
       var _data = {

@@ -442,6 +442,110 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should accept array of array #patch20230227', function (done) {
+    var _xml = '<xml> <br/> {d.tab[i][i].val} <br/> {d.tab[i+1][i+1].val} <br/></xml>';
+    var _data = { tab : [
+      [{val:'row1c1'}, {val:'row1c2'}],
+      [{val:'row2c1'}, {val:'row2c2'}],
+      [{val:'row3c1'}, {val:'row3c2'}]
+    ]};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <br/> row1c1 <br/> row1c2 <br/> row2c1 <br/> row2c2 <br/> row3c1 <br/> row3c2 <br/> </xml>');
+      done();
+    });
+  });
+  it('should accept array of array of array #patch20230227', function (done) {
+    var _xml = '<xml> <r1> <r2> <r3>{d.tab[i][i][i].val} </r3> <r3>{d.tab[i][i][i+1].val} </r3> </r2> <r2>{d.tab[i][i+1]} </r2> </r1> <r1>{d.tab[i+1]}</r1></xml>';
+    var _data = { tab : [
+      [
+        [{val:'row1c1'}, {val:'row1c2'}],
+        [{val:'row2c1'}, {val:'row2c2'}]
+      ],
+      [[{val:'row3c1'}, {val:'row3c2'}]]
+    ]};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <r1> <r2> <r3>row1c1 </r3> <r3>row1c2 </r3>  </r2> <r2> <r3>row2c1 </r3> <r3>row2c2 </r3>  </r2>  </r1> <r1> <r2> <r3>row3c1 </r3> <r3>row3c2 </r3>  </r2>  </r1> </xml>');
+      done();
+    });
+  });
+  it('should accept array of array of array with direct access in the middle #patch20230227', function (done) {
+    var _xml = '<xml> <r1> <r3>{d.tab[i][1][i].val} </r3> <r3>{d.tab[i][1][i+1].val} </r3> </r1> <r1>{d.tab[i+1]}</r1></xml>';
+    var _data = { tab : [
+      [
+        [{val:'row1c1'}, {val:'row1c2'}],
+        [{val:'row2c1'}, {val:'row2c2'}]
+      ],
+      [
+        [{val:'row3c1'}, {val:'row3c2'}],
+        [{val:'row4c1'}, {val:'row4c2'}],
+        [{val:'row5c1'}, {val:'row5c2'}]
+      ]
+    ]};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <r1> <r3>row2c1 </r3> <r3>row2c2 </r3>  </r1> <r1> <r3>row4c1 </r3> <r3>row4c2 </r3>  </r1> </xml>');
+      done();
+    });
+  });
+  it('should accept direct array access with array of string #patch20230227', function (done) {
+    var _xml = '<xml> <br/> {d.tab[2]} <br/></xml>';
+    var _data = { tab : ['row1c1', 'row1c2', 'row1c3'] };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <br/> row1c3 <br/></xml>');
+      done();
+    });
+  });
+  it('should accept direct array access with array of array of string #patch20230227', function (done) {
+    var _xml = '<xml> <br/> {d.tab[2][1]} <br/></xml>';
+    var _data = { tab : [
+      ['row1c1', 'row1c2', 'row1c3'],
+      ['row2c1', 'row2c2', 'row2c3'],
+      ['row3c1', 'row3c2', 'row3c3']
+    ]};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <br/> row3c2 <br/></xml>');
+      done();
+    });
+  });
+  it('should accept direct array access with array of array of string and loops #patch20230227', function (done) {
+    var _xml = '<xml> <br/> {d.tab[i][1]} <br/> {d.tab[i+1][1]} <br/></xml>';
+    var _data = { tab : [
+      ['row1c1', 'row1c2', 'row1c3'],
+      ['row2c1', 'row2c2', 'row2c3'],
+      ['row3c1', 'row3c2', 'row3c3']
+    ]};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <br/> row1c2 <br/> row2c2 <br/> row3c2 <br/> </xml>');
+      done();
+    });
+  });
+  it('should accept direct array access with array of array of string and numbers and loops #patch20230227', function (done) {
+    var _xml = '<xml> <br/> {d.tab[i][1]} <br/> {d.tab[i+1][1]} <br/></xml>';
+    var _data = { tab : [
+      ['row1c1', 'row1c2'   , 'row1c3'],
+      ['row2c1', 0          , 'row2c3'],
+      ['row3c1', -100.1     , 'row3c3'],
+      ['row3c1', null       , 'row3c3'],
+      ['row3c1', undefined  , 'row3c3'],
+      ['row3c1', ['1', '2'] , 'row3c3'],
+      ['row3c1', {'a' :'3'} , 'row3c3']
+    ]};
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <br/> row1c2 <br/> 0 <br/> -100.1 <br/>  <br/>  <br/> 1,2 <br/>  <br/> </xml>');
+      done();
+    });
+  });
+  it('should accept array of string with loops #patch20230227', function (done) {
+    var _xml = '<xml> <tr> {d.tab[i]} </tr> <tr> {d.tab[i+1]} </tr> </xml>';
+    var _data = {
+      tab : [ 'Lumeneo', 'Tesla motors']
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml> <tr> Lumeneo </tr> <tr> Tesla motors </tr>  </xml>');
+      _data.cars = [];
+      done();
+    });
+  });
   it('should manage nested arrays', function (done) {
     var _xml =
        '<xml>'
@@ -1872,6 +1976,163 @@ describe('builder.buildXML', function () {
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       console.log(err);
       assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
+  it('should accept to use markers as the start or the end of a loop. This tag is neutral for array filters if it contains objects #patch20230227', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} <i></i> {d.cars[i].wheels[i, size=10].nuts[i].type} <b></b> {d.cars[i].wheels[i, size=10].nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        {
+          wheels : [
+            {
+              size : 10,
+              nuts : [{ type : 'M5'}, { type : 'M6'}]
+            },
+            {
+              size : 11,
+              nuts : [{ type : 'M10'}, { type : 'M11'}]
+            },
+            {
+              size : 10,
+              nuts : [{ type : 'M8'}, { type : 'M9'}]
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
+  it('should not print any value if a tag without attribute and without filters "{d.cars[i].wheels[i]}" is used with an array of object, like before the #patch20230227 (array of string support)', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} <i></i> {d.cars[i].wheels[i, size=10].nuts[i].type} <b></b> {d.cars[i].wheels[i, size=10].nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        {
+          wheels : [
+            null,
+            {
+              size : 10,
+              nuts : [{ type : 'M5'}, { type : 'M6'}]
+            },
+            undefined,
+            {
+              size : 11,
+              nuts : [{ type : 'M10'}, { type : 'M11'}]
+            },
+            'oho',
+            {
+              size : 10,
+              nuts : [{ type : 'M8'}, { type : 'M9'}]
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      done();
+    });
+  });
+  it('should not print any value if a tag without attribute and without filters "{d.cars[i].wheels[i]}" is used with an object and sub object, like before the #patch20230227 (array of string support)', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} <i></i> {d.cars[i].wheels[i, size=10].nuts.type} <i></i> {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        {
+          wheels : [
+            null,
+            {
+              size : 10,
+              nuts : { type : 'M5' }
+            },
+            undefined,
+            {
+              size : 11,
+              nuts : { type : 'M10' }
+            },
+            'oho',
+            {
+              size : 10,
+              nuts : { type : 'M8' }
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <i></i>  <i></i> M8 <i></i> </xml>');
+      done();
+    });
+  });
+  it('should not print any value if a tag without attribute and without filters "{d.cars[i].wheels[i]}" is used with a simple object, like before the #patch20230227 (array of string support)', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} <i></i> {d.cars[i].wheels[i, size=10].nuts} <i></i> {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        {
+          wheels : [
+            null,
+            {
+              size : 10,
+              nuts : 'M5'
+            },
+            undefined,
+            {
+              size : 11,
+              nuts : 'M10'
+            },
+            'oho',
+            {
+              size : 10,
+              nuts : 'M8'
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <i></i>  <i></i> M8 <i></i> </xml>');
+      done();
+    });
+  });
+  it('should not print any value if a tag without attribute "{d.cars[i].wheels[i]}" is used with a simple object, like before the #patch20230227 (array of string support)', function (done) {
+    var _xml = '<xml>{d.cars[i].wheels[i]} A {d.cars[i].wheels[i].nuts} B {d.cars[i+1].wheels[i+1]}</xml>';
+    var _data = {
+      who  : 'test',
+      cars : [
+        {
+          wheels : [
+            null,
+            {
+              size : 10,
+              nuts : 'M5'
+            },
+            undefined,
+            {
+              size : 11,
+              nuts : 'M10'
+            },
+            'oho',
+            {
+              size : 10,
+              nuts : 'M8'
+            }
+          ]
+        }
+      ],
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml> A  B  A M5 B  A  B  A M10 B  A  B  A M8 B </xml>');
       done();
     });
   });

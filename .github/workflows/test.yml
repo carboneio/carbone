@@ -74,7 +74,7 @@ jobs:
         # If the cache is empty
         if: steps.libreoffice-cache.outputs.cache-hit != 'true'
         run: |
-          wget https://downloadarchive.documentfoundation.org/libreoffice/old/${{env.LIBREOFFICE_VERSION}}/deb/x86_64/LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb.tar.gz
+          curl -O -J -L https://downloadarchive.documentfoundation.org/libreoffice/old/${{env.LIBREOFFICE_VERSION}}/deb/x86_64/LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb.tar.gz
           tar -zxvf LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb.tar.gz
           cd LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb/DEBS
           sudo dpkg -i *.deb

@@ -14,6 +14,7 @@ jobs:
   TEST:
     # https://docs.github.com/en/actions/learn-github-actions/environment-variables
     env:
+      # BE CAREFUL, THIS VARIABLE IS NOT USED (direct link is used below to solve LO server availability)
       LIBREOFFICE_VERSION: 7.5.1.2
     
     # Execute tests only if tests are launched manually (workflow_dispatch) or if the pull request title does not contain "WIP:".
@@ -72,9 +73,11 @@ jobs:
 
       - name: Install LibreOffice if cache is invalid
         # If the cache is empty
+        # curl -O -J -L https://downloadarchive.documentfoundation.org/libreoffice/old/${{env.LIBREOFFICE_VERSION}}/deb/x86_64/LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb.tar.gz
         if: steps.libreoffice-cache.outputs.cache-hit != 'true'
+        # Download LO from a US mirror to make it more stable
         run: |
-          curl -O -J -L https://downloadarchive.documentfoundation.org/libreoffice/old/${{env.LIBREOFFICE_VERSION}}/deb/x86_64/LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb.tar.gz
+          curl -O -J -L https://mirror.usi.edu/pub/tdf/libreoffice/_testing_/7.5.1/deb/x86_64/LibreOffice_7.5.1.2_Linux_x86-64_deb.tar.gz
           tar -zxvf LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb.tar.gz
           cd LibreOffice_${{env.LIBREOFFICE_VERSION}}_Linux_x86-64_deb/DEBS
           sudo dpkg -i *.deb

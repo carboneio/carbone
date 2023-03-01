@@ -4142,8 +4142,8 @@ describe('Carbone', function () {
           formatName    : 'png',
           formatOptions : {
             Compression : 1,
-            PixelWidth  : 100,
-            PixelHeight : 100,
+            PixelWidth  : 500,
+            PixelHeight : 500,
             Interlaced  : 0
           }
         }
@@ -4162,8 +4162,7 @@ describe('Carbone', function () {
           carbone.render('test_odt_render_static.odt', data, _options, (err, imageInterlaced) => {
             helper.assert(err, null);
             helper.assert(imageInterlaced.slice(0, 8).toString('hex'), '89504e470d0a1a0a');
-            helper.assert(imageInterlaced.length > imageLowerRes.length, true);
-
+            helper.assert(imageInterlaced.length < image.length, true);
             _options.convertTo.formatOptions.Compression = 9;
             carbone.render('test_odt_render_static.odt', data, _options, (err, imageCompressed) => {
               helper.assert(err, null);

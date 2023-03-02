@@ -1,5 +1,9 @@
 
 ### v4.9.0
+  - Release March 3rd 2023
+  - [EE] Includes a part of the new v5 engine that supports more use cases in some complex templates. This v5 engine is only enabled 
+    if the template contains the tag `{o.preReleaseFeatureIn=4009000}`. This tag means: "enable all pre-release features added up to v4.9.0"
+    Please only use this tag if we tell you to use it on our live chat.
   - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}` or `{d.id:print(c.other[0].test)}`
   - [EE] Force download of the rendered report when the query parameter `?download=true` is set
   - [EE] Increase request timeout from 5 to 6 seconds to download images from URLs

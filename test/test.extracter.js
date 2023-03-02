@@ -3012,7 +3012,23 @@ describe('extracter', function () {
         ]
       });
     });
-
+    it('should sort by XML position and JSON depth', function () {
+      var _data = {
+        staticData  : { },
+        dynamicData : {
+          _root            : { name : '_root'  , type : 'object', parent : ''          , parents : []                                 , xmlParts : [] },
+          _rootd           : { name : 'd'      , type : 'object', parent : '_root'     , parents : ['_root']                          , xmlParts : [] },
+          _rootdrows       : { name : 'rows'   , type : 'array' , parent : '_rootd'    , parents : ['_rootd', '_root' ]               , position : { start : 8, end : 93, endOdd : 101 }, depth : 1 },
+          _rootdcolumns    : { name : 'columns', type : 'array' , parent : '_rootd'    , parents : ['_rootd', '_root' ]               , position : { start : 29, end : 43, endOdd : 53 }, depth : 2 },
+          _rootdrowsvalues : { name : 'values' , type : 'array' , parent : '_rootdrows', parents : [ '_rootdrows', '_rootd', '_root' ], position : { start : 57, end : 71, endOdd : 81 }, depth : 2 }
+        }
+      };
+      helper.assert(extracter.buildSortedHierarchyNew(_data), {
+        staticData  : {},
+        dynamicData : _data.dynamicData,
+        hierarchy   : ['_root', '_rootd', '_rootdrows', '_rootdcolumns', '_rootdrowsvalues']
+      });
+    });
   });
 
   // Many complex cases are tested indirectly in other tests

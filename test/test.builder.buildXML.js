@@ -681,6 +681,64 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should repeat correctly the XML if a "parallel table" (columns vs rows) is used inside a parent loop with v5 Engine', function (done) {
+    const _xml = ''
+              + '<body>'
+              + '  <p>{d.rows[i].note}</p>'
+              + '  <table>'
+              + '    <th>{d.columns[i].text}</th>'
+              + '    <th>{d.columns[i+1].text}</th>'
+              + '    <tc>{d.rows[i].values[i].value}</tc>'
+              + '    <tc>{d.rows[i].values[i+1].value}</tc>'
+              + '  </table>'
+              + '  <p>{d.rows[i+1]}</p>'
+              + '</body>'
+    ;
+    const _data = {
+      columns : [
+        { text : 'col1' },
+        { text : 'col2' }
+      ],
+      rows : [
+        {
+          note   : 'A',
+          values : [
+            { value : 'A1' },
+            { value : 'A2' }
+          ]
+        },
+        {
+          note   : 'B',
+          values : [
+            { value : 'B1' },
+            { value : 'B2' }
+          ]
+        }
+      ]
+    };
+    builder.buildXML(_xml, _data, { preReleaseFeatureIn : 4009000 }, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, ''
+        + '<body>'
+        + '  <p>A</p>'
+        + '  <table>'
+        + '    <th>col1</th>'
+        + '    <th>col2</th>    '
+        + '    <tc>A1</tc>'
+        + '    <tc>A2</tc>    '
+        + '  </table>'
+        + '  <p>B</p>'
+        + '  <table>'
+        + '    <th>col1</th>'
+        + '    <th>col2</th>    '
+        + '    <tc>B1</tc>'
+        + '    <tc>B2</tc>    '
+        + '  </table>  '
+        + '</body>');
+      done();
+    });
+  });
+
   it('should manage two adjacents arrays within an array. It should accept partial repetitions (only {d[i+1].site.label} is set)', function (done) {
     var _xml =
        '<xml>'

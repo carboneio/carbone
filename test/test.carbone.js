@@ -1288,6 +1288,64 @@ describe('Carbone', function () {
       });
     });
 
+    it('should active v5 engine if {o.preReleaseFeatureIn=4009000} is written in XML', function (done) {
+      const _xml = ''
+                + '<body>'
+                + '  <p>{d.rows[i].note}</p>'
+                + '  <table>'
+                + '    <th>{d.columns[i].text}</th>'
+                + '    <th>{d.columns[i+1].text}</th>'
+                + '    <tc>{d.rows[i].values[i].value}</tc>'
+                + '    <tc>{d.rows[i].values[i+1].value}</tc>'
+                + '  </table>'
+                + '  <p>{d.rows[i+1]}</p>{o.preReleaseFeatureIn=4009000}'
+                + '</body>'
+      ;
+      const _data = {
+        columns : [
+          { text : 'col1' },
+          { text : 'col2' }
+        ],
+        rows : [
+          {
+            note   : 'A',
+            values : [
+              { value : 'A1' },
+              { value : 'A2' }
+            ]
+          },
+          {
+            note   : 'B',
+            values : [
+              { value : 'B1' },
+              { value : 'B2' }
+            ]
+          }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(err+'', 'null');
+        assert.equal(_xmlBuilt, ''
+          + '<body>'
+          + '  <p>A</p>'
+          + '  <table>'
+          + '    <th>col1</th>'
+          + '    <th>col2</th>    '
+          + '    <tc>A1</tc>'
+          + '    <tc>A2</tc>    '
+          + '  </table>'
+          + '  <p>B</p>'
+          + '  <table>'
+          + '    <th>col1</th>'
+          + '    <th>col2</th>    '
+          + '    <tc>B1</tc>'
+          + '    <tc>B2</tc>    '
+          + '  </table>  '
+          + '</body>');
+        done();
+      });
+    });
+
     describe('Dynamic variables in formatters', function () {
       it('should use variable in object if the variable starts with a point', function (done) {
         var data = {

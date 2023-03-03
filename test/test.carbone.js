@@ -1340,7 +1340,7 @@ describe('Carbone', function () {
           + '    <th>col2</th>    '
           + '    <tc>B1</tc>'
           + '    <tc>B2</tc>    '
-          + '  </table>  '
+          + '  </table>  {o.preReleaseFeatureIn=4009000}'
           + '</body>');
         done();
       });

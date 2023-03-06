@@ -1431,9 +1431,47 @@ describe('Webserver', () => {
           assert.strictEqual(err, null);
           get.concat(getBody(4000, `/render/${data.data.renderId}?download=true`, 'GET'), (err, res) => {
             assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(res.headers['content-type'], 'application/pdf');
             assert.strictEqual(res.headers['content-disposition'], 'attachment; filename="renderedReport.pdf"');
             done();
+          });
+        });
+      });
+
+      it('should force download of the rendered report if download=true is set in the query', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          reportName : 'renderedReport',
+          complement : {},
+          enum       : {},
+          convertTo  : 'pdf'
+        };
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          assert.strictEqual(err, null);
+          get.concat(getBody(4000, `/render/${data.data.renderId}?download=true`, 'HEAD'), (err, res) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 200);
+            assert.strictEqual(res.headers['access-control-allow-origin'], '*');
+            assert.strictEqual(res.headers['access-control-expose-headers'], 'X-Request-URL,Content-Disposition');
+            const _requestURL = res.headers['x-request-url'];
+            assert.strictEqual(res.headers['content-type'], 'application/pdf');
+            assert.strictEqual(res.headers['content-disposition'], 'attachment; filename="renderedReport.pdf"');
+            setTimeout(() => {
+              get.concat(getBody(4000, `/render/${data.data.renderId}?download=true`, 'GET'), (err, res) => {
+                assert.strictEqual(err, null);
+                assert.strictEqual(res.statusCode, 200);
+                assert.strictEqual(res.headers['access-control-allow-origin'], '*');
+                assert.strictEqual(res.headers['access-control-expose-headers'], 'X-Request-URL,Content-Disposition');
+                assert.strictEqual(res.headers['x-request-url'], _requestURL);
+                assert.strictEqual(res.headers['content-type'], 'application/pdf');
+                assert.strictEqual(res.headers['content-disposition'], 'attachment; filename="renderedReport.pdf"');
+                done();
+              });
+            },1000);
           });
         });
       });

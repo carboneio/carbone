@@ -1,4 +1,7 @@
 
+### v4.9.1
+  - HEAD request should only returns headers withtou dleeting rendered file in memory
+
 ### v4.9.0
   - Release March 3rd 2023
   - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}` or `{d.id:print(c.other[0].test)}`

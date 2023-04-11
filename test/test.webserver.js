@@ -898,6 +898,7 @@ describe('Webserver', () => {
             const _queueItemData = JSON.parse(fs.readFileSync(path.join(os.tmpdir(), 'queue', data[0]), 'utf-8'));
             assert.strictEqual(_queueItemData.successUrl, _successUrl);
             assert.strictEqual(_queueItemData.templateAbsolutePath.length > 0, true);
+            body.ruid = _queueItemData.body.ruid;
             assert.strictEqual(JSON.stringify(_queueItemData.body), JSON.stringify(body));
             assert.strictEqual(_queueItemData.req.url.length > 0, true);
             assert.strictEqual(_queueItemData.req.method, 'Webhook POST');

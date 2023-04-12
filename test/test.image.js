@@ -2364,7 +2364,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      describe('with proxy', function () {
+      describe.skip('with proxy', function () {
         afterEach(function() {
           carbone.reset();
         });

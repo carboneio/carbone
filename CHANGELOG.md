@@ -1,4 +1,7 @@
 
+### v4.10.0
+  - [EE] On-Premise: Add new options to use a proxy for egress traffic
+
 ### v4.9.1
   - Fix dynamic hyperlinks error URL and add slash to URLs
 

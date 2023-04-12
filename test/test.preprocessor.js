@@ -567,6 +567,33 @@ describe('preprocessor', function () {
           helper.assert(!!/t="s"/.exec(_result), false);
           helper.assert(!!/t="n"/.exec(_result), true);
         });
+        it('should makes a number marker (:formatN applied) recognised as number type even if d is an array" ', function () {
+          const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
+          const _sharedString = ['<t xml:space="preserve">{d[0].id:formatN()}</t>'];
+          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d[0].id}</v></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="s"/.exec(_result), false);
+          helper.assert(!!/t="n"/.exec(_result), true);
+        });
+        it('should detect formatN without parenthesis" ', function () {
+          const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
+          const _sharedString = ['<t xml:space="preserve">{d[i].id:formatN}</t>'];
+          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d[i].id}</v></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="s"/.exec(_result), false);
+          helper.assert(!!/t="n"/.exec(_result), true);
+        });
+        it('should detect formatN with parenthesis and precision and whitespaces" ', function () {
+          const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
+          const _sharedString = ['<t xml:space="preserve">{d[0].id:formatN( 2 )}</t>'];
+          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d[0].id}</v></c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+          helper.assert(!!/t="s"/.exec(_result), false);
+          helper.assert(!!/t="n"/.exec(_result), true);
+        });
 
         it('should makes a number marker (:formatN applied) recognised as number type by changing the type t="n", removing xml markups and formatter ":formatN()" [Multiple markers test]', function () {
           const _xml = '<c r="A1" s="1" t="s"><v>0</v></c><c r="A2" s="0" t="s"><v>1</v></c><c r="A3" s="0" t="s"><v>2</v></c>';
@@ -596,6 +623,18 @@ describe('preprocessor', function () {
             }]
           };
           const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d.nbr}" calcext:value-type="float"><text:p>{d.nbr}</text:p></table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+
+        it('should makes a number marker (:formatN) even if d is an array', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{d[i].id:formatN()}</text:p></table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d[i].id}" calcext:value-type="float"><text:p>{d[i].id}</text:p></table:table-cell>';
           preprocessor.convertNumberMarkersIntoNumericFormat(_template);
           helper.assert(_template.files[0].data, _expectedResult);
         });

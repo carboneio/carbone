@@ -638,6 +638,17 @@ describe('preprocessor', function () {
           preprocessor.convertNumberMarkersIntoNumericFormat(_template);
           helper.assert(_template.files[0].data, _expectedResult);
         });
+        it('should detect formatN without parenthesis', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<table:table-cell office:value-type="string" calcext:value-type="string"><text:p>{d[i].id:formatN}</text:p></table:table-cell>'
+            }]
+          };
+          const _expectedResult = '<table:table-cell office:value-type="float" office:value="{d[i].id}" calcext:value-type="float"><text:p>{d[i].id}</text:p></table:table-cell>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
 
         it('should makes a number marker (:formatN) recognised as number cell for ODS files [2 markers]', function () {
           const _template = {

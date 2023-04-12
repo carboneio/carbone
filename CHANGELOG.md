@@ -1,6 +1,6 @@
 
 ### v4.10.0
-  - [EE] with XLSX templates: `formatN` converts values to native Excel number even if `d` is an array. `formatN` without parenthesis is also accepted.
+  - [EE] with XLSX/ODS templates: `formatN` converts values to native Excel number even if `d` is an array. `formatN` without parenthesis is also accepted.
   - [EE] On-Premise: Add new options to use a proxy for egress traffic
 
 ### v4.9.1

@@ -1,4 +1,8 @@
 
+### v4.9.2
+  - Release April 14th 2023
+  - [EE] Fix dynamic hyperlinks when `d` is an array for DOCX templates
+
 ### v4.9.1
   - Release April 12th 2023
   - [EE] with XLSX/ODS templates: `formatN` converts values to native Excel number even if `d` is an array. `formatN` without parenthesis is also accepted.

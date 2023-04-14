@@ -222,6 +222,28 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
+  it('[DOCX - preprocess] accept hyperlinks if d is an array', function () {
+    const _template = {
+      files : [{
+        name : '_rels/document.xml.rels',
+        data : ''
+          + '<?xml version="1.0" encoding="UTF-8"?>'
+          + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+          + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="%7Bd%5Bi%5D.url%7D" TargetMode="External"/>'
+          + '</Relationships>'
+      },{
+        name : 'word/document.xml',
+        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="rId2" w:history="1"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>'
+      }]
+    };
+    const _expectedRelsResult = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="{d[i].url:generateHyperlinkReference()}" w:history="1"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>';
+    hyperlinks.preProcesstHyperlinksDocx(_template);
+    helper.assert(_template.files[0].data, _expectedRelsResult);
+    helper.assert(_template.files[1].data, _expectedDocumentResult);
+  });
+
   it('[DOCX - preprocess] should inject the special hyperlink inside the tag `w:instrText` at the top of the document.xml', function () {
     const _template = {
       files : [{

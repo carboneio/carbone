@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.3" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0">
+  <manifest:file-entry manifest:full-path="/" manifest:version="1.3" manifest:media-type="application/vnd.oasis.opendocument.text"/>
+  <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
+  <manifest:file-entry manifest:full-path="settings.xml" manifest:media-type="text/xml"/>
+  <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
+  <manifest:file-entry manifest:full-path="manifest.rdf" manifest:media-type="application/rdf+xml"/>
+  <manifest:file-entry manifest:full-path="Configurations2/" manifest:media-type="application/vnd.sun.xml.ui.configuration"/>
+  <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/10000000000000640000003E7BCFF6B890FF3254.jpg" manifest:media-type="image/jpeg"/>
+  <manifest:file-entry manifest:full-path="layout-cache" manifest:media-type="application/binary"/>
+  <manifest:file-entry manifest:full-path="Thumbnails/thumbnail.png" manifest:media-type="image/png"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage0.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage1.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage2.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage3.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage4.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage5.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage6.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage7.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage8.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage9.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage10.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage11.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage12.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage13.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage14.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage15.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage16.svg" manifest:media-type="image/svg+xml"/>
+  <manifest:file-entry manifest:full-path="Pictures/CarboneImage17.svg" manifest:media-type="image/svg+xml"/>
+</manifest:manifest>

@@ -1,7 +1,7 @@
 
 ### v4.10.0
   - Release April 17th 2023
-  - Support vector barcodes with the new `svg` option to improve print quality: `{d.number:barcode(qrcode, svg:true)}`
+  - [EE] Support vector barcodes with the new `svg` option to improve print quality: `{d.number:barcode(qrcode, svg:true)}`
 
 ### v4.9.2
   - Release April 14th 2023

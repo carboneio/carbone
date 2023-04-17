@@ -42,7 +42,7 @@
     "image-size": "=1.0.2",
     "kitten-jwt": "=2.0.0",
     "restana": "=4.9.6",
-    "rock-req": "=5.0.2",
+    "rock-req": "=5.1.0",
     "which": "=2.0.2",
     "yauzl": "=2.10.0",
     "yazl": "=2.5.1"

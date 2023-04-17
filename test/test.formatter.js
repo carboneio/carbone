@@ -1541,6 +1541,9 @@ describe('formatter', function () {
         });
 
         it('should return the barcode as JSON with options and should validate options', function () {
+          // svg
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'svg:true'), '{"bcid":"qrcode","text":"https://carbone.io","svg":true}', );
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'svg:false'), '{"bcid":"qrcode","text":"https://carbone.io","svg":false}');
           // width
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:2'), '{"bcid":"qrcode","text":"https://carbone.io","width":"2"}', );
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:100'), '{"bcid":"qrcode","text":"https://carbone.io","width":"100"}');

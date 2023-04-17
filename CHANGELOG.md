@@ -1,3 +1,7 @@
+### v3.6.0
+  - Release April 17th 2023
+  - Support vector barcodes with the new `svg` option to improve print quality: `{d.number:barcode(qrcode, svg:true)}`
+
 ### v3.5.6
   - Release February 16th 2023
   - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`. 

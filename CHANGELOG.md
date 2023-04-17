@@ -1,3 +1,39 @@
+### v3.5.6
+  - Release February 16th 2023
+  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`. 
+    If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
+
+### v3.5.5
+  - Release December 7th 2022
+  - Add user-agent `Carbone` when webhook is called.
+
+### v3.5.4
+  - Release June 15th 2022
+  - [EE] Do not return an error when `DEL /template` is called and the template is already deleted on local storage. It may be already deleted by the plugin.
+
+### v3.5.3
+  - Release May 25th 2022
+  - [EE] Accept `convCRLF` before `:html` formatter to convert `\r\n` to `<br>` 
+
+### v3.5.2
+  - Release May 6th 2022
+  - [EE] Add file verification on template upload
+
+### v3.5.1
+  - Release May 4th 2022
+  - Rollback fix in v3.4.9
+
+### v3.5.0
+  - Release May 4st 2022
+  - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.
+      - Example: `{d.val:add(.otherQty  +  .vat  *  .price - 10 / 2)`
+      - Only mathematical operators `+, *, -, /` are allowed, without parenthesis
+      - Multiplication and division operators (`*`, `/`) has higher precedence than the addition/substration operator (`+`, `-`) and thus will be evaluated first.
+
+### v3.4.9
+  - Release April 27st 2022
+  - Fix crash with very complex JSON map
+
 ### v3.4.8
   - Release March 15st 2022
   - [EE] Fix: avoid crash when a marker is used on a shape instead of a sample image (v3.2.2-1)

@@ -329,9 +329,21 @@ mv /path/to/carbone/binary ./carbone
 
 When Carbone On-premise is executed for the first time, default folders are created automatically ([explanation here](#Carbone-Options-overview)). Custom plugins should be inserted in the `plugin` folder.
 
-### Override write template
+### Override template storage
 
-To override template writing, the file `storage.js` in the `plugin` folder has to be created. The function to export is `writeTemplate` and is described as follow:
+To override template storage, create the file `storage.js` in the `plugin` folder.
+It will be possible to upload your template into an Object Storage, S3 API or other storage systems.
+Export a function called `writeTemplate` with 5 arguments:
+- `req`: The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on.
+- `res`: The res object represents the HTTP response that a server sends when it gets an HTTP request
+- `templateId`: Unique template ID as a sha256 hash
+- `templatePathTemp`: Absolute path of the uploaded template
+- `callback`: callback function
+
+Additional file informations are available the request header:
+- `req.headers['carbone-template-extension']`: file extension (eg: 'xml')
+- `req.headers['carbone-template-mimetype']`: file mimetype (eg: 'application/xml')
+- `req.headers['carbone-template-size']`: file size in bytes
 
 ```js
 const fs = require('fs');
@@ -393,7 +405,7 @@ To override render writing, add the function `afterRender` in the `storage.js` f
 ```js
 function afterRender (req, res, err, reportPath, reportName, statistics, next) {
   // Write or rename your render
-
+  // TemplateID available: req.params.templateId
   return next(null)
 }
 
@@ -411,6 +423,16 @@ res.send({
     newField: reportName
   }
 });
+```
+The `statistics` argument return an object with:
+```json
+{
+  "renderId": "",
+  "template": "filename",
+  "user"      : "if authentication enabled, the user ID is returned, it is coming from the JWT token",
+  "options"   : "Rendering options as an object",
+  "jsonSize"  : "size of the JSON data-set as bytes"
+}
 ```
 
 ### Override read render

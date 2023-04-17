@@ -246,7 +246,7 @@ Carbone的幕后运转：
 ## 许可证和版本
 
 Carbone有两个版本：
-  - 根据Apache v2许可，用户可以免费获得Carbone社区版
+  - 根据CCL Agreement许可，用户可以免费获得Carbone社区版
   - Carbone Enterprise Edition（托管和内部部署）包括用户界面等其他功能。
 因为我们要遵循Gitlab的模型，所以免费版本必须保持慷慨。
 

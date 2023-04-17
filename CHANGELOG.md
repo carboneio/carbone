@@ -1,4 +1,8 @@
 
+### v4.10.1
+  - Release April 17th 2023
+  - [EE] Disable egress proxy by default
+
 ### v4.10.0
   - Release April 17th 2023
   - [EE] Support vector barcodes with the new `svg` option to improve print quality: `{d.number:barcode(qrcode, svg:true)}`

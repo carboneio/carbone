@@ -245,6 +245,17 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
     });
+    it('should generate barcodes as SVG images with options', function (done) {
+      const _testedReport = 'image/odt-barcodes-options-svg';
+      const _data = {
+        item : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13')
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
   describe('[Full test] ODS', function () {

@@ -516,6 +516,15 @@
         - Sum by people by age and gender, regardless of departments
           - `{d.departments[i].people[i].salary:aggSum(.age, .gender)}`
 
+### v3.6.0
+  - Release April 17th 2023
+  - Support vector barcodes with the new `svg` option to improve print quality: `{d.number:barcode(qrcode, svg:true)}`
+
+### v3.5.6
+  - Release February 16th 2023
+  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`. 
+    If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
+
 ### v3.5.5
   - Release December 7th 2022
   - Add user-agent `Carbone` when webhook is called.

@@ -72,6 +72,80 @@ describe('drop formatter', function () {
         });
       });
 
+      it('should replace the drop(p) by hideBegin/hideEnd - basic paragraph into body, header and footer', function (done) {
+        const contentBody = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<w:body>' +
+              (expected ? '<carbone>{d.name:ifEM:hideBegin}</carbone>' : '') +
+              '<w:p w14:paraId="5C4E8B45" w14:textId="08330C66" w:rsidR="005A25A6" w:rsidRDefault="00C301BD">'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:lang w:val="en-US"/>'+
+                  '</w:rPr>'+
+                  `<w:t>{d.name}${expected ? '' : '{d.name:ifEM:drop(p)}'}</w:t>`+
+                '</w:r>'+
+              '</w:p>'+
+              (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '') +
+            '</w:body>';
+        };
+
+        const contentHeader = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+            '<w:hdr>'+
+              (expected ? '<carbone>{d.header:ifEM:hideBegin}</carbone>' : '') +
+              '<w:p w14:paraId="1FFF6AC5" w14:textId="687E89FF" w:rsidR="007611BE" w:rsidRDefault="007611BE">'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:lang w:val="en-US"/>'+
+                  '</w:rPr>'+
+                  `<w:t>HEADER 2 ${expected ? '' : '{d.header:ifEM:drop(p)}'}</w:t>`+
+                '</w:r>'+
+              '</w:p>'+
+              (expected ? '<carbone>{d.header:ifEM:hideEnd}</carbone>' : '') +
+            '</w:hdr>';
+        };
+
+        const contentFooter = (expected) => {
+          expected = expected ?? false;
+          return '' +
+          '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+
+          '<w:ftr>'+
+            (expected ? '<carbone>{d.footer:ifEM:hideBegin}</carbone>' : '') +
+            '<w:p w14:paraId="7DA45D73" w14:textId="7B61ED76" w:rsidR="007611BE" w:rsidRDefault="007611BE">'+
+              '<w:r>'+
+                '<w:rPr>'+
+                  '<w:lang w:val="en-US"/>'+
+                '</w:rPr>'+
+                `<w:t>FOOTER 2 ${ expected ? '' : '{d.footer:ifEM:drop(p)}' }</w:t>`+
+              '</w:r>'+
+            '</w:p>'+
+            (expected ? '<carbone>{d.footer:ifEM:hideEnd}</carbone>' : '') +
+          '</w:ftr>';
+        };
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.docx',
+          extension  : 'docx',
+          embeddings : [],
+          files      : [
+            { name : 'document.xml', parent : '', data : contentBody()},
+            { name : 'header2.xml', parent : '', data : contentHeader()},
+            { name : 'footer2.xml', parent : '', data : contentFooter()}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, contentBody(true));
+          helper.assert(res?.files[1]?.data, contentHeader(true));
+          helper.assert(res?.files[2]?.data, contentFooter(true));
+          done();
+        });
+      });
+
 
       it('should replace the drop(p) by hideBegin/hideEnd - drop tag with spaces before and after curly braces', function (done) {
         const content = (expected) => {
@@ -260,12 +334,12 @@ describe('drop formatter', function () {
                 '<text:p text:style-name="P1">This is a first paragraph</text:p>'+
                 (expected ? '<carbone>{d.name:ifEM:hideBegin}</carbone>' : '') +
                 (expected ? '<carbone>{d.desc:ifEM:hideBegin}</carbone>' : '') +
-                (expected ? '<carbone>{d.details:ifEM:hideBegin}</carbone>' : '') +
+                (expected ? '<carbone>{  d.details:ifEM:hideBegin}</carbone>' : '') +
                 '<text:p text:style-name="P1">'+
                   '{d.name}' +
-                  (expected ? '' : '{d.name:ifEM:drop("p")}{d.desc:ifEM:drop(\'p\')}{d.details:ifEM:drop(    p   )}') +
+                  (expected ? '' : '{d.name:ifEM:drop("p")}{d.desc:ifEM:drop(\'p\')}{  d.details:ifEM:drop(    p   )  }') +
                 '</text:p>'+
-                (expected ? '<carbone>{d.details:ifEM:hideEnd}</carbone>' : '')+
+                (expected ? '<carbone>{  d.details:ifEM:hideEnd}</carbone>' : '')+
                 (expected ? '<carbone>{d.desc:ifEM:hideEnd}</carbone>' : '')+
                 (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '')+
                 '<text:p text:style-name="P1">This is a third paragraph</text:p>'+
@@ -280,6 +354,62 @@ describe('drop formatter', function () {
         };
         preprocessor.handleDropFormatter(_template, 'odt');
         helper.assert(_template.files[0]?.data, content(true));
+        done();
+      });
+
+      it('should replace the drop(p) by hideBegin/hideEnd - basic paragraph into header, footer and body', function (done) {
+        const contentHeaderFooter = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<office:document-styles>'+
+              '<office:master-styles>'+
+                '<style:master-page style:name="Standard" style:page-layout-name="Mpm1">'+
+                  '<style:header>'+
+                    '<text:p text:style-name="MP1">Header first paragraph</text:p>'+
+                    (expected ? '<carbone>{d.header:ifEM:hideBegin}</carbone>' : '') +
+                    `<text:p text:style-name="MP1">Header second paragraph ${ expected ? '' : '{d.header:ifEM:drop(p)}' }</text:p>`+
+                    (expected ? '<carbone>{d.header:ifEM:hideEnd}</carbone>' : '') +
+                    '<text:p text:style-name="MP1">Header last paragraph</text:p>'+
+                  '</style:header>'+
+                  '<style:footer>'+
+                    '<text:p text:style-name="MP2"><text:span text:style-name="MT1">Footer</text:span> first paragraph</text:p>'+
+                    (expected ? '<carbone>{d.footer:ifEM:hideBegin}</carbone>' : '') +
+                    `<text:p text:style-name="MP2"><text:span text:style-name="MT1">Footer</text:span> second paragraph ${expected ? '' : '{d.footer:ifEM:drop(p)}'}</text:p>`+
+                    (expected ? '<carbone>{d.footer:ifEM:hideEnd}</carbone>' : '') +
+                    '<text:p text:style-name="MP2"><text:span text:style-name="MT1">Footer</text:span> last paragraph</text:p>'+
+                  '</style:footer>'+
+                '</style:master-page>'+
+              '</office:master-styles>'+
+            '</office:document-styles>';
+        };
+
+        const contentBody = (expected) => {
+          expected = expected ?? false;
+          return '' +
+
+            '<office:body>'+
+              '<office:text>'+
+                '<text:p text:style-name="P1">This is a first paragraph</text:p>'+
+                (expected ? '<carbone>{d.name:ifEM:hideBegin}</carbone>' : '') +
+                '<text:p text:style-name="P1">'+
+                  '{d.name}' +
+                  (expected ? '' : '{d.name:ifEM:drop(p)}') +
+                '</text:p>'+
+                (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '')+
+                '<text:p text:style-name="P1">This is a third paragraph</text:p>'+
+              '</office:text>'+
+            '</office:body>';
+        };
+
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : contentBody()},
+            { name : 'styles.xml', parent : '', data : contentHeaderFooter()},
+          ]
+        };
+        preprocessor.handleDropFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, contentBody(true));
+        helper.assert(_template.files[1]?.data, contentHeaderFooter(true));
         done();
       });
 

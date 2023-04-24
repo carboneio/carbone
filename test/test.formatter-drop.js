@@ -72,6 +72,41 @@ describe('drop formatter', function () {
         });
       });
 
+
+      it('should replace the drop(p) by hideBegin/hideEnd - drop tag with spaces before and after curly braces', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<w:body>' +
+              (expected ? '<carbone>{ d.name:ifEM:hideBegin}</carbone>' : '') +
+              '<w:p w14:paraId="5C4E8B45" w14:textId="08330C66" w:rsidR="005A25A6" w:rsidRDefault="00C301BD">'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:lang w:val="en-US"/>'+
+                  '</w:rPr>'+
+                  `<w:t>{d.name}${expected ? '' : '{ d.name:ifEM:drop(p) }'}</w:t>`+
+                '</w:r>'+
+              '</w:p>'+
+              (expected ? '<carbone>{ d.name:ifEM:hideEnd}</carbone>' : '') +
+            '</w:body>';
+        };
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.docx',
+          extension  : 'docx',
+          embeddings : [],
+          files      : [
+            { name : 'document.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, content(true));
+          done();
+        });
+      });
+
       it('should replace the drop(p) by hideBegin/hideEnd - long paragraph and similar <w:p tags', function (done) {
         const content = (expected) => {
           expected = expected ?? false;

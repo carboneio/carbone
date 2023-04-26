@@ -222,6 +222,28 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
+  it('[DOCX - preprocess] accept hyperlinks if d is an array', function () {
+    const _template = {
+      files : [{
+        name : '_rels/document.xml.rels',
+        data : ''
+          + '<?xml version="1.0" encoding="UTF-8"?>'
+          + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+          + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="%7Bd%5Bi%5D.url%7D" TargetMode="External"/>'
+          + '</Relationships>'
+      },{
+        name : 'word/document.xml',
+        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="rId2" w:history="1"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>'
+      }]
+    };
+    const _expectedRelsResult = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="{d[i].url:generateHyperlinkReference()}" w:history="1"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>';
+    hyperlinks.preProcesstHyperlinksDocx(_template);
+    helper.assert(_template.files[0].data, _expectedRelsResult);
+    helper.assert(_template.files[1].data, _expectedDocumentResult);
+  });
+
   it('[DOCX - preprocess] should inject the special hyperlink inside the tag `w:instrText` at the top of the document.xml', function () {
     const _template = {
       files : [{
@@ -511,6 +533,9 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       helper.assert(hyperlinks.validateURL('carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\''), 'https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\'');
       helper.assert(hyperlinks.validateURL('https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\''), 'https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\'');
       helper.assert(hyperlinks.validateURL('https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c'), 'https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&amp;token=6bc57ba6-3056-4563-8d21-f1687737142c');
+      helper.assert(hyperlinks.validateURL('carbone.io?quer=23'), 'https://carbone.io/?quer=23');
+      helper.assert(hyperlinks.validateURL('www.carbone.com.au?key=value&name=john'), 'https://www.carbone.com.au/?key=value&amp;name=john');
+      helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick'), 'http://carbone.io/?name=john&amp;lastname=wick');
     });
 
     it('[utils] validateURL - \n \
@@ -521,27 +546,24 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('magnet:?xt=urn:btih:123'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('http://my test.asp'), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('carbone.io?quer=23'), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('www.carbone.com.au?key=value&name=john'), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37'), hyperlinks.URL_ON_ERROR);
 
       /** URL ON ERROR RECEIVED BY ARGUMENTS */
       helper.assert(hyperlinks.validateURL('javascript:void(0)', 'https://carbone.io'), 'https://carbone.io');
       helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf', 'https://carbone.io/index.html'), 'https://carbone.io/index.html');
-      helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick', 'https://my_test.asp'), 'https://my_test.asp');
       helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37', 'https://carbone.io/url_on_error.html'), 'https://carbone.io/url_on_error.html');
     });
 
     it('[utils] validateURL && \n \
         should correct the URL and convert "&" caracter to "&amp;" encoded caracter && \n \
+        should add a `/` before query parameters if it is missing && \n \
         should return the default Error URL when the URL is invalid && \n \
         should return a different default Error URL when the URL is invalid', () => {
       helper.assert(hyperlinks.validateURL('carbone.io', ''), 'https://carbone.io');
       helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick', ''), 'http://carbone.io/?name=john&amp;lastname=wick');
       helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick&key=code', ''), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
-      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', ''), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', 'https://www.carbone.com.au'), 'https://www.carbone.com.au');
+      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', ''), 'https://carbone.io/?quer=23');
+      helper.assert(hyperlinks.validateURL('carbon e.io?quer=23', 'https://www.carbone.com.au'), 'https://www.carbone.com.au');
     });
 
     it('[utils] formatter "addLinkDatabase" should add to the hyperlinkDatabase and return the hyperlink properties', () => {
@@ -582,8 +604,8 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://my test.asp', 'https://carbone.io/default_url_on_error2'));
       helper.assert(_resultUrl, 'https://carbone.io/default_url_on_error2');
       /** if the url is invalid AND if the new URL On Error passed by the formatter "defaultURL" is invalid, it should return the default hyperlinks.URL_ON_ERROR */
-      _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://my test.asp', 'carbone.io?quer=23'));
-      helper.assert(_resultUrl, 'https://carbone.io/documentation.html#hyperlink-validation');
+      _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://my test.asp', 'carb one.io?quer=23'));
+      helper.assert(_resultUrl, hyperlinks.URL_ON_ERROR);
     });
   });
 

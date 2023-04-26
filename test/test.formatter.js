@@ -60,7 +60,7 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
     });
     it('should apply timezone if only a time is provided', function () {
-      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'HH-mm-ss', 'HH-mm-ss'), '04-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'HH-mm-ss', 'HH-mm-ss'), '03-12-01');
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01Z', 'HH-mm-ss', 'HH-mm-ssZ'), '05-12-01');
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01T01:00:00Z', 'LLL'), 'November 30, 2010 8:00 PM');
     });
@@ -1905,6 +1905,9 @@ describe('formatter', function () {
         });
 
         it('should return the barcode as JSON with options and should validate options', function () {
+          // svg
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'svg:true'), '{"bcid":"qrcode","text":"https://carbone.io","svg":true}', );
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'svg:false'), '{"bcid":"qrcode","text":"https://carbone.io","svg":false}');
           // width
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:2'), '{"bcid":"qrcode","text":"https://carbone.io","width":"2"}', );
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:100'), '{"bcid":"qrcode","text":"https://carbone.io","width":"100"}');

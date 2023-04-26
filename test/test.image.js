@@ -245,6 +245,17 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
     });
+    it('should generate barcodes as SVG images with options', function (done) {
+      const _testedReport = 'image/odt-barcodes-options-svg';
+      const _data = {
+        item : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13')
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
   describe('[Full test] ODS', function () {
@@ -2298,7 +2309,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .delay(7000)
           .reply(200, '<html></html>');
         image.downloadImage('https://google.com/random-image.jpeg', {}, {}, function (err, imageInfo) {
-          helperTest.assert(err.message, 'Request timed out');
+          helperTest.assert(err.message, 'TimeoutError');
           assert(imageInfo+'', 'undefined');
           done();
         });
@@ -2363,6 +2374,245 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+
+      describe('with proxy', function () {
+        afterEach(function () {
+          carbone.reset();
+        });
+        it('should rewrite the URL if a proxy is activated', function (done) {
+          carbone.set({
+            egressProxyPrimary : 'http://127.0.0.1:4010',
+            egressProxyPath    : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}'
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should add tenantId and request id in URL', function (done) {
+          carbone.set({
+            egressProxyPrimary : 'http://127.0.0.1:4010',
+            egressProxyPath    : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}'
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/23232323/c12122133/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {tenantId : 23232323, requestId : 'c12122133'}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should rewrite URL only for some tenantIds (match)', function (done) {
+          carbone.set({
+            egressProxyPrimary      : 'http://127.0.0.1:4010',
+            egressProxyPath         : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}',
+            egressExcludeFilterMode : false,
+            egressTenantFilter      : [789]
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/789/c12122133/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {tenantId : 789, requestId : 'c12122133'}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should rewrite URL only for some tenantIds (not match)', function (done) {
+          carbone.set({
+            egressProxyPrimary      : 'http://127.0.0.1:4010',
+            egressProxyPath         : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}',
+            egressExcludeFilterMode : false,
+            egressTenantFilter      : [789]
+          });
+          nock('https://google.com')
+            .get('/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {tenantId : 90089, requestId : 'c12122133'}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should NOT rewrite URL only for some tenantIds (match)', function (done) {
+          carbone.set({
+            egressProxyPrimary      : 'http://127.0.0.1:4010',
+            egressProxyPath         : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}',
+            egressExcludeFilterMode : true,
+            egressTenantFilter      : [789]
+          });
+          nock('https://google.com')
+            .get('/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {tenantId : 789, requestId : 'c12122133'}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should rewrite URL for all users except some tenantIds (not match)', function (done) {
+          carbone.set({
+            egressProxyPrimary      : 'http://127.0.0.1:4010',
+            egressProxyPath         : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}',
+            egressExcludeFilterMode : true,
+            egressTenantFilter      : [789]
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/90089/c12122133/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {tenantId : 90089, requestId : 'c12122133'}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should manage 301 redirect even with if the URL is rewritten with a proxy', function (done) {
+          carbone.set({
+            egressProxyPrimary : 'http://127.0.0.1:4010',
+            egressProxyPath    : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}'
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .reply(302, undefined, {
+              Location : 'https://google.com/sub/redirected-image.jpg?query=true'
+            })
+            .get('/https/google.com/443/0/0/sub/redirected-image.jpg?query=true')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should manage 301 redirect with relative Location even with if the URL is rewritten with a proxy', function (done) {
+          carbone.set({
+            egressProxyPrimary : 'http://127.0.0.1:4010',
+            egressProxyPath    : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}'
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .reply(302, undefined, {
+              Location : '/sub/redirected-image.jpg?query=true'
+            })
+            .get('/https/google.com/443/0/0/sub/redirected-image.jpg?query=true')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should retry with the secondary proxy if configured', function (done) {
+          carbone.set({
+            egressMaxRetry       : 2,
+            egressProxyPrimary   : 'http://127.0.0.1:4010',
+            egressProxySecondary : 'http://127.0.1.1:4011',
+            egressProxyPath      : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}'
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .reply(502, undefined);
+          nock('http://127.0.1.1:4011')
+            .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should retry with on the same proxy if there is no second proxy', function (done) {
+          carbone.set({
+            egressMaxRetry       : 2,
+            egressProxyPrimary   : 'http://127.0.0.1:4010',
+            egressProxySecondary : '',
+            egressProxyPath      : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}'
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .reply(502, undefined)
+            .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should retry with the secondary proxy if configured and accept redirect in the same time (also redirect from http to https)', function (done) {
+          carbone.set({
+            egressMaxRetry       : 1,
+            egressProxyPrimary   : 'http://127.0.0.1:4010',
+            egressProxySecondary : 'http://127.0.1.1:4011',
+            egressProxyPath      : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}'
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/http/google.com/80/0/0/image-flag-fr.jpg')
+            .reply(302, undefined, {
+              Location : 'https://google.com/sub/redirected-image.jpg?query=true'
+            })
+            .get('/https/google.com/443/0/0/sub/redirected-image.jpg?query=true')
+            .reply(502, undefined);
+          nock('http://127.0.1.1:4011')
+            .get('/https/google.com/443/0/0/sub/redirected-image.jpg?query=true')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('http://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+      });
+
     });
     describe('checkIfImageIncludedDocx', function () {
       it('should return true because the relational file name include one of the element in the file name list', function () {

@@ -1,7 +1,10 @@
 const bwipjs = require('bwip-js');
+const drawsvg = require('./_barcodeSVG');
+
 
 const REG_HEXA_COLOR = /^#?[0-9A-F]{6}$/i;
 const CHECK_BARCODE_OPTIONS_VALUE = {
+  'svg': (value) => ['true', 'false'].includes(value), // generate SVG instead of image
   'width': (value) => !isNaN(value) && parseInt(value) > 0, // width as millimeters
   'height': (value) => !isNaN(value) && parseInt(value) > 0, // height as millimeters
   'scale': (value) => !isNaN(value) && parseInt(value) > 0 && parseInt(value) <= 10,
@@ -408,25 +411,35 @@ function generateBarcodeImage (jsonStringBarcodeData, callback) {
   catch (err) {
     return callback('Barcode read values: ' + err.toString());
   }
-  return bwipjs.toBuffer(
-    {
-      ...initBarcodeValuesBasedOnType(_barcodeData.bcid),
-      ..._barcodeData,
-    },
-    function (err, png) {
-      if (err) {
-        // `err` may be a string or Error object
-        return callback('Barcode generation error: ' + err.toString());
-      }
-      else {
-        return callback(null, {
-          data      : new Buffer.from(png, 'base64'),
-          extension : 'png',
-          mimetype  : 'image/png',
-        });
-      }
+
+  let opts = {
+    ...initBarcodeValuesBasedOnType(_barcodeData.bcid),
+    ..._barcodeData,
+  };
+
+  if (_barcodeData.svg === true) {
+    bwipjs.fixupOptions(opts);
+    let _svg = bwipjs.render(opts, drawsvg(opts, bwipjs.FontLib));
+    return callback(null, {
+      data      : new Buffer.from(_svg, 'utf-8'),
+      extension : 'svg',
+      mimetype  : 'image/svg+xml',
+    });
+  }
+
+  return bwipjs.toBuffer(opts, function (err, png) {
+    if (err) {
+      // `err` may be a string or Error object
+      return callback('Barcode generation error: ' + err.toString());
     }
-  );
+    else {
+      return callback(null, {
+        data      : new Buffer.from(png, 'base64'),
+        extension : 'png',
+        mimetype  : 'image/png',
+      });
+    }
+  });
 }
 
 /**

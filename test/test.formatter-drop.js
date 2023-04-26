@@ -2318,4 +2318,37 @@ describe('drop formatter', function () {
       });
     });
   });
+
+  describe('drop(h)', function () {
+    describe('ODT Documents', function () {
+      it('should replace the drop(h) by hideBegin/hideEnd', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<office:body>' +
+              '<office:text>' +
+                (expected ? '<carbone>{d.value:ifEM:hideBegin}</carbone>' : '') +
+                `<text:h text:style-name="P1" text:outline-level="1">This is a heading 1 ${ expected ? '' : '{d.value:ifEM:drop(h)}' }</text:h>` +
+                (expected ? '<carbone>{d.value:ifEM:hideEnd}</carbone>' : '') +
+                '<text:p text:style-name="P3"/>' +
+                '<text:p text:style-name="P2">This is a paragraph</text:p>' +
+              '</office:text>' +
+            '</office:body>';
+        };
+
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content() },
+            { name : 'footer2.xml', parent : '', data : content() },
+            { name : 'header3.xml', parent : '', data : content() },
+          ]
+        };
+        preprocessor.handleDropFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, content(true));
+        helper.assert(_template.files[1]?.data, content(true));
+        helper.assert(_template.files[2]?.data, content(true));
+        done();
+      });
+    });
+  });
 });

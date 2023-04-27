@@ -1,3 +1,7 @@
+### v4.X.X
+  - [EE] Fixed `HEAD /render/:renderId`: The request don't delete the generated document anymore.
+  - [EE] Fixed `GET /template/:templateId`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
+
 ### v4.10.1
   - Release April 17th 2023
   - [EE] Disable egress proxy by default

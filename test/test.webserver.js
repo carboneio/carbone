@@ -1733,15 +1733,18 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/template/abcdef', 'GET'), (err, res, data) => {
           assert.strictEqual(res.headers['content-disposition'], 'filename="abcdef.html"');
           assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+          assert.strictEqual(res.statusCode, 200);
           done();
         });
       });
 
-      it('should return an error if template does not exists', (done) => {
+      it('should return an error 404 if template does not exists', (done) => {
         get.concat(getBody(4000, '/template/dontexists', 'GET'), (err, res, data) => {
           data = JSON.parse(data.toString());
+          assert.strictEqual(res.statusCode, 404);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Cannot find template extension, does it exists?');
+          assert.strictEqual(data.code, 'w103');
           done();
         });
       });
@@ -1751,6 +1754,7 @@ describe('Webserver', () => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Template id or render id is not defined in the URL');
+          assert.strictEqual(res.statusCode, 400);
           done();
         });
       });

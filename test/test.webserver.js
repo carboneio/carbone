@@ -1432,6 +1432,7 @@ describe('Webserver', () => {
           assert.strictEqual(err, null);
           get.concat(getBody(4000, `/render/${data.data.renderId}?download=true`, 'GET'), (err, res) => {
             assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(res.headers['content-type'], 'application/pdf');
             assert.strictEqual(res.headers['content-disposition'], 'attachment; filename="renderedReport.pdf"');
             done();
@@ -1537,6 +1538,55 @@ describe('Webserver', () => {
           assert.strictEqual(_resp.error, 'Template id or render id is not defined in the URL');
           assert.strictEqual(_resp.code, 'w115');
           done();
+        });
+      });
+
+      describe('HEAD template', () => {
+        it('should HEAD a rendered file, return a status 200, and download the document', (done) => {
+          const body = {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
+            },
+            reportName : 'renderedReport',
+            complement : {},
+            enum       : {}
+          };
+
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+            assert.strictEqual(err, null);
+            const _renderId = data.data.renderId;
+            get.concat(getBody(4000, `/render/${_renderId}`, 'HEAD'), (err, res, data) => {
+              assert.strictEqual(err, null);
+              assert.strictEqual(res.statusCode, 200);
+              assert.strictEqual(data.toString(), '');
+              assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'render', _renderId)), true);
+              assert.strictEqual(res.headers['content-type'], 'text/html; charset=UTF-8');
+              assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
+              /** Now download the file and it should be deleted */
+              get.concat(getBody(4000, `/render/${_renderId}`, 'GET'), (err, res) => {
+                assert.strictEqual(res.headers['content-type'], 'text/html; charset=UTF-8');
+                assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
+                // add a timeout because we receive the response before the file unlinking
+                setTimeout(() => {
+                  assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'render', _renderId)), false);
+                  done();
+                }, 10);
+              });
+            });
+          });
+        });
+
+        it('should HEAD the render file and return a status 404 if the document does not exist', (done) => {
+          const _renderId = 'does_not_exist_404';
+          get.concat(getBody(4000, `/render/${_renderId}`, 'HEAD'), (err, res, data) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 404);
+            assert.strictEqual(data.toString(), '');
+            assert.strictEqual(res.headers['content-type'], '');
+            assert.strictEqual(res.headers['content-disposition'], '');
+            done();
+          });
         });
       });
     });
@@ -1683,15 +1733,18 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/template/abcdef', 'GET'), (err, res, data) => {
           assert.strictEqual(res.headers['content-disposition'], 'filename="abcdef.html"');
           assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+          assert.strictEqual(res.statusCode, 200);
           done();
         });
       });
 
-      it('should return an error if template does not exists', (done) => {
+      it('should return an error 404 if template does not exists', (done) => {
         get.concat(getBody(4000, '/template/dontexists', 'GET'), (err, res, data) => {
           data = JSON.parse(data.toString());
+          assert.strictEqual(res.statusCode, 404);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Cannot find template extension, does it exists?');
+          assert.strictEqual(data.code, 'w103');
           done();
         });
       });
@@ -1701,6 +1754,7 @@ describe('Webserver', () => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Template id or render id is not defined in the URL');
+          assert.strictEqual(res.statusCode, 400);
           done();
         });
       });

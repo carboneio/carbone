@@ -1,3 +1,6 @@
+### v4.X.X
+  - [EE] Fixed `HEAD /render/:renderId`: The request don't delete the generated document anymore.
+  - [EE] Fixed `GET /template/:templateId`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
 
 ### v4.10.1
   - Release April 17th 2023
@@ -30,10 +33,10 @@
     ```
   - Support aggregators on array of numbers. For example:`{d.table[]:aggSum}` = 63  if `table` contains `[10, 20, 33]`. Known limitation: Array filters on array of strings/numbers are still not supported.
   - ⚡️ Support loops on array of string/numbers. Example:
-    
+
     Data:
     ```json
-      { 
+      {
         "myArray" : ["yellow", 125, "blue"],
       }
     ```
@@ -53,14 +56,14 @@
         - blue
     ```
 
-    To maintain backward compatibility with existing templates, if the template contains at least one attribute access 
+    To maintain backward compatibility with existing templates, if the template contains at least one attribute access
     on `myArray` (Example: `{d.myArray[i].subObjectAttribue}`), Carbone considers `myArray` is an array of objects
-    and it disables this feature. In this case, `{d.myArray[i]}` prints nothing and is neutral for array filters even if 
+    and it disables this feature. In this case, `{d.myArray[i]}` prints nothing and is neutral for array filters even if
     the array contains a printable type like a string or a number, as it was before v4.9.0.
 
     Data:
     ```json
-      { 
+      {
         "otherArray" : [
           {"id" : 10},
           {"id" : 20},
@@ -69,7 +72,7 @@
         ]
       }
     ```
-    
+
     Template:
     ```
       Without filters:
@@ -84,8 +87,8 @@
       Without filters:
         -  10
         -  20
-        - 
-        - 
+        -
+        -
       With filters:
         -  10
         -  20
@@ -93,10 +96,10 @@
 
     Known limitation: Array filters on array of strings/numbers are still not supported.
 
-  - [EE] Includes a part of the new v5 engine that supports more use cases in some complex templates. This v5 engine is only enabled 
+  - [EE] Includes a part of the new v5 engine that supports more use cases in some complex templates. This v5 engine is only enabled
     if the template contains the tag `{o.preReleaseFeatureIn=4009000}`. This tag means: "enable all pre-release features added up to v4.9.0".
     Please only use this tag if we tell you to use it on our live chat.
-  
+
 ### v4.8.3
   - Release February 15th 2023
   - [EE] Experimental: increase the limit to 400 repetitions maximum when using the repetition feature `{d[i+1*qty]`
@@ -111,7 +114,7 @@
 
 ### v4.8.0
   - Release February 1st 2023
-  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`. 
+  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`.
     If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
   - [EE] Update Echarts to 5.4.1, dayjs to 1.11.7
   - Fix horizontal loops in DOCX tables
@@ -126,7 +129,7 @@
 
 ### v4.6.8
   - Release December 7th 2022
-  - Fix array filters when the same filter is used with different operators in multiple tags. Ex `{d[type=ok].id} {d[type!=ok].id}` 
+  - Fix array filters when the same filter is used with different operators in multiple tags. Ex `{d[type=ok].id} {d[type!=ok].id}`
 
 ### v4.6.7
   - Release December 5th 2022
@@ -156,7 +159,7 @@
 ### v4.6.1
   - Release October 28th 2022
   - Fixed `:drop(row, nbrToDrop)` for DOCX documents: bookmarked table rows can be deleted.
-  - negative numbers can by used when filtering with the iterator `i` 
+  - negative numbers can by used when filtering with the iterator `i`
     - `{d.arr[i, i<-2].id}  {d.arr[i+1, i<-2].id}` print all elements except the last 2 items
     - `{d.arr[i, i<-1].id}  {d.arr[i+1, i<-1].id}` print all elements except the last item
 
@@ -530,7 +533,7 @@
 
 ### v3.5.6
   - Release February 16th 2023
-  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`. 
+  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`.
     If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
 
 ### v3.5.5

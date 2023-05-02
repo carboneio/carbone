@@ -11,6 +11,9 @@ const package    = require('../package.json');
 const params     = require('../lib/params');
 const helper     = require('../lib/helper');
 const nock       = require('nock');
+const http       = require('http');
+const url        = require('url');
+
 
 function deleteRequiredFiles () {
   try {
@@ -1720,13 +1723,21 @@ describe('Webserver', () => {
     describe('Get template', () => {
       let templatePath = path.join(os.tmpdir(), 'template', 'abcdef');
       let templateFilePath = path.join(__dirname, 'datasets', 'template.html');
+      let bigTemplatePath = path.join(os.tmpdir(), 'template', 'large_file.xml');
 
       before(() => {
         fs.copyFileSync(templateFilePath, templatePath);
+        // generate a file of at least 1MB for some tests
+        let _largeBuffer = [];
+        for (let i=0; i<800000; i++) {
+          _largeBuffer.push('a');
+        }
+        fs.writeFileSync(bigTemplatePath, _largeBuffer.join('\n'), 'utf8');
       });
 
       after(() => {
         fs.unlinkSync(path.join(templatePath));
+        fs.unlinkSync(path.join(bigTemplatePath));
       });
 
       it('should return template', (done) => {
@@ -1735,6 +1746,33 @@ describe('Webserver', () => {
           assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
           assert.strictEqual(res.statusCode, 200);
           done();
+        });
+      });
+
+      it('should not crash if the stream is broken during download of a template for big files', (done) => {
+        const _opts = getBody(4000, '/template/large_file.xml', 'GET');
+        Object.assign(_opts, url.parse(_opts.url));
+        const _req = http.request(_opts, (res) => {
+          assert.strictEqual(res.statusCode, 200);
+          const outputChunks = [];
+          res.on('data', (chunk) => {
+            outputChunks.push(chunk);
+            if (outputChunks.length > 1) {
+              res.destroy();
+            }
+          });
+          res.on('error', (e) => {
+            assert.strictEqual(e, null);
+          });
+          res.on('close', () => {
+            // if Carbone crash, mocha detects Uncaught Error automatically:
+            // [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+            done();
+          });
+        });
+        _req.end();
+        _req.on('error', (e) => {
+          assert.strictEqual(e, null);
         });
       });
 

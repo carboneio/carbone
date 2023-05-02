@@ -1,3 +1,5 @@
+### v4.10.x
+  - [EE] Fix `options.isDebugActive = true`: do not return internal (not visible by user) tags
 ### v4.10.2
   - [EE] Fixed `HEAD /render/:renderId`: The request don't delete the generated document anymore.
   - [EE] Fixed `GET /template/:templateId`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.

@@ -899,6 +899,18 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
           done();
         });
       });
+      it('isDebugActive:true should not return internal Carbone makers used for hyperlinks', function (done) {
+        const _testedReport = 'hyperlink/docx-normal-loop';
+        const _data = [
+          { id : 'car1' },
+          { id : 'car2' }
+        ];
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false, isDebugActive : true }, (err, res, reportName, debugInfo) => {
+          helper.assert(err+'', 'null');
+          helper.assert(debugInfo.markers, [ '{d[i].id}', '{d[i].id}', '{d[i+1].id}']);
+          done();
+        });
+      });
     });
   });
 

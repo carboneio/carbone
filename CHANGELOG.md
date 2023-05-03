@@ -1,4 +1,8 @@
 
+### v4.10.3
+  - Release May 3rd 2023
+  - [EE] Improve automatic HTTP request retry of images with the last version of [rock-req](https://github.com/carboneio/rock-req)
+
 ### v4.10.2
   - Release May 3rd 2023
   - [EE] Fix `options.isDebugActive = true`: do not return internal (not visible by user) tags

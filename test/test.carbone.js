@@ -3267,10 +3267,7 @@ describe('Carbone', function () {
             '{d.field1}',
             '{d.field2}',
             '{c.author1}',
-            '{c.author2}',
-            '{c.now:neutralForArrayFilter:cumCount}',
-            '{c.now:neutralForArrayFilter:cumCount}',
-            '{c.now:neutralForArrayFilter:cumCount}'
+            '{c.author2}'
           ],
           sample : {
             data       : { field1 : 'field10' , field2 : 'field21'   },

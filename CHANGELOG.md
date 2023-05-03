@@ -1,5 +1,6 @@
 ### v4.10.x
   - [EE] Fix `options.isDebugActive = true`: do not return internal (not visible by user) tags
+  - [EE] Fix crash when dynamic image URL contains forbidden character
   - [EE] Fix crash when the socket is broken while the stream is still in progress for `GET /template/:templateId` and `GET /render/:reportId`
 
 ### v4.10.2

@@ -164,7 +164,7 @@ Carbone does a lot of thing for you behind the scene:
   wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.5.1.1/deb/x86_64/LibreOffice_7.5.1.1_Linux_x86-64_deb.tar.gz
 
   # Install required dependencies on ubuntu server for LibreOffice 7.0+
-  sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
+  sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6 libnss3
 
   # Uncompress package
   tar -zxvf LibreOffice_7.5.1.1_Linux_x86-64_deb.tar.gz

@@ -2166,6 +2166,13 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+      it('should not crash if the URL is not encoded', function (done) {
+        // this é character is encoded as \u0065 (forbidden)
+        image.downloadImage('https://google.com/é.png', {}, {}, function (err) {
+          helperTest.assert(err+'', 'Error Carbone: image URL contains unescaped characters: https://google.com/é.png');
+          done();
+        });
+      });
       it('should download a PNG image from an url', function (done) {
         nock('https://google.com')
           .get('/image-flag-it.png')

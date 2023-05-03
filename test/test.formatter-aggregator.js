@@ -572,6 +572,20 @@ describe('Aggregatted operations', function () {
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
+      it('should accept filters in the second array only', function (done) {
+        const _xml =
+           '<x>'
+          +     '<d>{d.companies[].services[name=IT].people[].salary:__TESTED_FORMATTER__}</d>'
+          +'</x>';
+        let _expected = [
+          [ 'aggSum'   , '<x><d>41</d></x>' ],
+          [ 'aggAvg'   , '<x><d>8.2</d></x>' ],
+          [ 'aggMin'   , '<x><d>1</d></x>' ],
+          [ 'aggMax'   , '<x><d>20</d></x>' ],
+          [ 'aggCount' , '<x><d>5</d></x>' ],
+        ];
+        executeTest(_xml, dataThreeLoops, _expected, done);
+      });
       // TOOD limit only this known usage
       it('[CUM] should accept to aggregate reduced array [] and to do a cumulative sum in the same time (aggSum:cumSum)', function (done) {
         const _xml =

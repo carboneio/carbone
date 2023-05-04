@@ -1,4 +1,8 @@
 
+### v4.10.4
+  - Release May 4th 2023
+  - [EE] Egress traffic: When a request retry is attempted, do not use the egress proxy again if the primary egress proxy is configured and the secondary egress proxy is undefined
+
 ### v4.10.3
   - Release May 3rd 2023
   - [EE] Improve automatic HTTP request retry of images with the last version of [rock-req](https://github.com/carboneio/rock-req)

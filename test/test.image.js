@@ -2385,6 +2385,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       describe('with proxy', function () {
         afterEach(function () {
           carbone.reset();
+          if (!nock.isDone()) {
+            this.test.error(new Error('Not all nock interceptors were used!'));
+            nock.cleanAll();
+          }
         });
         it('should rewrite the URL if a proxy is activated', function (done) {
           carbone.set({
@@ -2569,7 +2573,8 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             done();
           });
         });
-        it('should retry with on the same proxy if there is no second proxy', function (done) {
+        // This test is skipped because it is replaced by the second test here after (temp)
+        it.skip('should retry with on the same proxy if there is no second proxy', function (done) {
           carbone.set({
             egressMaxRetry       : 2,
             egressProxyPrimary   : 'http://127.0.0.1:4010',
@@ -2580,6 +2585,30 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
             .get('/https/google.com/443/0/0/image-flag-fr.jpg')
             .reply(502, undefined)
             .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+              'Content-Type' : 'image/jpeg',
+            });
+          image.downloadImage('https://google.com/image-flag-fr.jpg', {}, {}, function (err, imageInfo) {
+            helperTest.assert(err+'', 'null');
+            assert(imageInfo.data.length > 0);
+            helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+            helperTest.assert(imageInfo.extension, 'jpg');
+            done();
+          });
+        });
+        it('should retry without any proxy if the primary proxy is configured and not the second one', function (done) {
+          carbone.set({
+            egressMaxRetry       : 2,
+            egressProxyPrimary   : 'http://127.0.0.1:4010',
+            egressProxySecondary : '',
+            egressProxyPath      : '/${protocol}/${hostname}/${port}/${tenantId}/${requestId}${path}'
+          });
+          nock('http://127.0.0.1:4010')
+            .get('/https/google.com/443/0/0/image-flag-fr.jpg')
+            .reply(502, undefined)
+          ;
+          nock('https://google.com')
+            .get('/image-flag-fr.jpg')
             .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
               'Content-Type' : 'image/jpeg',
             });

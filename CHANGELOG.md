@@ -1,4 +1,8 @@
 
+### v4.10.5
+  - Release May 8th 2023
+  - [EE] set default webhook timeout to 16 seconds (it was 3s since 4.10.0)
+
 ### v4.10.4
   - Release May 4th 2023
   - [EE] Egress traffic: When a request retry is attempted, do not use the egress proxy again if the primary egress proxy is configured and the secondary egress proxy is undefined

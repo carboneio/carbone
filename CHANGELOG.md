@@ -1,4 +1,8 @@
 
+### v4.10.6
+  - Release May 12th 2023
+  - [EE] Fix: accepts whitespace in image URL like before v4.10.2 even if it is not recommended
+
 ### v4.10.5
   - Release May 8th 2023
   - [EE] set default webhook timeout to 16 seconds (it was 3s since 4.10.0)

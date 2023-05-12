@@ -2173,6 +2173,19 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+      it('should accept whitespace for some clients (thaï), because it does not crash Node even if it it not recommended', function (done) {
+        nock('https://go ogle.com')
+          .get('/sd%20sd.jpg')
+          .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+            'Content-Type' : 'image/jpeg',
+          });
+        image.downloadImage('https://go ogle.com/sd sd.jpg', {}, {}, function (err, imageInfo) {
+          helperTest.assert(err+'', 'null');
+          assert(imageInfo.data.length > 0);
+          helperTest.assert(imageInfo.extension, 'jpg');
+          done();
+        });
+      });
       it('should download a PNG image from an url', function (done) {
         nock('https://google.com')
           .get('/image-flag-it.png')

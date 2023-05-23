@@ -4879,6 +4879,10 @@ describe('Dynamic HTML', function () {
         let template = {
           files : [
             {
+              name : 'numbering.xml.rels',
+              data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xml>RELATION FILE</xml>'
+            },
+            {
               name : 'numbering.xml',
               data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:numbering><w:abstractNum w:abstractNumId="1"><w:multiLevelType w:val="hybridMultilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="bullet"/><w:lvlText w:val=""/><w:lvlJc w:val="left"/><w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr><w:rPr><w:rFonts w:ascii="Symbol" w:hAnsi="Symbol" w:hint="default"/></w:rPr></w:lvl></w:abstractNum><w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num></w:numbering>'
             }
@@ -4889,7 +4893,7 @@ describe('Dynamic HTML', function () {
         };
         htmlFormatters.getHTMLContentDocx.call(_options, _content);
         html.postProcessDocx(template, null, _options);
-        helper.assert(template.files[0].data, _expectedNumberingFile);
+        helper.assert(template.files[1].data, _expectedNumberingFile);
       });
     });
   });

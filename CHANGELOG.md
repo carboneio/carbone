@@ -1,3 +1,5 @@
+### v4.10.X
+ - [EE] Fixed HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
 
 ### v4.10.6
   - Release May 12th 2023

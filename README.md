@@ -33,7 +33,7 @@
 
 ### News
 
-15th of February 2023: Carbone just launched [on Product Hunt](https://www.producthunt.com/posts/carbone)! Feel free to support us. It will help us improve the engine!
+June 2023: A new Carbone website is coming with a free interactive tutorial (FR/EN) to learn Carbone language. Stay tuned 👋.
 
 Please consider using the Cloud or On-Premise [Enterprise Edition](https://carbone.io/pricing.html) if you need **professional support**. 
 The Community Edition is one major version behind the Enterprise Edition. Feel free to contact us [on the chat](https://carbone.io) if you need further information.

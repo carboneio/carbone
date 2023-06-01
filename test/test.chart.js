@@ -403,7 +403,7 @@ describe('chart', function () {
       const _testedReport = 'chart/docx-simple-with-bind';
       helperTest.assert(chartLib.getDocxObjectIdFromRel(helperTest.openTemplate(_testedReport), 'charts/chart1.xml'), 'rId4');
     });
-    it('get object id of another element', function () {
+    it('get object id of another element, even if this id is after the filename in XML', function () {
       const _testedReport = 'chart/docx-simple-with-bind';
       helperTest.assert(chartLib.getDocxObjectIdFromRel(helperTest.openTemplate(_testedReport), 'theme/theme1.xml'), 'rId6');
     });

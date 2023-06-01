@@ -11,6 +11,9 @@ const package    = require('../package.json');
 const params     = require('../lib/params');
 const helper     = require('../lib/helper');
 const nock       = require('nock');
+const http       = require('http');
+const url        = require('url');
+
 
 function deleteRequiredFiles () {
   try {
@@ -1432,6 +1435,7 @@ describe('Webserver', () => {
           assert.strictEqual(err, null);
           get.concat(getBody(4000, `/render/${data.data.renderId}?download=true`, 'GET'), (err, res) => {
             assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(res.headers['content-type'], 'application/pdf');
             assert.strictEqual(res.headers['content-disposition'], 'attachment; filename="renderedReport.pdf"');
             done();
@@ -1537,6 +1541,55 @@ describe('Webserver', () => {
           assert.strictEqual(_resp.error, 'Template id or render id is not defined in the URL');
           assert.strictEqual(_resp.code, 'w115');
           done();
+        });
+      });
+
+      describe('HEAD template', () => {
+        it('should HEAD a rendered file, return a status 200, and download the document', (done) => {
+          const body = {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
+            },
+            reportName : 'renderedReport',
+            complement : {},
+            enum       : {}
+          };
+
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+            assert.strictEqual(err, null);
+            const _renderId = data.data.renderId;
+            get.concat(getBody(4000, `/render/${_renderId}`, 'HEAD'), (err, res, data) => {
+              assert.strictEqual(err, null);
+              assert.strictEqual(res.statusCode, 200);
+              assert.strictEqual(data.toString(), '');
+              assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'render', _renderId)), true);
+              assert.strictEqual(res.headers['content-type'], 'text/html; charset=UTF-8');
+              assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
+              /** Now download the file and it should be deleted */
+              get.concat(getBody(4000, `/render/${_renderId}`, 'GET'), (err, res) => {
+                assert.strictEqual(res.headers['content-type'], 'text/html; charset=UTF-8');
+                assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
+                // add a timeout because we receive the response before the file unlinking
+                setTimeout(() => {
+                  assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'render', _renderId)), false);
+                  done();
+                }, 10);
+              });
+            });
+          });
+        });
+
+        it('should HEAD the render file and return a status 404 if the document does not exist', (done) => {
+          const _renderId = 'does_not_exist_404';
+          get.concat(getBody(4000, `/render/${_renderId}`, 'HEAD'), (err, res, data) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 404);
+            assert.strictEqual(data.toString(), '');
+            assert.strictEqual(res.headers['content-type'], '');
+            assert.strictEqual(res.headers['content-disposition'], '');
+            done();
+          });
         });
       });
     });
@@ -1670,28 +1723,66 @@ describe('Webserver', () => {
     describe('Get template', () => {
       let templatePath = path.join(os.tmpdir(), 'template', 'abcdef');
       let templateFilePath = path.join(__dirname, 'datasets', 'template.html');
+      let bigTemplatePath = path.join(os.tmpdir(), 'template', 'large_file.xml');
 
       before(() => {
         fs.copyFileSync(templateFilePath, templatePath);
+        // generate a file of at least 1MB for some tests
+        let _largeBuffer = [];
+        for (let i=0; i<800000; i++) {
+          _largeBuffer.push('a');
+        }
+        fs.writeFileSync(bigTemplatePath, _largeBuffer.join('\n'), 'utf8');
       });
 
       after(() => {
         fs.unlinkSync(path.join(templatePath));
+        fs.unlinkSync(path.join(bigTemplatePath));
       });
 
       it('should return template', (done) => {
         get.concat(getBody(4000, '/template/abcdef', 'GET'), (err, res, data) => {
           assert.strictEqual(res.headers['content-disposition'], 'filename="abcdef.html"');
           assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+          assert.strictEqual(res.statusCode, 200);
           done();
         });
       });
 
-      it('should return an error if template does not exists', (done) => {
+      it('should not crash if the stream is broken during download of a template for big files', (done) => {
+        const _opts = getBody(4000, '/template/large_file.xml', 'GET');
+        Object.assign(_opts, url.parse(_opts.url));
+        const _req = http.request(_opts, (res) => {
+          assert.strictEqual(res.statusCode, 200);
+          const outputChunks = [];
+          res.on('data', (chunk) => {
+            outputChunks.push(chunk);
+            if (outputChunks.length > 1) {
+              res.destroy();
+            }
+          });
+          res.on('error', (e) => {
+            assert.strictEqual(e, null);
+          });
+          res.on('close', () => {
+            // if Carbone crash, mocha detects Uncaught Error automatically:
+            // [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+            done();
+          });
+        });
+        _req.end();
+        _req.on('error', (e) => {
+          assert.strictEqual(e, null);
+        });
+      });
+
+      it('should return an error 404 if template does not exists', (done) => {
         get.concat(getBody(4000, '/template/dontexists', 'GET'), (err, res, data) => {
           data = JSON.parse(data.toString());
+          assert.strictEqual(res.statusCode, 404);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Cannot find template extension, does it exists?');
+          assert.strictEqual(data.code, 'w103');
           done();
         });
       });
@@ -1701,6 +1792,7 @@ describe('Webserver', () => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Template id or render id is not defined in the URL');
+          assert.strictEqual(res.statusCode, 400);
           done();
         });
       });
@@ -1763,6 +1855,10 @@ describe('Webserver', () => {
         helper.assert(webserver.sanitizeValidateId('./bill.pdf'), 'bill.pdf');
         helper.assert(webserver.sanitizeValidateId('../bill.pdf'), 'bill.pdf');
         helper.assert(webserver.sanitizeValidateId('../../../bill.pdf'), 'bill.pdf');
+        helper.assert(webserver.sanitizeValidateId('bill/../../../bill.pdf'), null);
+        helper.assert(webserver.sanitizeValidateId('bill//bill.pdf'), 'billbill.pdf');
+        helper.assert(webserver.sanitizeValidateId('bill/bill.pdf'), 'billbill.pdf');
+        helper.assert(webserver.sanitizeValidateId('/bill/../../../bill.pdf'), null);
         helper.assert(webserver.sanitizeValidateId('..../bill.pdf'), 'bill.pdf');
         helper.assert(webserver.sanitizeValidateId('./././bill.pdf'), 'bill.pdf');
       });
@@ -1833,7 +1929,7 @@ describe('Webserver', () => {
         enum       : {},
         convertTo  : 'txt'
       };
-      const child = spawn('node', ['bin/carbone', 'webserver', '-p', '3000']);
+      const child = spawn('node', ['bin/carbone', 'webserver', '-p', '3000', '-A', 'false']);
       function runQueries () {
         uploadFile(3000, null, () => {
           get.concat(getBody(3000, '/status', 'GET', {}, null), (err, res) => {

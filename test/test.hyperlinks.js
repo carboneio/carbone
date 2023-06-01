@@ -539,9 +539,15 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     });
 
     it('[utils] validateURL - \n \
+        should return an error URL when the element is not a string && \n\
         should return an error URL when the URL is invalid && \n\
         should return an error URL passed as a second argument when the URL is invalid', () => {
       /** DEFAULT URL ON ERROR */
+      helper.assert(hyperlinks.validateURL([]), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL({}), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(undefined), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(null), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(12345), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('javascript:void(0)'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('magnet:?xt=urn:btih:123'), hyperlinks.URL_ON_ERROR);
@@ -896,6 +902,18 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
         carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false }, (err, res) => {
           helper.assert(err+'', 'null');
           helper.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('isDebugActive:true should not return internal Carbone makers used for hyperlinks', function (done) {
+        const _testedReport = 'hyperlink/docx-normal-loop';
+        const _data = [
+          { id : 'car1' },
+          { id : 'car2' }
+        ];
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false, isDebugActive : true }, (err, res, reportName, debugInfo) => {
+          helper.assert(err+'', 'null');
+          helper.assert(debugInfo.markers, [ '{d[i].id}', '{d[i].id}', '{d[i+1].id}']);
           done();
         });
       });

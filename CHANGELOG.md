@@ -4,6 +4,36 @@
   - Added `drop` formatter support in headers and footers of DOCX and ODT documents.
   - Added the option `h` for the `:drop(element)` formatter to delete heading elements for ODT templates only. On LibreOffice, it relates to heading style 1, 2, 3, 4 and custom styles. Usage: `{d.value:ifEM:drop(h)}` To delete heading elements for DOCX template, the `:drop(p)` must be used.
 
+### v4.10.X
+  - [EE] Fixed HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
+  - [EE] Fix a random chart issue with DOCX template (Depends on how the document is saved By Microsoft Office)
+  - [EE] Fix DOCX to PDF conversion when the document contains more than 20 charts
+  - [EE] Fix hyperlink error when the value is not a string
+
+### v4.10.6
+  - Release May 12th 2023
+  - [EE] Fix: accepts whitespace in image URL like before v4.10.2 even if it is not recommended
+
+### v4.10.5
+  - Release May 8th 2023
+  - [EE] set default webhook timeout to 16 seconds (it was 3s since 4.10.0)
+
+### v4.10.4
+  - Release May 4th 2023
+  - [EE] Egress traffic: When a request retry is attempted, do not use the egress proxy again if the primary egress proxy is configured and the secondary egress proxy is undefined
+
+### v4.10.3
+  - Release May 3rd 2023
+  - [EE] Improve automatic HTTP request retry of images with the last version of [rock-req](https://github.com/carboneio/rock-req)
+
+### v4.10.2
+  - Release May 3rd 2023
+  - [EE] Fix `options.isDebugActive = true`: do not return internal (not visible by user) tags
+  - [EE] Fix crash when dynamic image URL contains forbidden characters
+  - [EE] Fix crash when the socket is broken while the stream is still in progress for `GET /template/:templateId` and `GET /render/:reportId`
+  - [EE] Fix `HEAD /render/:renderId`: The request don't delete the generated document anymore.
+  - [EE] Fix `GET /template/:templateId`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
+
 ### v4.10.1
   - Release April 17th 2023
   - [EE] Disable egress proxy by default

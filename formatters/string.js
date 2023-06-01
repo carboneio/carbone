@@ -225,13 +225,30 @@ function convCRLFH (d) {
  * @param {String} d
  * @param {Integer} begin Zero-based index at which to begin extraction.
  * @param {Integer} end Zero-based index before which to end extraction
+ * @param {Boolean} wordMode if true, it never cuts words (default: false)
  * @return {String} return the formatted string
  */
-function substr (d, begin, end) {
-  if (typeof d === 'string') {
-    return d.slice(begin, end);
+function substr (d, begin, end, wordMode = false) {
+  if (typeof d !== 'string') {
+    return d;
   }
-  return d;
+  if (wordMode === true) {
+    // const _newEnd   = (end === -1)  ? d.length : (end + 1);
+    // const _newBegin = (begin === 0) ? 0        : (begin - 1);
+    const _posOfCharBeforeBegin = (begin === 0) ? 0 : (begin - 1);
+    const _posOfCharAfterEnd = (end === -1) ? d.length : (end + 1);
+    const _text = d.slice(_posOfCharBeforeBegin, _posOfCharAfterEnd);
+    let _newBegin = begin !== 0 ? 1 : 0;
+    let _newEnd = end >= d.length ? _text.length :  _text.length-1;
+    if (_text[0] !== ' ' && _posOfCharBeforeBegin !== 0) {
+      _newBegin = _text.indexOf(' ');
+    }
+    if (_text[_text.length - 1] !== ' ' && _posOfCharAfterEnd < d.length) {
+      _newEnd = _text.lastIndexOf(' ') + 1;
+    }
+    return _newBegin !== -1 && _newEnd !== -1 ? _text.slice(_newBegin, _newEnd) : '';
+  }
+  return d.slice(begin, end);
 }
 
 /**
@@ -296,6 +313,27 @@ function padr (d, targetLength, padString) {
     return d.toString().padEnd(targetLength, _padString);
   }
   return d;
+}
+
+/**
+ * Add "..." if the text is too long
+ *
+ * @version 4.11.0
+ *
+ * @example ["abcdef" , 3 ]
+ * @example ["abcdef" , 6 ]
+ * @example ["abcdef" , 10]
+ *
+ * @param {String} d
+ * @param {Integer} maximum number of characters to print.
+ * @param {Integer} end Zero-based index before which to end extraction
+ * @return {String} return the formatted string
+ */
+function ellispis (d, maxLength, end) {
+  if (typeof d !== 'string') {
+    return d;
+  }
+  return d.length <= maxLength ? d : d.slice(0, maxLength) + '...';
 }
 
 function md5 (d) {
@@ -365,6 +403,7 @@ module.exports = {
   md5       : md5,
   prepend   : prepend,
   append    : append,
+  ellispis  : ellispis,
   neutralForArrayFilter : neutralForArrayFilter,
   // private
   convCRLFH : convCRLFH

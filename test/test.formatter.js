@@ -1420,7 +1420,7 @@ describe('formatter', function () {
     });
   });
 
-  describe('substr', function () {
+  describe.only('substr', function () {
     it('should keep only the selection', function () {
       helper.assert(stringFormatter.substr('coucou', 0, 3), 'cou');
       helper.assert(stringFormatter.substr('coucou', 0, 0), '');
@@ -1429,6 +1429,47 @@ describe('formatter', function () {
     it('should not crash if data is null or undefined', function () {
       helper.assert(stringFormatter.substr(null, 0, 3), null);
       helper.assert(stringFormatter.substr(undefined, 0, 3), undefined);
+    });
+    it('should keep only the selection of characters but do not cut words if the third paramater is true. The returned tetx can be shorter', function () {
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 2, true)     , '');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, false)   , 'coucou donotcutme  d');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, true)    , 'coucou donotcutme  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 27, true)    , 'coucou donotcutme  donotcut');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 40, true)    , 'coucou donotcutme  donotcut   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 6, true)     , 'coucou');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 6, 28, true)    , ' donotcutme  donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 1000, true) , '  other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 35, true)   , '  other');
+
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -2, true)    , 'coucou donotcutme  donotcut   ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -1, true)    , 'coucou donotcutme  donotcut   ');
+
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -16, 28, true)    , 'donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -16, 100, true)    , 'donotcut   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -9, 100, true)    , '   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -8, 100, true)    , '   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -6, 100, true)    , ' other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -5, 100, true)    , 'other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -4, 100, true)    , '');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -1, 100, true)    , '');
+    });
+  });
+
+  describe('ellispis', function () {
+    it('should cut the text and add dots', function () {
+      helper.assert(stringFormatter.ellispis('coucou', 3), 'cou...');
+      helper.assert(stringFormatter.ellispis('coucou', 5), 'couco...');
+      helper.assert(stringFormatter.ellispis('coucou', 6), 'coucou');
+      helper.assert(stringFormatter.ellispis('coucou', 7), 'coucou');
+      helper.assert(stringFormatter.ellispis('coucou ', 7), 'coucou ');
+      helper.assert(stringFormatter.ellispis('coucou  ', 7), 'coucou ...');
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.ellispis(null, 0), null);
+      helper.assert(stringFormatter.ellispis(undefined, 0), undefined);
+    });
+    it('works only on string', function () {
+      helper.assert(stringFormatter.ellispis(30, 0), 30);
     });
   });
 

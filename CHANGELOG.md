@@ -1,14 +1,13 @@
 ### v4.X.X
-  - Fixed DOCX rendering: Using `:html` or `:drop` with an empty value inside a table cell is not creating a corrupted document anymore.
-  - Fixed `drop` formatter: it was not found and executed by Carbone.
-  - Added `drop` formatter support in headers and footers of DOCX and ODT documents.
-  - Added the option `h` for the `:drop(element)` formatter to delete heading elements for ODT templates only. On LibreOffice, it relates to heading style 1, 2, 3, 4 and custom styles. Usage: `{d.value:ifEM:drop(h)}` To delete heading elements for DOCX template, the `:drop(p)` must be used.
-
-### v4.10.X
-  - [EE] Fixed HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
-  - [EE] Fix a random chart issue with DOCX template (Depends on how the document is saved By Microsoft Office)
-  - [EE] Fix DOCX to PDF conversion when the document contains more than 20 charts
-  - [EE] Fix hyperlink error when the value is not a string
+  - Support `drop` formatter in headers and footers of DOCX and ODT documents.
+  - Fix: using `:html` or `:drop` with an empty value inside a table cell is not creating a corrupted document anymore with DOCX templates
+  - Fix: sometimes `drop` formatter was not found and not executed by Carbone
+  - `:drop(h)` can be used to delete heading elements for ODT templates only. On LibreOffice, it relates to heading style 1, 2, 3, 4 and custom styles.
+    For DOCX templates, `:drop(p)` must be used to delete heading elements.
+  - Fix HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
+  - Fix a random chart issue with DOCX template (Depends on how the document is saved By Microsoft Office)
+  - Fix DOCX to PDF conversion when the document contains more than 20 charts
+  - Fix hyperlink error when the value is not a string
 
 ### v4.10.6
   - Release May 12th 2023

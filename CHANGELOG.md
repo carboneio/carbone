@@ -3,7 +3,7 @@
   - Support `drop` formatter in headers and footers of DOCX and ODT documents.
   - `:drop(h)` can be used to delete heading elements for ODT templates only. On LibreOffice, it relates to heading style 1, 2, 3, 4 and custom styles.
     For DOCX templates, `:drop(p)` must be used to delete heading elements.
-  - Fix: using `:html' or `:drop' with an empty value inside a table cell no longer creates a corrupted document with DOCX templates.
+  - Fix: using `:html` or `:drop` with an empty value inside a table cell no longer creates a corrupted document with DOCX templates.
   - Fix: sometimes `drop` formatter was not found and not executed by Carbone
   - Fix HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
   - Fix a random dynamic chart issue with some DOCX templates

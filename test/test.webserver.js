@@ -1925,7 +1925,7 @@ describe('Webserver', () => {
         enum       : {},
         convertTo  : 'txt'
       };
-      const child = spawn('node', ['bin/carbone', 'webserver', '-p', '3000']);
+      const child = spawn('node', ['bin/carbone', 'webserver', '-p', '3000', '-A', 'false']);
       function runQueries () {
         uploadFile(3000, null, () => {
           get.concat(getBody(3000, '/status', 'GET', {}, null), (err, res) => {

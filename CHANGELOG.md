@@ -1,6 +1,7 @@
 ### v4.10.X
  - [EE] Fixed HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
   - [EE] Fix a random chart issue with DOCX template (Depends on how the document is saved By Microsoft Office)
+  - [EE] Fix DOCX to PDF conversion when the document contains more than 20 charts
 
 ### v4.10.6
   - Release May 12th 2023

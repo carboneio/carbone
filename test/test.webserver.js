@@ -1855,6 +1855,10 @@ describe('Webserver', () => {
         helper.assert(webserver.sanitizeValidateId('./bill.pdf'), 'bill.pdf');
         helper.assert(webserver.sanitizeValidateId('../bill.pdf'), 'bill.pdf');
         helper.assert(webserver.sanitizeValidateId('../../../bill.pdf'), 'bill.pdf');
+        helper.assert(webserver.sanitizeValidateId('bill/../../../bill.pdf'), null);
+        helper.assert(webserver.sanitizeValidateId('bill//bill.pdf'), 'billbill.pdf');
+        helper.assert(webserver.sanitizeValidateId('bill/bill.pdf'), 'billbill.pdf');
+        helper.assert(webserver.sanitizeValidateId('/bill/../../../bill.pdf'), null);
         helper.assert(webserver.sanitizeValidateId('..../bill.pdf'), 'bill.pdf');
         helper.assert(webserver.sanitizeValidateId('./././bill.pdf'), 'bill.pdf');
       });

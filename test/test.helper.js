@@ -927,6 +927,9 @@ describe('helper', function () {
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg'), 'jpeg');
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt'), 'txt');
     });
+    it('should lower case extension to normalize', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.JPG'), 'jpg');
+    });
     it('should return a png/jpeg/gif/txt extension with query parameters', function () {
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png?fewfw=223&lala=few'), 'png');
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif#fewfw=223?lala=few'), 'gif');

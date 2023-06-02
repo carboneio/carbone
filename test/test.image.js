@@ -2166,6 +2166,20 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           done();
         });
       });
+      it('should accept mime type application/binary with JPG extension in upper case from dropbox', function (done) {
+        nock('https://dropbox.com')
+          .get('/image-flag-fr.JPG?dl=1')
+          .replyWithFile(200, __dirname + '/datasets/image/imageFR.jpg', {
+            'Content-Type' : 'application/binary',
+          });
+        image.downloadImage('https://dropbox.com/image-flag-fr.JPG?dl=1', {}, {}, function (err, imageInfo) {
+          helperTest.assert(err+'', 'null');
+          assert(imageInfo.data.length > 0);
+          helperTest.assert(imageInfo.mimetype, 'image/jpeg');
+          helperTest.assert(imageInfo.extension, 'jpg');
+          done();
+        });
+      });
       it('should not crash if the URL is not encoded', function (done) {
         // this é character is encoded as two chars \u0065\u0301 (forbidden)
         image.downloadImage('https://google.com/é.png', {}, {}, function (err) {

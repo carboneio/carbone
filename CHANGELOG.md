@@ -1,3 +1,6 @@
+### v4.11.1
+  - Accept image from dropbox with mime type `application/binary` and image extension in capital letters
+
 ### v4.11.0
   - Release June 1st 2023
   - Support `drop` formatter in headers and footers of DOCX and ODT documents.

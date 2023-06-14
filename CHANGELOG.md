@@ -1,10 +1,16 @@
+### v3.X.X
+  - [EE] All APIs returns "400 Bad request" instead of "404 Not Found" when `idTemplate` is not valid
+  - [EE] Fixed `HEAD /render/:renderId` : The request don't delete the generated document anymore.
+  - [EE] Fixed `GET /template/:templateId` : If the template doesn't exist, the statusCode 404 is returned instead of 400.
+  - [EE] Force download of the rendered report when the query parameter ?download=true is set, such as: `POST /render/:renderId?download=true`
+
 ### v3.6.0
   - Release April 17th 2023
   - Support vector barcodes with the new `svg` option to improve print quality: `{d.number:barcode(qrcode, svg:true)}`
 
 ### v3.5.6
   - Release February 16th 2023
-  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`. 
+  - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`.
     If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
 
 ### v3.5.5
@@ -17,7 +23,7 @@
 
 ### v3.5.3
   - Release May 25th 2022
-  - [EE] Accept `convCRLF` before `:html` formatter to convert `\r\n` to `<br>` 
+  - [EE] Accept `convCRLF` before `:html` formatter to convert `\r\n` to `<br>`
 
 ### v3.5.2
   - Release May 6th 2022

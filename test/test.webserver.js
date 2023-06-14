@@ -136,6 +136,7 @@ function unlinkConfigFile () {
 
 describe('Webserver', () => {
   before(() => {
+    carbone.reset();
     writeConfigFile();
   });
 
@@ -347,6 +348,7 @@ describe('Webserver', () => {
 
     describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender and middlewares', () => {
       before((done) => {
+        carbone.reset();
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'middlewares.js'), path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
@@ -573,6 +575,7 @@ describe('Webserver', () => {
     let toDelete = [];
 
     before((done) => {
+      carbone.reset();
       deleteRequiredFiles();
       webserver = require('../lib/webserver');
 
@@ -727,6 +730,7 @@ describe('Webserver', () => {
     let toDelete = [];
 
     before((done) => {
+      carbone.reset();
       process.env.CARBONE_EE_AUTHENTICATION = true;
       deleteRequiredFiles();
       webserver = require('../lib/webserver');
@@ -768,6 +772,7 @@ describe('Webserver', () => {
     let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
 
     before((done) => {
+      carbone.reset();
       deleteRequiredFiles();
       webserver = require('../lib/webserver');
 

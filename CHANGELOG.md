@@ -1,4 +1,7 @@
 ### v4.11.1
+  - Improve security.
+
+### v4.11.1
   - Release June 2nd 2023
   - Accept image from dropbox with mime type `application/binary` and image extension in capital letters
 

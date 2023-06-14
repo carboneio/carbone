@@ -1735,11 +1735,13 @@ describe('Webserver', () => {
 
     describe('Get template', () => {
       let templatePath = path.join(os.tmpdir(), 'template', 'abcdef');
+      let templatePathTemplateId = path.join(os.tmpdir(), 'template', 'f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6');
       let templateFilePath = path.join(__dirname, 'datasets', 'template.html');
       let bigTemplatePath = path.join(os.tmpdir(), 'template', 'large_file.xml');
 
       before(() => {
         fs.copyFileSync(templateFilePath, templatePath);
+        fs.copyFileSync(templateFilePath, templatePathTemplateId);
         // generate a file of at least 1MB for some tests
         let _largeBuffer = [];
         for (let i=0; i<800000; i++) {
@@ -1750,6 +1752,7 @@ describe('Webserver', () => {
 
       after(() => {
         fs.unlinkSync(path.join(templatePath));
+        fs.unlinkSync(path.join(templatePathTemplateId));
         fs.unlinkSync(path.join(bigTemplatePath));
       });
 
@@ -1809,6 +1812,33 @@ describe('Webserver', () => {
           done();
         });
       });
+
+      describe("Get template with security", function () {
+
+        before(function (done) {
+          params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY;
+          done()
+        })
+
+        after(function (done) {
+          params.securityLevel = 0;
+          done()
+        })
+
+        it('should return template with a correct template ID and a template ID', (done) => {
+          get.concat(getBody(4000, '/template/f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6', 'GET'), (err, res, data) => {
+            assert.strictEqual(res.headers['content-disposition'], 'filename="f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6.html"');
+            assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+            assert.strictEqual(res.statusCode, 200);
+            get.concat(getBody(4000, '/template/:f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6', 'GET'), (err, res, data) => {
+              assert.strictEqual(res.headers['content-disposition'], 'filename="f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6.html"');
+              assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+              assert.strictEqual(res.statusCode, 200);
+              done();
+            });
+          });
+        });
+      })
     });
 
     describe('Delete template', () => {
@@ -1835,6 +1865,39 @@ describe('Webserver', () => {
           done();
         });
       });
+
+      describe("Delete template with security level", function () {
+
+        before(function (done) {
+          params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY;
+          done()
+        })
+
+        after(function (done) {
+          params.securityLevel = 0;
+          done()
+        })
+
+        it('should delete a template (Correct templateID with/without ":" character)', (done) => {
+          /** NOT including ":" in the template Id */
+          exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'template', '541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd')}`, () => {
+            get.concat(getBody(4000, '/template/541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd', 'DELETE'), (err, res, data) => {
+              data = JSON.parse(data.toString());
+              assert.strictEqual(data.success, true);
+              assert.strictEqual(data.message, 'Template deleted');
+              /** Including ":" in the template ID */
+              exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'template', '541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd')}`, () => {
+                get.concat(getBody(4000, '/template/:541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd', 'DELETE'), (err, res, data) => {
+                  data = JSON.parse(data.toString());
+                  assert.strictEqual(data.success, true);
+                  assert.strictEqual(data.message, 'Template deleted');
+                  done();
+                });
+              });
+            });
+          });
+        });
+      })
     });
   });
 
@@ -1928,6 +1991,34 @@ describe('Webserver', () => {
         helper.assert(webserver.sanitizeValidateId('9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html'), '9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html');
       });
     });
+
+    describe('valideTemplateId', function() {
+
+      before(function (done) {
+        params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY;
+        done()
+      })
+
+      after(function (done) {
+        params.securityLevel = 0;
+        done()
+      })
+
+      it('should validate templateId', function() {
+        helper.assert(webserver.validateTemplateId('541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd'), '541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd')
+        helper.assert(webserver.validateTemplateId('d02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243'), 'd02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243')
+        helper.assert(webserver.validateTemplateId(':d02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243'), 'd02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243')
+      })
+
+      it('should return null if the template Id is not correct', function() {
+        helper.assert(webserver.validateTemplateId('d02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243fewewfewfwe'), null)
+        helper.assert(webserver.validateTemplateId('feiowfoweij'), null);
+        helper.assert(webserver.validateTemplateId(12345), null);
+        helper.assert(webserver.validateTemplateId(null), null);
+        helper.assert(webserver.validateTemplateId(undefined), null);
+        helper.assert(webserver.validateTemplateId({}), null);
+      })
+    });
   });
   describe('Gracefully exit', function () {
     it('should kill a server with SIGTERM, wait remaining renders and exist after 15 seconds', (done) => {
@@ -1988,7 +2079,7 @@ describe('Webserver', () => {
 
   describe('Security test', () => {
     before((done) => {
-      const _securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY 
+      const _securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY
                           | helper.SECURITY_LO_DISABLE_SCRIPT_EXECUTION
                           | helper.SECURITY_LO_DISABLE_EXTERNAL_LINK
                           | helper.SECURITY_LO_DISABLE_EXOTIC_FILE

@@ -1,5 +1,7 @@
-### v4.11.1
-  - Improve security.
+### v4.11.2
+  - Release June 14th 2023
+  - [EE] On-Premise: New option to enable more security controls, following ANSSI (France) and BSI (Germany) recommendations. Contact us for more information.
+  - [EE] All APIs returns `400 Bad request` instead of `404 Not Found` when `idTemplate` is not valid
 
 ### v4.11.1
   - Release June 2nd 2023

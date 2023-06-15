@@ -134,6 +134,7 @@ function unlinkConfigFile () {
 
 describe('Webserver', () => {
   before(() => {
+    carbone.reset();
     writeConfigFile();
   });
 
@@ -152,6 +153,7 @@ describe('Webserver', () => {
         const _bind = '127.0.0.1';
         const _studio = true;
         const _studioUser = 'root:1234';
+        const _securityLevel = 128;
         const _templatePathRetention = '30';
         const _lang = 'zh-tw';
         const _timezone = 'Asia/Singapore';
@@ -173,6 +175,7 @@ describe('Webserver', () => {
                                 '--studio', '--authentication',
                                 '--lang', _lang,
                                 '--timezone', _timezone,
+                                '--securityLevel', _securityLevel,
                                 '--currencySource', _currencySource,
                                 '--currencyTarget', _currencyTarget,
                                 '--licenseDir', _licenseDir,
@@ -187,6 +190,7 @@ describe('Webserver', () => {
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication, true);
           assert.strictEqual(params.studio, _studio);
+          assert.strictEqual(params.securityLevel, _securityLevel);
           assert.strictEqual(params.studioUser, _studioUser);
           assert.strictEqual(params.templatePathRetention, _templatePathRetention);
           assert.strictEqual(params.lang, _lang);
@@ -216,6 +220,7 @@ describe('Webserver', () => {
         process.env.CARBONE_EE_AUTHENTICATION = 'true';
         process.env.CARBONE_EE_MAXDATASIZE = 200 * 1024 * 1024;
         process.env.CARBONE_EE_LICENSE = 'LICENSE_KEY_TEST_2';
+        process.env.CARBONE_EE_SECURITYLEVEL = 129;
         webserver = require('../lib/webserver');
         webserver.handleParams([], () => {
           assert.strictEqual(params.port + '', process.env.CARBONE_EE_PORT);
@@ -227,6 +232,7 @@ describe('Webserver', () => {
           assert.strictEqual(params.authentication + '', process.env.CARBONE_EE_AUTHENTICATION);
           assert.strictEqual(params.maxDataSize + '', process.env.CARBONE_EE_MAXDATASIZE);
           assert.strictEqual(params.license + '', process.env.CARBONE_EE_LICENSE);
+          assert.strictEqual(params.securityLevel + '', process.env.CARBONE_EE_SECURITYLEVEL);
           // clean
           helper.rmDirRecursive(process.env.CARBONE_EE_WORKDIR);
           delete process.env.CARBONE_EE_PORT;
@@ -237,6 +243,7 @@ describe('Webserver', () => {
           delete process.env.CARBONE_EE_AUTHENTICATION;
           delete process.env.CARBONE_EE_MAXDATASIZE;
           delete process.env.CARBONE_EE_LICENSE;
+          delete process.env.CARBONE_EE_SECURITYLEVEL;
           params.license = '';
           webserver.stopServer(done);
         });
@@ -253,6 +260,7 @@ describe('Webserver', () => {
           attempts       : 2,
           authentication : true,
           maxDataSize    : 120 * 1024 * 1024,
+          securityLevel  : 130,
           license        : 'LICENSE_KEY_TEST_3'
         };
         fs.mkdirSync(_workdirConfig, { recursive : true });
@@ -266,6 +274,7 @@ describe('Webserver', () => {
           params.bind = '127.0.0.1';
           assert.strictEqual(params.authentication, _configContent.authentication);
           assert.strictEqual(params.maxDataSize, _configContent.maxDataSize);
+          assert.strictEqual(params.securityLevel, _configContent.securityLevel);
           assert.strictEqual(params.license, _configContent.license);
           params.license = '';
           helper.rmDirRecursive(_workdir);
@@ -345,6 +354,7 @@ describe('Webserver', () => {
 
     describe('Plugins: writeTemplate, readTemplate, onRenderEnd (with res), readRender and middlewares', () => {
       before((done) => {
+        carbone.reset();
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'middlewares.js'), path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
@@ -536,6 +546,7 @@ describe('Webserver', () => {
     let toDelete = [];
 
     before((done) => {
+      carbone.reset();
       deleteRequiredFiles();
       webserver = require('../lib/webserver');
 
@@ -687,6 +698,7 @@ describe('Webserver', () => {
     let toDelete = [];
 
     before((done) => {
+      carbone.reset();
       process.env.CARBONE_EE_AUTHENTICATION = true;
       deleteRequiredFiles();
       webserver = require('../lib/webserver');
@@ -728,6 +740,7 @@ describe('Webserver', () => {
     let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
 
     before((done) => {
+      carbone.reset();
       deleteRequiredFiles();
       webserver = require('../lib/webserver');
 
@@ -1059,11 +1072,57 @@ describe('Webserver', () => {
 
         get.concat(getBody(4000, '/render/..%2F..%2F..%2F..%2Fdatasets%2Ftemplate.html', 'POST', body), (err, res, data) => {
           assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 400);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Unvalid ID');
+          assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
+          assert.strictEqual(data.code, 'w115');
           done();
         });
       });
+
+      describe("Render document with security level", function () {
+
+        before(function (done) {
+          params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY;
+          done()
+        })
+
+        after(function (done) {
+          params.securityLevel = 0;
+          done()
+        })
+
+        it('should render a template with and without ":" character', (done) => {
+          const body = {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
+            },
+            complement : {},
+            enum       : {}
+          };
+
+          /** Without ":" */
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+            assert.strictEqual(data.success, true);
+            const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
+            assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+            helper.assert(data.data.debug, undefined); // is isActiveDebug is false
+            toDelete.push(data.data.renderId);
+            /** With ":" before the template ID */
+            get.concat(getBody(4000, `/render/:${templateId}`, 'POST', body), (err, res, data) => {
+              assert.strictEqual(data.success, true);
+              const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
+              assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+              helper.assert(data.data.debug, undefined); // is isActiveDebug is false
+              toDelete.push(data.data.renderId);
+              done();
+            });
+          });
+        });
+
+
+      })
     });
 
     describe('renderWebhookQueue', () => {
@@ -1376,6 +1435,29 @@ describe('Webserver', () => {
         });
       });
 
+      it('should force download of the rendered report if download=true is set in the query', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          reportName : 'renderedReport',
+          complement : {},
+          enum       : {},
+          convertTo  : 'pdf'
+        };
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          assert.strictEqual(err, null);
+          get.concat(getBody(4000, `/render/${data.data.renderId}?download=true`, 'GET'), (err, res) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 200);
+            assert.strictEqual(res.headers['content-type'], 'application/pdf');
+            assert.strictEqual(res.headers['content-disposition'], 'attachment; filename="renderedReport.pdf"');
+            done();
+          });
+        });
+      });
+
       it('should retrieve the render file, get the filename and get the header "access-control-expose-headers" for CORS', (done) => {
         const body = {
           data : {
@@ -1471,8 +1553,57 @@ describe('Webserver', () => {
           const _resp = JSON.parse(data.toString());
           assert.strictEqual(res.statusCode, 400);
           assert.strictEqual(_resp.success, false);
-          assert.strictEqual(_resp.error, 'Unvalid ID');
+          assert.strictEqual(_resp.error, 'Invalid or undefined TemplateId or RenderId in the URL');
           assert.strictEqual(_resp.code, 'w115');
+          done();
+        });
+      });
+
+      describe('HEAD template', () => {
+        it('should HEAD a rendered file, return a status 200, and download the document', (done) => {
+          const body = {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
+            },
+            reportName : 'renderedReport',
+            complement : {},
+            enum       : {}
+          };
+
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+            assert.strictEqual(err, null);
+            const _renderId = data.data.renderId;
+            get.concat(getBody(4000, `/render/${_renderId}`, 'HEAD'), (err, res, data) => {
+              assert.strictEqual(err, null);
+              assert.strictEqual(res.statusCode, 200);
+              assert.strictEqual(data.toString(), '');
+              assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'render', _renderId)), true);
+              assert.strictEqual(res.headers['content-type'], 'text/html; charset=UTF-8');
+              assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
+              /** Now download the file and it should be deleted */
+              get.concat(getBody(4000, `/render/${_renderId}`, 'GET'), (err, res) => {
+                assert.strictEqual(res.headers['content-type'], 'text/html; charset=UTF-8');
+                assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
+                // add a timeout because we receive the response before the file unlinking
+                setTimeout(() => {
+                  assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'render', _renderId)), false);
+                  done();
+                }, 10);
+              });
+            });
+          });
+        });
+      });
+
+      it('should HEAD the render file and return a status 404 if the document does not exist', (done) => {
+        const _renderId = 'does_not_exist_404';
+        get.concat(getBody(4000, `/render/${_renderId}`, 'HEAD'), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 404);
+          assert.strictEqual(data.toString(), '');
+          assert.strictEqual(res.headers['content-type'], '');
+          assert.strictEqual(res.headers['content-disposition'], '');
           done();
         });
       });
@@ -1607,28 +1738,34 @@ describe('Webserver', () => {
     describe('Get template', () => {
       let templatePath = path.join(os.tmpdir(), 'template', 'abcdef');
       let templateFilePath = path.join(__dirname, 'datasets', 'template.html');
+      let templatePathTemplateId = path.join(os.tmpdir(), 'template', 'f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6');
 
       before(() => {
         fs.copyFileSync(templateFilePath, templatePath);
+        fs.copyFileSync(templateFilePath, templatePathTemplateId);
       });
 
       after(() => {
         fs.unlinkSync(path.join(templatePath));
+        fs.unlinkSync(path.join(templatePathTemplateId));
       });
 
       it('should return template', (done) => {
         get.concat(getBody(4000, '/template/abcdef', 'GET'), (err, res, data) => {
           assert.strictEqual(res.headers['content-disposition'], 'filename="abcdef.html"');
           assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+          assert.strictEqual(res.statusCode, 200);
           done();
         });
       });
 
-      it('should return an error if template does not exists', (done) => {
+      it('should return an error 404 if template does not exists', (done) => {
         get.concat(getBody(4000, '/template/dontexists', 'GET'), (err, res, data) => {
           data = JSON.parse(data.toString());
+          assert.strictEqual(res.statusCode, 404);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Cannot find template extension, does it exists?');
+          assert.strictEqual(data.code, 'w103');
           done();
         });
       });
@@ -1637,10 +1774,39 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/template/CON', 'GET'), (err, res, data) => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Unvalid ID');
+          assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
+          assert.strictEqual(data.code, 'w115');
+          assert.strictEqual(res.statusCode, 400);
           done();
         });
       });
+
+      describe("Get template with security", function () {
+
+        before(function (done) {
+          params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY;
+          done()
+        })
+
+        after(function (done) {
+          params.securityLevel = 0;
+          done()
+        })
+
+        it('should return template with a correct template ID and a template ID', (done) => {
+          get.concat(getBody(4000, '/template/f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6', 'GET'), (err, res, data) => {
+            assert.strictEqual(res.headers['content-disposition'], 'filename="f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6.html"');
+            assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+            assert.strictEqual(res.statusCode, 200);
+            get.concat(getBody(4000, '/template/:f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6', 'GET'), (err, res, data) => {
+              assert.strictEqual(res.headers['content-disposition'], 'filename="f691a2f6b7ccf0fc303dcd4c0a432afb9d17ab733602a376a8124961aecab1f6.html"');
+              assert.strictEqual(data.toString(), '<!DOCTYPE html>\n<html>\n<p>I\'m a Carbone template !</p>\n<p>I AM {d.firstname} {d.lastname}</p>\n</html>\n');
+              assert.strictEqual(res.statusCode, 200);
+              done();
+            });
+          });
+        });
+      })
     });
 
     describe('Delete template', () => {
@@ -1663,10 +1829,45 @@ describe('Webserver', () => {
         get.concat(getBody(4000, '/template/' + filename + '.pdf', 'DELETE'), (err, res, data) => {
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Unvalid ID');
+          assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
+          assert.strictEqual(data.code, 'w115');
+          assert.strictEqual(res.statusCode, 400);
           done();
         });
       });
+
+      describe("Delete template with security level", function () {
+
+        before(function (done) {
+          params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY;
+          done()
+        })
+
+        after(function (done) {
+          params.securityLevel = 0;
+          done()
+        })
+
+        it('should delete a template (Correct templateID with/without ":" character)', (done) => {
+          /** NOT including ":" in the template Id */
+          exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'template', '541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd')}`, () => {
+            get.concat(getBody(4000, '/template/541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd', 'DELETE'), (err, res, data) => {
+              data = JSON.parse(data.toString());
+              assert.strictEqual(data.success, true);
+              assert.strictEqual(data.message, 'Template deleted');
+              /** Including ":" in the template ID */
+              exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'template', '541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd')}`, () => {
+                get.concat(getBody(4000, '/template/:541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd', 'DELETE'), (err, res, data) => {
+                  data = JSON.parse(data.toString());
+                  assert.strictEqual(data.success, true);
+                  assert.strictEqual(data.message, 'Template deleted');
+                  done();
+                });
+              });
+            });
+          });
+        });
+      })
     });
   });
 
@@ -1756,6 +1957,39 @@ describe('Webserver', () => {
         helper.assert(webserver.sanitizeValidateId('9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html'), '9j136K95dowwD2sSGotf4wZW5jb2RlZCBmaWxlbmFtZQ.html');
       });
     });
+    describe('valideTemplateId', function() {
+
+      beforeEach(function (done) {
+        params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY;
+        done()
+      })
+
+      afterEach(function (done) {
+        params.securityLevel = 0;
+        done()
+      })
+
+      it('should validate templateId', function() {
+        helper.assert(webserver.validateTemplateId('541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd'), '541876047406f57c6d723bc765e02fdf2851f40b9dc0f6234c11e00e652a88dd')
+        helper.assert(webserver.validateTemplateId('d02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243'), 'd02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243')
+        helper.assert(webserver.validateTemplateId(':d02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243'), 'd02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243')
+        helper.assert(webserver.validateTemplateId('template'), 'template');
+      })
+
+      it('should return null if the template Id is not correct', function() {
+        helper.assert(webserver.validateTemplateId('d02e428ceebe81391414eecd1c3041aa3af88638f51f520c9de40059a4d72243fewewfewfwe'), null)
+        helper.assert(webserver.validateTemplateId('feiowfoweij'), null);
+        helper.assert(webserver.validateTemplateId(12345), null);
+        helper.assert(webserver.validateTemplateId(null), null);
+        helper.assert(webserver.validateTemplateId(undefined), null);
+        helper.assert(webserver.validateTemplateId({}), null);
+      })
+
+      it('should not accept the demo template', function() {
+        params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY | helper.SECURITY_API_DISABLE_DEMO_TEMPLATE;
+        helper.assert(webserver.validateTemplateId('template'), null);
+      });
+    });
   });
   describe('Gracefully exit', function () {
     it('should kill a server with SIGTERM, wait remaining renders and exist after 15 seconds', (done) => {
@@ -1809,6 +2043,61 @@ describe('Webserver', () => {
       child.on('close', () => {
         console.log('Test is done, close...');
         assert.strictEqual(isShutdownWithinFifteenSecond, true);
+        done();
+      });
+    });
+  });
+
+  describe('Security test', () => {
+    before((done) => {
+      const _securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY
+                          | helper.SECURITY_LO_DISABLE_SCRIPT_EXECUTION
+                          | helper.SECURITY_LO_DISABLE_EXTERNAL_LINK
+                          | helper.SECURITY_LO_DISABLE_EXOTIC_FILE
+                          | helper.SECURITY_LO_REMOVE_PERSONAL_INFO;
+      carbone.reset();
+      deleteRequiredFiles();
+      webserver = require('../lib/webserver');
+      webserver.handleParams(['--port', 4000, '--workdir', os.tmpdir(), '--securityLevel', _securityLevel], done);
+      uploadFile(4000, null, done);
+    });
+    after((done) => {
+      webserver.stopServer(done);
+    });
+    it('POST /render/idTemplate - should not accept template id which are not 64-hex', (done) => {
+      get.concat(getBody(4000, '/render/12-aaf', 'POST', { data : {} }), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
+        assert.strictEqual(res.statusCode, 400);
+        done();
+      });
+    });
+    it('GET /render/idTemplate - should not accept template id which are not 64-hex', (done) => {
+      get.concat(getBody(4000, '/template/12-aaf', 'GET'), (err, res, data) => {
+        data = JSON.parse(data.toString());
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
+        assert.strictEqual(res.statusCode, 400);
+        done();
+      });
+    });
+    it('DELETE /render/idTemplate - should not accept template id which are not 64-hex', (done) => {
+      get.concat(getBody(4000, '/template/12-aaf', 'DELETE'), (err, res, data) => {
+        data = JSON.parse(data.toString());
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
+        assert.strictEqual(res.statusCode, 400);
+        done();
+      });
+    });
+    it.skip('TODO do not accept external linkPersonal info removed', (done) => {
+      let _template = path.join(os.tmpdir(), 'template', 'b84222403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
+      fs.copyFileSync(path.join(__dirname, 'datasets', 'test.external_image.odt'), _template);
+      get.concat(getBody(4000, '/render/b84222403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47', 'POST', { data : {}, convertTo : 'odt' }), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(res.statusCode, 200);
         done();
       });
     });

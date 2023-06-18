@@ -1,11 +1,11 @@
 ### v3.7.0
-  - Release June 15th 2023 
+  - Release June 15th 2023
   - [EE] All APIs returns "400 Bad request" instead of "404 Not Found" when `idTemplate` is not valid
   - [EE] Fixed `HEAD /render/:renderId` : The request don't delete the generated document anymore.
   - [EE] Fixed `GET /template/:templateId` : If the template doesn't exist, the statusCode 404 is returned instead of 400.
   - [EE] Force download of the rendered report when the query parameter ?download=true is set, such as: `POST /render/:renderId?download=true`
   - [EE] On-Premise: New option to enable more security controls, following ANSSI (France) and BSI (Germany) recommendations. Contact us for more information.
-  - [EE] All APIs returns 400 Bad request instead of 404 Not Found when idTemplate is not valid
+  - [EE] Updated `DELETE /template/:templateId`: If there isn't a template, Carbone does not remove any template but will still respond that the command was successful with a code `200`.
 
 ### v3.6.0
   - Release April 17th 2023

@@ -449,6 +449,27 @@ describe('Webserver', () => {
         });
       });
 
+      it('should NOT upload templates bigger than 20 MB', (done) => {
+
+        let _template = '<!DOCTYPE html><html>';
+        for (let i = 0; i < 500000; i++) {
+          _template += '<p>I\'m a Carbone template !</p><p>I AM {d.firstname} {d.lastname}</p> TEST TEST TEST TEST TEST TEST'
+        }
+        _template += '</html>';
+
+        let _data = {
+          template : Buffer.from(_template).toString('base64')
+        };
+        get.concat(getBody(4001, '/template', 'POST', _data, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Template too large, the file size limit is 20 MB');
+          assert.strictEqual(data.code, 'w119');
+          assert.strictEqual(res.statusCode, 413);
+          done();
+        });
+      });
+
       it('should render a template using readTemplate, onRenderEnd and readRender plugins', (done) => {
         let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
         let body = {
@@ -516,6 +537,17 @@ describe('Webserver', () => {
             assert.strictEqual(data.message, 'Template deleted');
             done();
           });
+        });
+      });
+
+      it('should return a 404 error if the template does not exist', (done) => {
+        get.concat(getBody(4001, '/template/template_not_exists', 'GET', null, token), (err, res, data) => {
+          assert.strictEqual(res.statusCode, 404);
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Template not found');
+          assert.strictEqual(data.code, 'w100');
+          done();
         });
       });
 

@@ -1,3 +1,7 @@
+### v4.X.X
+ - [EE] Fix `GET /template`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
+ - [EE] Fix `POST /template`: If the template is too large, the statusCode `413` is returned instead of `400`
+
 ### v4.11.2
   - Release June 14th 2023
   - [EE] On-Premise: New option to enable more security controls, following ANSSI (France) and BSI (Germany) recommendations. Contact us for more information.

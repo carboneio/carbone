@@ -539,9 +539,15 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     });
 
     it('[utils] validateURL - \n \
+        should return an error URL when the element is not a string && \n\
         should return an error URL when the URL is invalid && \n\
         should return an error URL passed as a second argument when the URL is invalid', () => {
       /** DEFAULT URL ON ERROR */
+      helper.assert(hyperlinks.validateURL([]), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL({}), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(undefined), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(null), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(12345), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('javascript:void(0)'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('magnet:?xt=urn:btih:123'), hyperlinks.URL_ON_ERROR);

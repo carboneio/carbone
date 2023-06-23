@@ -1,12 +1,30 @@
-### v4.10.X
- - [EE] Fixed HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
+### v4.12.0
   - Add new fomatters:
     - `ellipsis(maxLength)`:  add three dots `...` if the text is longer than `maxLength`
     - `substr(begin, end, wordMode)`: add a third option to cut the text without cutting a word if wordMode = true (false by default)
     - `abs()`: get the absolute value of a number
     - `replace(oldText, newText)`: replace a text by another
 
- // https://stackoverflow.com/questions/9461621/format-a-number-as-2-5k-if-a-thousand-or-more-otherwise-900
+### v4.11.2
+  - Release June 14th 2023
+  - [EE] On-Premise: New option to enable more security controls, following ANSSI (France) and BSI (Germany) recommendations. Contact us for more information.
+  - [EE] All APIs returns `400 Bad request` instead of `404 Not Found` when `idTemplate` is not valid
+
+### v4.11.1
+  - Release June 2nd 2023
+  - Accept image from dropbox with mime type `application/binary` and image extension in capital letters
+
+### v4.11.0
+  - Release June 1st 2023
+  - Support `drop` formatter in headers and footers of DOCX and ODT documents.
+  - `:drop(h)` can be used to delete heading elements for ODT templates only. On LibreOffice, it relates to heading style 1, 2, 3, 4 and custom styles.
+    For DOCX templates, `:drop(p)` must be used to delete heading elements.
+  - Fix: using `:html` or `:drop` with an empty value inside a table cell no longer creates a corrupted document with DOCX templates.
+  - Fix: sometimes `drop` formatter was not found and not executed by Carbone
+  - Fix HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
+  - Fix a random dynamic chart issue with some DOCX templates
+  - Fix chart distortion issue when converting DOCX to PDF if the document contains more than 20 charts
+  - Fix hyperlink error when the value is not a string
 
 ### v4.10.6
   - Release May 12th 2023

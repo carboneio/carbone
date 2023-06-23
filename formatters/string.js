@@ -215,7 +215,7 @@ function convCRLFH (d) {
 /**
  * Slice a string with a begin and an end
  *
- * @version 1.2.0
+ * @version 4.12.0 new
  *
  * @example ["foobar" , 0  , 3 ]
  * @example ["foobar" , 1      ]
@@ -225,9 +225,9 @@ function convCRLFH (d) {
  * @example ["abcd efg hijklm" , 1 , 11, true]
  *
  * @param {String} d
- * @param {Integer} begin Zero-based index at which to begin extraction.
- * @param {Integer} end Zero-based index before which to end extraction
- * @param {Boolean} wordMode if true, it never cuts words (default: false)
+ * @param {Integer} begin      Zero-based index at which to begin extraction.
+ * @param {Integer} end        [optional] Zero-based index before which to end extraction
+ * @param {Boolean} wordMode   [optional]  if true, it never cuts words (default: false)
  * @return {String} return the formatted string
  */
 function substr (d, begin, end, wordMode = false) {
@@ -249,6 +249,31 @@ function substr (d, begin, end, wordMode = false) {
     return _newBegin !== -1 && _newEnd !== -1 ? _text.slice(_newBegin, _newEnd) : '';
   }
   return d.slice(begin, end);
+}
+
+/**
+ * Split a string using a delimiter
+ *
+ * It can be used with `arrayJoin('', 1, 2)` to select one specific item of the generated array
+ *
+ * @version 4.12.0 new
+ *
+ * @example ["abcdefc12", "c" ]
+ * @example [1222.100   , "." ]
+ * @example ["ab/cd/ef" , "/" ]
+ *
+ * @param  {String}  d
+ * @param  {String}  delimiter  The delimiter
+ * @return {Array}              return an array, which can be filtered and join with arrayJoin
+ */
+function split (d, delimiter) {
+  if (d === null || d === undefined) {
+    return d;
+  }
+  if (delimiter instanceof RegExp) {
+    delimiter = null;
+  }
+  return (d+'').split(delimiter);
 }
 
 /**
@@ -318,7 +343,7 @@ function padr (d, targetLength, padString) {
 /**
  * Add "..." if the text is too long
  *
- * @version 4.11.0
+ * @version 4.12.0 new
  *
  * @example ["abcdef" , 3 ]
  * @example ["abcdef" , 6 ]
@@ -326,10 +351,9 @@ function padr (d, targetLength, padString) {
  *
  * @param {String} d
  * @param {Integer} maximum number of characters to print.
- * @param {Integer} end Zero-based index before which to end extraction
  * @return {String} return the formatted string
  */
-function ellispis (d, maxLength, end) {
+function ellispis (d, maxLength) {
   if (typeof d !== 'string') {
     return d;
   }
@@ -341,7 +365,9 @@ function md5 (d) {
 }
 
 /**
- * Prepend a text
+ * add a prefix to a text
+ *
+ * @version 4.12.0 new
  *
  * @example ["abcdef", "123" ]
  *
@@ -350,11 +376,13 @@ function md5 (d) {
  * @return  {string}  return textToPrepend + d
  */
 function prepend (d, textToPrepend) {
-  return textToPrepend + d;
+  return (textToPrepend ?? '') + '' + (d ?? '');
 }
 
 /**
- * Append a text
+ * Add a suffix to a text
+ *
+ * @version 4.12.0 new
  *
  * @example ["abcdef", "123" ]
  *
@@ -362,12 +390,14 @@ function prepend (d, textToPrepend) {
  * @param   {string}  textToAppend  text to append
  * @return  {string}  return d + textToAppend
  */
-function append (d, textToAppend) {
-  return d + '' + textToAppend;
+function append (d, textToAppend = '') {
+  return (d ?? '') + '' + (textToAppend ?? '');
 }
 
 /**
  * Replace a text
+ *
+ * @version 4.12.0 new
  *
  * @example [ "abcdef abcde", "cd", "OK" ]
  * @example [ "abcdef abcde", "cd"       ]
@@ -380,13 +410,10 @@ function append (d, textToAppend) {
  * @return  {string}  return text with replaced text
  */
 function replace (d, oldText, newText = '') {
-  if (typeof d !== 'string' || typeof oldText !== 'string') {
+  if (oldText instanceof RegExp) {
     return d;
   }
-  if (newText === null || newText === undefined) {
-    newText = '';
-  }
-  return d.replaceAll(oldText, newText+'');
+  return ((d ?? '') + '').replaceAll(oldText, newText ?? '');
 }
 
 /**
@@ -445,6 +472,7 @@ module.exports = {
   append    : append,
   ellispis  : ellispis,
   replace   : replace,
+  split     : split,
   neutralForArrayFilter : neutralForArrayFilter,
   // private
   convCRLFH : convCRLFH

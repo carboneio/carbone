@@ -252,20 +252,85 @@ describe('formatter', function () {
   });
   describe('replace', function () {
     it('should replace a string by another', function () {
-      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', 'OK'), 'tOKt bi 123 tOK');
-      helper.assert(stringFormatter.replace('test bi 123 tes', 'es')      , 'tt bi 123 t');
-      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', null), 'tt bi 123 t');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', 'OK'     ), 'tOKt bi 123 tOK');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es'           ), 'tt bi 123 t');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', null     ), 'tt bi 123 t');
       helper.assert(stringFormatter.replace('test bi 123 tes', 'es', undefined), 'tt bi 123 t');
-      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', 1000), 't1000t bi 123 t1000');
-      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', -1000), 't-1000t bi 123 t-1000');
-      helper.assert(stringFormatter.replace(-10000.1), -10000.1);
-      helper.assert(stringFormatter.replace(null), null);
-      helper.assert(stringFormatter.replace(undefined), undefined);
-      helper.assert(stringFormatter.replace({}), {});
-      helper.assert(stringFormatter.replace([]), []);
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', 1000     ), 't1000t bi 123 t1000');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', -1000    ), 't-1000t bi 123 t-1000');
+      helper.assert(stringFormatter.replace(-10000.1                          ), '-10000.1');
+      helper.assert(stringFormatter.replace(-10000.1         , '.' , ';'      ), '-10000;1');
+      helper.assert(stringFormatter.replace(-100110.1        , 11 , 'AA'      ), '-100AA0.1');
+      helper.assert(stringFormatter.replace(null                              ), '');
+      helper.assert(stringFormatter.replace(undefined                         ), '');
+      helper.assert(stringFormatter.replace({}                                ), '[object Object]');
+      helper.assert(stringFormatter.replace(['1', '2']                        ), '1,2');
     });
     it('should not accept regex (security)', function () {
       helper.assert(stringFormatter.replace('test bi 123 tes', /es/g), 'test bi 123 tes');
+    });
+  });
+
+  describe('split', function () {
+    it('should split the text and generate an array', function () {
+      helper.assert(stringFormatter.split('couc/ousd/sdzd', '/')  , ['couc', 'ousd', 'sdzd']);
+      helper.assert(stringFormatter.split('coucou')               , ['coucou']);
+      helper.assert(stringFormatter.split('coucou', 'c')          , ['', 'ou', 'ou']);
+      helper.assert(stringFormatter.split('coucou', 'co')         , ['', 'u', 'u']);
+      helper.assert(stringFormatter.split(102000, 2)              , ['10', '000']);
+      helper.assert(stringFormatter.split(102.0001, '.')          , ['102', '0001']);
+      helper.assert(stringFormatter.split('coucou', null)         , ['coucou']);
+      helper.assert(stringFormatter.split('cou0cou', 0)           , ['cou', 'cou']);
+      helper.assert(stringFormatter.split('coucou', undefined)    , ['coucou']);
+      helper.assert(stringFormatter.split('coucou', {})           , ['coucou']);
+      helper.assert(stringFormatter.split('coucou', ['ou', 'ao']) , ['coucou']);
+    });
+    it('should not crash if data is null or undefined or a regex', function () {
+      helper.assert(stringFormatter.split('coucou', /ou/g), ['coucou']);
+      helper.assert(stringFormatter.split(null), null);
+      helper.assert(stringFormatter.split(undefined), undefined);
+    });
+  });
+
+  describe('append', function () {
+    it('should append text', function () {
+      helper.assert(stringFormatter.append('coucou')               , 'coucou');
+      helper.assert(stringFormatter.append('coucou', 'c')          , 'coucouc');
+      helper.assert(stringFormatter.append('coucou', 'co')         , 'coucouco');
+      helper.assert(stringFormatter.append('coucou', 10)           , 'coucou10');
+      helper.assert(stringFormatter.append('coucou', null)         , 'coucou');
+      helper.assert(stringFormatter.append('coucou', undefined)    , 'coucou');
+      helper.assert(stringFormatter.append('coucou', [])           , 'coucou');
+      helper.assert(stringFormatter.append('coucou', ['1', '2'])   , 'coucou1,2');
+      helper.assert(stringFormatter.append('coucou', {})           , 'coucou[object Object]');
+      helper.assert(stringFormatter.append(222, 10)                , '22210');
+      helper.assert(stringFormatter.append({}, '')                 , '[object Object]');
+      helper.assert(stringFormatter.append(['1', '2'], '3')         , '1,23');
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.append(null), '');
+      helper.assert(stringFormatter.append(undefined), '');
+    });
+  });
+
+  describe('prepend', function () {
+    it('should prepend text', function () {
+      helper.assert(stringFormatter.prepend('coucou')               , 'coucou');
+      helper.assert(stringFormatter.prepend('coucou', 'c')          , 'ccoucou');
+      helper.assert(stringFormatter.prepend('coucou', 'co')         , 'cocoucou');
+      helper.assert(stringFormatter.prepend('coucou', 10)           , '10coucou');
+      helper.assert(stringFormatter.prepend('coucou', null)         , 'coucou');
+      helper.assert(stringFormatter.prepend('coucou', undefined)    , 'coucou');
+      helper.assert(stringFormatter.prepend('coucou', [])           , 'coucou');
+      helper.assert(stringFormatter.prepend('coucou', ['1', '2'])   , '1,2coucou');
+      helper.assert(stringFormatter.prepend('coucou', {})           , '[object Object]coucou');
+      helper.assert(stringFormatter.prepend(222, 10)                , '10222');
+      helper.assert(stringFormatter.prepend({}, '')                 , '[object Object]');
+      helper.assert(stringFormatter.prepend(['1', '2'], '3')        , '31,2');
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.prepend(null), '');
+      helper.assert(stringFormatter.prepend(undefined), '');
     });
   });
 
@@ -1632,12 +1697,26 @@ describe('formatter', function () {
       helper.assert(arrayFormatter.arrayJoin(_datas, ' | '), '1 | 2 | hey!');
       helper.assert(arrayFormatter.arrayJoin(_datas, '\\n'), '1\n2\nhey!');
     });
+    it('should select and print only items from index', function () {
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 0), '1234');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1), '234');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, 1), '2');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, 2), '23');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, -1), '23');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, -2), '2');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, 0), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, 100), '234');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 2), '34');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 3), '4');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 4), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 5), '');
+    });
     it('should not crash if datas is null or undefined', function () {
-      helper.assert(arrayFormatter.arrayMap(null), null);
-      helper.assert(arrayFormatter.arrayMap(undefined), undefined);
-      helper.assert(arrayFormatter.arrayMap(120), 120);
-      helper.assert(arrayFormatter.arrayMap([]), '');
-      helper.assert(arrayFormatter.arrayMap({}), {});
+      helper.assert(arrayFormatter.arrayJoin(null), null);
+      helper.assert(arrayFormatter.arrayJoin(undefined), undefined);
+      helper.assert(arrayFormatter.arrayJoin(120), 120);
+      helper.assert(arrayFormatter.arrayJoin([]), '');
+      helper.assert(arrayFormatter.arrayJoin({}), {});
     });
   });
 

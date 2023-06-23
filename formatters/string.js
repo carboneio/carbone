@@ -221,6 +221,8 @@ function convCRLFH (d) {
  * @example ["foobar" , 1      ]
  * @example ["foobar" , -2     ]
  * @example ["foobar" , 2  , -1]
+ * @example ["abcd efg hijklm" , 0 , 11, true]
+ * @example ["abcd efg hijklm" , 1 , 11, true]
  *
  * @param {String} d
  * @param {Integer} begin Zero-based index at which to begin extraction.
@@ -232,11 +234,9 @@ function substr (d, begin, end, wordMode = false) {
   if (typeof d !== 'string') {
     return d;
   }
-  if (wordMode === true) {
-    // const _newEnd   = (end === -1)  ? d.length : (end + 1);
-    // const _newBegin = (begin === 0) ? 0        : (begin - 1);
+  if (wordMode === true || wordMode === 'true') {
     const _posOfCharBeforeBegin = (begin === 0) ? 0 : (begin - 1);
-    const _posOfCharAfterEnd = (end === -1) ? d.length : (end + 1);
+    const _posOfCharAfterEnd = (end === -1) ? d.length - 1 : (end + 1);
     const _text = d.slice(_posOfCharBeforeBegin, _posOfCharAfterEnd);
     let _newBegin = begin !== 0 ? 1 : 0;
     let _newEnd = end >= d.length ? _text.length :  _text.length-1;
@@ -340,14 +340,54 @@ function md5 (d) {
   return toMd5(d);
 }
 
-function prepend (d, toPrepend) {
-  return toPrepend + d;
+/**
+ * Prepend a text
+ *
+ * @example ["abcdef", "123" ]
+ *
+ * @param   {string}  d
+ * @param   {string}  textToPrepend  text to prepend
+ * @return  {string}  return textToPrepend + d
+ */
+function prepend (d, textToPrepend) {
+  return textToPrepend + d;
 }
 
-function append (d, append) {
-  return d + '' + append;
+/**
+ * Append a text
+ *
+ * @example ["abcdef", "123" ]
+ *
+ * @param   {string}  d
+ * @param   {string}  textToAppend  text to append
+ * @return  {string}  return d + textToAppend
+ */
+function append (d, textToAppend) {
+  return d + '' + textToAppend;
 }
 
+/**
+ * Replace a text
+ *
+ * @example [ "abcdef abcde", "cd", "OK" ]
+ * @example [ "abcdef abcde", "cd"       ]
+ * @example [ "abcdef abcde", "cd", null ]
+ * @example [ "abcdef abcde", "cd", 1000 ]
+ *
+ * @param   {string}  d
+ * @param   {string}  oldText  old text to replace
+ * @param   {string}  newText  new text
+ * @return  {string}  return text with replaced text
+ */
+function replace (d, oldText, newText = '') {
+  if (typeof d !== 'string' || typeof oldText !== 'string') {
+    return d;
+  }
+  if (newText === null || newText === undefined) {
+    newText = '';
+  }
+  return d.replaceAll(oldText, newText+'');
+}
 
 /**
  * Neutral for array filters
@@ -404,6 +444,7 @@ module.exports = {
   prepend   : prepend,
   append    : append,
   ellispis  : ellispis,
+  replace   : replace,
   neutralForArrayFilter : neutralForArrayFilter,
   // private
   convCRLFH : convCRLFH

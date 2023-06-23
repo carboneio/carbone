@@ -250,6 +250,25 @@ describe('formatter', function () {
       helper.assert(stringFormatter.convCRLFH.call({}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <br> sd <br> qsd <br> sq');
     });
   });
+  describe('replace', function () {
+    it('should replace a string by another', function () {
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', 'OK'), 'tOKt bi 123 tOK');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es')      , 'tt bi 123 t');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', null), 'tt bi 123 t');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', undefined), 'tt bi 123 t');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', 1000), 't1000t bi 123 t1000');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', -1000), 't-1000t bi 123 t-1000');
+      helper.assert(stringFormatter.replace(-10000.1), -10000.1);
+      helper.assert(stringFormatter.replace(null), null);
+      helper.assert(stringFormatter.replace(undefined), undefined);
+      helper.assert(stringFormatter.replace({}), {});
+      helper.assert(stringFormatter.replace([]), []);
+    });
+    it('should not accept regex (security)', function () {
+      helper.assert(stringFormatter.replace('test bi 123 tes', /es/g), 'test bi 123 tes');
+    });
+  });
+
   describe('ifEmpty', function () {
     it('should show a message if data is empty. It should stop propagation to next formatter', function () {
       var _context = {};
@@ -1420,20 +1439,26 @@ describe('formatter', function () {
     });
   });
 
-  describe.only('substr', function () {
+  describe('substr', function () {
     it('should keep only the selection', function () {
       helper.assert(stringFormatter.substr('coucou', 0, 3), 'cou');
       helper.assert(stringFormatter.substr('coucou', 0, 0), '');
       helper.assert(stringFormatter.substr('coucou', 3, 4), 'c');
+      helper.assert(stringFormatter.substr('coucou', 0, -1), 'couco');
+      helper.assert(stringFormatter.substr('coucou', 0, -2), 'couc');
+      helper.assert(stringFormatter.substr('coucou', 1, -2), 'ouc');
+      helper.assert(stringFormatter.substr('abcdef', -1, 100), 'f');
+      helper.assert(stringFormatter.substr('abcdef', -2, 100), 'ef');
     });
     it('should not crash if data is null or undefined', function () {
       helper.assert(stringFormatter.substr(null, 0, 3), null);
       helper.assert(stringFormatter.substr(undefined, 0, 3), undefined);
     });
-    it('should keep only the selection of characters but do not cut words if the third paramater is true. The returned tetx can be shorter', function () {
+    it('should keep only the selection of characters but do not cut words if the third paramater is true. The returned text can be shorter', function () {
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 2, true)     , '');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, false)   , 'coucou donotcutme  d');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, true)    , 'coucou donotcutme  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, 'true')  , 'coucou donotcutme  ');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 27, true)    , 'coucou donotcutme  donotcut');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 40, true)    , 'coucou donotcutme  donotcut   other');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 6, true)     , 'coucou');
@@ -1443,6 +1468,11 @@ describe('formatter', function () {
 
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -2, true)    , 'coucou donotcutme  donotcut   ');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -1, true)    , 'coucou donotcutme  donotcut   ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -5, true)    , 'coucou donotcutme  donotcut   ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -6, true)    , 'coucou donotcutme  donotcut  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -7, true)    , 'coucou donotcutme  donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -8, true)    , 'coucou donotcutme  donotcut');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -9, true)    , 'coucou donotcutme  ');
 
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -16, 28, true)    , 'donotcut ');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -16, 100, true)    , 'donotcut   other');
@@ -1690,6 +1720,19 @@ describe('formatter', function () {
 
       helper.assert(numberFormatter.formatN.call(_this, -1.005, 3), '-1,005');
       helper.assert(numberFormatter.formatN.call(_this, -1.006, 2), '-1,01');
+    });
+  });
+
+  describe('abs', function () {
+    it('should return absolute value of a number', function () {
+      helper.assert(numberFormatter.abs(10000.1), 10000.1);
+      helper.assert(numberFormatter.abs(-10000.1), 10000.1);
+      helper.assert(numberFormatter.abs(null), null);
+      helper.assert(numberFormatter.abs(undefined), undefined);
+      helper.assert(numberFormatter.abs({}), null);
+      helper.assert(numberFormatter.abs([]), null);
+      helper.assert(numberFormatter.abs('20'), 20);
+      helper.assert(numberFormatter.abs('-20.5454'), 20.5454);
     });
   });
 

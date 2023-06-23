@@ -1,9 +1,12 @@
 ### v4.10.X
  - [EE] Fixed HTML formatter: The style of `<ul>` or `<ol>` lists are now correctly rendered into DOCX documents.
-  - Two new fomatters:
-    - ellipsis
-    - substr has a new option to cut text withotu cutting words
+  - Add new fomatters:
+    - `ellipsis(maxLength)`:  add three dots `...` if the text is longer than `maxLength`
+    - `substr(begin, end, wordMode)`: add a third option to cut the text without cutting a word if wordMode = true (false by default)
+    - `abs()`: get the absolute value of a number
+    - `replace(oldText, newText)`: replace a text by another
 
+ // https://stackoverflow.com/questions/9461621/format-a-number-as-2-5k-if-a-thousand-or-more-otherwise-900
 
 ### v4.10.6
   - Release May 12th 2023

@@ -280,6 +280,26 @@ function mod (d, value) {
   return d;
 }
 
+/**
+ * Get absolute value 
+ *
+ * @version 4.12.0 new
+ *
+ * @example [-10    ]
+ * @example [-10.54 ]
+ * @example [10.54  ]
+ * @example ["-200" ]
+ *
+ * @param   {Number}  d   value
+ * @return  {Number}      Always a positive number
+ */
+function abs (d) {
+  if (d !== null && typeof d !== 'undefined') {
+    return Math.abs(parseFloat(d));
+  }
+  return d;
+}
+
 
 module.exports = {
   formatN  : formatN,
@@ -291,6 +311,7 @@ module.exports = {
   mul      : mul,
   mod      : mod,
   div      : div,
+  abs      : abs,
 
   /**
    * Converts a number to an INT

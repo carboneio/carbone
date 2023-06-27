@@ -1,6 +1,15 @@
-### v4.X.X
- - [EE] Fix `GET /template`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
- - [EE] Fix `POST /template`: If the template is too large, the statusCode `413` is returned instead of `400`
+### v4.12.0
+  - [EE] Fix `GET /template`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
+  - [EE] Fix `POST /template`: If the template is too large, the statusCode `413` is returned instead of `400`
+  - Add new fomatters:
+    - `ellipsis(maxLength)`: add three dots `...` if the text is longer than `maxLength`
+    - `substr(begin, end, wordMode)`: add a third option to cut the text without cutting a word if wordMode = true (false by default)
+    - `abs()`: get the absolute value of a number
+    - `replace(oldText, newText)`: replace a text by another
+    - `split(delimiter)`: split a text using a delimiter and generate an array
+    - `prepend(text)`: add a prefix
+    - `append(text)`: add a suffix
+    - `arrayJoin(separator, index, count)`: add two options to cut the array and select only a part of it
 
 ### v4.11.2
   - Release June 14th 2023

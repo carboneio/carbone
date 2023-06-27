@@ -214,6 +214,12 @@ Here is an example of passing options to the service:
 ./carbone webserver --port 4001 --factories 4 --workdir /var/www/carbone --attemps 2 --authentication --studio
 ```
 
+When Carbone receives SIGTERM signal, (what we call "SOFT STOP")
+- The GET /status API returns HTTP status 503 instead of 200. It can be used as a trigger (liveness, readiness probes) for a load balancer ... kubernetes
+- If there is no report generation in progress, it will exist within 15 seconds.
+- If there is a report in progress, it waits until the process is finished before exiting
+- After 5 minutes, it still exists, even if there is some report generation in progress
+
 ### Configuration file options
 To use a configuration file, `config.json` must be created in the `config` folder. Here is an example of a configuration:
 ```json

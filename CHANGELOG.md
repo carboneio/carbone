@@ -1,4 +1,6 @@
 ### v4.12.0
+  - Release June 27th 2023
+  - Carbone On-Premise: add parameter `maxTemplateSize` (bytes) to change default limit (20MB)
   - [EE] Fix `GET /template`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
   - [EE] Fix `POST /template`: If the template is too large, the statusCode `413` is returned instead of `400`
   - Add new fomatters:

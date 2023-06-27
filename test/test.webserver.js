@@ -452,8 +452,8 @@ describe('Webserver', () => {
       it('should NOT upload templates bigger than 20 MB', (done) => {
 
         let _template = '<!DOCTYPE html><html>';
-        for (let i = 0; i < 500000; i++) {
-          _template += '<p>I\'m a Carbone template !</p><p>I AM {d.firstname} {d.lastname}</p> TEST TEST TEST TEST TEST TEST'
+        for (let i = 0; i < 160000; i++) {
+          _template += '<p>I\'m a Carbone template !</p><p>I AM {d.firstname} {d.lastname}</p> TEST TEST TEST TEST TEST TEST';
         }
         _template += '</html>';
 

@@ -188,7 +188,8 @@ If an option is reported in different places, CLI options are picked in priority
 | authentication | false            | [Authentification documentation at the following link](#authentication-option) | --authentication / -A |  CARBONE_EE_AUTHENTICATION |
 | studio         | false            | Web interface to preview reports. [Learn more.](#carbone-studio-light)                             | --studio / -s | CARBONE_EE_STUDIO |
 | studioUser         | ''  | If the authentication option is enabled and this field contains more than two characters, Carbone accepts a basic authentication (do not use for production). Credentials have to be formated, such as: `[username]:[password]`.                             | --studioUser / -S | CARBONE_EE_STUDIOUSER |
-| maxDataSize         |  60MB  | Maximum JSON data size accepted when rendering a report, the value must be **bytes**. Calcul example: 100 * 1024 * 1024 = 100MB | --maxDataSize / -mds | CARBONE_EE_MAXDATASIZE |
+| maxDataSize         |  60MB  | Maximum JSON data size accepted when rendering a report, the value must be **bytes**. Example: 100 * 1024 * 1024 = 100MB | --maxDataSize / -mds | CARBONE_EE_MAXDATASIZE |
+| maxTemplateSize     |  20MB  | Maximum template size, the value must be **bytes**. Example: 100 * 1024 * 1024 = 100MB |  | CARBONE_EE_MAXTEMPLATESIZE |
 | templatePathRetention         | 0            | Template path retention in days. 0 means infinite retention. | --templatePathRetention / -r | CARBONE_EE_TEMPLATEPATHRETENTION |
 | lang         | en            | Locale language used by Carbone | --lang / -l  | CARBONE_EE_EN |
 | timezone         | Europe/Paris  |  Timezone for managing dates | --timezone / -t | CARBONE_EE_TIMEZONE |

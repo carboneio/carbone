@@ -1,4 +1,6 @@
 ### v4.12.0
+  - [EE] Fix `GET /template`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
+  - [EE] Fix `POST /template`: If the template is too large, the statusCode `413` is returned instead of `400`
   - Add new fomatters:
     - `ellipsis(maxLength)`: add three dots `...` if the text is longer than `maxLength`
     - `substr(begin, end, wordMode)`: add a third option to cut the text without cutting a word if wordMode = true (false by default)

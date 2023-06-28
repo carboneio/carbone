@@ -395,7 +395,10 @@ function append (d, textToAppend = '') {
 }
 
 /**
- * Replace a text
+ * Replace a text based on a pattern
+ *
+ * All matches of the pattern (first argument: `oldText`) is replaced by the replacement string (second argument: `newText`).
+ * The pattern can only be a string.
  *
  * @version 4.12.0 new
  *

@@ -1550,21 +1550,21 @@ describe('formatter', function () {
     });
   });
 
-  describe('ellispis', function () {
+  describe('ellipsis', function () {
     it('should cut the text and add dots', function () {
-      helper.assert(stringFormatter.ellispis('coucou', 3), 'cou...');
-      helper.assert(stringFormatter.ellispis('coucou', 5), 'couco...');
-      helper.assert(stringFormatter.ellispis('coucou', 6), 'coucou');
-      helper.assert(stringFormatter.ellispis('coucou', 7), 'coucou');
-      helper.assert(stringFormatter.ellispis('coucou ', 7), 'coucou ');
-      helper.assert(stringFormatter.ellispis('coucou  ', 7), 'coucou ...');
+      helper.assert(stringFormatter.ellipsis('coucou', 3), 'cou...');
+      helper.assert(stringFormatter.ellipsis('coucou', 5), 'couco...');
+      helper.assert(stringFormatter.ellipsis('coucou', 6), 'coucou');
+      helper.assert(stringFormatter.ellipsis('coucou', 7), 'coucou');
+      helper.assert(stringFormatter.ellipsis('coucou ', 7), 'coucou ');
+      helper.assert(stringFormatter.ellipsis('coucou  ', 7), 'coucou ...');
     });
     it('should not crash if data is null or undefined', function () {
-      helper.assert(stringFormatter.ellispis(null, 0), null);
-      helper.assert(stringFormatter.ellispis(undefined, 0), undefined);
+      helper.assert(stringFormatter.ellipsis(null, 0), null);
+      helper.assert(stringFormatter.ellipsis(undefined, 0), undefined);
     });
     it('works only on string', function () {
-      helper.assert(stringFormatter.ellispis(30, 0), 30);
+      helper.assert(stringFormatter.ellipsis(30, 0), 30);
     });
   });
 

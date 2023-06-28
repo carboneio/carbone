@@ -1,3 +1,7 @@
+### v4.12.1
+  - Release June 28th 2023
+  - Fix `ellispis` -> `ellipsis` formatter
+
 ### v4.12.0
   - Release June 28th 2023
   - [EE] Carbone On-Premise: add parameter `maxTemplateSize` (bytes) to change default limit (20MB)

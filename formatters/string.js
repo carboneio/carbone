@@ -353,7 +353,7 @@ function padr (d, targetLength, padString) {
  * @param {Integer} maximum number of characters to print.
  * @return {String} return the formatted string
  */
-function ellispis (d, maxLength) {
+function ellipsis (d, maxLength) {
   if (typeof d !== 'string') {
     return d;
   }
@@ -470,7 +470,7 @@ module.exports = {
   md5       : md5,
   prepend   : prepend,
   append    : append,
-  ellispis  : ellispis,
+  ellipsis  : ellipsis,
   replace   : replace,
   split     : split,
   neutralForArrayFilter : neutralForArrayFilter,

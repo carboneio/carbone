@@ -1,3 +1,6 @@
+### v4.12.2
+  - Fix chained formatters `:split():arrayJoin('', 2, 3)`
+
 ### v4.12.1
   - Release June 28th 2023
   - Fix `ellispis` -> `ellipsis` formatter

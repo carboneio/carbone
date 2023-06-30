@@ -284,6 +284,11 @@ describe('formatter', function () {
       helper.assert(stringFormatter.split('coucou', undefined)    , ['coucou']);
       helper.assert(stringFormatter.split('coucou', {})           , ['coucou']);
       helper.assert(stringFormatter.split('coucou', ['ou', 'ao']) , ['coucou']);
+      /** Combine split + arrayJoin */
+      const _resSplit = stringFormatter.split('Lorem ipsum dolor sit amet', ' ');
+      helper.assert(_resSplit, ["Lorem","ipsum","dolor","sit","amet"]);
+      const _resJoin = arrayFormatter.arrayJoin(_resSplit, '', "2", "1");
+      helper.assert(_resJoin, "dolor");
     });
     it('should not crash if data is null or undefined or a regex', function () {
       helper.assert(stringFormatter.split('coucou', /ou/g), ['coucou']);
@@ -1710,6 +1715,11 @@ describe('formatter', function () {
       helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 3), '4');
       helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 4), '');
       helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 5), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1', '0'), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1'), '234');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1', '1'), '2');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1', '2'), '23');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1', '100'), '234');
     });
     it('should not crash if datas is null or undefined', function () {
       helper.assert(arrayFormatter.arrayJoin(null), null);
@@ -1717,6 +1727,11 @@ describe('formatter', function () {
       helper.assert(arrayFormatter.arrayJoin(120), 120);
       helper.assert(arrayFormatter.arrayJoin([]), '');
       helper.assert(arrayFormatter.arrayJoin({}), {});
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', null, null), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', {}, {}), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', [], []), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', "null", "null"), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', -2, -2), '');
     });
   });
 

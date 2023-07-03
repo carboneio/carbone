@@ -1,6 +1,8 @@
 ### v4.12.2
+  - Release July 3rd 2023
   - Fix chained formatters `:split():arrayJoin('', 2, 3)`
   - Fix formatter `substr`
+  - Array filters: accept to filter `null` or `undefined` values
 
 ### v4.12.1
   - Release June 28th 2023

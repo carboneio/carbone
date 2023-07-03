@@ -2,7 +2,7 @@
 /**
  * Flatten an array of String or Number
  *
- * @version 0.12.5
+ * @version 4.12.0 new
  *
  * @example [ ["homer", "bart", "lisa"]        ]
  * @example [ ["homer", "bart", "lisa"] , " | "]
@@ -13,12 +13,18 @@
  * @example [ {}                               ]
  * @example [ 20                               ]
  * @example [                                  ]
+ * @example [ ["homer", "bart", "lisa"] , "", 1     ]
+ * @example [ ["homer", "bart", "lisa"] , "", 1, 1  ]
+ * @example [ ["homer", "bart", "lisa"] , "", 1, 2  ]
+ * @example [ ["homer", "bart", "lisa"] , "", 0, -1 ]
  *
  * @param  {Array}  d           array passed by carbone
  * @param  {String} separator   [optional] item separator (`,` by default)
+ * @param  {Number} index       [optional] select items from this array index.
+ * @param  {Number} count       [optional] number of items to select from `index`. `count` can be a negative number to select N items from the end of the array.
  * @return {String}             computed result, or `d` if `d` is not an array
  */
-function arrayJoin (d, separator) {
+function arrayJoin (d, separator, index = 0, count ) {
   if (separator === undefined) {
     separator = ', ';
   }
@@ -28,9 +34,13 @@ function arrayJoin (d, separator) {
   if (separator === '\\r\\n') {
     separator = '\r\n';
   }
-
   if (d instanceof Array) {
-    return d.join(separator);
+    index = parseInt(index, 10);
+    if (index === 0 && count === undefined) {
+      return d.join(separator);
+    }
+    count = typeof count === 'string' ? parseInt(count, 10) : count;
+    return d.slice(index, (count > 0 ? index+count : count) ).join(separator);
   }
   return d;
 }
@@ -106,17 +116,16 @@ function arrayMap (d, objSeparator, attributeSeparator) {
  *
  * Usage example: `d[i].id:count()` will print a counter of the current row no matter the value of `id`
  *
+ * This formatter is replaced internally by `:cumCount` since version v4.0.0
+ *
  * @version 1.1.0
  *
  * @param   {String}  d       Array passed by carbone
  * @param   {String}  start   Number to start with (default: 1)
  * @return  {String}          Counter value
  */
-function count (d, loopId, start) {
-  if (start === undefined) {
-    start = 1;
-  }
-  return '__COUNT_' + loopId + '_' + start + '__';
+function count () {
+  return ''; // replaced by cumCount
 }
 
 module.exports = {

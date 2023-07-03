@@ -5,8 +5,13 @@ services:
     platform: linux/amd64
     ports:
       - "4000:4000"
-    volumes:
-      - "/var/tmp/key:/key"
     environment:
-      - CARBONE_EE_LICENSEDIR=/key
+      - CARBONE_EE_LICENSE='carbone_license_as_string'
+      ## To pass the license as a file, move the file into a directory (e.g. `/var/tmp/key`)
+      ## Then, set the environment varibale `CARBONE_EE_LICENSEDIR` with the directory name
+      # - CARBONE_EE_LICENSEDIR=/key
+      ## Finally, mount the `/var/tmp/key` directory into the `/key` folder inside the container
+    # volumes:
+      # - "/var/tmp/key:/key"
+
     command: /app/carbone-ee-linux webserver --studio

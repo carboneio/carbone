@@ -1,0 +1,72 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" viewBox="0 0 600 400">
+<rect width="600" height="400" x="0" y="0" id="0" fill="none"></rect>
+<path d="M80 120l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M80 140l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M80 160l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M80 180l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M100 60l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M100 80l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M100 100l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M100 120l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M100 140l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M100 160l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M100 180l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M120 60l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M120 80l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M120 100l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M120 120l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M120 140l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M120 160l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M120 180l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M140 60l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M140 80l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M140 100l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M140 120l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M140 140l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M140 160l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M140 180l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M160 60l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M160 80l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M160 100l20 0l0 20l-20 0Z" fill="#fff" stroke="#ccc"></path>
+<path d="M80.5 120.5l19 0l0 19l-19 0Z" fill="rgb(222,151,125)"></path>
+<path d="M80.5 140.5l19 0l0 19l-19 0Z" fill="rgb(215,128,114)"></path>
+<path d="M80.5 160.5l19 0l0 19l-19 0Z" fill="rgb(207,107,101)"></path>
+<path d="M80.5 180.5l19 0l0 19l-19 0Z" fill="rgb(235,198,147)"></path>
+<path d="M100.5 60.5l19 0l0 19l-19 0Z" fill="rgb(234,197,146)"></path>
+<path d="M100.5 80.5l19 0l0 19l-19 0Z" fill="rgb(238,210,152)"></path>
+<path d="M100.5 100.5l19 0l0 19l-19 0Z" fill="rgb(232,189,142)"></path>
+<path d="M100.5 120.5l19 0l0 19l-19 0Z" fill="rgb(224,158,128)"></path>
+<path d="M100.5 140.5l19 0l0 19l-19 0Z" fill="rgb(244,233,163)"></path>
+<path d="M100.5 160.5l19 0l0 19l-19 0Z" fill="rgb(207,107,100)"></path>
+<path d="M100.5 180.5l19 0l0 19l-19 0Z" fill="rgb(222,152,125)"></path>
+<path d="M120.5 60.5l19 0l0 19l-19 0Z" fill="rgb(215,127,113)"></path>
+<path d="M120.5 80.5l19 0l0 19l-19 0Z" fill="rgb(198,86,87)"></path>
+<path d="M120.5 100.5l19 0l0 19l-19 0Z" fill="rgb(236,202,148)"></path>
+<path d="M120.5 120.5l19 0l0 19l-19 0Z" fill="rgb(217,135,117)"></path>
+<path d="M120.5 140.5l19 0l0 19l-19 0Z" fill="rgb(200,91,90)"></path>
+<path d="M120.5 160.5l19 0l0 19l-19 0Z" fill="rgb(212,120,109)"></path>
+<path d="M120.5 180.5l19 0l0 19l-19 0Z" fill="rgb(243,228,161)"></path>
+<path d="M140.5 60.5l19 0l0 19l-19 0Z" fill="rgb(202,96,94)"></path>
+<path d="M140.5 80.5l19 0l0 19l-19 0Z" fill="rgb(230,180,138)"></path>
+<path d="M140.5 100.5l19 0l0 19l-19 0Z" fill="rgb(241,221,158)"></path>
+<path d="M140.5 120.5l19 0l0 19l-19 0Z" fill="rgb(209,112,103)"></path>
+<path d="M140.5 140.5l19 0l0 19l-19 0Z" fill="rgb(206,104,99)"></path>
+<path d="M140.5 160.5l19 0l0 19l-19 0Z" fill="rgb(236,202,149)"></path>
+<path d="M140.5 180.5l19 0l0 19l-19 0Z" fill="rgb(236,202,149)"></path>
+<path d="M160.5 60.5l19 0l0 19l-19 0Z" fill="rgb(198,86,87)"></path>
+<path d="M160.5 80.5l19 0l0 19l-19 0Z" fill="rgb(228,173,135)"></path>
+<path d="M160.5 100.5l19 0l0 19l-19 0Z" fill="rgb(232,190,143)"></path>
+<polyline points="100 60 100 80 100 80 100 100 100 100 100 120 80 120 80 140 80 140 80 160 80 160 80 180 80 180 80 200" fill="none" stroke="#000"></polyline>
+<polyline points="180 60 180 80 180 80 180 100 180 100 180 120 160 120 160 140 160 140 160 160 160 160 160 180 160 180 160 200" fill="none" stroke="#000"></polyline>
+<polyline points="99.5 60 180.5 60" fill="none" stroke="#000"></polyline>
+<polyline points="79.5 200 160.5 200" fill="none" stroke="#000"></polyline>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:20px;font-family:sans-serif;font-weight:bolder;" y="-10" transform="matrix(0,-1,1,0,50,130)" fill="#ccc">2017</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:12px;font-family:sans-serif;" x="130" y="49" fill="#000">Feb</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="70" fill="#000">S</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="90" fill="#000">M</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="110" fill="#000">T</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="130" fill="#000">W</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="150" fill="#000">T</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="170" fill="#000">F</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" x="70" y="190" fill="#000">S</text>
+</svg>

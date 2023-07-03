@@ -222,6 +222,28 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     helper.assert(_template.files[1].data, _expectedDocumentResult);
   });
 
+  it('[DOCX - preprocess] accept hyperlinks if d is an array', function () {
+    const _template = {
+      files : [{
+        name : '_rels/document.xml.rels',
+        data : ''
+          + '<?xml version="1.0" encoding="UTF-8"?>'
+          + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+          + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+          + '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="%7Bd%5Bi%5D.url%7D" TargetMode="External"/>'
+          + '</Relationships>'
+      },{
+        name : 'word/document.xml',
+        data : '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="rId2" w:history="1"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>'
+      }]
+    };
+    const _expectedRelsResult = '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>';
+    const _expectedDocumentResult = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:body><w:p><w:hyperlink r:id="{d[i].url:generateHyperlinkReference()}" w:history="1"><w:r><w:rPr><w:rStyle w:val="InternetLink"/><w:color w:val="000000"/><w:u w:val="none"/></w:rPr><w:t>Firstname</w:t></w:r></w:hyperlink></w:p></w:body>';
+    hyperlinks.preProcesstHyperlinksDocx(_template);
+    helper.assert(_template.files[0].data, _expectedRelsResult);
+    helper.assert(_template.files[1].data, _expectedDocumentResult);
+  });
+
   it('[DOCX - preprocess] should inject the special hyperlink inside the tag `w:instrText` at the top of the document.xml', function () {
     const _template = {
       files : [{
@@ -499,49 +521,55 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
     it('[utils] validateURL - should correct the URL by adding "https" and a missing slash', () => {
       helper.assert(hyperlinks.validateURL('carbone.io'), 'https://carbone.io');
       helper.assert(hyperlinks.validateURL('www.carbone.com.au'), 'https://www.carbone.com.au');
-      helper.assert(hyperlinks.validateURL('www.carbone.com.au/?key=value&name=john'), 'https://www.carbone.com.au/?key=value&name=john');
-      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick'), 'http://carbone.io/?name=john&lastname=wick');
-      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick'), 'https://carbone.io/?name=john&lastname=wick');
+      helper.assert(hyperlinks.validateURL('www.carbone.com.au/?key=value&name=john'), 'https://www.carbone.com.au/?key=value&amp;name=john');
+      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick'), 'http://carbone.io/?name=john&amp;lastname=wick');
+      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick'), 'https://carbone.io/?name=john&amp;lastname=wick');
       helper.assert(hyperlinks.validateURL('example.com:3000'), 'https://example.com:3000');
-      helper.assert(hyperlinks.validateURL('example.com:3000/?key=value&name=john'), 'https://example.com:3000/?key=value&name=john');
+      helper.assert(hyperlinks.validateURL('example.com:3000/?key=value&name=john'), 'https://example.com:3000/?key=value&amp;name=john');
       helper.assert(hyperlinks.validateURL('my_test.asp/?name=st%C3%A5le&amp;car=saab'), 'https://my_test.asp/?name=st%C3%A5le&amp;car=saab');
       helper.assert(hyperlinks.validateURL('http://my_test.asp/?name=st%C3%A5le&amp;car=saab'), 'http://my_test.asp/?name=st%C3%A5le&amp;car=saab');
       helper.assert(hyperlinks.validateURL('https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B'), 'https://carbone.io/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B');
       helper.assert(hyperlinks.validateURL('https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1'), 'https://carbone.io/iu/?u=https%3A%2F%2Fcdn1.carbone.io%2Fcmsdata%2Fslideshow%2F3634008%2Ffunny_tech_memes_1_thumb800.jpg&amp;f=1&amp;nofb=1');
       helper.assert(hyperlinks.validateURL('carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\''), 'https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\'');
       helper.assert(hyperlinks.validateURL('https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\''), 'https://carbone.io/page?arg=12&amp;arg1=%22value%22&amp;arg2%3E=23&amp;arg3%3C=23&amp;arg4=\'valu2\'');
-      helper.assert(hyperlinks.validateURL('https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c'), 'https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c');
+      helper.assert(hyperlinks.validateURL('https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&token=6bc57ba6-3056-4563-8d21-f1687737142c'), 'https://test.carbone.com/v0/b/roux-prod.appspot.com/o/users%2F000004%2Finterventions%2FTT000003866-001%2Fanswers%2FixfxgnCS1tXATBG2DaWq-0%2F16109891796034608114088270121464.jpg?alt=media&amp;token=6bc57ba6-3056-4563-8d21-f1687737142c');
+      helper.assert(hyperlinks.validateURL('carbone.io?quer=23'), 'https://carbone.io/?quer=23');
+      helper.assert(hyperlinks.validateURL('www.carbone.com.au?key=value&name=john'), 'https://www.carbone.com.au/?key=value&amp;name=john');
+      helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick'), 'http://carbone.io/?name=john&amp;lastname=wick');
     });
 
     it('[utils] validateURL - \n \
+        should return an error URL when the element is not a string && \n\
         should return an error URL when the URL is invalid && \n\
         should return an error URL passed as a second argument when the URL is invalid', () => {
       /** DEFAULT URL ON ERROR */
+      helper.assert(hyperlinks.validateURL([]), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL({}), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(undefined), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(null), hyperlinks.URL_ON_ERROR);
+      helper.assert(hyperlinks.validateURL(12345), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('javascript:void(0)'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('magnet:?xt=urn:btih:123'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('http://my test.asp'), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('carbone.io?quer=23'), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('www.carbone.com.au?key=value&name=john'), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick'), hyperlinks.URL_ON_ERROR);
       helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37'), hyperlinks.URL_ON_ERROR);
 
       /** URL ON ERROR RECEIVED BY ARGUMENTS */
       helper.assert(hyperlinks.validateURL('javascript:void(0)', 'https://carbone.io'), 'https://carbone.io');
       helper.assert(hyperlinks.validateURL('dfdsfdsfdfdsfsdf', 'https://carbone.io/index.html'), 'https://carbone.io/index.html');
-      helper.assert(hyperlinks.validateURL('http://carbone.io?name=john&lastname=wick', 'https://my_test.asp'), 'https://my_test.asp');
       helper.assert(hyperlinks.validateURL('assurance#/insights/course/749c27c3db1e5010701364a14a961939?view&#61;af6c82041be654107ac94338dc4bcb37', 'https://carbone.io/url_on_error.html'), 'https://carbone.io/url_on_error.html');
     });
 
-    it('[utils] validateURL + DOCX && \n \
+    it('[utils] validateURL && \n \
         should correct the URL and convert "&" caracter to "&amp;" encoded caracter && \n \
+        should add a `/` before query parameters if it is missing && \n \
         should return the default Error URL when the URL is invalid && \n \
         should return a different default Error URL when the URL is invalid', () => {
-      helper.assert(hyperlinks.validateURL('carbone.io', '', 'docx'), 'https://carbone.io');
-      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick', '', 'docx'), 'http://carbone.io/?name=john&amp;lastname=wick');
-      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick&key=code', '', 'docx'), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
-      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', '', 'docx'), hyperlinks.URL_ON_ERROR);
-      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', 'https://www.carbone.com.au', 'docx'), 'https://www.carbone.com.au');
+      helper.assert(hyperlinks.validateURL('carbone.io', ''), 'https://carbone.io');
+      helper.assert(hyperlinks.validateURL('http://carbone.io/?name=john&lastname=wick', ''), 'http://carbone.io/?name=john&amp;lastname=wick');
+      helper.assert(hyperlinks.validateURL('https://carbone.io/?name=john&lastname=wick&key=code', ''), 'https://carbone.io/?name=john&amp;lastname=wick&amp;key=code');
+      helper.assert(hyperlinks.validateURL('carbone.io?quer=23', ''), 'https://carbone.io/?quer=23');
+      helper.assert(hyperlinks.validateURL('carbon e.io?quer=23', 'https://www.carbone.com.au'), 'https://www.carbone.com.au');
     });
 
     it('[utils] formatter "addLinkDatabase" should add to the hyperlinkDatabase and return the hyperlink properties', () => {
@@ -582,8 +610,313 @@ describe('Hyperlinks - It Injects Hyperlinks to elements (texts/images/tables) f
       _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://my test.asp', 'https://carbone.io/default_url_on_error2'));
       helper.assert(_resultUrl, 'https://carbone.io/default_url_on_error2');
       /** if the url is invalid AND if the new URL On Error passed by the formatter "defaultURL" is invalid, it should return the default hyperlinks.URL_ON_ERROR */
-      _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://my test.asp', 'carbone.io?quer=23'));
-      helper.assert(_resultUrl, 'https://carbone.io/documentation.html#hyperlink-validation');
+      _resultUrl = hyperlinksFormatters.validateURL.call(_options, hyperlinksFormatters.defaultURL.call(_options, 'http://my test.asp', 'carb one.io?quer=23'));
+      helper.assert(_resultUrl, hyperlinks.URL_ON_ERROR);
+    });
+  });
+
+  describe('DOCX preprocessing', function () {
+    describe('replaceBookmarkAndTableOfContentDocx', function () {
+      it('should do nothing', function () {
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(''), '');
+      });
+      it('should add markers to generate new bookmark ids and ref. And it should force hard refresh for some dynamic fields', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:id="12345" w:name="_Ref118464460"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12345"/>'
+            + '<w:bookmarkStart w:id="12" w:name="_Ref78986565650"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12"/>'
+            + '<b>blabla _Ref78986565650</b>'
+            + '<w:instrText xml:space="preserve">REF _Ref78986565650 \\h</w:instrText>'
+            + '<b>blabla</b>'
+            + '<w:instrText xml:space="preserve">PAGEREF _Ref78986565650 \\h</w:instrText>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), ''
+          + '<xml>'
+          + '<w:bookmarkStart w:id="{c.now:neutralForArrayFilter:cumCount}12345" w:name="_Ref118464460_{c.now:neutralForArrayFilter:cumCount}"/>'
+          + '<b>blabla</b><w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}12345"/>'
+          + '<w:bookmarkStart w:id="{c.now:neutralForArrayFilter:cumCount}012" w:name="_Ref78986565650_{c.now:neutralForArrayFilter:cumCount}"/>'
+          + '<b>blabla</b><w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}012"/>'
+          + '<b>blabla _Ref78986565650</b>'
+          + '<w:instrText xml:space="preserve">REF _Ref78986565650_{c.now:neutralForArrayFilter:cumCount} \\h</w:instrText>'
+          + '<b>blabla</b>'
+          + '<w:instrText xml:space="preserve">PAGEREF _Ref78986565650_{c.now:neutralForArrayFilter:cumCount} \\h</w:instrText>'
+          + '</xml>'
+        );
+        helper.assert(_options.hardRefresh, true);
+        // test hardRefresh for other dynamic field
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'REF'), _options);
+        helper.assert(_options.hardRefresh, false);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMCHARS'), _options);
+        helper.assert(_options.hardRefresh, true);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMPAGES'), _options);
+        helper.assert(_options.hardRefresh, true);
+        _options.hardRefresh = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMWORDS'), _options);
+        helper.assert(_options.hardRefresh, true);
+        // if user set hardRefresh, respect his choice
+        _options.hardRefresh = false;
+        _options.hardRefreshUser = false;
+        hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml.replaceAll('PAGEREF', 'NUMWORDS'), _options);
+        helper.assert(_options.hardRefresh, false);
+      });
+      it('should add markers to generate new bookmark ids and ref, but not if the bookmark name contains already a Carbone tag', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:name="_Ref118464460" w:id="0"/>'
+            + '<w:bookmarkStart w:name="_Ref118464461" w:id="1"/>'
+            + '<w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '<w:bookmarkStart w:name="_{d[i].id}" w:id="2"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="2"/>'
+            + '<w:bookmarkEnd w:id="0"/>'
+            + '<w:bookmarkEnd w:id="1"/>'
+            + '<w:bookmarkEnd w:id="1"/>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), ''
+          + '<xml>'
+            + '<w:bookmarkStart w:name="_Ref118464460_{c.now:neutralForArrayFilter:cumCount}" w:id="{c.now:neutralForArrayFilter:cumCount}000"/>'
+            + '<w:bookmarkStart w:name="_Ref118464461_{c.now:neutralForArrayFilter:cumCount}" w:id="{c.now:neutralForArrayFilter:cumCount}001"/>'
+            + '<w:bookmarkStart w:name="_Ref118464462_{c.now:neutralForArrayFilter:cumCount}" w:id="{c.now:neutralForArrayFilter:cumCount}001"/>'
+            + '<w:bookmarkStart w:name="_{d[i].id}" w:id="{c.now:neutralForArrayFilter:cumCount}002"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}002"/>'
+            + '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}000"/>'
+            + '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}001"/>'
+            + '<w:bookmarkEnd w:id="{c.now:neutralForArrayFilter:cumCount}001"/>'
+          + '</xml>'
+        );
+        helper.assert(_options.hardRefresh, false);
+      });
+      it('should work with array filters (added markers should not break filters). And it should not generate Ids if the anchor has already a Carbone tag', function (done) {
+        let _data = [
+          { id : 10 },
+          { id : 20 },
+          { id : 30 },
+        ];
+        let _xml = ''
+          + '<xml>'
+          + '  <w:hyperlink w:anchor="_{d[i, id>10].id}" w:history="1">o</w:hyperlink>'
+          + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+          + '  <w:bookmarkStart w:name="_{d[i, id>10].id}" w:id="2"/>'
+          + '  <b>blabla</b>'
+          + '  <w:bookmarkEnd w:id="2"/>'
+          + '  <w:bookmarkEnd w:id="1"/>'
+          + '</xml>'
+          + '<xml>'
+          + '  {d[i+1, id>10].id}>'
+          + '</xml>'
+        ;
+        let _report = {
+          embeddings : [],
+          extension  : 'docx',
+          files      : [
+            { name : 'word/document.xml', parent : '', data : _xml, isMarked : true },
+            { name : 'word/other.xml'   , parent : '', data : _xml, isMarked : true }
+          ]
+        };
+        carbone.render(_report, _data, function (err, data) {
+          let _expectedXmlInDoc = ''
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_20" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462_2" w:id="2001"/>'
+            + '  <w:bookmarkStart w:name="_20" w:id="2002"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2002"/>'
+            + '  <w:bookmarkEnd w:id="2001"/>'
+            + '</xml>'
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_30" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462_3" w:id="3001"/>'
+            + '  <w:bookmarkStart w:name="_30" w:id="3002"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="3002"/>'
+            + '  <w:bookmarkEnd w:id="3001"/>'
+            + '</xml>'
+          ;
+          let _expectedXmlInOther = ''
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_20" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '  <w:bookmarkStart w:name="_20" w:id="2"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2"/>'
+            + '  <w:bookmarkEnd w:id="1"/>'
+            + '</xml>'
+            + '<xml>'
+            + '  <w:hyperlink w:anchor="_30" w:history="1">o</w:hyperlink>'
+            + '  <w:bookmarkStart w:name="_Ref118464462" w:id="1"/>'
+            + '  <w:bookmarkStart w:name="_30" w:id="2"/>'
+            + '  <b>blabla</b>'
+            + '  <w:bookmarkEnd w:id="2"/>'
+            + '  <w:bookmarkEnd w:id="1"/>'
+            + '</xml>'
+          ;
+          let _expected = {
+            embeddings : [],
+            extension  : 'docx',
+            files      : [
+              { name : 'word/document.xml', parent : '', data : _expectedXmlInDoc, isMarked : true },
+              { name : 'word/other.xml'   , parent : '', data : _expectedXmlInOther, isMarked : true }
+            ]
+          };
+          helper.assert(data, _expected);
+          done();
+        });
+      });
+      it.skip('should not replace or modify bookmarks of table of content???', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = ''
+          + '<xml>'
+            + '<w:bookmarkStart w:id="12345" w:name="_Toc118464460"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12345"/>'
+            + '<w:bookmarkStart w:id="12" w:name="_Toc78986565650"/>'
+            + '<b>blabla</b>'
+            + '<w:bookmarkEnd w:id="12"/>'
+            + '<b>blabla _Toc78986565650</b>'
+            + '<w:instrText xml:space="preserve">REF _Toc78986565650 \\h</w:instrText>'
+            + '<b>blabla</b>'
+            + '<w:instrText xml:space="preserve">PAGEREF _Toc78986565650 \\h</w:instrText>'
+          + '</xml>'
+        ;
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml, _options), _xml);
+        helper.assert(_options.hardRefresh, false);
+      });
+      it('should remove (deactivate) carbone markers inside table of content and force hardRefresh of the document to update the table of Content', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = (expected = false) => {
+          return `
+            <w:p>
+              <w:pPr>
+                <w:pStyle w:val="TOC1"/>
+              </w:pPr>
+              <w:r>
+                <w:instrText xml:space="preserve">TOC \\o "1-3" \\h \\z \\u</w:instrText>
+              </w:r>
+              <w:hyperlink w:anchor="_Toc118845175" w:history="1">
+                <w:r>
+                  <w:rPr>
+                    <w:rStyle w:val="Hyperlink"/>
+                    <w:rFonts w:cs="Times New Roman (Headings CS)"/>
+                    <w:noProof/>
+                  </w:rPr>
+                  <w:t>${ (expected === true? 'd.tables[i].name' : '{d.tables[i].name}') }</w:t>
+                </w:r>
+                <w:r w:rsidR="001844B7">
+                  <w:instrText xml:space="preserve">PAGEREF _Toc118845175 \\h</w:instrText>
+              </w:hyperlink>
+            </w:p>`
+          ;
+        };
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml(), _options), _xml(true));
+        helper.assert(_options.hardRefresh, true);
+      });
+      it('should remove (deactivate) carbone markers inside table of content for DOCX generated by LibreOffice', function () {
+        let _options = {
+          hardRefresh : false
+        };
+        let _xml = (expected = false) => {
+          return `
+            <w:p>
+              <w:hyperlink w:anchor="__RefHeading___Toc48_1186019735">
+                <w:r>
+                  <w:rPr>
+                    <w:webHidden/>
+                    <w:rStyle w:val="IndexLink"/>
+                  </w:rPr>
+                  <w:t>${ (expected === true ? 'd.name' : '{d.name}') }</w:t>
+                  <w:tab/>
+                  <w:t>2</w:t>
+                </w:r>
+              </w:hyperlink>
+            </w:p>
+            <w:p>
+              <w:hyperlink w:anchor="__RefHeading___Toc48_1186019738">
+                <w:r>
+                  <w:rPr>
+                    <w:webHidden/>
+                    <w:rStyle w:val="IndexLink"/>
+                  </w:rPr>
+                  <w:t>${ (expected === true ? 'd.other' : '{d.other}') }</w:t>
+                  <w:tab/>
+                  <w:t>2</w:t>
+                </w:r>
+              </w:hyperlink>
+            </w:p>`
+          ;
+        };
+        helper.assert(hyperlinks.replaceBookmarkAndTableOfContentDocx(_xml(), _options), _xml(true));
+        helper.assert(_options.hardRefresh, true);
+      });
+      it('should udpate bookmarks in DOCX document, and it should not hardRefresh if user set hardRefresh to false', function (done) {
+        const _testedReport = 'hyperlink/docx-crossreference';
+        const _data = [
+          { id : 'car1' },
+          { id : 'car2' },
+          { id : 'car3' }
+        ];
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false }, (err, res) => {
+          helper.assert(err+'', 'null');
+          helper.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('should update regular hyperlinks', function (done) {
+        const _testedReport = 'hyperlink/docx-normal';
+        const _data = {
+          id1 : 'car1',
+          id2 : 'car2',
+          id3 : 'car3'
+        };
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false }, (err, res) => {
+          helper.assert(err+'', 'null');
+          helper.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('should update regular hyperlinks in loops', function (done) {
+        const _testedReport = 'hyperlink/docx-normal-loop';
+        const _data = [
+          { id : 'car1' },
+          { id : 'car2' }
+        ];
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false }, (err, res) => {
+          helper.assert(err+'', 'null');
+          helper.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('isDebugActive:true should not return internal Carbone makers used for hyperlinks', function (done) {
+        const _testedReport = 'hyperlink/docx-normal-loop';
+        const _data = [
+          { id : 'car1' },
+          { id : 'car2' }
+        ];
+        carbone.render(helper.openTemplate(_testedReport), _data, { hardRefresh : false, isDebugActive : true }, (err, res, reportName, debugInfo) => {
+          helper.assert(err+'', 'null');
+          helper.assert(debugInfo.markers, [ '{d[i].id}', '{d[i].id}', '{d[i+1].id}']);
+          done();
+        });
+      });
     });
   });
 

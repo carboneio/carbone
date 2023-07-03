@@ -51,6 +51,19 @@ describe('formatter', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '2017-05-10 15:57:23.769561+03:00', 'LLLL'), 'Wednesday, May 10, 2017 2:57 PM');
       helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : _tz}, '1997-12-17 07:37:16-08:00', 'LLLL'), 'Wednesday, December 17, 1997 4:37 PM');
     });
+    it('should not apply timezone if only a date is provided without time', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '20101201', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01', 'L'), '12/01/2010');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '20100-12-01', 'L'), '12/01/20100');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '100100-12-01', 'L'), '12/01/100100');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'L'), '10/12/2001');
+    });
+    it('should apply timezone if only a time is provided', function () {
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01', 'HH-mm-ss', 'HH-mm-ss'), '03-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '10-12-01Z', 'HH-mm-ss', 'HH-mm-ssZ'), '05-12-01');
+      helper.assert(dateFormatter.formatD.call({lang : 'en', timezone : 'america/guayaquil'}, '2010-12-01T01:00:00Z', 'LLL'), 'November 30, 2010 8:00 PM');
+    });
     it('should accepts real locales', function () {
       helper.assert(dateFormatter.formatD.call({lang : 'en-gb', timezone : _tz}, '20101201', 'L'), '01/12/2010');
       helper.assert(dateFormatter.formatD.call({lang : 'en'   , timezone : _tz}, '20101201', 'L'), '12/01/2010');
@@ -104,6 +117,123 @@ describe('formatter', function () {
       );
     });
   });
+  describe('formatI', function () {
+    it('should transform duration (patternOut), which are by default in milliseconds (patternIn)', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'millisecond' ), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'milliseconds'), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'ms'          ), 2000);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'second'      ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 'seconds'     ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                   , 's'           ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'minute'      ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'minutes'     ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'm'           ), 60);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'hour'        ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'hours'       ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600            , 'h'           ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'year'        ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'years'       ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 365 , 'y'           ), 1);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'month'       ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'months'      ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 60  , 'M'           ), 2);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'week'        ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'weeks'       ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'w'           ), 4);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'day'         ), 28);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'days'        ), 28);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600 * 24 * 28  , 'd'           ), 28);
+    });
+    it('should return null if patternOur is unknown ', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 0         ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , ''        ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , undefined ), null);
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , null      ), null);
+    });
+    it('should accept other units for patternIn', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'millisecond' ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'milliseconds'), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000 , 'ms',  'ms'          ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'second'      ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'seconds'     ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  's'           ), 2000                   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'minute'      ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'minutes'     ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 60   , 'ms',  'm'           ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'hour'        ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'hours'       ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'h'           ), 1000 * 3600            );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'year'        ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'years'       ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1    , 'ms',  'y'           ), 1000 * 3600 * 24 * 365 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'month'       ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'months'      ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2    , 'ms',  'M'           ), 1000 * 3600 * 24 * 60  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'week'        ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'weeks'       ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 4    , 'ms',  'w'           ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'day'         ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'days'        ), 1000 * 3600 * 24 * 28  );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 28   , 'ms',  'd'           ), 1000 * 3600 * 24 * 28  );
+    });
+    it('should also accept ISO units for patternIn if not defined, and if the value starts with "P..."', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 'P1M'            , 'ms'    ), 1000 * 3600 * 24 * 30 );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 'P1Y2M3DT4H5M6S' , 'hour'  ), 10276.085 );
+    });
+    it('should humanize if patternOut contain humain or humain+ and manage locale', function () {
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 2000                           , 'human' ) , 'a few seconds' );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600                    , 'human' ) , 'an hour'       );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, 1000 * 3600                    , 'human+') , 'in an hour'    );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, -1000 * 3600                   , 'human+') , 'an hour ago'   );
+      helper.assert(dateFormatter.formatI.call({lang : 'en'}, -1000 * 3600 * 24 * 365 * 4    , 'human+') , '4 years ago'   );
+      helper.assert(dateFormatter.formatI.call({lang : 'fr'}, -1000 * 3600 * 24 * 365 * 4    , 'human+') , 'il y a 4 ans'  );
+      helper.assert(dateFormatter.formatI.call({lang : 'fr-FR'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'il y a 4 ans'  );
+      helper.assert(dateFormatter.formatI.call({lang : 'es-ES'}, -1000 * 3600 * 24 * 365 * 4 , 'human+') , 'hace 4 años'   );
+    });
+  });
+  describe('diffD', function () {
+    it('should compute the difference between two dates', function () {
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'millisecond' ), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'milliseconds'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'ms'          ), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'second'      ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'seconds'     ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 's'           ), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'minute'      ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'minutes'     ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'm'           ), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'hour'        ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'hours'       ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'h'           ), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'year'        ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'years'       ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20091001', '20101201', 'y'           ), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'quarter'     ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'quarters'    ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20100520', '20101201', 'Q'           ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'month'       ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'months'      ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'M'           ), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'week'        ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'weeks'       ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'w'           ), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'day'         ), 61);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'days'        ), 61);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '20101001', '20101201', 'd'           ), 61);
+    });
+    it('should compute the difference between two dates and accept patterns for both dates', function () {
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'ms' , 'YYYY+MM+DD', 'YYYY=MM=DD'), 5274000000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 's'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 5274000);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'm'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 87900);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'h'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 1465);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2009+10+01', '2010=12=01', 'y'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 1);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+05+20', '2010=12=01', 'Q'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'M'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 2);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'w'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 8);
+      helper.assert(dateFormatter.diffD.call({lang : 'en'}, '2010+10+01', '2010=12=01', 'd'  , 'YYYY+MM+DD', 'YYYY=MM=DD'), 61);
+    });
+  });
   describe('convCRLF', function () {
     it('should convert LF and CR in odt', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'odt'}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <text:line-break/> sd <text:line-break/> qsd <text:line-break/> sq');
@@ -111,12 +241,104 @@ describe('formatter', function () {
     it('should convert LF and CR in docx', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'docx'}, 'qsdqsd \n'), 'qsdqsd </w:t><w:br/><w:t>');
     });
+    it('should add a paragraph in ODS', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'ods'}, 'qsdqsd \n'), 'qsdqsd </text:p><text:p>');
+    });
   });
   describe('convCRLFH', function () {
     it('should convert LF and CR to <br>', function () {
       helper.assert(stringFormatter.convCRLFH.call({}, 'qsdqsd \n sd \r\n qsd \n sq'), 'qsdqsd <br> sd <br> qsd <br> sq');
     });
   });
+  describe('replace', function () {
+    it('should replace a string by another', function () {
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', 'OK'     ), 'tOKt bi 123 tOK');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es'           ), 'tt bi 123 t');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', null     ), 'tt bi 123 t');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', undefined), 'tt bi 123 t');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', 1000     ), 't1000t bi 123 t1000');
+      helper.assert(stringFormatter.replace('test bi 123 tes', 'es', -1000    ), 't-1000t bi 123 t-1000');
+      helper.assert(stringFormatter.replace(-10000.1                          ), '-10000.1');
+      helper.assert(stringFormatter.replace(-10000.1         , '.' , ';'      ), '-10000;1');
+      helper.assert(stringFormatter.replace(-100110.1        , 11 , 'AA'      ), '-100AA0.1');
+      helper.assert(stringFormatter.replace(null                              ), '');
+      helper.assert(stringFormatter.replace(undefined                         ), '');
+      helper.assert(stringFormatter.replace({}                                ), '[object Object]');
+      helper.assert(stringFormatter.replace(['1', '2']                        ), '1,2');
+    });
+    it('should not accept regex (security)', function () {
+      helper.assert(stringFormatter.replace('test bi 123 tes', /es/g), 'test bi 123 tes');
+    });
+  });
+
+  describe('split', function () {
+    it('should split the text and generate an array', function () {
+      helper.assert(stringFormatter.split('couc/ousd/sdzd', '/')  , ['couc', 'ousd', 'sdzd']);
+      helper.assert(stringFormatter.split('coucou')               , ['coucou']);
+      helper.assert(stringFormatter.split('coucou', 'c')          , ['', 'ou', 'ou']);
+      helper.assert(stringFormatter.split('coucou', 'co')         , ['', 'u', 'u']);
+      helper.assert(stringFormatter.split(102000, 2)              , ['10', '000']);
+      helper.assert(stringFormatter.split(102.0001, '.')          , ['102', '0001']);
+      helper.assert(stringFormatter.split('coucou', null)         , ['coucou']);
+      helper.assert(stringFormatter.split('cou0cou', 0)           , ['cou', 'cou']);
+      helper.assert(stringFormatter.split('coucou', undefined)    , ['coucou']);
+      helper.assert(stringFormatter.split('coucou', {})           , ['coucou']);
+      helper.assert(stringFormatter.split('coucou', ['ou', 'ao']) , ['coucou']);
+      /** Combine split + arrayJoin */
+      const _resSplit = stringFormatter.split('Lorem ipsum dolor sit amet', ' ');
+      helper.assert(_resSplit, ['Lorem','ipsum','dolor','sit','amet']);
+      const _resJoin = arrayFormatter.arrayJoin(_resSplit, '', '2', '1');
+      helper.assert(_resJoin, 'dolor');
+    });
+    it('should not crash if data is null or undefined or a regex', function () {
+      helper.assert(stringFormatter.split('coucou', /ou/g), ['coucou']);
+      helper.assert(stringFormatter.split(null), null);
+      helper.assert(stringFormatter.split(undefined), undefined);
+    });
+  });
+
+  describe('append', function () {
+    it('should append text', function () {
+      helper.assert(stringFormatter.append('coucou')               , 'coucou');
+      helper.assert(stringFormatter.append('coucou', 'c')          , 'coucouc');
+      helper.assert(stringFormatter.append('coucou', 'co')         , 'coucouco');
+      helper.assert(stringFormatter.append('coucou', 10)           , 'coucou10');
+      helper.assert(stringFormatter.append('coucou', null)         , 'coucou');
+      helper.assert(stringFormatter.append('coucou', undefined)    , 'coucou');
+      helper.assert(stringFormatter.append('coucou', [])           , 'coucou');
+      helper.assert(stringFormatter.append('coucou', ['1', '2'])   , 'coucou1,2');
+      helper.assert(stringFormatter.append('coucou', {})           , 'coucou[object Object]');
+      helper.assert(stringFormatter.append(222, 10)                , '22210');
+      helper.assert(stringFormatter.append({}, '')                 , '[object Object]');
+      helper.assert(stringFormatter.append(['1', '2'], '3')         , '1,23');
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.append(null), '');
+      helper.assert(stringFormatter.append(undefined), '');
+    });
+  });
+
+  describe('prepend', function () {
+    it('should prepend text', function () {
+      helper.assert(stringFormatter.prepend('coucou')               , 'coucou');
+      helper.assert(stringFormatter.prepend('coucou', 'c')          , 'ccoucou');
+      helper.assert(stringFormatter.prepend('coucou', 'co')         , 'cocoucou');
+      helper.assert(stringFormatter.prepend('coucou', 10)           , '10coucou');
+      helper.assert(stringFormatter.prepend('coucou', null)         , 'coucou');
+      helper.assert(stringFormatter.prepend('coucou', undefined)    , 'coucou');
+      helper.assert(stringFormatter.prepend('coucou', [])           , 'coucou');
+      helper.assert(stringFormatter.prepend('coucou', ['1', '2'])   , '1,2coucou');
+      helper.assert(stringFormatter.prepend('coucou', {})           , '[object Object]coucou');
+      helper.assert(stringFormatter.prepend(222, 10)                , '10222');
+      helper.assert(stringFormatter.prepend({}, '')                 , '[object Object]');
+      helper.assert(stringFormatter.prepend(['1', '2'], '3')        , '31,2');
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.prepend(null), '');
+      helper.assert(stringFormatter.prepend(undefined), '');
+    });
+  });
+
   describe('ifEmpty', function () {
     it('should show a message if data is empty. It should stop propagation to next formatter', function () {
       var _context = {};
@@ -402,6 +624,206 @@ describe('formatter', function () {
           [[1, 2, 3, 4, 6, 7, 8, 9], [1, 2, 3, 6, 7, 8, 9]],
         ];
         testCondition('ifNE', _dataSet, true);
+      });
+    });
+
+    describe('ifTE', function () {
+      it('should turn the `isConditionTrue` to false if a data is not a string', function () {
+        const _dataSet = [
+          [0                , 'string'],
+          [-0               , 'string'],
+          [-21              , 'string'],
+          [NaN              , 'string'],
+          [() => {}         , 'string'],
+          [22.2222          , 'string'],
+          [true             , 'string'],
+          [false            , 'string'],
+          [undefined        , 'string'],
+          [null             , 'string'],
+          [{value : 'john'} , 'string'],
+          [[1, 2, 3]        , 'string']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+      it('should turn the `isConditionTrue` to true if the data is a string', function () {
+        const _dataSet = [
+          [''          , 'string'],
+          ['0'         , 'string'],
+          ['22.2222'   , 'string'],
+          ['true'      , 'string'],
+          ['false'     , 'string'],
+          ['è#@&é'     , 'string'],
+          ['undefined' , 'string'],
+          ['null'      , 'string']
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a number', function () {
+        const _dataSet = [
+          ['undefined'      , 'number'],
+          ['null'           , 'number'],
+          [true             , 'number'],
+          [false            , 'number'],
+          ['1.000'          , 'number'],
+          ['-1.000'         , 'number'],
+          ['a12'            , 'number'],
+          [NaN              , 'number'],
+          [() => {}         , 'number'],
+          [undefined        , 'number'],
+          [null             , 'number'],
+          [{value : 'john'} , 'number'],
+          [[1, 2, 3]        , 'number']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a number', function () {
+        const _dataSet = [
+          [2          , 'number'],
+          [-2         , 'number'],
+          [3.14       , 'number'],
+          [Infinity   , 'number']
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a boolean', function () {
+        const _dataSet = [
+          ['undefined'      , 'boolean'],
+          ['null'           , 'boolean'],
+          [3.14             , 'boolean'],
+          [1                , 'boolean'],
+          [NaN              , 'boolean'],
+          [0                , 'boolean'],
+          ['false'          , 'boolean'],
+          ['true'           , 'boolean'],
+          ['0'              , 'boolean'],
+          ['1'              , 'boolean'],
+          [undefined        , 'boolean'],
+          [null             , 'boolean'],
+          [{value : 'john'} , 'boolean'],
+          [[1, 2, 3]        , 'boolean']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a boolean', function () {
+        const _dataSet = [
+          [true          , 'boolean'],
+          [false         , 'boolean']
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a object', function () {
+        const _dataSet = [
+          ['undefined'      , 'object'],
+          ['null'           , 'object'],
+          [3.14             , 'object'],
+          [1                , 'object'],
+          [undefined        , 'object'],
+          [NaN              , 'object'],
+          [null             , 'object'],
+          [() => {}         , 'object'],
+          ['aa'             , 'object'],
+          [true             , 'object'],
+          [false            , 'object'],
+          [[1, 2, 3]        , 'object']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+
+      it('should turn the `isConditionTrue` to true if the data is a object', function () {
+        const _dataSet = [
+          [{ a : 1 }  , 'object'],
+          [{}         , 'object']
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a array', function () {
+        const _dataSet = [
+          ['undefined'      , 'array'],
+          ['null'           , 'array'],
+          [3.14             , 'array'],
+          [1                , 'array'],
+          [NaN              , 'array'],
+          [null             , 'array'],
+          ['a'              , 'array'],
+          [undefined        , 'array'],
+          [true             , 'array'],
+          [false            , 'array'],
+          [{value : 'john'} , 'array'],
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+      it('should turn the `isConditionTrue` to true if the data is a array', function () {
+        const _dataSet = [
+          [[1, 2, 3]  , 'array'],
+          [[]         , 'array'],
+          [[{a : 1}]  , 'array'],
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('[binary] should turn the `isConditionTrue` to false if a data is not a binary', function () {
+        const _dataSet = [
+          ['undefined'      , 'binary'],
+          ['null'           , 'binary'],
+          [3.14             , 'binary'],
+          ['10'             , 'binary'],
+          [-1               , 'binary'],
+          [NaN              , 'binary'],
+          [undefined        , 'binary'],
+          [null             , 'binary'],
+          [{value : 'john'} , 'binary'],
+          [[1, 2, 3]        , 'binary']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+      it('should turn the `isConditionTrue` to true if the data is a binary', function () {
+        const _dataSet = [
+          [false    , 'binary'],
+          [true     , 'binary'],
+          ['false'  , 'binary'],
+          ['true'   , 'binary'],
+          ['0'      , 'binary'],
+          ['1'      , 'binary'],
+          [0        , 'binary'],
+          [1        , 'binary'],
+        ];
+        testCondition('ifTE', _dataSet, true);
+      });
+
+      it('should turn the `isConditionTrue` to false if a data is not a integer', function () {
+        const _dataSet = [
+          ['undefined'      , 'integer'],
+          ['null'           , 'integer'],
+          [true             , 'integer'],
+          [false            , 'integer'],
+          ['1.000'          , 'integer'],
+          ['1000'           , 'integer'],
+          ['-1.000'         , 'integer'],
+          ['a12'            , 'integer'],
+          [NaN              , 'integer'],
+          [3.1              , 'integer'],
+          [() => {}         , 'integer'],
+          [undefined        , 'integer'],
+          [null             , 'integer'],
+          [{value : 'john'} , 'integer'],
+          [[1, 2, 3]        , 'integer']
+        ];
+        testCondition('ifTE', _dataSet, false);
+      });
+      it('should turn the `isConditionTrue` to true if the data is a integer', function () {
+        const _dataSet = [
+          [545454     , 'integer'],
+          [2          , 'integer'],
+          [-2         , 'integer'],
+          [0          , 'integer']
+        ];
+        testCondition('ifTE', _dataSet, true);
       });
     });
 
@@ -915,9 +1337,9 @@ describe('formatter', function () {
         });
         it('Should show + AND + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 1997);
+          callWithContext(conditionFormatter.ifLTE, _context, stringFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 1997);
           callWithContext(conditionFormatter.and, _context);
-          callWithContext(conditionFormatter.ifGT, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 10);
+          callWithContext(conditionFormatter.ifGT, _context, stringFormatter.len('This Is a long string with numbers 12345'), 10);
           helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
           helper.assert(_context.isConditionTrue, true);
           helper.assert(_context.isAndOperator, true);
@@ -926,9 +1348,9 @@ describe('formatter', function () {
 
         it('Should elseShow + AND + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLTE, _context, conditionFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 10);
+          callWithContext(conditionFormatter.ifLTE, _context, stringFormatter.len(['Banana', 'Apple', 'Bread', 'Blue Cheese']), 10);
           callWithContext(conditionFormatter.and, _context);
-          callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('This Is a long string with numbers 12345'), 41);
+          callWithContext(conditionFormatter.ifGTE, _context, stringFormatter.len('This Is a long string with numbers 12345'), 41);
           callWithContext(conditionFormatter.show, _context);
           helper.assert(callWithContext(conditionFormatter.elseShow, _context, null, 'Apple'), 'Apple');
           helper.assert(_context.isConditionTrue, false);
@@ -938,9 +1360,9 @@ describe('formatter', function () {
 
         it('Should show + OR + len', function () {
           let _context = {isConditionTrue : false};
-          callWithContext(conditionFormatter.ifLT, _context, conditionFormatter.len(['car', 'train', 'plane']), 2);
+          callWithContext(conditionFormatter.ifLT, _context, stringFormatter.len(['car', 'train', 'plane']), 2);
           callWithContext(conditionFormatter.or, _context);
-          callWithContext(conditionFormatter.ifGTE, _context, conditionFormatter.len('Hello12345'), 10);
+          callWithContext(conditionFormatter.ifGTE, _context, stringFormatter.len('Hello12345'), 10);
           helper.assert(callWithContext(conditionFormatter.show, _context, null, 'Pineapple'), 'Pineapple');
           helper.assert(_context.isConditionTrue, true);
           helper.assert(_context.isAndOperator, false);
@@ -952,17 +1374,17 @@ describe('formatter', function () {
 
   describe('LEN', function () {
     it('should return the string length or array length', function () {
-      helper.assert(conditionFormatter.len('This is a string'), 16);
-      helper.assert(conditionFormatter.len(''), 0);
-      helper.assert(conditionFormatter.len('樂而不淫 建章曰'), 8);
-      helper.assert(conditionFormatter.len('This is a longer string lenght'), 30);
-      helper.assert(conditionFormatter.len([0, 1, 2, 3]), 4);
-      helper.assert(conditionFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
-      helper.assert(conditionFormatter.len([]), 0);
-      helper.assert(conditionFormatter.len({name : 'John'}), 0);
-      helper.assert(conditionFormatter.len(undefined), 0);
-      helper.assert(conditionFormatter.len(null), 0);
-      helper.assert(conditionFormatter.len(-1), 0);
+      helper.assert(stringFormatter.len('This is a string'), 16);
+      helper.assert(stringFormatter.len(''), 0);
+      helper.assert(stringFormatter.len('樂而不淫 建章曰'), 8);
+      helper.assert(stringFormatter.len('This is a longer string lenght'), 30);
+      helper.assert(stringFormatter.len([0, 1, 2, 3]), 4);
+      helper.assert(stringFormatter.len([1, 2, 'This is a string', 3, 9, 10]), 6);
+      helper.assert(stringFormatter.len([]), 0);
+      helper.assert(stringFormatter.len({name : 'John'}), 0);
+      helper.assert(stringFormatter.len(undefined), 0);
+      helper.assert(stringFormatter.len(null), 0);
+      helper.assert(stringFormatter.len(-1), 0);
     });
   });
 
@@ -1092,10 +1514,71 @@ describe('formatter', function () {
       helper.assert(stringFormatter.substr('coucou', 0, 3), 'cou');
       helper.assert(stringFormatter.substr('coucou', 0, 0), '');
       helper.assert(stringFormatter.substr('coucou', 3, 4), 'c');
+      helper.assert(stringFormatter.substr('coucou', 0, -1), 'couco');
+      helper.assert(stringFormatter.substr('coucou', 0, -2), 'couc');
+      helper.assert(stringFormatter.substr('coucou', 1, -2), 'ouc');
+      helper.assert(stringFormatter.substr('abcdef', -1, 100), 'f');
+      helper.assert(stringFormatter.substr('abcdef', -2, 100), 'ef');
+      helper.assert(stringFormatter.substr('coucou', '3', '5'), 'co');
+      helper.assert(stringFormatter.substr('abcdef', '-2', '100'), 'ef');
     });
     it('should not crash if data is null or undefined', function () {
       helper.assert(stringFormatter.substr(null, 0, 3), null);
       helper.assert(stringFormatter.substr(undefined, 0, 3), undefined);
+      helper.assert(stringFormatter.substr([], 0, 3), []);
+      helper.assert(stringFormatter.substr(2, 0, 3), 2);
+      helper.assert(stringFormatter.substr('abcdef', undefined, undefined), '');
+      helper.assert(stringFormatter.substr('abcdef', null, null), '');
+      helper.assert(stringFormatter.substr('abcdef', [], []), '');
+    });
+    it('should keep only the selection of characters but do not cut words if the third paramater is true. The returned text can be shorter', function () {
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 2, true)     , '');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, false)   , 'coucou donotcutme  d');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, true)    , 'coucou donotcutme  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, 'true')  , 'coucou donotcutme  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 27, true)    , 'coucou donotcutme  donotcut');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 40, true)    , 'coucou donotcutme  donotcut   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 6, true)     , 'coucou');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 6, 28, true)    , ' donotcutme  donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 1000, true) , '  other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 35, true)   , '  other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', '0', '20', 'true')  , 'coucou donotcutme  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', '6', '28', true)    , ' donotcutme  donotcut ');
+
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -2, true)    , 'coucou donotcutme  donotcut   ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -1, true)    , 'coucou donotcutme  donotcut   ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -5, true)    , 'coucou donotcutme  donotcut   ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -6, true)    , 'coucou donotcutme  donotcut  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -7, true)    , 'coucou donotcutme  donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -8, true)    , 'coucou donotcutme  donotcut');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -9, true)    , 'coucou donotcutme  ');
+
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -16, 28, true)    , 'donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -16, 100, true)    , 'donotcut   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -9, 100, true)    , '   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -8, 100, true)    , '   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -6, 100, true)    , ' other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -5, 100, true)    , 'other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -4, 100, true)    , '');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -1, 100, true)    , '');
+    });
+  });
+
+  describe('ellipsis', function () {
+    it('should cut the text and add dots', function () {
+      helper.assert(stringFormatter.ellipsis('coucou', 3), 'cou...');
+      helper.assert(stringFormatter.ellipsis('coucou', 5), 'couco...');
+      helper.assert(stringFormatter.ellipsis('coucou', 6), 'coucou');
+      helper.assert(stringFormatter.ellipsis('coucou', 7), 'coucou');
+      helper.assert(stringFormatter.ellipsis('coucou ', 7), 'coucou ');
+      helper.assert(stringFormatter.ellipsis('coucou  ', 7), 'coucou ...');
+    });
+    it('should not crash if data is null or undefined', function () {
+      helper.assert(stringFormatter.ellipsis(null, 0), null);
+      helper.assert(stringFormatter.ellipsis(undefined, 0), undefined);
+    });
+    it('works only on string', function () {
+      helper.assert(stringFormatter.ellipsis(30, 0), 30);
     });
   });
 
@@ -1228,12 +1711,36 @@ describe('formatter', function () {
       helper.assert(arrayFormatter.arrayJoin(_datas, ' | '), '1 | 2 | hey!');
       helper.assert(arrayFormatter.arrayJoin(_datas, '\\n'), '1\n2\nhey!');
     });
+    it('should select and print only items from index', function () {
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 0), '1234');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1), '234');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, 1), '2');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, 2), '23');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, -1), '23');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, -2), '2');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, 0), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 1, 100), '234');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 2), '34');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 3), '4');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 4), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 5), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1', '0'), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1'), '234');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1', '1'), '2');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1', '2'), '23');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', '1', '100'), '234');
+    });
     it('should not crash if datas is null or undefined', function () {
-      helper.assert(arrayFormatter.arrayMap(null), null);
-      helper.assert(arrayFormatter.arrayMap(undefined), undefined);
-      helper.assert(arrayFormatter.arrayMap(120), 120);
-      helper.assert(arrayFormatter.arrayMap([]), '');
-      helper.assert(arrayFormatter.arrayMap({}), {});
+      helper.assert(arrayFormatter.arrayJoin(null), null);
+      helper.assert(arrayFormatter.arrayJoin(undefined), undefined);
+      helper.assert(arrayFormatter.arrayJoin(120), 120);
+      helper.assert(arrayFormatter.arrayJoin([]), '');
+      helper.assert(arrayFormatter.arrayJoin({}), {});
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', null, null), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', {}, {}), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', [], []), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 'null', 'null'), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', -2, -2), '');
     });
   });
 
@@ -1316,6 +1823,19 @@ describe('formatter', function () {
 
       helper.assert(numberFormatter.formatN.call(_this, -1.005, 3), '-1,005');
       helper.assert(numberFormatter.formatN.call(_this, -1.006, 2), '-1,01');
+    });
+  });
+
+  describe('abs', function () {
+    it('should return absolute value of a number', function () {
+      helper.assert(numberFormatter.abs(10000.1), 10000.1);
+      helper.assert(numberFormatter.abs(-10000.1), 10000.1);
+      helper.assert(numberFormatter.abs(null), null);
+      helper.assert(numberFormatter.abs(undefined), undefined);
+      helper.assert(numberFormatter.abs({}), null);
+      helper.assert(numberFormatter.abs([]), null);
+      helper.assert(numberFormatter.abs('20'), 20);
+      helper.assert(numberFormatter.abs('-20.5454'), 20.5454);
     });
   });
 
@@ -1437,6 +1957,31 @@ describe('formatter', function () {
     it('should divide number', function () {
       helper.assert(numberFormatter.div('120', '80'), 1.5);
     });
+
+    it('should modulo number', function () {
+      helper.assert(numberFormatter.mod(-2, 0), null);
+      helper.assert(numberFormatter.mod(-2, 2), 0);
+      helper.assert(numberFormatter.mod(-1, 2), -1);
+      helper.assert(numberFormatter.mod(0, 2), 0);
+      helper.assert(numberFormatter.mod(1, 2), 1);
+      helper.assert(numberFormatter.mod(2, 2), 0);
+      helper.assert(numberFormatter.mod(16, 4), 0);
+      helper.assert(numberFormatter.mod(17, 4), 1);
+      helper.assert(numberFormatter.mod(18, 4), 2);
+      helper.assert(numberFormatter.mod(19, 4), 3);
+      helper.assert(numberFormatter.mod('-2', '2'), 0);
+      helper.assert(numberFormatter.mod('-1', '2'), -1);
+      helper.assert(numberFormatter.mod('0', '2'), 0);
+      helper.assert(numberFormatter.mod('1', '2'), 1);
+      helper.assert(numberFormatter.mod('2', '2'), 0);
+      helper.assert(numberFormatter.mod('16', '4'), 0);
+      helper.assert(numberFormatter.mod('17', '4'), 1);
+      helper.assert(numberFormatter.mod('18', '4'), 2);
+      helper.assert(numberFormatter.mod('19', '4'), 3);
+      helper.assert(numberFormatter.mod(1.8, 1.1), 0.7);
+      helper.assert(numberFormatter.mod(undefined, 1.1), undefined);
+      helper.assert(numberFormatter.mod(null, 1.1), null);
+    });
   });
 
   describe('Barcodes', function () {
@@ -1540,7 +2085,16 @@ describe('formatter', function () {
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'SPC\n0200\n1\nCH5800791123000889012\nS\nRobert Schneider AG\nRue du Lac\n1268\n2501\nBiel\nCH\n\n199.95\nCHF\nKPia-Maria Rutschmann-Schnyder\nGrosse Marktgasse 28\n9400 Rorschach\n\n\nCH\nSCOR\nRF18539007547034\n\nEPD\n',  'swissqrcode'), '{"bcid":"swissqrcode","text":"SPC\\n0200\\n1\\nCH5800791123000889012\\nS\\nRobert Schneider AG\\nRue du Lac\\n1268\\n2501\\nBiel\\nCH\\n\\n199.95\\nCHF\\nKPia-Maria Rutschmann-Schnyder\\nGrosse Marktgasse 28\\n9400 Rorschach\\n\\n\\nCH\\nSCOR\\nRF18539007547034\\n\\nEPD\\n"}');
         });
 
+        it('should return the barcode as JSON and CAST integer values as strings', function () {
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 15854377, 'code39'), '{"bcid":"code39","text":"15854377"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 2112345678900, 'ean13'), '{"bcid":"ean13","text":"2112345678900"}');
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 5715311709768, 'code128'), '{"bcid":"code128","text":"5715311709768"}');
+        });
+
         it('should return the barcode as JSON with options and should validate options', function () {
+          // svg
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'svg:true'), '{"bcid":"qrcode","text":"https://carbone.io","svg":true}', );
+          helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'svg:false'), '{"bcid":"qrcode","text":"https://carbone.io","svg":false}');
           // width
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:2'), '{"bcid":"qrcode","text":"https://carbone.io","width":"2"}', );
           helper.assert(barcodeFormatter.barcode.call({ isBarcodeImage : true }, 'https://carbone.io', 'qrcode', 'width:100'), '{"bcid":"qrcode","text":"https://carbone.io","width":"100"}');

@@ -489,6 +489,23 @@ describe('parser', function () {
     });
   });
 
+  describe('removeFormatters', function () {
+    it('should remove formatters from markers', function () {
+      assert.equal(parser.removeFormatters(), undefined);
+      assert.equal(parser.removeFormatters(null), null);
+      assert.equal(parser.removeFormatters('{d.id}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.id:simpleFormatter}'), '{d.id}');
+      assert.equal(parser.removeFormatters('     {d.id:simpleFormatter}    '), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort].id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort=\':sd\'].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort=\':sd\'].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, sort:formatter].id:ifEQ(..id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, sort:formatter].id}');
+      assert.equal(parser.removeFormatters('{d.cars[i].wheels[i, id.sort:formatter].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}'), '{d.cars[i].wheels[i, id.sort:formatter].id}');
+      assert.equal(parser.removeFormatters('    {d.cars[i].wheels[i, id.sort:formatter].id:ifEQ(..cars[0].id):print(\'sds \'):ellipsis}    '), '{d.cars[i].wheels[i, id.sort:formatter].id}');
+    });
+  });
+
   describe('flattenXML', function () {
     it('should transform XML into an array of object and find the corresponding XML tag (match)', function () {
       helper.assert(parser.flattenXML('<xml></xml>'), [
@@ -552,6 +569,12 @@ describe('parser', function () {
     });
     it('should remove whitespaces everywhere except between simple quotes', function () {
       assert.equal(parser.removeWhitespace(' <trinity>  \'the matrix  has  you\'  <neo> <the> id=5  '), '<trinity>\'the matrix  has  you\'<neo><the>id=5');
+    });
+    it('should not remove whitespaces in `ifIN` if there is an empty string in one formatter (second parameter of arrayMap)', function () {
+      // with whitespace
+      assert.equal(parser.removeWhitespace("d.arr:arrayMap(',',' ','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')"), "d.arr:arrayMap(',',' ','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')");
+      // without whitespace
+      assert.equal(parser.removeWhitespace("d.arr:arrayMap(',','','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')"), "d.arr:arrayMap(',','','source'):ifIN('HIGK LMN'):show('true'):elseShow('false')");
     });
     it('should accept escaped simple quotes', function () {
       assert.equal(parser.removeWhitespace(' <trinity>  \'the matrix \\\' has  you\'  <neo> <the> id=5  '), '<trinity>\'the matrix \\\' has  you\'<neo><the>id=5');
@@ -707,6 +730,19 @@ describe('parser', function () {
         done();
       });
     });
+    it('should be fast to translate (reDoS attack)', function (done) {
+      const _xmlReDoS = '<w:t>{d.a}</w:t>        <w:t>{</w:t>            <w:r>              <w:rPr>                <w:sz w:val="16"/>                <w:szCs w:val="16"/>                <w:lang w:val="en-MY"/>              </w:rPr>              <w:t >d.</w:t>              <w:rPr>              </w:rPr>              <w:t >b</w:t>';
+      var _start = process.hrtime();
+      parser.translate(_xmlReDoS, {}, function (err, xmlTranslated) {
+        helper.assert(err, null);
+        helper.assert(xmlTranslated, _xmlReDoS);
+        const _diff    = process.hrtime(_start);
+        const _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
+        console.log('\n sortXmlParts speed : ' + _elapsed + ' ms (usually around 0.1 ms)\n');
+        helper.assert(_elapsed < (20 * helper.CPU_PERFORMANCE_FACTOR), true);
+        done();
+      });
+    });
     /* Should be activated if we encoded others special characters (non operators special characters)
     it('should translate this sentence with special characters', function(done){
       var _objLang = {
@@ -775,7 +811,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables from the xml even if there are some xml tags everywhere', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/> =  id<bla>=2    }</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def <br/> =  id<bla>=2    }</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -784,7 +821,8 @@ describe('parser', function () {
       });
     });
     it('should work if there are whitespaces and xml in the variable name and xml tags around each braces', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#de <br> f <br> =<br>id=2  <br>}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#de <br> f <br> =<br>id=2  <br>}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><br><br><br></div></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -793,7 +831,8 @@ describe('parser', function () {
       });
     });
     it('should extract multiple variables ', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def =<br/>  id<bla>=2  }</div>{ <br> # <bla> my_Var2= <br/>  test<bla>[1=5]}</xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> def =<br/>  id<bla>=2  }</div>{ <br> # <bla> my_Var2= <br/>  test<bla>[1=5]}</xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><br/><bla></div><br><bla><br/><bla></xmlend>');
         helper.assert(variables[0].name, 'def');
@@ -804,7 +843,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables with parameters. It should replace parameters by $0, $1, ...', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b)=id=$a,g=$b}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$b)=id=$a,g=$b}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -813,7 +853,8 @@ describe('parser', function () {
       });
     });
     it('should not confuse two parameters which begin with the same word', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$ab)=id=$a,g=$ab}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{#myFn($a,$ab)=id=$a,g=$ab}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -822,7 +863,8 @@ describe('parser', function () {
       });
     });
     it('should extract variables with parameters even if there are xml tags everywhere', function (done) {
-      parser.findVariables('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> = id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>', function (err, xml, variables) {
+      const xml = parser.removeXMLInsideMarkers('<xmlstart>{me<interxml>n<bullshit>u}<div>{ <br> # <bla> myFn <tr> ( <tr> $a,$b)<tr/> = id= <tr/>$ <td>a<td> , g=$b<tf>}</div></xmlend>');
+      parser.findVariables(xml, function (err, xml, variables) {
         helper.assert(err, null);
         helper.assert(xml, '<xmlstart>{me<interxml>n<bullshit>u}<div><br><bla><tr><tr><tr/><tr/><td><td><tf></div></xmlend>');
         helper.assert(variables[0].name, 'myFn');
@@ -1329,7 +1371,7 @@ describe('parser', function () {
         part2Start : {tag : 'br', pos : 10, selfClosing : true}
       };
       var _expectedRange = {startEven : 5,  endEven : 10, startOdd : 10, endOdd : 10};
-      var _roughStart = 6;
+      var _roughStart = 5;
       helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
     });
     it('should not over-estimate the length of the repeated parts', function () {
@@ -1520,7 +1562,11 @@ describe('parser', function () {
       helper.assert(parser.isCarboneMarker('<text:span text:style-name="T3">{c.element</text:span>}'), false);
       helper.assert(parser.isCarboneMarker('  {d.value}'), false);
       helper.assert(parser.isCarboneMarker('  {   $  mealOf(2)}'), false);
+    });
 
+    it('should ignore markers which contain not printable chars (come from binary file)', function () {
+      helper.assert(parser.isCarboneMarker('{d.value\u000C}'), false);
+      helper.assert(parser.isCarboneMarker('{d.\u0000value\u000C}'), false);
     });
 
     it('should not find Carbone markers', function () {
@@ -1563,112 +1609,116 @@ describe('parser', function () {
   });
 
   describe('count formatter', function () {
-
-    describe('Preprocess', function () {
-
-      it('should assign loop id (without parenthesis)', function (done) {
-        var _xml = '<xml><p>{d.cars[i].brand:count}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
-        // eslint-disable-next-line no-unused-vars
-        var _data = {
-          cars : [
-            {brand : 'Lumeneo'},
-            {brand : 'Tesla'  },
-            {brand : 'Toyota' }
-          ]
-        };
-
-        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
-          parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(09)');
-            done();
-          });
+    it('should replace old count by new cumCount (without parenthesis)', function (done) {
+      var _xml = '<xml><p>{d.cars[i].brand:count}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+      parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+        parser.preprocessMarkers(markers, [], function (err, markers) {
+          helper.assert(markers[0].name, '_root.d.cars[i].brand:cumCount');
+          done();
         });
       });
-
-      it('should assign loop id (with parenthesis)', function (done) {
-        var _xml = '<xml><p>{d.cars[i].brand:count()}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
-        // eslint-disable-next-line no-unused-vars
-        var _data = {
-          cars : [
-            {brand : 'Lumeneo'},
-            {brand : 'Tesla'  },
-            {brand : 'Toyota' }
-          ]
-        };
-
-        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
-          parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(09)');
-            done();
-          });
-        });
-      });
-      it('should assign loop id (with start given)', function (done) {
-        var _xml = '<xml><p>{d.cars[i].brand:count(42)}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
-        // eslint-disable-next-line no-unused-vars
-        var _data = {
-          cars : [
-            {brand : 'Lumeneo'},
-            {brand : 'Tesla'  },
-            {brand : 'Toyota' }
-          ]
-        };
-
-        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
-          parser.preprocessMarkers(markers, [], function (err, markers) {
-            helper.assert(markers[0].name, '_root.d.cars[i].brand:count(09, 42)');
-            done();
-          });
-        });
-      });
-
-      it('should assign loop id (with start given)', function (done) {
-        var _xml = '<xml> <t_row> {d[speed=100,i].brand:count} </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
-        // eslint-disable-next-line no-unused-vars
-        var _data = [
-          {brand : 'Lumeneo'     , speed : 100},
-          {brand : 'Tesla motors', speed : 200},
-          {brand : 'Toyota'      , speed : 100}
-        ];
-
-        parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
-          parser.preprocessMarkers(markers, [], function () {
-            // helper.assert(markers[0].name, '_root.d.cars[i].brand:count(08, 42)')
-            done();
-          });
-        });
-      });
-
     });
-
-
-    describe('Exec', function () {
-
-      it('should return __COUNT_0_0__ each time', function () {
-        helper.assert(count('', 0), '__COUNT_0_1__');
-        helper.assert(count('', 0), '__COUNT_0_1__');
-        helper.assert(count('', 0), '__COUNT_0_1__');
+    it('should replace old count by new cumCount (without whitespaces)', function (done) {
+      var _xml = '<xml><p>{d.cars[i].brand : count   }:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+      parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+        parser.preprocessMarkers(markers, [], function (err, markers) {
+          helper.assert(markers[0].name, '_root.d.cars[i].brand:cumCount');
+          done();
+        });
       });
-
-      it('should return __COUNT_1337_42__ each time', function () {
-        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
-        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
-        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
-      });
-
-      it('should return __COUNT_1337_42__ then __COUNT_42_1337__', function () {
-        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
-        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
-        helper.assert(count('', 1337, 42), '__COUNT_1337_42__');
-
-        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
-        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
-        helper.assert(count('', 42, 1337), '__COUNT_42_1337__');
-      });
-
     });
+    it('should replace old count by new cumCount(with parenthesis)', function (done) {
+      var _xml = '<xml><p>{d.cars[i].brand:count()}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+      parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+        parser.preprocessMarkers(markers, [], function (err, markers) {
+          helper.assert(markers[0].name, '_root.d.cars[i].brand:cumCount');
+          done();
+        });
+      });
+    });
+    it('should replace old count by new cumCount (with parenthesis and whitespaces)', function (done) {
+      var _xml = '<xml><p>{d.cars[i].brand:count  (  ) }:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+      parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+        parser.preprocessMarkers(markers, [], function (err, markers) {
+          helper.assert(markers[0].name, '_root.d.cars[i].brand:cumCount');
+          done();
+        });
+      });
+    });
+    it('should replace old count by new cumCount (with start given)', function (done) {
+      var _xml = '<xml><p>{d.cars[i].brand:count(42)}:{d.cars[i].brand }</p><p>{d.cars[i+1].brand} : {d.cars[i+1].brand}</p></xml>';
+      parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+        parser.preprocessMarkers(markers, [], function (err, markers) {
+          helper.assert(markers[0].name, '_root.d.cars[i].brand:cumCount:add(41)');
+          done();
+        });
+      });
+    });
+    it('should replace old count by new cumCount (with start given, and whitespaces)', function (done) {
+      var _xml = '<xml> <t_row> {d[speed=100,i].brand:  count  (  42 )  } </t_row><t_row> {d[  speed =  100 ,  i+1].brand} </t_row></xml>';
+      parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+        parser.preprocessMarkers(markers, [], function () {
+          helper.assert(markers[0].name, '_root.d[speed=100,i].brand:cumCount:add(41)');
+          done();
+        });
+      });
+    });
+    it('should not replace formatter, which have closed name)', function (done) {
+      var _xml = '<xml> <t_row> {d[i].brand:cumcount(42):county} </t_row><t_row> {d[i+1].brand} </t_row></xml>';
+      parser.findMarkers(_xml, function (err, xmlWithoutMarkers, markers) {
+        parser.preprocessMarkers(markers, [], function () {
+          helper.assert(markers[0].name, '_root.d[i].brand:cumcount(42):county');
+          done();
+        });
+      });
+    });
+  });
 
 
+  describe('removeAndGetXMLDeclaration', function () {
+    it('should do nothing', function () {
+      helper.assert(parser.removeAndGetXMLDeclaration().xml, undefined);
+      helper.assert(parser.removeAndGetXMLDeclaration().declaration, '');
+      helper.assert(parser.removeAndGetXMLDeclaration(null).xml, null);
+      helper.assert(parser.removeAndGetXMLDeclaration(null).declaration, '');
+      helper.assert(parser.removeAndGetXMLDeclaration(Buffer.from('aa', 'utf8')).xml, Buffer.from('aa', 'utf8'));
+      helper.assert(parser.removeAndGetXMLDeclaration(Buffer.from('aa', 'utf8')).declaration, '');
+    });
+    it('should return xml without declaration, and a separate declaration', function () {
+      const _xml = ''
+                 + '<?xml version="1.0" encoding="UTF-8"?>'
+                 + '<?xml version="1.0" encoding="ISO-8859-1" ?>'
+                 + '<a><b>dd</b></a>';
+      const _res = parser.removeAndGetXMLDeclaration(_xml);
+      helper.assert(_res.xml, '<a><b>dd</b></a>');
+      helper.assert(_res.declaration, '<?xml version="1.0" encoding="UTF-8"?><?xml version="1.0" encoding="ISO-8859-1" ?>');
+    });
+  });
+
+  describe('removeMarkers', function () {
+    it('should do nothing', function () {
+      helper.assert(parser.removeMarkers(), undefined);
+    });
+    it('should replace markers by 0 by default', function () {
+      const _xml = '<xml version="{1.0}" encoding="UTF-8"/>'
+                 + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+                 + '<a><b>dd{d.id} {c.now} {#ssd = d.id}</b></a>';
+      helper.assert(parser.removeMarkers(_xml), ''
+        + '<xml version="{1.0}" encoding="UTF-8"/>'
+        + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+        + '<a><b>dd0 0 0</b></a>'
+      );
+    });
+    it('should replace markers by custom string', function () {
+      const _xml = '<xml version="{1.0}" encoding="UTF-8"/>'
+                 + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+                 + '<a><b>dd{d.id} {c.now} {#ssd = d.id}</b></a>';
+      helper.assert(parser.removeMarkers(_xml, 'azerty'), ''
+        + '<xml version="{1.0}" encoding="UTF-8"/>'
+        + '<xml version="1.0" encoding="{ISO-8859-1}"/>'
+        + '<a><b>ddazerty azerty azerty</b></a>'
+      );
+    });
   });
 
 });

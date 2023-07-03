@@ -90,6 +90,7 @@ describe('helper', function () {
   });
 
 
+
   describe('assignObjectIfAttributesExist', function () {
     it('should do nothing', function () {
       helper.assignObjectIfAttributesExist();
@@ -244,50 +245,49 @@ describe('helper', function () {
     });
   });
 
-  describe('getValueOfPath', function () {
+  describe('getSafePathCode', function () {
+    // simulate getSafeValue, which normally must return dictionary[index] to get the content of str
+    const getSafeValue = (str) => '_'+str+'_';
     it('should do nothing if object is undefined', function () {
-      helper.assert(helper.getValueOfPath(), undefined);
+      helper.assert(helper.getSafePathCode(), undefined);
     });
-    it('should get value of attribute if (first level)', function () {
-      var _obj = {
-        id : 1
-      };
-      helper.assert(helper.getValueOfPath(_obj, 'id'), 1);
+    it('should return a safe string with optional chaining', function () {
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id'), 'root?.[_id_]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id.car.auto'), 'root?.[_id_]?.[_car_]?.[_auto_]');
     });
-    it('should do nothing if object is undefined', function () {
-      var _obj = {
-        subObj : {
-          subObj : {
-            end : {
-              label : 'bla'
-            }
-          }
-        }
-      };
-      helper.assert(helper.getValueOfPath(_obj, 'subObj.subObj.end.label'), 'bla');
+    it('should return a safe string with optional chaining and arrays', function () {
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[1]'), 'root?.[_id_]?.[1]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[243][1212]'), 'root?.[_id_]?.[243]?.[1212]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[243].bus[1212].id.bidule'), 'root?.[_id_]?.[243]?.[_bus_]?.[1212]?.[_id_]?.[_bidule_]');
     });
-    it('should be fast to sort 1 Millons of rows', function () {
-      var _nbRows = 100000;
-      var _res = 0;
-      var _obj = {
-        subObj : {
-          subObj : {
-            end : {
-              val : 10
-            },
-            val : 1
-          }
-        }
-      };
-      var _start = process.hrtime();
-      var _random = ['subObj.subObj.end.val', 'subObj.subObj.val'];
-      for (var i = 0; i < _nbRows; i++) {
-        _res += helper.getValueOfPath(_obj, _random[Math.round(Math.random())]);
-      }
-      var _diff = process.hrtime(_start);
-      var _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
-      console.log('\n getValueOfPath speed : ' + _elapsed  + ' ms (usually around 30 ms) '+_res+'\n');
-      helper.assert(_elapsed < (100 * helper.CPU_PERFORMANCE_FACTOR), true);
+    it('should accept whitespaces', function () {
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', '   id [1]'), 'root?.[_id_]?.[1]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', ' id  [ 243  ]  [ 1212  ]  '), 'root?.[_id_]?.[243]?.[1212]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', ' id[243] .   bus [ 1212].id .   bidule'), 'root?.[_id_]?.[243]?.[_bus_]?.[1212]?.[_id_]?.[_bidule_]');
+    });
+    it('should return error if direct array access is not safe', function () {
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[a]'), new Error('Forbidden array access in "id[a]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[]'), new Error('Forbidden array access in "id[]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id]sd'), new Error('Forbidden array access in "id]sd". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[12][b]'), new Error('Forbidden array access in "id[12][b]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id  [  12  ] [ b ]'), new Error('Forbidden array access in "id  [  12  ] [ b ]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[undefined]'), new Error('Forbidden array access in "id[undefined]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[?/2/éxs\n*¨%£_°]'), new Error('Forbidden array access in "id[?/2/éxs\n*¨%£_°]". Only positive integers are allowed in []'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[-121]'), new Error('Forbidden array access in "id[-121]". Only positive integers are allowed in []'));
+    });
+    it('should return error if empty attributes', function () {
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', '[1]'), new Error('Forbidden array access in "[1]". Only non-empty attributes are allowed'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', '  [1]'), new Error('Forbidden array access in "  [1]". Only non-empty attributes are allowed'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', '   '), new Error('Forbidden array access in "   ". Only non-empty attributes are allowed'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id..sd'), new Error('Forbidden array access in "id..sd". Only non-empty attributes are allowed'));
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[0].di....sd'), new Error('Forbidden array access in "id[0].di....sd". Only non-empty attributes are allowed'));
+    });
+    it('should accept dynamic array direct access with .i', function () {
+      const _currentIterators = ['it1', 'it2'];
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[.i]', _currentIterators), 'root?.[_id_]?.[it2]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[..i]', _currentIterators), 'root?.[_id_]?.[it1]');
+      helper.assert(helper.getSafePathCode(getSafeValue, 'root', 'id[..i].toto.titi[.i].id', _currentIterators), 'root?.[_id_]?.[it1]?.[_toto_]?.[_titi_]?.[it2]?.[_id_]');
+      assert.throws(() => helper.getSafePathCode(getSafeValue, 'root', 'id[...i]', _currentIterators), new Error('Forbidden array access in "id[...i]". No array iterators matching with ...i'));
     });
   });
 
@@ -553,27 +553,31 @@ describe('helper', function () {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
       generateLicense(path.join(_testDir, 'acm.otherfile')                  , 123, 'carbone-ee-on-premise', 10000, badPrivKey, _data);
       generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 10000, badPrivKey, _data);
-      generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 10000, privKey   , _data);
-      generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 10000, badPrivKey   , _data);
-      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
-        helper.assert(isValid, true);
-        helper.assert(message, 'Valid license file.carbone-license');
-        helper.assert(payload.data.plan, 'eternity');
-        done();
-      }, '2020-12-29T15:47:12.636Z');
+      setTimeout(()=> {
+        generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 10000, privKey   , _data);
+        generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 10000, badPrivKey   , _data);
+        helper.findCheckLicense({ licenseDir : _testDir }, pubKey, (isValid, message, payload) => {
+          helper.assert(isValid, true);
+          helper.assert(message, 'Valid license file.carbone-license');
+          helper.assert(payload.data.plan, 'eternity');
+          done();
+        }, '2020-12-29T15:47:12.636Z');
+      }, 1100);
     });
     it('should read a directory and select the most recent *.carbone-license file (invalid)', function (done) {
       let _data = { name : 'Acme', address : 'FR', email : 'client@email.com', startedAt : _createAt, plan : 'eternity' };
       generateLicense(path.join(_testDir, 'acm.otherfile')                  , 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
       generateLicense(path.join(_testDir, 'file.carbone-license')           , 123, 'carbone-ee-on-premise', 5000, privKey   , _data);
-      generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
-      generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
-      helper.findCheckLicense({ licenseDir: _testDir }, pubKey, (isValid, message, payload) => {
-        helper.assert(isValid, false);
-        helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
-        helper.assert(payload, undefined);
-        done();
-      }, '2020-12-29T15:47:12.636Z');
+      setTimeout(()=> {
+        generateLicense(path.join(_testDir, 'acme_2020-10-10.carbone-license'), 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
+        generateLicense(path.join(_testDir, 'license.txt')                    , 123, 'carbone-ee-on-premise', 5000, badPrivKey, _data);
+        helper.findCheckLicense({ licenseDir : _testDir }, pubKey, (isValid, message, payload) => {
+          helper.assert(isValid, false);
+          helper.assert(message, 'Invalid license acme_2020-10-10.carbone-license');
+          helper.assert(payload, undefined);
+          done();
+        }, '2020-12-29T15:47:12.636Z');
+      }, 1100);
     });
 
 
@@ -922,6 +926,9 @@ describe('helper', function () {
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif'), 'gif');
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg'), 'jpeg');
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt'), 'txt');
+    });
+    it('should lower case extension to normalize', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.JPG'), 'jpg');
     });
     it('should return a png/jpeg/gif/txt extension with query parameters', function () {
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png?fewfw=223&lala=few'), 'png');

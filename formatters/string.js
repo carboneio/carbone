@@ -3,6 +3,7 @@ var toMd5 = require('./md5');
 
 const LINEBREAK = {
   odt  : '<text:line-break/>',
+  ods  : '</text:p><text:p>',
   docx : '</w:t><w:br/><w:t>'
 };
 
@@ -163,13 +164,14 @@ function unaccent (d) {
 
 
 /**
- * Convert carriage return `\\r\\n` and line feed `\\n` to XML-specific code in rendered document
+ * It renders carriage return `\\r\\n` and line feed `\\n` into documents instead of printing them as a string.
+ * Importante notes:
+ * - Feature supported for DOCX, PDF, ODT, and ODS files.
+ * - ODS supports is experimental for now, contact the support if you find issues.
+ * - Since `v3.5.3`, using the `:convCRLF` formatter before `:html` converts `\\n` to `<br>` tags. Usage example: `{d.content:convCRLF:html}`
+
  *
- * Since v3.5.3, it can be used before `:html` formatter to convert `\n` to `<br>` tags
- *
- * Compatible with odt, and docx (beta)
- *
- * @version 1.1.0
+ * @version 4.1.0
  *
  * @exampleContext { "extension" : "odt" }
  * @example [ "my blue \\n car"   ]
@@ -193,6 +195,7 @@ function convCRLF (d) {
 }
 // this formatter is separately to inject code
 convCRLF.canInjectXML = true;
+convCRLF.isExecutionNotConditionnalyExecuted;
 
 /**
  * Specific formatter used to replace, when convCRLF is used before :html formatter
@@ -212,23 +215,67 @@ function convCRLFH (d) {
 /**
  * Slice a string with a begin and an end
  *
- * @version 1.2.0
+ * @version 4.12.0 new
  *
  * @example ["foobar" , 0  , 3 ]
  * @example ["foobar" , 1      ]
  * @example ["foobar" , -2     ]
  * @example ["foobar" , 2  , -1]
+ * @example ["abcd efg hijklm" , 0 , 11, true]
+ * @example ["abcd efg hijklm" , 1 , 11, true]
  *
  * @param {String} d
- * @param {Integer} begin Zero-based index at which to begin extraction.
- * @param {Integer} end Zero-based index before which to end extraction
+ * @param {Integer} begin      Zero-based index at which to begin extraction.
+ * @param {Integer} end        [optional] Zero-based index before which to end extraction
+ * @param {Boolean} wordMode   [optional]  if true, it never cuts words (default: false)
  * @return {String} return the formatted string
  */
-function substr (d, begin, end) {
-  if (typeof d === 'string') {
-    return d.slice(begin, end);
+function substr (d, begin, end, wordMode = false) {
+  if (typeof d !== 'string') {
+    return d;
   }
-  return d;
+  begin = parseInt(begin, 10);
+  end = parseInt(end, 10);
+  if (wordMode === true || wordMode === 'true') {
+    const _posOfCharBeforeBegin = (begin === 0) ? 0 : (begin - 1);
+    const _posOfCharAfterEnd = (end === -1) ? d.length - 1 : (end + 1);
+    const _text = d.slice(_posOfCharBeforeBegin, _posOfCharAfterEnd);
+    let _newBegin = begin !== 0 ? 1 : 0;
+    let _newEnd = end >= d.length ? _text.length :  _text.length-1;
+    if (_text[0] !== ' ' && _posOfCharBeforeBegin !== 0) {
+      _newBegin = _text.indexOf(' ');
+    }
+    if (_text[_text.length - 1] !== ' ' && _posOfCharAfterEnd < d.length) {
+      _newEnd = _text.lastIndexOf(' ') + 1;
+    }
+    return _newBegin !== -1 && _newEnd !== -1 ? _text.slice(_newBegin, _newEnd) : '';
+  }
+  return d.slice(begin, end);
+}
+
+/**
+ * Split a string using a delimiter
+ *
+ * It can be used with `arrayJoin('', 1, 2)` to select one specific item of the generated array
+ *
+ * @version 4.12.0 new
+ *
+ * @example ["abcdefc12", "c" ]
+ * @example [1222.100   , "." ]
+ * @example ["ab/cd/ef" , "/" ]
+ *
+ * @param  {String}  d
+ * @param  {String}  delimiter  The delimiter
+ * @return {Array}              return an array, which can be filtered and join with arrayJoin
+ */
+function split (d, delimiter) {
+  if (d === null || d === undefined) {
+    return d;
+  }
+  if (delimiter instanceof RegExp) {
+    delimiter = null;
+  }
+  return (d+'').split(delimiter);
 }
 
 /**
@@ -295,12 +342,120 @@ function padr (d, targetLength, padString) {
   return d;
 }
 
+/**
+ * Add "..." if the text is too long
+ *
+ * @version 4.12.0 new
+ *
+ * @example ["abcdef" , 3 ]
+ * @example ["abcdef" , 6 ]
+ * @example ["abcdef" , 10]
+ *
+ * @param {String} d
+ * @param {Integer} maximum number of characters to print.
+ * @return {String} return the formatted string
+ */
+function ellipsis (d, maxLength) {
+  if (typeof d !== 'string') {
+    return d;
+  }
+  return d.length <= maxLength ? d : d.slice(0, maxLength) + '...';
+}
+
 function md5 (d) {
   return toMd5(d);
 }
 
-function prepend (d, toPrepend) {
-  return toPrepend + d;
+/**
+ * add a prefix to a text
+ *
+ * @version 4.12.0 new
+ *
+ * @example ["abcdef", "123" ]
+ *
+ * @param   {string}  d
+ * @param   {string}  textToPrepend  text to prepend
+ * @return  {string}  return textToPrepend + d
+ */
+function prepend (d, textToPrepend) {
+  return (textToPrepend ?? '') + '' + (d ?? '');
+}
+
+/**
+ * Add a suffix to a text
+ *
+ * @version 4.12.0 new
+ *
+ * @example ["abcdef", "123" ]
+ *
+ * @param   {string}  d
+ * @param   {string}  textToAppend  text to append
+ * @return  {string}  return d + textToAppend
+ */
+function append (d, textToAppend = '') {
+  return (d ?? '') + '' + (textToAppend ?? '');
+}
+
+/**
+ * Replace a text based on a pattern
+ *
+ * All matches of the pattern (first argument: `oldText`) is replaced by the replacement string (second argument: `newText`).
+ * The pattern can only be a string.
+ *
+ * @version 4.12.0 new
+ *
+ * @example [ "abcdef abcde", "cd", "OK" ]
+ * @example [ "abcdef abcde", "cd"       ]
+ * @example [ "abcdef abcde", "cd", null ]
+ * @example [ "abcdef abcde", "cd", 1000 ]
+ *
+ * @param   {string}  d
+ * @param   {string}  oldText  old text to replace
+ * @param   {string}  newText  new text
+ * @return  {string}  return text with replaced text
+ */
+function replace (d, oldText, newText = '') {
+  if (oldText instanceof RegExp) {
+    return d;
+  }
+  return ((d ?? '') + '').replaceAll(oldText, newText ?? '');
+}
+
+/**
+ * Neutral for array filters
+ *
+ * This formatter can be used to "ignore" Carbone tags if an array filter is used.
+ * For example:
+ *   XML: {d[i, id>0].id} {c.now:neutralForArrayFilter:somethingElse} {d[i, id>0].name}
+ *
+ * Array filters works only if all Carbone tags are filtered. But `{c.now}` has no filter, so it will print all
+ * rows of the d[] array because there is at least one Carbone tag without a filter.
+ * With :neutralForArrayFilter formatter, we can tell to Carbone: "filter array rows regardless the presence of this Carbone tag"
+ *
+ * @private
+ */
+function neutralForArrayFilter (d) {
+  return d;
+}
+
+
+/**
+ * Returns the length of a string or array.
+ *
+ * @version 2.0.0
+ * @example ["Hello World"]
+ * @example [""]
+ * @example [[1, 2, 3, 4, 5]]
+ * @example [[1, "Hello"]]
+ *
+ * @param {Mixed} d Array or String
+ * @returns {Number} Length of the element
+ */
+function len (d) {
+  if (typeof d === 'string' || Array.isArray(d)) {
+    return d.length;
+  }
+  return 0;
 }
 
 module.exports = {
@@ -316,8 +471,14 @@ module.exports = {
   slice     : substr,
   padl      : padl,
   padr      : padr,
+  len       : len,
   md5       : md5,
   prepend   : prepend,
+  append    : append,
+  ellipsis  : ellipsis,
+  replace   : replace,
+  split     : split,
+  neutralForArrayFilter : neutralForArrayFilter,
   // private
   convCRLFH : convCRLFH
 };

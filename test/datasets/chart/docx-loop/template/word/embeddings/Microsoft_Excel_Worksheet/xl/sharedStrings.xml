@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="9" uniqueCount="9">
+  <si>
+    <t>
+      Colonne1
+    </t>
+  </si>
+  <si>
+    <t>
+      Col1
+    </t>
+  </si>
+  <si>
+    <t>
+      Col2
+    </t>
+  </si>
+  <si>
+    <t>
+      {d.charts[i].data[i].label}
+    </t>
+  </si>
+  <si>
+    <t>
+      {d.charts[i].data[i].valCol1}
+    </t>
+  </si>
+  <si>
+    <t xml:space="preserve">
+      {d.charts[i].data[i].valCol2}
+    </t>
+  </si>
+  <si>
+    <t xml:space="preserve">
+      {d.charts[i].data[i+1].label}
+    </t>
+  </si>
+  <si>
+    <t>
+      {d.charts[i].data[i+1].valCol1}
+    </t>
+  </si>
+  <si>
+    <t xml:space="preserve">
+      {d.charts[i].data[i+1].valCol2}
+    </t>
+  </si>
+</sst>

@@ -328,6 +328,78 @@ function ifNIN (d, value) {
   return d;
 }
 
+
+/**
+ * Tests the type of the operand's value.
+ *
+ * @version 4.4.0 new
+ * @exampleContextFormatter [ 0        , "string" ] false
+ * @exampleContextFormatter [ [23]     , "string" ] false
+ * @exampleContextFormatter [ {"id":3} , "string" ] false
+ * @exampleContextFormatter [ null     , "string" ] false
+ * @exampleContextFormatter [ []       , "string" ] false
+ * @exampleContextFormatter [ {}       , "string" ] false
+ * @exampleContextFormatter [ "10"     , "string" ] true
+ * @exampleContextFormatter [ "homer"  , "string" ] true
+ * @exampleContextFormatter [ ""       , "string" ] true
+ * @exampleContextFormatter [ true     , "boolean" ] true
+ * @exampleContextFormatter [ false    , "boolean" ] true
+ * @exampleContextFormatter [ "0"      , "boolean" ] false
+ * @exampleContextFormatter [ "false"  , "boolean" ] false
+ * @exampleContextFormatter [ "0"      , "binary" ] true
+ * @exampleContextFormatter [ "1"      , "binary" ] true
+ * @exampleContextFormatter [ false    , "binary" ] true
+ * @exampleContextFormatter [ "false"  , "binary" ] true
+ * @exampleContextFormatter [ 10.5     , "number" ] true
+ * @exampleContextFormatter [ "10.5"   , "number" ] false
+ *
+ * @param {Integer|String|Array} d
+ * @param {String} type can be "string", "number", "integer", "boolean", "binary", "object", "array"
+ * @returns It returns the initial value `d`. The state of the condition is not returned.
+ */
+function ifTE (d, type) {
+  var _result = false;
+  switch (type) {
+    case 'array':
+      _result = (d instanceof Array);
+      break;
+    case 'object':
+      _result = !(d instanceof Array) && (d instanceof Object) && (typeof d !== 'function');
+      break;
+    case 'string':
+    case 'boolean':
+      _result = typeof(d) === type;
+      break;
+    case 'number':
+      _result = typeof(d) === 'number' && !isNaN(d);
+      break;
+    case 'binary':
+      _result = typeof(d) === 'boolean' || d === 'true' || d === 'false' || /^[01]$/.test(d);
+      break;
+    case 'integer':
+      _result = typeof(d) === 'number' && d % 1 === 0 && !isNaN(d);
+      break;
+    /**
+     * @private
+     *
+    If somebody asks:
+    case 'decimal':
+      _result = typeof(d) === 'number' || /^-?[0-9]+(\\.[0-9]+)?$/.test(d);
+      break;
+    case 'alpha':
+      _result = typeof(d) === 'string' && /^[a-zA-Z]+$/.test(d);
+      break;
+    case 'numeric':
+      _result = /^-?[0-9]+$/.test(d);
+      break;
+    case 'alphanumeric':
+      _result = typeof(d) === 'string' && /^[0-9a-zA-Z]+$/.test(d);
+      break; */
+  }
+  this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
+  return d;
+}
+
 /**
  * Print a message if the condition is true. It should be used with other formatters to print conditional content.
  *
@@ -344,6 +416,8 @@ function show (d, message) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+show.isUpdatingPropagation = true;
 
 /**
  * Print a message if the condition is false. It should be used with other formatters to print conditional content.
@@ -359,6 +433,8 @@ function elseShow (d, message) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+elseShow.isUpdatingPropagation = true;
 
 /**
  * Show a text block between showBegin and showEnd if the condition is true
@@ -374,6 +450,9 @@ function showBegin (d) {
   }
   return '';
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+showBegin.isUpdatingPropagation = true;
+
 
 /**
  * show a text block between showBegin and showEnd if the condition is true
@@ -399,6 +478,8 @@ function hideBegin (d) {
   }
   return '';
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+hideBegin.isUpdatingPropagation = true;
 
 /**
  * hide text block between hideBegin and hideEnd if the condition is true
@@ -410,24 +491,6 @@ function hideEnd () {
   return '';
 }
 
-/**
- * Returns the length of a string or array.
- *
- * @version 2.0.0
- * @example ["Hello World"]
- * @example [""]
- * @example [[1, 2, 3, 4, 5]]
- * @example [[1, "Hello"]]
- *
- * @param {Mixed} d Array or String
- * @returns {Number} Length of the element
- */
-function len (d) {
-  if (typeof d === 'string' || Array.isArray(d)) {
-    return d.length;
-  }
-  return 0;
-}
 
 /**
  * Test if data is empty (null, undefined, [], {}, ...). The new formatter `ifEM` should be used instead of this one.
@@ -462,6 +525,8 @@ function ifEmpty (d, message, continueOnSuccess) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+ifEmpty.isUpdatingPropagation = true;
 
 /**
  * Test if a value equals a variable. The new formatter `ifEQ` should be used instead of this one.
@@ -493,6 +558,8 @@ function ifEqual (d, value, messageIfTrue, continueOnSuccess) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+ifEqual.isUpdatingPropagation = true;
 
 /**
  * Test if a string or an array contains a value. The new formatter `ifIN` should be used instead of this one.
@@ -524,6 +591,8 @@ function ifContain (d, value, messageIfTrue, continueOnSuccess) {
   }
   return d;
 }
+// Tells the builder this formatter can update the state of this.stopPropagation to generate optimized code
+ifContain.isUpdatingPropagation = true;
 
 /**
  * Detect conditional block begin/end
@@ -562,6 +631,7 @@ module.exports = {
   ifLTE,
   ifIN,
   ifNIN,
+  ifTE,
   hideBegin,
   hideEnd,
   showBegin,
@@ -570,5 +640,5 @@ module.exports = {
   elseShow,
   and,
   or,
-  len
+  hide : () => ''
 };

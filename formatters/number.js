@@ -260,6 +260,47 @@ function div (d, value) {
 }
 div.isAcceptingMathExpression = true;
 
+
+/**
+ * Compute modulo
+ *
+ * @version 4.5.2 new
+ *
+ * @example [4 ,  2 ]
+ * @example [3 ,  2 ]
+ *
+ * @param   {Number}  d       X
+ * @param   {Number}  value   Y
+ * @return  {Number}          Result = X mod Y
+ */
+function mod (d, value) {
+  if (d !== null && typeof d !== 'undefined') {
+    return parseFloat(d) % parseFloat(value);
+  }
+  return d;
+}
+
+/**
+ * Get absolute value 
+ *
+ * @version 4.12.0 new
+ *
+ * @example [-10    ]
+ * @example [-10.54 ]
+ * @example [10.54  ]
+ * @example ["-200" ]
+ *
+ * @param   {Number}  d   value
+ * @return  {Number}      Always a positive number
+ */
+function abs (d) {
+  if (d !== null && typeof d !== 'undefined') {
+    return Math.abs(parseFloat(d));
+  }
+  return d;
+}
+
+
 module.exports = {
   formatN  : formatN,
   formatC  : formatC,
@@ -268,7 +309,9 @@ module.exports = {
   add      : add,
   sub      : sub,
   mul      : mul,
+  mod      : mod,
   div      : div,
+  abs      : abs,
 
   /**
    * Converts a number to an INT

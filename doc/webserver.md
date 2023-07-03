@@ -29,12 +29,13 @@ Carbone On-premise can be installed in different ways:
 ### Basic Installation
 
 1. Download the license and the Carbone On-premise binary for server/OS: Mac, Linux or Windows
-2. Install LibreOffice (Optional). [Link to instructions](#How-and-why-install-LibreOffice?).
-3. Prepare the license key to be loaded, multiple solution:
+2. On your terminal run `chmod +x carbone-ee` in order to execute the binary.
+3. Install LibreOffice (Optional, if you need to generate PDF, you must install Libre Office) [Link to instructions](#how-and-why-install-libreoffice).
+4. Prepare the license key to be loaded, multiple solution:
    - Set the Environment Variable `CARBONE_EE_LICENSE` with the license key as the value
    - Or pass the CLI option `--license` followed by the license key as the value when you start the server (step 4)
    - Or insert the **license** file in the "config" directory. If the directory doesn't exist, it must be created next to the Carbone On-premise binary. If multiple licenses are available, only the latest license is selected. The binary can't start if the license is outdated or invalid.
-4. Start Carbone web server or [daemonize it with systemd](#installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#carbone-options-overview) to Carbone On-Premise through the CLI:
+5. Start Carbone web server or [daemonize it with systemd](#installation-from-systemd-(Ubuntu/Debian-ONLY)). It is possible to pass [options](#carbone-options-overview) to Carbone On-Premise through the CLI:
 
 ```bash
   ./carbone webserver --port 4000 --workdir .
@@ -43,8 +44,6 @@ Carbone On-premise can be installed in different ways:
 If an error appears during the start up, you must verify:
 - if your license is valid
 - if CLI options and values are valid
-
-You must install LibreOffice to generate PDF documents, [read instructions](#how-and-why-install-libreoffice).
 
 ### Installation from systemd
 
@@ -64,8 +63,10 @@ The service is configured to run with "carbone" user (automatically created) in 
 It is possible to overwrite values through environment variables `CARBONE_USER` and `CARBONE_WORKDIR`.
 
 You must install LibreOffice to generate PDF documents, [read instructions](#how-and-why-install-libreoffice).
+
 ## How and why install LibreOffice?
-#### on OSX
+
+#### on OSX and Windows
 
 - Install LibreOffice normally using the stable version from https://www.libreoffice.org/
 
@@ -81,14 +82,14 @@ You must install LibreOffice to generate PDF documents, [read instructions](#how
   # Download LibreOffice debian package. Select the right one (64-bit or 32-bit) for your OS.
   # Get the latest from http://download.documentfoundation.org/libreoffice/stable
   # or download the version currently "carbone-tested":
-  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.1.5.2/deb/x86_64/LibreOffice_7.1.5.2_Linux_x86-64_deb.tar.gz
+  wget https://downloadarchive.documentfoundation.org/libreoffice/old/7.4.1.1/deb/x86_64/LibreOffice_7.4.1.1_Linux_x86-64_deb.tar.gz
 
   # Install required dependencies on ubuntu server for LibreOffice 7.0+
   sudo apt install libxinerama1 libfontconfig1 libdbus-glib-1-2 libcairo2 libcups2 libglu1-mesa libsm6
 
   # Uncompress package
-  tar -zxvf LibreOffice_7.1.5.2_Linux_x86-64_deb.tar.gz
-  cd LibreOffice_7.1.5.2_Linux_x86-64_deb/DEBS
+  tar -zxvf LibreOffice_7.4.1.1_Linux_x86-64_deb.tar.gz
+  cd LibreOffice_7.4.1.1_Linux_x86-64_deb/DEBS
 
   # Install LibreOffice
   sudo dpkg -i *.deb
@@ -186,8 +187,9 @@ If an option is reported in different places, CLI options are picked in priority
 | attempts       | 1                | If LibreOffice fails to convert one document, `attempts` options set the number of re-try | --attemps / -a | CARBONE_EE_ATTEMPTS  |
 | authentication | false            | [Authentification documentation at the following link](#authentication-option) | --authentication / -A |  CARBONE_EE_AUTHENTICATION |
 | studio         | false            | Web interface to preview reports. [Learn more.](#carbone-studio-light)                             | --studio / -s | CARBONE_EE_STUDIO |
-| studioUser         | admin:pass  | If the authentication option is enabled, the browser requests an authentication to access the web page. Credentials have to be formated, such as: `[username]:[password]`.                             | --studioUser / -S | CARBONE_EE_STUDIOUSER |
-| maxDataSize         |  60MB  | Maximum JSON data size accepted when rendering a report, the value must be **bytes**. Calcul example: 100 * 1024 * 1024 = 100MB | --maxDataSize / -mds | CARBONE_EE_MAXDATASIZE |
+| studioUser         | ''  | If the authentication option is enabled and this field contains more than two characters, Carbone accepts a basic authentication (do not use for production). Credentials have to be formated, such as: `[username]:[password]`.                             | --studioUser / -S | CARBONE_EE_STUDIOUSER |
+| maxDataSize         |  60MB  | Maximum JSON data size accepted when rendering a report, the value must be **bytes**. Example: 100 * 1024 * 1024 = 100MB | --maxDataSize / -mds | CARBONE_EE_MAXDATASIZE |
+| maxTemplateSize     |  20MB  | Maximum template size, the value must be **bytes**. Example: 100 * 1024 * 1024 = 100MB |  | CARBONE_EE_MAXTEMPLATESIZE |
 | templatePathRetention         | 0            | Template path retention in days. 0 means infinite retention. | --templatePathRetention / -r | CARBONE_EE_TEMPLATEPATHRETENTION |
 | lang         | en            | Locale language used by Carbone | --lang / -l  | CARBONE_EE_EN |
 | timezone         | Europe/Paris  |  Timezone for managing dates | --timezone / -t | CARBONE_EE_TIMEZONE |
@@ -196,6 +198,7 @@ If an option is reported in different places, CLI options are picked in priority
 | currencyRates          | `{ EUR : 1, USD : 1.14, ... }` | Currency rates, it is based on EUR which should be equals to "1". The option can only be set on the `config/config.json` file. |  | |
 | translations          | `{}` | Translation object loaded at startup. It can be overwritten by rendering requests. The option can only be set on the `config/config.json` file.  |  | |
 | converterFactoryTimeout  | 60000  | Maximum conversion/socket timeout for one render (unit: ms) |  | CARBONE_EE_CONVERTERFACTORYTIMEOUT |
+| xlsmEnabled  | false  | Accept xlsm export | --xlsmEnabled / -xe | CARBONE_EE_XLSMENABLED |
 
 
 ### CLI options
@@ -211,6 +214,12 @@ Here is an example of passing options to the service:
 ```bash
 ./carbone webserver --port 4001 --factories 4 --workdir /var/www/carbone --attemps 2 --authentication --studio
 ```
+
+When Carbone receives SIGTERM signal, (what we call "SOFT STOP")
+- The GET /status API returns HTTP status 503 instead of 200. It can be used as a trigger (liveness, readiness probes) for a load balancer ... kubernetes
+- If there is no report generation in progress, it will exist within 15 seconds.
+- If there is a report in progress, it waits until the process is finished before exiting
+- After 5 minutes, it still exists, even if there is some report generation in progress
 
 ### Configuration file options
 To use a configuration file, `config.json` must be created in the `config` folder. Here is an example of a configuration:
@@ -490,13 +499,13 @@ const path = require('path');
  */
 function getPublicKey (req, res, payload, callback) {
   // Read the public key on disk or somewhere else
-  fs.readFile(path.join(__dirname, '..', 'config', 'key.pub'), 'utf8', (err, content) => {
+  fs.readFile(path.join(__dirname, '..', 'config', 'key.pub'), 'utf8', (err, publicKey) => {
     if (err) {
-      return callback(new Error('Cannot read public key ' + err.toString()));
+      return callback(new Error('Cannot read public key ' + err.toString()), null);
     }
 
-    // Return the public key content in the callback
-    return callback(content)
+    // Return the public key publicKey in the callback
+    return callback(null, publicKey)
   });
 }
 

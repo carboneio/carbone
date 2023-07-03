@@ -234,14 +234,14 @@ function substr (d, begin, end, wordMode = false) {
   if (typeof d !== 'string') {
     return d;
   }
-  begin = parseInt(begin, 10);
-  end = parseInt(end, 10);
   if (wordMode === true || wordMode === 'true') {
-    const _posOfCharBeforeBegin = (begin === 0) ? 0 : (begin - 1);
-    const _posOfCharAfterEnd = (end === -1) ? d.length - 1 : (end + 1);
+    const _begin = parseInt(begin, 10);
+    const _end = end !== undefined ? parseInt(end, 10) : d.length;
+    const _posOfCharBeforeBegin = (_begin === 0) ? 0 : (_begin - 1);
+    const _posOfCharAfterEnd = (_end === -1) ? d.length - 1 : (_end + 1);
     const _text = d.slice(_posOfCharBeforeBegin, _posOfCharAfterEnd);
-    let _newBegin = begin !== 0 ? 1 : 0;
-    let _newEnd = end >= d.length ? _text.length :  _text.length-1;
+    let _newBegin = _begin !== 0 ? 1 : 0;
+    let _newEnd = _end >= d.length ? _text.length :  _text.length-1;
     if (_text[0] !== ' ' && _posOfCharBeforeBegin !== 0) {
       _newBegin = _text.indexOf(' ');
     }

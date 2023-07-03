@@ -1521,27 +1521,31 @@ describe('formatter', function () {
       helper.assert(stringFormatter.substr('abcdef', -2, 100), 'ef');
       helper.assert(stringFormatter.substr('coucou', '3', '5'), 'co');
       helper.assert(stringFormatter.substr('abcdef', '-2', '100'), 'ef');
+      helper.assert(stringFormatter.substr('abcdef', '1'), 'bcdef');
+      helper.assert(stringFormatter.substr('abcdef', 1), 'bcdef');
     });
     it('should not crash if data is null or undefined', function () {
       helper.assert(stringFormatter.substr(null, 0, 3), null);
       helper.assert(stringFormatter.substr(undefined, 0, 3), undefined);
       helper.assert(stringFormatter.substr([], 0, 3), []);
       helper.assert(stringFormatter.substr(2, 0, 3), 2);
-      helper.assert(stringFormatter.substr('abcdef', undefined, undefined), '');
+      helper.assert(stringFormatter.substr('abcdef', undefined, undefined), 'abcdef');
       helper.assert(stringFormatter.substr('abcdef', null, null), '');
       helper.assert(stringFormatter.substr('abcdef', [], []), '');
     });
     it('should keep only the selection of characters but do not cut words if the third paramater is true. The returned text can be shorter', function () {
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 2, true)     , '');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, false)   , 'coucou donotcutme  d');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, true)    , 'coucou donotcutme  ');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, 'true')  , 'coucou donotcutme  ');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 27, true)    , 'coucou donotcutme  donotcut');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 40, true)    , 'coucou donotcutme  donotcut   other');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 6, true)     , 'coucou');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 6, 28, true)    , ' donotcutme  donotcut ');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 1000, true) , '  other');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 35, true)   , '  other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 2, true)         , '');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, false)       , 'coucou donotcutme  d');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, true)        , 'coucou donotcutme  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 20, 'true')      , 'coucou donotcutme  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 27, true)        , 'coucou donotcutme  donotcut');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 40, true)        , 'coucou donotcutme  donotcut   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, 6, true)         , 'coucou');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 6, 28, true)        , ' donotcutme  donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 6, undefined, true) , ' donotcutme  donotcut   other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', '6', '28', true)    , ' donotcutme  donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 1000, true)     , '  other');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 35, true)       , '  other');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', '0', '20', 'true')  , 'coucou donotcutme  ');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', '6', '28', true)    , ' donotcutme  donotcut ');
 
@@ -1551,6 +1555,7 @@ describe('formatter', function () {
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -6, true)    , 'coucou donotcutme  donotcut  ');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -7, true)    , 'coucou donotcutme  donotcut ');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -8, true)    , 'coucou donotcutme  donotcut');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', '0', '-8', true), 'coucou donotcutme  donotcut');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -9, true)    , 'coucou donotcutme  ');
 
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', -16, 28, true)    , 'donotcut ');

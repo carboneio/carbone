@@ -24,7 +24,7 @@
  * @param  {Number} count       [optional] number of items to select from `index`. `count` can be a negative number to select N items from the end of the array.
  * @return {String}             computed result, or `d` if `d` is not an array
  */
-function arrayJoin (d, separator, index = 0, count) {
+function arrayJoin (d, separator, index = 0, count ) {
   if (separator === undefined) {
     separator = ', ';
   }
@@ -35,9 +35,11 @@ function arrayJoin (d, separator, index = 0, count) {
     separator = '\r\n';
   }
   if (d instanceof Array) {
+    index = parseInt(index, 10);
     if (index === 0 && count === undefined) {
       return d.join(separator);
     }
+    count = typeof count === 'string' ? parseInt(count, 10) : count;
     return d.slice(index, (count > 0 ? index+count : count) ).join(separator);
   }
   return d;

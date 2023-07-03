@@ -234,6 +234,8 @@ function substr (d, begin, end, wordMode = false) {
   if (typeof d !== 'string') {
     return d;
   }
+  begin = parseInt(begin, 10);
+  end = parseInt(end, 10);
   if (wordMode === true || wordMode === 'true') {
     const _posOfCharBeforeBegin = (begin === 0) ? 0 : (begin - 1);
     const _posOfCharAfterEnd = (end === -1) ? d.length - 1 : (end + 1);

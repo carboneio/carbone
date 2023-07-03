@@ -1429,17 +1429,49 @@ describe('builder.buildXML', function () {
       done();
     });
   });
-  it.only('it should filter with null or undefined values', function (done) {
-    var _xml = '<xml> <t_row> {d[brand=null, brand=undefined].id} </t_row><t_row> {d[brand=null,brand=undefined].id} </t_row></xml>';
+  it('it should filter with null or undefined values', function (done) {
+    var _xml = '<xml> <t_row> {d[brand=null].id} </t_row><t_row> {d[brand=undefined].id} </t_row></xml>';
     var _data = [
       {brand : 'Lumeneo'     , id : 1},
-      {brand : null, id : 2},
-      {brand : 'Toyota'      , id : 3},
-      {brand : undefined      , id : 4},
-      {brand : 'tesla'      , id : 5}
+      {brand : null          , id : 2},
+      {brand : 'Toyota'      , id : 4},
+      {brand : undefined     , id : 5},
+      {brand : 'tesla'       , id : 7}
     ];
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      helper.assert(_xmlBuilt, '<xml> <t_row> 2 </t_row><t_row> 4 </t_row></xml>');
+      helper.assert(_xmlBuilt, '<xml> <t_row> 2 </t_row><t_row> 5 </t_row></xml>');
+      done();
+    });
+  });
+  it('it should filter with null  values with a loop', function (done) {
+    var _xml = '<xml> <t_row> {d[brand=null, i].id} </t_row><t_row> {d[brand=null, i+1].id} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : 1},
+      {brand : null          , id : 2},
+      {brand : 'null'        , id : 3},
+      {brand : 'Toyota'      , id : 4},
+      {brand : undefined     , id : 5},
+      {brand : 'undefined'   , id : 6},
+      {brand : 'tesla'       , id : 7}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> 2 </t_row><t_row> 3 </t_row></xml>');
+      done();
+    });
+  });
+  it('it should filter with undefined values with a loop', function (done) {
+    var _xml = '<xml> <t_row> {d[brand=undefined, i].id} </t_row><t_row> {d[brand=undefined, i+1].id} </t_row></xml>';
+    var _data = [
+      {brand : 'Lumeneo'     , id : 1},
+      {brand : null          , id : 2},
+      {brand : 'null'        , id : 3},
+      {brand : 'Toyota'      , id : 4},
+      {brand : undefined     , id : 5},
+      {brand : 'undefined'   , id : 6},
+      {brand : 'tesla'       , id : 7}
+    ];
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> 5 </t_row><t_row> 6 </t_row></xml>');
       done();
     });
   });

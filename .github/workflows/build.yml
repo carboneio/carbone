@@ -40,22 +40,22 @@ jobs:
       - run: git add "package.json"
       - run: git commit -n -m "Save date in package.json"
       - run: git push
-      # - run: git tag ${{env.CARBONE_EE_TAG}}
-      # - run: git push origin ${{env.CARBONE_EE_TAG}}
+      - run: git tag ${{env.CARBONE_EE_TAG}}
+      - run: git push origin ${{env.CARBONE_EE_TAG}}
 
-      #- name: Create Release
-      #  id: create_release
-      #  uses: actions/create-release@v1
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #  with:
-      #    tag_name: ${{ env.CARBONE_EE_TAG }}
-      #    release_name: "v${{ env.PACKAGE_VERSION }}"
-      #    draft: false
-      #    prerelease: false
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.CARBONE_EE_TAG }}
+          release_name: "v${{ env.PACKAGE_VERSION }}"
+          draft: false
+          prerelease: false
 
       # Let Github creates its release before uploading to avoid errors
-      #- run: sleep 40s
+      - run: sleep 60s
 
       # We use hub CLI because actions/upload-release-asset@v1 does not support to upload multiple release files in one job
       - name: Upload

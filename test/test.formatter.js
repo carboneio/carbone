@@ -286,9 +286,9 @@ describe('formatter', function () {
       helper.assert(stringFormatter.split('coucou', ['ou', 'ao']) , ['coucou']);
       /** Combine split + arrayJoin */
       const _resSplit = stringFormatter.split('Lorem ipsum dolor sit amet', ' ');
-      helper.assert(_resSplit, ["Lorem","ipsum","dolor","sit","amet"]);
-      const _resJoin = arrayFormatter.arrayJoin(_resSplit, '', "2", "1");
-      helper.assert(_resJoin, "dolor");
+      helper.assert(_resSplit, ['Lorem','ipsum','dolor','sit','amet']);
+      const _resJoin = arrayFormatter.arrayJoin(_resSplit, '', '2', '1');
+      helper.assert(_resJoin, 'dolor');
     });
     it('should not crash if data is null or undefined or a regex', function () {
       helper.assert(stringFormatter.split('coucou', /ou/g), ['coucou']);
@@ -1519,8 +1519,8 @@ describe('formatter', function () {
       helper.assert(stringFormatter.substr('coucou', 1, -2), 'ouc');
       helper.assert(stringFormatter.substr('abcdef', -1, 100), 'f');
       helper.assert(stringFormatter.substr('abcdef', -2, 100), 'ef');
-      helper.assert(stringFormatter.substr('coucou', "3", "5"), 'co');
-      helper.assert(stringFormatter.substr('abcdef', "-2", "100"), 'ef');
+      helper.assert(stringFormatter.substr('coucou', '3', '5'), 'co');
+      helper.assert(stringFormatter.substr('abcdef', '-2', '100'), 'ef');
     });
     it('should not crash if data is null or undefined', function () {
       helper.assert(stringFormatter.substr(null, 0, 3), null);
@@ -1542,8 +1542,8 @@ describe('formatter', function () {
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 6, 28, true)    , ' donotcutme  donotcut ');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 1000, true) , '  other');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 28, 35, true)   , '  other');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', "0", "20", 'true')  , 'coucou donotcutme  ');
-      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', "6", "28", true)    , ' donotcutme  donotcut ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', '0', '20', 'true')  , 'coucou donotcutme  ');
+      helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', '6', '28', true)    , ' donotcutme  donotcut ');
 
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -2, true)    , 'coucou donotcutme  donotcut   ');
       helper.assert(stringFormatter.substr('coucou donotcutme  donotcut   other', 0, -1, true)    , 'coucou donotcutme  donotcut   ');
@@ -1739,7 +1739,7 @@ describe('formatter', function () {
       helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', null, null), '');
       helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', {}, {}), '');
       helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', [], []), '');
-      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', "null", "null"), '');
+      helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', 'null', 'null'), '');
       helper.assert(arrayFormatter.arrayJoin(['1', '2', '3', '4'], '', -2, -2), '');
     });
   });

@@ -55,6 +55,10 @@ function afterRender (req, res, err, reportPath, reportName, statObject, callbac
 }
 
 function readRender (req, res, renderId, next) {
+  if (renderId === 'render_not_exist') {
+    // simulate error from Carbone SaaS Plugin
+    return next(new Error('File does not exist'));
+  }
   return next(null, path.join(os.tmpdir(), 'titi' + renderId));
 }
 

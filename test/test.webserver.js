@@ -518,6 +518,18 @@ describe('Webserver', () => {
         });
       });
 
+      it('should return 404 if the renderID does not exist', (done) => {
+        get.concat(getBody(4001, '/render/render_not_exist', 'GET'), (err, res, data) => {
+          console.log(data.toString());
+          assert.strictEqual(res.statusCode, 404);
+          const _resp = JSON.parse(data.toString());
+          assert.strictEqual(_resp.success, false);
+          assert.strictEqual(_resp.error, 'File not found');
+          assert.strictEqual(_resp.code, 'w104');
+          done();
+        });
+      });
+
       it('should return template in the user location choice', (done) => {
         exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'PREFIX_abcdefghi')}`, () => {
           get.concat(getBody(4001, '/template/abcdefghi', 'GET', null, token), (err, res, data) => {
@@ -1572,8 +1584,12 @@ describe('Webserver', () => {
       });
 
       it('should not retrieve anything (does not exist)', (done) => {
-        get.concat(getBody(4000, '/render/nopeidontexists', 'GET'), (err, res) => {
+        get.concat(getBody(4000, '/render/nopeidontexists', 'GET'), (err, res, data) => {
           assert.strictEqual(res.statusCode, 404);
+          const _resp = JSON.parse(data.toString());
+          assert.strictEqual(_resp.success, false);
+          assert.strictEqual(_resp.error, 'File not found');
+          assert.strictEqual(_resp.code, 'w104');
           done();
         });
       });
@@ -1727,6 +1743,7 @@ describe('Webserver', () => {
 
         get.concat(getBody(4000, '/template', 'POST', form), (err, res, data) => {
           assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 415);
           data = JSON.parse(data);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file');

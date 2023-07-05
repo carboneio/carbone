@@ -5542,6 +5542,12 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should convert the & character into &amp; if the HTML entity is not found', function () {
+        const _content = '<p>R&D;</p>';
+        const _expected = '<p>R&amp;D;</p>';
+        helper.assert(html.convertHTMLEntities(_content), _expected);
+      });
+
       it('should remove "\\r\\n|\\n|\\r|\\t"', function () {
         const _content = '\t\t\t<div>\rThis is an <b>apple</b>\n and <i>strawberry</i>.</div>\r\n';
         const _expected = '<div>This is an <b>apple</b> and <i>strawberry</i>.</div>';

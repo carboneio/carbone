@@ -61,10 +61,14 @@ function getBody (port, route, method, body, token, headers) {
  * @param {String} token Auth token
  * @param {Function} callback
  */
-function uploadFile (port, token, callback) {
+function uploadFile (port, token, callback, error = false) {
   let form = new FormData();
 
-  form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
+  if (error === true) {
+    form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template-error.html')));
+  } else {
+    form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
+  }
 
   let headers = {
     'Content-Type' : 'multipart/form-data;boundary=' + form.getBoundary()
@@ -412,6 +416,7 @@ describe('Webserver', () => {
 
         get.concat(getBody(4001, '/template', 'POST', form, token), (err, res, data) => {
           assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 200);
           data = JSON.parse(data);
           assert.strictEqual(data.success, true);
           assert.strictEqual(data.data.templateId, '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47');
@@ -484,6 +489,7 @@ describe('Webserver', () => {
         uploadFile(4001, token, () => {
           get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token), (err, res, data) => {
             assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(data.success, true);
             assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'titi' + data.data.renderId)), true);
             assert.strictEqual(data.data.renderId.startsWith('REPORT'), true);
@@ -500,6 +506,29 @@ describe('Webserver', () => {
             });
           });
         });
+      });
+
+      it('should not render a template if the design has an issue', (done) => {
+        let templateId = 'ed1934624a9417b58849fba8cf85504ca75ebb706b8b1acbf8fafef32f8f9c72';
+        let body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement : {},
+          enum       : {}
+        };
+
+        uploadFile(4001, token, () => {
+          get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token), (err, res, data) => {
+            assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 500);
+            assert.strictEqual(data.success, false);
+            assert.strictEqual(data.code, 'w101');
+            assert.strictEqual(data.error.includes('Error while rendering template'), true);
+            done();
+          });
+        }, true);
       });
 
       it('should return 404 error when the template does not exist for SDK', (done) => {
@@ -545,6 +574,7 @@ describe('Webserver', () => {
         exec(`cp ${path.join(__dirname, 'datasets', 'template.html')} ${path.join(os.tmpdir(), 'PREFIX_abcdef')}`, () => {
           get.concat(getBody(4001, '/template/abcdef', 'DELETE', null, token), (err, res, data) => {
             data = JSON.parse(data.toString());
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(data.success, true);
             assert.strictEqual(data.message, 'Template deleted');
             done();
@@ -710,6 +740,7 @@ describe('Webserver', () => {
 
       get.concat(getBody(4001, '/status', 'GET'), (err, res, data) => {
         assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 200);
         data = JSON.parse(data);
         assert.strictEqual(data.success, true);
         assert.strictEqual(data.version, package.version);
@@ -1496,6 +1527,7 @@ describe('Webserver', () => {
           assert.strictEqual(err, null);
           get.concat(getBody(4000, `/render/${data.data.renderId}`, 'GET'), (err, res, data) => {
             assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(res.headers['content-type'], 'text/html; charset=UTF-8');
             assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
             assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
@@ -1519,6 +1551,7 @@ describe('Webserver', () => {
           assert.strictEqual(err, null);
           get.concat(getBody(4000, `/render/${data.data.renderId}`, 'GET'), (err, res) => {
             assert.strictEqual(err, null);
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(res.headers['content-type'], 'application/pdf');
             assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.pdf"');
             done();
@@ -1564,6 +1597,7 @@ describe('Webserver', () => {
           assert.strictEqual(err, null);
 
           get.concat(getBody(4000, `/render/${data.data.renderId}`, 'GET'), (err, res) => {
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(res.headers['access-control-expose-headers'], 'X-Request-URL,Content-Disposition');
             assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
             done();
@@ -1587,6 +1621,7 @@ describe('Webserver', () => {
           assert.strictEqual(exists, true);
 
           get.concat(getBody(4000, `/render/${data.data.renderId}`, 'GET'), (err, res) => {
+            assert.strictEqual(res.statusCode, 200);
             assert.strictEqual(res.headers['access-control-expose-headers'], 'X-Request-URL,Content-Disposition');
             assert.strictEqual(res.headers['content-disposition'], 'filename="renderedReport.html"');
             // add a timeout because we receive the response before the file unlinking

@@ -511,6 +511,7 @@ describe('Webserver', () => {
         };
         get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token), (err, res, data) => {
           assert.strictEqual(err, null);
+          assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Template not found');
           assert.strictEqual(data.code, 'w100');
           assert.strictEqual(res.statusCode, 404);
@@ -553,6 +554,7 @@ describe('Webserver', () => {
 
       it('should return a 404 error if the template does not exist', (done) => {
         get.concat(getBody(4001, '/template/template_not_exists', 'GET', null, token), (err, res, data) => {
+          assert.strictEqual(err, null);
           assert.strictEqual(res.statusCode, 404);
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
@@ -562,12 +564,28 @@ describe('Webserver', () => {
         });
       });
 
-      it('should delete a template that does not exist on the plugin storage', (done) => {
+      it('should not delete a template that does not exist on the plugin storage', (done) => {
         const _request = getBody(4001, '/template/template_not_exists', 'DELETE', null, token);
         get.concat(_request, (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 404);
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Cannot remove template, does it exist?');
+          assert.strictEqual(data.code, 'w100');
+          assert.strictEqual(data.error, 'Template not found');
+          done();
+        });
+      });
+
+      it('should not delete a template that does not exist on the plugin storage', (done) => {
+        const _request = getBody(4001, '/template/storage_error', 'DELETE', null, token);
+        get.concat(_request, (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 400);
+          data = JSON.parse(data.toString());
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w105');
+          assert.strictEqual(data.error, 'Cannot delete template');
           done();
         });
       });
@@ -662,9 +680,28 @@ describe('Webserver', () => {
 
       get.concat(getBody(4001, '/template', 'POST', form, null), (err, res, data) => {
         assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 401);
         data = JSON.parse(data);
         assert.strictEqual(data.success, false);
         assert.strictEqual(data.error, 'Error: No JSON Web Token detected in Authorization header or Cookie. Format is "Authorization: jwt" or "Cookie: access_token=jwt"');
+        done();
+      });
+    });
+
+    it('should return a custom error message when the user is not authenticated on Carbone API servers', (done) => {
+      let form = new FormData();
+
+      form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
+
+      params.clientId = 'carbone-1.1.1';
+      get.concat(getBody(4001, '/template', 'POST', form, null), (err, res, data) => {
+        delete params.clientId;
+        assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 401);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.code, 'w120');
+        assert.strictEqual(data.error, 'Unauthorized, please provide a correct API key on the "Authorization" header. The API key is available on your Carbone account: https://account.carbone.io');
         done();
       });
     });
@@ -749,6 +786,7 @@ describe('Webserver', () => {
     it('should not crash and return an error if template field is empty', (done) => {
       get.concat(getBody(4001, '/template', 'POST', {}, token), (err, res, data) => {
         assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 422);
         assert.strictEqual(data.success, false);
         assert.strictEqual(data.error, '"template" field is empty');
         assert.strictEqual(data.code, 'w112');
@@ -811,6 +849,7 @@ describe('Webserver', () => {
 
       get.concat(getBody(4002, '/template', 'POST', form), (err, res, data) => {
         assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 401);
         data = JSON.parse(data);
         assert.strictEqual(data.success, false);
         assert.strictEqual(data.error, 'Error: No JSON Web Token detected in Authorization header or Cookie. Format is "Authorization: jwt" or "Cookie: access_token=jwt"');
@@ -983,6 +1022,8 @@ describe('Webserver', () => {
         params.queuePath = '/folderDoesNotExist/queue';
 
         get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 500)
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Error while setting up the webhook');
           assert.strictEqual(data.code, 'w117');
@@ -998,8 +1039,11 @@ describe('Webserver', () => {
         };
 
         get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 422);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Missing data key in body');
+          assert.strictEqual(data.error, 'Missing "data" property in body');
+          assert.strictEqual(data.code, 'w111');
           done();
         });
       });
@@ -1057,9 +1101,11 @@ describe('Webserver', () => {
         };
 
         get.concat(getBody(4000, '/render/nopeidontexists', 'POST', body), (err, res, data) => {
+          assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
           assert.strictEqual(res.statusCode, 404);
           assert.strictEqual(data.error, 'Template not found');
+          assert.strictEqual(data.code, 'w100');
           done();
         });
       });
@@ -1139,10 +1185,12 @@ describe('Webserver', () => {
           url    : 'http://localhost:4000/render/' + templateId,
           method : 'POST'
         }, (err, res, data) => {
+          assert.strictEqual(res.statusCode, 400);
           data = JSON.parse(data.toString());
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Content-Type header is not application/json');
+          assert.strictEqual(data.code, 'w110')
+          assert.strictEqual(data.error, '"Content-Type" header is not "application/json"');
           done();
         });
       });
@@ -1159,7 +1207,9 @@ describe('Webserver', () => {
 
         get.concat(getBody(4000, '/render/..%2F..%2F..%2F..%2Fdatasets%2Ftemplate.html', 'POST', body), (err, res, data) => {
           assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 400);
           assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w115');
           assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
           done();
         });
@@ -1711,8 +1761,10 @@ describe('Webserver', () => {
           body : fs.createReadStream(path.join(__dirname, 'datasets', 'template.html'))
         }, (err, res, data) => {
           assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 400);
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w107');
           assert.strictEqual(data.error.endsWith('Try uploading your file using form data'), true);
           done();
         });
@@ -1728,8 +1780,10 @@ describe('Webserver', () => {
           body : fs.createReadStream(path.join(__dirname, 'datasets', 'template.html'))
         }, (err, res, data) => {
           assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 400)
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w106');
           assert.strictEqual(data.error, 'Content-Type header should be multipart/form-data (preferred) or application/json (base64 mode)');
           done();
         });
@@ -1745,6 +1799,7 @@ describe('Webserver', () => {
           assert.strictEqual(res.statusCode, 415);
           data = JSON.parse(data);
           assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w118');
           assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file');
           done();
         });
@@ -1773,8 +1828,10 @@ describe('Webserver', () => {
 
         get.concat(getBody(4000, '/template', 'POST', form), (err, res, data) => {
           assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 422);
           data = JSON.parse(data);
           assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w112');
           assert.strictEqual(data.error, '"template" field is empty');
           done();
         });
@@ -1853,8 +1910,10 @@ describe('Webserver', () => {
 
       it('should return an error if template ID is invalid (windows reserved filename)', (done) => {
         get.concat(getBody(4000, '/template/CON', 'GET'), (err, res, data) => {
+          assert.strictEqual(err, null);
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w115');
           assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
           assert.strictEqual(res.statusCode, 400);
           done();
@@ -1907,8 +1966,11 @@ describe('Webserver', () => {
           filename += 'i';
         }
         get.concat(getBody(4000, '/template/' + filename + '.pdf', 'DELETE'), (err, res, data) => {
+          assert.strictEqual(err, null)
+          assert.strictEqual(res.statusCode, 400)
           data = JSON.parse(data.toString());
           assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w115');
           assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
           done();
         });
@@ -2144,27 +2206,32 @@ describe('Webserver', () => {
     it('POST /render/idTemplate - should not accept template id which are not 64-hex', (done) => {
       get.concat(getBody(4000, '/render/12-aaf', 'POST', { data : {} }), (err, res, data) => {
         assert.strictEqual(err, null);
-        assert.strictEqual(data.success, false);
-        assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
         assert.strictEqual(res.statusCode, 400);
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.code, 'w115');
+        assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
         done();
       });
     });
     it('GET /render/idTemplate - should not accept template id which are not 64-hex', (done) => {
       get.concat(getBody(4000, '/template/12-aaf', 'GET'), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 400);
         data = JSON.parse(data.toString());
         assert.strictEqual(data.success, false);
+        assert.strictEqual(data.code, 'w115');
         assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
-        assert.strictEqual(res.statusCode, 400);
         done();
       });
     });
     it('DELETE /render/idTemplate - should not accept template id which are not 64-hex', (done) => {
       get.concat(getBody(4000, '/template/12-aaf', 'DELETE'), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 400);
         data = JSON.parse(data.toString());
         assert.strictEqual(data.success, false);
+        assert.strictEqual(data.code, 'w115');
         assert.strictEqual(data.error, 'Invalid or undefined TemplateId or RenderId in the URL');
-        assert.strictEqual(res.statusCode, 400);
         done();
       });
     });

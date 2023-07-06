@@ -35,6 +35,9 @@ function deleteTemplate (req, res, templateId, callback) {
     // simulate error from Carbone SaaS Plugin
     return callback(new Error('File does not exist'));
   }
+  if (templateId === 'storage_error') {
+    return callback(new Error('Storage error'));
+  }
   return callback(null, path.join(os.tmpdir(), 'PREFIX_' + templateId));
 }
 

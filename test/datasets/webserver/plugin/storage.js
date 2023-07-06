@@ -3,12 +3,18 @@ const path = require('path');
 const os = require('os');
 
 function beforeRender (req, res, data, options, next) {
+  if (req?.query.error === 'true') {
+    return next(new Error('Something went wrong'));
+  }
   options.renderPrefix = 'REPORT';
   req.isProd = true;
   next();
 }
 
-function writeTemplate (req, res, templateId, templatePathTemp) {
+function writeTemplate (req, res, templateId, templatePathTemp, next) {
+  if (req.query.error === 'true') {
+    return next(new Error('Something went wrong'));
+  }
   fs.rename(templatePathTemp, path.join(os.tmpdir(), 'PREFIX_' + templateId), () => {
     return res.send({
       success : true,

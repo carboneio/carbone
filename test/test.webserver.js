@@ -454,6 +454,20 @@ describe('Webserver', () => {
         });
       });
 
+      it('should NOT upload the template if the writeTemplate returns an error', (done) => {
+        let _data = {
+          template : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'})
+        };
+        get.concat(getBody(4001, '/template?error=true', 'POST', _data, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 400);
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w109');
+          assert.strictEqual(data.error, 'Cannot store template');
+          done();
+        });
+      });
+
       it('should NOT upload templates bigger than 20 MB', (done) => {
 
         let _template = '<!DOCTYPE html><html>';
@@ -505,6 +519,27 @@ describe('Webserver', () => {
               done();
             });
           });
+        });
+      });
+
+      it.only('should NOT render a template if the beforeRender return an error', (done) => {
+        let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
+        let body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement : {},
+          enum       : {}
+        };
+
+        get.concat(getBody(4001, `/render/${templateId}?error=true`, 'POST', body, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 500);
+          assert.strictEqual(data.success , false);
+          assert.strictEqual(data.code , 'w114');
+          assert.strictEqual(data.error , 'Cannot execute beforeRender');
+          done();
         });
       });
 

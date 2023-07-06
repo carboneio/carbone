@@ -520,7 +520,6 @@ describe('Webserver', () => {
 
       it('should return 404 if the renderID does not exist', (done) => {
         get.concat(getBody(4001, '/render/render_not_exist', 'GET'), (err, res, data) => {
-          console.log(data.toString());
           assert.strictEqual(res.statusCode, 404);
           const _resp = JSON.parse(data.toString());
           assert.strictEqual(_resp.success, false);
@@ -1846,8 +1845,8 @@ describe('Webserver', () => {
           data = JSON.parse(data.toString());
           assert.strictEqual(res.statusCode, 404);
           assert.strictEqual(data.success, false);
-          assert.strictEqual(data.error, 'Cannot find template extension, does it exists?');
-          assert.strictEqual(data.code, 'w103');
+          assert.strictEqual(data.error, 'Template not found');
+          assert.strictEqual(data.code, 'w100');
           done();
         });
       });

@@ -6,7 +6,7 @@ const assert = require('assert');
 const image = require('../lib/image');
 const hyperlinks = require('../lib/hyperlinks');
 
-describe.only('Dynamic HTML', function () {
+describe('Dynamic HTML', function () {
 
   describe('Preprocess - functions used by ODT and DOCX reports', function () {
 

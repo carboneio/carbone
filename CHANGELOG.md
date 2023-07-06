@@ -1,3 +1,13 @@
+### v4.13.0
+  - [EE] Carbone API status codes fixes:
+    - For all endpoints, if the API key is missing or not correct, a `401` code is returned instead of `500`.
+    - `POST /template`: if the `template` attribute is missing, a `422` code is returned instead of `400`.
+    - `POST /template`: if the template format is not supported, a `415` code is returned instead of `200`.
+    - `POST /render/:templateId`: if the `data` attribute is missing, a `422` code is returned instead of `400`.
+    - `GET /render/:renderId`: if the generated document does not exist, a `404` code is returned instead of `200`.
+    - `DELETE /render/:templateId`: if the template does not exist, a `404` code is returned instead of `400`.
+
+
 ### v4.12.2
   - Release July 3rd 2023
   - Fix chained formatters `:split():arrayJoin('', 2, 3)`

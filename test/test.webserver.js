@@ -522,7 +522,7 @@ describe('Webserver', () => {
         });
       });
 
-      it.only('should NOT render a template if the beforeRender return an error', (done) => {
+      it('should NOT render a template if the beforeRender return an error', (done) => {
         let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
         let body = {
           data : {
@@ -579,6 +579,23 @@ describe('Webserver', () => {
           assert.strictEqual(data.error, 'Template not found');
           assert.strictEqual(data.code, 'w100');
           assert.strictEqual(res.statusCode, 404);
+          done();
+        });
+      });
+
+      it('should return 400 error when the template can not be retreive', (done) => {
+        let templateId = 'storage_error';
+        let body = {
+          data : {
+            firstname : 'John'
+          }
+        };
+        get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Cannot retrieve template');
+          assert.strictEqual(data.code, 'w116');
+          assert.strictEqual(res.statusCode, 400);
           done();
         });
       });

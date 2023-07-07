@@ -1060,6 +1060,13 @@ describe('formatter', function () {
           ['car is broken',  'caris'],
           [[1, 2, 'toto'], 'titi'],
           [[], 3],
+          [null, 'titi'],
+          [null, null],
+          [undefined, null],
+          [undefined, 'titi'],
+          [undefined, undefined],
+          ['titi', null],
+          ['titi', undefined],
         ];
         testCondition('ifNIN', _dataSet, true);
       });
@@ -1070,13 +1077,6 @@ describe('formatter', function () {
           ['car is broken', 'car is'],
           [[1, 2, 'toto'], 'toto'],
           [[1, 2, 'toto'], 2],
-          [null, 'titi'],
-          ['titi', null],
-          [null, null],
-          [undefined, null],
-          [undefined, 'titi'],
-          ['titi', undefined],
-          [undefined, undefined],
           [12, 'titi'],
           [{toto : 2 }, 3],
         ];

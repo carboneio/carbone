@@ -321,7 +321,7 @@ function ifIN (d, value) {
  */
 function ifNIN (d, value) {
   var _result = false;
-  if (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) === -1) {
+  if (!d || !value ||  (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) === -1)) {
     _result = true;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);

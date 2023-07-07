@@ -320,9 +320,9 @@ function ifIN (d, value) {
  * @returns It returns the initial value `d`. The state of the condition is not returned.
  */
 function ifNIN (d, value) {
-  var _result = false;
-  if (!d || !value ||  (value && (typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) === -1)) {
-    _result = true;
+  var _result = true;
+  if ((typeof(d) === 'string' || d instanceof Array) && d.indexOf(value) !== -1) {
+    _result = false;
   }
   this.isConditionTrue = _updateCondition(this.isAndOperator, this.isConditionTrue, _result);
   return d;

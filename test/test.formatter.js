@@ -1066,7 +1066,14 @@ describe('formatter', function () {
           [undefined, 'titi'],
           [undefined, undefined],
           ['titi', null],
+          [{toto : 2 }, 3],
           ['titi', undefined],
+          [12, 'titi'],
+          [0, '0'], // data and value must be a string, like ifIN
+          [0, '1'],
+          [0, 0],
+          [-1, -1],
+          [0, 1]
         ];
         testCondition('ifNIN', _dataSet, true);
       });
@@ -1077,8 +1084,7 @@ describe('formatter', function () {
           ['car is broken', 'car is'],
           [[1, 2, 'toto'], 'toto'],
           [[1, 2, 'toto'], 2],
-          [12, 'titi'],
-          [{toto : 2 }, 3],
+          ['0', '0']
         ];
         testCondition('ifNIN', _dataSet, false);
       });

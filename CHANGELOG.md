@@ -1,3 +1,6 @@
+### v4.X.X
+  - [EE] Fix `:html` formatter for ODT/DOCX: empty paragraphs on the generated document are now keeping the style applied on the template
+
 ### v4.13.0
   - Release July 7th 2023
   - [EE] Carbone API status codes fixes:

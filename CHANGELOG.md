@@ -1,5 +1,7 @@
 ### v4.X.X
-  - [EE] Fix `:html` formatter for ODT/DOCX: empty paragraphs on the generated document are now keeping the style applied on the template
+  - [EE] Fix `:html` formatter for ODT/DOCX: 
+    - Empty paragraphs on the generated document are now keeping the style applied on the template.
+    - HTML entities: Support unicode values for all currency symbols and most used punctuation. For instance `&#39;` will print `'`.
 
 ### v4.13.0
   - Release July 7th 2023

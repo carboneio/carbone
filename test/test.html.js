@@ -5590,6 +5590,27 @@ describe('Dynamic HTML', function () {
         helper.assert(html.convertHTMLEntities(_content), _content);
       });
 
+      it('should convert html entities as "Entity Number" into the document format (GENERAL SYMBOLS)', function () {
+        const _content = '<div>&#39; &#162; &#169; &#61; &#8364; &#160; &#163; &#174; &#165;</div>';
+        helper.assert(html.convertHTMLEntities(_content), `<div>\' ¢ © = € ${String.fromCodePoint(160)} £ ® ¥</div>`);
+      });
+
+      it('should convert html entities as "Entity Number" into the document format (GENERAL PONCTUATION)', function () {
+        const _content = "&#8211; &#8212; &#8216; &#8217; &#8218; &#8220; &#8221; &#8222; &#8226; &#8230; &#8242; &#8243; &#8249; &#8250; &#8260; &#171; &#187; &#176; &#177; &#182; &#183; &#8776; &#8800; &#8804; &#8805;";
+        helper.assert(html.convertHTMLEntities(_content), `${String.fromCodePoint(8211)} ${String.fromCodePoint(8212)} ‘ ’ ‚ “ ” „ • … ′ ″ ‹ › ⁄ « » ° ± ¶ · ≈ ≠ ≤ ≥`);
+      });
+
+      "&#8211; &#8212; &#8216; &#8217; &#8218; &#8220; &#8221; &#8222; &#8226; &#8230; &#8242; &#8243; &#8249; &#8250; &#8260;"
+
+      it('should convert html entities as "Entity Number" into the document format (CURRENCIES)', function () {
+        let _content = '<div>';
+        for (let i = 8352; i < 8383; i++) {
+          _content += `&#${i}; `
+        }
+        _content += '</div>';        
+        helper.assert(html.convertHTMLEntities(_content), `<div>₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₪ ₫ € ₭ ₮ ₯ ₰ ₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₹ ₺ ₻ ₼ ₽ ₾ </div>`);
+      });
+
       it('should convert unsupported HTML entities into valid HTML entities [non-breaking space]', function () {
         const _content = '<div>This&nbsp;is an&nbsp;<b>apple</b>&nbsp;and&nbsp;<i>strawberry</i>.</div>';
         const _expected = `<div>This${String.fromCodePoint(160)}is an${String.fromCodePoint(160)}<b>apple</b>${String.fromCodePoint(160)}and${String.fromCodePoint(160)}<i>strawberry</i>.</div>`;

@@ -2,6 +2,7 @@
   - [EE] Support two new template formats: 
     - `XML Word 2003` can be used to generate: `pdf`, `txt`, `docx`, `odt`, `doc`, `jpeg`, `png`
     - `XML Excel 2003` can be used to generate: `pdf`, `csv`, `ods`, `xlsx`, `xls`, `jpeg`, `png`
+    - Known limitations: enterprise features are not supported for the moment (images, barcode, colors, html, etc...)
 
 ### v4.13.0
   - Release July 7th 2023

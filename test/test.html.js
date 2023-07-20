@@ -1902,6 +1902,68 @@ describe('Dynamic HTML', function () {
         '<text:p text:style-name="Standard"/>'
         );
       });
+      it('should support a text inside a paragraph next to a nested list', function () {
+        let content = '' +
+        '<ul>' +
+          '<li><p>Coffee</p>' +
+            '<ul>' +
+              '<li>Mocha</li>' +
+            '</ul>' +
+          '</li>' +
+        '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        helper.assert(res.content.get(), '' +
+          '<text:list text:style-name="LC010">'+
+              '<text:list-item>'+
+                  '<text:p>'+
+                      '<text:span>Coffee</text:span>'+
+                  '</text:p>'+
+                  '<text:list>'+
+                      '<text:list-item>'+
+                          '<text:p>'+
+                              '<text:span>Mocha</text:span>'+
+                          '</text:p>'+
+                      '</text:list-item>'+
+                  '</text:list>'+
+              '</text:list-item>'+
+          '</text:list>'+
+          '<text:p text:style-name="Standard"/>'
+        );
+      });
+      it('should support a text inside a anchor next to a nested list', function () {
+        const _options = {
+          defaultUrlOnError: 'https://carbone.io/error'
+        }
+
+        let content = '' +
+        '<ul>' +
+          '<li><a href="https://carbone.io">Coffee</a>' +
+            '<ul>' +
+              '<li>Mocha</li>' +
+            '</ul>' +
+          '</li>' +
+        '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options);
+        helper.assert(res.content.get(_options), '' +
+          '<text:list text:style-name="LC010">'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:a xlink:type="simple" xlink:href="https://carbone.io">'+
+                  '<text:span>Coffee</text:span>'+
+                '</text:a>'+
+              '</text:p>'+
+              '<text:list>'+
+                '<text:list-item>'+
+                  '<text:p>'+
+                    '<text:span>Mocha</text:span>'+
+                  '</text:p>'+
+                '</text:list-item>'+
+              '</text:list>'+
+            '</text:list-item>'+
+          '</text:list>'+
+          '<text:p text:style-name="Standard"/>'
+        );
+      });
       it('should create a nested list with in a "li" tag without text', function () {
         let content = '' +
                   '<ul>' +
@@ -3903,6 +3965,98 @@ describe('Dynamic HTML', function () {
             '</w:r>' +
           '</w:p>' +
           '<w:p/>'
+        );
+      });
+
+      it('should create nested list with text inside a paragraph without closing a `li` element', function () {
+        // eslint-disable-next-line no-unused-vars
+        const _htmlContent = '' +
+          '<ul>' +
+              '<li>' +
+                  '<p>This check can be asked by Edwin, please issue the following data:</p>' +
+                  '<ul>' +
+                      '<li>' +
+                          '<p>Full client name and address</p>' +
+                      '</li>' +
+                  '</ul>' +
+              '</li>' +
+          '</ul>';
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML(_htmlContent));
+        helper.assert(content.get(), '' +
+          '<w:p>'+
+            '<w:pPr>'+
+                '<w:numPr>'+
+                    '<w:ilvl w:val="0"/>'+
+                    '<w:numId w:val="1000"/>'+
+                '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+                '<w:t xml:space="preserve">This check can be asked by Edwin, please issue the following data:</w:t>'+
+            '</w:r>'+
+          '</w:p>'+ // << Should include this end paragraph
+          '<w:p>'+
+            '<w:pPr>'+
+                '<w:numPr>'+
+                    '<w:ilvl w:val="1"/>'+
+                    '<w:numId w:val="1000"/>'+
+                '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+                '<w:t xml:space="preserve">Full client name and address</w:t>'+
+            '</w:r>'+
+          '</w:p>'+
+          '<w:p/>'
+        );
+      });
+
+      it('should create nested list with text inside a anchor tag without closing a `li` element', function () {
+        const _options = {
+          defaultUrlOnError: 'https://carbone.io/error',
+          hyperlinkDatabase: new Map()
+        }
+
+        // eslint-disable-next-line no-unused-vars
+        const _htmlContent = '' +
+          '<ul>' +
+              '<li>' +
+                  '<a>This check can be asked by Edwin, please issue the following data:</a>' +
+                  '<ul>' +
+                      '<li>' +
+                          '<p>Full client name and address</p>' +
+                      '</li>' +
+                  '</ul>' +
+              '</li>' +
+          '</ul>';
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML(_htmlContent), _options);
+        helper.assert(content.get(_options), '' +
+          '<w:p>'+
+            '<w:pPr>'+
+                '<w:numPr>'+
+                    '<w:ilvl w:val="0"/>'+
+                    '<w:numId w:val="1000"/>'+
+                '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:hyperlink r:id="CarboneHyperlinkId0">'+
+              '<w:r>'+
+                  '<w:rPr>'+
+                      '<w:rStyle w:val="Hyperlink"/>'+
+                  '</w:rPr>'+
+                  '<w:t xml:space="preserve">This check can be asked by Edwin, please issue the following data:</w:t>'+
+              '</w:r>'+
+            '</w:hyperlink>'+
+          '</w:p>'+ // << Should include this end paragraph
+          '<w:p>'+
+            '<w:pPr>'+
+                '<w:numPr>'+
+                    '<w:ilvl w:val="1"/>'+
+                    '<w:numId w:val="1000"/>'+
+                '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+                '<w:t xml:space="preserve">Full client name and address</w:t>'+
+            '</w:r>'+
+          '</w:p>'+
+        '<w:p/>'
         );
       });
 

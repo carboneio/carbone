@@ -1,7 +1,8 @@
 ### v4.X.X
-  - [EE] Fix `:html` formatter for ODT/DOCX: 
+  - [EE] Fixed `:html` formatter for ODT/DOCX/PDF documents: 
     - Empty paragraphs on the generated document are now keeping the style applied on the template.
     - HTML entities: Support unicode values for all currency symbols and most used punctuation. For instance `&#39;` will print `'`.
+    - Support the rendering of nested ordered/unordered lists with mixed paragraphs and anchors tags.
 
 ### v4.13.0
   - Release July 7th 2023

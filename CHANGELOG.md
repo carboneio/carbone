@@ -1,3 +1,6 @@
+### v4.X.X
+  - [EE] Fix `POST /render/:templateId`: when a body request is larger than the `maxDataSize` (Carbone CLoud API limit is 60MB), a `413` code is returned instead of `500`, and the error message is `Content too large, the JSON size limit is X MB` instead of `PayloadTooLargeError`.
+
 ### v4.13.0
   - Release July 7th 2023
   - [EE] Carbone API status codes fixes:

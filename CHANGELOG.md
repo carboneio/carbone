@@ -1,4 +1,7 @@
 ### v4.13.0
+  - [EE] Support Charts in ODP
+  
+### v4.13.0
   - Release July 7th 2023
   - [EE] Carbone API status codes fixes:
     - For all endpoints, if the API key is missing or not correct, a `401` code is returned instead of `500`.

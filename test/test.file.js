@@ -37,6 +37,13 @@ describe('file', function () {
         done();
       });
     });
+    it('should detect a pptx type even if it contains an XLSX file', function (done) {
+      carbone.getFileExtension('chart/pptx-simple/pptx-simple.pptx', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'pptx');
+        done();
+      });
+    });
     it('should detect an odt type', function (done) {
       carbone.getFileExtension('test_odt_to_translate.odt', function (err, extension) {
         helper.assert(err, null);

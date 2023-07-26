@@ -1,5 +1,6 @@
 ### v4.13.0
-  - [EE] Support Charts in ODP
+  - [EE] Support charts in ODP and PPTX
+  - Fix wrong type detection when a PPTX contains a chart which an embbedded XLSX file
   
 ### v4.13.0
   - Release July 7th 2023

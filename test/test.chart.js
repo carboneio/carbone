@@ -413,6 +413,22 @@ describe('chart', function () {
     });
   });
 
+  describe('[Full test] PPTX', function () {
+    it('should replace markers in charts', function (done) {
+      const _data = [
+        { label : 'row1' , valCol1 : 10 , valCol2 : 100.1 },
+        { label : 'row2' , valCol1 : 20 , valCol2 : 200.2 },
+        { label : 'row3' , valCol1 : 30 , valCol2 : 300.3 }
+      ];
+      const _testedReport = 'chart/pptx-simple';
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+  });
+
 
   describe('getDocxObjectIdFromRel', function () {
     it('get chart Id from Docx rel', function () {
@@ -426,6 +442,31 @@ describe('chart', function () {
     it('get return an empty string if object is not found', function () {
       const _testedReport = 'chart/docx-simple-with-bind';
       helperTest.assert(chartLib.getDocxObjectIdFromRel(helperTest.openTemplate(_testedReport), 'sdqsdqsd/tqsdheme1.xml'), '');
+    });
+  });
+
+  describe('getAllChartIdsFromRelOffice', function () {
+    it('get all chart Id from PPTX', function () {
+      const _testedReport = 'chart/pptx-simple';
+      helperTest.assert(chartLib.getAllChartIdsFromRelOffice(helperTest.openTemplate(_testedReport)), {
+        'ppt/charts/chart1.xml' : {
+          id        : 'rId2',
+          usedInRel : 'ppt/slides/_rels/slide1.xml.rels',
+          usedIn    : 'ppt/slides/slide1.xml'
+        }
+      });
+    });
+    it('get all chart Id from DOCX ', function () {
+      const _testedReport = 'chart/docx-simple-with-bind';
+      const _template = helperTest.openTemplate(_testedReport);
+      _template.extension = 'docx';
+      helperTest.assert(chartLib.getAllChartIdsFromRelOffice(_template), {
+        'word/charts/chart1.xml' : {
+          id        : 'rId4',
+          usedInRel : 'word/_rels/document.xml.rels',
+          usedIn    : 'word/document.xml'
+        }
+      });
     });
   });
 });

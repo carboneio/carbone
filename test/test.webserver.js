@@ -367,7 +367,7 @@ describe('Webserver', () => {
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
         deleteRequiredFiles();
         webserver = require('../lib/webserver');
-        webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir()], () => {
+        webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir(), '--maxDataSize', 20 * 1024 * 1024], () => {
           webserver.generateToken((_, newToken) => {
             token = newToken;
             done();
@@ -539,6 +539,30 @@ describe('Webserver', () => {
           assert.strictEqual(data.success , false);
           assert.strictEqual(data.code , 'w114');
           assert.strictEqual(data.error , 'Cannot execute beforeRender');
+          done();
+        });
+      });
+
+      it('should not render if the JSON Body request is too large and should return an error 413', (done) => {
+        let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
+        let body = {
+          data : {
+            firstname : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            lastname  : 'Doe'
+          },
+          complement : {},
+          enum       : {}
+        };
+
+        for (let i = 0; i < 100000; i++) {
+          body.data[i] = ' ' + body.data.firstname;          
+        }
+        get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 413);
+          assert.strictEqual(data.success , false);
+          assert.strictEqual(data.code , 'w121');
+          assert.strictEqual(data.error , 'Content too large, the JSON size limit is 20 MB');
           done();
         });
       });
@@ -775,15 +799,37 @@ describe('Webserver', () => {
 
       form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
-      params.clientId = 'carbone-1.1.1';
+      params.egressProxyPrimary = 'http://X.X.X.X:4444';
       get.concat(getBody(4001, '/template', 'POST', form, null), (err, res, data) => {
-        delete params.clientId;
+        delete params.egressProxyPrimary;
         assert.strictEqual(err, null);
         assert.strictEqual(res.statusCode, 401);
         data = JSON.parse(data);
         assert.strictEqual(data.success, false);
         assert.strictEqual(data.code, 'w120');
         assert.strictEqual(data.error, 'Unauthorized, please provide a correct API key on the "Authorization" header. The API key is available on your Carbone account: https://account.carbone.io');
+        done();
+      });
+    });
+
+    it('should not get templates and should return an error message when the user is not authenticated', (done) => {
+      get.concat(getBody(4001, '/templates', 'GET', {}, null), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 401);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.error, 'Error: No JSON Web Token detected in Authorization header or Cookie. Format is "Authorization: jwt" or "Cookie: access_token=jwt"');
+        done();
+      });
+    });
+
+    it('should get a list of templates', (done) => {
+      get.concat(getBody(4001, '/templates', 'GET', {}, token), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 200);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(JSON.stringify(data.data), "[]");
         done();
       });
     });

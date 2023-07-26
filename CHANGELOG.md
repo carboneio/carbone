@@ -1,4 +1,8 @@
 ### v4.X.X
+  - [EE] Support two new template formats: 
+    - `XML Word 2003` can be used to generate: `pdf`, `txt`, `docx`, `odt`, `doc`, `jpeg`, `png`
+    - `XML Excel 2003` can be used to generate: `pdf`, `csv`, `ods`, `xlsx`, `xls`, `jpeg`, `png`
+    - Known limitations: enterprise features are not supported for the moment (images, barcode, colors, html, etc...)
   - [EE] Fix `POST /render/:templateId`: when a body request is larger than the `maxDataSize` (Carbone CLoud API limit is 60MB), a `413` code is returned instead of `500`, and the error message is `Content too large, the JSON size limit is X MB` instead of `PayloadTooLargeError`.
 
 ### v4.13.0

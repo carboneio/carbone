@@ -799,15 +799,37 @@ describe('Webserver', () => {
 
       form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
 
-      params.clientId = 'carbone-1.1.1';
+      params.egressProxyPrimary = 'http://X.X.X.X:4444';
       get.concat(getBody(4001, '/template', 'POST', form, null), (err, res, data) => {
-        delete params.clientId;
+        delete params.egressProxyPrimary;
         assert.strictEqual(err, null);
         assert.strictEqual(res.statusCode, 401);
         data = JSON.parse(data);
         assert.strictEqual(data.success, false);
         assert.strictEqual(data.code, 'w120');
         assert.strictEqual(data.error, 'Unauthorized, please provide a correct API key on the "Authorization" header. The API key is available on your Carbone account: https://account.carbone.io');
+        done();
+      });
+    });
+
+    it('should not get templates and should return an error message when the user is not authenticated', (done) => {
+      get.concat(getBody(4001, '/templates', 'GET', {}, null), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 401);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, false);
+        assert.strictEqual(data.error, 'Error: No JSON Web Token detected in Authorization header or Cookie. Format is "Authorization: jwt" or "Cookie: access_token=jwt"');
+        done();
+      });
+    });
+
+    it('should get a list of templates', (done) => {
+      get.concat(getBody(4001, '/templates', 'GET', {}, token), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 200);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(JSON.stringify(data.data), "[]");
         done();
       });
     });

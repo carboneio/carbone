@@ -3754,6 +3754,34 @@ describe('Carbone', function () {
       });
     });
 
+    it('should return error by converting an XML template to PDF (non compatible files types)', (done) => {
+      var data = [];
+      var _options = {
+        convertTo : {
+          formatName : 'pdf'
+        }
+      };
+      carbone.render('test_xml.xml', data, _options, function (err, result) {
+        helper.assert(typeof err, 'string');
+        helper.assert(/can't be converted to "pdf"*/.test(err), true);
+        helper.assert(result, undefined);
+        done();
+      });
+    });
+
+    it('should convert XML Word 2023 and XML Excel files as template', (done) => {
+      var data = { value: "Data injected!" };
+      carbone.render('test_word-2003.xml', data, { convertTo: "txt" }, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result.toString().includes(data.value), true);
+        carbone.render('test_excel-2003.xml', data, { convertTo: "csv" }, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result.toString().includes(data.value), true);
+          done();
+        });
+      });
+    });
+
     it('should accept txt files as template', (done) => {
       var data = [{ id : 1, name : 'field_1' }, { id : 2, name : 'field_2' }];
       carbone.render('template_txt.txt', data, function (err, result) {

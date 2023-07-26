@@ -1933,7 +1933,7 @@ describe('Webserver', () => {
           data = JSON.parse(data);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.code, 'w118');
-          assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, XHTML, HTML or an XML file');
+          assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG, XHTML, IDML, HTML or an XML file');
           done();
         });
       });

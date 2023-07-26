@@ -392,7 +392,7 @@ describe('Dynamic HTML', function () {
             '</w:document>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffSegoe Print-fs36-rtl')), JSON.stringify({ paragraph: '<w:bidi/>', text: '<w:rFonts w:ascii=\"Segoe Print\" w:hAnsi=\"Segoe Print\"/><w:sz w:val=\"36\"/>' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffSegoe Print-fs36-rtl')), JSON.stringify({ paragraph: '<w:rFonts w:ascii=\"Segoe Print\" w:hAnsi=\"Segoe Print\"/><w:sz w:val=\"36\"/><w:bidi/>', text: '<w:rFonts w:ascii=\"Segoe Print\" w:hAnsi=\"Segoe Print\"/><w:sz w:val=\"36\"/>' }))
         });
 
 
@@ -807,7 +807,7 @@ describe('Dynamic HTML', function () {
                 '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
               '</w:rPr>', _options), '(\'style-ffAmerican Typewriter-fs18\')');
             assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffAmerican Typewriter-fs18')), JSON.stringify({ paragraph: '', text: '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cstheme=\"minorHAnsi\"/><w:sz w:val=\"18\"/>' }))
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffAmerican Typewriter-fs18')), JSON.stringify({ paragraph: '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cstheme=\"minorHAnsi\"/><w:sz w:val=\"18\"/>', text: '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cstheme=\"minorHAnsi\"/><w:sz w:val=\"18\"/>' }))
           /** Missing font size */
           helper.assert(html.getTemplateDefaultStyles('<w:p>' +
               '<w:r>' +
@@ -816,7 +816,7 @@ describe('Dynamic HTML', function () {
                   '<w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cstheme="minorHAnsi"/>' +
                 '</w:rPr>', _options), '(\'style-ffAmerican Typewriter\')');
           assert.strictEqual(_options.htmlStylesDatabase.size, 2);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffAmerican Typewriter')), JSON.stringify({ paragraph: '', text: '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cstheme=\"minorHAnsi\"/>' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-ffAmerican Typewriter')), JSON.stringify({ paragraph: '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cstheme=\"minorHAnsi\"/>', text: '<w:rFonts w:ascii=\"American Typewriter\" w:hAnsi=\"American Typewriter\" w:cstheme=\"minorHAnsi\"/>' }))
           /** Missing font family */
           helper.assert(html.getTemplateDefaultStyles('<w:p>' +
               '<w:r>' +
@@ -825,7 +825,7 @@ describe('Dynamic HTML', function () {
                   '<w:sz w:val="18"/>' +
                 '</w:rPr>', _options), '(\'style-fs18\')');
           assert.strictEqual(_options.htmlStylesDatabase.size, 3);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-fs18')), JSON.stringify({ paragraph: '', text: '<w:sz w:val=\"18\"/>' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-fs18')), JSON.stringify({ paragraph: '<w:sz w:val=\"18\"/>', text: '<w:sz w:val=\"18\"/>' }))
 
           /** Colors */
           helper.assert(html.getTemplateDefaultStyles('<w:p>' +
@@ -1373,6 +1373,30 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should apply a default style on each paragraph (empty paragraphs as break line, empty paragraph at the end of <p></p>, empty paragraph if <p> has no end)', function () {
+        /** Init template style, it is executed during the preprocessing */
+        const htmlDefaultStyleDatabase = new Map();
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += ''
+        _htmlDefaultStyleObject.paragraph += 'text:style-name="P1"';
+        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        let res = html.buildXMLContentOdt(
+          _uniqueID, 
+          html.parseHTML('<p>This is a paragraph</p><br><p> lala'), 
+          { htmlStylesDatabase: htmlDefaultStyleDatabase }, 
+          _styleId /** Default style ID as a last argument */
+        );
+        helper.assert(res.content.get(), '' +
+          '<text:p text:style-name="P1"><text:span>This is a paragraph</text:span></text:p>' +
+          '<text:p text:style-name="P1"/>' +
+          '<text:p text:style-name="P1"/>' +
+          '<text:p text:style-name="P1"><text:span> lala</text:span></text:p>' +
+          '<text:p text:style-name="P1"/>'
+        );
+      });
+
       it('should return a paragraph without comments', function () {
         const _content = '<p class="MsoNormal">I:\\MARKETING TDA\\Produktentwicklung\\Packanweisung\\Display\\2022-09-28 überarbeitete Packanweisung 28261 Mellow Marshmallow Meterspeckspieße 30x180g BA (1UK = 1VE à 30x180g).docx</p>' +
                         '<!--[if gte mso 9]><xml> <w:WordDocument><w:View>Normal</w:View> <w:Zoom>0</w:Zoom> <w:TrackMoves/> <w:TrackFormatting/>' +
@@ -1690,24 +1714,24 @@ describe('Dynamic HTML', function () {
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
         _htmlDefaultStyleObject.text += ''
-        _htmlDefaultStyleObject.paragraph += 'style:name="P2"';
+        _htmlDefaultStyleObject.paragraph += 'text:style-name="P2"';
         html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
 
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options, _styleId);
         helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">' +
             '<text:list-item>' +
-              '<text:p style:name="P2">' +
+              '<text:p text:style-name="P2">' +
                 '<text:span text:style-name="C012">Felgen ALU</text:span>' +
               '</text:p>' +
             '</text:list-item>' +
             '<text:list-item>' +
-              '<text:p style:name="P2">' +
+              '<text:p text:style-name="P2">' +
                 '<text:span text:style-name="C015">Farbe rot</text:span>' +
               '</text:p>' +
             '</text:list-item>' +
           '</text:list>' +
-          '<text:p text:style-name="Standard"/>'
+          '<text:p text:style-name="P2"/>'
         );
       });
 
@@ -1876,6 +1900,68 @@ describe('Dynamic HTML', function () {
           '</text:list-item>'+
         '</text:list>'+
         '<text:p text:style-name="Standard"/>'
+        );
+      });
+      it('should support a text inside a paragraph next to a nested list', function () {
+        let content = '' +
+        '<ul>' +
+          '<li><p>Coffee</p>' +
+            '<ul>' +
+              '<li>Mocha</li>' +
+            '</ul>' +
+          '</li>' +
+        '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content));
+        helper.assert(res.content.get(), '' +
+          '<text:list text:style-name="LC010">'+
+              '<text:list-item>'+
+                  '<text:p>'+
+                      '<text:span>Coffee</text:span>'+
+                  '</text:p>'+
+                  '<text:list>'+
+                      '<text:list-item>'+
+                          '<text:p>'+
+                              '<text:span>Mocha</text:span>'+
+                          '</text:p>'+
+                      '</text:list-item>'+
+                  '</text:list>'+
+              '</text:list-item>'+
+          '</text:list>'+
+          '<text:p text:style-name="Standard"/>'
+        );
+      });
+      it('should support a text inside a anchor next to a nested list', function () {
+        const _options = {
+          defaultUrlOnError: 'https://carbone.io/error'
+        }
+
+        let content = '' +
+        '<ul>' +
+          '<li><a href="https://carbone.io">Coffee</a>' +
+            '<ul>' +
+              '<li>Mocha</li>' +
+            '</ul>' +
+          '</li>' +
+        '</ul>';
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options);
+        helper.assert(res.content.get(_options), '' +
+          '<text:list text:style-name="LC010">'+
+            '<text:list-item>'+
+              '<text:p>'+
+                '<text:a xlink:type="simple" xlink:href="https://carbone.io">'+
+                  '<text:span>Coffee</text:span>'+
+                '</text:a>'+
+              '</text:p>'+
+              '<text:list>'+
+                '<text:list-item>'+
+                  '<text:p>'+
+                    '<text:span>Mocha</text:span>'+
+                  '</text:p>'+
+                '</text:list-item>'+
+              '</text:list>'+
+            '</text:list-item>'+
+          '</text:list>'+
+          '<text:p text:style-name="Standard"/>'
         );
       });
       it('should create a nested list with in a "li" tag without text', function () {
@@ -2975,7 +3061,11 @@ describe('Dynamic HTML', function () {
             '<w:t xml:space="preserve"> thit is some text</w:t>' +
           '</w:r>'+
         '</w:p>' +
-        '<w:p/>' +
+        '<w:p>' + /** Empty paragraph */
+          '<w:pPr>'+
+            '<w:bidi/><w:jc w:val="center"/>'+
+          '</w:pPr>'+
+        '</w:p>' +
         '<w:p>'+
           '<w:pPr>'+
             '<w:bidi/><w:jc w:val="center"/>'+
@@ -2990,6 +3080,47 @@ describe('Dynamic HTML', function () {
             '</w:rPr>'+
             '<w:t xml:space="preserve">John</w:t>'+
           '</w:r>'+
+        '</w:p>'
+        );
+      });
+
+      it('should convert HTML to DOCX and should apply a default style on each paragraph (empty paragraphs as break line, empty paragraph at the end of <p></p>, empty paragraph if <p> has no end)', function () {
+        let _descriptor = html.parseHTML('<p>This is a paragraph</p><br><p> lala');
+        
+        /** Init template style, it is executed during the preprocessing */
+        const htmlDefaultStyleDatabase = new Map();
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += '<w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/>'
+        _htmlDefaultStyleObject.paragraph += '<w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/>';
+        htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
+
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, { htmlStylesDatabase: htmlDefaultStyleDatabase }, _styleId); // STYLE AS A LAST ARGUMENT
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content.get(), '' +
+        '<w:p>'+
+          '<w:pPr><w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/></w:pPr>'+
+          '<w:r>'+
+              '<w:rPr><w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
+              '<w:t xml:space="preserve">This is a paragraph</w:t>'+
+          '</w:r>'+
+        '</w:p>'+
+        '<w:p>'+
+          '<w:pPr><w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/></w:pPr>'+
+        '</w:p>'+
+        '<w:p>'+
+          '<w:pPr><w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/></w:pPr>'+
+        '</w:p>'+
+        '<w:p>'+
+          '<w:pPr><w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/></w:pPr>'+
+          '<w:r>'+
+            '<w:rPr><w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
+            '<w:t xml:space="preserve"> lala</w:t>'+
+          '</w:r>'+
+        '</w:p>'+
+        '<w:p>'+
+          '<w:pPr><w:rFonts w:ascii="Segoe Print"/><w:sz w:val="18"/></w:pPr>'+
         '</w:p>'
         );
       });
@@ -3223,44 +3354,41 @@ describe('Dynamic HTML', function () {
         }
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.paragraph += '<w:sz w:val="22"/>';
         _htmlDefaultStyleObject.text += '<w:sz w:val="18"/>';
         _options.htmlStylesDatabase.set(_styleId, _htmlDefaultStyleObject)
 
         const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options, _styleId);
-        helper.assert(content.get(), '' +
-          '<w:p>' +
+      
+        helper.assert(content.get(), ''+ 
+          '<w:p>'+
+            '<w:pPr>'+ 
+              '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
+              /** Default paragraph style */
+              '<w:sz w:val="22"/>'+
+              /** Default Text style */
+              '<w:rPr><w:sz w:val="18"/></w:rPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+              '<w:rPr><w:i/><w:iCs/><w:sz w:val="18"/></w:rPr>'+
+              '<w:t xml:space="preserve">Coffee</w:t>'+
+            '</w:r>'+
+          '</w:p>'+
+          '<w:p>'+
             '<w:pPr>'+
               '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
-              '<w:rPr>' +
-                /** Inject the text size inside the list property */
-                '<w:sz w:val="18"/>' +
-              '</w:rPr>' +
-            '</w:pPr>' +
-            '<w:r>' +
-              '<w:rPr>' +
-                '<w:i/><w:iCs/>' +
-                '<w:sz w:val="18"/>' +
-              '</w:rPr>' +
-              '<w:t xml:space="preserve">Coffee</w:t>' +
-            '</w:r>' +
-          '</w:p>' +
-          '<w:p>' +
-            '<w:pPr>'+
-              '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
-              '<w:rPr>' +
-                /** Inject the text size inside the list property */
-                '<w:sz w:val="18"/>' +
-              '</w:rPr>' +
-            '</w:pPr>' +
-            '<w:r>' +
-              '<w:rPr>' +
-                '<w:i/><w:iCs/>' +
-                '<w:sz w:val="18"/>' +
-              '</w:rPr>' +
-              '<w:t xml:space="preserve">Tea</w:t>' +
-            '</w:r>' +
-          '</w:p><w:p/>'
-        );
+              /** Default paragraph style */
+              '<w:sz w:val="22"/>'+
+              /** Default Text style */
+              '<w:rPr><w:sz w:val="18"/></w:rPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+              '<w:rPr><w:i/><w:iCs/><w:sz w:val="18"/></w:rPr>'+
+              '<w:t xml:space="preserve">Tea</w:t>'+
+            '</w:r>'+
+          '</w:p>'+
+          /** Default paragraph style */
+          '<w:p><w:pPr><w:sz w:val="22"/></w:pPr></w:p>');
         helper.assert(listStyleAbstract, '' +
         '<w:abstractNum w:abstractNumId="1000">' +
           '<w:multiLevelType w:val="hybridMultilevel"/>' +
@@ -3297,7 +3425,8 @@ describe('Dynamic HTML', function () {
         helper.assert(content.get(), '' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Coffee</w:t></w:r></w:p>' +
           '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Tea</w:t></w:r></w:p>' +
-          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p><w:p/>'
+          '<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr><w:bidi/><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">Milk</w:t></w:r></w:p>' +
+          '<w:p><w:pPr><w:bidi/></w:pPr></w:p>'
         );
         helper.assert(listStyleAbstract, '' +
         '<w:abstractNum w:abstractNumId="1000">' +
@@ -3836,6 +3965,98 @@ describe('Dynamic HTML', function () {
             '</w:r>' +
           '</w:p>' +
           '<w:p/>'
+        );
+      });
+
+      it('should create nested list with text inside a paragraph without closing a `li` element', function () {
+        // eslint-disable-next-line no-unused-vars
+        const _htmlContent = '' +
+          '<ul>' +
+              '<li>' +
+                  '<p>This check can be asked by Edwin, please issue the following data:</p>' +
+                  '<ul>' +
+                      '<li>' +
+                          '<p>Full client name and address</p>' +
+                      '</li>' +
+                  '</ul>' +
+              '</li>' +
+          '</ul>';
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML(_htmlContent));
+        helper.assert(content.get(), '' +
+          '<w:p>'+
+            '<w:pPr>'+
+                '<w:numPr>'+
+                    '<w:ilvl w:val="0"/>'+
+                    '<w:numId w:val="1000"/>'+
+                '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+                '<w:t xml:space="preserve">This check can be asked by Edwin, please issue the following data:</w:t>'+
+            '</w:r>'+
+          '</w:p>'+ // << Should include this end paragraph
+          '<w:p>'+
+            '<w:pPr>'+
+                '<w:numPr>'+
+                    '<w:ilvl w:val="1"/>'+
+                    '<w:numId w:val="1000"/>'+
+                '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+                '<w:t xml:space="preserve">Full client name and address</w:t>'+
+            '</w:r>'+
+          '</w:p>'+
+          '<w:p/>'
+        );
+      });
+
+      it('should create nested list with text inside a anchor tag without closing a `li` element', function () {
+        const _options = {
+          defaultUrlOnError: 'https://carbone.io/error',
+          hyperlinkDatabase: new Map()
+        }
+
+        // eslint-disable-next-line no-unused-vars
+        const _htmlContent = '' +
+          '<ul>' +
+              '<li>' +
+                  '<a>This check can be asked by Edwin, please issue the following data:</a>' +
+                  '<ul>' +
+                      '<li>' +
+                          '<p>Full client name and address</p>' +
+                      '</li>' +
+                  '</ul>' +
+              '</li>' +
+          '</ul>';
+        let { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(html.parseHTML(_htmlContent), _options);
+        helper.assert(content.get(_options), '' +
+          '<w:p>'+
+            '<w:pPr>'+
+                '<w:numPr>'+
+                    '<w:ilvl w:val="0"/>'+
+                    '<w:numId w:val="1000"/>'+
+                '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:hyperlink r:id="CarboneHyperlinkId0">'+
+              '<w:r>'+
+                  '<w:rPr>'+
+                      '<w:rStyle w:val="Hyperlink"/>'+
+                  '</w:rPr>'+
+                  '<w:t xml:space="preserve">This check can be asked by Edwin, please issue the following data:</w:t>'+
+              '</w:r>'+
+            '</w:hyperlink>'+
+          '</w:p>'+ // << Should include this end paragraph
+          '<w:p>'+
+            '<w:pPr>'+
+                '<w:numPr>'+
+                    '<w:ilvl w:val="1"/>'+
+                    '<w:numId w:val="1000"/>'+
+                '</w:numPr>'+
+            '</w:pPr>'+
+            '<w:r>'+
+                '<w:t xml:space="preserve">Full client name and address</w:t>'+
+            '</w:r>'+
+          '</w:p>'+
+        '<w:p/>'
         );
       });
 
@@ -5521,6 +5742,27 @@ describe('Dynamic HTML', function () {
       it('should keep html entities that are supported by XML format: <>\'"&', function () {
         const _content = '<div> &amp; &quot; &apos; &lt; &gt; </div>';
         helper.assert(html.convertHTMLEntities(_content), _content);
+      });
+
+      it('should convert html entities as "Entity Number" into the document format (GENERAL SYMBOLS)', function () {
+        const _content = '<div>&#39; &#162; &#169; &#61; &#8364; &#160; &#163; &#174; &#165;</div>';
+        helper.assert(html.convertHTMLEntities(_content), `<div>\' ¢ © = € ${String.fromCodePoint(160)} £ ® ¥</div>`);
+      });
+
+      it('should convert html entities as "Entity Number" into the document format (GENERAL PONCTUATION)', function () {
+        const _content = "&#8211; &#8212; &#8216; &#8217; &#8218; &#8220; &#8221; &#8222; &#8226; &#8230; &#8242; &#8243; &#8249; &#8250; &#8260; &#171; &#187; &#176; &#177; &#182; &#183; &#8776; &#8800; &#8804; &#8805;";
+        helper.assert(html.convertHTMLEntities(_content), `${String.fromCodePoint(8211)} ${String.fromCodePoint(8212)} ‘ ’ ‚ “ ” „ • … ′ ″ ‹ › ⁄ « » ° ± ¶ · ≈ ≠ ≤ ≥`);
+      });
+
+      "&#8211; &#8212; &#8216; &#8217; &#8218; &#8220; &#8221; &#8222; &#8226; &#8230; &#8242; &#8243; &#8249; &#8250; &#8260;"
+
+      it('should convert html entities as "Entity Number" into the document format (CURRENCIES)', function () {
+        let _content = '<div>';
+        for (let i = 8352; i < 8383; i++) {
+          _content += `&#${i}; `
+        }
+        _content += '</div>';        
+        helper.assert(html.convertHTMLEntities(_content), `<div>₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₪ ₫ € ₭ ₮ ₯ ₰ ₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₹ ₺ ₻ ₼ ₽ ₾ </div>`);
       });
 
       it('should convert unsupported HTML entities into valid HTML entities [non-breaking space]', function () {

@@ -4,6 +4,10 @@
     - `XML Excel 2003` can be used to generate: `pdf`, `csv`, `ods`, `xlsx`, `xls`, `jpeg`, `png`
     - Known limitations: enterprise features are not supported for the moment (images, barcode, colors, html, etc...)
   - [EE] Fix `POST /render/:templateId`: when a body request is larger than the `maxDataSize` (Carbone CLoud API limit is 60MB), a `413` code is returned instead of `500`, and the error message is `Content too large, the JSON size limit is X MB` instead of `PayloadTooLargeError`.
+  - [EE] Fixed `:html` formatter for ODT/DOCX/PDF documents: 
+    - Empty paragraphs on the generated document are now keeping the style applied on the template.
+    - HTML entities: Support unicode values for all currency symbols and most used punctuation. For instance `&#39;` will print `'`.
+    - Support the rendering of nested ordered/unordered lists with mixed paragraphs and anchors tags.
 
 ### v4.13.0
   - Release July 7th 2023

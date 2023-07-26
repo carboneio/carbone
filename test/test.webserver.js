@@ -367,7 +367,7 @@ describe('Webserver', () => {
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
         deleteRequiredFiles();
         webserver = require('../lib/webserver');
-        webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir()], () => {
+        webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir(), '--maxDataSize', 20 * 1024 * 1024], () => {
           webserver.generateToken((_, newToken) => {
             token = newToken;
             done();
@@ -539,6 +539,30 @@ describe('Webserver', () => {
           assert.strictEqual(data.success , false);
           assert.strictEqual(data.code , 'w114');
           assert.strictEqual(data.error , 'Cannot execute beforeRender');
+          done();
+        });
+      });
+
+      it('should not render if the JSON Body request is too large and should return an error 413', (done) => {
+        let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
+        let body = {
+          data : {
+            firstname : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            lastname  : 'Doe'
+          },
+          complement : {},
+          enum       : {}
+        };
+
+        for (let i = 0; i < 100000; i++) {
+          body.data[i] = ' ' + body.data.firstname;          
+        }
+        get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 413);
+          assert.strictEqual(data.success , false);
+          assert.strictEqual(data.code , 'w121');
+          assert.strictEqual(data.error , 'Content too large, the JSON size limit is 20 MB');
           done();
         });
       });

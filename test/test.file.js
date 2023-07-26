@@ -134,6 +134,20 @@ describe('file', function () {
         done();
       });
     });
+    it('should detect a ooxml type (XML Word 2003)', function (done) {
+      carbone.getFileExtension('test_word-2003.xml', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'ooxml');
+        done();
+      });
+    });
+    it('should detect a ooxml type (XML Excel 2003)', function (done) {
+      carbone.getFileExtension('test_excel-2003.xml', function (err, extension) {
+        helper.assert(err, null);
+        assert.strictEqual(extension, 'ooxml');
+        done();
+      });
+    });
   });
 
   describe('isZipped', function () {

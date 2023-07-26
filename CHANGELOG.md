@@ -1,4 +1,6 @@
-### v4.X.X
+
+### v4.14.0
+  - Release July 26th 2023
   - [EE] Support two new template formats: 
     - `XML Word 2003` can be used to generate: `pdf`, `txt`, `docx`, `odt`, `doc`, `jpeg`, `png`
     - `XML Excel 2003` can be used to generate: `pdf`, `csv`, `ods`, `xlsx`, `xls`, `jpeg`, `png`
@@ -8,6 +10,8 @@
     - Empty paragraphs on the generated document are now keeping the style applied on the template.
     - HTML entities: Support unicode values for all currency symbols and most used punctuation. For instance `&#39;` will print `'`.
     - Support the rendering of nested ordered/unordered lists with mixed paragraphs and anchors tags.
+  - [EE] Support charts in ODP and PPTX templates (same chart types as DOCX/ODT)
+  - Fix wrong type detection when a PPTX contains a chart which an embbedded XLSX file
 
 ### v4.13.0
   - Release July 7th 2023

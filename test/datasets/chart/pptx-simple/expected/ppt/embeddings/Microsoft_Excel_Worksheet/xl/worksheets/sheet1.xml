@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac xr xr2 xr3" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision" xmlns:xr2="http://schemas.microsoft.com/office/spreadsheetml/2015/revision2" xmlns:xr3="http://schemas.microsoft.com/office/spreadsheetml/2016/revision3" xr:uid="{891420DD-8048-9F49-BBA6-8F464956F957}">
+  <dimension ref="A1:D5"/>
+  <sheetViews>
+    <sheetView tabSelected="1" workbookViewId="0">
+      <selection activeCell="D6" sqref="D6"/>
+    </sheetView>
+  </sheetViews>
+  <sheetFormatPr baseColWidth="10" defaultRowHeight="16" x14ac:dyDescent="0.2"/>
+  <sheetData>
+    <row   x14ac:dyDescent="0.2">
+      <c  s="1" t="inlineStr">
+        <is>
+          <t xml:space="preserve">
+          </t>
+        </is>
+      </c>
+      <c  s="1" t="inlineStr">
+        <is>
+          <t>Series 1</t>
+        </is>
+      </c>
+      <c  s="1" t="inlineStr">
+        <is>
+          <t>Series 2</t>
+        </is>
+      </c>
+      <c  s="1"/>
+    </row>
+    <row   x14ac:dyDescent="0.2">
+      <c  s="1" t="inlineStr">
+        <is>
+          <t>0</t>
+        </is>
+      </c>
+      <c  s="1" t="inlineStr">
+        <is>
+          <t>0</t>
+        </is>
+      </c>
+      <c  s="1" t="inlineStr">
+        <is>
+          <t>0</t>
+        </is>
+      </c>
+      <c  s="1"/>
+    </row>
+    <row   x14ac:dyDescent="0.2">
+      <c  s="1" t="inlineStr">
+        <is>
+          <t>0</t>
+        </is>
+      </c>
+      <c  s="1" t="inlineStr">
+        <is>
+          <t>0</t>
+        </is>
+      </c>
+      <c  s="1" t="inlineStr">
+        <is>
+          <t>0</t>
+        </is>
+      </c>
+      <c  s="1"/>
+    </row>
+    <row   x14ac:dyDescent="0.2">
+      <c  s="1"/>
+      <c  s="1"/>
+      <c  s="1"/>
+      <c  s="1"/>
+    </row>
+    <row   x14ac:dyDescent="0.2">
+      <c  s="1"/>
+      <c  s="1"/>
+      <c  s="1"/>
+      <c  s="1"/>
+    </row>
+  </sheetData>
+  <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
+  <tableParts count="1">
+    <tablePart r:id="rId1"/>
+  </tableParts>
+</worksheet>

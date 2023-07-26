@@ -1,5 +1,5 @@
 ### v4.13.0
-  - [EE] Support charts in ODP and PPTX
+  - [EE] Support charts in ODP and PPTX templates (same chart types as DOCX/ODT)
   - Fix wrong type detection when a PPTX contains a chart which an embbedded XLSX file
   
 ### v4.13.0

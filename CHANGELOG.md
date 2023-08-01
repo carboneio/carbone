@@ -1,4 +1,8 @@
 
+### v4.14.1
+  - Release August 1st  2023
+  - [EE] Fix charts bug in Docx templates since 4.14.0
+
 ### v4.14.0
   - Release July 26th 2023
   - [EE] Support two new template formats: 

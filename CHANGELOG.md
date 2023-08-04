@@ -1,4 +1,8 @@
 
+### v4.14.2
+  - Release August 4th  2023
+  - [EE] Fix corrupted documents when ODP/ODT templates contain charts in some rare cases.
+
 ### v4.14.1
   - Release August 1st  2023
   - [EE] Fix charts bug in Docx templates since 4.14.0

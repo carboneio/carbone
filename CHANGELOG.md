@@ -1,3 +1,5 @@
+### v4.X.X
+  - [EE] Fix dynamic images mixed with dynamic hyperlinks for DOCX documents
 
 ### v4.14.2
   - Release August 4th  2023

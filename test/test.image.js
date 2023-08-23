@@ -1350,6 +1350,33 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(_template.files[1].data, _expectedContent);
       });
 
+
+      it('should add an image references into "word/_rels/document.xml.rels" by using imageDatabase and should not conflict with dynamic hyperlinks relations', function () {
+        const _template = {
+          files : [{
+            name : 'word/_rels/document.xml.rels',
+            data : '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/image2.png" Id="R1e71cf0a0beb4eb3" /><Relationship Id="CarboneHyperlinkId0" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://carbone.io/photos/85/pic.jpg" TargetMode="External"/></Relationships>',
+          }]
+        };
+        const _expectedContent = '<?xml version="1.0" encoding="utf-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/image2.png" Id="R1e71cf0a0beb4eb3" /><Relationship Id="CarboneHyperlinkId0" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="https://carbone.io/photos/85/pic.jpg" TargetMode="External"/><Relationship Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="/media/CarboneImage0.gif" Id="rIdCarbone0"/></Relationships>';
+        const _options = {
+          imageDatabase : new Map()
+        };
+        _options.imageDatabase.set('logo.gif', {
+          data      : '1234',
+          id        : 0,
+          sheetIds  : [ 'document.xml' ],
+          extension : 'gif'
+        });
+        image.postProcessDocx(_template, null, _options);
+        helperTest.assert(_template.files[0], {
+          name   : 'media/CarboneImage0.gif',
+          parent : '',
+          data   : '1234'
+        });
+        helperTest.assert(_template.files[1].data, _expectedContent);
+      });
+
       it('should add multiple images references into "word/_rels/document.xml.rels" by using imageDatabase', function () {
         const _template = {
           files : [{

@@ -1,7 +1,5 @@
-### v4.X.X
-  - [EE] Fix dynamic images mixed with dynamic hyperlinks for DOCX documents
-
 ### v4.14.3
+  - [EE] Fix dynamic images mixed with dynamic hyperlinks for DOCX documents
   - [EE] On-premise. Change message "Unknown parameter" to "Additional plugin parameters detected" when Carbone is starting.
 
 ### v4.14.2

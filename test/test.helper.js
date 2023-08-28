@@ -117,7 +117,7 @@ describe('helper', function () {
         path       : '/yeah/',
         doNotTouch : 55
       });
-      helper.assert(_messages, 'Unknown parameter(s): nbAttempt2, unkown');
+      helper.assert(_messages, 'Additional plugin parameters detected: nbAttempt2, unkown');
     });
     it('should assign value of target, and return an empty message if all parameters are known', function () {
       var _target = {

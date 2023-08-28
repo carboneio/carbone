@@ -1,4 +1,7 @@
 
+### v4.14.3
+  - [EE] On-premise. Change message "Unknown parameter" to "Additional plugin parameters detected" when Carbone is starting.
+
 ### v4.14.2
   - Release August 4th  2023
   - [EE] Fix corrupted documents when ODP/ODT templates contain charts in some rare cases.

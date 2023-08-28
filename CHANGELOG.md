@@ -1,6 +1,8 @@
 ### v4.14.3
+  - Release August 28th  2023
   - [EE] Fix dynamic images mixed with dynamic hyperlinks for DOCX documents
   - [EE] On-premise. Change message "Unknown parameter" to "Additional plugin parameters detected" when Carbone is starting.
+  - [EE] Fix corrupted PPTX files when the template use multiple charts on many slides
 
 ### v4.14.2
   - Release August 4th  2023

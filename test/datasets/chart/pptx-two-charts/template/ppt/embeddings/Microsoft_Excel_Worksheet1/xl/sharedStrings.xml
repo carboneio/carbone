@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="6" uniqueCount="6">
+  <si>
+    <t>
+      Sales
+    </t>
+  </si>
+  <si>
+    <t xml:space="preserve">
+    </t>
+  </si>
+  <si>
+    <t>
+      {d[i].valCol2}
+    </t>
+  </si>
+  <si>
+    <t>
+      {d[i].label}
+    </t>
+  </si>
+  <si>
+    <t>
+      {d[i+1].label}
+    </t>
+  </si>
+  <si>
+    <t>
+      {d[i+1].valCol2}
+    </t>
+  </si>
+</sst>

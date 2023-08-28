@@ -1,8 +1,9 @@
 ### v4.14.3
   - Release August 28th  2023
   - [EE] Fix dynamic images mixed with dynamic hyperlinks for DOCX documents
-  - [EE] On-premise. Change message "Unknown parameter" to "Additional plugin parameters detected" when Carbone is starting.
-  - [EE] Fix corrupted PPTX files when the template use multiple charts on many slides
+  - [EE] On-premise. Change the message "Unknown parameter" to "Additional plugin parameters detected" when Carbone starts.
+  - [EE] Fix corrupted PPTX files when the template uses multiple charts on many slides
+  - [EE] When converting ODT/DOCX to HTML, embed images in the HTML instead of creating external links (works only with xhtml export)  
 
 ### v4.14.2
   - Release August 4th  2023

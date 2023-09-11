@@ -486,12 +486,12 @@
     - 1 - using native charts of MS Word or LibreOffice
     - 2 - or using [Apache ECharts 5.3.3](https://echarts.apache.org/examples/en/index.html) object descriptors to generate advanced cha2
 
-    ## Method n°1, how to inject your data in native charts?
+    ### Method n°1, how to inject your data in native charts?
       - Insert a chart with native tools of LibreOffice or MS Word in your document
       - Use traditional Carbone tags to create loops in chart's data to inject your JSON data
       - If necessary, use the special tag `bind` to tell Carbone that the value `X` in the chart must be replaced by the tag `Y`
 
-    ## Method n°2, how to do advanced charts with Apache ECharts objects?
+    ### Method n°2, how to do advanced charts with Apache ECharts objects?
       - Insert a sample image in your template.
       - Place a tag in alt text , like a dynamic image : `{d.chartObj:chart}` with the formatter `:chart`.
         The formatter `:chart` is optional if the `chartObj` object contains the attribute `"type" : "echarts@v5"`.

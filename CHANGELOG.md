@@ -1,3 +1,7 @@
+## v4.X.X
+  - [EE] The `:imageFit` formatter is now supported for PPTX documents.
+
+
 ## v4.14.3
   - Release August 28th  2023
   - [EE] Fix dynamic images mixed with dynamic hyperlinks for DOCX documents

@@ -639,6 +639,22 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
+      it('should render images into a document with formatter "imageFit(fill)"', function (done) {
+        const _testedReport = 'image/pptx-simple-imagefit';
+        const _data = {
+          image  : _imageDEBase64jpg,
+          image2 : _imageLogoBase64jpg,
+          image3 : _imageLogoBase64jpg,
+          list   : [
+            { image4 : _imageFRBase64jpg }
+          ]
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err) => {
+          helperTest.assert(err+'', 'null');
+          done();
+        });
+      });
+
       it('should do nothing if the template does not include Carbone tags', function (done) {
         const _testedReport = 'image/pptx-simple-without-marker';
         const _data = {

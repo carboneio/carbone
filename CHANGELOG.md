@@ -1,6 +1,6 @@
-## v4.X.X
+## v4.14.4
+  - Release September 12th 2023
   - [EE] The `:imageFit` formatter is now supported for PPTX documents.
-
 
 ## v4.14.3
   - Release August 28th  2023

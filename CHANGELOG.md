@@ -1,22 +1,23 @@
-### v4.X.X
+## v4.X.X
   - [EE] The `:imageFit` formatter is now supported for PPTX documents.
 
-### v4.14.3
+
+## v4.14.3
   - Release August 28th  2023
   - [EE] Fix dynamic images mixed with dynamic hyperlinks for DOCX documents
   - [EE] On-premise: change the message "Unknown parameter" to "Additional plugin parameters detected" when Carbone starts.
   - [EE] Fix corrupted PPTX files when the template uses multiple charts on many slides
   - [EE] When converting ODT/DOCX to HTML, embed images in the HTML instead of creating external links (works only with xhtml export)  
 
-### v4.14.2
+## v4.14.2
   - Release August 4th  2023
   - [EE] Fix corrupted documents when ODP/ODT templates contain charts in some rare cases.
 
-### v4.14.1
+## v4.14.1
   - Release August 1st  2023
   - [EE] Fix charts bug in Docx templates since 4.14.0
 
-### v4.14.0
+## v4.14.0
   - Release July 26th 2023
   - [EE] Support two new template formats: 
     - `XML Word 2003` can be used to generate: `pdf`, `txt`, `docx`, `odt`, `doc`, `jpeg`, `png`
@@ -30,7 +31,7 @@
   - [EE] Support charts in ODP and PPTX templates (same chart types as DOCX/ODT)
   - Fix wrong template format detection when a PPTX contains a chart which an embbedded XLSX file
 
-### v4.13.0
+## v4.13.0
   - Release July 7th 2023
   - [EE] Carbone API status codes fixes:
     - For all endpoints, if the API key is missing or not correct, a `401` code is returned instead of `500`.
@@ -43,17 +44,17 @@
   - Fix corrupted document when `html` formatter is used and the text contains `&D;`
 
 
-### v4.12.2
+## v4.12.2
   - Release July 3rd 2023
   - Fix chained formatters `:split():arrayJoin('', 2, 3)`
   - Fix formatter `substr`
   - Array filter: accept to filter `null` or `undefined` values
 
-### v4.12.1
+## v4.12.1
   - Release June 28th 2023
   - Fix `ellispis` -> `ellipsis` formatter
 
-### v4.12.0
+## v4.12.0
   - Release June 28th 2023
   - [EE] Carbone On-Premise: add parameter `maxTemplateSize` (bytes) to change default limit (20MB)
   - [EE] Fix `GET /template`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
@@ -68,16 +69,16 @@
     - `append(text)`: add a suffix
     - `arrayJoin(separator, index, count)`: add two options to cut the array and select only a part of it
 
-### v4.11.2
+## v4.11.2
   - Release June 14th 2023
   - [EE] On-Premise: New option to enable more security controls, following ANSSI (France) and BSI (Germany) recommendations. Contact us for more information.
   - [EE] All APIs returns `400 Bad request` instead of `404 Not Found` when `idTemplate` is not valid
 
-### v4.11.1
+## v4.11.1
   - Release June 2nd 2023
   - Accept image from dropbox with mime type `application/binary` and image extension in capital letters
 
-### v4.11.0
+## v4.11.0
   - Release June 1st 2023
   - Support `drop` formatter in headers and footers of DOCX and ODT documents.
   - `:drop(h)` can be used to delete heading elements for ODT templates only. On LibreOffice, it relates to heading style 1, 2, 3, 4 and custom styles.
@@ -89,23 +90,23 @@
   - Fix chart distortion issue when converting DOCX to PDF if the document contains more than 20 charts
   - Fix hyperlink error when the value is not a string
 
-### v4.10.6
+## v4.10.6
   - Release May 12th 2023
   - [EE] Fix: accepts whitespace in image URL like before v4.10.2 even if it is not recommended
 
-### v4.10.5
+## v4.10.5
   - Release May 8th 2023
   - [EE] set default webhook timeout to 16 seconds (it was 3s since 4.10.0)
 
-### v4.10.4
+## v4.10.4
   - Release May 4th 2023
   - [EE] Egress traffic: When a request retry is attempted, do not use the egress proxy again if the primary egress proxy is configured and the secondary egress proxy is undefined
 
-### v4.10.3
+## v4.10.3
   - Release May 3rd 2023
   - [EE] Improve automatic HTTP request retry of images with the last version of [rock-req](https://github.com/carboneio/rock-req)
 
-### v4.10.2
+## v4.10.2
   - Release May 3rd 2023
   - [EE] Fix `options.isDebugActive = true`: do not return internal (not visible by user) tags
   - [EE] Fix crash when dynamic image URL contains forbidden characters
@@ -113,25 +114,25 @@
   - [EE] Fix `HEAD /render/:renderId`: The request don't delete the generated document anymore.
   - [EE] Fix `GET /template/:templateId`: If the template doesn't exist, the statusCode `404` is returned instead of `400`.
 
-### v4.10.1
+## v4.10.1
   - Release April 17th 2023
   - [EE] Disable egress proxy by default
 
-### v4.10.0
+## v4.10.0
   - Release April 17th 2023
   - [EE] Support vector barcodes with the new `svg` option to improve print quality: `{d.number:barcode(qrcode, svg:true)}`
 
-### v4.9.2
+## v4.9.2
   - Release April 14th 2023
   - [EE] Fix dynamic hyperlinks when `d` is an array for DOCX templates
 
-### v4.9.1
+## v4.9.1
   - Release April 12th 2023
   - [EE] with XLSX/ODS templates: `formatN` converts values to native Excel number even if `d` is an array. `formatN` without parenthesis is also accepted.
   - [EE] On-Premise: Add new options to use a proxy for egress traffic
   - Fix dynamic hyperlinks error URL and add slash to URLs
 
-### v4.9.0
+## v4.9.0
   - Release March 3rd 2023
   - Accept absolute path which starts by `d.` or `c.` without quotes in formatters like this : `{d.id:print(d.other)}` or `{d.id:print(c.other[0].test)}`
   - [EE] Force download of the rendered report when the query parameter `?download=true` is set
@@ -211,19 +212,19 @@
     if the template contains the tag `{o.preReleaseFeatureIn=4009000}`. This tag means: "enable all pre-release features added up to v4.9.0".
     Please only use this tag if we tell you to use it on our live chat.
 
-### v4.8.3
+## v4.8.3
   - Release February 15th 2023
   - [EE] Experimental: increase the limit to 400 repetitions maximum when using the repetition feature `{d[i+1*qty]`
 
-### v4.8.2
+## v4.8.2
   - Release February 7rd 2023
   - Fix dynamic image injection in some XLSX files
 
-### v4.8.1
+## v4.8.1
   - Release February 3rd 2023
   - Fix regular hyperlinks in DOCX (bug introduced by v4.6.3)
 
-### v4.8.0
+## v4.8.0
   - Release February 1st 2023
   - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`.
     If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
@@ -232,49 +233,49 @@
   - Ignore `hardRefresh : true` if the output file type is the same as the template type, and the file type is unknown by LibreOffice (example: XML to XML)
   - Fix: The parameter of a formatter should not be considered as a dynamic variable if it starts with a dot and is surrounded by quotes as in v3.x
 
-### v4.7.0
+## v4.7.0
   - Release January 26th 2023
   - Improve error message when there is a missing [show|hide]Begin/End
   - Fix: Accept PDF password with integers
   - [EE] Support Bubble charts in Docx templates
 
-### v4.6.8
+## v4.6.8
   - Release December 7th 2022
   - Fix array filters when the same filter is used with different operators in multiple tags. Ex `{d[type=ok].id} {d[type!=ok].id}`
 
-### v4.6.7
+## v4.6.7
   - Release December 5th 2022
   - Fix regression of v4.6.6 when multiple loops are used on the same table.
 
-### v4.6.6
+## v4.6.6
   - Release November 30th 2022
   - Fix bugs when using two Carbone tags which are using similar paths in some complex situation (d > obj > arr > obj > [arr|obj] > att). Very hard to explain here!
   - Increase max downloaded image in parallel from 5 to 15.
 
-### v4.6.5
+## v4.6.5
   - Release November 25th 2022
   - Accept parentheses in formatters between single quotes
 
-### v4.6.4
+## v4.6.4
   - Release November 17th 2022
   - Fix aspect ratio of images if the same image is used twice in a second section of a document
 
-### v4.6.3
+## v4.6.3
   - Release November 10th 2022
   - Full support of table of content and bookmarks (internal hyperlinks) in DOCX templates
 
-### v4.6.2
+## v4.6.2
   - Release November 4th 2022
   - Fix: Encode HTML special characters when generating SVG with Echarts
 
-### v4.6.1
+## v4.6.1
   - Release October 28th 2022
   - Fixed `:drop(row, nbrToDrop)` for DOCX documents: bookmarked table rows can be deleted.
   - negative numbers can by used when filtering with the iterator `i`
     - `{d.arr[i, i<-2].id}  {d.arr[i+1, i<-2].id}` print all elements except the last 2 items
     - `{d.arr[i, i<-1].id}  {d.arr[i+1, i<-1].id}` print all elements except the last item
 
-### v4.6.0
+## v4.6.0
   - Release October 18th 2022
   - Added the option `table` for the `:drop(element)` formatter to delete table conditionally. Available for DOCX, ODT and ODP templates. Usage: `{d.value:ifEM:drop(table)}`. The tag must be located within a table cell.
   - ⚡️ Added for **PPTX** templates:
@@ -283,7 +284,7 @@
   - Add user-agent `Carbone` when webhook is called. Print HTTP status webhook response in logs.
   - Added types for the `ifTE(type)` formatter: `boolean`, `binary`, `array`, `object`, `number`, `integer`.  Usage: `{d.value:ifTE(number):show('It is a number!')}`, the conditional formatter checks if the type of the value is a number.
 
-### v4.5.2
+## v4.5.2
   - Release October 9th 2022
   - ⭐️ Add the possibility to store values in data with new formatter `:set(d.value)`. Known limits:
     - accepts only to store values at the root level of `d`, and only in `d`.
@@ -292,7 +293,7 @@
   - New Formatters `mod()` to compute modulo
       - Example: `{d.val:mod(2)}` returns 0 if `d.val` = 4
 
-### v4.5.1
+## v4.5.1
   - Release October 7th 2022
   - Added for the `:drop(element)` formatter:
     - ODP templates are supported
@@ -305,7 +306,7 @@
     - aggMax : -infinity
     - aggAvg : 0
 
-### v4.5.0
+## v4.5.0
   - Release October 5th 2022
   - Dynamic parameters passed in formatters with a dot `.` accepts dynamic array access between brackets `[.i]`:
     It can be used to select the corresponding element of another array: `{d.myArray[i]:myFormatter(..otherParentArray[.i].id)}`.
@@ -317,12 +318,12 @@
     - Improve logs messages for webhooks
   - Performance: huge gain from x10 to x20 when Carbone builds the final result of the report before the conversion
 
-### v4.4.1
+## v4.4.1
   - Release September 26st 2022
   - On-Premise:
     - add options `xlsmEnabled` to accept export to `xlsm` format (false by default)
 
-### v4.4.0
+## v4.4.0
   - Release September 21st 2022
   - Add new formatter `ifTE(string)` to test if a value is a string. Only "string" is supported for now.
   - Fix: In docx templates, array filters could be ignored when the loop includes images (bug introduced in v4.1.0 to fix broken docx)
@@ -341,13 +342,13 @@
     -  `'2010-12-01':formatD(LL)`           returns `December 1, 2010`. Before this version Carbone returned `November 30, 2010`
     -  `'2010-12-01T01:00:00Z':formatD(LL)` returns `November 30, 2010 8:00 PM`
 
-### v4.3.0
+## v4.3.0
   - Release September 12st 2022
   - `hide` formatter becomes `drop` to avoid confusion with `hideBegin/hideEnd/show`. `hide` was introduced in 4.2 and is still not offically documented.
   - `drop(row, nbrRows)` accepts a second parameter to select the number of row to remove
   - `drop` formatter can't be used into Carbone aliases.
 
-### v4.2.0
+## v4.2.0
   - Release September 8st 2022
   - Fixed parsing of Carbone tags when empty string are used between two single quotes.
     Ex. `{d.text:print(''):print('HIGK LMN')}` prints `HIGK LMN` instead of `HIGKLMN`
@@ -389,7 +390,7 @@
     - `shape` to hide shape (square, circle, arrows, etc...), usage: `{d.dataset:ifEM:hide(shape)}`. The tag must be included within the shape' title, description or alternative text.
   - [EE] Improved: ODS templates support loops of dynamic images. Setting the image anchor "To cell" is required.
 
-### v4.1.0
+## v4.1.0
   - Release August 22st 2022
   - [EE] New: `convCRLF` prints `\\n` and `\\r\\n` as new lines in ODS template instead of strings
   - [EE] New: On-Premise Embedded Studio features:
@@ -421,7 +422,7 @@
   - [EE] Fixed dynamic hyperlinks with query parameters for ODT templates
   - [EE] Fixed broken Docx files when shapes were duplicated by Carbone
 
-### v4.0.0
+## v4.0.0
   - Release June 25st 2022
   - [EE] ⚡️ Main features summary (see v4.0.0-alpha.0 for details)
     - Support dynamic charts in LibreOffice and Word + echarts
@@ -454,11 +455,11 @@
     - The colours for Ultracode symbols were changed to RGB values rather than CMYK.
     - The metrics for Ultracode symbols was updated and a raw mode was added.
 
-### v4.0.0-beta.2
+## v4.0.0-beta.2
   - Release June 1st 2022
   - Fix crash with very complex JSON map
 
-### v4.0.0-beta.1
+## v4.0.0-beta.1
   - Release May 25th 2022
   - [EE] Accept formatters after conditional formatters. It solves many issues, such as dynamic colors with conditions:
     - `{d.value:ifLT(10):show(0):formatN}` : `formatN` works even if the condition `ifLT(10)` is true
@@ -471,7 +472,7 @@
     - Fix chart binding when values contain white spaces
     - Fix ODT charts when images are used for background
 
-### v4.0.0-alpha.1
+## v4.0.0-alpha.1
   - [EE] BREAKING CHANGE: the specific tag `{bind` becomes `{bindChart`. Example: `{bindChart(91) = d[i].valCol1}`
   - [EE] DOCX Charts improvements
     - Manage loops to repeat multiple charts in DOCX template made by MS Office
@@ -481,7 +482,7 @@
     - Using the specific tag `{bindChart` is not mandatory for DOCX because MS Word accepts Carbone tags in chart values
   - Fix crash when a condition is used just before a filtered loop
 
-### v4.0.0-alpha.0
+## v4.0.0-alpha.0
 
   WARNING: Native charts in LibreOffice and Word still need a lot of work before being stable for production
 
@@ -638,58 +639,58 @@
         - Sum by people by age and gender, regardless of departments
           - `{d.departments[i].people[i].salary:aggSum(.age, .gender)}`
 
-### v3.6.0
+## v3.6.0
   - Release April 17th 2023
   - Support vector barcodes with the new `svg` option to improve print quality: `{d.number:barcode(qrcode, svg:true)}`
 
-### v3.5.6
+## v3.5.6
   - Release February 16th 2023
   - [EE] BREAKING CHANGE in Carbone On-Premise plugins: the callback of `getPublicKey` must take two arguments `(err, publicKeys)`.
     If the first argument contains an error, the bad token is kept in quarantine area for 60s instead of infinitely.
 
-### v3.5.5
+## v3.5.5
   - Release December 7th 2022
   - Add user-agent `Carbone` when webhook is called.
 
-### v3.5.4
+## v3.5.4
   - Release June 15th 2022
   - [EE] Do not return an error when `DEL /template` is called and the template is already deleted on local storage. It may be already deleted by the plugin.
 
-### v3.5.3
+## v3.5.3
   - Release May 25th 2022
   - [EE] Accept `convCRLF` before `:html` formatter to convert `\r\n` to `<br>`
 
-### v3.5.2
+## v3.5.2
   - Release May 6th 2022
   - [EE] Add file verification on template upload
 
-### v3.5.1
+## v3.5.1
   - Release May 4th 2022
   - Rollback fix in v3.4.9
 
-### v3.5.0
+## v3.5.0
   - Release May 4st 2022
   - Formatters `add()`, `mul()`, `sub()` and `div()` accept simple mathematical expressions inside parenthesis.
       - Example: `{d.val:add(.otherQty  +  .vat  *  .price - 10 / 2)`
       - Only mathematical operators `+, *, -, /` are allowed, without parenthesis
       - Multiplication and division operators (`*`, `/`) has higher precedence than the addition/substration operator (`+`, `-`) and thus will be evaluated first.
 
-### v3.4.9
+## v3.4.9
   - Release April 27st 2022
   - Fix crash with very complex JSON map
 
-### v3.4.8
+## v3.4.8
   - Release March 15st 2022
   - [EE] Fix: avoid crash when a tag is used on a shape instead of a sample image (v3.2.2-1)
   - [EE] Fix graceful exit on SIGTERM, keep the converter alive to finish remaining renders!
     - As soon as Carbone has finished all renders, it exits after 15 seconds instead of 10 seconds
   - [EE] Fix DOCX documents that are including dynamic images and static charts
 
-### v3.4.7
+## v3.4.7
   - Release March 1st 2022
   - [EE] Carbone-EE On-Premise accepts to read the license from environment variable `CARBONE_EE_LICENSE`, or `--license` CLI options
 
-### v3.4.6
+## v3.4.6
   - Release February 18th 2022
   - [EE] The HTTP server starts as soon as possible, before LibreOffice.
   - [EE] Gracefully exits on SIGTERM. When the signal is received
@@ -712,15 +713,15 @@
   - [EE] Dynamic HTML improvement - the following styles applied on the `:html` formatter are kept on the generated document: Right-to-left text, and text/background colors.
   - [EE] Dynamic HTML Fix - When creating a ordered or unordered list, the font-size, and font-family applied on the template are now kept in the generated document.
 
-### v3.4.5
+## v3.4.5
   - Release February 9th 2022
   - Now the parameter `converterFactoryTimeout` updates also the HTTP socket timeout accordingly
 
-### v3.4.4
+## v3.4.4
   - Release February 7th 2022
   - [EE] Experimental: increase the limit to 200 repetitions maximum when using the repetition feature `{d[i+1*qty]`
 
-### v3.4.3
+## v3.4.3
   - Release January 31th 2022
   - [EE] Bump dependencies to latest version
   - [EE] Add `options.isDebugActive`. If true, `POST /render` returns additional information in `debug` sub-object:
@@ -733,17 +734,17 @@
     }
     ```
 
-### v3.4.2
+## v3.4.2
   - Release January 10th 2022
   - [EE] Fix do not crash if content passed to `:html` formatter is not a string
 
-### v3.4.1
+## v3.4.1
   - Release December 9th 2021
   - Accepts "OpenDocument Text Flat XML" (.fodt) template files
   - Includes v3.3.3: fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
   - [EE] Fix dynamic colors for DOCX cells background
 
-### v3.4.0
+## v3.4.0
   - Release November 17th 2021
   - Remove compatibility with NodeJS 10.x. V8 uses timsort since NodeJS 11. So we can remove timsort dependency. NodeJS 12+ required.
   - Bump DayJS to 1.10.7 and debug to 4.3.2
@@ -780,20 +781,20 @@
     - You must pass one of the following types to the `:barcode` formatter as a first argument: `ean5`, `ean2`, `ean13`, `ean8`, `upca`, `upce`, `isbn`, `ismn`, `issn`, `code128`, `gs1-128`, `ean14`, `sscc18`, `code39`, `code39ext`, `code32`, `pzn`, `code93`, `code93ext`, `interleaved2of5`, `itf14`, `identcode`, `leitcode`, `databaromni`, `databarstacked`, `databarstackedomni`, `databartruncated`, `databarlimited`, `databarexpanded`, `databarexpandedstacked`, `gs1northamericancoupon`, `pharmacode`, `pharmacode2`, `code2of5`, `industrial2of5`, `iata2of5`, `matrix2of5`, `coop2of5`, `datalogic2of5`, `code11`, `bc412`, `rationalizedCodabar`, `onecode`, `postnet`, `planet`, `royalmail`, `auspost`, `kix`, `japanpost`, `msi`, `plessey`, `telepen`, `telepennumeric`, `posicode`, `codablockf`, `code16k`, `code49`, `channelcode`, `flattermarken`, `raw`, `daft`, `symbol`, `pdf417`, `pdf417compact`, `micropdf417`, `datamatrix`, `datamatrixrectangular`, `datamatrixrectangularextension`, `mailmark`, `qrcode`, `swissqrcode`, `microqrcode`, `rectangularmicroqrcode`, `maxicode`, `azteccode`, `azteccodecompact`, `aztecrune`, `codeone`, `hanxin`, `dotcode`, `ultracode`, `gs1-cc`, `ean13composite`, `ean8composite`, `upcacomposite`, `upcecomposite`, `databaromnicomposite`, `databarstackedcomposite`, `databarstackedomnicomposite`, `databartruncatedcomposite`, `databarlimitedcomposite`, `databarexpandedcomposite`, `databarexpandedstackedcomposite`, `gs1-128composite`, `gs1datamatrix`, `gs1datamatrixrectangular`, `gs1qrcode`, `gs1dotcode`, `hibccode39`, `hibccode128`, `hibcdatamatrix`, `hibcdatamatrixrectangular`, `hibcpdf417`, `hibcmicropdf417`, `hibcqrcode`, `hibccodablockf`, `hibcazteccode`
     - The previous system, which uses a special font, is still available but is limited to `ean8`, `ean13`, `ean128`, `code39`.
 
-### v3.3.2
+## v3.3.2
   - Release October 11th 2021
   - [EE] Dynamic Image fix: image types verification support uppercase and lower case formats
 
-### v3.3.1
+## v3.3.1
   - Release September 9th 2021
   - [EE] New Carbone On-premise: Pass the option "maxDataSize" to change the maximum JSON data size when rendering a report. The value must be **bytes**. The default value is 60MB.
 
-### v3.3.3
+## v3.3.3
   - Release November 26th 2021
   - Fix timezone conversion with latest IANA database to manage correctly Daylight Saving Time
     `2021-11-18T08:05+0000` -> `Europe/London` -> `Thursday, November 18, 2021 8:05 AM`
 
-### v3.3.0
+## v3.3.0
   - Release August 30th 2021
   - [EE] HTML Formatter:
     - Fix: The HTML content is rendered without adding an empty line above it.
@@ -803,33 +804,33 @@
   - [EE] Dynamic Checkbox are supported only for ODT file. A tag should be inserted into the checkbox property "name" and it is used to set the value of the checkbox on the generated report. The checkbox is ticked (checked) when the value is a Boolean with the value "true", a non empty string, a non empty array or a non empty object. If the exported file type is a PDF, the checkbox can be edited on the generated document. An ODT document created from MS Word that include checkboxes does not work. It is also not possible to create a list of checkboxes with the expressions `[i] / [i+1]`.
   - Accept `null` for the attribute `complement` in `options`
 
-### v3.2.7
+## v3.2.7
   - Release July 21th 2021
   - Fix corrupted document when accessing a sub-object in an array `{d.surrounding[i].subArray[0].subObject.id}`, within a surrounding loop
 
-### v3.2.6
+## v3.2.6
   - Release June 15th 2021
   - [EE] Fix the generation of ODP document that includes table lists.
 
-### v3.2.5
+## v3.2.5
   - Release June 10th 2021
   - [EE] Accept URLs with weird Content-Type such as `image/png; charset=utf-8`  for dynamic image replacement
 
-### v3.2.4
+## v3.2.4
   - Release May 25th 2021
   - [EE] Add the possibility to upload templates in base64. The content-type must be `application/json` and the template
     must be sent in base64 in the body `{ "template" : "pure base64 or data-URI scheme in base64"}`
   - [EE] Accepts loops with dynamic image replacement across slides/pages in ODP templates
 
-### v3.2.3
+## v3.2.3
   - Release May 21th 2021
   - Accepts letter `W` to get the week number in `formatD` formatter
 
-### v3.2.2-1
+## v3.2.2-1
   - Release March 11th 2022
   - Fix: avoid crash when a tag is used on a shape instead of a sample image
 
-### v3.2.2
+## v3.2.2
   - Release May 10th 2021
   - Fix broken Excel files. It removes the alert which appears sometime when opening the file with MS Excel.
   - Update DayJS dependency from 1.9.6 to 1.10.4.
@@ -861,12 +862,12 @@
     Example:
       - `de` => `Freitag 1,000.123` (before) `Freitag 1.000,123` (after)
 
-### v3.2.1
+## v3.2.1
   - Release May 4th 2021
   - Fix locale de-de
   - [EE] Fix dynamic HTML: null or undefined values return an empty string instead of an error.
 
-### v3.2.0
+## v3.2.0
   - Release April 13th 2021
   - [EE] Fix dynamic image resize when using the `:imageFit` formatter with the `contain` property.
   - [EE] Add the option `:imageFit(fillWidth)` to fill the full width of the template image while keeping aspect ratio of the inserted image.
@@ -878,30 +879,30 @@
     - this replacement image more beautiful (vectorial) and does not contain any text for internationalisation
   - [EE] Fix corrupted XLSX files when inserting new type of image which were not previously present
 
-### v3.1.7
+## v3.1.7
   - Release April 12th 2021
   - [EE] Fix Dynamic HTML: paragraph and break lines inside nested lists or anchor tags were creating corrupted DOCX/ODT documents.
 
-### v3.1.6
+## v3.1.6
   - Release April 12th 2021
   - [EE] New formatter `:defaultURL()`: if a **dynamic hyperlink** or a **HTML anchor tag** is injected into a report and the URL verification fails, the formatter is used to replace the default error URL. Example to use it with and HTML formatter: `{d.content:defaultURL(https:url.of.your.choice):html}`. The `:defaultURL` should be placed before the `:html` formatter.
   - [EE] Fix: return 404 error when the template does not exist on rendering
 
-### v3.1.5
+## v3.1.5
   - Release April 8th 2021
   - [EE] Fix hyperlinks verification which could lead to crash.
 
-### v3.1.4
+## v3.1.4
   - Release April 1st 2021
   - [EE] Improve `:html` formatter stability when using special characters such as "'<>& for ODT and DOCX reports.
 
-### v3.1.3
+## v3.1.3
   - Release March 29th 2021
   - Fix: Do not break documents if the `i+1` row contains some tags coming from parent object or condition blocks (rare)
   - [EE] if a font family and font size is applied to an HTML formatter `{d.content:html}`, the font & size will be applied to the whole rendered HTML
   - [EE] return an error message when image anchor is not correct in the template
 
-### v3.1.2
+## v3.1.2
   - Release March 4rd 2021
   - Fix: v3.1.0 introduced a backward compatibility issue with reports made with v1/v2. Now, filter with boolean works like this (same behavior as numbers)
     - data                       => template                       => condition result in array
@@ -913,11 +914,11 @@
     - `data.myBoolean = true`    => `d.array[i, myBoolean='true']` => false
 
 
-### v3.1.1
+## v3.1.1
   - Release March 4rd 2021
   - [EE] Fix: remove html entities not supported by XML format when using `:html` formatter
 
-### v3.1.0
+## v3.1.0
   - Release March 3rd 2021
   - Accepts boolean in array filters `d.array[i, myBoolean=true]`
   - [EE] Improve hyperlinks validation
@@ -930,26 +931,26 @@
     - Possible to include hyperlinks, break-lines, and style tags into any level of lists
     - Improved overall stability
 
-### v3.0.4
+## v3.0.4
   - [EE] Restore old `convert` formatter for some clients
 
-### v3.0.3
+## v3.0.3
   - [EE] Fix: add the "https://" protocol if it is missing for dynamic hyperlinks
 
-### v3.0.2
+## v3.0.2
   - [EE] Fix: accepts hyperlinks with "&", add the "https://" protocol if it missing, add URL validation. If the URL is invalid, it is replaced by a valid URL refering to the carbone documentation.
   - [EE] Fix: do not crash if hyperlink is undefined
   - [EE] Fix: support random way of managing hyperlinks in MS Word
   - [EE] Fix: set Content-Type when downloading the report
 
-### v3.0.1
+## v3.0.1
   - Fix: aliases beginning with same prefix names are properly rendered in the generated reports instead of not being skip.
   - [EE] Accepts a new local filename in the On-Premise  plugin `writeTemplate(err, newFilename)`
   - [EE] Fix: license detection in Docker
   - [EE] Fix dynamic hyperlinks for DOCX reports
   - Improve documentation
 
-### v3.0.0
+## v3.0.0
   - 👋🏻 NOTE: This version contains breaking changes of undocumented features.
     So if you use only documented features so far, you should not be concerned by these breaking changes.
   - ⚡️ **Manage timezone + new date formatters + switch from MomentJS to DayJS**
@@ -1059,14 +1060,14 @@
   - [EE] New Carbone Render On-Premise
     - Carbone can be safely deployed on your own servers. Contact us for further information
 
-### v2.1.1
+## v2.1.1
   - Release September 23rd 2020
   - Fixes `arrayJoin(\n):convCRLF`. Now it works in carbone v2.x.x like in v1.x.x.
   - Removes 'zipfile' dev dependency. Tests use unzip from the system instead.
   - 8.1.3 mocha upgrade
   - [EE] Fixes crash when images field in data contain an object instead of a string
 
-### v2.1.0
+## v2.1.0
   - Release September 1st, 2020
   - Performance: huge gain from x11 to x30 for the compression of reports.
     Now, some huge reports takes 0.1s to render instead of 4s.
@@ -1084,18 +1085,18 @@
       - the color format does not exist
       - 2 different lists of colors are used to edit the same element
 
-### v2.0.2
+## v2.0.2
   - Release August 10th, 2020
   - Fix locales de-ch and pt-br
   - Fix direct access in a nested array `{d.array[i].nestedArray[i=0].id}`
   - [EE] : fix server exit on "Ctrl+C"
 
-### v2.0.1
+## v2.0.1
   - Release July 8th, 2020
   - Add regression tests
   - [EE] : fix crash when an array was printed directly without formatters `{d.myArray}`
 
-### v2.0.0
+## v2.0.0
   - Release June 28th, 2020
   - 🚀 **Accepts dynamic variables in all formatters!**
 
@@ -1280,11 +1281,11 @@
     ```
 
 
-### v1.2.1
+## v1.2.1
   - Release June 11, 2019
   - Fix `arrayMap()` if used with an array of strings or integer
 
-### v1.2.0
+## v1.2.0
   - Release March 13, 2019
   - Add new formatters
     - `convCurr(targetCurrency, sourceCurrency)` to convert from one currency to another
@@ -1308,11 +1309,11 @@
   - Bump debug and moment to fix vulnerabilities
   - Remove Support of NodeJS 4
 
-### v1.1.1
+## v1.1.1
   - Release October 11, 2018
   - Better Windows support by improving path detection for `soffice` and `python` across all operating platforms. Done by Robert Kawecki (@rkaw92).
 
-### v1.1.0
+## v1.1.0
   - Release February 26, 2018
   - Fix: should find tags even if there is a opening bracket `{` before the tags
   - Fix: accept to nest arrays in XML whereas these arrays are not nested in JSON
@@ -1335,12 +1336,12 @@
     - ...
 
 
-### V1.0.1
+## V1.0.1
   - Release October 13, 2017
   - Automatically remove XML-incompatible control codes (U+0000 to U+0008 and U+000B to U+000C and U+000E to U+001F) before inserting data in templates
   - Fix: ifEqual did not work correctly with boolean values
 
-### V1.0.0
+## V1.0.0
   - Release June 7, 2017 - First Public Release, First Public Demo on the [Web2day](https://web2day.co) event!
   - It loads all lang at startup, and it is able to change the lang at runtime
   - Avoid unnecessary synchronous code in `carbone.set`
@@ -1356,13 +1357,13 @@
   - Fix: improve tags detection to avoid removing some XML variable like `{DSDSD-232D}` used in DOCX
   - Fix: now compatible with node v4.5.0+, v6+, v8+
 
-### v0.13.1
+## v0.13.1
   - Release February 22, 2017
   - Access properties of the parent object with two (or more) points `..` and then access children properties as usual: `{d.cities[i, temp=20]..country.history.sport.value}`
   - Do not crash when there is a javascript error during building process
   - Improve error outputs: detect when an unknown formatter is used, and propose a correction
 
-### v0.13.0
+## v0.13.0
   - Release February 20, 2017
   - Access properties of the parent object with two points `..` or more. Use case: conditional printing of properties using filters in nested arrays:
     - `{d.cities[i, temp=20]..countryName}` prints `d.countryName` only when the temperature of cities equals 20
@@ -1380,16 +1381,16 @@
   - Add a tool to search a text within a tag in all reports `carbone find :formatterName`
 
 
-### v0.12.5
+## v0.12.5
   - Release December 1, 2016
   - Bump moment.js to 2.17.0
   - Add some powerful and tested formatters: `ifEmpty`, `arrayJoin`, `arrayMap`, `convDate`, `lowerCase`, `upperCase`, `ucFirst`, `ucWords`
   - Fix: in formatters `convert`, `format`, `addDays`, `parse`: if the date is null or undefined these formatters return null or undefined instead of "Invalid Date"
 
-### v0.12.4
+## v0.12.4
   - Fix: `carbone.render` crash if `options` contains `formatName` without `formatOptionsRaw` and `formatOptions`
 
-### v0.12.3
+## v0.12.3
   - Fix: on OSX, the LibreOffice 5.2 path has changed
   - Possibility to add the source file extension in `options` when using `convert(data, convertTo, options, callback)` function. It is mandatory for CSV files otherwise LibreOffice does not understand the file type.
   ```
@@ -1401,31 +1402,31 @@
     }
   ```
 
-### v0.12.2
+## v0.12.2
   - Fixed crash when a document cannot be parsed. It returns an error instead of crashing
 
-### v0.12.1
+## v0.12.1
   - Fixed crash when a document cannot be converted (ods -> doc for example). It returns an error instead of crashing
   - Update documentation to install LibreOffice 5.1 on Ubuntu Server
   - Fix: crashed when using a nested undefined object inside a template
 
-### v0.12.0
+## v0.12.0
   - Upgrade Zipfile, improve some tests for Node.js 4.x compatibility
 
-### v0.11.3
+## v0.11.3
   - Fixed crash when data contains a lot of nested arrays
 
-### v0.11.2
+## v0.11.2
   - Fix a performance issue when a template isn't using iterators at all, this issue caused the array of data to become really big in some cases even though only a small portion of the data was really used
 
-### v0.11.1
+## v0.11.1
   - CarboneJS Server can be used on a remote server. CarboneJS send the document by socket instead of writing a file locally (only when a document conversion occurs)
   - CarboneJS Server 0.11 is still compatible with CarboneJS v0.10 clients
   - Add two benchmarks tests
   - Fix a random failure in a test
 
 
-### v0.10.1
+## v0.10.1
 
   - Allow the comparison operator `!=` in your template: `{d.cars[engine.power != 3].name}`
   - Add a newline at the end of the lang file
@@ -1507,7 +1508,7 @@
 
   - Warning: cannot use moxie-zip 0.0.4 because this commit (https://github.com/spocke/moxie-zip/commit/cbc6af14dc2318bbcfcfa82ebaf183c525346ae2) creates wrong *.ods files. The empty directory Bitmap is replaced by a executable file.
 
-### v0.10.0
+## v0.10.0
 
   - Add new conversion options for CSV export
 

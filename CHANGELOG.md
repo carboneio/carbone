@@ -1,3 +1,6 @@
+## v4.X.X
+  - [EE] Dynamic colors are supported into ODP documents. Only the text and background colors can be changed dynamically. Changing shapes and cell background are not supported.
+
 ## v4.14.4
   - Release September 12th 2023
   - [EE] The `:imageFit` formatter is now supported for PPTX documents.

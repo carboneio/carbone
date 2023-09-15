@@ -546,6 +546,70 @@ describe('parser', function () {
     });
   });
 
+
+
+  describe('flattenXML_v5 without text node', function () {
+    it('should transform XML into an array of object and find the corresponding XML tag (match)', function () {
+      helper.assert(parser.flattenXML_v5('<xml></xml>'), [
+        { id : 0, index : 0, lastIndex : 5 , depth : 0, match : 1 },
+        { id : 1, index : 5, lastIndex : 11, depth : 1, match : 0 }
+      ]);
+    });
+    it('should not crash if XML is null or undefined', function () {
+      helper.assert(parser.flattenXML_v5(null), []);
+      helper.assert(parser.flattenXML_v5(), []);
+      helper.assert(parser.flattenXML_v5(''), [
+        { id : 0, index : 0, lastIndex : 0, depth : 0, match : 0 }
+      ]);
+    });
+    it('should keep non-XML part', function () {
+      helper.assert(parser.flattenXML_v5('<xml>a</xml>'), [
+        { id : 0, index : 0, lastIndex : 5 , depth : 0, match : 2 },
+        // { id : 1, index : 5, lastIndex : 6 , depth : 1, match : 1 },
+        { id : 2, index : 6, lastIndex : 12, depth : 1, match : 0 }
+      ]);
+    });
+    it('should consider self-closing tag as non-XML part', function () {
+      helper.assert(parser.flattenXML_v5('<xml><br/></xml>'), [
+        { id : 0, index : 0 , lastIndex : 5 , depth : 0, match : 2 },
+        { id : 1, index : 5 , lastIndex : 10, depth : 1, match : 1 },
+        { id : 2, index : 10, lastIndex : 16, depth : 1, match : 0 }
+      ]);
+    });
+    it('should consider self-closing tag as non-XML part', function () {
+      helper.assert(parser.flattenXML_v5('<xml><a></a> <br/> </xml>'), [
+        { id: 0, index: 0, lastIndex: 5, depth: 0, match: 4 },
+        { id: 1, index: 5, lastIndex: 8, depth: 1, match: 2 },
+        { id: 2, index: 8, lastIndex: 12, depth: 2, match: 1 },
+        //{ id: 3, index: 12, lastIndex: 13, depth: 1, match: Number.MIN_SAFE_INTEGER },
+        { id: 3, index: 13, lastIndex: 18, depth: 1, match: 3 },
+        //{ id: 5, index: 18, lastIndex: 19, depth: 1, match: Number.MIN_SAFE_INTEGER },
+        { id: 4, index: 19, lastIndex: 25, depth: 1, match: 0 }
+      ]);
+    });
+    it('should compute XML depth and works with multiple XML tag', function () {
+      helper.assert(parser.flattenXML_v5('<xml>a<td>b</td></xml>'), [
+        { id : 0, index : 0 , lastIndex : 5 , depth : 0, match : 5 },
+        //{ id : 1, index : 5 , lastIndex : 6 , depth : 1, match : 1 },
+        { id : 1, index : 6 , lastIndex : 10, depth : 1, match : 4 },
+        //{ id : 3, index : 10, lastIndex : 11, depth : 2, match : 3 },
+        { id : 2, index : 11, lastIndex : 16, depth : 2, match : 1 },
+        { id : 3, index : 16, lastIndex : 22, depth : 1, match : 0 }
+      ]);
+    });
+    it('should accept closing tag without opening tag', function () {
+      helper.assert(parser.flattenXML_v5('</b><a><b></b></a></c><a>'), [
+        { id: 0, index: 0, lastIndex: 4, depth: 0, match: -1 },
+        { id: 1, index: 4, lastIndex: 7, depth: -1, match: 4 },
+        { id: 2, index: 7, lastIndex: 10, depth: 0, match: 3 },
+        { id: 3, index: 10, lastIndex: 14, depth: 1, match: 2 },
+        { id: 4, index: 14, lastIndex: 18, depth: 0, match: 1 },
+        { id: 5, index: 18, lastIndex: 22, depth: -1, match: -2 },
+        { id: 6, index: 22, lastIndex: 25, depth: -2, match: 6 }
+      ]);
+    });
+  });
+
   describe('cleanXml', function () {
     it('should extract only the xml (it removes all markers from xml)', function () {
       assert.equal(parser.cleanXml('menu</xmlend>bla'), '</xmlend>');
@@ -1092,6 +1156,356 @@ describe('parser', function () {
     });
   });
 
+  describe('findPivot_v5 NEW ', function () {
+    it('should return null if the pivot cannot be found', function () {
+      var _str = '<tr><tr><tr><tr>'
+               + '</tr></tr></tr></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 16, _str.length), {
+        part1End   : { pos : 36 },
+        part2Start : { pos : 36 }
+      });
+      _str = '<tr>'
+           + '</tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 4, _str.length), {
+        part1End   : { pos : 9 },
+        part2Start : { pos : 9 }
+      });
+      _str = '<tr><tr><tr>'
+           + '</tr></tr></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, 12), {
+        part1End   : { pos : 0 },
+        part2Start : { pos : 0 }
+      });
+      _str = '<tr><tr><tr></tr>'
+           + '</tr></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, 17), {
+        part1End   : { pos : 0 },
+        part2Start : { pos : 0 }
+      });
+      _str = '<tr>'
+           + '<tr><tr><tr></tr></tr></tr></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 4, _str.length), {
+        part1End   : { pos : 36 },
+        part2Start : { pos : 36 }
+      });
+    });
+    it('AAAAshould detect the pivot point. It represents the transition between the two repeated parts', function () {
+      var _str = '   <tr>'
+               + '</tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, 7), {
+        part1End   : { pos : 3 },
+        part2Start : { pos : 3 }
+      });
+      _str = '   <tr>   '
+           + '</tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, 10), {
+        part1End   : { pos : 3 },
+        part2Start : { pos : 3 }
+      });
+      _str = '     <tr><t>'
+           + '</t></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, 12), {
+        part1End   : { pos : 5 },
+        part2Start : { pos : 5 }
+      });
+    });
+    it('should detect the pivot point. It represents the transition between the two repeated parts', function () {
+      var _str = '<tr> <td>'
+               + '</td> </tr><tr> <td>'
+               + '</td> </tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 9, 9+20), {
+        part1End   : { pos : 11+9 },
+        part2Start : { pos : 11+9 }
+      });
+      _str = '<tr> <p>'
+           + 'menu </p><p> bla </p><p> foot </p> </tr><tr> <p> basket </p><p> tennis </p><p> balle'
+           + '</p></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 8, 8+84), {
+        part1End   : { pos : 40+8 },
+        part2Start : { pos : 40+8 }
+      });
+      _str = '<tr><p>'
+           + 'menu </p><p> bla </p><p> foot </p> </tr>   <tr> <p> basket </p><p> tennis </p><p> balle'
+           + '</p></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 7, 7+87), {
+        part1End   : { pos : 43+7},
+        part2Start : { pos : 43+7 }
+      });
+      _str = '<tr><image><xml><p>'
+           + 'menu </p><p teddds> bla </p></xml><p> foot </p> </image></tr><tr> <p> basket </p><tag><p> tennis </p><p> balle'
+           + '</p></tag></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 19, 19+110), {
+        part1End   : { pos : 61+19 },
+        part2Start : { pos : 61+19 }
+      });
+      _str = '<tr>'
+           + '<h1><tr B> <p></p> </tr><tr B> <p></p> </tr></h1> </tr> <tr A> '
+           + '</tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 4, 4+63), {
+        part1End   : { pos : 56+4 },
+        part2Start : { pos : 56+4 }
+      });
+    });
+    it('should work even if there are some tags between the two repeated parts (+ complex case)', function () {
+      var _str = '<tab><tr><p><p>'
+               + '</p></p></tr><tr><p></p></tr></tab><inter><p></p></inter><tab><p></p><p><tr><td><p></p><a></a>'
+               + '</td></tr></p></tab>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 15, 15+94), {
+        part1End   : { pos : 35+15 },
+        part2Start : { pos : 57+15 }
+      });
+    });
+    it('should work even if the opening tag of the second part is not the same as the closing tag of the first part', function () {
+      var _str = '<tab><tr><p><p>'
+               + '</p></p></tr><tr><p></p></tr></tab><inter><p></p></inter><tab2><p></p><p><tr><td><p></p><a></a>'
+               + '</td></tr></p></tab2>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 15, 15+95), {
+        part1End   : { pos : 35+15 },
+        part2Start : { pos : 57+15 }
+      });
+    });
+    it('should accept tags with variables', function () {
+      var _str = '<tr:w><p>'
+               + 'menu </p><p> </p></tr:w><tr:w color=test test=3> <p> basket </p> balle'
+               + '</tr:w>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 9, 9+70), {
+        part1End   : { pos : 24+9 },
+        part2Start : { pos : 24+9 }
+      });
+    });
+    it('should accept tags with /', function () {
+      var _str = '<p><w>'
+               + '</w>  </p>  <a url=":/">  </a>  <p>    <w>'
+               + '</w></p>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 6, 6+42), {
+        part1End   : { pos : 12+6 },
+        part2Start : { pos : 32+6 }
+      });
+    });
+    it('should detect the pivot point even if the repetition is not an array or a list (flat representation)', function () {
+      var _str = '<h1>'
+               + '</h1> <h1></h1> <h1></h1> <h1></h1> <h1> <h2>'
+               + '</h2></h1>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 4, 4+45), {
+        part1End   : { pos : 6+4 },
+        part2Start : { pos : 36+4 }
+      });
+      _str = '<h1>'
+           + '</h1> <h1></h1> <h1></h1> <h3></h3> <h1> <h2>'
+           + '</h2></h1>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 4, 4+45), {
+        part1End   : { pos : 6+4 },
+        part2Start : { pos : 36+4 }
+      });
+      _str = '<t_row>'
+           + ' </t_row> <t_row></t_row> <t_row> '
+           + '</t_row>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 7, 7+34), {
+        part1End   : { pos : 10+7 },
+        part2Start : { pos : 26+7 }
+      });
+    });
+    it('should accept self-closing tags and add a boolean "selfClosing" if the tag is a self-closing one', function () {
+      var _str = '<tab><tr><p><p>'
+               + '</p></p></tr><tr><p></p></tr></tab><inter/><br/><tab2><p></p><p><tr><td><p></p><a></a>'
+               + '</td></tr></p></tab2>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 15, 15+86), {
+        part1End   : { pos : 35+15 },
+        part2Start : { pos : 48+15 }
+      });
+      _str = '<tab><tr><p><p>'
+           + '</p></p><br/></tr><tr><p></p></tr><br/></tab><inter/><br/><tab><p></p><p><tr><td><br/><p><br/></p><a></a>'
+           + '</td></tr></p></tab>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 15, 15+105), {
+        part1End   : { pos : 45+15 },
+        part2Start : { pos : 58+15 }
+      });
+      _str = '<xml>'
+           + '<br/><br/><br/>'
+           + '</xml>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 5, 5+15), {
+        part1End   : { pos : 15+5 },
+        part2Start : { pos : 15+5 }
+      });
+      _str = '<xml>'
+           + '<br/><br/><br/><br/>'
+           + '</xml>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 5, 5+20), {
+        part1End   : { pos : 20+5 },
+        part2Start : { pos : 20+5 }
+      });
+      _str = '<xml>'
+           + '<br/>'
+           + '</xml>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 5, 5+5), {
+        part1End   : { pos : 5+5 },
+        part2Start : { pos : 5+5 }
+      });
+      // _str = '<br/><br/><tr></tr>';
+      // helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str)), {
+      //   part1End   : { pos : 5  },
+      //   part2Start : { pos : 10 }
+      // });
+      // TODO, test real XML which end by TEXT NODE (not managed currently)
+      _str = '<tr>'
+           + '<br/></tr><br/>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 4, 4+15), {
+        part1End   : { pos : 10+4 },
+        part2Start : { pos : 10+4 }
+      });
+      _str = '<tr>'
+           + '<br/></tr> <br/>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 4, 4+16), {
+        part1End   : { pos : 11+4 },
+        part2Start : { pos : 11+4 }
+      });
+    });
+    it('should accept flat XML structure and return the last tag as the pivot', function () {
+      var _str = ' <tr></tr>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, _str.length), {
+        part1End   : { pos : 10 },
+        part2Start : { pos : 10 }
+      });
+      _str = '<tr></tr> <i></i>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, _str.length), {
+        part1End   : { pos : 17 },
+        part2Start : { pos : 17 }
+      });
+      _str = '<b/>  <tr></tr>    <a></a> ';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 4, 17), {
+        part1End   : { pos : 17 },
+        part2Start : { pos : 17 }
+      });
+      _str = '<xml>'
+           + ' <tr></tr>'
+           + '</xml>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 5, 5+10), {
+        part1End   : { pos : 10+5 },
+        part2Start : { pos : 10+5 }
+      });
+      _str = '<xml>'
+           + '<tr></tr> <i></i>'
+           + '</xml>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 5, 5+17), {
+        part1End   : { pos : 17+5 },
+        part2Start : { pos : 17+5 }
+      });
+    });
+    it('should accept very complex case', function () {
+      var _str = '<w:tbl>'
+                +   '<w:tr>'
+                +     '<w:tc>'
+                +       '<w:p>'
+                +         '<w:r>'
+                // last ith marker position
+                +            '<w:rPr>'
+                +              '<w:b/>'
+                +              '<w:b-cs/>'
+                +              '<w:color w:val="FFFFFF"/>'
+                +            '</w:rPr>'
+                +            '<w:t></w:t>'
+                +          '</w:r>'
+                +        '</w:p>'
+                +      '</w:tc>'
+                +    '</w:tr>'
+                +    '<w:tr wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidTr="00137A31">'
+                +      '<w:trPr>'
+                +        '<w:trHeight w:val="1760"/>'
+                +      '</w:trPr>'
+                +      '<w:tc>'
+                +        '<w:tcPr>'
+                +          '<w:tcW w:w="10012" w:type="dxa"/>'
+                +          '<w:shd w:val="clear" w:color="auto" w:fill="auto"/>'
+                +        '</w:tcPr>'
+                +        '<w:p wsp:rsidR="00137A31" wsp:rsidRPr="00F62BCC" wsp:rsidRDefault="00137A31" wsp:rsidP="007057CC">'
+                +          '<w:pPr>'
+                +            '<w:rPr>'
+                +              '<w:b/>'
+                +              '<w:b-cs/>'
+                +            '</w:rPr>'
+                +          '</w:pPr>'
+                +        '</w:p>'
+                +      '</w:tc>'
+                +    '</w:tr>'
+                +  '</w:tbl>'
+                +  '<w:p wsp:rsidR="00F62BCC" wsp:rsidRDefault="00F62BCC">'
+                +    '<w:pPr>'
+                +      '<w:rPr>'
+                +        '<w:sz w:val="32"/>'
+                +      '</w:rPr>'
+                +    '</w:pPr>'
+                +  '</w:p>'
+                +  '<w:tbl>'
+                +    '<w:tblPr>'
+                +      '<w:tblpPr w:leftFromText="180" w:rightFromText="180" w:horzAnchor="page" w:tblpX="1009"/>'
+                +      '<w:tblW w:w="10081" w:type="dxa"/>'
+                +      '<w:tblBorders>'
+                +        '<w:top w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/>'
+                +        '<w:left w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/>'
+                +        '<w:bottom w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/>'
+                +        '<w:right w:val="single" w:sz="8" wx:bdrwidth="20" w:space="0" w:color="4F81BD"/>'
+                +      '</w:tblBorders>'
+                +      '<w:tblLook w:val="04A0"/>'
+                +    '</w:tblPr>'
+                +    '<w:tblGrid>'
+                +      '<w:gridCol w:w="10081"/>'
+                +    '</w:tblGrid>'
+                +    '<w:tr wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidTr="00F62BCC">'
+                +      '<w:trPr>'
+                +        '<w:trHeight w:val="98"/>'
+                +      '</w:trPr>'
+                +      '<w:tc>'
+                +        '<w:tcPr>'
+                +          '<w:tcW w:w="10081" w:type="dxa"/>'
+                +          '<w:shd w:val="clear" w:color="auto" w:fill="4F81BD"/>'
+                +        '</w:tcPr>'
+                +        '<w:p wsp:rsidR="00F62BCC" wsp:rsidRPr="00F62BCC" wsp:rsidRDefault="00F62BCC" wsp:rsidP="007E678B">'
+                +          '<w:pPr>'
+                +            '<w:rPr>'
+                +              '<w:b/>'
+                +              '<w:b-cs/>'
+                +              '<w:color w:val="FFFFFF"/>'
+                +            '</w:rPr>'
+                +          '</w:pPr>'
+                +          '<w:r wsp:rsidRPr="00F62BCC">'
+                +            '<w:rPr>'
+                +              '<w:b/>'
+                +              '<w:b-cs/>'
+                +              '<w:color w:val="FFFFFF"/>'
+                +            '</w:rPr>'
+                // first ith+1 marker position
+                +         '</w:r>'
+                +       '</w:p>'
+                +     '</w:tc>'
+                +   '</w:tr>'
+                + '</w:tbl>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 29, 29+1634), {
+        part1End   : { pos : 485+29 },
+        part2Start : { pos : 593+29 }
+      });
+    });
+    it('should accept non-XML structure', function () {
+      var _str = '';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, 0), {
+        part1End   : { pos : 0 },
+        part2Start : { pos : 0 }
+      });
+      _str = '  ,  ';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 0, _str.length), {
+        part1End   : { pos : 5 },
+        part2Start : { pos : 5 }
+      });
+      _str = '<xml>'
+           + '  ,  '
+           + '</xml>';
+      helper.assert(parser.findPivot_v5(parser.flattenXML_v5(_str), 5, 5+5), {
+        part1End   : { pos : 5+5 },
+        part2Start : { pos : 5+5 }
+      });
+    });
+  });
+
+
   describe('findPivot', function () {
     it('should return null if the pivot cannot be found', function () {
       var _str = '</tr></tr></tr></tr>';
@@ -1393,6 +1807,165 @@ describe('parser', function () {
       var _expectedRange = {startEven : 0,  endEven : 5, startOdd : 5, endOdd : 5};
       var _roughStart = 0;
       helper.assert(parser.findRepetitionPosition(_xml, _pivot, _roughStart), _expectedRange);
+    });
+  });
+
+
+
+  describe('findSafeConditionalBlockPosition_v5', function () {
+    it.skip('should return an array that contains a beginning and ending position of a conditional block which does not break XML', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<p><h1></h1>'), 0, 12), [[3, 12]]);
+    });
+    it('should parse xml only at the provided positions', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><h1></h1>a</p></xml>'), 5, 17), [[8, 17]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><h1></h1></p></xml>'), 8, 17), [[8, 17]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><p>a<h1></h1></p> </xm>'), 8, 21), [[8, 17]]);
+    });
+    it('beginning and ending position should be the same if it not possible to find a valid conditional position', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>a</a></a></a></a></xml>'), 5, 17), [[17, 17]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>a</a></a></a></a></xml>'), 18, 34), [[34, 34]]);
+    });
+    it.skip('should throw an error if XML is not valid', function () {
+      assert.throws(
+        () => {
+          parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml></b><a><a><a><a>a</a></a></a></a></xml>'), 5, 17);
+        },
+        (err) => {
+          helper.assert(err.message, 'XML not valid');
+          return true;
+        }
+      );
+    });
+    it('should include self-closing tags', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><h1><br/><br/><br/></h1>a</p></xml>'), 5, 32), [[8, 32]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 37), [[8, 37]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><b>a</b><br/>ab<b>a</b></xm>'), 8, 22), [[12, 19]]);
+    });
+    it('should include non-XML part', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a> <br/> b</a></a></a></a></xml>'), 5, 24), [[17, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml>ab</xml>'), 0, 13), [[0, 13]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><b>a</b>ab<b>a</b></xml>'), 8, 17), [[12, 14]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm>bab</xm><div>'), 5, 12), [[5, 7]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml>ab<br/><div>'), 5, 12), [[5, 12]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml>ab<br/> <div>'), 5, 13), [[5, 13]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a>ab<br/><br/><br/>'), 5, 20), [[8, 20]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a>ab<br/><br/><br/>'), 5, 23), [[11, 23]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><h1><br/><br/><br/></h1><br/>aa</p></xml>'), 5, 38), [[8, 38]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><h1><br/><br/><br/></h1><br/>a </p></xml>'), 5, 38), [[8, 38]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><p>aa<h1><br/><br/><br/></h1><br/>aa</p></xm>'), 4, 39), [[7, 39]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p> a<h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 39), [[8, 39]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p>a <h1><br/><br/><br/></h1><br/>aa</p></xml>'), 5, 40), [[8, 40]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p>a<h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 38), [[8, 38]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  a</a></a></a></a></xml>'), 5, 19), [[17, 19]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml>ab</xml>'), 5, 7), [[5, 7]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm>xab</xm>'), 5, 12), [[5, 7]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a>ab<br/>'), 5, 10), [[8, 10]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('ab'), 0, 2), [[0, 2]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('abcd'), 1, 3), [[1, 3]]);
+    });
+    it('should select multiple valid XML parts', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><b>x</b>ab<b><br/>a</b></xm>'), 8, 22), [[12, 14], [17, 22]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b>x<c></c> </b><d> textD <e>e</e> </d><f>  <g></g>'), 4, 51), [[4, 12], [16, 39], [42, 51]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><p><p><p><p>x <a>b</a> </p></p></p></p> <br/><br/><br/> </xm>'), 17, 60), [[17, 27], [43, 60]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><p><p><p><p>x <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xm>'), 17, 65), [[17, 32], [48, 65]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><b><br/><br/></b><br/>ab<br/><b><br/><br/></b></xml>'), 13, 42), [[13, 18], [22, 34], [37, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b>x<c></c> </b><d> textD <e>e</e> </d><f>  <g>a</g>'), 4, 47), [[4, 12], [16, 39], [42, 44]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b>x<c></c> </b><d> textD <e>e</e> </d> <br/><d> textD <e>e</e> </d><f>  <g>a</g>'), 4, 76), [[4, 12], [16, 68], [71, 73]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b>w<c></c> </b><d> textD <e>e</e> </d> <br/> <d> textD <e>e</e> </d><f>  <g>a</g>'), 4, 77), [[4, 12], [16, 69], [72, 74]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml> <p><br/><br/><br/>x</p></xml>'), 5, 24), [[5, 6], [9, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml> <p><br/><br/><br/> w</p></xml>'), 5, 25), [[5, 6], [9, 25]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><p><p><p><p>x </p></p></p></p> <br/><br/><br/> </xm>'), 17, 51), [[17, 18], [34, 51]]);
+    });
+    it('should include trailing characters', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<div><if>aa</if><if>bb</if></div>'), 10, 21), [[10, 11], [20, 21]]);
+    });
+    it('should accept tag with URLs and slashes', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<div><if url="https://">a<br></br>abb</if><if>sssss</if></div>'), 5, 49), [[5, 42], [46, 49]]);
+    });
+    it('should include non-XML part at the beginning and ending of condition', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a>xtext</a><b></b><c></c><d>texta</d><br/>'), 4, 33), [[4, 8], [12, 26], [29,33]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a>x</a><b></b><c></c><d>texta</d><br/>'), 4, 29), [[8, 22], [25, 29]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a>xtext</a><b></b><c></c><d>a</d><br/>'), 4, 29), [[4, 8], [12, 26]]);
+    });
+    it('should create only one if-block section even if there are multiple opening and closing tags', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm>x<table><tr><td><p></p></td></tr><tr><td><p></p></td></tr></table></xm>'), 5, 79), [[5, 70]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><table> <tr> <td><p></p></td> </tr>   <tr> <td><p></p></td> </tr> </table></xml>'), 5, 79), [[5, 79]]);
+    });
+    it('should accept float position if markers are next to each over in XML', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a></a></a></a></a></xml>'), 17, 17.1), [[17, 17]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>'), 24, 24.03125), [[24, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>'), 24.03125, 24.8), [[24, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml> <table> <tr> <li> </li><li> </li> </tr> <tr></tr></table> </xml>'), 24, 24), [[24, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xm><p><p><p><p>x <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xm>'), 17.9, 65.9), [[17, 32], [48, 65]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a>xtext</a><b></b><c></c><d>x</d><br/>'), 4.9, 29.1), [[4, 8], [12, 26]]);
+    });
+    it('should move if start/end before or after original start/end if there is only opening tag before, or ending tag after', function () {
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<body><a></a><p></p><p></p><n></n></body> '), 9, 30), [[6, 34]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a></a></a></a></a></xml>'), 5, 17), [[5, 33]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a></a></a></a></a></xml>'), 17, 33), [[5, 33]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a> <br/> </a></a></a></a></xml>'), 5, 24), [[5, 40]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a></xml>'), 5, 19), [[5, 35]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a></xml>'), 8, 19), [[8, 31]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a></xml>'), 11, 19), [[11, 27]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a></xml>'), 14, 19), [[14, 23]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a></xml>'), 17, 23), [[14, 23]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a></xml>'), 17, 27), [[11, 27]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a></xml>'), 17, 31), [[8, 31]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a></xml>'), 17, 35), [[5, 35]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a>a<a><a><a><a>  </a></a></a></a></xml>'), 35, 48), [[35, 36]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a>a<a><a><a><a>  </a></a></a></a></xml>'), 35, 58), [[35, 66]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a></a></a></a>a<a><a><a><a>  </a></a>b</a></a></xml>'), 35, 58), [[35, 36], [42, 58]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<body><p>a</p><g></g><g></g><p></p></body>'), 10, 31), [[14, 35]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a><p></p></a></a></a></xml>'), 5, 19), [[14, 23]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a><p></p></a></a></a></xml>'), 17, 42), [[5, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><p><p></p></p><a><p></p><a>  </a></a></a></a></xml>'), 5, 40), [[5, 56]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a>za<a>zd<p><p>dza</p></p><a><p></p><a>  </a></a></a></a></xml>'), 5, 47), [[5, 63]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><p></p><a>  </a></a></a></a></xml>'), 5, 26), [[5, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><p></p><a>  </a></a></a></a></xml>'), 24, 42), [[21, 30]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a>x<a>  </a></a></a></a></xml>'), 18, 36), [[15, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a>x<a><a>  </a></a></a></a></xml>'), 18, 36), [[12, 28]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a>  </a><p>z</p></a><p>z</p></a></a></xml>'), 17, 51), [[5, 51]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a><p>qs</p></a></a></a></a></xml>'), 17, 26), [[17, 26]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><a><a><a><a> ed<br/><p>qs</p>qs </a></a></a></a></xml>'), 17, 37), [[17, 37]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml> <tr></tr>a<tr></tr> </xml>'), 10, 20), [[6, 25]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><b></b>ab<b></b></p></xml>'), 11, 20), [[8, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p>ab<b></b>ab<b></b></p></xml>'), 13, 26), [[10, 26]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><b></b>ab<b></b>ab</p></xml>'), 11, 20), [[8, 24]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 38), [[5, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p>a<h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 39), [[5, 43]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p>a <h1><br/><br/><br/></h1><br/>a</p></xml>'), 5, 40), [[5, 44]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p>a<h1><br/><br/><br/></h1><br/></p></xml>'), 5, 38), [[5, 42]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml>ab</xml><div>'), 5, 13), [[0, 13]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml>ab</xml>'), 5, 13), [[0, 13]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><b></b>ab<b><br/>a</b></xml>'), 8, 22), [[5, 14], [17, 22]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><b></b>ab<b><br/></b></xml>'), 8, 22), [[5, 26]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b><c></c> </b><d> textD <e>e</e> </d><f>  <g></g>'), 3, 50), [[0, 38], [41, 50]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><p><p><p> <a>b</a> </p></p></p></p> <br/><br/><br/> </xml>'), 17, 60), [[5, 60]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><p><p><p> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml>'), 17, 65), [[5, 65]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a><xml><p><p><p><p> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml></a>'), 20, 68), [[8, 68]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b><c></c> </b><d> textD <e>e</e> </d><f>  <g>a</g>'), 3, 46), [[0, 38], [41, 43]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b><c></c> </b><d> textD <e>e</e> </d><f>  <g></g>'), 3, 46), [[0, 38], [41, 50]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b><c></c> </b><d> textD <e>e</e> </d> <br/><d> textD <e>e</e> </d><f>  <g>a</g>'), 3, 75), [[0, 67], [70, 72]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b><c></c> </b><d> textD <e>e</e> </d> <br/><d> textD <e>e</e> </d><f>  <g></g>'), 3, 75), [[0, 67], [70, 79]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b><c></c> </b><d> textD <e>e</e> </d> <br/> <d> textD <e>e</e> </d><f>  <g>a</g>'), 3, 76), [[0, 68], [71, 73]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<b><c></c> </b><d> textD <e>e</e> </d> <br/> <d> textD <e>e</e> </d><f>  <g></g>'), 3, 76), [[0, 68], [71, 80]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml> <p><br/><br/><br/></p> </xml>'), 5, 29), [[5, 29]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><p><p><p> </p></p></p></p> <br/><br/><br/> </xml>'), 17, 51), [[5, 51]]);
+
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a>text</a><b></b><c></c><d>text</d><br/>'), 3, 32), [[0, 36]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a></a><b></b><c></c><d>text</d><br/>'), 3, 28), [[0, 32]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a>text</a><b></b><c></c><d></d><br/>'), 3, 28), [[0, 32]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><table><tr><td><p></p></td></tr><tr><td><p></p></td></tr></table></xml>'), 5, 79), [[0, 76]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<xml><p><p><p><p> <a>b</a> <br/></p></p></p></p> <br/><br/><br/> </xml>'), 17.9, 65.9), [[5, 65]]);
+      helper.assert(parser.findSafeConditionalBlockPosition_v5(convXML_v5('<a>text</a><b></b><c></c><d>x</d><br/>'), 3.9, 28.1), [[0, 25]]);
     });
   });
 
@@ -1734,6 +2307,19 @@ describe('parser', function () {
 function convXML (xml) {
   return parser.flattenXML(xml);
 }
+
+/**
+ * Convert XML to flattened XML.
+ *
+ * It is easier to work with XML in tests
+ *
+ * @param  {String} xml xml to parser
+ * @return {Array}      xml array
+ */
+function convXML_v5 (xml) {
+  return parser.flattenXML_v5(xml);
+}
+
 
 /**
  * @description Function used to call removeXMLInsideMarkers and findMarker

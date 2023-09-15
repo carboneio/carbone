@@ -1720,6 +1720,195 @@ describe('Carbone', function () {
         });
       });
     });
+    describe('renderXML v5 special case with new algorithm', function () {
+      it('should accept loop inside an XML tag', function (done) {
+        var _xml = '<body>  <p1>{d.tool[i].id} | {d.tool[i+1].id}</p1>  <p2></p2></body>';
+        carbone.renderXML(_xml, {}, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<body>  <p1></p1>  <p2></p2></body>');
+          carbone.renderXML(_xml, { tool : [{id : 1}, {id : 2}] }, function (err, _xmlBuilt) {
+            helper.assert(err+'', 'null');
+            helper.assert(_xmlBuilt, '<body>  <p1>1 | 2 | </p1>  <p2></p2></body>');
+            done();
+          });
+        });
+      });
+      it('should accept a loop inside an XML tag and weird condition, and it should not break XML', function (done) {
+        var _xml = ''
+          + '<body>'
+          +   '<p1>'
+          +     '<w1>'
+          +       '<t1>{d.tool:ifEM:hideBegin} </t1>'
+          +     '</w1>'
+          +     '<w2>'
+          +       '<t2>text:</t2>'
+          +     '</w2>'
+          +     '<w3>'
+          +       '<rPr1>'
+          +         '<w:szCs/>'
+          +       '</rPr1>'
+          +       '<t3>{d.tool[i].id} | {d.tool[i+1].id}{d.tool:hideEnd()}</t3>'
+          +     '</w3>'
+          +   '</p1>'
+          +   '<p2>'
+          +     '<r1>'
+          +       '<t4></t4>'
+          +     '</r1>'
+          +   '</p2>'
+          + '</body>'
+        ;
+        carbone.renderXML(_xml, {}, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<body><p1></p1><p2><r1><t4></t4></r1></p2></body>');
+          done();
+        });
+      });
+      it('should accept a loop inside an XML tag and weird condition, and it should not break XML (other use case)', function (done) {
+        var _xml = (expected) => {
+          return ''
+            + '<body>'
+            + '  <p1>'
+            + '    <w3>'
+            + (expected === false ?
+              '      <t3>{d.tool[i].id} | {d.tool[i+1].id}</t3>' :
+              '      <t3></t3>')
+            + '    </w3>'
+            + '  </p1>'
+            + '  <p2>'
+            + '    <r1>'
+            + '      <t4></t4>'
+            + '    </r1>'
+            + '  </p2>'
+            + '</body>';
+        };
+        carbone.renderXML(_xml(false), {}, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, _xml(true));
+          done();
+        });
+      });
+      it('should not break XML if the loop is not correctly build inside XML', function (done) {
+        var _xml = ''
+          + '<body>'
+          + '  <p>'
+          + '    {d.tab[i].id}'
+          + '    <t>{d.tab[i+1]}</t>'
+          + '  </p>'
+          + '</body>'
+        ;
+        var _data = {
+          tab : [
+            { id : 1 },
+            { id : 2 }
+          ]
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, ''
+            + '<body>'
+            + '  <p>'
+            + '    1'
+            + '    2'
+            + '    '
+            + '  </p>'
+            + '</body>'
+          );
+          done();
+        });
+      });
+      it.skip('should not break XML if the loop is not correctly built', function (done) {
+        const _xml = ''
+          + '<t>'
+          + '  <c>{d.other:ifEM():hideBegin}</c>'
+          + '  <tr>'
+          + '    <c>{d.val:ifLT(2):hideBegin}</c>'
+          + '    <p>{d.arr[i].a} </p>'
+          + '    <c>{d.val:hideEnd}</c>'
+          + '    <p>{d.arr[i+1]}</p>'
+          + '  </tr>'
+          + '  <c>{d.other:hideEnd}</c>'
+          + '</t>';
+        var _data = {
+          arr : [],
+        };
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '');
+          done();
+        });
+      });
+      it('should accept two loops, with cumCount (is it a v5 test?)', function (done) {
+        var _xml = ''
+          + '<d>'
+          + '  <l>'
+          + '    <ref>{c.id:cumCount}</ref>'
+          + '    <acc id="{c.id:cumCount}">{d[i].groups[i].label}</acc>'
+          + '  </l>'
+          + '  <l>'
+          + '    {d[i+1].groups[i+1]}'
+          + '  </l>'
+          + '  <l>'
+          + '    <acc id="{c.id:cumCount}">{d[i].groups[i].label}</acc>'
+          + '    <ref>{c.id:cumCount}</ref>'
+          + '  </l>'
+          + '  <l>'
+          + '    {d[i+1].groups[i+1]}'
+          + '  </l>'
+          + '</d>'
+        ;
+        var _data = [
+          {
+            groups : [ { label : 10 }, {label : 11 } ],
+            direct : [ { sub : { id : 'aa' }}, { sub : { id : 'cc' }} ]
+          },
+          {
+            groups : [ { label : 20 }, { label : 30 } ],
+            direct : [ { sub : { id : 'zz' }} ]
+          }
+        ];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, ''
+            + '<d>'
+            + '  <l>'
+            + '    <ref>1</ref>'
+            + '    <acc id="1">10</acc>'
+            + '  </l>'
+            + '  <l>'
+            + '    <ref>2</ref>'
+            + '    <acc id="2">11</acc>'
+            + '  </l>'
+            + '  <l>'
+            + '    <ref>3</ref>'
+            + '    <acc id="3">20</acc>'
+            + '  </l>'
+            + '  <l>'
+            + '    <ref>4</ref>'
+            + '    <acc id="4">30</acc>'
+            + '  </l>  '
+            + '  <l>'
+            + '    <acc id="1">10</acc>'
+            + '    <ref>1</ref>'
+            + '  </l>'
+            + '  <l>'
+            + '    <acc id="2">11</acc>'
+            + '    <ref>2</ref>'
+            + '  </l>'
+            + '  <l>'
+            + '    <acc id="3">20</acc>'
+            + '    <ref>3</ref>'
+            + '  </l>'
+            + '  <l>'
+            + '    <acc id="4">30</acc>'
+            + '    <ref>4</ref>'
+            + '  </l>  '
+            + '</d>'
+          );
+          done();
+        });
+      });
+    });
+
     describe('number formatters', function () {
       afterEach(function (done) {
         carbone.reset();
@@ -1950,7 +2139,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in variable names', function (done) {
         var data = {
           o           : { id : 2 },
-          'r🚀cket'    : { id : 3 },
+          'r🚀cket'   : { id : 3 },
           'qu\\\'ote' : { id : 4 },
           报道          : { id : 5 },
           'qu\'ote'   : { id : 6 }
@@ -1964,7 +2153,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in arrays', function (done) {
         var data = [{
           o           : { id : 2 },
-          'r🚀cket'    : { id : 3 },
+          'r🚀cket'   : { id : 3 },
           'qu\\\'ote' : { id : 4 },
           报道          : { id : 5 },
           'qu\'ote'   : { id : 6 }
@@ -1978,7 +2167,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in arrays conditions', function (done) {
         var data = [{
           o           : { id : 2, 'i💎d' : 200, 'i\\\'d' : 2000 },
-          'r🚀cket'    : { id : 3, 'i💎d' : 300, 'i\\\'d' : 3000 },
+          'r🚀cket'   : { id : 3, 'i💎d' : 300, 'i\\\'d' : 3000 },
           'qu\\\'ote' : { id : 4, 'i💎d' : 400, 'i\\\'d' : 4000 },
           报道          : { id : 5, 'i💎d' : 500, 'i\\\'d' : 5000 },
           'qu"ote'    : { id : 6, 'i💎d' : 600, 'i"d' : 600 },
@@ -1986,7 +2175,7 @@ describe('Carbone', function () {
         },
         {
           o           : { id : 12, 'i💎d' : 1200, 'i\\\'d' : 1200 },
-          'r🚀cket'    : { id : 13, 'i💎d' : 1300, 'i\\\'d' : 1300 },
+          'r🚀cket'   : { id : 13, 'i💎d' : 1300, 'i\\\'d' : 1300 },
           'qu\\\'ote' : { id : 14, 'i💎d' : 1400, 'i\\\'d' : 1400 },
           报道          : { id : 15, 'i💎d' : 1500, 'i\\\'d' : 1500 },
           'qu"ote'    : { id : 16, 'i💎d' : 1600, 'i"d' : 1600 },

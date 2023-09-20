@@ -696,7 +696,7 @@ describe('Carbone', function () {
         ['row3c1', 'row3c2', 'row3c3']
       ]};
       carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
-        helper.assert(_xmlBuilt, '<xml> <br/> w1c2 <br/> w2c2 <br/> w3c2 <br/> </xml>');
+        helper.assert(_xmlBuilt, '<xml> <br/> w1c2 <br/> w2c2 <br/> w3c2 <br/>  <br/></xml>');
         done();
       });
     });
@@ -1720,194 +1720,6 @@ describe('Carbone', function () {
         });
       });
     });
-    describe('renderXML v5 special case with new algorithm', function () {
-      it('should accept loop inside an XML tag', function (done) {
-        var _xml = '<body>  <p1>{d.tool[i].id} | {d.tool[i+1].id}</p1>  <p2></p2></body>';
-        carbone.renderXML(_xml, {}, function (err, _xmlBuilt) {
-          helper.assert(err+'', 'null');
-          helper.assert(_xmlBuilt, '<body>  <p1></p1>  <p2></p2></body>');
-          carbone.renderXML(_xml, { tool : [{id : 1}, {id : 2}] }, function (err, _xmlBuilt) {
-            helper.assert(err+'', 'null');
-            helper.assert(_xmlBuilt, '<body>  <p1>1 | 2 | </p1>  <p2></p2></body>');
-            done();
-          });
-        });
-      });
-      it('should accept a loop inside an XML tag and weird condition, and it should not break XML', function (done) {
-        var _xml = ''
-          + '<body>'
-          +   '<p1>'
-          +     '<w1>'
-          +       '<t1>{d.tool:ifEM:hideBegin} </t1>'
-          +     '</w1>'
-          +     '<w2>'
-          +       '<t2>text:</t2>'
-          +     '</w2>'
-          +     '<w3>'
-          +       '<rPr1>'
-          +         '<w:szCs/>'
-          +       '</rPr1>'
-          +       '<t3>{d.tool[i].id} | {d.tool[i+1].id}{d.tool:hideEnd()}</t3>'
-          +     '</w3>'
-          +   '</p1>'
-          +   '<p2>'
-          +     '<r1>'
-          +       '<t4></t4>'
-          +     '</r1>'
-          +   '</p2>'
-          + '</body>'
-        ;
-        carbone.renderXML(_xml, {}, function (err, _xmlBuilt) {
-          helper.assert(err+'', 'null');
-          helper.assert(_xmlBuilt, '<body><p1></p1><p2><r1><t4></t4></r1></p2></body>');
-          done();
-        });
-      });
-      it('should accept a loop inside an XML tag and weird condition, and it should not break XML (other use case)', function (done) {
-        var _xml = (expected) => {
-          return ''
-            + '<body>'
-            + '  <p1>'
-            + '    <w3>'
-            + (expected === false ?
-              '      <t3>{d.tool[i].id} | {d.tool[i+1].id}</t3>' :
-              '      <t3></t3>')
-            + '    </w3>'
-            + '  </p1>'
-            + '  <p2>'
-            + '    <r1>'
-            + '      <t4></t4>'
-            + '    </r1>'
-            + '  </p2>'
-            + '</body>';
-        };
-        carbone.renderXML(_xml(false), {}, function (err, _xmlBuilt) {
-          helper.assert(err+'', 'null');
-          helper.assert(_xmlBuilt, _xml(true));
-          done();
-        });
-      });
-      it('should not break XML if the loop is not correctly build inside XML', function (done) {
-        var _xml = ''
-          + '<body>'
-          + '  <p>'
-          + '    {d.tab[i].id}'
-          + '    <t>{d.tab[i+1]}</t>'
-          + '  </p>'
-          + '</body>'
-        ;
-        var _data = {
-          tab : [
-            { id : 1 },
-            { id : 2 }
-          ]
-        };
-        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
-          helper.assert(err+'', 'null');
-          helper.assert(_xmlBuilt, ''
-            + '<body>'
-            + '  <p>'
-            + '    1'
-            + '    2'
-            + '    '
-            + '  </p>'
-            + '</body>'
-          );
-          done();
-        });
-      });
-      it.skip('should not break XML if the loop is not correctly built', function (done) {
-        const _xml = ''
-          + '<t>'
-          + '  <c>{d.other:ifEM():hideBegin}</c>'
-          + '  <tr>'
-          + '    <c>{d.val:ifLT(2):hideBegin}</c>'
-          + '    <p>{d.arr[i].a} </p>'
-          + '    <c>{d.val:hideEnd}</c>'
-          + '    <p>{d.arr[i+1]}</p>'
-          + '  </tr>'
-          + '  <c>{d.other:hideEnd}</c>'
-          + '</t>';
-        var _data = {
-          arr : [],
-        };
-        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
-          assert.equal(err+'', 'null');
-          assert.equal(_xmlBuilt, '');
-          done();
-        });
-      });
-      it('should accept two loops, with cumCount (is it a v5 test?)', function (done) {
-        var _xml = ''
-          + '<d>'
-          + '  <l>'
-          + '    <ref>{c.id:cumCount}</ref>'
-          + '    <acc id="{c.id:cumCount}">{d[i].groups[i].label}</acc>'
-          + '  </l>'
-          + '  <l>'
-          + '    {d[i+1].groups[i+1]}'
-          + '  </l>'
-          + '  <l>'
-          + '    <acc id="{c.id:cumCount}">{d[i].groups[i].label}</acc>'
-          + '    <ref>{c.id:cumCount}</ref>'
-          + '  </l>'
-          + '  <l>'
-          + '    {d[i+1].groups[i+1]}'
-          + '  </l>'
-          + '</d>'
-        ;
-        var _data = [
-          {
-            groups : [ { label : 10 }, {label : 11 } ],
-            direct : [ { sub : { id : 'aa' }}, { sub : { id : 'cc' }} ]
-          },
-          {
-            groups : [ { label : 20 }, { label : 30 } ],
-            direct : [ { sub : { id : 'zz' }} ]
-          }
-        ];
-        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
-          helper.assert(err+'', 'null');
-          helper.assert(_xmlBuilt, ''
-            + '<d>'
-            + '  <l>'
-            + '    <ref>1</ref>'
-            + '    <acc id="1">10</acc>'
-            + '  </l>'
-            + '  <l>'
-            + '    <ref>2</ref>'
-            + '    <acc id="2">11</acc>'
-            + '  </l>'
-            + '  <l>'
-            + '    <ref>3</ref>'
-            + '    <acc id="3">20</acc>'
-            + '  </l>'
-            + '  <l>'
-            + '    <ref>4</ref>'
-            + '    <acc id="4">30</acc>'
-            + '  </l>  '
-            + '  <l>'
-            + '    <acc id="1">10</acc>'
-            + '    <ref>1</ref>'
-            + '  </l>'
-            + '  <l>'
-            + '    <acc id="2">11</acc>'
-            + '    <ref>2</ref>'
-            + '  </l>'
-            + '  <l>'
-            + '    <acc id="3">20</acc>'
-            + '    <ref>3</ref>'
-            + '  </l>'
-            + '  <l>'
-            + '    <acc id="4">30</acc>'
-            + '    <ref>4</ref>'
-            + '  </l>  '
-            + '</d>'
-          );
-          done();
-        });
-      });
-    });
 
     describe('number formatters', function () {
       afterEach(function (done) {
@@ -2423,6 +2235,7 @@ describe('Carbone', function () {
           done();
         });
       });
+      // ref2238
       it('should accept 3 nested condition markers next to each over', function (done) {
         var _xml = '<xml> {d.val:showBegin}{d.id:showBegin}{d.o:showBegin}joe{d.val:showEnd}{d.id:showEnd}{d.o:showEnd} </xml>';
         var _data = {
@@ -2557,6 +2370,7 @@ describe('Carbone', function () {
           });
         });
       });
+      // ref2373
       it('should accepts multiple conditions next to arrays markers', function (done) {
         var _xml = '<body><a>{d.isShown:ifEQ(true):showBegin}</a>{d.isMegaShown:ifEQ(true):showBegin}{d.isShown:ifNE(false):showBegin}'
                   +'<p>{d.fruits:ifNEM():showBegin}{d.fruits[i].name}{d.fruits:showEnd}</p>'

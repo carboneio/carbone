@@ -1759,8 +1759,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'element1', attr : 'id'    , pos : 12, posOrigin : 12, depth : 1},
-              {obj : 'element1', array : 'start', pos : 8 , posOrigin : 12 , depth : 1, after : '<tr>'},
-              {obj : 'element1', array : 'end'  , pos : 17, posOrigin : 21, depth : 1, before : '</tr>'}
+              {obj : 'element1', array : 'start', pos : 8 , posOrigin : 12, matchWithPos : 17, depth : 1, after : '<tr>' },
+              {obj : 'element1', array : 'end'  , pos : 17, posOrigin : 21, matchWithPos : 8, depth : 1, before : '</tr>' }
             ],
             depth : 1
           },
@@ -1770,9 +1770,9 @@ describe('extracter', function () {
             parent   : 'd0',
             parents  : ['d0'],
             xmlParts : [
-              {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 33       , posOrigin : 30, markerId : 1 , depth : 0 , before : '</x><p>', after : ''}, // if start
+              {obj : 'info1', formatters : ['ifEq(3)', 'showBegin()'], attr : 'test', pos : 33       , posOrigin : 30, markerId : 1 , matchWithPos : 42 , depth : 0, before : '</x><p>', after : ''}, // if start
               {obj : 'info1', formatters : []                        , attr : 'val' , pos : 33.015625, posOrigin : 30, markerId : 1 , depth : 0 , after : '<h1></h1>'},
-              {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42       , posOrigin : 42 , depth : 0 , after : 'p</p>'  } // if end
+              {obj : 'info1', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'test', pos : 42       , posOrigin : 42, matchWithPos : 33 , depth : 0, after : 'p</p>' } // if end
             ]
           },
           menus2 : {
@@ -1785,8 +1785,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'menus2', attr : 'id'    , pos : 51, posOrigin : 51, depth : 1},
-              {obj : 'menus2', array : 'start', pos : 47, posOrigin : 51,  depth : 1, after : '<th>'},
-              {obj : 'menus2', array : 'end'  , pos : 56, posOrigin : 60, depth : 1, before : '</th>'}
+              {obj : 'menus2', array : 'start', pos : 47, posOrigin : 51, matchWithPos : 56,  depth : 1, after : '<th>'},
+              {obj : 'menus2', array : 'end'  , pos : 56, posOrigin : 60, matchWithPos : 47, depth : 1, before : '</th>'}
             ],
             depth : 1
           },
@@ -1823,17 +1823,17 @@ describe('extracter', function () {
             type      : 'array',
             parent    : '',
             parents   : [],
-            position  : {start : 12, end : 34, endOdd : 39 },
+            position  : {start : 12, end : 39, endOdd : 39 },
             iterators : [{ attr : 'i' }],
             hasSubAtt : true,
             xmlParts  : [
-              {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 17,        posOrigin : 17, conditions : _condition, depth : 1, after : 'a'},
+              {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 17,        posOrigin : 17, conditions : _condition, matchWithPos : 18, depth : 1, after : 'a'},
               {obj : 'd0'                                         , attr : 'menu', pos : 18,        posOrigin : 18, conditions : _condition, depth : 1, after : '' },
-              {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 18.015625, posOrigin : 28, conditions : _condition, depth : 1, after : '</if><if>'},
-              {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 27,        posOrigin : 17, conditions : _condition, depth : 1, after : 'b'},
-              {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 28,        posOrigin : 28, conditions : _condition, depth : 1},
-              {obj : 'd0', array : 'start'                                       , pos : 12,        posOrigin : 16, depth : 1,  after : '<if>a'},
-              {obj : 'd0', array : 'end'                                         , pos : 34,        posOrigin : 39, depth : 1, before : 'b</if>'},
+              {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 18.015625, posOrigin : 28, conditions : _condition, matchWithPos : 17, depth : 1, after : '</if><if>'},
+              {obj : 'd0', formatters : ['ifEq(3)', 'showBegin()'], attr : 'menu', pos : 27,        posOrigin : 17, conditions : _condition, matchWithPos : 28, depth : 1, after : 'b'},
+              {obj : 'd0', formatters : ['ifEq(3)', 'showEnd()']  , attr : 'menu', pos : 28,        posOrigin : 28, conditions : _condition, matchWithPos : 27, depth : 1},
+              {obj : 'd0', array : 'start'                                       , pos : 12,        posOrigin : 16, matchWithPos : 39, depth : 1,  after : '<if>a'},
+              {obj : 'd0', array : 'end'                                         , pos : 39,        posOrigin : 39, matchWithPos : 12, depth : 1, before : 'b</if><br/>'},
             ],
             depth : 1
           }
@@ -1868,9 +1868,9 @@ describe('extracter', function () {
             parent   : '',
             parents  : [],
             xmlParts : [
-              {obj : 'd0' , formatters : ['hideBegin'], attr : 'test' , pos : 8        , posOrigin : 5 , depth : 0 , after : ''},
+              {obj : 'd0' , formatters : ['hideBegin'], attr : 'test' , pos : 8        , posOrigin : 5 , matchWithPos : 17, depth : 0 , after : ''},
               {obj : 'd0' , formatters : []           , attr : 'val'  , pos : 8.015625 , posOrigin : 8 , depth : 0 , after : '<h1></h1>'},
-              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 17       , posOrigin : 17, depth : 0 }
+              {obj : 'd0' , formatters : ['hideEnd']  , attr : 'test' , pos : 17       , posOrigin : 17, matchWithPos : 8, depth : 0 }
             ]
           }
         }
@@ -1909,8 +1909,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'd0', attr : 'menu'   , pos : 12.015625, posOrigin : 12, depth : 1},
-              {obj : 'd0', array : 'start' , pos : 12       , posOrigin : 12, depth : 1,  after : ''},
-              {obj : 'd0', array : 'end'   , pos : 17       , posOrigin : 17, depth : 1, before : '<br/>'}
+              {obj : 'd0', array : 'start' , pos : 12       , posOrigin : 12, matchWithPos : 17, depth : 1,  after : ''},
+              {obj : 'd0', array : 'end'   , pos : 17       , posOrigin : 17, matchWithPos : 12, depth : 1, before : '<br/>'}
             ],
             depth : 1
           }
@@ -1954,8 +1954,8 @@ describe('extracter', function () {
               {obj : 'd0', attr : 'menu'   , pos : 9 , posOrigin : 9 ,  depth : 1,  after : ' <h1>'},
               {obj : 'd0', attr : 'val'    , pos : 14, posOrigin : 14, depth : 1,  after : ' </h1>'},
               {obj : 'd0', attr : 'test'   , pos : 20, posOrigin : 20, depth : 1},
-              {obj : 'd0', array : 'start' , pos : 5 , posOrigin : 9 , depth : 1,  after : '<tr>'},
-              {obj : 'd0', array : 'end'   , pos : 26, posOrigin : 30, depth : 1, before : ' </tr>'}
+              {obj : 'd0', array : 'start' , pos : 5 , posOrigin : 9 , matchWithPos : 26, depth : 1,  after : '<tr>'},
+              {obj : 'd0', array : 'end'   , pos : 26, posOrigin : 30, matchWithPos : 5, depth : 1, before : ' </tr>'}
             ],
             depth : 1
           }
@@ -2017,8 +2017,8 @@ describe('extracter', function () {
               {obj : 'menu1', attr : 'menu'   , pos : 9 , posOrigin : 9 ,  depth : 1,  after : ' <h1>'},
               {obj : 'menu1', attr : 'val'    , pos : 14, posOrigin : 14, depth : 1,  after : ' </h1>'},
               {obj : 'menu1', attr : 'test'   , pos : 20, posOrigin : 20, depth : 1},
-              {obj : 'menu1', array : 'start' , pos : 5 , posOrigin : 9 , depth : 1,  after : '<tr>'},
-              {obj : 'menu1', array : 'end'   , pos : 26, posOrigin : 30, depth : 1, before : ' </tr>'}
+              {obj : 'menu1', array : 'start' , pos : 5 , posOrigin : 9 , matchWithPos : 26, depth : 1,  after : '<tr>'},
+              {obj : 'menu1', array : 'end'   , pos : 26, posOrigin : 30, matchWithPos : 5, depth : 1, before : ' </tr>'}
             ],
             depth : 1
           }
@@ -2071,8 +2071,8 @@ describe('extracter', function () {
               {obj : 'd0', attr : 'menu'  , pos : 9 , posOrigin : 9 ,  depth : 1,  after : ' <h1>'},
               {obj : 'd0', attr : 'val'   , pos : 14, posOrigin : 14, depth : 1,  after : ' </h1>'},
               {obj : 'd0', attr : 'test'  , pos : 20, posOrigin : 20, depth : 1,  after : ' <p>'},
-              {obj : 'd0', array : 'start', pos : 5 , posOrigin : 9 ,  depth : 1, after : '<tr>'},
-              {obj : 'd0', array : 'end'  , pos : 34, posOrigin : 38, depth : 1, before : '</p> </tr>'}
+              {obj : 'd0', array : 'start', pos : 5 , posOrigin : 9 , matchWithPos : 34,  depth : 1, after : '<tr>'},
+              {obj : 'd0', array : 'end'  , pos : 34, posOrigin : 38, matchWithPos : 5, depth : 1, before : '</p> </tr>'}
             ],
             depth : 1
           },
@@ -2150,8 +2150,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'movies1',  attr : 'title', pos : 11, posOrigin : 11, depth : 1 },
-              {obj : 'movies1', array : 'start', pos : 5 , posOrigin : 10, depth : 1,after : '<tr1> ' },
-              {obj : 'movies1', array : 'end'  , pos : 17, posOrigin : 22, depth : 1,before : '</tr1>' }
+              {obj : 'movies1', array : 'start', pos : 5 , posOrigin : 10, matchWithPos : 17, depth : 1,after : '<tr1> ' },
+              {obj : 'movies1', array : 'end'  , pos : 17, posOrigin : 22, matchWithPos : 5, depth : 1,before : '</tr1>' }
             ]
           },
           cars2 : {
@@ -2165,8 +2165,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'cars2',  attr : 'brand', pos : 36, posOrigin : 36, depth : 1 },
-              {obj : 'cars2', array : 'start', pos : 30, posOrigin : 35, depth : 1,after : '<tr2> ' },
-              {obj : 'cars2', array : 'end'  , pos : 42, posOrigin : 48, depth : 1,before : '</tr2>' }
+              {obj : 'cars2', array : 'start', pos : 30, posOrigin : 35, matchWithPos : 42, depth : 1,after : '<tr2> ' },
+              {obj : 'cars2', array : 'end'  , pos : 42, posOrigin : 48, matchWithPos : 30, depth : 1,before : '</tr2>' }
             ],
             before : ' '
           }
@@ -2235,8 +2235,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'movies1',  attr : 'title', pos : 11, posOrigin : 11, depth : 1 },
-              {obj : 'movies1', array : 'start', pos : 5 , posOrigin : 10, depth : 1,after : '<tr1> ' },
-              {obj : 'movies1', array : 'end'  , pos : 17, posOrigin : 22, depth : 1,before : '</tr1>' }
+              {obj : 'movies1', array : 'start', pos : 5 , posOrigin : 10, matchWithPos : 17, depth : 1,after : '<tr1> ' },
+              {obj : 'movies1', array : 'end'  , pos : 17, posOrigin : 22, matchWithPos : 5, depth : 1,before : '</tr1>' }
             ]
           },
           cars2 : {
@@ -2250,8 +2250,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'cars2',  attr : 'brand', pos : 40, posOrigin : 40, depth : 1 },
-              {obj : 'cars2', array : 'start', pos : 34, posOrigin : 39, depth : 1,after : '<tr2> ' },
-              {obj : 'cars2', array : 'end'  , pos : 46, posOrigin : 52, depth : 1,before : '</tr2>' }
+              {obj : 'cars2', array : 'start', pos : 34, posOrigin : 39, matchWithPos : 46, depth : 1,after : '<tr2> ' },
+              {obj : 'cars2', array : 'end'  , pos : 46, posOrigin : 52, matchWithPos : 34, depth : 1,before : '</tr2>' }
             ],
             before : ' <b> '
           }
@@ -2312,8 +2312,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'd0', attr : 'menu'   , pos : 11, posOrigin : 11, depth : 1, after : ' <h1>'},
-              {obj : 'd0', array : 'start' , pos : 5 , posOrigin : 11,  depth : 1, after : '<tr A>'},
-              {obj : 'd0', array : 'end'   , pos : 68, posOrigin : 75, depth : 1, before : '</h1> </tr> '},
+              {obj : 'd0', array : 'start' , pos : 5 , posOrigin : 11, matchWithPos : 68, depth : 1, after : '<tr A>'},
+              {obj : 'd0', array : 'end'   , pos : 68, posOrigin : 75, matchWithPos : 5, depth : 1, before : '</h1> </tr> '},
             ],
             depth : 1
           },
@@ -2327,8 +2327,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'element1', attr : 'id'    , pos : 26, posOrigin : 26, depth : 2},
-              {obj : 'element1', array : 'start', pos : 16, posOrigin : 26, depth : 2, after : '<tr B> <p>'},
-              {obj : 'element1', array : 'end'  , pos : 36, posOrigin : 46, depth : 2, before : '</p> </tr>'}
+              {obj : 'element1', array : 'start', pos : 16, posOrigin : 26, matchWithPos : 36, depth : 2, after : '<tr B> <p>'},
+              {obj : 'element1', array : 'end'  , pos : 36, posOrigin : 46, matchWithPos : 16, depth : 2, before : '</p> </tr>'}
             ],
             depth : 2
           },
@@ -2391,8 +2391,8 @@ describe('extracter', function () {
             xmlParts  : [
               {obj : 'd0', attr : 'menu'  , pos : 11, posOrigin : 11, depth : 1, after : ' <h1>' },
               {obj : 'd0', attr : 'val'   , pos : 56, posOrigin : 56, depth : 1, },
-              {obj : 'd0', array : 'start', pos : 5 , posOrigin : 11,  depth : 1,  after : '<tr A>'},
-              {obj : 'd0', array : 'end'  , pos : 68, posOrigin : 75, depth : 1,  before : '</h1> </tr> '}
+              {obj : 'd0', array : 'start', pos : 5 , posOrigin : 11, matchWithPos : 68, depth : 1,  after : '<tr A>'},
+              {obj : 'd0', array : 'end'  , pos : 68, posOrigin : 75, matchWithPos : 5, depth : 1,  before : '</h1> </tr> '}
             ],
             depth : 1
           },
@@ -2406,8 +2406,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : 'element1', attr : 'id'    , pos : 26, posOrigin : 26, depth : 2},
-              {obj : 'element1', array : 'start', pos : 16, posOrigin : 26, depth : 2, after : '<tr B> <p>'},
-              {obj : 'element1', array : 'end'  , pos : 36, posOrigin : 46, depth : 2, before : '</p> </tr>'}
+              {obj : 'element1', array : 'start', pos : 16, posOrigin : 26, matchWithPos : 36, depth : 2, after : '<tr B> <p>'},
+              {obj : 'element1', array : 'end'  , pos : 36, posOrigin : 46, matchWithPos : 16, depth : 2, before : '</p> </tr>'}
             ],
             depth : 2
           }
@@ -2546,8 +2546,8 @@ describe('extracter', function () {
             hasSubAtt : true,
             xmlParts  : [
               {obj : '_rootdcars', attr : 'brand' , pos : 13, posOrigin : 13, depth : 1                                 },
-              {obj : '_rootdcars', array : 'start', pos : 5 , posOrigin : 12, depth : 1, after : '<t_row>'             },
-              {obj : '_rootdcars', array : 'end'  , pos : 22, posOrigin : 29, depth : 1, before : ' </t_row>'          }
+              {obj : '_rootdcars', array : 'start', pos : 5 , posOrigin : 12, matchWithPos : 22, depth : 1, after : '<t_row>'             },
+              {obj : '_rootdcars', array : 'end'  , pos : 22, posOrigin : 29, matchWithPos : 5, depth : 1, before : ' </t_row>'          }
             ],
             depth : 1
           }
@@ -2636,8 +2636,8 @@ describe('extracter', function () {
             xmlParts  : [
               {obj : '_rootdcars', attr : 'brand' , pos : 13, posOrigin : 13, depth : 2, moveTo : '_rootdcarswheels' , after : ' '   },
               {obj : '_rootdcars', attr : 'brand' , pos : 32, posOrigin : 32, toDelete : true }, // we do not care of depth because this part is in the odd section
-              {obj : '_rootdcars', array : 'start', pos : 5 , posOrigin : 12, depth : 1, after : ''           },
-              {obj : '_rootdcars', array : 'end'  , pos : 25.015625, posOrigin : 32, depth : 1, before : ''          }
+              {obj : '_rootdcars', array : 'start', pos : 5 , posOrigin : 12, matchWithPos : 25, depth : 1, after : ''           },
+              {obj : '_rootdcars', array : 'end'  , pos : 25.015625, posOrigin : 32, matchWithPos : 5, depth : 1, before : ''          }
             ],
             depth : 1
           },
@@ -2652,8 +2652,8 @@ describe('extracter', function () {
             xmlParts  : [
               {obj : '_rootdcarswheels', attr : 'size'  , pos : 14       , posOrigin : 14, depth : 2, after : ' '},
               {obj : '_rootdcarswheels', attr : 'size'  , pos : 33       , posOrigin : 33, toDelete : true },
-              {obj : '_rootdcarswheels', array : 'start', pos : 5.015625 , posOrigin : 12, depth : 2, after : '<t_row> ' },
-              {obj : '_rootdcarswheels', array : 'end'  , pos : 25       , posOrigin : 32, depth : 2, before : '  </t_row>' }
+              {obj : '_rootdcarswheels', array : 'start', pos : 5.015625 , posOrigin : 12, matchWithPos : 25, depth : 2, after : '<t_row> ' },
+              {obj : '_rootdcarswheels', array : 'end'  , pos : 25       , posOrigin : 32, matchWithPos : 5, depth : 2, before : '  </t_row>' }
             ],
             depth : 2
           }

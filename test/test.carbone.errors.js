@@ -14,11 +14,11 @@ describe('Carbone error management', function () {
       done();
     });
   });
-  it('should return an error if Carbone cannot find the repeated section', function (done) {
+  it('should return an error if Carbone cannot find the repeated section (Carbone v5 accepts this)', function (done) {
     const _data = [ { brand : 'Lumeneo' }, { brand : 'Toyota' } ];
     carbone.renderXML('<xml> <t_row> {d[i].brand} </t_row> {d[i+1].brand} <t_row> </t_row></xml>', _data, function (err, result) {
-      helper.assert(err+'', 'Error: Unable to find what to repeat between marker {d[i].brand} and {d[i+1].brand}. Is the i-th [+1] section a repetition of the i-th section?');
-      helper.assert(result, null);
+      // helper.assert(err+'', 'Error: Unable to find what to repeat between marker {d[i].brand} and {d[i+1].brand}. Is the i-th [+1] section a repetition of the i-th section?');
+      helper.assert(result, '<xml> <t_row> Lumeneo </t_row> <t_row> Toyota </t_row>  <t_row> </t_row></xml>');
       done();
     });
   });

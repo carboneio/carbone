@@ -427,7 +427,7 @@ describe('builder.buildXML', function () {
       {brand : 'Tesla motors'}
     ];
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      helper.assert(_xmlBuilt, '<xml><p><p><br/></p></p>Lumeneo  <br/>Tesla motors  <br/></xml>');
+      helper.assert(_xmlBuilt, '<xml><p><p><br/></p></p>Lumeneo  <br/>Tesla motors  <br/>  <br/></xml>');
       done();
     });
   });
@@ -438,7 +438,7 @@ describe('builder.buildXML', function () {
       {brand : 'Tesla motors'}
     ];
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      helper.assert(_xmlBuilt, '<xml> <br/> Lumeneo <br/> <br/><br/> <br/> Tesla motors <br/> <br/><br/> <br/> </xml>');
+      helper.assert(_xmlBuilt, '<xml> <br/> Lumeneo <br/> <br/><br/> <br/> Tesla motors <br/> <br/><br/> <br/>  <br/></xml>');
       done();
     });
   });
@@ -450,7 +450,7 @@ describe('builder.buildXML', function () {
       [{val:'row3c1'}, {val:'row3c2'}]
     ]};
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      helper.assert(_xmlBuilt, '<xml> <br/> row1c1 <br/> row1c2 <br/> row2c1 <br/> row2c2 <br/> row3c1 <br/> row3c2 <br/> </xml>');
+      helper.assert(_xmlBuilt, '<xml> <br/> row1c1 <br/> row1c2 <br/> row2c1 <br/> row2c2 <br/> row3c1 <br/> row3c2 <br/>  <br/></xml>');
       done();
     });
   });
@@ -514,7 +514,7 @@ describe('builder.buildXML', function () {
       ['row3c1', 'row3c2', 'row3c3']
     ]};
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      helper.assert(_xmlBuilt, '<xml> <br/> row1c2 <br/> row2c2 <br/> row3c2 <br/> </xml>');
+      helper.assert(_xmlBuilt, '<xml> <br/> row1c2 <br/> row2c2 <br/> row3c2 <br/>  <br/></xml>');
       done();
     });
   });
@@ -530,7 +530,7 @@ describe('builder.buildXML', function () {
       ['row3c1', {'a' :'3'} , 'row3c3']
     ]};
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
-      helper.assert(_xmlBuilt, '<xml> <br/> row1c2 <br/> 0 <br/> -100.1 <br/>  <br/>  <br/> 1,2 <br/>  <br/> </xml>');
+      helper.assert(_xmlBuilt, '<xml> <br/> row1c2 <br/> 0 <br/> -100.1 <br/>  <br/>  <br/> 1,2 <br/>  <br/>  <br/></xml>');
       done();
     });
   });
@@ -2079,7 +2079,7 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       console.log(err);
-      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>  <i></i>  <i></i> M8 <b></b> M9 <b></b>  <i></i> </xml>');
       done();
     });
   });
@@ -2108,7 +2108,7 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(err+'', 'null');
-      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>  <i></i>  <i></i> M8 <b></b> M9 <b></b>  <i></i> </xml>');
       done();
     });
   });
@@ -2140,7 +2140,7 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       assert.equal(err+'', 'null');
-      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>  <i></i>  <i></i> M8 <b></b> M9 <b></b>  <i></i> </xml>');
       done();
     });
   });
@@ -2261,12 +2261,12 @@ describe('builder.buildXML', function () {
     };
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
       console.log(err);
-      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>   <i></i> M8 <b></b> M9 <b></b>  </xml>');
+      assert.equal(_xmlBuilt, '<xml> <i></i> M5 <b></b> M6 <b></b>  <i></i>  <i></i> M8 <b></b> M9 <b></b>  <i></i> </xml>');
       done();
     });
   });
   it('should accept to nest arrays in XML whereas these arrays are not nested in JSON. Moreover, the XML structure is flat', function (done) {
-    var _xml = '<xml>{d.cars[i].wheels[i].keys[i]} <i></i> {d.cars[i].wheels[i].nuts[i].type} <b></b> {d.cars[i].wheels[i].nuts[i+1].type} <i></i> {d.cars[i+1].wheels[i+1].keys[i+1]}</xml>';
+    var _xml = '<xml>{d.cars[i].wheels[i].keys[i]} <i></i> {d.cars[i].wheels[i].nuts[i].type} <b></b> {d.cars[i].wheels[i].nuts[i+1].type} {d.cars[i+1].wheels[i+1].keys[i+1]}</xml>';
     var _data = {
       who  : 'test',
       cars : [

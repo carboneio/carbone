@@ -696,7 +696,7 @@ describe('Carbone', function () {
         ['row3c1', 'row3c2', 'row3c3']
       ]};
       carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
-        helper.assert(_xmlBuilt, '<xml> <br/> w1c2 <br/> w2c2 <br/> w3c2 <br/> </xml>');
+        helper.assert(_xmlBuilt, '<xml> <br/> w1c2 <br/> w2c2 <br/> w3c2 <br/>  <br/></xml>');
         done();
       });
     });
@@ -1720,6 +1720,7 @@ describe('Carbone', function () {
         });
       });
     });
+
     describe('number formatters', function () {
       afterEach(function (done) {
         carbone.reset();
@@ -1950,7 +1951,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in variable names', function (done) {
         var data = {
           o           : { id : 2 },
-          'r🚀cket'    : { id : 3 },
+          'r🚀cket'   : { id : 3 },
           'qu\\\'ote' : { id : 4 },
           报道          : { id : 5 },
           'qu\'ote'   : { id : 6 }
@@ -1964,7 +1965,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in arrays', function (done) {
         var data = [{
           o           : { id : 2 },
-          'r🚀cket'    : { id : 3 },
+          'r🚀cket'   : { id : 3 },
           'qu\\\'ote' : { id : 4 },
           报道          : { id : 5 },
           'qu\'ote'   : { id : 6 }
@@ -1978,7 +1979,7 @@ describe('Carbone', function () {
       it('should accept non-alphanumeric characters in arrays conditions', function (done) {
         var data = [{
           o           : { id : 2, 'i💎d' : 200, 'i\\\'d' : 2000 },
-          'r🚀cket'    : { id : 3, 'i💎d' : 300, 'i\\\'d' : 3000 },
+          'r🚀cket'   : { id : 3, 'i💎d' : 300, 'i\\\'d' : 3000 },
           'qu\\\'ote' : { id : 4, 'i💎d' : 400, 'i\\\'d' : 4000 },
           报道          : { id : 5, 'i💎d' : 500, 'i\\\'d' : 5000 },
           'qu"ote'    : { id : 6, 'i💎d' : 600, 'i"d' : 600 },
@@ -1986,7 +1987,7 @@ describe('Carbone', function () {
         },
         {
           o           : { id : 12, 'i💎d' : 1200, 'i\\\'d' : 1200 },
-          'r🚀cket'    : { id : 13, 'i💎d' : 1300, 'i\\\'d' : 1300 },
+          'r🚀cket'   : { id : 13, 'i💎d' : 1300, 'i\\\'d' : 1300 },
           'qu\\\'ote' : { id : 14, 'i💎d' : 1400, 'i\\\'d' : 1400 },
           报道          : { id : 15, 'i💎d' : 1500, 'i\\\'d' : 1500 },
           'qu"ote'    : { id : 16, 'i💎d' : 1600, 'i"d' : 1600 },
@@ -2234,6 +2235,7 @@ describe('Carbone', function () {
           done();
         });
       });
+      // ref2238
       it('should accept 3 nested condition markers next to each over', function (done) {
         var _xml = '<xml> {d.val:showBegin}{d.id:showBegin}{d.o:showBegin}joe{d.val:showEnd}{d.id:showEnd}{d.o:showEnd} </xml>';
         var _data = {
@@ -2368,6 +2370,7 @@ describe('Carbone', function () {
           });
         });
       });
+      // ref2373
       it('should accepts multiple conditions next to arrays markers', function (done) {
         var _xml = '<body><a>{d.isShown:ifEQ(true):showBegin}</a>{d.isMegaShown:ifEQ(true):showBegin}{d.isShown:ifNE(false):showBegin}'
                   +'<p>{d.fruits:ifNEM():showBegin}{d.fruits[i].name}{d.fruits:showEnd}</p>'

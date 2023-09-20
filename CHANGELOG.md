@@ -1,3 +1,19 @@
+## v4.15.0
+  - Release September 20th 2023
+  - [EE] Includes a part of the upcoming Carbone v5 engine that supports more use cases and reduces a lot the probability to get "Could not open document" error.
+    The new engine accepts syntaxes that are not logical for a computer but acceptable for a human, especially in a document.
+    For example, writing tags in a document can generates such an algorithm sometimes:
+    ```sh
+      IF
+        START LOOP
+          END IF
+        END LOOP
+      # END IF should be here for a computer. Carbone fixes it automatically
+    ```
+    This v5 engine is only enabled if the template contains the tag `{o.preReleaseFeatureIn=4015000}` or if the configuration / API contains `preReleaseFeatureIn : 4015000`.
+    This tag means: "enable all pre-release features added up to v4.15.0".
+
+
 ## v4.14.4
   - Release September 12th 2023
   - [EE] The `:imageFit` formatter is now supported for PPTX documents.

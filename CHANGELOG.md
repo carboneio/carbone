@@ -1,6 +1,6 @@
 ## v4.15.0
   - Release September 20th 2023
-  - [EE] Includes a part of the new highly reliable engine of Carbone v5. It supports more use cases and reduces to virtually 0% the probability to have "Could not open document" error.
+  - [EE] Includes a part of the new highly reliable engine of Carbone v5. It supports more use cases and reduces virtually to 0% the probability to have "Could not open document" error.
     The new engine accepts syntaxes that are not logical for a computer but acceptable for a human, especially in a document.
     For example, writing tags in a document can generates such an algorithm sometimes:
     ```sh

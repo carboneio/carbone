@@ -182,6 +182,148 @@ describe('Carbone v5', function () {
         done();
       });
     });
+    it('should not break XML if there is a condition around i+1 part', function (done) {
+      const _xml = ''
+        + '<t>'
+        + ' <c>{d.val:ifEM:hideBegin}</c>'
+        + ' <tab>'
+        + '  <p>{d.arr[i].a}</p>'
+        + '  <c>{d.arr:ifEM:hideBegin}</c>'
+        + '  <p>{d.arr[i+1].a}</p>'
+        + '  <c>{d.arr:hideEnd}</c>'
+        + ' </tab>'
+        + ' <c>{d.val:ifEM:hideEnd}</c>'
+        + '</t>';
+      var _data = {
+        arr : []
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(err+'', 'null');
+        assert.equal(_xmlBuilt, '<t> </t>');
+
+        _data.val = 'a';
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<t> <c></c> <tab>   </tab> <c></c></t>');
+
+          _data.arr = [{ a : 1}, { a : 2}];
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<t> <c></c> <tab>  <p>1</p>  <p>2</p>   </tab> <c></c></t>');
+            done();
+          });
+        });
+      });
+    });
+    it('should not break XML or crash if there is no XML at the end of a loop with a condition on i+1 part', function (done) {
+      const _xml = ''
+        + '<p>{d.arr[i].a}</p>'
+        + '{d.val:ifEM:hideBegin}'
+        + '{d.arr[i+1].a}'
+        + '{d.val:hideEnd}';
+      var _data = {
+        arr : []
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(err+'', 'null');
+        assert.equal(_xmlBuilt, '');
+
+        _data.val = 'a';
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '');
+
+          _data.arr = [{ a : 1}, { a : 2}];
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<p>1</p><p>2</p>');
+            done();
+          });
+        });
+      });
+    });
+    it('should not break XML or crash if there are two loops and no XML at the end', function (done) {
+      const _xml = ''
+        + '<p>{d.arr[i].sub[i].a}</p>'
+        + '{d.arr[i+1].sub[i+1].a}';
+      var _data = {
+        arr : []
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(err+'', 'null');
+        assert.equal(_xmlBuilt, '');
+        _data.arr = [{ sub : [{ a : 1}, { a : 2}] }, { sub : [{ a : 3}] }];
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<p>1</p><p>2</p><p>3</p>');
+          done();
+        });
+      });
+    });
+    it('should not break XML or crash if there are two loops, withour XML and a condition', function (done) {
+      const _xmls = [
+        '{d.val:ifEM:hideBegin}{d.arr[i].sub[i].a}{d.arr[i+1].sub[i+1].a}{d.val:hideEnd}',
+        '{d.val:ifEM:hideBegin}{d.arr[i].sub[i].a}{d.val:hideEnd}{d.arr[i+1].sub[i+1].a}',
+        '{d.val:ifEM:hideBegin}{d.val:hideEnd}{d.arr[i].sub[i].a}{d.arr[i+1].sub[i+1].a}',
+        '{d.arr[i].sub[i].a}{d.val:ifEM:hideBegin}{d.arr[i+1].sub[i+1].a}{d.val:hideEnd}'
+      ];
+      _xmls.forEach((xml, i) => {
+        let _data = {
+          arr : [],
+          val : 'a'
+        };
+        carbone.renderXML(xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '');
+          let _data = {
+            arr : [{ sub : [{ a : 1}, { a : 2}] }, { sub : [{ a : 3}] }],
+            val : 'a'
+          };
+          carbone.renderXML(xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '123');
+            if (i === _xmls.length - 1) {
+              done();
+            }
+          });
+        });
+      });
+    });
+    it('should not break XML if there is the same condition around i and i+1 part', function (done) {
+      const _xml = ''
+        + '<t>'
+        + ' <c>{d.val:ifEM:hideBegin}</c>'
+        + ' <tab>'
+        + '  <c>{d.val:ifEM:hideBegin}</c>'
+        + '  <p>{d.arr[i].a}</p>'
+        + '  <c>{d.val:hideEnd}</c>'
+        + '  <c>{d.val:ifEM:hideBegin}</c>'
+        + '  <p>{d.arr[i+1].a}</p>'
+        + '  <c>{d.val:hideEnd}</c>'
+        + ' </tab>'
+        + ' <c>{d.val:ifEM:hideEnd}</c>'
+        + '</t>';
+      var _data = {
+        arr : []
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(err+'', 'null');
+        assert.equal(_xmlBuilt, '<t> </t>');
+
+        _data.val = 'a';
+        carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+          assert.equal(err+'', 'null');
+          assert.equal(_xmlBuilt, '<t> <c></c> <tab>   </tab> <c></c></t>');
+
+          _data.arr = [{ a : 1}, { a : 2}];
+          carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+            assert.equal(err+'', 'null');
+            assert.equal(_xmlBuilt, '<t> <c></c> <tab>  <c></c>  <p>1</p>  <c></c>  <c></c>  <p>2</p>  <c></c>   </tab> <c></c></t>');
+            done();
+          });
+        });
+      });
+    });
     it('should not break XML if the loop is not correctly built', function (done) {
       const _xml = ''
         + '<t>'

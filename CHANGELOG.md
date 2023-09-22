@@ -1,3 +1,6 @@
+## v4.15.1
+  - [EE] Improve embedded v5 engine (see v4.15.0) when the formatter `drop` is used on `i+1` part of an array
+
 ## v4.15.0
   - Release September 20th 2023
   - [EE] Includes a part of the new highly reliable engine of Carbone v5. It supports more use cases and reduces virtually to 0% the probability to have "Could not open document" error.

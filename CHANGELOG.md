@@ -1,5 +1,6 @@
 ## v4.15.1
   - [EE] Improve embedded v5 engine (see v4.15.0) when the formatter `drop` is used on `i+1` part of an array
+  - Fix: Accepts access adjacent array with `..`. Example: `{d.array[i]..otherArray[condition=other].id}`    
 
 ## v4.15.0
   - Release September 20th 2023

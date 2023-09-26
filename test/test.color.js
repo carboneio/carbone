@@ -59,6 +59,94 @@ describe('Dynamic colors', function () {
           helper.assert(_options, _expectedOptions);
         });
 
+        it('should insert two color marker and formatter from a two bindColor marker [ODP]', function () {
+
+          const getContent = (expected) => '' +
+            '<?xml version="1.0" encoding="UTF-8"?>'+
+              '<office:document-content>'+
+                  '<office:automatic-styles>'+
+                      '<style:style style:name="P1" style:family="paragraph">'+
+                          '<loext:graphic-properties draw:fill-color="#ffffff"/>'+
+                          '<style:text-properties fo:color="#008d2c" loext:opacity="100%" loext:color-lum-mod="100%" loext:color-lum-off="0%"/>'+
+                      '</style:style>'+
+                      '<style:style style:name="P2" style:family="paragraph">'+
+                          '<loext:graphic-properties draw:fill-color="#ffffff"/>'+
+                      '</style:style>'+
+                      '<style:style style:name="T1" style:family="text">'+
+                          '<style:text-properties fo:color="#008d2c" loext:opacity="100%" fo:background-color="#a5faff"/>'+
+                      '</style:style>'+
+                      '<style:style style:name="T2" style:family="text">'+
+                          '<style:text-properties fo:color="#000000" loext:opacity="100%"/>'+
+                      '</style:style>'+
+                  '<office:body>'+
+                      '<office:presentation>'+
+                          '<draw:page draw:name="page1" draw:style-name="dp1" draw:master-page-name="Default" presentation:presentation-page-layout-name="AL1T0">'+
+                              '<draw:frame presentation:style-name="pr1" draw:text-style-name="P1" draw:layer="layout" svg:width="25.199cm" svg:height="9.134cm" svg:x="1.4cm" svg:y="1.026cm" presentation:class="subtitle" presentation:user-transformed="true">'+
+                                  '<draw:text-box>'+
+                                      '<text:p>'+
+                                          `<text:span text:style-name="${expected === true ? '{d.color2:updateColorAndGetReferenceLo(#008d2c, .color1, #a5faff, T1)}' : 'T1'}">Text 1</text:span>`+
+                                      '</text:p>'+
+                                      '<text:p>'+
+                                          `<text:span text:style-name="T2">${expected === true ? '' : '{bindColor(#008d2c, #hexa)=d.color2}'}</text:span>`+
+                                      '</text:p>'+
+                                      '<text:p>'+
+                                          `<text:span text:style-name="T2">${expected === true ? '' : '{bindColor(#a5faff, #hexa)=d.color1}'}</text:span>`+
+                                      '</text:p>'+
+                                  '</draw:text-box>'+
+                              '</draw:frame>'+
+                          '</draw:page>'+
+                      '</office:presentation>'+
+                  '</office:body>'+
+              '</office:document-content>';
+
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : getContent()
+            }]
+          };
+          const _options = {
+
+          };
+          const _expectedOptions = {
+            colorStyleList : {
+              P1: {
+                file: 'content.xml',
+                styleFamily: 'paragraph',
+                colors: [ {
+                  id: 0,
+                  color: '#008d2c',
+                  element: 'textColor',
+                  marker: 'd.color2',
+                  colorType: '#hexa'
+                } ],
+                attributes: ' loext:opacity="100%" loext:color-lum-mod="100%" loext:color-lum-off="0%"'
+              },
+              T1: {
+                file: 'content.xml',
+                styleFamily: 'text',
+                colors: [ {
+                  id: 0,
+                  color: '#008d2c',
+                  element: 'textColor',
+                  marker: 'd.color2',
+                  colorType: '#hexa'
+                },
+                {
+                  id: 0,
+                  color: '#a5faff',
+                  element: 'textBackgroundColor',
+                  marker: 'd.color1',
+                  colorType: '#hexa'
+                } ],
+                attributes: ' loext:opacity="100%"'
+              }
+            }};
+          color.preProcessLo(_template, _options);
+          helper.assert(_template.files[0].data, getContent(true));
+          helper.assert(_options, _expectedOptions);
+        });
+
         it('should insert 2 color markers and formatters from a 2 bindColor marker [ODT]', function () {
           const _template = {
             files : [{
@@ -443,6 +531,75 @@ describe('Dynamic colors', function () {
           });
           color.postProcessLo(_template, null, _options);
           helper.assert(_template.files[0].data, _expectedData);
+          done();
+        });
+
+        it('should replace the text and background color with a colortype hexa [ODP file]', function (done) {
+
+          const getContent = (expected) => '' +
+            '<?xml version="1.0" encoding="UTF-8"?>'+
+            '<office:document-content>'+
+                '<office:automatic-styles>'+
+                    (expected === true ? '<style:style style:name="CC0" style:family="text">'+
+                        '<style:text-properties fo:color="#00ffff" fo:background-color="#654321" loext:opacity="100%"/>'+
+                    '</style:style>' : '') +
+                '</office:automatic-styles>'+
+                '<office:body>'+
+                    '<office:presentation>'+
+                        '<draw:page>'+
+                            '<draw:frame>'+
+                                '<draw:text-box>'+
+                                    '<text:p>'+
+                                        '<text:span text:style-name="CC0">Text 1</text:span>'+
+                                    '</text:p>'+
+                                '</draw:text-box>'+
+                            '</draw:frame>'+
+                        '</draw:page>'+
+                    '</office:presentation>'+
+                '</office:body>'+
+            '</office:document-content>'
+
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : getContent()
+            }]
+          };
+          const _options = {
+            extension      : 'odp',
+            colorDatabase  : new Map(),
+            colorStyleList : {
+              T1: {
+                file: 'content.xml',
+                styleFamily: 'text',
+                colors: [ {
+                  id: 0,
+                  color: '#008d2c',
+                  element: 'textColor',
+                  marker: 'd.color2',
+                  colorType: '#hexa'
+                },
+                {
+                  id: 0,
+                  color: '#a5faff',
+                  element: 'textBackgroundColor',
+                  marker: 'd.color1',
+                  colorType: '#hexa'
+                } ],
+                attributes: ' loext:opacity="100%"'
+              }
+            }
+          };
+          _options.colorDatabase.set('#00ffff#008d2c#654321#a5faffT1', {
+            id        : 0,
+            styleName : 'T1',
+            colors    : [
+              { newColor: '#00ffff', oldColor: '#008d2c' },
+              { newColor: '#654321', oldColor: '#a5faff' }
+            ]
+          });
+          color.postProcessLo(_template, null, _options);
+          helper.assert(_template.files[0].data, getContent(true));
           done();
         });
 

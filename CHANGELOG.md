@@ -1,3 +1,7 @@
+
+## v4.X.X
+  - [EE] Fix the `:html` formatter: the default font size from a DOCX template is always applied on the rendered HTML.
+
 ## v4.14.4
   - Release September 12th 2023
   - [EE] The `:imageFit` formatter is now supported for PPTX documents.

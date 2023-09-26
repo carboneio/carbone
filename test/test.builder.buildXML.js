@@ -1660,6 +1660,26 @@ describe('builder.buildXML', function () {
     });
   });
 
+  it('should accept to use .. on arrays of arrays without iterators', function (done) {
+    var _xml = '<xml> <t_row> {d.arr[i].id}  {d.arr[i]..sec[li=20].brand} </t_row> <t_row> {d.arr[i+1]..sec[li=20].brand} </t_row> </xml>';
+    var _data = {
+      arr : [
+        { brand : 'Lumeneo'     , id : 1},
+        { brand : 'Tesla motors', id : 2},
+        { brand : 'Toyota'      , id : 3}
+      ],
+      sec : [
+        { li : 10, brand : 'A' },
+        { li : 20, brand : 'B' },
+        { li : 30, brand : 'C' }
+      ]
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml> <t_row> 1  B </t_row> <t_row> 2  B </t_row> <t_row> 3  B </t_row>  </xml>');
+      done();
+    });
+  });
+
   it('should not crash if the object null or undefined', function (done) {
     var _xml = '<xml> <t_row> {d.test.id} </t_row></xml>';
     var _data = {

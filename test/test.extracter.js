@@ -192,6 +192,23 @@ describe('extracter', function () {
       helper.assert(_result.dsitenamesub.xmlParts, []);
       helper.assert(_result.dsitenamesub.parent, 'dsitename');
     });
+    it('should go up in hierarchy up to the root, even with two arrays, and go down', function () {
+      var _markers = [
+        {pos : 20, name : 'd.eugene[i].wheel[i]..other[item=1].id'},
+        {pos : 24, name : 'd.eugene[i+1].wheel[i+1]..other[item=1].id'}
+      ];
+      var _result = extracter.splitMarkers(_markers);
+      console.log(JSON.stringify(_result, null, 2))
+      helper.assert(_result.d.xmlParts, []);
+      helper.assert(_result.deugene.xmlParts, []);
+      helper.assert(_result.deugenewheel.xmlParts, [
+        {attr : 'id', formatters : [], obj : 'deugeneotheritem_EQ_1', pos : 20, posOrigin : 20, markerId : 0}
+      ]);
+      helper.assert(_result.deugeneotheritem_EQ_1.name, 'other');
+      helper.assert(_result.deugeneotheritem_EQ_1.parent, 'deugene');
+      helper.assert(_result.deugeneotheritem_EQ_1.parents,  ["d", "deugene"]);
+      helper.assert(_result.deugeneotheritem_EQ_1.xmlParts,  []);
+    });
     it('should throw an error if we go up to high with ".."', function () {
       var _markers = [
         {pos : 20, name : 'd.site...name'}

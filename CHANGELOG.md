@@ -1,7 +1,8 @@
 
 ## v4.15.1
+  - Release September 26th 2023
+  - Fix: Accepts to access adjacent array with `..`. Example: `{d.array[i]..otherArray[condition=other].id}`
   - [EE] Improve embedded v5 engine (see v4.15.0) when the formatter `drop` is used on `i+1` part of an array
-  - Fix: Accepts access adjacent array with `..`. Example: `{d.array[i]..otherArray[condition=other].id}`
   - [EE] Dynamic colors are supported into ODP documents. Only the text and background colors can be changed dynamically. Changing shapes and cell background are not supported.
 
 ## v4.15.0

@@ -1,4 +1,8 @@
 
+## v4.15.2
+  - Release October 3rd 2023
+  - [EE] Fix Basic authentication regression for On-premise version
+
 ## v4.15.1
   - Release September 26th 2023
   - Fix: Accepts to access adjacent array with `..`. Example: `{d.array[i]..otherArray[condition=other].id}`

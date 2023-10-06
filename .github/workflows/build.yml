@@ -58,11 +58,17 @@ jobs:
       #- run: sleep 60s
 
       # We use hub CLI because actions/upload-release-asset@v1 does not support to upload multiple release files in one job
-      - name: Upload
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag_name="${{ env.CARBONE_EE_TAG }}"
-          hub release edit $(find build/ -type f -name "carbone-ee*" -printf "-a %p ") -m "" "$tag_name"
+      #- name: Upload
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  run: |
+      #    tag_name="${{ env.CARBONE_EE_TAG }}"
+      #    hub release edit $(find build/ -type f -name "carbone-ee*" -printf "-a %p ") -m "" "$tag_name"
 
+      - name: Upload
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.CARBONE_EE_TAG }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: build/*
 

@@ -1,4 +1,8 @@
 
+## v4.15.3
+  - Release October 6rd 2023
+  - [EE] On-Premise: `GET /` returns the same response as `GET /status`  when the embedded studio is disabled
+
 ## v4.15.2
   - Release October 3rd 2023
   - [EE] Fix Basic authentication regression for On-premise version

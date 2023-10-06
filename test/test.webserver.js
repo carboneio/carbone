@@ -846,6 +846,18 @@ describe('Webserver', () => {
       });
     }).timeout(20000);
 
+    it('should access root URL route if user is not authenticated and studio is off', (done) => {
+
+      get.concat(getBody(4001, '/', 'GET'), (err, res, data) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(res.statusCode, 200);
+        data = JSON.parse(data);
+        assert.strictEqual(data.success, true);
+        assert.strictEqual(data.version, package.version);
+        done();
+      });
+    });
+
     it('should upload the template if user is authenticated', (done) => {
       let form = new FormData();
 

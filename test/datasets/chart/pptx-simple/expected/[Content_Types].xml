@@ -27,7 +27,7 @@
   <Override PartName="/ppt/charts/colors1.xml" ContentType="application/vnd.ms-office.chartcolorstyle+xml"/>
   <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
   <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-  <Override PartName="/word/charts/slide1_rId2c0_colors.xml" ContentType="application/vnd.ms-office.chartcolorstyle+xml"/>
-  <Override PartName="/word/charts/slide1_rId2c0_style.xml" ContentType="application/vnd.ms-office.chartstyle+xml"/>
-  <Override PartName="/word/charts/slide1_rId2c0.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>
+  <Override PartName="/ppt/charts/slide1_rId2c0_colors.xml" ContentType="application/vnd.ms-office.chartcolorstyle+xml"/>
+  <Override PartName="/ppt/charts/slide1_rId2c0_style.xml" ContentType="application/vnd.ms-office.chartstyle+xml"/>
+  <Override PartName="/ppt/charts/slide1_rId2c0.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>
 </Types>

@@ -466,6 +466,19 @@ describe('chart', function () {
         done();
       });
     });
+    it('should accept a chart without style/color', function (done) {
+      const _data = [
+        { label : 'row1' , valCol1 : 10 , valCol2 : 100.1 },
+        { label : 'row2' , valCol1 : 20 , valCol2 : 200.2 },
+        { label : 'row3' , valCol1 : 30 , valCol2 : 300.3 }
+      ];
+      const _testedReport = 'chart/pptx-no-style';
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
   });
 
 

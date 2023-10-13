@@ -2,6 +2,41 @@
 ## v4.X.X
   - [EE] Fix the `:html` formatter: the default font size from a DOCX template is always applied on the rendered HTML.
 
+
+## v4.15.4
+  - [EE] Accept charts in PPTX without style/color description
+  - [EE] Fix a minor PPTX generation issue when using chart
+
+## v4.15.3
+  - Release October 6th 2023
+  - [EE] On-Premise: `GET /` returns the same response as `GET /status`  when the embedded studio is disabled
+
+## v4.15.2
+  - Release October 3rd 2023
+  - [EE] Fix Basic authentication regression for On-premise version
+
+## v4.15.1
+  - Release September 26th 2023
+  - Fix: Accepts to access adjacent array with `..`. Example: `{d.array[i]..otherArray[condition=other].id}`
+  - [EE] Improve embedded v5 engine (see v4.15.0) when the formatter `drop` is used on `i+1` part of an array
+  - [EE] Dynamic colors are supported into ODP documents. Only the text and background colors can be changed dynamically. Changing shapes and cell background are not supported.
+
+## v4.15.0
+  - Release September 20th 2023
+  - [EE] Includes a part of the new highly reliable engine of Carbone v5. It supports more use cases and reduces virtually to 0% the probability to have "Could not open document" error.
+    The new engine accepts syntaxes that are not logical for a computer but acceptable for a human, especially in a document.
+    For example, writing tags in a document can generates such an algorithm sometimes:
+    ```sh
+      IF
+        START LOOP
+          END IF
+        END LOOP
+      # END IF should be here for a computer. Carbone fixes it automatically
+    ```
+    This v5 engine is only enabled if the template contains the tag `{o.preReleaseFeatureIn=4015000}` or if the configuration / API contains `preReleaseFeatureIn : 4015000`.
+    This tag means: "enable all pre-release features added up to v4.15.0".
+
+
 ## v4.14.4
   - Release September 12th 2023
   - [EE] The `:imageFit` formatter is now supported for PPTX documents.

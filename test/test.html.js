@@ -782,6 +782,16 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
+        it('should return DOCX font size (w:szCs and w:sz) even if the default style contains only w:szCs', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+            '<w:pPr>' +
+              '<w:szCs w:val="18"/>' +
+            '</w:pPr>', _options), '(\'style-fs18\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-fs18')), JSON.stringify({ "paragraph":"<w:szCs w:val=\"18\"/><w:sz w:val=\"18\"/>","text":"<w:szCs w:val=\"18\"/><w:sz w:val=\"18\"/>"}))
+        });
+
         it('should return DOCX paragraph style: RTL and Text Alignment', function () {
           let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
           helper.assert(html.getTemplateDefaultStyles('<w:p>' +

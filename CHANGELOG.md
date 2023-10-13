@@ -1,4 +1,8 @@
 
+## v4.15.4
+  - [EE] Accept charts in PPTX without style/color description
+  - [EE] Fix a minor PPTX generation issue when using chart
+
 ## v4.15.3
   - Release October 6th 2023
   - [EE] On-Premise: `GET /` returns the same response as `GET /status`  when the embedded studio is disabled

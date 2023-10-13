@@ -1,9 +1,6 @@
-
-## v4.X.X
-  - [EE] Fix the `:html` formatter: the default font size from a DOCX template is always applied on the rendered HTML.
-
-
 ## v4.15.4
+  - Release October 13th 2023
+  - [EE] Fix the `:html` formatter: the default font size from a DOCX template is always applied on the rendered HTML.
   - [EE] Accept charts in PPTX without style/color description
   - [EE] Fix a minor PPTX generation issue when using chart
 

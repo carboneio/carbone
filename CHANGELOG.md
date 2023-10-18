@@ -1,3 +1,7 @@
+## v4.15.5
+  - Release October 18th 2023
+  - [EE] On-premise: accept both Basic authentication and JWT when basic authentication is enabled
+
 ## v4.15.4
   - Release October 13th 2023
   - [EE] Fix the `:html` formatter: the default font size from a DOCX template is always applied on the rendered HTML.

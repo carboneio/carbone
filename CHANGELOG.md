@@ -1,7 +1,7 @@
 ## v4.15.5
   - Release October 18th 2023
   - [EE] On-premise: accept both Basic authentication and JWT when basic authentication is enabled
-  - [EE] On-premise: set the time interval of the cleanup process for the `/template` and `/render` directories. Set the environment variable `CARBONE_EE_CLEANINTERVALTIME`, or `--cleanIntervalTime` CLI options, or set `cleanIntervalTime` on the configuration file.
+  - [EE] On-premise: set the time interval of the cleanup process for the `/template` and `/render` directories. Set the environment variable `CARBONE_EE_CLEANINTERVALTIME`, or `--cleanIntervalTime` CLI options, or set `cleanIntervalTime` on the configuration file. The value must be millisecond. The default value is one hour. 
 
 ## v4.15.4
   - Release October 13th 2023

@@ -169,7 +169,10 @@ describe('Webserver', () => {
         const _licenseDirPrev = params.licenseDir;
         const _license = 'LICENSE_KEY_TEST';
         const _maxDataSize = 100 * 1024 * 1024;
+        const _cleanIntervalTime = 15;
+
         assert.strictEqual(params.maxDataSize, 60 * 1024 * 1024); // default datasize 60MB
+        assert.strictEqual(params.cleanIntervalTime, 10); // default Clean interval time: every 10 minutes
         webserver = require('../lib/webserver');
         webserver.handleParams(['--port', _port,
                                 '--workdir', _workdir,
@@ -186,7 +189,8 @@ describe('Webserver', () => {
                                 '--currencyTarget', _currencyTarget,
                                 '--licenseDir', _licenseDir,
                                 '--license', _license,
-                                '--maxDataSize', _maxDataSize], () => {
+                                '--maxDataSize', _maxDataSize,
+                                '--cleanIntervalTime', _cleanIntervalTime], () => {
           assert.strictEqual(params.port, _port);
           assert.strictEqual(fs.existsSync(_workdir), true);
           helper.rmDirRecursive(_workdir);
@@ -212,6 +216,7 @@ describe('Webserver', () => {
           assert.strictEqual(params.license, _license);
           params.license = '';
           assert.strictEqual(params.maxDataSize, _maxDataSize);
+          assert.strictEqual(params.cleanIntervalTime, _cleanIntervalTime);
           webserver.stopServer(done);
         });
       });
@@ -227,6 +232,7 @@ describe('Webserver', () => {
         process.env.CARBONE_EE_MAXDATASIZE = 200 * 1024 * 1024;
         process.env.CARBONE_EE_LICENSE = 'LICENSE_KEY_TEST_2';
         process.env.CARBONE_EE_SECURITYLEVEL = 129;
+        process.env.CARBONE_EE_CLEANINTERVALTIME = 1;
         webserver = require('../lib/webserver');
         webserver.handleParams([], () => {
           assert.strictEqual(params.port + '', process.env.CARBONE_EE_PORT);
@@ -239,6 +245,7 @@ describe('Webserver', () => {
           assert.strictEqual(params.maxDataSize + '', process.env.CARBONE_EE_MAXDATASIZE);
           assert.strictEqual(params.license + '', process.env.CARBONE_EE_LICENSE);
           assert.strictEqual(params.securityLevel + '', process.env.CARBONE_EE_SECURITYLEVEL);
+          assert.strictEqual(params.cleanIntervalTime + '', process.env.CARBONE_EE_CLEANINTERVALTIME);
           // clean
           helper.rmDirRecursive(process.env.CARBONE_EE_WORKDIR);
           delete process.env.CARBONE_EE_PORT;
@@ -250,6 +257,7 @@ describe('Webserver', () => {
           delete process.env.CARBONE_EE_MAXDATASIZE;
           delete process.env.CARBONE_EE_LICENSE;
           delete process.env.CARBONE_EE_SECURITYLEVEL;
+          delete process.env.CARBONE_EE_CLEANINTERVALTIME;
           params.license = '';
           webserver.stopServer(done);
         });
@@ -260,14 +268,15 @@ describe('Webserver', () => {
         const _workdir = path.join(os.tmpdir(), 'testConfig');
         const _workdirConfig = path.join(_workdir, 'config');
         const _configContent = {
-          port           : 4008,
-          bind           : '127.0.0.1',
-          factories      : 4,
-          attempts       : 2,
-          authentication : true,
-          maxDataSize    : 120 * 1024 * 1024,
-          securityLevel  : 130,
-          license        : 'LICENSE_KEY_TEST_3'
+          port              : 4008,
+          bind              : '127.0.0.1',
+          factories         : 4,
+          attempts          : 2,
+          authentication    : true,
+          maxDataSize       : 120 * 1024 * 1024,
+          securityLevel     : 130,
+          license           : 'LICENSE_KEY_TEST_3',
+          cleanIntervalTime : 45
         };
         fs.mkdirSync(_workdirConfig, { recursive : true });
         fs.writeFileSync(path.join(_workdirConfig, 'config.json'), JSON.stringify(_configContent));
@@ -282,6 +291,7 @@ describe('Webserver', () => {
           assert.strictEqual(params.maxDataSize, _configContent.maxDataSize);
           assert.strictEqual(params.securityLevel, _configContent.securityLevel);
           assert.strictEqual(params.license, _configContent.license);
+          assert.strictEqual(params.cleanIntervalTime, _configContent.cleanIntervalTime);
           params.license = '';
           helper.rmDirRecursive(_workdir);
           webserver.stopServer(done);

@@ -1,3 +1,14 @@
+## v4.15.5
+  - Release October 18th 2023
+  - [EE] Before v4.15.5, Carbone executed the job which deletes unused reports (= not downloaded) every 60 minutes. 
+    The default retention time was also 60 minutes. Carbone could keep a generated report during 1 hour and 59 minutes 59 seconds instead of 1 hour (time announced in our documentation).
+    Now, Carbone executes the cleaning process every 10 minutes, and the retention time is 50 min.
+    As a result, a generated report is available for download for 50 minutes to a maximum of one hour. 
+  - [EE] On-premise: accept both Basic authentication and JWT when basic authentication is enabled
+  - [EE] On-premise: add the possibility to set the scheduled job time interval for cleaning unused templates and unused generated reports.
+    Set the environment variable `CARBONE_EE_CLEANINTERVALTIME`, or `--cleanIntervalTime` CLI options, or set `cleanIntervalTime` on the configuration file. 
+    The value must be in minutes (minimum : 1, maximum : 35791). The default value is "every 10 minutes". 
+
 ## v4.15.4
   - Release October 13th 2023
   - [EE] Fix the `:html` formatter: the default font size from a DOCX template is always applied on the rendered HTML.

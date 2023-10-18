@@ -169,10 +169,10 @@ describe('Webserver', () => {
         const _licenseDirPrev = params.licenseDir;
         const _license = 'LICENSE_KEY_TEST';
         const _maxDataSize = 100 * 1024 * 1024;
-        const _cleanIntervalTime = 10 * 60 * 1000;
+        const _cleanIntervalTime = 15;
 
         assert.strictEqual(params.maxDataSize, 60 * 1024 * 1024); // default datasize 60MB
-        assert.strictEqual(params.cleanIntervalTime, 60 * 60 * 1000); // default Clean interval time: every hour
+        assert.strictEqual(params.cleanIntervalTime, 10); // default Clean interval time: every 10 minutes
         webserver = require('../lib/webserver');
         webserver.handleParams(['--port', _port,
                                 '--workdir', _workdir,
@@ -232,7 +232,7 @@ describe('Webserver', () => {
         process.env.CARBONE_EE_MAXDATASIZE = 200 * 1024 * 1024;
         process.env.CARBONE_EE_LICENSE = 'LICENSE_KEY_TEST_2';
         process.env.CARBONE_EE_SECURITYLEVEL = 129;
-        process.env.CARBONE_EE_CLEANINTERVALTIME = 60000;
+        process.env.CARBONE_EE_CLEANINTERVALTIME = 1;
         webserver = require('../lib/webserver');
         webserver.handleParams([], () => {
           assert.strictEqual(params.port + '', process.env.CARBONE_EE_PORT);
@@ -276,7 +276,7 @@ describe('Webserver', () => {
           maxDataSize       : 120 * 1024 * 1024,
           securityLevel     : 130,
           license           : 'LICENSE_KEY_TEST_3',
-          cleanIntervalTime : 45 * 60 * 1000
+          cleanIntervalTime : 45
         };
         fs.mkdirSync(_workdirConfig, { recursive : true });
         fs.writeFileSync(path.join(_workdirConfig, 'config.json'), JSON.stringify(_configContent));

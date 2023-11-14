@@ -1,6 +1,8 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
+const params = require('../lib/params')
 const assert = require('assert');
+
 
 describe('preprocessor', function () {
   describe('preParse', function () {
@@ -109,7 +111,82 @@ describe('preprocessor', function () {
           done();
         });
       });
+
+      describe('removeMacroLO', function() {
+
+        it.only('should delete macros and scripts files and definitions', function (done) {
+
+          const _getMetaFile = (result) => {
+            return '<?xml version="1.0" encoding="UTF-8"?>' +
+            '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0">' +
+              '<manifest:file-entry manifest:full-path="/" manifest:version="1.2" manifest:media-type="application/vnd.oasis.opendocument.text"/>' +
+  
+              (result === true ? '' : '' +
+                /** Basic */
+                '<manifest:file-entry manifest:full-path="Basic/Standard/Module1.xml" manifest:media-type="text/xml"/>' +
+                '<manifest:file-entry manifest:full-path="Basic/Standard/script-lb.xml" manifest:media-type="text/xml"/>' +
+                '<manifest:file-entry manifest:full-path="Basic/script-lc.xml" manifest:media-type="text/xml"/>' +
+                /** Basic Dialog */
+                '<manifest:file-entry manifest:full-path="Dialogs/Standard/Dialog1.xml" manifest:media-type="text/xml"/>' +
+                '<manifest:file-entry manifest:full-path="Dialogs/Standard/dialog-lb.xml" manifest:media-type="text/xml"/>' +
+                '<manifest:file-entry manifest:full-path="Dialogs/dialog-lc.xml" manifest:media-type="text/xml"/>' +
+                /** Beansheel */
+                '<manifest:file-entry manifest:full-path="Scripts/beanshell/BibTest/parcel-descriptor.xml" manifest:media-type=""/>'+
+                '<manifest:file-entry manifest:full-path="Scripts/beanshell/BibTest/SaisirNom.bsh" manifest:media-type=""/>'+
+                '<manifest:file-entry manifest:full-path="Scripts/beanshell/BibTest/" manifest:media-type="application/binary"/>'+
+                '<manifest:file-entry manifest:full-path="Scripts/beanshell/" manifest:media-type="application/binary"/>'+
+                '<manifest:file-entry manifest:full-path="Scripts/" manifest:media-type="application/binary"/>' +
+                /** Javascript */
+                '<manifest:file-entry manifest:full-path="Scripts/javascript/HelloWorld/helloworld.js" manifest:media-type="application/binary"/>'+
+                '<manifest:file-entry manifest:full-path="Scripts/javascript/" manifest:media-type="application/binary"/>' +
+                /** Python */
+                '<manifest:file-entry manifest:full-path="Scripts/python/Module.py" manifest:media-type=""/>' +
+                '<manifest:file-entry manifest:full-path="Scripts/python/" manifest:media-type="application/binary"/>'
+              ) +
+  
+              '<manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>' +
+              '<manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>' +
+            '</manifest:manifest>'
+          }
+
+          var _report = {
+            isZipped   : true,
+            filename   : 'template.odt',
+            embeddings : [],
+            extension  : 'odt',
+            files      : [
+              { name : 'META-INF/manifest.xml'  , parent : '', data : _getMetaFile(false)},
+              { name : 'content.xml', parent : '', data : '<xml>{d.value}</xml>'},
+              { name : 'styles.xml', parent : '', data : '<xml>{d.style}</xml>'},
+              { name : '"Scripts/beanshell/BibTest/SaisirNom.bsh'  , parent : '', data : ''},
+              { name : 'Scripts/javascript/HelloWorld/helloworld.js'  , parent : '', data : ''},
+              { name : 'Scripts/python/Module.py'  , parent : '', data : ''},
+              { name : 'code.js'  , parent : '', data : ''},
+              { name : 'code.py'  , parent : '', data : ''},
+              { name : 'code.bsh'  , parent : '', data : ''},
+              { name : 'code_basic.xml'  , parent : '', data : '<script:module>Sub Main End Sub</script:module>'},
+              { name : 'code_javascript'  , parent : '', data : 'importClass(Packages.com.sun.star.uno.UnoRuntime);'},
+              { name : 'code_python'  , parent : '', data : 'g_exportedScripts'},
+              { name : 'code_python'  , parent : '', data : 'import uno import sys def Main():'},
+              { name : 'Dialogs/Standard/Dialog1.xml'  , parent : '', data : ''},
+              { name : 'Basic/Standard/Module1.xml'  , parent : '', data : ''},
+              { name : 'Basic/Standard/script-lb.xml'  , parent : '', data : ''},
+              { name : 'Basic/script-lc.xml'  , parent : '', data : ''}
+            ]
+          };
+          params.securityLevel = 128; 
+          preprocessor.execute(_report, function (err) {
+            params.securityLevel = 0;
+            helper.assert(err + '', 'null');
+            helper.assert(_report.files.length, 3);
+            helper.assert(_report.files[0].name.includes('manifest.xml'), true)
+            helper.assert(_report.files[0].data, _getMetaFile(true))
+            done();
+          });
+        });
+      })
     });
+    
     describe('DOCX preprocessing', function () {
       it('should insert markers to generate unique ids for shapes and images', function (done) {
         // eslint-disable-next-line

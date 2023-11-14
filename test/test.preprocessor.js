@@ -114,7 +114,7 @@ describe('preprocessor', function () {
 
       describe('removeMacroLO', function() {
 
-        it.only('should delete macros and scripts files and definitions', function (done) {
+        it('should delete macros and scripts files and definitions', function (done) {
 
           const _getMetaFile = (result) => {
             return '<?xml version="1.0" encoding="UTF-8"?>' +

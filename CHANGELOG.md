@@ -1,4 +1,11 @@
 ## v4.15.6
+  - Release November 16th 2023
+  - [EE] Fix `:html` formatter did not remove forbidden characters such as `\u0010` for DOCX/ODT...
+  - Fix weird behavior when a tag with direct array access is placed on the same row as the loop:
+    ```
+       {d.list[0].name} {d.list[i].name}
+                        {d.list[i+1].name}
+    ```
   - Fix: `:html` formatter did not remove forbidden characters such as `\u0010` for DOCX/ODT...
   - On-Premise: new feature to remove macro of ODS/ODT templates
 

@@ -1,3 +1,6 @@
+## v4.15.6
+  - Fix: `:html` formatter did not remove forbidden characters such as `\u0010` for DOCX/ODT...
+
 ## v4.15.5
   - Release October 18th 2023
   - [EE] Before v4.15.5, Carbone executed the job which deletes unused reports (= not downloaded) every 60 minutes. 

@@ -1318,6 +1318,11 @@ describe('Dynamic HTML', function () {
         );
       });
 
+      it('should remove forbidden character for XML like the builder', function () {
+        let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<p>\u001061ss s\u000B 02</p>'), {});
+        helper.assert(res.content.get(), '<text:p><text:span>61ss s 02</text:span></text:p><text:p text:style-name="Standard"/>');
+      });
+
       it('should create hyperlinks', function () {
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML('<a href="carbone.com/?name=john&lastname=wick">Carbone Website</a>'), {});
         helper.assert(res.content.get(), '' +

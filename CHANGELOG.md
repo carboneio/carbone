@@ -6,6 +6,8 @@
        {d.list[0].name} {d.list[i].name}
                         {d.list[i+1].name}
     ```
+  - Fix: `:html` formatter did not remove forbidden characters such as `\u0010` for DOCX/ODT...
+  - On-Premise: new feature to remove macro of ODS/ODT templates
 
 ## v4.15.5
   - Release October 18th 2023

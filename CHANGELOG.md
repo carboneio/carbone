@@ -1,5 +1,11 @@
 ## v4.15.6
-  - Fix: `:html` formatter did not remove forbidden characters such as `\u0010` for DOCX/ODT...
+  - Release November 16th 2023
+  - [EE] Fix `:html` formatter did not remove forbidden characters such as `\u0010` for DOCX/ODT...
+  - Fix weird behavior when a tag with direct array access is placed on the same row as the loop:
+    ```
+       {d.list[0].name} {d.list[i].name}
+                        {d.list[i+1].name}
+    ```
 
 ## v4.15.5
   - Release October 18th 2023

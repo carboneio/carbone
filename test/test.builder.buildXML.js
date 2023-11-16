@@ -1927,6 +1927,38 @@ describe('builder.buildXML', function () {
       done();
     }
   });
+  it('should accept direct access and a loop in the same row #patch20231116', function (done) {
+    var _xml = ''
+      + '<body>'
+      + '  <p>'
+      + '    {d.list[0].name} {d.list[i].name}'
+      + '  </p>'
+      + '  <p>'
+      + '    {d.list[i+1].name}'
+      + '  </p>'
+      + '  <p>'
+      + '    {d.price} Euro'
+      + '  </p>'
+      + '</body>';
+    var _data = {
+      list : [{ name : 'AA' }
+      ],
+      price : 58
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'null');
+      helper.assert(_xmlBuilt, ''
+        + '<body>'
+        + '  <p>'
+        + '    AA AA'
+        + '  </p>  '
+        + '  <p>'
+        + '    58 Euro'
+        + '  </p>'
+        + '</body>');
+      done();
+    });
+  });
   it('should direct access to a property in a loop inside a table', function (done) {
     var _xml = ''
       + '<table>'

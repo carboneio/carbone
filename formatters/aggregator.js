@@ -267,6 +267,52 @@ cumCount.canBeCalledInPrecomputedLoop = true;
 
 
 /**
+ * Dynamically replace formatter in the builder for cumulative formatters
+ *
+ * @private
+ * @param   {Object}   parsedFormatter                    The parsed formatter. Ex:  { str : sum, args : [0]}
+ * @return  {Array}    Array of formatter to call with their arguments
+ */
+function _replaceCumulativeDistinct (parsedFormatter) {
+  return [
+    { str : parsedFormatter.str, args : parsedFormatter.args, isNextFormatterExecutionPostponed : true },
+    { str : parsedFormatter.str.replace(/^cum/, '_agg'), args : parsedFormatter.args }
+  ];
+}
+/**
+ * Dynamically replace formatter in the builder for cumulative formatters
+ *
+ * @private
+ */
+function _aggCountD (d, ...partitionBy) {
+  const _id  = generateAggregatorId(this.id, ...partitionBy);
+  let _state = this.aggDatabase.get(_id) ?? { sum : 0 };
+  if (d !== _state.prev) {
+    _state.sum++;
+    _state.prev = d;
+  }
+  this.aggDatabase.set(_id, _state);
+  return _state.sum;
+}
+_aggCountD.replacedBy = _replaceEmptyArguments;
+_aggCountD.canBeCalledInPrecomputedLoop = true;
+/**
+ * Cumulative COUNT Distinct
+ *
+ * @version 4.0.0
+ *
+ * @param  {Number} d           Number to aggregate
+ * @param  {Mixed} partitionBy  [optional] group by
+ * @return {String}             return the result
+ */
+function cumCountD (d, ...partitionBy) {
+  return d;
+}
+cumCountD.replacedBy = _replaceCumulativeDistinct;
+cumCountD.canBeCalledInPrecomputedLoop = true;
+
+
+/**
  * Store result into data object `{d.` for later use. Current limits:
  *   - accepts only to store values at the root level of `d`, and only in `d`.
  *   - cannot be used in aliases
@@ -297,5 +343,7 @@ module.exports = {
   aggCountGet,
   cumSum,
   cumAvg,
-  cumCount
+  cumCount,
+  cumCountD,
+  _aggCountD
 };

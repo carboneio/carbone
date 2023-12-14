@@ -1,3 +1,7 @@
+## v4.15.7
+  - Release December 14th 2023
+  - New aggregator `:cumCountD` to count the number of distinct values
+
 ## v4.15.6
   - Release November 16th 2023
   - [EE] Fix `:html` formatter did not remove forbidden characters such as `\u0010` in DOCX, ..., XLSX, ODT

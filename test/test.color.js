@@ -1,10 +1,28 @@
 const color = require('../lib/color');
 const helper = require('../lib/helper');
 const parser = require('../lib/parser');
+const carbone = require('../lib/index');
 const assert = require('assert');
+const helperTest = require('./helper');
 const colorFormatters = require('../formatters/color');
 
 describe('Dynamic colors', function () {
+  describe('DOCX new :color', function () {
+    it.only('should inject color', function (done) {
+      const _testedReport = 'color/docx-multiple-color';
+      const _data = {
+        cell : '#1bcdef',
+        row  : '2bcdef',
+        para : '#3bcdef'
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+
+  });
   describe('ODT Files', function () {
     describe('ODT/ODS pre processor methods', function () {
       describe('preProcessLo', function () {

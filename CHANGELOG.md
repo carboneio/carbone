@@ -1,3 +1,10 @@
+## v4.16.0
+  - New :color formatter only for DOCX at the moment: `{d.myColor:color(p)}`
+    `:color(scope, type)`
+      - scope can be `p`  (by default), `cell`, `row` for applying color on the current paragraph, cell and row.
+      - type can be `text` (by default), `background` for cells and rows.
+
+
 ## v4.15.6
   - Release November 16th 2023
   - [EE] Fix `:html` formatter did not remove forbidden characters such as `\u0010` in DOCX, ..., XLSX, ODT

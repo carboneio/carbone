@@ -805,6 +805,58 @@ describe('Aggregatted operations', function () {
         done();
       });
     });
+    it('should count all lines with cumCount', function (done) {
+      var _xml = '<xml>'
+               + '<tr>{d.table[id].id:cumCount} {d.table[id].sub[i].id}  </tr>'
+               + '<tr>{d.table[id].id:cumCount} {d.table[id].sub[i+1].id}</tr>'
+               + '<tr>{d.table[id+1].id}                                 </tr>'
+               + '</xml>';
+      var _data = {
+        table : [
+          { id : 10, sub : [{ id : 1000}, { id : 2000}, { id : 3000}] },
+          { id : 20, sub : [{ id : 4000}, { id : 5000}] }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml><tr>1 1000  </tr><tr>2 2000  </tr><tr>3 3000  </tr><tr>4 4000  </tr><tr>5 5000  </tr></xml>');
+        done();
+      });
+    });
+    it('should count all distinct id with cumCountD', function (done) {
+      var _xml = '<xml>'
+               + '<tr>{d.table[id].id:cumCountD} {d.table[id].sub[i].id}  </tr>'
+               + '<tr>{d.table[id].id:cumCountD} {d.table[id].sub[i+1].id}</tr>'
+               + '<tr>{d.table[id+1].id}                                  </tr>'
+               + '</xml>';
+      var _data = {
+        table : [
+          { id : 10, sub : [{ id : 1000}, { id : 2000}, { id : 3000}] },
+          { id : 20, sub : [{ id : 4000}, { id : 5000}] }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml><tr>1 1000  </tr><tr>1 2000  </tr><tr>1 3000  </tr><tr>2 4000  </tr><tr>2 5000  </tr></xml>');
+        done();
+      });
+    });
+    it('should count all distinct id with cumCountD (with all sub items)', function (done) {
+      var _xml = '<xml>'
+               + '<tr>{d.table[id, i].id:cumCountD} {d.table[id, i].sub[i].id}  </tr>'
+               + '<tr>{d.table[id, i].id:cumCountD} {d.table[id, i].sub[i+1].id}</tr>'
+               + '<tr>{d.table[id+1, i+1].id}                                  </tr>'
+               + '</xml>';
+      var _data = {
+        table : [
+          { id : 10, sub : [{ id : 1000}, { id : 2000}, { id : 3000}] },
+          { id : 20, sub : [{ id : 4000}, { id : 5000}] },
+          { id : 10, sub : [{ id : 6000}] }
+        ]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml><tr>1 1000  </tr><tr>1 2000  </tr><tr>1 3000  </tr><tr>1 6000  </tr><tr>2 4000  </tr><tr>2 5000  </tr></xml>');
+        done();
+      });
+    });
     it('should accept array of numbers', function (done) {
       var _xml = '<xml>{d.table[]:aggSum}</xml>';
       var _data = {

@@ -1,3 +1,7 @@
+### v3.7.1
+  - Release December 19th 2023
+  - fix avoid crash 
+
 ### v3.7.0
   - Release June 15th 2023
   - [EE] All APIs returns "400 Bad request" instead of "404 Not Found" when `idTemplate` is not valid

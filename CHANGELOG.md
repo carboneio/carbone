@@ -1,6 +1,6 @@
 ### v3.7.1
   - Release December 19th 2023
-  - fix avoid crash 
+  - [EE] Fix crash when dynamic image URL contains forbidden characters
 
 ### v3.7.0
   - Release June 15th 2023

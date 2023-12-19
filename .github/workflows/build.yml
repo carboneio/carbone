@@ -5,14 +5,14 @@ on: workflow_dispatch
 jobs:
   BUILD:
     env:
-      PKG_VERSION: 5.7.0
+      PKG_VERSION: 5.8.0
       BUILD_TARGET: "node16-linux-x64,node16-macos-x64"
 
     runs-on: ubuntu-20.04
 
     strategy:
       matrix:
-        node_version: ['16.15.0']
+        node_version: ['16.16.0']
 
     steps:
       - uses: actions/checkout@v2
@@ -55,14 +55,12 @@ jobs:
           prerelease: false
 
       # Let Github creates its release before uploading to avoid errors
-      - run: sleep 30s
+      - run: sleep 60s
 
-      # We use hub CLI because actions/upload-release-asset@v1 does not support to upload multiple release files in one job
       - name: Upload
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag_name="${{ env.CARBONE_EE_TAG }}"
-          hub release edit $(find build/ -type f -name "carbone-ee*" -printf "-a %p ") -m "" "$tag_name"
-
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.CARBONE_EE_TAG }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: build/*
 

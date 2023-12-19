@@ -1,10 +1,242 @@
 const color = require('../lib/color');
 const helper = require('../lib/helper');
 const parser = require('../lib/parser');
+const carbone = require('../lib/index');
 const assert = require('assert');
+const helperTest = require('./helper');
 const colorFormatters = require('../formatters/color');
 
 describe('Dynamic colors', function () {
+  describe('DOCX new :color', function () {
+    const xmlColor = (expected) => {
+      return ''
+       + '\n<w:tbl>'
+       + '\n  <w:tblPr>'
+       + '\n  </w:tblPr>'
+       + '\n  <w:tr>'
+       + '\n    <w:tc>'
+       + '\n      <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+       + '\n      <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr></w:p>'
+       + '\n    </w:tc>'
+       + '\n    <w:tc>'
+       + '\n      <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+       + '\n      <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr></w:p>'
+       + '\n    </w:tc>'
+       + '\n  </w:tr>'
+       + '\n  <w:tr>'
+       + '\n    <w:tc>'
+       + '\n      <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+       + '\n      <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/><w:color w:val="'+((expected) ? '{d.test:color(row):colorToDocx}' : '1bcdef')+'"/></w:rPr></w:pPr>'
+       + '\n        <w:r><w:rPr><w:lang w:val="en-US"/><w:color w:val="'+((expected) ? '{d.test:color(row):colorToDocx}' : '1bcdef')+'"/></w:rPr>'
+       + '\n          <w:t>'
+       + '\n            ' + ((expected) ? '' : '{d.test:color(row)}')
+       + '\n          </w:t>'
+       + '\n        </w:r>'
+       + '\n      </w:p>'
+       + '\n    </w:tc>'
+       + '\n    <w:tc>'
+       + '\n      <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+       + '\n      <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/><w:color w:val="'+((expected) ? '{d.test:color(row):colorToDocx}' : '1bcdef')+'"/></w:rPr></w:pPr>'
+       + '\n        <w:r><w:rPr><w:lang w:val="en-US"/><w:color w:val="'+((expected) ? '{d.test:color(row):colorToDocx}' : '1bcdef')+'"/></w:rPr>'
+       + '\n          <w:t>'
+       + '\n            hello'
+       + '\n          </w:t>'
+       + '\n        </w:r>'
+       + '\n      </w:p>'
+       + '\n    </w:tc>'
+       + '\n  </w:tr>'
+       + '\n</w:tbl>';
+    };
+    it('should replace color of row', function () {
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'word/document.xml',
+            data : xmlColor(expected)
+          }]
+        };
+      };
+      assert.strictEqual(color.preProcessDocxColor(_template()).files[0].data, _template(true).files[0].data);
+    });
+    it('should replace color in headers and footers', function () {
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'word/document.xml',
+            data : xmlColor(expected)
+          },{
+            name : 'word/header1.xml',
+            data : ' ' + xmlColor(expected) // add some whitespace to create different XML
+          },{
+            name : 'word/footer1.xml',
+            data : '  <w:p> hello </w:p>  '
+          },{
+            name : 'word/footer2.xml',
+            data : '    ' + xmlColor(expected)
+          }]
+        };
+      };
+      helper.assert(color.preProcessDocxColor(_template()), _template(true));
+    });
+    it('should returns error if the scope cannot be found', function () {
+      const _template = {
+        files : [{
+          name : 'word/document.xml',
+          data : '\n<w:p>{d.test:color(row)}</w:p>'
+        }]
+      };
+      assert.throws(() => color.preProcessDocxColor(_template), {
+        message : 'The Carbone tag "{d.test:color(row)}" is outside of its defined scope "(row)"'
+      });
+    });
+    it('should returns error if the color scope is unknown', function () {
+      const _template = {
+        files : [{
+          name : 'word/document.xml',
+          data : '\n<w:p>{d.test:color(eeee)}</w:p>'
+        }]
+      };
+      assert.throws(() => color.preProcessDocxColor(_template), {
+        message : 'The color scope "eeee" is unknown in "{d.test:color(eeee)}". The formatter accepts only row, cell, p for the first argument.'
+      });
+    });
+    it('should returns error if the color type is unknown', function () {
+      const _template = {
+        files : [{
+          name : 'word/document.xml',
+          data : '\n<w:p>{d.test:color(p, bidule)}</w:p>'
+        }]
+      };
+      assert.throws(() => color.preProcessDocxColor(_template), {
+        message : 'The color type "bidule" is unknown in "{d.test:color(p, bidule)}". The formatter accepts only text, background for the second argument.'
+      });
+    });
+    it('should returns error if the color type/scope combination is not valid', function () {
+      const _template = {
+        files : [{
+          name : 'word/document.xml',
+          data : '\n<w:p>{d.test:color(p, background)}</w:p>'
+        }]
+      };
+      assert.throws(() => color.preProcessDocxColor(_template), {
+        message : 'The color type "background" is invalid for the scope "p" in "{d.test:color(p, background)}".'
+      });
+    });
+    it('should replace undefined, null or not valid colors by white', function (done) {
+      const _template = (expected) => {
+        return  ''
+             + '<body>'
+             + '<w:color w:val="'+((expected) ? 'ffffff' : '{d.undef:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? 'ffffff' : '{d.nulli:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? 'A1A2A3' : '{d.okU:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? 'a1f2e3' : '{d.okL:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? '01f9c3' : '{d.okH:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? 'ffffff' : '{d.nOk1:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? 'ffffff' : '{d.nOk2:color(row):colorToDocx}')+'"/>'
+             + '</body>';
+      };
+      const _data = {
+        nulli : null,
+        okU   : 'A1A2A3',
+        okL   : 'a1f2e3',
+        okH   : '#01f9c3',
+        nOk1  : 'gggggg',
+        nOk2  : 'aaa',
+      };
+      carbone.renderXML(_template(), _data, (err, res) => {
+        assert.strictEqual(err+'', 'null');
+        assert.strictEqual(res, _template(true));
+        done();
+      });
+    });
+    it('should inject color in a whole document, merge with existing XML style, manage priority between row/cell/p scope, accept hashtag or not', function (done) {
+      const _testedReport = 'color/docx-multiple-color';
+      const _data = {
+        cell : '#1bcdef',
+        row  : '2bcdef',
+        para : '#3bcdef'
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+    it.skip('should replace color of row without modifying the nested table', function () {
+      // TODO : dès la détection des tag color, ne pas modifier l'XML, juste générer des patch
+      // parser tous l'XML avec le state machine afin de construire un tableau qui indique où nous somme dans le word (inside row de 12, à 234)
+      // utiliser ce tableau pour détecter les scope
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'word/document.xml',
+            data : '\n'
+                 + '\n<w:tbl>'
+                 + '\n  <w:tblPr>'
+                 + '\n  </w:tblPr>'
+                 + '\n  <w:tr>'
+                 + '\n    <w:tc>'
+                 + '\n      <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+                 + '\n      <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr></w:p>'
+                 + '\n    </w:tc>'
+                 + '\n    <w:tc>'
+                 + '\n      <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+                 + '\n      <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/></w:rPr></w:pPr></w:p>'
+                 + '\n    </w:tc>'
+                 + '\n  </w:tr>'
+                 + '\n  <w:tr>'
+                 + '\n    <w:tc>'
+                 + '\n      <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+                 + '\n      <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/><w:color w:val="'+((expected) ? '{d.test:color(row):colorToDocx}' : '1bcdef')+'"/></w:rPr></w:pPr>'
+                 + '\n        <w:r><w:rPr><w:lang w:val="en-US"/><w:color w:val="'+((expected) ? '{d.test:color(row):colorToDocx}' : '1bcdef')+'"/></w:rPr>'
+                 + '\n          <w:t>'
+                 + '\n            hello'
+                 + '\n          </w:t>'
+                 + '\n        </w:r>'
+                 + '\n      </w:p>'
+                 + '\n    </w:tc>'
+                 + '\n    <w:tc>'
+                 + '\n      <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+                 + '\n      <w:tbl>'
+                 + '\n        <w:tr>'
+                 + '\n          <w:tc>'
+                 + '\n            <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+                 + '\n            <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/><w:color w:val="1bcdef"/></w:rPr></w:pPr>'
+                 + '\n              <w:r><w:rPr><w:lang w:val="en-US"/><w:color w:val="1bcdef"/></w:rPr>'
+                 + '\n                <w:t>'
+                 + '\n                  hello'
+                 + '\n                </w:t>'
+                 + '\n              </w:r>'
+                 + '\n            </w:p>'
+                 + '\n          </w:tc>'
+                 + '\n          <w:tc>'
+                 + '\n            <w:tcPr><w:tcW w:w="4675" w:type="dxa"/></w:tcPr>'
+                 + '\n            <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/><w:color w:val="1bcdef"/></w:rPr></w:pPr>'
+                 + '\n              <w:r><w:rPr><w:lang w:val="en-US"/><w:color w:val="1bcdef"/></w:rPr>'
+                 + '\n                <w:t>'
+                 + '\n                  hello'
+                 + '\n                </w:t>'
+                 + '\n              </w:r>'
+                 + '\n            </w:p>'
+                 + '\n          </w:tc>'
+                 + '\n        </w:tr>'
+                 + '\n      </w:tbl>'
+                 + '\n      <w:p><w:pPr><w:rPr><w:lang w:val="en-US"/><w:color w:val="'+((expected) ? '{d.test:color(row):colorToDocx}' : '1bcdef')+'"/></w:rPr></w:pPr>'
+                 + '\n        <w:r><w:rPr><w:lang w:val="en-US"/><w:color w:val="'+((expected) ? '{d.test:color(row):colorToDocx}' : '1bcdef')+'"/></w:rPr>'
+                 + '\n          <w:t>'
+                 + '\n            ' + ((expected) ? '' : '{d.test:color(row)}')
+                 + '\n          </w:t>'
+                 + '\n        </w:r>'
+                 + '\n      </w:p>'
+                 + '\n    </w:tc>'
+                 + '\n  </w:tr>'
+                 + '\n</w:tbl>'
+          }]
+        };
+      };
+      assert.strictEqual(color.preProcessDocxColor(_template()).files[0].data, _template(true).files[0].data);
+    });
+  });
   describe('ODT Files', function () {
     describe('ODT/ODS pre processor methods', function () {
       describe('preProcessLo', function () {

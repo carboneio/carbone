@@ -1,3 +1,9 @@
+## v4.16.0
+  - Release December 19th 2023
+  - New `:color(scope, type)` formatter only for DOCX template: `{d.myColor:color(p)}`
+    - scope can be `p`  (by default), `cell`, `row` for applying color on the current paragraph, cell and row.
+    - type can be `text` (by default), `background` for cells and rows.
+
 ## v4.15.7
   - Release December 14th 2023
   - New aggregator `:cumCountD` to count the number of distinct values

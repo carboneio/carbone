@@ -1,4 +1,4 @@
-const color = require('../lib/color');
+const colorLib = require('../lib/color');
 
 /**
  * Add the color to the colorDatabase Map.
@@ -71,7 +71,35 @@ function updateColorAndGetReferenceLo () {
  */
 function getNewColorReferencePostProcessingLo (colorId) {
   const _colorData = this.colorDatabase.get(colorId);
-  return  color.getColorReference(_colorData.id);
+  return  colorLib.getColorReference(_colorData.id);
+}
+
+/**
+ * Transfrom color for Docx
+ *
+ * @private
+ * @param {String} d
+ */
+function colorToDocx (d) {
+  if (typeof (d) === 'string') {
+    const _colorWithoutHash = d.replace(/^#/, '');
+    if (/^[0-9a-f]{6}$/i.test(_colorWithoutHash) === true) {
+      return _colorWithoutHash;
+    }
+  }
+  return 'ffffff';
+}
+
+/**
+ * Apply the color on the text, paragraph, table row or table cell
+ *
+ * @version 4.16.0
+ * @param  {String} d    data
+ * @param  {Mixed} scope "p", "row", "cell"
+ * @param  {Mixed} type  "text", "highlight", "background"
+ */
+function color (d, scope, type) {
+  return d;
 }
 
 /** ==================================== DOCX FORMATTERS ========================================= */
@@ -87,12 +115,14 @@ function getNewColorReferencePostProcessingLo (colorId) {
 function getAndConvertColorDocx (colorName, colorType, elementType) {
   // check if colorName exist, the element is probably null or undefined on the JSON dataset
   if (colorName && colorType && elementType) {
-    return color.colorFormatConverter[colorType](colorName, 'docx', elementType);
+    return colorLib.colorFormatConverter[colorType](colorName, 'docx', elementType);
   }
   return '';
 }
 
 module.exports = {
+  color,
+  colorToDocx,
   updateColorAndGetReferenceLo,
   getNewColorReferencePostProcessingLo,
   getAndConvertColorDocx

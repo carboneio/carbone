@@ -1,9 +1,8 @@
 ## v4.16.0
-  - New :color formatter only for DOCX at the moment: `{d.myColor:color(p)}`
-    `:color(scope, type)`
-      - scope can be `p`  (by default), `cell`, `row` for applying color on the current paragraph, cell and row.
-      - type can be `text` (by default), `background` for cells and rows.
-
+  - Release December 19th 2023
+  - New `:color(scope, type)` formatter only for DOCX template: `{d.myColor:color(p)}`
+    - scope can be `p`  (by default), `cell`, `row` for applying color on the current paragraph, cell and row.
+    - type can be `text` (by default), `background` for cells and rows.
 
 ## v4.15.6
   - Release November 16th 2023

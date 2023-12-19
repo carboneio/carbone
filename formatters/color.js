@@ -82,8 +82,12 @@ function getNewColorReferencePostProcessingLo (colorId) {
  */
 function colorToDocx (d) {
   if (typeof (d) === 'string') {
-    return d.replace(/^#/, ''); // accept #fefefe or fefefe
+    const _colorWithoutHash = d.replace(/^#/, '');
+    if (/^[0-9a-f]{6}$/i.test(_colorWithoutHash) === true) {
+      return _colorWithoutHash;
+    }
   }
+  return 'ffffff';
 }
 
 /**

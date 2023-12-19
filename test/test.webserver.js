@@ -1080,6 +1080,25 @@ describe('Webserver', () => {
         });
       });
 
+      it('should not crash if formatOptions is undefined', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          convertTo : {
+            formatName : 'pdf'
+          }
+        };
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+          assert.equal(err+'', 'null');
+          assert.strictEqual(data.success, true);
+          toDelete.push(data.data.renderId);
+          done();
+        });
+      });
+
       it('should render a template and return debugInfo', (done) => {
         const body = {
           data : {

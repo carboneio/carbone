@@ -4,7 +4,7 @@
   - [EE] New `:color(scope, type)` formatter only for DOCX template: `{d.myHexColor:color(p)}`
     - scope can be `p`  (by default), `cell`, `row` for applying color on the current paragraph, cell and row.
     - type can be `text` (by default), `background` for cells and rows.
-    - accepts only 6-digit hex color notation with or without hashtag: `#FF0000` or `FF0000`. Carbone replaces incorrect color values with white (#FFFFFF)
+    - accepts only 6-digit hex color notation with or without hashtag, lower case or upper case: `#FF0000` or `FF0000`. Carbone replaces incorrect color values with white (#FFFFFF)
 
 ## v4.15.7
   - Release December 14th 2023

@@ -1,3 +1,6 @@
+## v4.16.1
+  - Fix array of string access in a loop of another array
+
 ## v4.16.0
   - Release December 19th 2023
   - Fix: accept undefined `formatOptions` when `convertTo` is an object

@@ -546,6 +546,19 @@ describe('builder.buildXML', function () {
       done();
     });
   });
+  it('should print values of array of string even if it is integrated inside a loop of another table (moveTo)', function (done) {
+    var _xml = '<xml> <tr> {d.tab[i][0]} {d.other[0]} </tr> <tr> {d.tab[i][1]} {d.other[1]} </tr>  <tr> {d.tab[i+1]} </tr> </xml>';
+    var _data = {
+      tab   : [[ '1A', '1B'], [ '2A', '2B']],
+      other : [ 'X', 'Y']
+    };
+    builder.buildXML(_xml, _data, function (err, _xmlBuilt) {
+      assert.equal(err+'', 'null');
+      assert.equal(_xmlBuilt, '<xml> <tr> 1A X </tr> <tr> 1B Y </tr>  <tr> 2A X </tr> <tr> 2B Y </tr>   </xml>');
+      _data.cars = [];
+      done();
+    });
+  });
   it('should manage nested arrays', function (done) {
     var _xml =
        '<xml>'

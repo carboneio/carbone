@@ -324,6 +324,11 @@ cumCountD.canBeCalledInPrecomputedLoop = true;
  * @return {String}          Nothing
  */
 function set (d, param) {
+  if ( param.startsWith('c.') === true ) {
+    const _attribute = param.replace('c.', '');
+    this.c[_attribute] = d;
+    return '';
+  }
   const _attribute = param.replace('d.', '');
   this.d[_attribute] = d;
   return '';

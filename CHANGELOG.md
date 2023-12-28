@@ -1,5 +1,7 @@
 ## v4.16.1
+  - Release December 28th 2023
   - Fix array of string access in a loop of another array
+  - The formatter `:set(c.value)` accepts to store values in complement object `c.`
 
 ## v4.16.0
   - Release December 19th 2023

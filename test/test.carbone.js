@@ -68,6 +68,16 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should save the result in complement, and it can be used later', function (done) {
+      var _xml = '<xml>{d.title:substr(0, 4):set(c.other)} {c.other} </xml>';
+      var _data = {title : 'boo1234'};
+      var _complement = {date : 'today'};
+      carbone.renderXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<xml> boo1 </xml>');
+        done();
+      });
+    });
   });
 
   describe('format date', function () {

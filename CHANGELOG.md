@@ -1,3 +1,6 @@
+## v4.16.2
+  - Increase glyphs cache size of Libreoffice at startup to speed up the PDF conversion of documents with 50 pages of table/text (potential gain: x10)
+
 ## v4.16.1
   - Release December 28th 2023
   - Fix array of string access in a loop of another array

@@ -1,5 +1,6 @@
 var preprocessor = require('../lib/preprocessor');
 var helper = require('../lib/helper');
+var carbone = require('../lib/index');
 
 describe('drop formatter', function () {
 
@@ -563,6 +564,38 @@ describe('drop formatter', function () {
         });
       });
 
+      describe('HTML', function () {
+        it('should replace the drop(p) by hideBegin/hideEnd formatter within the table XML', function (done) {
+          const _xml = (expected) => ''
+            + '<table>'
+            +   '<tr>'
+            +     '<td>'
+            +       (expected ? '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>' : '')
+            +       '<p>{d.list[i].desc}'
+            +       (expected ? '' : '{d.list[i].desc:ifEM:drop(p)}')
+            +       '</p>'
+            +       (expected ? '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' : '')
+            +     '</td>'
+            +   '</tr>'
+            + '</table>';
+
+          var _report = {
+            isZipped   : false,
+            filename   : 'template.html',
+            extension  : 'html',
+            embeddings : [],
+            files      : [
+              { name : 'random_name.xml', parent : '', data : _xml(false)}
+            ]
+          };
+          preprocessor.execute(_report, function (err, res) {
+            helper.assert(err + '', 'null');
+            helper.assert(res?.files[0]?.data, _xml(true));
+            done();
+          });
+        });
+      });
+
     });
 
   });
@@ -674,6 +707,50 @@ describe('drop formatter', function () {
         preprocessor.handleDropFormatter(_template, 'odt');
         helper.assert(_template.files[0]?.data, content(true));
         done();
+      });
+    });
+
+    describe('ODS', function () {
+      it('should replace the drop(row) by hideBegin/hideEnd formatter within the table XML', function (done) {
+        const _xml = (expected) => ''
+          + '<table:table table:name="Sheet1" table:style-name="ta1">'
+          +   '<table:table-row table:style-name="ro1">'
+          +     '<table:table-cell office:value-type="string" calcext:value-type="string">'
+          +       '<text:p>test</text:p>'
+          +     '</table:table-cell>'
+          +     '<table:table-cell/>'
+          +   '</table:table-row>'
+          +   '<table:table-row table:style-name="ro1">'
+          +     '<table:table-cell>'
+          +       (expected ? '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>' : '')
+          +       '<draw:frame draw:z-index="0" draw:name="Image 1" draw:style-name="gr1" draw:text-style-name="P1" svg:width="13.182cm" svg:height="7.515cm" svg:x="4.806cm" svg:y="0.096cm">'
+          +         '<draw:image xlink:href="Pictures/10000001000006CC000003E08A8F19E1.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/png">'
+          +           '<text:p/>'
+          +         '</draw:image>'
+          +         '<svg:desc>'
+          +           (expected ? '' : '{d.list[i].desc:ifEM:drop(img)}')
+          +         '</svg:desc>'
+          +       '</draw:frame>'
+          +       (expected ? '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' : '')
+          +     '</table:table-cell>'
+          +     '<table:table-cell/>'
+          +   '</table:table-row>'
+          + '</table:table>';
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.ods',
+          extension  : 'ods',
+          embeddings : [],
+          files      : [
+            { name : 'content.xml', parent : '', data : _xml(false)}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, _xml(true));
+          done();
+        });
       });
     });
 
@@ -802,7 +879,7 @@ describe('drop formatter', function () {
 
   });
 
-  describe(':drop(chart)', function () {
+  describe(':drop(table)', function () {
 
     describe('DOCX', function () {
       it('should replace the drop(table) by hideBegin/hideEnd around the table', function (done) {
@@ -902,6 +979,38 @@ describe('drop formatter', function () {
         preprocessor.handleDropFormatter(_template, 'odt');
         helper.assert(_template.files[0]?.data, content(true));
         done();
+      });
+    });
+
+    describe('HTML', function () {
+      it('should replace the drop(table) by hideBegin/hideEnd formatter within the table XML', function (done) {
+        const _xml = (expected) => ''
+          + (expected ? '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>' : '')
+          + '<table>'
+          +   '<tr>'
+          +     '<td>'
+          +       '<p>{d.list[i].desc}'
+          +       (expected ? '' : '{d.list[i].desc:ifEM:drop(table)}')
+          +       '</p>'
+          +     '</td>'
+          +   '</tr>'
+          + '</table>'
+          + (expected ? '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' : '');
+
+        var _report = {
+          isZipped   : false,
+          filename   : 'template.html',
+          extension  : 'html',
+          embeddings : [],
+          files      : [
+            { name : 'template.xml', parent : '', data : _xml(false)}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, _xml(true));
+          done();
+        });
       });
     });
 
@@ -2267,6 +2376,84 @@ describe('drop formatter', function () {
         });
       });
     });
+
+    describe('HTML', function () {
+      it('should replace the drop(row) by hideBegin/hideEnd formatter within the table XML', function (done) {
+        const _xml = (expected) => ''
+          + '<table>'
+          +   (expected ? '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>' : '')
+          +   '<tr>'
+          +     '<td>'
+          +       '<p>{d.list[i].desc}'
+          +       (expected ? '' : '{d.list[i].desc:ifEM:drop(row)}')
+          +       '</p>'
+          +     '</td>'
+          +   '</tr>'
+          +   (expected ? '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' : '')
+          + '</table>';
+
+        var _report = {
+          isZipped   : false,
+          filename   : 'template.html',
+          extension  : 'html',
+          embeddings : [],
+          files      : [
+            { name : 'template.xml', parent : '', data : _xml(false)}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, _xml(true));
+          done();
+        });
+      });
+    });
+
+    describe('ODS', function () {
+      it('should replace the drop(row) by hideBegin/hideEnd formatter within the table XML', function (done) {
+        const _xml = (expected) => ''
+          + '<table:table table:name="Sheet1" table:style-name="ta1">'
+          +   '<table:table-row table:style-name="ro1">'
+          +     '<table:table-cell office:value-type="string" calcext:value-type="string">'
+          +       '<text:p>test</text:p>'
+          +     '</table:table-cell>'
+          +     '<table:table-cell/>'
+          +   '</table:table-row>'
+          +   '<table:table-row table:style-name="ro1" table:number-rows-repeated="2">'
+          +     '<table:table-cell table:number-columns-repeated="2"/>'
+          +   '</table:table-row>'
+          +   (expected ? '<carbone>{d.list[i].desc:ifEM:hideBegin}</carbone>' : '')
+          +   '<table:table-row table:style-name="ro1">'
+          +     '<table:table-cell/>'
+          +     '<table:table-cell office:value-type="string" calcext:value-type="string">'
+          +       '<text:p>'
+          +       (expected ? '' : '{d.list[i].desc:ifEM:drop(row)}')
+          +       '</text:p>'
+          +     '</table:table-cell>'
+          +   '</table:table-row>'
+          +   (expected ? '<carbone>{d.list[i].desc:ifEM:hideEnd}</carbone>' : '')
+          +   '<table:table-row table:style-name="ro1" table:number-rows-repeated="5">'
+          +     '<table:table-cell table:number-columns-repeated="2"/>'
+          +   '</table:table-row>'
+          + '</table:table>';
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.ods',
+          extension  : 'ods',
+          embeddings : [],
+          files      : [
+            { name : 'content.xml', parent : '', data : _xml(false)}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, _xml(true));
+          done();
+        });
+      });
+    });
+
   });
 
   describe(':drop(slide)', function () {
@@ -2348,6 +2535,34 @@ describe('drop formatter', function () {
         helper.assert(_template.files[1]?.data, content(true));
         helper.assert(_template.files[2]?.data, content(true));
         done();
+      });
+    });
+  });
+
+  describe('Global tests', function () {
+    it('should remove row in HTML', function (done) {
+      const _xml = ''
+        + '<table>'
+        +   '<tr><td>A</td></tr>'
+        +   '<tr>'
+        +     '<td>'
+        +       '<p>'
+        +         'B{d.id:ifEM:drop(row)}'
+        +       '</p>'
+        +     '</td>'
+        +   '</tr>'
+        + '</table>'
+      ;
+      var _data = { id : null };
+      carbone.renderXML(_xml, _data, { extension : 'html' }, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<table><tr><td>A</td></tr></table>');
+        _data.id = 1;
+        carbone.renderXML(_xml, _data, { extension : 'html' }, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<table><tr><td>A</td></tr><tr><td><p>B</p></td></tr></table>');
+          done();
+        });
       });
     });
   });

@@ -121,8 +121,14 @@ describe('file', function () {
         done();
       });
     });
-    it('should not detect type if nothing has been matched', function (done) {
+    it('should detect type txt if nothing has been matched and if it is a string', function (done) {
       carbone.getFileExtension('test_unknown_file_type', function (err) {
+        helper.assert(err, null);
+        done();
+      });
+    });
+    it('should not detect type if nothing has been matched', function (done) {
+      carbone.getFileExtension('test_unknown_file_type.zip', function (err) {
         helper.assert(err, 'Cannot detect file extension');
         done();
       });

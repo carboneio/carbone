@@ -1966,7 +1966,7 @@ describe('Webserver', () => {
       it('should not be able to upload not supported file templates', (done) => {
         let form = new FormData();
 
-        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'helperDirTest', 'create.sql')));
+        form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'test_unknown_file_type.zip')));
 
         get.concat(getBody(4000, '/template', 'POST', form), (err, res, data) => {
           assert.strictEqual(err, null);

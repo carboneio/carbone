@@ -1,3 +1,6 @@
+## v4.17.0
+  - Support `drop` in ODS (img, row) and HTML (table, p, row) templates.
+
 ## v4.16.2
   - Release January 3rd 2024
   - Increase glyphs cache size of Libreoffice at startup to speed up the PDF conversion of documents with 50 pages of table/text (potential gain: x10)

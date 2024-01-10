@@ -1,3 +1,8 @@
+
+## v4.17.0
+  - Release January 10th 2024
+  - To include a single-quote character in formatter parameter, write two adjacent single quotes, e.g., 'David''s Car'. Note that this is not the same as a double-quote character (").
+
 ## v4.16.2
   - Release January 3rd 2024
   - Increase glyphs cache size of Libreoffice at startup to speed up the PDF conversion of documents with 50 pages of table/text (potential gain: x10)

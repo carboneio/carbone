@@ -1,4 +1,5 @@
 ## v4.17.0
+  - `carbone.renderXML` accepts html templates if `option.extension` is `html`
   - Support `drop` in ODS (img, row) and HTML (table, p, row) templates.
 
 ## v4.16.2

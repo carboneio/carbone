@@ -1,5 +1,6 @@
 ## v4.17.0
   - Support `drop` in ODS (img, row) and HTML (table, p, row) templates.
+  - Support `keep` (the opposite of `drop`)
 
 ## v4.16.2
   - Release January 3rd 2024

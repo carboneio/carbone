@@ -7,7 +7,7 @@ const helperTest = require('./helper');
 const colorFormatters = require('../formatters/color');
 
 describe('Dynamic colors', function () {
-  describe('DOCX new :color', function () {
+  describe('DOCX new :color (MASTER test)', function () {
     const xmlColor = (expected) => {
       return ''
        + '\n<w:tbl>'
@@ -235,6 +235,201 @@ describe('Dynamic colors', function () {
         };
       };
       assert.strictEqual(color.preProcessDocxColor(_template()).files[0].data, _template(true).files[0].data);
+    });
+  });
+  describe('HTML new :color', function () {
+    it('should replace color of row', function () {
+      const _xmlColor = (expected) => {
+        return ''
+         + '\n<table>'
+         + '\n  <tbody>'
+         + '\n    <tr style="margin:auto; color:'+((expected) ? '{d.test:color(row):colorToHtml}' : '1bcdef')+'; background-color:#FFF;">'
+         + '\n      <td>'
+         + '\n        <p></p>'
+         + '\n        <p>'
+         + '\n          <span>'
+         + '\n            ' + ((expected) ? '' : '{d.test:color(row)}')
+         + '\n          </span>'
+         + '\n        </p>'
+         + '\n      </td>'
+         + '\n      <td>'
+         + '\n        <p>text</p>'
+         + '\n      </td>'
+         + '\n    </tr>'
+         + '\n  </tbody>'
+         + '\n</table>';
+      };
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'template.html',
+            data : _xmlColor(expected)
+          }]
+        };
+      };
+      assert.strictEqual(color.preProcessHtmlColor(_template()).files[0].data, _template(true).files[0].data);
+    });
+    it('should add the style attribute if it does not exist', function () {
+      const _htmlColor = (expected) => {
+        return ''
+         + '\n<table>'
+         + '\n  <tbody>'
+         + '\n    <tr>'
+         + '\n    </tr>'
+         + '\n    <tr '+((expected) ? 'style="color:{d.test:color(row):colorToHtml};"' : '')+'>'
+         + '\n      <td>'
+         + '\n        <p></p>'
+         + '\n        <p>'
+         + '\n          <span>'
+         + '\n            ' + ((expected) ? '' : '{d.test:color(row)}')
+         + '\n          </span>'
+         + '\n        </p>'
+         + '\n      </td>'
+         + '\n    </tr>'
+         + '\n  </tbody>'
+         + '\n</table>';
+      };
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'template.html',
+            data : _htmlColor(expected)
+          }]
+        };
+      };
+      assert.strictEqual(color.preProcessHtmlColor(_template()).files[0].data, _template(true).files[0].data);
+    });
+    it('should add the style attribute on paragraph if it does not exist', function () {
+      const _htmlColor = (expected) => {
+        return ''
+         + '\n<table>'
+         + '\n  <tbody>'
+         + '\n    <tr>'
+         + '\n    </tr>'
+         + '\n    <tr>'
+         + '\n      <td>'
+         + '\n        <p></p>'
+         + '\n        <p '+((expected) ? 'style="color:{d.test:color(p):colorToHtml};"' : '')+'>'
+         + '\n          <span>'
+         + '\n            ' + ((expected) ? '' : '{d.test:color(p)}')
+         + '\n          </span>'
+         + '\n        </p>'
+         + '\n      </td>'
+         + '\n    </tr>'
+         + '\n  </tbody>'
+         + '\n</table>';
+      };
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'template.html',
+            data : _htmlColor(expected)
+          }]
+        };
+      };
+      assert.strictEqual(color.preProcessHtmlColor(_template()).files[0].data, _template(true).files[0].data);
+    });
+    it('should add the style attribute on cell', function () {
+      const _htmlColor = (expected) => {
+        return ''
+         + '\n<table>'
+         + '\n  <tbody>'
+         + '\n    <tr>'
+         + '\n    </tr>'
+         + '\n    <tr>'
+         + '\n      <td>'
+         + '\n      </td>'
+         + '\n      <td '+((expected) ? 'style="color:{d.test:color(cell):colorToHtml};"' : '')+'>'
+         + '\n        <p></p>'
+         + '\n        <p>'
+         + '\n          <span>'
+         + '\n            ' + ((expected) ? '' : '{d.test:color(cell)}')
+         + '\n          </span>'
+         + '\n        </p>'
+         + '\n      </td>'
+         + '\n    </tr>'
+         + '\n  </tbody>'
+         + '\n</table>';
+      };
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'template.html',
+            data : _htmlColor(expected)
+          }]
+        };
+      };
+      assert.strictEqual(color.preProcessHtmlColor(_template()).files[0].data, _template(true).files[0].data);
+    });
+    it('should replace undefined, null or not valid colors by white', function (done) {
+      const _template = (expected) => {
+        return  ''
+             + '<html>'
+             + '<p style="color:'+((expected) ? '#ffffff;"> ' : 'red;"> {d.undef:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#ffffff;"> ' : 'red;"> {d.nulli:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#A1A2A3;"> ' : 'red;"> {d.okU:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#a1f2e3;"> ' : 'red;"> {d.okL:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#01f9c3;"> ' : 'red;"> {d.okH:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#ffffff;"> ' : 'red;"> {d.nOk1:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#ffffff;"> ' : 'red;"> {d.nOk2:color(p)}')+'</p>'
+             + '</html>';
+      };
+      const _data = {
+        nulli : null,
+        okU   : 'A1A2A3',
+        okL   : 'a1f2e3',
+        okH   : '#01f9c3',
+        nOk1  : 'gggggg',
+        nOk2  : 'aaa',
+      };
+      carbone.renderXML(_template(), _data, {extension : 'html'}, (err, res) => {
+        assert.strictEqual(err+'', 'null');
+        assert.strictEqual(res, _template(true));
+        done();
+      });
+    });
+    it('should inject color in a whole document, merge multiple css properties in a new style attribute, merge multiple css properties in an existing style attribute', function (done) {
+      const _template = (expected) => {
+        return ''
+         + '<table>'
+         + '  <tbody>'
+         + '    <tr style="'+((expected) ? 'background-color:#4bcdef; color:#5bcdef; ' : '')+'margin:auto;">'
+         + '      <td>'
+         + '      ' + ((expected) ? '' : '{d.backRow:color(row, background)}')
+         + '      ' + ((expected) ? '' : '{d.textRow:color(row)}')
+         + '      </td>'
+         + '    </tr>'
+         + '    <tr '+((expected) ? 'style="background-color:#4bcdef; color:#5bcdef;"' : 'style="color:red;"')+'>'
+         + '      <td>'
+         + '      </td>'
+         + '      <td '+((expected) ? 'style="color:#1bcdef;"' : '')+'>'
+         + '        <p></p>'
+         + '        <p '+((expected) ? 'style="background-color:#2bcdef;color:#3bcdef;"' : '')+'>'
+         + '          <span>'
+         + '            ' + ((expected) ? '' : '{d.textCell:color(cell, text)}')
+         + '            ' + ((expected) ? '' : '{d.backP:color(p, background)}')
+         + '            ' + ((expected) ? '' : '{d.textP:color(p)}')
+         + '            ' + ((expected) ? '' : '{d.backRow:color(row, background)}')
+         + '            ' + ((expected) ? '' : '{d.textRow:color(row)}')
+         + '          </span>'
+         + '        </p>'
+         + '      </td>'
+         + '    </tr>'
+         + '  </tbody>'
+         + '</table>';
+      };
+      const _data = {
+        textCell : '#1bcdef',
+        backP    : '2bcdef',
+        textP    : '#3bcdef',
+        backRow  : '#4bcdef',
+        textRow  : '#5bcdef'
+      };
+      carbone.renderXML(_template(), _data, {extension : 'html'}, (err, res) => {
+        helper.assert(err+'', 'null');
+        helper.assert(res, _template(true));
+        done();
+      });
     });
   });
   describe('ODT Files', function () {

@@ -91,6 +91,22 @@ function colorToDocx (d) {
 }
 
 /**
+ * Transfrom color for Html
+ *
+ * @private
+ * @param {String} d
+ */
+function colorToHtml (d) {
+  if (typeof (d) === 'string') {
+    const _colorWithoutHash = d.startsWith('#') === true ? d : '#' + d;
+    if (/^#[0-9a-f]{6}$/i.test(_colorWithoutHash) === true) {
+      return _colorWithoutHash;
+    }
+  }
+  return '#ffffff';
+}
+
+/**
  * Apply the color on the text, paragraph, table row or table cell
  *
  * @version 4.16.0
@@ -123,6 +139,7 @@ function getAndConvertColorDocx (colorName, colorType, elementType) {
 module.exports = {
   color,
   colorToDocx,
+  colorToHtml,
   updateColorAndGetReferenceLo,
   getNewColorReferencePostProcessingLo,
   getAndConvertColorDocx

@@ -2,6 +2,11 @@
   - `carbone.renderXML` accepts html templates if `option.extension` is `html`
   - Support `drop` in ODS (img, row) and HTML (table, p, row) templates.
   - Support `keep` (the opposite of `drop`)
+  - Support `:color(scope, type)` for DOCX and HTML templates:
+    - scope can be `p`  (by default), `cell`, `row` for applying color on the current paragraph, cell and row.
+    - type can be `text` (by default), `background` for cells and rows and paragraph
+    - accepts only 6-digit hex color notation with or without hashtag, lower case or upper case: `#FF0000` or `FF0000`. Carbone replaces incorrect color values with white (#FFFFFF)
+    - for HTML, the color is applied with the style attribute only on the selected HTML tag (tr, td and p)
 
 ## v4.16.2
   - Release January 3rd 2024

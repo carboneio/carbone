@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<office:document-content xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:officeooo="http://openoffice.org/2009/office" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:ooo="http://openoffice.org/2004/office" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.3">
+  <office:scripts/>
+  <office:font-face-decls>
+    <style:font-face style:name="Arial Unicode MS" svg:font-family="&apos;Arial Unicode MS&apos;" style:font-family-generic="swiss"/>
+    <style:font-face style:name="Arial Unicode MS1" svg:font-family="&apos;Arial Unicode MS&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+    <style:font-face style:name="Liberation Sans" svg:font-family="&apos;Liberation Sans&apos;" style:font-family-generic="swiss" style:font-pitch="variable"/>
+    <style:font-face style:name="Liberation Serif" svg:font-family="&apos;Liberation Serif&apos;" style:font-family-generic="roman" style:font-pitch="variable"/>
+    <style:font-face style:name="PingFang SC" svg:font-family="&apos;PingFang SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+    <style:font-face style:name="Songti SC" svg:font-family="&apos;Songti SC&apos;" style:font-family-generic="system" style:font-pitch="variable"/>
+  </office:font-face-decls>
+  <office:automatic-styles>
+    <style:style style:name="P1" style:family="paragraph">
+      <loext:graphic-properties draw:fill-color="#fc5c00"/>
+    </style:style>
+    <style:style style:name="T1" style:family="text">
+      <style:text-properties fo:color="#622502" loext:opacity="100%"/>
+    </style:style>
+    <style:style style:name="gr1" style:family="graphic">
+      <style:graphic-properties draw:textarea-horizontal-align="justify" draw:textarea-vertical-align="middle" draw:auto-grow-height="false" fo:min-height="1.341cm" fo:min-width="2.727cm" loext:decorative="false" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph"/>
+    </style:style>
+    <style:style style:name="gr2" style:family="graphic">
+      <style:graphic-properties svg:stroke-width="0.035cm" svg:stroke-color="#0369a3" draw:marker-start-width="0.406cm" draw:marker-end-width="0.406cm" draw:fill-color="#fc5c00" draw:textarea-horizontal-align="justify" draw:textarea-vertical-align="middle" draw:auto-grow-height="false" fo:min-height="6.246cm" fo:min-width="12.158cm" fo:padding-top="0.018cm" fo:padding-bottom="0.018cm" fo:padding-left="0.018cm" fo:padding-right="0.018cm" loext:decorative="false" style:run-through="foreground" style:wrap="run-through" style:number-wrapped-paragraphs="no-limit" style:vertical-pos="from-top" style:vertical-rel="paragraph" style:horizontal-pos="from-left" style:horizontal-rel="paragraph"/>
+      <style:paragraph-properties style:writing-mode="lr-tb"/>
+    </style:style>
+  </office:automatic-styles>
+  <office:body>
+    <office:text>
+      <text:sequence-decls>
+        <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Table"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Text"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Drawing"/>
+        <text:sequence-decl text:display-outline-level="0" text:name="Figure"/>
+      </text:sequence-decls>
+      <text:p text:style-name="Standard">
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="0" draw:name="Shape 1" draw:style-name="gr2" draw:text-style-name="P1" svg:width="12.195cm" svg:height="6.282cm" svg:x="0.302cm" svg:y="0.661cm">
+          <svg:desc>
+            {d.shapeBack:color(shape, background)} {d.shapeBorder:color(shape, border)}
+          </svg:desc>
+          <text:p/>
+          <text:p>
+            <text:span text:style-name="T1">
+              ShapeText={d.shapeText}
+            </text:span>
+          </text:p>
+          <text:p>
+            <text:span text:style-name="T1">
+              ShapeHighlight={d.shapeHighlight}
+            </text:span>
+          </text:p>
+          <text:p>
+            <text:span text:style-name="T1">
+              {d.shapeText:color(shape, text)}
+            </text:span>
+          </text:p>
+          <text:p>
+            <text:span text:style-name="T1">
+              {d.shapeHighlight:color(shape, highlight)}
+            </text:span>
+          </text:p>
+          <text:p>
+            <text:span text:style-name="T1"/>
+          </text:p>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
+        </draw:custom-shape>
+        <draw:custom-shape text:anchor-type="paragraph" draw:z-index="1" draw:name="Shape 2" draw:style-name="gr1" svg:width="3.857cm" svg:height="1.895cm" svg:x="3.651cm" svg:y="10.245cm">
+          <svg:desc>
+            {d.shapeBack:color(shape, background)}
+          </svg:desc>
+          <text:p/>
+          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3163 3163 0 10800 3163 18437 10800 21600 18437 18437 21600 10800 18437 3163" draw:text-areas="3163 3163 18437 18437" draw:type="ellipse" draw:enhanced-path="U 10800 10800 10800 10800 0 360 Z N"/>
+        </draw:custom-shape>
+      </text:p>
+    </office:text>
+  </office:body>
+</office:document-content>

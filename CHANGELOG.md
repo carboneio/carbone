@@ -1,12 +1,24 @@
 ## v4.17.0
   - `carbone.renderXML` accepts html templates if `option.extension` is `html`
   - Support `drop` in ODS (img, row) and HTML (table, p, row) templates.
-  - Support `keep` (the opposite of `drop`)
-  - Support `:color(scope, type)` for DOCX and HTML templates:
-    - scope can be `p`  (by default), `cell`, `row` for applying color on the current paragraph, cell and row.
-    - type can be `text` (by default), `background` for cells and rows and paragraph
-    - accepts only 6-digit hex color notation with or without hashtag, lower case or upper case: `#FF0000` or `FF0000`. Carbone replaces incorrect color values with white (#FFFFFF)
-    - for HTML, the color is applied with the style attribute only on the selected HTML tag (tr, td and p)
+  - Support `keep`, the opposite of `drop`
+  - [EE] New features and new supported templates for the `:color(scope, type)` formatter:
+    - Supported in ODT, ODP, HTML and DOCX templates
+    - `scope` can be `p`  (by default), `cell`, `row`, `shape` 🤩  to apply color to the current paragraph, cell, row or shape
+    - `type` can be `text` (by default), `highlight` for text, `background` for cells, rows and shapes,  `border` for shapes only
+    - accepts only 6-digit hex color notation with or without hashtag, lowercase or uppercase: `#FF0000` or `FF0000`. Carbone replaces wrong color values with light gray (#888888)
+    - for HTML, the color is applied with the style attribute only to the selected HTML tag (tr, td and p)
+    - This new method is better than the old method with `bindColor`:
+      - It is much easier to use. The color is only applied to the targeted scope where the carbone tag is (like `:drop` or `:keep`).
+      - It does not break other styles of the targeted element. New colors are merged with existing style (e.g. cell border, ...).
+      - Supports different conditions on text and highlight at the same time for ODT/ODP. For example: `{d.col:color(p)} {d.nb:ifEQ(true):show(FF0000):color(p, highlight)}` is possible.
+      - Manages priority between overlapping areas. A color applied to the current paragraph has a higher priority than a color applied to the current shape, cell and row.
+    - WARNING: There are known limitations in this version:
+      - in ODP (text, table, and shapes) and ODT (shapes only), the dynamic color is applied only if a non-standard style (text size, color, ...) is already applied to the targeted element in the template.
+      - complex nested tables with colors on sub-tables are not fully supported.
+      - `highlight` is not managed in docx template
+      - Cannot be used with aliases
+  - Fixed `:color(scope, type)` bug for DOCX templates when the Carbone tag `:color` tag is quite long with many conditions for example.
 
 ## v4.16.2
   - Release January 3rd 2024

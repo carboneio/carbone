@@ -97,7 +97,7 @@ describe('Dynamic colors', function () {
         }]
       };
       assert.throws(() => color.preProcessDocxColor(_template), {
-        message : 'The color scope "eeee" is unknown in "{d.test:color(eeee)}". The formatter accepts only row, cell, p for the first argument.'
+        message : 'The color scope "eeee" is unknown in "{d.test:color(eeee)}". The formatter accepts only row, cell, p, shape for the first argument.'
       });
     });
     it('should returns error if the color type is unknown', function () {
@@ -108,7 +108,7 @@ describe('Dynamic colors', function () {
         }]
       };
       assert.throws(() => color.preProcessDocxColor(_template), {
-        message : 'The color type "bidule" is unknown in "{d.test:color(p, bidule)}". The formatter accepts only text, background for the second argument.'
+        message : 'The color type "bidule" is unknown in "{d.test:color(p, bidule)}". The formatter accepts only text, background, border for the second argument.'
       });
     });
     it('should returns error if the color type/scope combination is not valid', function () {
@@ -126,13 +126,13 @@ describe('Dynamic colors', function () {
       const _template = (expected) => {
         return  ''
              + '<body>'
-             + '<w:color w:val="'+((expected) ? 'ffffff' : '{d.undef:color(row):colorToDocx}')+'"/>'
-             + '<w:color w:val="'+((expected) ? 'ffffff' : '{d.nulli:color(row):colorToDocx}')+'"/>'
-             + '<w:color w:val="'+((expected) ? 'A1A2A3' : '{d.okU:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? '888888' : '{d.undef:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? '888888' : '{d.nulli:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? 'a1a2a3' : '{d.okU:color(row):colorToDocx}')+'"/>'
              + '<w:color w:val="'+((expected) ? 'a1f2e3' : '{d.okL:color(row):colorToDocx}')+'"/>'
              + '<w:color w:val="'+((expected) ? '01f9c3' : '{d.okH:color(row):colorToDocx}')+'"/>'
-             + '<w:color w:val="'+((expected) ? 'ffffff' : '{d.nOk1:color(row):colorToDocx}')+'"/>'
-             + '<w:color w:val="'+((expected) ? 'ffffff' : '{d.nOk2:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? '888888' : '{d.nOk1:color(row):colorToDocx}')+'"/>'
+             + '<w:color w:val="'+((expected) ? '888888' : '{d.nOk2:color(row):colorToDocx}')+'"/>'
              + '</body>';
       };
       const _data = {
@@ -155,6 +155,20 @@ describe('Dynamic colors', function () {
         cell : '#1bcdef',
         row  : '2bcdef',
         para : '#3bcdef'
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+    it('DOCX shape with text or without text', function (done) {
+      const _testedReport = 'color/docx-shape';
+      const _data ={
+        shapeBorder    : '#00FF00',
+        shapeBack      : '#660200',
+        shapeText      : '#F1119f',
+        shapeHighlight : '#FFDDEE'
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');
@@ -243,7 +257,7 @@ describe('Dynamic colors', function () {
         return ''
          + '\n<table>'
          + '\n  <tbody>'
-         + '\n    <tr style="margin:auto; color:'+((expected) ? '{d.test:color(row):colorToHtml}' : '1bcdef')+'; background-color:#FFF;">'
+         + '\n    <tr style="margin:auto; color:'+((expected) ? '{d.test:color(row)}' : '1bcdef')+'; background-color:#FFF;">'
          + '\n      <td>'
          + '\n        <p></p>'
          + '\n        <p>'
@@ -276,7 +290,7 @@ describe('Dynamic colors', function () {
          + '\n  <tbody>'
          + '\n    <tr>'
          + '\n    </tr>'
-         + '\n    <tr '+((expected) ? 'style="color:{d.test:color(row):colorToHtml};"' : '')+'>'
+         + '\n    <tr '+((expected) ? 'style="color:{d.test:color(row)};"' : '')+'>'
          + '\n      <td>'
          + '\n        <p></p>'
          + '\n        <p>'
@@ -309,7 +323,7 @@ describe('Dynamic colors', function () {
          + '\n    <tr>'
          + '\n      <td>'
          + '\n        <p></p>'
-         + '\n        <p '+((expected) ? 'style="color:{d.test:color(p):colorToHtml};"' : '')+'>'
+         + '\n        <p '+((expected) ? 'style="color:{d.test:color(p)};"' : '')+'>'
          + '\n          <span>'
          + '\n            ' + ((expected) ? '' : '{d.test:color(p)}')
          + '\n          </span>'
@@ -339,7 +353,7 @@ describe('Dynamic colors', function () {
          + '\n    <tr>'
          + '\n      <td>'
          + '\n      </td>'
-         + '\n      <td '+((expected) ? 'style="color:{d.test:color(cell):colorToHtml};"' : '')+'>'
+         + '\n      <td '+((expected) ? 'style="color:{d.test:color(cell)};"' : '')+'>'
          + '\n        <p></p>'
          + '\n        <p>'
          + '\n          <span>'
@@ -365,13 +379,13 @@ describe('Dynamic colors', function () {
       const _template = (expected) => {
         return  ''
              + '<html>'
-             + '<p style="color:'+((expected) ? '#ffffff;"> ' : 'red;"> {d.undef:color(p)}')+'</p>'
-             + '<p style="color:'+((expected) ? '#ffffff;"> ' : 'red;"> {d.nulli:color(p)}')+'</p>'
-             + '<p style="color:'+((expected) ? '#A1A2A3;"> ' : 'red;"> {d.okU:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#888888;"> ' : 'red;"> {d.undef:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#888888;"> ' : 'red;"> {d.nulli:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#a1a2a3;"> ' : 'red;"> {d.okU:color(p)}')+'</p>'
              + '<p style="color:'+((expected) ? '#a1f2e3;"> ' : 'red;"> {d.okL:color(p)}')+'</p>'
              + '<p style="color:'+((expected) ? '#01f9c3;"> ' : 'red;"> {d.okH:color(p)}')+'</p>'
-             + '<p style="color:'+((expected) ? '#ffffff;"> ' : 'red;"> {d.nOk1:color(p)}')+'</p>'
-             + '<p style="color:'+((expected) ? '#ffffff;"> ' : 'red;"> {d.nOk2:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#888888;"> ' : 'red;"> {d.nOk1:color(p)}')+'</p>'
+             + '<p style="color:'+((expected) ? '#888888;"> ' : 'red;"> {d.nOk2:color(p)}')+'</p>'
              + '</html>';
       };
       const _data = {
@@ -429,6 +443,561 @@ describe('Dynamic colors', function () {
         helper.assert(err+'', 'null');
         helper.assert(res, _template(true));
         done();
+      });
+    });
+  });
+  describe('ODT new :color PREPROCESS / POSTPROCESS', function () {
+    describe('Global render', function () {
+      it('should inject color in a whole document, merge with existing XML style, manage priority between row/cell/p scope, accept hashtag or not', function (done) {
+        const _xmlColor = (expected) => {
+          return ''
+            + '<office:automatic-styles>'
+            + '  <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">'
+            + '    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="#ffff00"/>'
+            + '  </style:style>'
+            + '  <style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard">'
+            + '    <style:text-properties fo:color="#c9211e" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>'
+            + '  </style:style>'
+            + '  <style:style style:name="P3" style:family="paragraph" style:parent-style-name="Table_20_Contents">'
+            + '    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0"/>'
+            + '  </style:style>'
+            + ((expected !== true) ? '' : ''
+              +   '<style:style style:name="CCS0" style:family="paragraph" style:parent-style-name="Standard">'
+              + '    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="#ffff00" fo:color="#1bcdef"/>'
+              + '  </style:style>'
+              +     '<style:style style:name="CCS1" style:family="paragraph" style:parent-style-name="Standard">'
+              + '    <style:text-properties fo:color="#2bcdef" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>'
+              + '  </style:style>')
+            + '</office:automatic-styles>'
+            + '<office:body>'
+            + '  <office:text>'
+            + '    <text:p text:style-name="'+ ((expected) ? 'CCS0':'P1') + '">'
+            + '            ' + ((expected) ? '' : '{d.test:color(p)}')
+            + '    </text:p>'
+            + '    <text:p text:style-name="'+ ((expected) ? 'CCS1':'P2') + '">'
+            + '            ' + ((expected) ? '' : '{d.test2:color(p)}')
+            + '    </text:p>'
+            + '    <text:p text:style-name="P3">blabla</text:p>'
+            + '  </office:text>'
+            + '</office:body>'
+          ;
+        };
+        const _template = (expected) => {
+          return {
+            isZipped   : false,
+            extension  : 'odt',
+            embeddings : [],
+            files      : [
+              { name : 'content.xml', data : _xmlColor(expected)                      , isMarked : true  },
+              { name : 'mimetype'   , data : 'application/vnd.oasis.opendocument.text', isMarked : false }
+            ]
+          };
+        };
+        const _data = {
+          test  : '#1bcdef',
+          test2 : '2bcdef'
+        };
+        carbone.render(_template(false), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          assert.strictEqual(res.files[0].data.replace(/>/g, '>\n'), _template(true).files[0].data.replace(/>/g, '>\n'));
+          done();
+        });
+      });
+      it('ODT should inject color in a whole document, merge with existing XML style, manage priority between row/cell/p scope,\
+               apply the right style at the right place (paragraph style !== paragraph style in a cell', function (done) {
+        const _testedReport = 'color/odt-multiple-color';
+        const _data = {
+          headerText : '#10f100',
+          textP      : '#20f1f0',
+          highlightP : '#f09100',
+          textCell   : '#ff0000',
+          rowBack    : '#d061d0',
+          rowText    : '#303ff0',
+          cellBack   : '#dedede',
+          cellText   : '#00dede'
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('ODT should manage loop, and accept different formatters on the same style (text + highlight) ', function (done) {
+        const _testedReport = 'color/odt-text-highlight-row-loop';
+        const _data = [
+          {
+            highlightP : '#00FF00',
+            textP      : '#66a200',
+            rowText    : '#111191'
+          },
+          {
+            highlightP : 'ZZ',
+            textP      : 'ZZ', // in the template, there is a condition only on textP. It should be applied on highlightP, even if it is the same style
+            rowText    : null
+          },
+          {
+            highlightP : 'ddddFF',
+            textP      : '1111ff',
+            rowText    : 'aa66aa'
+          }
+        ];
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('ODT shape with text or without text', function (done) {
+        const _testedReport = 'color/odt-shape';
+        const _data = {
+          shapeBorder    : '#00FF00',
+          shapeBack      : '#660200',
+          shapeText      : '#F11191',
+          shapeHighlight : '#FFDDEE'
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('ODP should manage loop, and accept different formatters on the same style (text + highlight) ', function (done) {
+        const _testedReport = 'color/odp-text-highlight-row-loop';
+        const _data = [
+          {
+            highlightP : '#00FF00',
+            textP      : '#66a200',
+            rowText    : '#111191',
+            cellBack   : '#FFDDEE'
+          },
+          {
+            highlightP : 'ZZ',
+            textP      : 'ZZ',
+            rowText    : null,
+            cellBack   : '#FFaaEE'
+          },
+          {
+            highlightP : 'ddddFF',
+            textP      : '1111ff',
+            rowText    : 'aa66aa',
+            cellBack   : '#00DDEE'
+          }
+        ];
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('ODP shape with text or without text', function (done) {
+        const _testedReport = 'color/odp-shape';
+        const _data = {
+          shapeBorder    : '#a0FF00',
+          shapeBack      : '#660200',
+          shapeText      : '#F11191',
+          shapeHighlight : '#FFDDEE'
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+    });
+    it('should remove the color formatter and place two new tags in the style attribute to generate a new style. It should create a database of style in options', function () {
+      const _xmlColor = (expected) => {
+        return ''
+          + '\n<office:automatic-styles>'
+          + '\n  <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">'
+          + '\n    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="#ffff00"/>'
+          + '\n  </style:style>'
+          + '\n  <style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard">'
+          + '\n    <style:text-properties fo:color="#c9211e" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>'
+          + '\n  </style:style>'
+          + '\n  <style:style style:name="P3" style:family="paragraph" style:parent-style-name="Table_20_Contents">'
+          + '\n    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0"/>'
+          + '\n  </style:style>'
+          + '\n</office:automatic-styles>'
+          + '\n<office:body>'
+          + '\n  <office:text>'
+          + '\n    <text:p text:style-name="'+ ((expected) ? '{d.test:color(p):colorLO1(p, text)}{c.now:neutralForArrayFilter:colorLOEnd(P1)}':'P1') + '">'
+          + '\n            ' + ((expected) ? '' : '{d.test:color(p)}')
+          + '\n    </text:p>'
+          + '\n    <text:p text:style-name="'+ ((expected) ? '{d.test2:color(p):colorLO1(p, text)}{c.now:neutralForArrayFilter:colorLOEnd(P2)}':'P2') + '">'
+          + '\n            ' + ((expected) ? '' : '{d.test2:color(p)}')
+          + '\n    </text:p>'
+          + '\n    <text:p text:style-name="P3">blabla</text:p>'
+          + '\n  </office:text>'
+          + '\n</office:body>'
+        ;
+      };
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'content.xml',
+            data : _xmlColor(expected)
+          }]
+        };
+      };
+      const _options = {
+        colorStyleDatabase : {}
+      };
+      assert.strictEqual(color.preProcessLOColorFormatter(_template(), _options).files[0].data, _template(true).files[0].data);
+      helper.assert(_options.colorStyleDatabase, {
+        P1 : {
+          startAt  : 29,
+          file     : 'content.xml',
+          original : '<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">\n    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="#ffff00"/>\n  </style:style>',
+          patches  : {
+            text       : [ { from : 208, to : 208, before : ' fo:color="', after : '"', add : '', priority : 1 }],
+            highlight  : [ { from : 200, to : 207, before : ''           , after : '' , add : '', priority : 3 } ],
+            background : [],
+            border     : [],
+            styleName  : [ { from : 25  , to : 27, before : ''           , after : '' , add : '', priority : 14 }]
+          }
+        },
+        P2 : {
+          startAt  : 259,
+          file     : 'content.xml',
+          original : '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard">\n    <style:text-properties fo:color="#c9211e" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>\n  </style:style>',
+          patches  : {
+            text       : [ { from : 127, to : 134, before : '', after : '' , add : '', priority : 1 } ],
+            highlight  : [ { from : 240, to : 251, before : '', after : '' , add : '', priority : 3 } ],
+            background : [],
+            border     : [],
+            styleName  : [ { from : 25  , to : 27, before : '', after : '' , add : '', priority : 14 }]
+          }
+        }
+      });
+    });
+    it('should create a database of style for tables', function () {
+      const _xmlColor = (expected) => {
+        return ''
+          + '\n<office:automatic-styles>'
+          + '\n  <style:style style:name="Table1.B3" style:family="table-cell">'
+          +   '    <style:table-cell-properties style:vertical-align="middle" fo:background-color="#fde9a9" fo:padding="0.097cm" fo:border-left="0.5pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.5pt solid #000000">'
+          +   '      <style:background-image/>'
+          +   '    </style:table-cell-properties>'
+          +   '  </style:style>'
+          + '\n</office:automatic-styles>'
+          + '\n<office:body>'
+          + '\n  <office:text>'
+          + '\n     <table:table table:name="Table1" table:style-name="Table1">'
+          + '\n       <table:table-column table:style-name="Table1.A" table:number-columns-repeated="3"/>'
+          + '\n       <table:table-row>'
+          + '\n         <table:table-cell table:style-name="Table1.A1" office:value-type="string">'
+          + '\n           <text:p text:style-name="P3">'
+          + '\n             other'
+          + '\n           </text:p>'
+          + '\n         </table:table-cell>'
+          + '\n         <table:table-cell table:style-name="'+((expected) ? '{d.cellBack:color(cell, background):colorLO1(cell, background)}{c.now:neutralForArrayFilter:colorLOEnd(Table1.B3)}' : 'Table1.B3' )+'" office:value-type="string">'
+          + '\n           <text:p text:style-name="P3">'
+          + '\n              '+((expected) ? '' : '{d.cellBack:color(cell, background)}')
+          + '\n           </text:p>'
+          + '\n         </table:table-cell>'
+          + '\n         <table:table-cell table:style-name="Table1.C1" office:value-type="string">'
+          + '\n           <text:p text:style-name="P3">'
+          + '\n             aaa'
+          + '\n           </text:p>'
+          + '\n         </table:table-cell>'
+          + '\n       </table:table-row>'
+          + '\n    </table:table>'
+          + '\n    <text:p text:style-name="P3">blabla</text:p>'
+          + '\n  </office:text>'
+          + '\n</office:body>'
+        ;
+      };
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'content.xml',
+            data : _xmlColor(expected)
+          }]
+        };
+      };
+      const _options = {
+        colorStyleDatabase : {}
+      };
+      assert.strictEqual(color.preProcessLOColorFormatter(_template(), _options).files[0].data, _template(true).files[0].data);
+      helper.assert(_options.colorStyleDatabase, {
+        'Table1.B3' : {
+          startAt  : 29,
+          file     : 'content.xml',
+          original : '<style:style style:name="Table1.B3" style:family="table-cell">    <style:table-cell-properties style:vertical-align="middle" fo:background-color="#fde9a9" fo:padding="0.097cm" fo:border-left="0.5pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.5pt solid #000000">      <style:background-image/>    </style:table-cell-properties>  </style:style>',
+          patches  : {
+            text       : [],
+            highlight  : [],
+            background : [{ from : 146, to : 153, before : '', after : '' , add : '', priority : 2 }],
+            border     : [],
+            styleName  : [{ from : 25  , to : 34, before : '', after : '' , add : '', priority : 14 }]
+          }
+        },
+      });
+    });
+    it('should accept very long conditions in color tag (test for tag offset when the tag is removed)', function () {
+      const _longTag = '{d.cellBack:ifGTE(-15):and:ifLT(-10):show(#0F4761):or(.temperature):ifGTE(-10):and:ifLT(-5):show(#45B0E1):or(.temperature):ifGTE(-5):and:ifLT(0):show(#83CAEB):or(.temperature):ifGTE(0):and:ifLT(5):show(#C1E4F5):or(.temperature):ifGTE(5):and:ifLT(10):show(#D9F2D0):or(.temperature):ifGTE(10):and:ifLT(15):show(#B3E5A0):or(.temperature):ifGTE(15):and:ifLT(20):show(#FFFF66):or(.temperature):ifGTE(20):and:ifLT(25):show(#FFCC00):or(.temperature):ifGTE(25):and:ifLT(30):show(#FF6600):or(.temperature):ifGTE(30):show(#CC0000):color(cell,background)';
+      const _xmlColor = (expected) => {
+        return ''
+          + '\n<office:automatic-styles>'
+          + '\n  <style:style style:name="Table1.B3" style:family="table-cell">'
+          +   '    <style:table-cell-properties style:vertical-align="middle" fo:background-color="#fde9a9" fo:padding="0.097cm" fo:border-left="0.5pt solid #000000" fo:border-right="none" fo:border-top="none" fo:border-bottom="0.5pt solid #000000">'
+          +   '      <style:background-image/>'
+          +   '    </style:table-cell-properties>'
+          +   '  </style:style>'
+          + '\n</office:automatic-styles>'
+          + '\n<office:body>'
+          + '\n  <office:text>'
+          + '\n     <table:table table:name="Table1" table:style-name="Table1">'
+          + '\n       <table:table-column table:style-name="Table1.A" table:number-columns-repeated="3"/>'
+          + '\n       <table:table-row>'
+          + '\n         <table:table-cell table:style-name="'+((expected) ? _longTag+':colorLO1(cell, background)}{c.now:neutralForArrayFilter:colorLOEnd(Table1.B3)}' : 'Table1.B3' )+'" office:value-type="string">'
+          + '\n           <text:p text:style-name="P3">'
+          + '\n              '+((expected) ? '' : _longTag+'}')
+          + '\n           </text:p>'
+          + '\n         </table:table-cell>'
+          + '\n       </table:table-row>'
+          + '\n    </table:table>'
+          + '\n    <text:p text:style-name="P3">blabla</text:p>'
+          + '\n  </office:text>'
+          + '\n</office:body>'
+        ;
+      };
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'content.xml',
+            data : _xmlColor(expected)
+          }]
+        };
+      };
+      const _options = {
+        colorStyleDatabase : {}
+      };
+      assert.strictEqual(color.preProcessLOColorFormatter(_template(), _options).files[0].data, _template(true).files[0].data);
+    });
+    it('should remove the color formatter and place two different new tags in the style attribute to manage background and text color', function () {
+      const _xmlColor = (expected) => {
+        return ''
+          + '\n<office:automatic-styles>'
+          + '\n</office:automatic-styles>'
+          + '\n<office:body>'
+          + '\n  <office:text>'
+          + '\n    <text:p text:style-name="'+ ((expected) ? '{d.hh:color(p, highlight):colorLO1(p, highlight)}{d.test:color(p):colorLO1(p, text)}{c.now:neutralForArrayFilter:colorLOEnd(P1)}':'P1') + '">'
+          + '\n           ' + ((expected) ? '' : '{d.test:color(p)}{d.hh:color(p, highlight)}')
+          + '\n    </text:p>'
+          + '\n    <text:p text:style-name="'+ ((expected) ? '{d.test2:color(p):colorLO1(p, text)}{c.now:neutralForArrayFilter:colorLOEnd(P1)}':'P1') + '">'
+          + '\n            ' + ((expected) ? '' : '{d.test2:color(p)}')
+          + '\n    </text:p>'
+          + '\n    <text:p text:style-name="P3">blabla</text:p>'
+          + '\n  </office:text>'
+          + '\n</office:body>'
+        ;
+      };
+      const _template = (expected) => {
+        return {
+          files : [{
+            name : 'content.xml',
+            data : _xmlColor(expected)
+          }]
+        };
+      };
+      assert.strictEqual(color.preProcessLOColorFormatter(_template(), { colorStyleDatabase : {} } ).files[0].data, _template(true).files[0].data);
+    });
+    describe('postProcessLOColorFormatter', function () {
+      const _xmlInContentFile = (expected) => {
+        return ''
+          + '\n<office:automatic-styles>'
+          + '\n  <style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">'
+          + '\n    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="#ffff00"/>'
+          + '\n  </style:style>'
+          + '\n  <style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard">'
+          + '\n    <style:text-properties fo:color="#c9211e" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>'
+          + '\n  </style:style>'
+          + '\n  <style:style style:name="P3" style:family="paragraph" style:parent-style-name="Table_20_Contents">'
+          + '\n    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0"/>'
+          + '\n  </style:style>\n'
+          + ((expected !== true) ? '' : ''
+            +     '<style:style style:name="CCS1" style:family="paragraph" style:parent-style-name="Standard">'
+            + '\n    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="#ffff00" fo:color="#A1A1A1"/>'
+            + '\n  </style:style>'
+            +     '<style:style style:name="CCS2" style:family="paragraph" style:parent-style-name="Standard">'
+            + '\n    <style:text-properties fo:color="#B1A1A1" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>'
+            + '\n  </style:style>'
+            +     '<style:style style:name="CCS3" style:family="paragraph" style:parent-style-name="Standard">'
+            + '\n    <style:text-properties fo:color="#B1A1A1" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="#C1A1A1"/>'
+            + '\n  </style:style>')
+          + '</office:automatic-styles>'
+          + '\n<office:body>'
+          + '\n  <office:text>'
+          + '\n    <text:p text:style-name="CCS1">'
+          + '\n            '
+          + '\n    </text:p>'
+          + '\n    <text:p text:style-name="CCS2">'
+          + '\n            '
+          + '\n    </text:p>'
+          + '\n    <text:p text:style-name="P3">blabla</text:p>'
+          + '\n  </office:text>'
+          + '\n</office:body>'
+        ;
+      };
+      const _colorStyleDatabase = {
+        P1 : {
+          startAt  : 29,
+          file     : 'content.xml',
+          original : '<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard">\n    <style:text-properties officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="#ffff00"/>\n  </style:style>',
+          patches  : {
+            text       : [ { from : 208, to : 208, before : ' fo:color="', after : '"', add : '', priority : 1 }],
+            highlight  : [ { from : 200, to : 207, before : ''           , after : '' , add : '', priority : 3} ],
+            background : [],
+            styleName  : [ { from : 25  , to : 27, before : ''           , after : '' , add : '', priority : 14 }]
+          }
+        },
+        P2 : {
+          startAt  : 259,
+          file     : 'content.xml',
+          original : '<style:style style:name="P2" style:family="paragraph" style:parent-style-name="Standard">\n    <style:text-properties fo:color="#c9211e" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>\n  </style:style>',
+          patches  : {
+            text       : [ { from : 127, to : 134, before : '', after : '' , add : '', priority : 1 } ],
+            highlight  : [ { from : 240, to : 251, before : '', after : '' , add : '', priority : 3 } ],
+            background : [],
+            styleName  : [ { from : 25  , to : 27, before : '', after : '' , add : '', priority : 14 }]
+          }
+        }
+      };
+      it('should add three styles in postprocess', function () {
+        const _template = (expected) => {
+          return {
+            files : [{
+              name : 'content.xml',
+              data : _xmlInContentFile(expected)
+            }]
+          };
+        };
+        const _options = {
+          colorDatabaseNew : new Map([
+            ['A1A1A1_P1'       , { id : 1, oldStyleName : 'P1', colors : [ {type : 'text', value : '#A1A1A1' } ] }],
+            ['B1A1A1_P2'       , { id : 2, oldStyleName : 'P2', colors : [ {type : 'text', value : '#B1A1A1' } ] }],
+            ['B1A1A1_C1A1A1_P2', { id : 3, oldStyleName : 'P2', colors : [ {type : 'text', value : '#B1A1A1' }, {type : 'highlight', value : '#C1A1A1' } ] }]
+          ]),
+          colorStyleDatabase : _colorStyleDatabase
+        };
+        assert.strictEqual(color.postProcessLOColorFormatter(_template(), {}, _options).files[0].data, _template(true).files[0].data);
+      });
+      it('should not crash if a background color is applied on a text style. Text can only accept highlight, but not a background. (should never happend -> controlled in preprocessing)', function () {
+        const _template = (expected) => {
+          return {
+            files : [{
+              name : 'content.xml',
+              data : _xmlInContentFile(expected)
+            }]
+          };
+        };
+        const _options = {
+          colorDatabaseNew : new Map([
+            ['A1A1A1_P1'       , { id : 1, oldStyleName : 'P1', colors : [ {type : 'background', value : '#A1A1A1' } ] }],
+            ['B1A1A1_P2'       , { id : 2, oldStyleName : 'P2', colors : [ {type : 'background', value : '#B1A1A1' } ] }],
+          ]),
+          colorStyleDatabase : _colorStyleDatabase
+        };
+        assert.doesNotThrow(() => color.postProcessLOColorFormatter(_template(), {}, _options));
+      });
+      it('should return an error if old style does not exists (should never happend)', function () {
+        const _template = (expected) => {
+          return {
+            files : [{
+              name : 'content.xml',
+              data : _xmlInContentFile(expected)
+            }]
+          };
+        };
+        const _options = {
+          colorDatabaseNew : new Map([
+            ['A1A1A1_P1' , { id : 1, oldStyleName : 'NOT_EXISTS', colors : [ {type : 'text', value : '#A1A1A1' } ] }]
+          ]),
+          colorStyleDatabase : _colorStyleDatabase
+        };
+        assert.doesNotThrow(() => color.postProcessLOColorFormatter(_template(), {}, _options));
+      });
+      it('should not crash if color type is unknown (should never happend, controlled in preprocessing)', function () {
+        const _template = (expected) => {
+          return {
+            files : [{
+              name : 'content.xml',
+              data : _xmlInContentFile(expected)
+            }]
+          };
+        };
+        const _options = {
+          colorDatabaseNew : new Map([
+            ['A1A1A1_P1' , { id : 1, oldStyleName : 'P1', colors : [ {type : 'UNKNOWN', value : '#A1A1A1' } ] }]
+          ]),
+          colorStyleDatabase : _colorStyleDatabase
+        };
+        assert.doesNotThrow(() => color.postProcessLOColorFormatter(_template(), {}, _options));
+      });
+      it('should add the style in the corresponding file (header and footer are in styles.xml', function () {
+        const _xmlInStyleFile = (expected) => {
+          return ''
+            + '\n<office:document-styles>'
+            + '\n  <office:automatic-styles>'
+            + '\n    <style:style style:name="Q1" style:family="paragraph" style:parent-style-name="Standard">'
+            + '\n      <style:text-properties fo:color="#ff0000" style:font-name="Liberation Serif" fo:font-size="12pt" fo:font-weight="normal" officeooo:rsid="0025a382" officeooo:paragraph-rsid="0042d46d" fo:background-color="#ffff00" style:font-size-asian="12pt" style:font-size-complex="12pt"/>'
+            + '\n    </style:style>'
+            + '\n    <style:page-layout style:name="Mpm1">'
+            + '\n    </style:page-layout>'
+            + ((expected !== true) ? '' : ''
+              +     '<style:style style:name="CCS4" style:family="paragraph" style:parent-style-name="Standard">'
+              + '\n    <style:text-properties fo:color="#D1A1A1" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>'
+              + '\n  </style:style>')
+            +     '</office:automatic-styles>'
+            + '\n  <office:master-styles>'
+            + '\n    <style:master-page style:name="Standard" style:page-layout-name="Mpm1">'
+            + '\n      <style:header>'
+            + '\n        <text:p text:style-name="MP1"></text:p>'
+            + '\n      </style:header>'
+            + '\n      <style:footer>'
+            + '\n        <text:p text:style-name="MP1"></text:p>'
+            + '\n      </style:footer>'
+            + '\n    </style:master-page>'
+            + '\n  </office:master-styles>'
+            + '\n</office:document-styles>'
+          ;
+        };
+        const _template = (expected) => {
+          return {
+            files : [{
+              name : 'content.xml',
+              data : _xmlInContentFile(expected)
+            },{
+              name : 'styles.xml',
+              data : _xmlInStyleFile(expected)
+            }]
+          };
+        };
+        const _colorStyleDatabaseWithTwoFiles = JSON.parse(JSON.stringify(_colorStyleDatabase));
+        // add style of another file
+        _colorStyleDatabaseWithTwoFiles.Q1 = {
+          startAt  : 259,
+          file     : 'styles.xml',
+          original : '<style:style style:name="Q1" style:family="paragraph" style:parent-style-name="Standard">\n    <style:text-properties fo:color="#c9211e" loext:opacity="100%" officeooo:rsid="000503a0" officeooo:paragraph-rsid="000503a0" fo:background-color="transparent"/>\n  </style:style>',
+          patches  : {
+            text       : [ { from : 127, to : 134, before : '', after : '' , add : '', priority : 1 } ],
+            highlight  : [ { from : 240, to : 251, before : '', after : '' , add : '', priority : 3 } ],
+            background : [],
+            styleName  : [ { from : 25  , to : 27, before : '', after : '' , add : '', priority : 14 }]
+          }
+        };
+        const _options = {
+          colorDatabaseNew : new Map([
+            ['A1A1A1_P1'       , { id : 1, oldStyleName : 'P1' , colors : [ {type : 'text', value : '#A1A1A1' } ] }],
+            ['B1A1A1_P2'       , { id : 2, oldStyleName : 'P2' , colors : [ {type : 'text', value : '#B1A1A1' } ] }],
+            ['B1A1A1_C1A1A1_P2', { id : 3, oldStyleName : 'P2' , colors : [ {type : 'text', value : '#B1A1A1' }, {type : 'highlight', value : '#C1A1A1' } ] }],
+            ['D1A1A1_Q1'       , { id : 4, oldStyleName : 'Q1' , colors : [ {type : 'text', value : '#D1A1A1' } ] }],
+          ]),
+          colorStyleDatabase : _colorStyleDatabaseWithTwoFiles
+        };
+        assert.strictEqual(color.postProcessLOColorFormatter(_template(), {}, _options).files[0].data, _template(true).files[0].data);
+        assert.strictEqual(color.postProcessLOColorFormatter(_template(), {}, _options).files[1].data, _template(true).files[1].data);
       });
     });
   });

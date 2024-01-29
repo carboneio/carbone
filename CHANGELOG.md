@@ -17,7 +17,7 @@
       - Supports different conditions on text and highlight at the same time for ODT/ODP. For example: `{d.col:color(p)} {d.nb:ifEQ(true):show(FF0000):color(p, highlight)}` is possible.
       - Manages priority between overlapping areas. A color applied to the current paragraph has a higher priority than a color applied to the current shape, cell and row.
     - WARNING: There are known limitations in this version:
-      - in ODP (text, table, and shapes) and ODT (shapes only), the dynamic color is applied only if a non-standard style (text size, color, ...) is already applied to the targeted element in the template.
+      - in ODP (text, table, and shapes) and ODT (shapes only), the `:color` formatter requires that a non-default style is already applied to the target element in the template (for example, a custom text color).
       - complex nested tables with colors on sub-tables are not fully supported.
       - `highlight` is not managed in docx template
       - Cannot be used with aliases

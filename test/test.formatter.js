@@ -4,6 +4,7 @@ var stringFormatter = require('../formatters/string');
 var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
 const barcodeFormatter = require('../formatters/barcode');
+const colorFormatter = require('../formatters/color');
 var helper = require('../lib/helper');
 
 describe('formatter', function () {
@@ -1951,6 +1952,28 @@ describe('formatter', function () {
       helper.assert(_elapsed < (70 * helper.CPU_PERFORMANCE_FACTOR), true, 'formatC is too slow');
     });
   });
+
+  describe('Color operations', function () {
+    it('should transform any invalid color to #888888', function () {
+      helper.assert(colorFormatter.color('120')          , '#888888');
+      helper.assert(colorFormatter.color(90)             , '#888888');
+      helper.assert(colorFormatter.color(undefined)      , '#888888');
+      helper.assert(colorFormatter.color(null)           , '#888888');
+      helper.assert(colorFormatter.color([1, 2])         , '#888888');
+      helper.assert(colorFormatter.color({bla : 'test'}) , '#888888');
+      helper.assert(colorFormatter.color('#cdeg00')      , '#888888');
+      helper.assert(colorFormatter.color('#fff')         , '#888888');
+    });
+    it('should transform any valid color to hex with 6 digits in lower case with hashtag', function () {
+      helper.assert(colorFormatter.color('ABABAB')       , '#ababab');
+      helper.assert(colorFormatter.color('#ABABAB')      , '#ababab');
+      helper.assert(colorFormatter.color('#012345')      , '#012345');
+      helper.assert(colorFormatter.color('#6789ab')      , '#6789ab');
+      helper.assert(colorFormatter.color('#cdef00')      , '#cdef00');
+      helper.assert(colorFormatter.color('cdef00')       , '#cdef00');
+    });
+  });
+
 
   describe('Number operations', function () {
     it('should add number', function () {

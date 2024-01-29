@@ -8,6 +8,46 @@ const hyperlinks = require('../lib/hyperlinks');
 
 describe('Dynamic HTML', function () {
 
+  describe('patchStyleAttribute', function () {
+    it('should do nothing if the html string is empty', function () {
+      assert.strictEqual(html.patchStyleAttribute(''), null);
+    });
+    it('should return a patch when there is an existing css properties', function () {
+      helper.assert(html.patchStyleAttribute('<tr  style="color:1a1a1a;">', 12, 'color', 'red'), {from : 18, to : 24, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="color: #FFF;">', 11, 'color', 'red'), {from : 17, to : 22, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="color:    #FFF;">', 11, 'color', 'red'), {from : 17, to : 25, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="color:    #FFF    ;">', 11, 'color', 'red'), {from : 17, to : 29, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="color:    #FFF    ;   ">', 11, 'color', 'red'), {from : 17, to : 29, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="color :    #FFF    ;   ">', 11, 'color', 'red'), {from : 18, to : 30, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="color  :    #FFF    ;   ">', 11, 'color', 'red'), {from : 19, to : 31, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style=" color  :    #FFF    ;   ">', 11, 'color', 'red'), {from : 20, to : 32, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style=" color  :    #FFF;">', 11, 'color', 'red'), {from : 20, to : 28, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style=" color  :#FFF;">', 11, 'color', 'red'), {from : 20, to : 24, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="  color :#FFF;">', 11, 'color', 'red'), {from : 20, to : 24, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="color:    #FFF       ">', 11, 'color', 'red'), {from : 17, to : 32, add : 'red'});
+    });
+    it('should return a patch when there is an existing css properties with other properties', function () {
+      helper.assert(html.patchStyleAttribute('<tr style="margin:auto; color:1bcdef; background-color:#FFF;">', 11, 'color', 'green'), {from : 30, to : 36, add : 'green'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;  color: #FFF;  border-color:#AAA;">', 11, 'color', 'red'), {from : 42, to : 47, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;  color:    #FFF; border-color:#AAA;">', 11, 'color', 'red'), {from : 42, to : 50, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;  color:    #FFF    ; border-color:#AAA;">', 11, 'color', 'red'), {from : 42, to : 54, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;  color :    #FFF    ;border-color:#AAA;  ">', 11, 'color', 'red'), {from : 43, to : 55, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;  color  :    #FFF    ;border-color:#AAA;">', 11, 'color', 'red'), {from : 44, to : 56, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green  ;   color  :    #FFF    ;  border-color:#AAA; ">', 11, 'color', 'red'), {from : 47, to : 59, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;   color  :    #FFF;border-color:#AAA;">', 11, 'color', 'red'), {from : 45, to : 53, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;   color  :#FFF;  border-color:#AAA;">', 11, 'color', 'red'), {from : 45, to : 49, add : 'red'});
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;    color :#FFF; border-color:#AAA;">', 11, 'color', 'red'), {from : 45, to : 49, add : 'red'});
+    });
+    it('should add the css properties when it does not exist', function () {
+      helper.assert(html.patchStyleAttribute('<tr style="background-color:green;  border-color:#AAA;">', 11, 'color', 'red'), {from : 11, to : 11, add : 'color:red; '});
+      helper.assert(html.patchStyleAttribute('<span style="">', 13, 'color', 'red'), {from : 13, to : 13, add : 'color:red; '});
+    });
+    it('should return a patch when there is an existing css properties and it should not modify other style attributes', function () {
+      helper.assert(html.patchStyleAttribute('<tr  style="margin:auto;"></tr><tr style="margin:auto;"></tr>', 12, 'color', 'red'), {from : 12, to : 12, add : 'color:red; '});
+      helper.assert(html.patchStyleAttribute('<tr  style="margin:auto;"></tr><tr style="color:green;"></tr>', 12, 'color', 'red'), {from : 12, to : 12, add : 'color:red; '});
+    });
+  });
+
   describe('Preprocess - functions used by ODT and DOCX reports', function () {
 
     describe('reorderXML - should seperate the html formatter outside paragraphs ', function () {

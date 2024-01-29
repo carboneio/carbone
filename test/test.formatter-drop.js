@@ -4,7 +4,7 @@ var carbone = require('../lib/index');
 
 describe('drop formatter', function () {
 
-  describe(':drop(p)', function () {
+  describe(':drop(p) / :keep(p)', function () {
 
     describe('DOCX', function () {
 
@@ -39,6 +39,37 @@ describe('drop formatter', function () {
         });
       });
 
+      it('should return an error if the argument of keep is unknown', function (done) {
+        const content = () => {
+          return '' +
+            '<w:body>' +
+              '<w:p w14:paraId="5C4E8B45" w14:textId="08330C66" w:rsidR="005A25A6" w:rsidRDefault="00C301BD">'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:lang w:val="en-US"/>'+
+                  '</w:rPr>'+
+                  '<w:t>{d.name}{d.name:ifEM:drop}{c.name:ifEM:keep(shap)} </w:t>'+
+                '</w:r>'+
+              '</w:p>'+
+            '</w:body>';
+        };
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.docx',
+          extension  : 'docx',
+          embeddings : [],
+          files      : [
+            { name : 'document.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'Error: Unknown parameter in formatter keep() of "{c.name:ifEM:keep(shap)}". Do you mean ":keep(shape)"?');
+          helper.assert(res?.files[0]?.data, content(false));
+          done();
+        });
+      });
+
       it('should replace the drop(p) by hideBegin/hideEnd - basic paragraph', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
@@ -54,6 +85,40 @@ describe('drop formatter', function () {
                 '</w:r>'+
               '</w:p>'+
               (expected ? '<carbone>{d.name:ifEM:hideEnd}</carbone>' : '') +
+            '</w:body>';
+        };
+
+        var _report = {
+          isZipped   : true,
+          filename   : 'template.docx',
+          extension  : 'docx',
+          embeddings : [],
+          files      : [
+            { name : 'document.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.execute(_report, function (err, res) {
+          helper.assert(err + '', 'null');
+          helper.assert(res?.files[0]?.data, content(true));
+          done();
+        });
+      });
+
+      it('should replace the keep(p) by hideBegin/hideEnd - basic paragraph', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<w:body>' +
+              (expected ? '<carbone>{d.name:ifEM:showBegin}</carbone>' : '') +
+              '<w:p w14:paraId="5C4E8B45" w14:textId="08330C66" w:rsidR="005A25A6" w:rsidRDefault="00C301BD">'+
+                '<w:r>'+
+                  '<w:rPr>'+
+                    '<w:lang w:val="en-US"/>'+
+                  '</w:rPr>'+
+                  `<w:t>{d.name}${expected ? '' : '{d.name:ifEM:keep(p)}'}</w:t>`+
+                '</w:r>'+
+              '</w:p>'+
+              (expected ? '<carbone>{d.name:ifEM:showEnd}</carbone>' : '') +
             '</w:body>';
         };
 
@@ -682,7 +747,7 @@ describe('drop formatter', function () {
     });
 
     describe('ODT / ODP', function () {
-      it('should replace the drop(img) by hideBegin/hideEnd - basic image', function (done) {
+      it('should replace the drop(img)/keep(img) by hideBegin/hideEnd - basic image', function (done) {
         const content = (expected) => {
           expected = expected ?? false;
           return '' +
@@ -696,6 +761,32 @@ describe('drop formatter', function () {
                 `<svg:title>{d.image}${ expected ? '' : '{d.image:ifEM:drop(img)}' }</svg:title>`+
               '</draw:frame>'+
               (expected ? '<carbone>{d.image:ifEM:hideEnd}</carbone>' : '')+
+            '</text:p>';
+        };
+
+        var _template = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleDropFormatter(_template, 'odt');
+        helper.assert(_template.files[0]?.data, content(true));
+        done();
+      });
+      it('should replace the keep(img) by hideBegin/hideEnd - basic image', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<text:p text:style-name="P4">'+
+              '<text:span text:style-name="T3">'+
+                '<text:s/>'+
+              '</text:span>'+
+              (expected ? '<carbone>{d.image:ifEM:showBegin}</carbone>' : '') +
+              '<draw:frame draw:style-name="fr1" draw:name="Image1" text:anchor-type="as-char" svg:width="4.78cm" svg:height="4.992cm" draw:z-index="0">'+
+                '<draw:image xlink:href="Pictures/10000001000003000000032247707408E6138C7C.png" xlink:type="simple" xlink:show="embed" xlink:actuate="onLoad" draw:mime-type="image/png"/>'+
+                `<svg:title>{d.image}${ expected ? '' : '{d.image:ifEM:keep(img)}' }</svg:title>`+
+              '</draw:frame>'+
+              (expected ? '<carbone>{d.image:ifEM:showEnd}</carbone>' : '')+
             '</text:p>';
         };
 
@@ -2540,7 +2631,7 @@ describe('drop formatter', function () {
   });
 
   describe('Global tests', function () {
-    it('should remove row in HTML', function (done) {
+    it('should remove row in HTML if drop(row) is used', function (done) {
       const _xml = ''
         + '<table>'
         +   '<tr><td>A</td></tr>'
@@ -2561,6 +2652,31 @@ describe('drop formatter', function () {
         carbone.renderXML(_xml, _data, { extension : 'html' }, function (err, _xmlBuilt) {
           helper.assert(err+'', 'null');
           helper.assert(_xmlBuilt, '<table><tr><td>A</td></tr><tr><td><p>B</p></td></tr></table>');
+          done();
+        });
+      });
+    });
+    it('should keep one row in HTML if keep(row) is used', function (done) {
+      const _xml = ''
+        + '<table>'
+        +   '<tr><td>A</td></tr>'
+        +   '<tr>'
+        +     '<td>'
+        +       '<p>'
+        +         'B{d.id:ifEM:keep(row)}'
+        +       '</p>'
+        +     '</td>'
+        +   '</tr>'
+        + '</table>'
+      ;
+      var _data = { id : null };
+      carbone.renderXML(_xml, _data, { extension : 'html' }, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<table><tr><td>A</td></tr><tr><td><p>B</p></td></tr></table>');
+        _data.id = 1;
+        carbone.renderXML(_xml, _data, { extension : 'html' }, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<table><tr><td>A</td></tr></table>');
           done();
         });
       });

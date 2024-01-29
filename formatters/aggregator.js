@@ -90,19 +90,20 @@ function aggSumGet (d, ...partitionBy) {
  * Dynamically replace formatter in the builder (specific for aggStr)
  *
  * @private
- * @param   {Object}   parsedFormatter                    The parsed formatter. Ex:  { str : sum, args : [0]}
+ * @param   {Object}   parsedFormatter                    The parsed formatter. Ex:  { str : aggStr, args : [', ']}
  * @param   {Array}    currentIterators                   The current iterators
  * @param   {Boolean}  isCalledInPrecomputedReducedArray  Indicates if called in precomputed reduced array
  * @return  {Array}    Array of formatter to call with their arguments
  */
 function _replaceEmptyArgumentsStr (parsedFormatter, currentIterators, isCalledInPrecomputedReducedArray) {
-  let _separator = ', ';
+  let _separator = ', '; // real default value
   if (parsedFormatter.args.length > 0) {
     _separator = parsedFormatter.args.shift(); // backup separator
   }
   const _replaced = _replaceEmptyArguments(parsedFormatter, currentIterators, isCalledInPrecomputedReducedArray);
   _replaced[0].args.unshift(_separator); // restore separator
   if (isCalledInPrecomputedReducedArray === true) {
+    // In the builder, the array is traversed in reverse order, so we need to reverse the concatenation at the end. TODO, could we avoid this in v5?
     _replaced[1].str += 'Reverse';
   }
   return _replaced;
@@ -135,18 +136,17 @@ aggStr.replacedBy = _replaceEmptyArgumentsStr;
 aggStr.canBeCalledInPrecomputedLoop = true;
 
 /**
- * Get current result of the SUM aggregator
+ * Get current result of the aggStr aggregator
  *
  * @private
  */
 function aggStrGet (d, separator, ...partitionBy) {
   const _id = generateAggregatorId(this.id, ...partitionBy);
-  // TODO Could we avoid the reverse in v5??
   return this.aggDatabase.get(_id)?.join(separator) ?? '';
 }
 
 /**
- * Get current result of the SUM aggregator
+ * Get current result of the aggStr aggregator when aggStr is executed in precomputed/reduce part of the builder
  *
  * @private
  */

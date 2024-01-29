@@ -19,6 +19,9 @@
       - `highlight` is not managed in docx template
       - Cannot be used with aliases
   - Fixed `:color(scope, type)` bug for DOCX templates when the Carbone tag `:color` tag is quite long with many conditions for example.
+  - New `:aggStr(separator)` formatter, a more powerful version of `:arrayMap`. By default the separator is ', '.
+    - `d.user.phones[]:addStr()` -> `+331112345678, +331112345678, +331112345678`
+    - `d.cars[electric=true].brand:addStr(' - ')` -> `Tesla, BYD, Kia` 
 
 ## v4.16.2
   - Release January 3rd 2024

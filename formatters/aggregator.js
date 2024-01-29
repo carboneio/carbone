@@ -85,6 +85,81 @@ function aggSumGet (d, ...partitionBy) {
   return this.aggDatabase.get(_id) ?? 0;
 }
 
+
+/**
+ * Dynamically replace formatter in the builder (specific for aggStr)
+ *
+ * @private
+ * @param   {Object}   parsedFormatter                    The parsed formatter. Ex:  { str : sum, args : [0]}
+ * @param   {Array}    currentIterators                   The current iterators
+ * @param   {Boolean}  isCalledInPrecomputedReducedArray  Indicates if called in precomputed reduced array
+ * @return  {Array}    Array of formatter to call with their arguments
+ */
+function _replaceEmptyArgumentsStr (parsedFormatter, currentIterators, isCalledInPrecomputedReducedArray) {
+  let _separator = ', ';
+  if (parsedFormatter.args.length > 0) {
+    _separator = parsedFormatter.args.shift(); // backup separator
+  }
+  const _replaced = _replaceEmptyArguments(parsedFormatter, currentIterators, isCalledInPrecomputedReducedArray);
+  _replaced[0].args.unshift(_separator); // restore separator
+  if (isCalledInPrecomputedReducedArray === true) {
+    _replaced[1].str += 'Reverse';
+  }
+  return _replaced;
+}
+
+/**
+ * Aggregate string
+ *
+ * @version 4.17.0
+ *
+ * @param  {Number} d            Concatenate text with a separator
+ * @param  {String} separator    [optional] by default ', '
+ * @param  {Mixed}  partitionBy  [optional] group by
+ * @return {String}              return the result
+ */
+function aggStr (d, separator = ', ', ...partitionBy) {
+  const _id  = generateAggregatorId(this.id, ...partitionBy);
+  let _val = this.aggDatabase.get(_id) ?? [];
+  if (d !== null && d !== undefined) {
+    _val.push(d);
+    this.aggDatabase.set(_id, _val);
+  }
+  return _val;
+}
+// This formatter will be dynamically replaced by two formatters, with specific execution options for builder.
+// It works almost like formatters which returns postprocess functions, but with a little more options.
+// With this method, the builder will also postprocess other formatters which are called after aggSum  (ex. aggSum:formatC)
+aggStr.replacedBy = _replaceEmptyArgumentsStr;
+// Tells the builder this formatter can be called in preprocess/reduce loop (ex. "d.cars[i].wheels[]" without iterator on second array)
+aggStr.canBeCalledInPrecomputedLoop = true;
+
+/**
+ * Get current result of the SUM aggregator
+ *
+ * @private
+ */
+function aggStrGet (d, separator, ...partitionBy) {
+  const _id = generateAggregatorId(this.id, ...partitionBy);
+  // TODO Could we avoid the reverse in v5??
+  return this.aggDatabase.get(_id)?.join(separator) ?? '';
+}
+
+/**
+ * Get current result of the SUM aggregator
+ *
+ * @private
+ */
+function aggStrGetReverse (d, separator, ...partitionBy) {
+  const _id = generateAggregatorId(this.id, ...partitionBy);
+  const _list = this.aggDatabase.get(_id);
+  if (_list && _list.isReversed !== true) {
+    _list.reverse(); // TODO Could we avoid the reverse in v5??
+    _list.isReversed = true;
+  }
+  return _list?.join(separator) ?? '';
+}
+
 /**
  * Cumulative SUM
  *
@@ -335,6 +410,9 @@ function set (d, param) {
 }
 
 module.exports = {
+  aggStr,
+  aggStrGet,
+  aggStrGetReverse,
   aggSum,
   aggSumGet,
   set,

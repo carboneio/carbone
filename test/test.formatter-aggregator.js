@@ -25,7 +25,8 @@ describe('Aggregatted operations', function () {
           [ 'aggAvg'  , '<xml> 3.5 </xml>'],
           [ 'aggMin'  , '<xml> 1 </xml>'],
           [ 'aggMax'  , '<xml> 10 </xml>'],
-          [ 'aggCount', '<xml> 6 </xml>']
+          [ 'aggCount', '<xml> 6 </xml>'],
+          [ 'aggStr'  , '<xml> 1, 4, 3, 2, 1, 10 </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -36,7 +37,8 @@ describe('Aggregatted operations', function () {
           [ 'aggAvg'  , '<xml> 2.3333333333333335 </xml>'],
           [ 'aggMin'  , '<xml> 1 </xml>'],
           [ 'aggMax'  , '<xml> 10 </xml>'],
-          [ 'aggCount', '<xml> 6 </xml>']
+          [ 'aggCount', '<xml> 6 </xml>'],
+          [ 'aggStr'  , '<xml> 1, 2, 1, 10 </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -47,7 +49,8 @@ describe('Aggregatted operations', function () {
           [ 'aggAvg'  , '<xml> -2.6166666666666667 </xml>'],
           [ 'aggMin'  , '<xml> -10.5 </xml>'],
           [ 'aggMax'  , '<xml> -1.2 </xml>'],
-          [ 'aggCount', '<xml> 6 </xml>']
+          [ 'aggCount', '<xml> 6 </xml>'],
+          [ 'aggStr'  , '<xml> -1.5, -2.5, -1.2, -10.5 </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -58,7 +61,8 @@ describe('Aggregatted operations', function () {
           [ ' aggAvg() '  , '<xml> 3.5 </xml>'],
           [ '  aggMin() ' , '<xml> 1 </xml>'],
           [ ' aggMax() '  , '<xml> 10 </xml>'],
-          [ ' aggCount()' , '<xml> 6 </xml>']
+          [ ' aggCount()' , '<xml> 6 </xml>'],
+          [ 'aggStr()'    , '<xml> 1, 4, 3, 2, 1, 10 </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -70,6 +74,13 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<xml> 1.00 € </xml>'],
           [ 'aggMax'   , '<xml> 10.00 € </xml>'],
           [ 'aggCount', '<xml> 6.00 € </xml>']
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('should accept formatters (aggStr)', function (done) {
+        const _xml = '<xml> {d.cars[].qty:__TESTED_FORMATTER__:append(yes)} </xml>';
+        let _expected = [
+          [ 'aggStr' , '<xml> 1, 4, 3, 2, 1, 10yes </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -130,7 +141,8 @@ describe('Aggregatted operations', function () {
           [ 'aggAvg'   , '<xml> 4.75 </xml>'],
           [ 'aggMin'   , '<xml> 2 </xml>'],
           [ 'aggMax'   , '<xml> 10 </xml>'],
-          [ 'aggCount', '<xml> 4 </xml>']
+          [ 'aggCount' , '<xml> 4 </xml>'],
+          [ 'aggStr'   , '<xml> 4, 3, 2, 10 </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -142,6 +154,13 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<xml> 2.00 € </xml>'],
           [ 'aggMax'   , '<xml> 10.00 € </xml>'],
           [ 'aggCount', '<xml> 4.00 € </xml>']
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('should accept formatters after (aggStr)', function (done) {
+        const _xml = '<xml> {d.cars[sort>1].qty:__TESTED_FORMATTER__:append(yes)} </xml>';
+        let _expected = [
+          [ 'aggStr' , '<xml> 4, 3, 2, 10yes </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -189,6 +208,13 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<xml> 1 </xml>'],
           [ 'aggMax'   , '<xml> 50 </xml>'],
           [ 'aggCount', '<xml> 6 </xml>']
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('should accept formatters before (aggStr, with filter)', function (done) {
+        const _xml = '<xml> {d.cars[sort>1].qty:append(a):prepend(b):__TESTED_FORMATTER__} </xml>';
+        let _expected = [
+          [ 'aggStr' , '<xml> b4a, b3a, b2a, b10a </xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -293,7 +319,8 @@ describe('Aggregatted operations', function () {
           [ 'aggAvg'   , '<xml> 2750.75 A 2</xml>'],
           [ 'aggMin'   , '<xml> 1 A 2</xml>'],
           [ 'aggMax'   , '<xml> 6000 A 2</xml>'],
-          [ 'aggCount', '<xml> 4 A 2</xml>']
+          [ 'aggCount' , '<xml> 4 A 2</xml>'],
+          [ 'aggStr'   , '<xml> 1, 2, 5000, 6000 A 2</xml>']
         ];
         executeTest(_xml, dataDeepDepth, _expected, done);
       });
@@ -311,6 +338,7 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<xml><tr> Lu 1 </tr><tr> To 1 </tr><tr> Fa 1 </tr><tr> Vi 1 </tr><tr> Fa 1 </tr><tr> Vi 1 </tr></xml>'],
           [ 'aggMax'   , '<xml><tr> Lu 10 </tr><tr> To 10 </tr><tr> Fa 10 </tr><tr> Vi 10 </tr><tr> Fa 10 </tr><tr> Vi 10 </tr></xml>'],
           [ 'aggCount' , '<xml><tr> Lu 6 </tr><tr> To 6 </tr><tr> Fa 6 </tr><tr> Vi 6 </tr><tr> Fa 6 </tr><tr> Vi 6 </tr></xml>'],
+          [ 'aggStr'   , '<xml><tr> Lu 1, 4, 3, 2, 1, 10 </tr><tr> To 1, 4, 3, 2, 1, 10 </tr><tr> Fa 1, 4, 3, 2, 1, 10 </tr><tr> Vi 1, 4, 3, 2, 1, 10 </tr><tr> Fa 1, 4, 3, 2, 1, 10 </tr><tr> Vi 1, 4, 3, 2, 1, 10 </tr></xml>'],
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -332,6 +360,13 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<xml><tr> Lu 1.00 € </tr><tr> To 1.00 € </tr><tr> Fa 1.00 € </tr><tr> Vi 1.00 € </tr><tr> Fa 1.00 € </tr><tr> Vi 1.00 € </tr></xml>'],
           [ 'aggMax'   , '<xml><tr> Lu 50.00 € </tr><tr> To 50.00 € </tr><tr> Fa 50.00 € </tr><tr> Vi 50.00 € </tr><tr> Fa 50.00 € </tr><tr> Vi 50.00 € </tr></xml>'],
           [ 'aggCount' , '<xml><tr> Lu 6.00 € </tr><tr> To 6.00 € </tr><tr> Fa 6.00 € </tr><tr> Vi 6.00 € </tr><tr> Fa 6.00 € </tr><tr> Vi 6.00 € </tr></xml>'],
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('[AGG] should accept formatters before and after aggregator (aggStr)', function (done) {
+        const _xml = '<xml><tr> {d.cars[sort,i].brand} {d.cars[].qty:append(a):__TESTED_FORMATTER__:prepend(b)} </tr><tr> {d.cars[sort+1,i+1].brand} </tr></xml>';
+        let _expected = [
+          [ 'aggStr'   , '<xml><tr> Lu b1a, 4a, 3a, 2a, 1a, 10a </tr><tr> To b1a, 4a, 3a, 2a, 1a, 10a </tr><tr> Fa b1a, 4a, 3a, 2a, 1a, 10a </tr><tr> Vi b1a, 4a, 3a, 2a, 1a, 10a </tr><tr> Fa b1a, 4a, 3a, 2a, 1a, 10a </tr><tr> Vi b1a, 4a, 3a, 2a, 1a, 10a </tr></xml>'],
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -417,6 +452,7 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<xml><tr> Lu 2 </tr><tr> To 2 </tr><tr> Fa 2 </tr><tr> Vi 2 </tr><tr> Fa 2 </tr><tr> Vi 2 </tr></xml>'],
           [ 'aggMax'   , '<xml><tr> Lu 10 </tr><tr> To 10 </tr><tr> Fa 10 </tr><tr> Vi 10 </tr><tr> Fa 10 </tr><tr> Vi 10 </tr></xml>'],
           [ 'aggCount' , '<xml><tr> Lu 4 </tr><tr> To 4 </tr><tr> Fa 4 </tr><tr> Vi 4 </tr><tr> Fa 4 </tr><tr> Vi 4 </tr></xml>'],
+          [ 'aggStr'   , '<xml><tr> Lu 4, 3, 2, 10 </tr><tr> To 4, 3, 2, 10 </tr><tr> Fa 4, 3, 2, 10 </tr><tr> Vi 4, 3, 2, 10 </tr><tr> Fa 4, 3, 2, 10 </tr><tr> Vi 4, 3, 2, 10 </tr></xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -438,6 +474,13 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<xml><tr> Lu 4.00 € </tr><tr> To 4.00 € </tr><tr> Fa 4.00 € </tr><tr> Vi 4.00 € </tr><tr> Fa 4.00 € </tr><tr> Vi 4.00 € </tr></xml>'],
           [ 'aggMax'   , '<xml><tr> Lu 50.00 € </tr><tr> To 50.00 € </tr><tr> Fa 50.00 € </tr><tr> Vi 50.00 € </tr><tr> Fa 50.00 € </tr><tr> Vi 50.00 € </tr></xml>'],
           [ 'aggCount' , '<xml><tr> Lu 4.00 € </tr><tr> To 4.00 € </tr><tr> Fa 4.00 € </tr><tr> Vi 4.00 € </tr><tr> Fa 4.00 € </tr><tr> Vi 4.00 € </tr></xml>'],
+        ];
+        executeTest(_xml, dataSimpleLoop, _expected, done);
+      });
+      it('should accept formatters before and after aggregator (aggStr)', function (done) {
+        const _xml = '<xml><tr> {d.cars[sort,i].brand} {d.cars[sort>1].qty:prepend(a):__TESTED_FORMATTER__:append(b)} </tr><tr> {d.cars[sort+1,i+1].brand} </tr></xml>';
+        let _expected = [
+          [ 'aggStr'   , '<xml><tr> Lu a4, a3, a2, a10b </tr><tr> To a4, a3, a2, a10b </tr><tr> Fa a4, a3, a2, a10b </tr><tr> Vi a4, a3, a2, a10b </tr><tr> Fa a4, a3, a2, a10b </tr><tr> Vi a4, a3, a2, a10b </tr></xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -483,7 +526,8 @@ describe('Aggregatted operations', function () {
           [ 'aggAvg'   , '<xml><tr> Lu 3.5 </tr><tr> To 3.5 </tr><tr> Fa 3.5 </tr><tr> Vi 3.5 </tr><tr> Fa 3.5 </tr><tr> Vi 3.5 </tr></xml>'],
           [ 'aggMin'   , '<xml><tr> Lu 1 </tr><tr> To 1 </tr><tr> Fa 1 </tr><tr> Vi 1 </tr><tr> Fa 1 </tr><tr> Vi 1 </tr></xml>'],
           [ 'aggMax'   , '<xml><tr> Lu 10 </tr><tr> To 10 </tr><tr> Fa 10 </tr><tr> Vi 10 </tr><tr> Fa 10 </tr><tr> Vi 10 </tr></xml>'],
-          [ 'aggCount' , '<xml><tr> Lu 6 </tr><tr> To 6 </tr><tr> Fa 6 </tr><tr> Vi 6 </tr><tr> Fa 6 </tr><tr> Vi 6 </tr></xml>']
+          [ 'aggCount' , '<xml><tr> Lu 6 </tr><tr> To 6 </tr><tr> Fa 6 </tr><tr> Vi 6 </tr><tr> Fa 6 </tr><tr> Vi 6 </tr></xml>'],
+          [ 'aggStr'   , '<xml><tr> Lu 1, 4, 3, 2, 1, 10 </tr><tr> To 1, 4, 3, 2, 1, 10 </tr><tr> Fa 1, 4, 3, 2, 1, 10 </tr><tr> Vi 1, 4, 3, 2, 1, 10 </tr><tr> Fa 1, 4, 3, 2, 1, 10 </tr><tr> Vi 1, 4, 3, 2, 1, 10 </tr></xml>']
         ];
         executeTest(_xml, dataSimpleLoop, _expected, done);
       });
@@ -537,6 +581,21 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'  , '<x><r>2 <d>_IT=10</d><d>_Sales=2</d></r>  <r>2 <d>_IT=2</d><d>_Marketing=1</d><d>_Sales=3</d></r>  <r>2 <d>_IT=1</d></r>  </x>'],
           [ 'aggMax'  , '<x><r>3 <d>_IT=20</d><d>_Sales=7</d></r>  <r>3 <d>_IT=8</d><d>_Marketing=6</d><d>_Sales=3</d></r>  <r>3 <d>_IT=1</d></r>  </x>'],
           [ 'aggCount', '<x><r>3 <d>_IT=2</d><d>_Sales=3</d></r>  <r>3 <d>_IT=2</d><d>_Marketing=3</d><d>_Sales=1</d></r>  <r>3 <d>_IT=1</d></r>  </x>'],
+          [ 'aggStr'  , '<x><r>2, 3, 2 <d>_IT=10, 20</d><d>_Sales=5, 2, 7</d></r>  <r>2, 3, 2 <d>_IT=2, 8</d><d>_Marketing=1, 3, 6</d><d>_Sales=3</d></r>  <r>2, 3, 2 <d>_IT=1</d></r>  </x>'],
+        ];
+        executeTest(_xml, dataThreeLoops, _expected, done);
+      });
+      it('[AGG] should do aggregation aggStr with custom paramater', function (done) {
+        const _xml =
+           '<x>'
+          +  '<r>{d.companies[i].size:__TESTED_FORMATTER__(-)} '
+          +     '<d>_{d.companies[i].services[i].name}={d.companies[i].services[i].people[].salary:__TESTED_FORMATTER__(\'+\')}</d>'
+          +     '<d>{d.companies[i].services[i+1].name}</d>'
+          +  '</r>  '
+          +  '<r>{d.companies[i+1].size:__TESTED_FORMATTER__(-)}</r>'
+          +'</x>';
+        let _expected = [
+          [ 'aggStr'  , '<x><r>2-3-2 <d>_IT=10+20</d><d>_Sales=5+2+7</d></r>  <r>2-3-2 <d>_IT=2+8</d><d>_Marketing=1+3+6</d><d>_Sales=3</d></r>  <r>2-3-2 <d>_IT=1</d></r>  </x>'],
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
@@ -569,6 +628,7 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<x><d>1</d></x>' ],
           [ 'aggMax'   , '<x><d>20</d></x>' ],
           [ 'aggCount' , '<x><d>12</d></x>' ],
+          [ 'aggStr'   , '<x><d>10, 20, 5, 2, 7, 2, 8, 1, 3, 6, 3, 1</d></x>'],
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
@@ -583,6 +643,7 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'   , '<x><d>1</d></x>' ],
           [ 'aggMax'   , '<x><d>20</d></x>' ],
           [ 'aggCount' , '<x><d>5</d></x>' ],
+          [ 'aggStr'   , '<x><d>10, 20, 2, 8, 1</d></x>' ],
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
@@ -622,6 +683,20 @@ describe('Aggregatted operations', function () {
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
+      it('[AGG] should do aggregation with "partition by" set (same as default one) aggStr', function (done) {
+        const _xml =
+           '<x>'
+          +  '<r>{d.companies[i].size:__TESTED_FORMATTER__(\', \', 0)} '
+          +     '<d>_{d.companies[i].services[i].name}={d.companies[i].services[i].people[].salary:__TESTED_FORMATTER__(\', \', .i, ..i)}</d>'
+          +     '<d>{d.companies[i].services[i+1].name}</d>'
+          +  '</r>  '
+          +  '<r>{d.companies[i+1].size:__TESTED_FORMATTER__(\', \', 0)}</r>'
+          +'</x>';
+        let _expected = [
+          [ 'aggStr'  , '<x><r>2, 3, 2 <d>_IT=10, 20</d><d>_Sales=5, 2, 7</d></r>  <r>2, 3, 2 <d>_IT=2, 8</d><d>_Marketing=1, 3, 6</d><d>_Sales=3</d></r>  <r>2, 3, 2 <d>_IT=1</d></r>  </x>']
+        ];
+        executeTest(_xml, dataThreeLoops, _expected, done);
+      });
       it.skip('[CUM] should do aggregation', function (done) {
         const _xml =
            '<x>'
@@ -653,6 +728,7 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'  , '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>0</d></r></x>'],
           [ 'aggMax'  , '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>0</d></r></x>'],
           [ 'aggCount', '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d>0</d></r></x>'],
+          [ 'aggStr'  , '<x>  <r><d>2</d></r><r><d>3</d></r><r><d>2</d></r><r><d></d><d></d></r></x>']
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
@@ -672,6 +748,20 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'  , '<x>  <r>2.00 € <d>_IT=10.00 €</d><d>_Sales=2.00 €</d></r>  <r>2.00 € <d>_IT=2.00 €</d><d>_Marketing=1.00 €</d><d>_Sales=3.00 €</d></r>  <r>2.00 € <d>_IT=1.00 €</d></r>  </x>'],
           [ 'aggMax'  , '<x>  <r>3.00 € <d>_IT=20.00 €</d><d>_Sales=7.00 €</d></r>  <r>3.00 € <d>_IT=8.00 €</d><d>_Marketing=6.00 €</d><d>_Sales=3.00 €</d></r>  <r>3.00 € <d>_IT=1.00 €</d></r>  </x>'],
           [ 'aggCount', '<x>  <r>3.00 € <d>_IT=2.00 €</d><d>_Sales=3.00 €</d></r>  <r>3.00 € <d>_IT=2.00 €</d><d>_Marketing=3.00 €</d><d>_Sales=1.00 €</d></r>  <r>3.00 € <d>_IT=1.00 €</d></r>  </x>'],
+        ];
+        executeTest(_xml, dataThreeLoops, _expected, done);
+      });
+      it('should accept formatters (aggStr)', function (done) {
+        const _xml =
+           '<x>  '
+          +  '<r>{d.companies[i].size:__TESTED_FORMATTER__:append(a)} '
+          +     '<d>_{d.companies[i].services[i].name}={d.companies[i].services[i].people[].salary:__TESTED_FORMATTER__:append(b)}</d>'
+          +     '<d>{d.companies[i].services[i+1].name}</d>'
+          +  '</r>  '
+          +  '<r>{d.companies[i+1].size:__TESTED_FORMATTER__:append(a)}</r>'
+          +'</x>';
+        let _expected = [
+          [ 'aggStr', '<x>  <r>2, 3, 2a <d>_IT=10, 20b</d><d>_Sales=5, 2, 7b</d></r>  <r>2, 3, 2a <d>_IT=2, 8b</d><d>_Marketing=1, 3, 6b</d><d>_Sales=3b</d></r>  <r>2, 3, 2a <d>_IT=1b</d></r>  </x>'],
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
@@ -765,6 +855,20 @@ describe('Aggregatted operations', function () {
           [ 'aggMin'  , '<x>  <r>2 <d>_IT=1</d><d>_Sales=1</d></r>  <r>3 <d>_IT=1</d><d>_Marketing=1</d><d>_Sales=1</d></r>  <r>2 <d>_IT=1</d></r>  </x>'],
           [ 'aggMax'  , '<x>  <r>2 <d>_IT=20</d><d>_Sales=20</d></r>  <r>3 <d>_IT=8</d><d>_Marketing=8</d><d>_Sales=8</d></r>  <r>2 <d>_IT=20</d></r>  </x>'],
           [ 'aggCount', '<x>  <r>2 <d>_IT=6</d><d>_Sales=6</d></r>  <r>1 <d>_IT=6</d><d>_Marketing=6</d><d>_Sales=6</d></r>  <r>2 <d>_IT=6</d></r>  </x>'],
+        ];
+        executeTest(_xml, dataThreeLoops, _expected, done);
+      });
+      it('should do aggregation (aggStr)', function (done) {
+        const _xml =
+           '<x>  '
+          +  '<r>{d.companies[i].size:__TESTED_FORMATTER__(\', \', .size)} '
+          +     '<d>_{d.companies[i].services[i].name}={d.companies[i].services[i].people[].salary:__TESTED_FORMATTER__(\', \', ...size)}</d>'
+          +     '<d>{d.companies[i].services[i+1].name}</d>'
+          +  '</r>  '
+          +  '<r>{d.companies[i+1].size:__TESTED_FORMATTER__(\', \', .size)}</r>'
+          +'</x>';
+        let _expected = [
+          [ 'aggStr'  , '<x>  <r>2, 2 <d>_IT=1, 5, 2, 7, 10, 20</d><d>_Sales=1, 5, 2, 7, 10, 20</d></r>  <r>3 <d>_IT=3, 1, 3, 6, 2, 8</d><d>_Marketing=3, 1, 3, 6, 2, 8</d><d>_Sales=3, 1, 3, 6, 2, 8</d></r>  <r>2, 2 <d>_IT=1, 5, 2, 7, 10, 20</d></r>  </x>'],
         ];
         executeTest(_xml, dataThreeLoops, _expected, done);
       });
@@ -864,6 +968,26 @@ describe('Aggregatted operations', function () {
       };
       carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
         assert.equal(_xmlBuilt, '<xml>63</xml>');
+        done();
+      });
+    });
+    it('should accept array of numbers (aggStr)', function (done) {
+      var _xml = '<xml>{d.table[]:aggStr}</xml>';
+      var _data = {
+        table : [10, 20, 33]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml>10, 20, 33</xml>');
+        done();
+      });
+    });
+    it('should accept custom separator for aggStr', function (done) {
+      var _xml = '<xml>{d.table[]:aggStr(\'++\')}</xml>';
+      var _data = {
+        table : [10, 20, 33]
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        assert.equal(_xmlBuilt, '<xml>10++20++33</xml>');
         done();
       });
     });

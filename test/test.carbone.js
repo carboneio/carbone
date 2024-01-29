@@ -2104,6 +2104,31 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should accept two single quotes to escape a single quote in formatter parameters', function (done) {
+        var data = {
+          id : "10ier's LiaDD",
+          ob : "AB ri' e r's Lia CC",
+          ab : "bla bla \\',",
+          zz : "b la '' bl a",
+        };
+        carbone.renderXML("<xml>{d.id:ifEQ('10ier''s LiaDD'):show(OK)}</xml>", data, {complement : {}}, function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<xml>OK</xml>');
+          carbone.renderXML("<xml>{d.ob:ifEQ('AB ri'' e r''s Lia CC'):show(OK)}</xml>", data, {complement : {}}, function (err, result) {
+            helper.assert(err+'', 'null');
+            helper.assert(result, '<xml>OK</xml>');
+            carbone.renderXML("<xml>{d.ab:ifEQ('bla bla \\'','):show(OK)}</xml>", data, {complement : {}}, function (err, result) {
+              helper.assert(err+'', 'null');
+              helper.assert(result, '<xml>OK</xml>');
+              carbone.renderXML("<xml>{d.zz:ifEQ('b la '''' bl a'):show(OK)}</xml>", data, {complement : {}}, function (err, result) {
+                helper.assert(err+'', 'null');
+                helper.assert(result, '<xml>OK</xml>');
+                done();
+              });
+            });
+          });
+        });
+      });
       it('should not crash if the iterator contains string and is negative', function (done) {
         var _xml = '<xml> <t_row> {d[i=-1a].brand} </t_row><t_row> {d[i=-2a].brand} </t_row></xml>';
         var _data = [

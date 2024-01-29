@@ -3296,8 +3296,8 @@ describe('extracter', function () {
     it('should accept single quote in the middle', function () {
       helper.assert(extracter.parseFormatter("format('YYYY \\' MM DD')")                   , { str : 'format', args : ["YYYY \\' MM DD"]});
       helper.assert(extracter.parseFormatter("format(' , ', '  ,  ')")                     , { str : 'format', args : [' , ', '  ,  ']});
-      helper.assert(extracter.parseFormatter("format('YYYY '' MM, DD')")                   , { str : 'format', args : ["YYYY '' MM, DD"]});
-      helper.assert(extracter.parseFormatter("format('YYYY '' MM, DD', 'a')")              , { str : 'format', args : ["YYYY '' MM, DD",  'a']});
+      helper.assert(extracter.parseFormatter("format('YYYY '' MM, DD')")                   , { str : 'format', args : ["YYYY ' MM, DD"]});
+      helper.assert(extracter.parseFormatter("format('YYYY '' MM, DD', 'a')")              , { str : 'format', args : ["YYYY ' MM, DD",  'a']});
       helper.assert(extracter.parseFormatter("format('YYYY \" MM DD')")                    , { str : 'format', args : ['YYYY " MM DD']});
       helper.assert(extracter.parseFormatter("format('YYYY \" MM, DD')")                   , { str : 'format', args : ['YYYY " MM, DD']});
       helper.assert(extracter.parseFormatter("format(  'YYYY \" MM, DD'   )")              , { str : 'format', args : ['YYYY " MM, DD']});

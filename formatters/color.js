@@ -161,12 +161,30 @@ function colorToDocx (d) {
 /**
  * Apply the color on the text, paragraph, table row or table cell
  *
- * @version 4.16.0
- * @param  {String} d    data
- * @param  {Mixed} scope "p", "row", "cell"
- * @param  {Mixed} type  "text", "highlight", "background"
+ * Template format supported: ODT, ODP, HTML, DOCX. Please, contact us if you need more format.
+ *
+ * WARNING: There are known limitations in v4.17.0:
+ *  - in ODP (text, table, and shapes) and ODT (shapes only), the `:color` formatter requires that a non-default style is already applied to the target element in the template (for example, a custom text color).
+ *  - complex nested tables with colors on sub-tables are not fully supported.
+ *  - `highlight` is not managed in docx template
+ *  - Cannot be used with aliases
+ *
+ * @version 4.17.0
+ *
+ * @param  {String} d     The color in format 6-digit hex color notation with or without hashtag, lowercase or uppercase: `#FF0000` or `FF0000`.
+ *                        Carbone replaces wrong color values with light gray (#888888)
+ * @param  {Mixed} scope  The scope where to apply the color
+ *                          - `p`     : the current paragraph where the tag is (by default)
+ *                          - `cell`  : the current cell of a table
+ *                          - `row`   : the current row of a table
+ *                          - `shape` : the current shape
+ * @param  {Mixed} type   Where the color is applied
+ *                          - `text` (by default)
+ *                          - `highlight` to highlight the text
+ *                          - `background` for cells, rows and shapes
+ *                          - `border` for shapes only
  */
-function color (d, scope, type) {
+function color (d, scope = 'p', type = 'text') {
   // Here we validate only the color, scope and type are validated in preprocessind or postprocessing
   if (typeof (d) === 'string') {
     const _lowerCase     = d.toLowerCase();

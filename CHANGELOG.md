@@ -1,4 +1,7 @@
+
 ## v4.17.0
+  - Release January 10th 2024
+  - To include a single-quote character in formatter parameter, write two adjacent single quotes, e.g., 'David''s Car'. Note that this is not the same as a double-quote character (").
   - `carbone.renderXML` accepts html templates if `option.extension` is `html`
   - Support `drop` in ODS (img, row) and HTML (table, p, row) templates.
   - Support `keep` (the opposite of `drop`)

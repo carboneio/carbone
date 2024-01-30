@@ -4,10 +4,10 @@
   - To include a single-quote character in formatter parameter, write two adjacent single quotes, e.g., 'David''s Car'. Note that this is not the same as a double-quote character (").
   - `carbone.renderXML` accepts html templates if `option.extension` is `html`
   - Support `drop` in ODS (img, row) and HTML (table, p, row) templates.
-  - Support `keep`, the opposite of `drop`
-  - [EE] New features and new supported templates for the `:color(scope, type)` formatter:
+  - ⚡️ Support `keep`, the opposite of `drop`
+  - [EE] 🤩 New features and new supported templates for the new `:color(scope, type)` formatter 
     - Supported in ODT, ODP, HTML and DOCX templates
-    - `scope` can be `p`  (by default), `cell`, `row`, `shape` 🤩  to apply color to the current paragraph, cell, row or shape
+    - `scope` can be `p`  (by default), `cell`, `row`, `shape`  to apply color to the current paragraph, cell, row or shape
     - `type` can be `text` (by default), `highlight` for text, `background` for cells, rows and shapes,  `border` for shapes only
     - accepts only 6-digit hex color notation with or without hashtag, lowercase or uppercase: `#FF0000` or `FF0000`. Carbone replaces wrong color values with light gray (#888888)
     - for HTML, the color is applied with the style attribute only to the selected HTML tag (tr, td and p)
@@ -21,8 +21,8 @@
       - complex nested tables with colors on sub-tables are not fully supported.
       - `highlight` is not managed in docx template
       - Cannot be used with aliases
-  - Fixed `:color(scope, type)` bug for DOCX templates when the Carbone tag `:color` tag is quite long with many conditions for example.
-  - New `:aggStr(separator)` formatter, a more powerful version of `:arrayMap`. By default the separator is ', '.
+    - Fixed `:color(scope, type)` bug for DOCX templates when the Carbone tag `:color` tag is quite long with many conditions for example (v4.16.0)
+  - 🌈 New `:aggStr(separator)` formatter, a more powerful version of `:arrayMap`. By default the separator is ', '.
     - `d.user.phones[]:aggStr()` -> `+331112345678, +331112345678, +331112345678`
     - `d.cars[electric=true].brand:aggStr(' - ')` -> `Tesla - BYD - Kia` 
 

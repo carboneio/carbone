@@ -255,13 +255,13 @@ function substr (d, begin, end, wordMode = false) {
     }
     const _lineWidth      = end - begin;
     const _regex          = /^\s$/;
-    let _lineNumber       = Math.floor(begin / _lineWidth);
+    let _wantedLine       = Math.floor(begin / _lineWidth);
     let _currentLine      = 0;
     let _currentLineStart = 0;
     if (begin % _lineWidth > 0) {
       // if begin is lower than line width. Add virtually N whitespace at the begining of the string
       _currentLineStart = -(_lineWidth - (begin % _lineWidth));
-      _lineNumber++;
+      _wantedLine++;
     }
     let _nbCharInCurrentLine  = 0;
     let _currentLineEnd       = 0;
@@ -281,7 +281,7 @@ function substr (d, begin, end, wordMode = false) {
         if (_currentLineStart === _currentLineEnd) {
           _currentLineEnd = _pos+1; // word bigger than line width, cut the word
         }
-        if (_currentLine > _lineNumber) {
+        if (_currentLine > _wantedLine) {
           break; // searched line reached, leave
         }
         _currentLineStart = _currentLineEnd;
@@ -289,7 +289,7 @@ function substr (d, begin, end, wordMode = false) {
       _isWhitespaceChar = _isNextWhitespaceChar;
     }
     // end of text reached but searched line not reached
-    if (_pos === d.length && _currentLine < _lineNumber) {
+    if (_pos === d.length && _currentLine < _wantedLine) {
       return '';
     }
     if (wordMode === 'last') {

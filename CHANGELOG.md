@@ -1,3 +1,5 @@
+## v4.XX.X
+ - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 
 
 ## v4.17.0
   - Release January 30th 2024

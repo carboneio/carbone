@@ -1,4 +1,5 @@
 ## v4.18.0
+  - Release February 14th 2024
   - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 
   - Fixes formatter `substr(begin, end, wordMode)` when word mode is active. If `wordMode=true`, it never cuts words. 
     It can be used to print successive lines of text of constant width.

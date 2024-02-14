@@ -24,7 +24,7 @@ jobs:
       name: Get Carbone binary
       uses: robinraju/release-downloader@v1.9
       with:
-        tag: v${{ env.PACKAGE_VERSION }}
+        tag: ee-${{ env.PACKAGE_VERSION }}
         fileName: "*-linux"
         out-file-path: docker
         token: ${{ secrets.GITHUB_TOKEN }}

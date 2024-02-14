@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:stable-slim
 
 WORKDIR /tmp
 RUN apt update && \
@@ -7,7 +7,7 @@ RUN apt update && \
                    libnss3 curl wget fontconfig
 
 # Download LibreOffice
-RUN curl https://download.documentfoundation.org/libreoffice/stable/7.6.4/deb/x86_64/LibreOffice_7.6.4_Linux_x86-64_deb.tar.gz \
+RUN curl -L https://download.documentfoundation.org/libreoffice/stable/7.6.4/deb/x86_64/LibreOffice_7.6.4_Linux_x86-64_deb.tar.gz \
     -o libo.tar.gz \
     && tar -zxvf libo.tar.gz
 

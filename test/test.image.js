@@ -8,6 +8,7 @@ const image     = require('../lib/image');
 const preprocessor  = require('../lib/preprocessor');
 const nock      = require('nock');
 const barcodeFormatter = require('../formatters/barcode');
+const os        = require('os');
 
 describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageFRBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageFR_base64_html_jpg.txt'  ), 'utf8');
@@ -41,7 +42,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     });
 
 
-    it.skip('should generate barcodes as images and as fonts', function (done) {
+    it('should generate barcodes as images and as fonts', function (done) {
+      if (os.platform() !== 'darwin') {
+        this.skip();
+      }
       const _testedReport = 'image/odg-barcodes';
       const _data = {
         /** Barcodes as Fonts & Images*/
@@ -98,7 +102,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    it.skip('should generate barcodes as images and as fonts', function (done) {
+    it('should generate barcodes as images and as fonts', function (done) {
+      if (os.platform() !== 'darwin') {
+        this.skip();
+      }
       const _testedReport = 'image/odp-barcodes';
       const _data = {
         /** Barcodes as Fonts & Images*/
@@ -217,7 +224,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    it.skip('should generate all barcodes as images', function (done) {
+    it('should generate all barcodes as images', function (done) {
+      if (os.platform() !== 'darwin') {
+        this.skip();
+      }
       const _testedReport = 'image/odt-barcodes';
       const _data = {
         /** Barcodes as Fonts */
@@ -234,7 +244,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         done();
       });
     });
-    it.skip('should generate barcodes as images with options', function (done) {
+    it('should generate barcodes as images with options', function (done) {
+      if (os.platform() !== 'darwin') {
+        this.skip();
+      }
       const _testedReport = 'image/odt-barcodes-options';
       const _data = {
         item : barcodeFormatter.supportedBarcodes.find(value => value.sym === 'ean13')
@@ -305,7 +318,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       });
     });
 
-    it.skip('should generate barcodes as images and as fonts', function (done) {
+    it('should generate barcodes as images and as fonts', function (done) {
+      if (os.platform() !== 'darwin') {
+        this.skip();
+      }
       const _testedReport = 'image/ods-barcodes';
       const _data = {
         /** Barcodes as Fonts & Images*/
@@ -1092,7 +1108,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      it.skip('should generate barcodes as images and as fonts', function (done) {
+      it('should generate barcodes as images and as fonts', function (done) {
+        if (os.platform() !== 'darwin') {
+          this.skip();
+        }
         const _testedReport = 'image/docx-barcodes';
         const _data = {
           /** Barcodes as Fonts & Images*/
@@ -1706,7 +1725,10 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      it.skip('should generate barcodes as images and as fonts', function (done) {
+      it('should generate barcodes as images and as fonts', function (done) {
+        if (os.platform() !== 'darwin') {
+          this.skip();
+        }
         const _testedReport = 'image/xlsx-barcodes';
         const _data = {
           /** Barcodes as Fonts & Images*/

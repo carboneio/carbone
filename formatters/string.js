@@ -215,7 +215,7 @@ function convCRLFH (d) {
 /**
  * Slice a string with a begin and an end.
  *
- * @version 4.17.0 new
+ * @version 4.18.0 new
  *
  * @example ["foobar" , 0  , 3 ]
  * @example ["foobar" , 1      ]

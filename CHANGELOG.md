@@ -1,7 +1,5 @@
-## v4.XX.X
- - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 
-
-## v4.17.1
+## v4.18.0
+  - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 
   - Fixes formatter `substr(begin, end, wordMode)` when word mode is active. If `wordMode=true`, it never cuts words. 
     It can be used to print successive lines of text of constant width.
     The previous algorithm of v4.12.0 could create some gaps (missing words) when doing successive calls of `substr`.
@@ -16,9 +14,8 @@
       - `{d.text(150, 200, last)}` -> line 4 of infinite characters
     - `last` can be used instead of `true` to print the rest of the text, even if it is longer than the defined line width.
     - A word can only be truncated if it does not fit in the line. In this case, the word always starts at the beginning of a new line.
-
-## v4.18.0
-  - Carbone On-Premise starts with Community Edition features if no valid license is provided. It collects some statistics at startup (version, subscription). These statistics can be deactivated.
+  - ⚡️ Carbone On-Premise starts with Community Edition features if no valid license is provided. It collects some statistics at startup (version, subscription). These statistics can be deactivated.
+  - Improve the stability of reports based on ODT templates that include native charts.
 
 ## v4.17.0
   - Release January 30th 2024

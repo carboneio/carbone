@@ -213,9 +213,9 @@ function convCRLFH (d) {
 }
 
 /**
- * Slice a string with a begin and an end
+ * Slice a string with a begin and an end.
  *
- * @version 4.12.0 new
+ * @version 4.17.0 new
  *
  * @example ["foobar" , 0  , 3 ]
  * @example ["foobar" , 1      ]
@@ -224,32 +224,80 @@ function convCRLFH (d) {
  * @example ["abcd efg hijklm" , 0 , 11, true]
  * @example ["abcd efg hijklm" , 1 , 11, true]
  *
- * @param {String} d
- * @param {Integer} begin      Zero-based index at which to begin extraction.
+ * @param {String}  d
+ * @param {Integer} begin      Zero-based Index at which to begin extraction.
  * @param {Integer} end        [optional] Zero-based index before which to end extraction
- * @param {Boolean} wordMode   [optional]  if true, it never cuts words (default: false)
+ * @param {Mixed}   wordMode   [optional] If `true`, it never cuts words. In such a case:
+ *                                          - `end` must be greater than `begin` and negative values cannot be used.
+ *                                            `end - begin` = maximum number of characters per line of text
+ *                                          - A word can only be truncated only if it does not fit in the line.
+ *                                            In this case, the word always starts at the beginning of a new line, just like in Word or LibreOffice
+ *                                          - The same line width (end - begin) must be used between successive calls of `substr` to print all the words of the text (no gaps). Ex:
+ *                                              `{d.text(0  , 50 , true)}` -> line 1 of 50 characters
+ *                                              `{d.text(50 , 100, true)}` -> line 2 of 50 characters
+ *                                              `{d.text(100, 150, true)}` -> line 3 of 50 characters
+ *                                              `{d.text(150, 200, last)}` -> line 4 of infinite characters
+ *                                          - `last` can be used instead of `true` to print the rest of the text, even if it is longer than the defined line width
  * @return {String} return the formatted string
  */
 function substr (d, begin, end, wordMode = false) {
   if (typeof d !== 'string') {
     return d;
   }
-  if (wordMode === true || wordMode === 'true') {
-    const _begin = parseInt(begin, 10);
-    const _end = end !== undefined ? parseInt(end, 10) : d.length;
-    const _posOfCharBeforeBegin = (_begin === 0) ? 0 : (_begin - 1);
-    const _posOfCharAfterEnd = (_end === -1) ? d.length - 1 : (_end + 1);
-    const _text = d.slice(_posOfCharBeforeBegin, _posOfCharAfterEnd);
-    let _newBegin = _begin !== 0 ? 1 : 0;
-    let _newEnd = _end >= d.length ? _text.length :  _text.length-1;
-    if (_text[0] !== ' ' && _posOfCharBeforeBegin !== 0) {
-      _newBegin = _text.indexOf(' ');
+  if (wordMode === true || wordMode === 'true' || wordMode === 'last') {
+    end   = parseInt(end, 10);
+    begin = parseInt(begin, 10);
+    if (end < 0) {
+      end = 0;
     }
-    if (_text[_text.length - 1] !== ' ' && _posOfCharAfterEnd < d.length) {
-      _newEnd = _text.lastIndexOf(' ') + 1;
+    if (begin < 0) {
+      begin = 0;
     }
-    return _newBegin !== -1 && _newEnd !== -1 ? _text.slice(_newBegin, _newEnd) : '';
+    const _lineWidth      = end - begin;
+    const _regex          = /^\s$/;
+    let _wantedLine       = Math.floor(begin / _lineWidth);
+    let _currentLine      = 0;
+    let _currentLineStart = 0;
+    if (begin % _lineWidth > 0) {
+      // if begin is lower than line width. Add virtually N whitespace at the begining of the string
+      _currentLineStart = -(_lineWidth - (begin % _lineWidth));
+      _wantedLine++;
+    }
+    let _nbCharInCurrentLine  = 0;
+    let _currentLineEnd       = 0;
+    let _isNextWhitespaceChar = false;
+    let _isWhitespaceChar     = _regex.test(d[0]);
+    let _pos                  = 0;
+    // avoid any string allocation in the loop for performance reason.
+    for (_pos = 0; _pos < d.length; _pos++) {
+      const _nextChar = d[_pos+1] ?? ' ';
+      _isNextWhitespaceChar = _regex.test(_nextChar);
+      if (_isNextWhitespaceChar === true || _isWhitespaceChar === true) {
+        _currentLineEnd = _pos+1;
+      }
+      _nbCharInCurrentLine = (_pos - _currentLineStart + 1);
+      if (_nbCharInCurrentLine >= _lineWidth) {
+        _currentLine++;  // new line of text
+        if (_currentLineStart === _currentLineEnd) {
+          _currentLineEnd = _pos+1; // word bigger than line width, cut the word
+        }
+        if (_currentLine > _wantedLine) {
+          break; // searched line reached, leave
+        }
+        _currentLineStart = _currentLineEnd;
+      }
+      _isWhitespaceChar = _isNextWhitespaceChar;
+    }
+    // end of text reached but searched line not reached
+    if (_pos === d.length && _currentLine < _wantedLine) {
+      return '';
+    }
+    if (wordMode === 'last') {
+      _currentLineEnd = d.length;
+    }
+    return d.slice(_currentLineStart, _currentLineEnd);
   }
+
   return d.slice(begin, end);
 }
 

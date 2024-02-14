@@ -1,6 +1,22 @@
 ## v4.XX.X
  - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 
 
+## v4.17.1
+  - Fixes formatter `substr(begin, end, wordMode)` when word mode is active. If `wordMode=true`, it never cuts words. 
+    It can be used to print successive lines of text of constant width.
+    The previous algorithm of v4.12.0 could create some gaps (missing words) when doing successive calls of `substr`.
+    Here is the problem: 
+      - Each call to `substr` in the template is calculated independently.
+      - But the line of text we want to print depends on all the lines of text that have been printed before.
+    To solve this, each subsequent call to `substr` must obey these constraints:
+    - A constant line width (`end` - `begin`) must be used between successive calls of `substr` to print all the words of the text without gaps. For example:
+      - `{d.text(0  , 50 , true)}` -> line 1 of 50 characters
+      - `{d.text(50 , 100, true)}` -> line 2 of 50 characters
+      - `{d.text(100, 150, true)}` -> line 3 of 50 characters
+      - `{d.text(150, 200, last)}` -> line 4 of infinite characters
+    - `last` can be used instead of `true` to print the rest of the text, even if it is longer than the defined line width.
+    - A word can only be truncated if it does not fit in the line. In this case, the word always starts at the beginning of a new line.
+
 ## v4.17.0
   - Release January 30th 2024
   - To include a single-quote character in formatter parameter, write two adjacent single quotes, e.g., 'David''s Car'. Note that this is not the same as a double-quote character (").

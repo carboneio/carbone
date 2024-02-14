@@ -1,9 +1,12 @@
 name: Release Carbone Docker
 
 on:
-  workflow_dispatch:
+ # workflow_dispatch:
 #  release:
 #    types: [published]
+  push:
+    branches:    
+    - docker_build
 
 jobs:
   build:

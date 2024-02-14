@@ -20,19 +20,15 @@ jobs:
       name: Get Carbone version 
       run: echo "PACKAGE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
 
-#    - 
-#      name: Get Carbone binary
-#      uses: robinraju/release-downloader@v1.9
-#      with:
-#        tag: v${{ env.PACKAGE_VERSION }}
-#        fileName: "*-linux"
-#        out-file-path: docker
-    -
+    - 
       name: Get Carbone binary
-      uses: actions/download-artifact@v4.1.2
+      uses: robinraju/release-downloader@v1.9
       with:
-        name: carbone-ee-${{ env.PACKAGE_VERSION }}-linux
-        path: docker
+        tag: v${{ env.PACKAGE_VERSION }}
+        fileName: "*-linux"
+        out-file-path: docker
+        token: ${{ secrets.GITHUB_TOKEN }}
+
     -
       name: Rename Carbone binary
       run: mv docker/carbone-ee-${{ env.PACKAGE_VERSION }}-linux docker/carbone-ee-linux

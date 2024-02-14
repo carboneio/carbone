@@ -1036,6 +1036,21 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
+      it('should insert images into shapes', function (done) {
+        const _testedReport = 'image/docx-image-as-shape';
+        const _data = {
+          imgDe: _imageDEBase64jpg,
+          imgFr: _imageFRBase64jpg,
+          imgIt: _imageITBase64png,
+          imgLogo: _imageLogoBase64jpg
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+
       it('generating unique ids for docPr tag should not break filters in loop', function (done) {
         var _xml = (expected) => { return ''
           + '<w:p>'

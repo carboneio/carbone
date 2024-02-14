@@ -48,4 +48,4 @@ jobs:
         context: ./docker
         file: ./docker/Dockerfile
         push: false
-        tags: ${{ env.DOCKERHUB_ORG }}/carbone-ee:${{ env.PACKAGE_VERSION }},${{ env.DOCKERHUB_ORG }}/carbone-ee:latest
+        tags: ${{ vars.DOCKERHUB_ORG }}/carbone-ee:${{ env.PACKAGE_VERSION }},${{ vars.DOCKERHUB_ORG }}/carbone-ee:latest

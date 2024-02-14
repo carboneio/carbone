@@ -766,6 +766,17 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should return a clear error if the formatter is not available in the Community Edition but available in the Enterprise Edition', function (done) {
+      carbone.addFormatters({ testEnterpriseFormatter : () => {} }, false);
+      var data = {
+        param : 1
+      };
+      carbone.renderXML('<xml>{d.param:testEnterpriseFormatter()}</xml>', data, function (err, result) {
+        helper.assert(err+'', 'Error: Formatter "testEnterpriseFormatter" is disabled in the Community Edition.');
+        helper.assert(result, null);
+        done();
+      });
+    });
     it('#1 conditional formatters should be executed one after another, the next formatter is called if the condition of the previous one is false', function (done) {
       var data = {
         param : 1

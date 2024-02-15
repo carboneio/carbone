@@ -1,12 +1,12 @@
 name: Release Carbone Docker
 
 on:
-#  workflow_dispatch:
+  workflow_dispatch:
 #  release:
 #    types: [published]
-  push:
-    branches:    
-    - docker_build
+#  push:
+#    branches:    
+#    - docker_build
 
 jobs:
   build:
@@ -47,7 +47,7 @@ jobs:
       with:
         context: ./docker
         file: ./docker/Dockerfile
-        push: false
+        push: true
         tags: ${{ vars.DOCKERHUB_ORG }}/carbone-ee:${{ env.PACKAGE_VERSION }},${{ vars.DOCKERHUB_ORG }}/carbone-ee:latest
 
     -

@@ -57,6 +57,7 @@ jobs:
         repository: carboneio/carbone-fonts
         path: docker/carbone-fonts
         ref: master
+        ssh-key: ${{ secrets.PRIVATE_KEY_FONT_REPO }}
 
     - 
       name: Remove commercial font

@@ -55,7 +55,8 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: carboneio/carbone-fonts
-        path: docker/
+        path: docker/carbone-fonts
+        ref: master
 
     - 
       name: Remove commercial font

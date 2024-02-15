@@ -54,7 +54,7 @@ jobs:
       name: Checkout fonts
       uses: actions/checkout@v4
       with:
-        repository: https://github.com/carboneio/carbone-fonts
+        repository: carboneio/carbone-fonts
         path: docker/
 
     - 

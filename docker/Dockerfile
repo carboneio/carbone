@@ -2,21 +2,17 @@ FROM debian:stable-slim
 
 WORKDIR /tmp
 RUN apt update && \
-    apt install -y lsof libxinerama1 libfontconfig1 libdbus-glib-1-2 \
-                   libcairo2 libcups2 libglu1-mesa libsm6 unzip \
-                   libnss3 curl wget fontconfig
-
+    apt install -y curl libnss3 libxinerama1 libdbus-glib-1-2 libcairo2 libcups2
+    
 # Download LibreOffice
-RUN curl -L https://download.documentfoundation.org/libreoffice/stable/7.6.4/deb/x86_64/LibreOffice_7.6.4_Linux_x86-64_deb.tar.gz \
-    -o libo.tar.gz \
-    && tar -zxvf libo.tar.gz
+RUN curl -L https://download.documentfoundation.org/libreoffice/stable/7.6.4/deb/x86_64/LibreOffice_7.6.4_Linux_x86-64_deb.tar.gz | \
+    tar -zx
 
 # Install LibreOffice
-WORKDIR /tmp/LibreOffice_7.6.4.1_Linux_x86-64_deb/DEBS
-RUN dpkg -i *.deb
+RUN dpkg -i LibreOffice_*_Linux_x86-64_deb/DEBS/*.deb
+RUN rm -r /tmp/LibreOffice_*
 
 # Create Carbone user
-#RUN addgroup carbone
 RUN adduser carbone --home /app --no-create-home --disabled-password --system
 
 # Copy the local binary into the image folder "app"

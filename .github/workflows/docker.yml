@@ -47,5 +47,25 @@ jobs:
       with:
         context: ./docker
         file: ./docker/Dockerfile
-        push: true
+        push: false
         tags: ${{ vars.DOCKERHUB_ORG }}/carbone-ee:${{ env.PACKAGE_VERSION }},${{ vars.DOCKERHUB_ORG }}/carbone-ee:latest
+
+    -
+      name: Checkout fonts
+      uses: actions/checkout@v4
+      with:
+        repository: https://github.com/carboneio/carbone-fonts
+        path: docker/
+
+    - 
+      name: Remove commercial font
+      run: rm -r docker/carbone-fonts/custom
+
+    -
+      name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: ./docker
+        file: ./docker/Dockerfile-fonts
+        push: true
+        tags: ${{ vars.DOCKERHUB_ORG }}/carbone-ee:${{ env.PACKAGE_VERSION }}-fonts,${{ vars.DOCKERHUB_ORG }}/carbone-ee:latest-fonts

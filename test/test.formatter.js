@@ -1869,6 +1869,12 @@ describe('formatter', function () {
       helper.assert(numberFormatter.convCurr.call(_this, 10.1, 'GBP'), 8.08);
     });
 
+    it('should not convert if the source is unknown', function () {
+      var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
+      var _this = {currency : { source : '', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.convCurr.call(_this, 10.1, 'GBP'), 10.1);
+    });
+
     it('should accept to change source in the formatter', function () {
       var _rates = {EUR : 1, USD : 1.14, GBP : 0.8};
       var _this = {currency : { source : 'EUR', target : 'USD', rates : _rates }};
@@ -2025,6 +2031,26 @@ describe('formatter', function () {
       console.log('\n formatC number speed : ' + _elapsed + ' ms (around 30ms for 10k) \n');
       helper.assert(_elapsed < (70 * helper.CPU_PERFORMANCE_FACTOR), true, 'formatC is too slow');
     });
+
+    it('should accept a third paramter to define the currency', function () {
+      var _rates = {USD : 1, BTC : 0.000102618, ETH : 0.003695354, XMR : 0.01218769 };
+      /**  USD to BTC, overwrite API  */
+      var _this = {lang : 'en-us', currency : { source : 'USD', target : 'EUR', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 1255, 'L', 'BTC'), '₿0.12878559');
+      /* no conversion, because the source is unknown */
+      _this = {lang : 'en-us', currency : { source : '', target : '', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 1255, 'L', 'BTC'), '₿1,255.00000000');
+      /* should format the the current lang */
+      _this = {lang : 'fr-fr', currency : { source : '', target : '', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 1255, 'L', 'BTC'), '1 255,00000000 ₿');
+      /* no conversion, because the source is unknown, overwrite target */
+      _this = {lang : 'en-us', currency : { source : '', target : 'USD', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 1255, 'L', 'BTC'), '₿1,255.00000000');
+      /**  USD to ETH by API, overwritten USD to ETH */
+      _this = {lang : 'en-us', currency : { source : 'USD', target : 'ETH', rates : _rates }};
+      helper.assert(numberFormatter.formatC.call(_this, 32.41, 'L', 'USD'), '$32.41');
+    });
+
   });
 
   describe('Color operations', function () {

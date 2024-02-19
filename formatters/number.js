@@ -9,6 +9,8 @@ const currency = require('./_currency.js');
  *
  * `convCurr()`  without parameters converts automatically from `options.currencySource` to `options.currencyTarget`.
  *
+ * If `options.currencySource' is undefined, no conversion will be performed.
+ *
  * @version 1.2.0
  *
  * @exampleContext {"currency": { "source":"EUR", "target":"USD", "rates": { "EUR":1, "USD":2 }} }
@@ -26,6 +28,9 @@ const currency = require('./_currency.js');
 function convCurr (d, target, source) {
   var _target        = target ? target : this.currency.target;
   var _source        = source ? source : this.currency.source;
+  if (!_source) {
+    return d; // we can't convert if we don't know the currency source
+  }
   var _targetRate    = this.currency.rates[_target] || 1;
   var _sourceRate    = this.currency.rates[_source] || 1;
   var _valueInEuro   = d / _sourceRate;
@@ -145,19 +150,21 @@ function formatN (d, precision) {
  * @exampleContext {"lang":"fr-fr", "currency": { "source":"EUR", "target":"EUR", "rates": { "EUR":1, "USD":2 }} }
  * @example ["1000.456"    ]
  *
- * @param  {Number} d                 Number to format
- * @param  {Number} precisionOrFormat [optional] Number of decimal, or specific format <br>
- *                                      - Integer : change default precision of the currency
- *                                      - M  : print Major currency name without the number
- *                                      - L  : prints number with currency symbol (by default)
- *                                      - LL : prints number with Major currency name
- * @return {String}                   return converted values
+ * @param  {Number} d                  Number to format
+ * @param  {Number} precisionOrFormat  [optional] Number of decimal, or specific format <br>
+ *                                       - Integer : change default precision of the currency
+ *                                       - M  : print Major currency name without the number
+ *                                       - L  : prints number with currency symbol (by default)
+ *                                       - LL : prints number with Major currency name
+ * @param  {String} targetCurrencyCode  target currency code (upper case). Ex: USD, EUR, ...
+ *                                      It overwrites the global option `options.currencyTarget`
+ * @return {String}                     return converted values
  *
  */
-function formatC (d, precisionOrFormat) {
+function formatC (d, precisionOrFormat, targetCurrencyCode) {
   if (d !== null && typeof d !== 'undefined') {
     var _locale       = locale[this.lang] || locale.en; // TODO optimize, this test should be done before
-    var _currency     = this.modifiedCurrencyTarget || this.currency.target;
+    var _currency     = targetCurrencyCode || this.modifiedCurrencyTarget || this.currency.target;
     var _currencyInfo = currency[_currency];
     var _precision    = _currencyInfo.precision;
     var _customPrec   = parseInt(precisionOrFormat, 10);
@@ -168,7 +175,7 @@ function formatC (d, precisionOrFormat) {
     else if ( _locale.currency[precisionOrFormat] instanceof Function ) {
       _formatFn = _locale.currency[precisionOrFormat];
     }
-    var _valueRaw  = _format(convCurr.call(this, d), _locale.number, _precision);
+    var _valueRaw  = _format(convCurr.call(this, d, targetCurrencyCode), _locale.number, _precision);
     // reset modifiedCurrencyTarget for next use
     this.modifiedCurrencyTarget = null;
     return _formatFn(_valueRaw,

@@ -1,3 +1,6 @@
+## v4.19.0
+  - [EE] The formatter `:color` supports to update the background color of a page with options `:color(page, background)` in DOCX template
+
 ## v4.18.0
   - Release February 14th 2024
   - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 

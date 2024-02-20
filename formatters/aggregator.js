@@ -114,10 +114,10 @@ function _replaceEmptyArgumentsStr (parsedFormatter, currentIterators, isCalledI
  *
  * @version 4.17.0
  *
- * @param  {Number} d            Concatenate text with a separator
+ * @param  {Number} d            Text to contatenate
  * @param  {String} separator    [optional] by default ', '
  * @param  {Mixed}  partitionBy  [optional] group by
- * @return {String}              return the result
+ * @return {String}              Concatenated text with a separator
  */
 function aggStr (d, separator = ', ', ...partitionBy) {
   const _id  = generateAggregatorId(this.id, ...partitionBy);
@@ -161,6 +161,62 @@ function aggStrGetReverse (d, separator, ...partitionBy) {
 }
 
 /**
+ * Aggregate distinct strings
+ *
+ * Null and undefined values are ignored.
+ * Warning: the order of items can change in upcoming version of Carbone
+ *
+ * @version 4.19.0
+ *
+ * @param  {Number} d            Text to contatenate
+ * @param  {String} separator    [optional] by default ', '
+ * @param  {Mixed}  partitionBy  [optional] group by
+ * @return {String}              Concatenated text with a separator
+ */
+function aggStrD (d, separator = ', ', ...partitionBy) {
+  const _id  = generateAggregatorId(this.id, ...partitionBy);
+  let _distinctValues = this.aggDatabase.get(_id) ?? new Set();
+  if (d !== null && d !== undefined) {
+    _distinctValues.add(d);
+    this.aggDatabase.set(_id, _distinctValues);
+  }
+  return _distinctValues;
+}
+aggStrD.replacedBy = _replaceEmptyArgumentsStr;
+aggStrD.canBeCalledInPrecomputedLoop = true;
+
+/**
+ * Get current result of the aggStr aggregator
+ *
+ * @private
+ */
+function aggStrDGet (d, separator, ...partitionBy) {
+  const _id = generateAggregatorId(this.id, ...partitionBy);
+  const _distinctValues = this.aggDatabase.get(_id);
+  if (!_distinctValues) {
+    return '';
+  }
+  return Array.from(_distinctValues).join(separator);
+}
+
+
+/**
+ * Get current result of the aggStr aggregator
+ *
+ * @private
+ */
+function aggStrDGetReverse (d, separator, ...partitionBy) {
+  const _id = generateAggregatorId(this.id, ...partitionBy);
+  const _distinctValues = this.aggDatabase.get(_id);
+  if (_distinctValues) {
+    const _list = Array.from(_distinctValues);
+    _list.reverse(); // TODO Could we avoid the reverse in v5??
+    return _list.join(separator);
+  }
+  return '';
+}
+
+/**
  * Cumulative SUM
  *
  * @version 4.0.0
@@ -192,7 +248,7 @@ function aggAvg (d, ...partitionBy) {
   _val.nb++;
   _val.sum += parseFloat(d ?? 0);
   this.aggDatabase.set(_id, _val);
-  return _val.sum / _val.nb; // TODO useless in normal AVG, used only by cumulative, 
+  return _val.sum / _val.nb; // TODO useless in normal AVG, used only by cumulative,
 }
 aggAvg.replacedBy = _replaceEmptyArguments;
 aggAvg.canBeCalledInPrecomputedLoop = true;
@@ -351,34 +407,47 @@ cumCount.canBeCalledInPrecomputedLoop = true;
 function _replaceCumulativeDistinct (parsedFormatter) {
   return [
     { str : parsedFormatter.str, args : parsedFormatter.args, isNextFormatterExecutionPostponed : true },
-    { str : parsedFormatter.str.replace(/^cum/, '_agg'), args : parsedFormatter.args }
+    { str : parsedFormatter.str.replace(/^cum/, 'agg'), args : parsedFormatter.args }
   ];
 }
 /**
- * Dynamically replace formatter in the builder for cumulative formatters
+ * Count the total number of distinct values
  *
- * @private
+ * @version 4.19.0
+ *
+ * @param  {Mixed} d   Value to count
+ * @return {Number}    the number of distinct value
  */
-function _aggCountD (d, ...partitionBy) {
+function aggCountD (d, ...partitionBy) {
   const _id  = generateAggregatorId(this.id, ...partitionBy);
-  let _state = this.aggDatabase.get(_id) ?? { sum : 0 };
-  if (d !== _state.prev) {
+  let _state = this.aggDatabase.get(_id) ?? { sum : 0, vals : new Set() };
+  if (d !== null && d !== undefined && _state.vals.has(d) === false) {
     _state.sum++;
-    _state.prev = d;
+    _state.vals.add(d);
   }
   this.aggDatabase.set(_id, _state);
   return _state.sum;
 }
-_aggCountD.replacedBy = _replaceEmptyArguments;
-_aggCountD.canBeCalledInPrecomputedLoop = true;
+aggCountD.replacedBy = _replaceEmptyArguments;
+aggCountD.canBeCalledInPrecomputedLoop = true;
+
+/**
+ * Get current result of the SUM aggregator
+ *
+ * @private
+ */
+function aggCountDGet (d, ...partitionBy) {
+  const _id = generateAggregatorId(this.id, ...partitionBy);
+  return this.aggDatabase.get(_id)?.sum ?? 0;
+}
 
 /**
  * Cumulative count of distinct values
  *
  * @version 4.15.7
  *
- * @param  {Number} d           Number to aggregate
- * @return {String}             return the result
+ * @param  {Mixed} d   Value to count
+ * @return {Number}    The cumulative number of distinct value
  */
 function cumCountD (d) {
   return d;
@@ -411,8 +480,11 @@ function set (d, param) {
 
 module.exports = {
   aggStr,
+  aggStrD,
   aggStrGet,
+  aggStrDGet,
   aggStrGetReverse,
+  aggStrDGetReverse,
   aggSum,
   aggSumGet,
   set,
@@ -428,5 +500,6 @@ module.exports = {
   cumAvg,
   cumCount,
   cumCountD,
-  _aggCountD
+  aggCountD,
+  aggCountDGet
 };

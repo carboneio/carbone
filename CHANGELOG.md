@@ -1,3 +1,8 @@
+## v4.19.0
+  - [EE] new aggeragor formatters:
+    `:aggCountD` : count the number of distinct values. Null or Undefined values are ignored
+    `:aggStrD` : aggregate distinct values. Null or Undefined values are ignored.
+
 ## v4.18.0
   - Release February 14th 2024
   - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 

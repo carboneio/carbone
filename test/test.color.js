@@ -97,7 +97,7 @@ describe('Dynamic colors', function () {
         }]
       };
       assert.throws(() => color.preProcessDocxColor(_template), {
-        message : 'The color scope "eeee" is unknown in "{d.test:color(eeee)}". The formatter accepts only row, cell, p, shape for the first argument.'
+        message : 'The color scope "eeee" is unknown in "{d.test:color(eeee)}". The formatter accepts only row, cell, p, shape, page for the first argument.'
       });
     });
     it('should returns error if the color type is unknown', function () {
@@ -169,6 +169,28 @@ describe('Dynamic colors', function () {
         shapeBack      : '#660200',
         shapeText      : '#F1119f',
         shapeHighlight : '#FFDDEE'
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+    it('DOCX should update the page background color', function (done) {
+      const _testedReport = 'color/docx-page-existing-color';
+      const _data = {
+        pageColor : '#00FF00'
+      };
+      carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assertFullReport(res, _testedReport);
+        done();
+      });
+    });
+    it('DOCX should add the page background color', function (done) {
+      const _testedReport = 'color/docx-page';
+      const _data = {
+        pageColor : '#00FF00'
       };
       carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
         helperTest.assert(err+'', 'null');

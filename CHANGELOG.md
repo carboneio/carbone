@@ -1,5 +1,6 @@
 
 ## v4.19.0
+  - [EE] The formatter `:color` supports to update the background color of a page with options `:color(page, background)` in DOCX template
   - The formatter `formatC` accepts a third parameter to forces the target currency. It overwrites the global options `currencyTarget`.
   - If the global option `currencySource` is undefined, no conversion is done when using the formatters `convCurr` and `formatC`.
   - [EE] new aggeragor formatters:

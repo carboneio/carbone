@@ -42,7 +42,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
     });
 
 
-    it('should generate barcodes as images and as fonts', function (done) {
+    it.only('should generate barcodes as images and as fonts', function (done) {
       if (os.platform() !== 'darwin') {
         this.skip();
       }

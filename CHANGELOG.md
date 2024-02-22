@@ -1,5 +1,8 @@
 
 ## v4.19.0
+  - [EE] new aggeragor formatters:
+    `:aggCountD` : count the number of distinct values. Null or Undefined values are ignored
+    `:aggStrD` : aggregate distinct values. Null or Undefined values are ignored.
   - Fixes locales `fr-CH` and `rm-CH`. Thousand separator is `’` and  decimal separator is `.` like  `de-CH` and `it-CH`.
 
 ## v4.18.0

@@ -7,6 +7,7 @@
     `:aggCountD` : count the number of distinct values. Null or Undefined values are ignored
     `:aggStrD` : aggregate distinct values. Null or Undefined values are ignored.
   - Fixes locales `fr-CH` and `rm-CH`. Thousand separator is `’` and  decimal separator is `.` like  `de-CH` and `it-CH`.
+  - The maximum number of repetitions when using this syntax `{d[i+1*qty]` can be set globally with the `maxRepetitionFactor` parameter (400 by default).
 
 ## v4.18.0
   - Release February 14th 2024

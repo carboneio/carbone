@@ -1,5 +1,7 @@
 
 ## v4.19.0
+  - The formatter `formatC` accepts a third parameter to forces the target currency. It overwrites the global options `currencyTarget`.
+  - If the global option `currencySource` is undefined, no conversion is done when using the formatters `convCurr` and `formatC`.
   - [EE] new aggeragor formatters:
     `:aggCountD` : count the number of distinct values. Null or Undefined values are ignored
     `:aggStrD` : aggregate distinct values. Null or Undefined values are ignored.

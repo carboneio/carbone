@@ -45,7 +45,7 @@ You will only need a license if you want to use some advanced features. By defau
 Why? We try to optimize our time as much as possible. We are working on many things for the long-awaited Carbone v5 (new studio, new website, IA, ...).
 Activating community features in the Docker Edition was much easier. This edition is updated as often as the Enterprise Edition with our automatic CI.
 
-The Open Source Edition will be updated in v4 when the v5 will be released. The open source edition is always one major version behind.
+The Open Source Edition will be updated in v4 when the v5 will be released. The open source edition is always one major version behind (v3+)
 
 Feel free to contact us [on the chat](https://carbone.io) if you need further information or  **professional support**. 
 

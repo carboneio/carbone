@@ -1,13 +1,14 @@
 
 ## v4.19.0
-  - [EE] The formatter `:color` supports to update the background color of a page with options `:color(page, background)` in DOCX template
-  - The formatter `formatC` accepts a third parameter to forces the target currency. It overwrites the global options `currencyTarget`.
+  - [EE] The `:color` formatter supports updating the background color of a page with `:color(page, background)` options in DOCX templates.
+  - [EE] New aggregator formatters:
+    - `:aggCountD` : Count the number of distinct values. Null or undefined values are ignored.
+    - `:aggStrD` : Aggregate distinct values. Null or undefined values are ignored.
+  - The `:formatC(precision, currency)' formatter accepts an optional second parameter to force the target currency. It overrides the global `currencyTarget` option.
   - If the global option `currencySource` is undefined, no conversion is done when using the formatters `convCurr` and `formatC`.
-  - [EE] new aggeragor formatters:
-    `:aggCountD` : count the number of distinct values. Null or Undefined values are ignored
-    `:aggStrD` : aggregate distinct values. Null or Undefined values are ignored.
-  - Fixes locales `fr-CH` and `rm-CH`. Thousand separator is `’` and  decimal separator is `.` like  `de-CH` and `it-CH`.
+  - Fixes locales `fr-CH` and `rm-CH`. Thousand separator is `'` and decimal separator is `.` like `de-CH` and `it-CH`.
   - The maximum number of repetitions when using this syntax `{d[i+1*qty]` can be set globally with the `maxRepetitionFactor` parameter (400 by default).
+  - [EE] Update to latest Node v18
 
 ## v4.18.0
   - Release February 14th 2024

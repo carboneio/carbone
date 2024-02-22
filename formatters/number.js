@@ -156,7 +156,7 @@ function formatN (d, precision) {
  *                                       - M  : print Major currency name without the number
  *                                       - L  : prints number with currency symbol (by default)
  *                                       - LL : prints number with Major currency name
- * @param  {String} targetCurrencyCode  target currency code (upper case). Ex: USD, EUR, ...
+ * @param  {String} targetCurrencyCode  [optional] target currency code (upper case). Ex: USD, EUR, ...
  *                                      It overwrites the global option `options.currencyTarget`
  * @return {String}                     return converted values
  *

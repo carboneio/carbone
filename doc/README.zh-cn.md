@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://carbone.io/" target="_blank">
-    <img alt="CarboneJS" width="100" src="https://carbone.io/img/favicon.png">
+    <img alt="CarboneJS" width="100" src="https://carbone.io/img/carbone_icon_v3_github.png">
   </a>
 </p>
 
@@ -20,8 +20,8 @@
   <a href="https://bundlephobia.com/result?p=carbone">
     <img src="https://badgen.net/bundlephobia/minzip/carbone" alt="minizip badge">
   </a>
-  <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
-    <img src="https://badgen.net/docker/pulls/carbone/carbone-env-docker?icon=docker" alt="docker badge">
+  <a href="https://hub.docker.com/r/carbone/carbone-ee">
+    <img src="https://badgen.net/docker/pulls/carbone/carbone-ee?icon=docker" alt="docker badge">
   </a>
   <a href="https://github.com/carboneio/carbone">
     <img src="https://badgen.net/github/forks/carboneio/carbone?icon=github" alt="github fork badge">

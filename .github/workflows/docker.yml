@@ -20,6 +20,7 @@ jobs:
       name: Get Carbone version 
       run: echo "PACKAGE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
 
+    # TODO can we avoid using this external Gihtub Action: Alternative:  https://stackoverflow.com/a/77233533 
     - 
       name: Get Carbone binary
       uses: robinraju/release-downloader@v1.9

@@ -31,21 +31,21 @@
 
 <p><b>⚡️ Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using templates and your JSON data as input !</p>
 
-### News
+### News 2024/02
 
-Do you want to use the latest version (v4+) for free?
+Use the latest version (v4+) for free with our Docker Edition:
 
 ```sh
   docker pull carbone/carbone-ee
 ```
 
-Since v4.18.0 (14th of February 2024), a license is not required to start the On-Premise Docker Edition with the REST API (same as Cloud API).
-You need a license only if you want to use some advanced features. By default, only community features are activated.
+Since v4.18.0 (February 14, 2024), no license is required to start the On-Premise Docker Edition with the REST API (same API as the Cloud Edition).
+You will only need a license if you want to use some advanced features. By default, only community features are enabled.
 
-Why? we try to optimize our time as much as possible. We are working on many subjects for upcoming Carbone v5 (new studio, new website, IA tools, ...).
-It was less time-consuming for us to activate community feature in the Docker edition.
+Why? We try to optimize our time as much as possible. We are working on many things for the long-awaited Carbone v5 (new studio, new website, IA, ...).
+Activating community features in the Docker Edition was much easier. This edition is updated as often as the Enterprise Edition with our automatic CI.
 
-The open source will be updated in v4 when the v5 will be released. The open source edition is always one major version behind.
+The Open Source Edition will be updated in v4 when the v5 will be released. The open source edition is always one major version behind.
 
 Feel free to contact us [on the chat](https://carbone.io) if you need further information or  **professional support**. 
 

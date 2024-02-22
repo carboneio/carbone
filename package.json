@@ -65,6 +65,6 @@
     "xml-beautifier": "=0.5.0"
   },
   "engines": {
-    "node": ">= 16.20.2"
+    "node": ">= 18.19.0"
   }
 }

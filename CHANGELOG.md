@@ -1,5 +1,6 @@
 
 ## v4.19.0
+  - Release February 22th 2024
   - [EE] The `:color` formatter supports updating the background color of a page with `:color(page, background)` options in DOCX templates.
   - [EE] New aggregator formatters:
     - `:aggCountD` : Count the number of distinct values. Null or undefined values are ignored.

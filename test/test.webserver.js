@@ -1384,6 +1384,50 @@ describe('Webserver', () => {
           done();
         });
       });
+
+      describe('Render document with security level', function () {
+
+        before(function (done) {
+          params.securityLevel = helper.SECURITY_API_ID_TEMPLATE_64_HEX_ONLY;
+          done();
+        });
+
+        after(function (done) {
+          params.securityLevel = 0;
+          done();
+        });
+
+        it('should render a template with and without ":" character', (done) => {
+          const body = {
+            data : {
+              firstname : 'John',
+              lastname  : 'Doe'
+            },
+            complement : {},
+            enum       : {}
+          };
+
+          /** Without ":" */
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body), (err, res, data) => {
+            assert.strictEqual(data.success, true);
+            const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
+            assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+            helper.assert(data.data.debug, undefined); // is isActiveDebug is false
+            toDelete.push(data.data.renderId);
+            /** With ":" before the template ID */
+            get.concat(getBody(4000, `/render/:${templateId}`, 'POST', body), (err, res, data) => {
+              assert.strictEqual(data.success, true);
+              const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
+              assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+              helper.assert(data.data.debug, undefined); // is isActiveDebug is false
+              toDelete.push(data.data.renderId);
+              done();
+            });
+          });
+        });
+
+
+      });
     });
 
     describe('renderWebhookQueue', () => {

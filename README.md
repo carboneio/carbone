@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://carbone.io/" target="_blank">
-    <img alt="CarboneJS" width="100" src="https://carbone.io/img/favicon.png">
+    <img alt="CarboneJS" width="100" src="https://carbone.io/img/carbone_icon_v3_github.png">
   </a>
 </p>
 
@@ -20,8 +20,8 @@
   <a href="https://bundlephobia.com/result?p=carbone">
     <img src="https://badgen.net/bundlephobia/minzip/carbone" alt="minizip badge">
   </a>
-  <a href="https://hub.docker.com/r/carbone/carbone-env-docker">
-    <img src="https://badgen.net/docker/pulls/carbone/carbone-env-docker?icon=docker" alt="docker badge">
+  <a href="https://hub.docker.com/r/carbone/carbone-ee">
+    <img src="https://badgen.net/docker/pulls/carbone/carbone-ee?icon=docker" alt="docker badge">
   </a>
   <a href="https://github.com/carboneio/carbone">
     <img src="https://badgen.net/github/forks/carboneio/carbone?icon=github" alt="github fork badge">
@@ -31,12 +31,24 @@
 
 <p><b>⚡️ Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using templates and your JSON data as input !</p>
 
-### News
+### News 2024/02
 
-15th of February 2023: Carbone just launched [on Product Hunt](https://www.producthunt.com/posts/carbone)! Feel free to support us. It will help us improve the engine!
+Use the latest version (v4+) for free with our Docker Edition:
 
-Please consider using the Cloud or On-Premise [Enterprise Edition](https://carbone.io/pricing.html) if you need **professional support**. 
-The Community Edition is one major version behind the Enterprise Edition. Feel free to contact us [on the chat](https://carbone.io) if you need further information.
+```sh
+  docker pull carbone/carbone-ee
+```
+
+Since v4.18.0 (February 14, 2024), no license is required to start the On-Premise Docker Edition with the REST API (same API as the Cloud Edition).
+You will only need a license if you want to use some advanced features. By default, only community features are enabled.
+
+Why? We try to optimize our time as much as possible. We are working on many things for the long-awaited Carbone v5 (new studio, new website, IA, ...).
+Activating community features in the Docker Edition was much easier. This edition is updated as often as the Enterprise Edition with our automatic CI.
+
+The Open Source Edition will be updated in v4 when the v5 will be released. The open source edition is always one major version behind (v3+)
+
+Feel free to contact us [on the chat](https://carbone.io) if you need further information or  **professional support**. 
+
 
 ## Table of content
 

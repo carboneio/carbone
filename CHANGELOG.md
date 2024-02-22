@@ -1,3 +1,7 @@
+
+## v4.19.0
+  - Fixes locales `fr-CH` and `rm-CH`. Thousand separator is `’` and  decimal separator is `.` like  `de-CH` and `it-CH`.
+
 ## v4.18.0
   - Release February 14th 2024
   - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 

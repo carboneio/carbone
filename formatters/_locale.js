@@ -789,8 +789,21 @@ const locales = {
   },
   'fr-ch' : {
     number : {
-      separator : ' ',
-      decimal   : ',',
+      separator : '’',
+      decimal   : '.',
+      group     : 3
+    },
+    currency : {
+      L    : commonFormatFn.v_S,
+      LL   : commonFormatFn.v_M,
+      M    : commonFormatFn.M,
+      code : 'CHF'
+    }
+  },
+  'rm-ch' : {
+    number : {
+      separator : '’',
+      decimal   : '.',
       group     : 3
     },
     currency : {

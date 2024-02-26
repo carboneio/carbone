@@ -772,8 +772,9 @@ describe('helper', function () {
       let _nb    = [];
       let _queue = helper.genericQueue(
         [{ id : 1 }]
-        , item => {
+        , (item, next) => {
           _nb.push(item.id);
+          next();
         },
         (err) => {
           helper.assert(err+'', 'null');

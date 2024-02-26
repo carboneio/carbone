@@ -1,7 +1,7 @@
 
 ## v4.20.0
   - [EE] Support batch processing of multiple documents (max 5000) with one API call. The result is a zip file of documents.
-    Currenlty, this feature is limited to some customers. Please contact us if you need to use it.
+    This feature is temporarily limited to some customers. Please contact us if you need to use it.
 
 ## v4.19.0
   - Release February 22th 2024

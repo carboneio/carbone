@@ -33,7 +33,7 @@
     </style:style>
   </office:automatic-styles>
   <office:body>
-    <office:text text:use-soft-page-breaks="true">
+    <office:text >
       <text:sequence-decls>
         <text:sequence-decl text:display-outline-level="0" text:name="Illustration"/>
         <text:sequence-decl text:display-outline-level="0" text:name="Table"/>

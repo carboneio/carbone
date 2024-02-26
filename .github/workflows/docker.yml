@@ -1,0 +1,74 @@
+name: Release Carbone Docker
+
+on: workflow_dispatch
+
+#  release:
+#    types: [published]
+#  push:
+#    branches:    
+#    - docker_build
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    -
+      name: Checkout
+      uses: actions/checkout@v4
+
+    - 
+      name: Get Carbone version 
+      run: echo "PACKAGE_VERSION=$(jq -r '.version' package.json)" >> $GITHUB_ENV
+
+    # TODO can we avoid using this external Gihtub Action: Alternative:  https://stackoverflow.com/a/77233533 
+    - 
+      name: Get Carbone binary
+      uses: robinraju/release-downloader@v1.9
+      with:
+        tag: ee-${{ env.PACKAGE_VERSION }}
+        fileName: "*-linux"
+        out-file-path: docker
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    -
+      name: Rename Carbone binary
+      run: mv docker/carbone-ee-${{ env.PACKAGE_VERSION }}-linux docker/carbone-ee-linux
+    -
+      name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    -
+      name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: ./docker
+        file: ./docker/Dockerfile
+        push: true
+        tags: ${{ vars.DOCKERHUB_ORG }}/carbone-ee:${{ env.PACKAGE_VERSION }},${{ vars.DOCKERHUB_ORG }}/carbone-ee:latest
+
+    -
+      name: Checkout fonts
+      uses: actions/checkout@v4
+      with:
+        repository: carboneio/carbone-fonts
+        path: docker/carbone-fonts
+        ref: master
+        ssh-key: ${{ secrets.PRIVATE_KEY_FONT_REPO }}
+
+    - 
+      name: Remove commercial font
+      run: rm -r docker/carbone-fonts/custom
+
+    -
+      name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: ./docker
+        file: ./docker/Dockerfile-fonts
+        push: true
+        tags: ${{ vars.DOCKERHUB_ORG }}/carbone-ee:${{ env.PACKAGE_VERSION }}-fonts,${{ vars.DOCKERHUB_ORG }}/carbone-ee:latest-fonts

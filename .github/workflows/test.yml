@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node: [ '16.16.0' ]
+        node: [ '18.19.1' ]
     name: Node on Ubuntu-20.04
     steps:
       # Checkout source code of the project

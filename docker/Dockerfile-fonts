@@ -1,0 +1,12 @@
+FROM carbone/carbone-ee:latest
+
+USER root
+
+RUN apt update && \
+    apt install -y fontconfig
+
+COPY carbone-fonts /usr/share/fonts/carbone-fonts
+
+RUN fc-cache -f -v
+
+USER carbone

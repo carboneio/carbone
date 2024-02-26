@@ -5,14 +5,14 @@ on: workflow_dispatch
 jobs:
   BUILD:
     env:
-      PKG_VERSION: 5.8.0
-      BUILD_TARGET: "node16-linux-x64,node16-macos-x64,node16-win-x64"
+      PKG_VERSION: 5.11.4
+      BUILD_TARGET: "node18-linux-x64,node18-macos-x64,node18-win-x64"
 
     runs-on: ubuntu-20.04
 
     strategy:
       matrix:
-        node_version: ['16.16.0']
+        node_version: ['18.19.1']
 
     steps:
       - uses: actions/checkout@v2
@@ -32,7 +32,7 @@ jobs:
       - run: git config user.email github-actions@github.com
 
       # Prepare and build
-      - run: sudo npm i -g pkg@${{env.PKG_VERSION}}
+      - run: sudo npm i -g @yao-pkg/pkg@${{env.PKG_VERSION}}
       - run: npm ci --production
       - run: node script/updatePackage.js
       - run: pkg -t ${{env.BUILD_TARGET}} -o ${{env.BUILD_PREFIX}} .

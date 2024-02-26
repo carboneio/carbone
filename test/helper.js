@@ -66,6 +66,8 @@ const helperTests = {
       }
       if (Buffer.isBuffer(_resultFile.data) === true) {
         if (_resultFile.data.equals(_expectedFile.data) === false) {
+          // This line of can be used to udpate barcode image (used when passing from Node16 to Node18 -> zlib -> compression changes)
+          // fs.writeFileSync(path.join(__dirname, 'datasets', expectedDirname, 'expected', 'xl', 'media', path.basename(_resultFile.name)), _resultFile.data);
           throw Error ('Buffer of (result) '+_resultFile.name + 'is not the same as (expected) '+_expectedFile.name);
         }
       }

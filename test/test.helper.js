@@ -366,7 +366,7 @@ describe('helper', function () {
   describe('printVersion', function () {
     it('should print info', function () {
       let _text = helper.printVersion();
-      helper.assert(/Carbone Render On-Premise Enterprise Edition/.test(_text), true);
+      helper.assert(/Carbone On-Premise: v/.test(_text), true);
     });
     it('should print license info', function () {
       let _licenseObj = {
@@ -380,11 +380,26 @@ describe('helper', function () {
         }
       };
       let _text = helper.printVersion(_licenseObj);
-      helper.assert(/Carbone Render On-Premise Enterprise Edition/.test(_text), true);
+      helper.assert(/Carbone On-Premise: v/.test(_text), true);
       helper.assert(/Acme/.test(_text), true);
       helper.assert(/FR/.test(_text), true);
       helper.assert(/client@email\.com/.test(_text), true);
       helper.assert(/eternity/.test(_text), true);
+    });
+    it('should print Community Edition message if not Enterprise', function () {
+      let _licenseObj = {
+        exp  : Date.now(),
+        data : {
+          name      : 'Acme',
+          address   : 'FR',
+          email     : 'client@email.com',
+          startedAt : Date.now() / 1000,
+          plan      : 'eternity'
+        }
+      };
+      let _text = helper.printVersion(_licenseObj, 'Ano valid licenseA', false);
+      helper.assert(/Ano valid licenseA/.test(_text), true);
+      helper.assert(/Only features of the Community Edition are enabled/.test(_text), true);
     });
   });
 

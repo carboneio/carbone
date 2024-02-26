@@ -1,13 +1,45 @@
 
+## v4.19.0
+  - Release February 22th 2024
+  - [EE] The `:color` formatter supports updating the background color of a page with `:color(page, background)` options in DOCX templates.
+  - [EE] New aggregator formatters:
+    - `:aggCountD` : Count the number of distinct values. Null or undefined values are ignored.
+    - `:aggStrD` : Aggregate distinct values. Null or undefined values are ignored.
+  - The `:formatC(precision, currency)' formatter accepts an optional second parameter to force the target currency. It overrides the global `currencyTarget` option.
+  - If the global option `currencySource` is undefined, no conversion is done when using the formatters `convCurr` and `formatC`.
+  - Fixes locales `fr-CH` and `rm-CH`. Thousand separator is `'` and decimal separator is `.` like `de-CH` and `it-CH`.
+  - The maximum number of repetitions when using this syntax `{d[i+1*qty]` can be set globally with the `maxRepetitionFactor` parameter (400 by default).
+  - [EE] Update to latest Node v18
+
+## v4.18.0
+  - Release February 14th 2024
+  - [EE] Support dynamic pictures into Shapes for DOCX template only. Create images with rounded corners, or images with special shapes. 
+  - Fixes formatter `substr(begin, end, wordMode)` when word mode is active. If `wordMode=true`, it never cuts words. 
+    It can be used to print successive lines of text of constant width.
+    The previous algorithm of v4.12.0 could create some gaps (missing words) when doing successive calls of `substr`.
+    Here is the problem: 
+      - Each call to `substr` in the template is calculated independently.
+      - But the line of text we want to print depends on all the lines of text that have been printed before.
+    To solve this, each subsequent call to `substr` must obey these constraints:
+    - A constant line width (`end` - `begin`) must be used between successive calls of `substr` to print all the words of the text without gaps. For example:
+      - `{d.text(0  , 50 , true)}` -> line 1 of 50 characters
+      - `{d.text(50 , 100, true)}` -> line 2 of 50 characters
+      - `{d.text(100, 150, true)}` -> line 3 of 50 characters
+      - `{d.text(150, 200, last)}` -> line 4 of infinite characters
+    - `last` can be used instead of `true` to print the rest of the text, even if it is longer than the defined line width.
+    - A word can only be truncated if it does not fit in the line. In this case, the word always starts at the beginning of a new line.
+  - ⚡️ Carbone On-Premise starts with Community Edition features if no valid license is provided. It collects some statistics at startup (version, subscription). These statistics can be deactivated.
+  - Improve the stability of reports based on ODT templates that include native charts.
+
 ## v4.17.0
-  - Release January 10th 2024
+  - Release January 30th 2024
   - To include a single-quote character in formatter parameter, write two adjacent single quotes, e.g., 'David''s Car'. Note that this is not the same as a double-quote character (").
   - `carbone.renderXML` accepts html templates if `option.extension` is `html`
   - Support `drop` in ODS (img, row) and HTML (table, p, row) templates.
-  - Support `keep`, the opposite of `drop`
-  - [EE] New features and new supported templates for the `:color(scope, type)` formatter:
+  - ⚡️ Support `keep`, the opposite of `drop`
+  - [EE] 🤩 New features and new supported templates for the new `:color(scope, type)` formatter 
     - Supported in ODT, ODP, HTML and DOCX templates
-    - `scope` can be `p`  (by default), `cell`, `row`, `shape` 🤩  to apply color to the current paragraph, cell, row or shape
+    - `scope` can be `p`  (by default), `cell`, `row`, `shape`  to apply color to the current paragraph, cell, row or shape
     - `type` can be `text` (by default), `highlight` for text, `background` for cells, rows and shapes,  `border` for shapes only
     - accepts only 6-digit hex color notation with or without hashtag, lowercase or uppercase: `#FF0000` or `FF0000`. Carbone replaces wrong color values with light gray (#888888)
     - for HTML, the color is applied with the style attribute only to the selected HTML tag (tr, td and p)
@@ -21,8 +53,8 @@
       - complex nested tables with colors on sub-tables are not fully supported.
       - `highlight` is not managed in docx template
       - Cannot be used with aliases
-  - Fixed `:color(scope, type)` bug for DOCX templates when the Carbone tag `:color` tag is quite long with many conditions for example.
-  - New `:aggStr(separator)` formatter, a more powerful version of `:arrayMap`. By default the separator is ', '.
+    - Fixed `:color(scope, type)` bug for DOCX templates when the Carbone tag `:color` tag is quite long with many conditions for example (v4.16.0)
+  - 🌈 New `:aggStr(separator)` formatter, a more powerful version of `:arrayMap`. By default the separator is ', '.
     - `d.user.phones[]:aggStr()` -> `+331112345678, +331112345678, +331112345678`
     - `d.cars[electric=true].brand:aggStr(' - ')` -> `Tesla - BYD - Kia` 
 
@@ -745,6 +777,20 @@
           - `{d.departments[i].people[i].salary:aggSum(.age)}`
         - Sum by people by age and gender, regardless of departments
           - `{d.departments[i].people[i].salary:aggSum(.age, .gender)}`
+
+
+## v3.7.1
+  - Release December 19th 2023
+  - [EE] Fix crash when dynamic image URL contains forbidden characters
+
+## v3.7.0
+  - Release June 15th 2023
+  - [EE] All APIs returns "400 Bad request" instead of "404 Not Found" when `idTemplate` is not valid
+  - [EE] Fixed `HEAD /render/:renderId` : The request don't delete the generated document anymore.
+  - [EE] Fixed `GET /template/:templateId` : If the template doesn't exist, the statusCode 404 is returned instead of 400.
+  - [EE] Force download of the rendered report when the query parameter ?download=true is set, such as: `POST /render/:renderId?download=true`
+  - [EE] On-Premise: New option to enable more security controls, following ANSSI (France) and BSI (Germany) recommendations. Contact us for more information.
+  - [EE] Updated `DELETE /template/:templateId`: If there isn't a template, Carbone does not remove any template but will still respond that the command was successful with a code `200`.
 
 ## v3.6.0
   - Release April 17th 2023

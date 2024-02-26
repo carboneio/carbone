@@ -768,106 +768,177 @@ describe('helper', function () {
 
   describe('genericQueue', () => {
 
-    it('should process one element', () => {
+    it('should process one element', (done) => {
       let _nb    = [];
       let _queue = helper.genericQueue(
         [{ id : 1 }]
-        , item => {
+        , (item, next) => {
           _nb.push(item.id);
+          next();
+        },
+        (err) => {
+          helper.assert(err+'', 'null');
+          helper.assert(_nb, [1]);
+          done();
         }
       );
-
       _queue.start();
-      helper.assert(_nb, [1]);
     });
 
-    it('should process multiple elements', () => {
+    it('should process multiple elements', (done) => {
       let _nb    = [];
       let _queue = helper.genericQueue(
         [{ id : 1 }, { id : 2 }, { id : 3 }]
         , (item, next) => {
           _nb.push(item.id);
           next();
-        }
-      );
-
-      _queue.start();
-      helper.assert(_nb, [1, 2, 3]);
-    });
-
-    it('should return error', () => {
-      let _nb    = [];
-      let _error = null;
-      let _queue = helper.genericQueue(
-        [{ id : 1 , error : 'error' }, { id : 2 }, { id : 3 }]
-        , (item, next) => {
-          if (item.error) {
-            return next(item.error);
-          }
-
-          _nb.push(item.id);
-          next();
-        }
-        , err => {
-          _error = err;
-        }
-      );
-
-      _queue.start();
-      helper.assert(_nb,[2, 3]);
-      helper.assert(_error, 'error');
-    });
-
-    it('should stop the queue on error when option is set', () => {
-
-      let _nb    = [];
-      let _error = null;
-      let _success = false;
-      let _items = [{ id : 1 }, { id : 2, error : 'error' }, { id : 3 }];
-      let _options = { stopOnError : true };
-
-      function handlerItem (item, next) {
-        if (item.error) {
-          return next(item.error);
-        }
-
-        _nb.push(item.id);
-        next();
-      }
-
-      function handlerSuccess () {
-        _success = true;
-      }
-
-      function handlerError (err) {
-        _error = err;
-      }
-
-      helper.genericQueue(_items, handlerItem, handlerError, handlerSuccess, _options).start();
-
-      helper.assert(_nb, [1]);
-      helper.assert(_error, 'error');
-      helper.assert(_success, false);
-    });
-
-    it('should process multiple elements and call callback end function when it is finished', (done) => {
-      let _nb    = [];
-      let _queue = helper.genericQueue(
-        [{ id : 1 }, { id : 2 }, { id : 3 }]
-        , (item, next) => {
-          setTimeout(() => {
-            _nb.push(item.id);
-            next();
-          }, 100);
-        }
-        , null
-        , () => {
+        },
+        (err) => {
+          helper.assert(err+'', 'null');
           helper.assert(_nb, [1, 2, 3]);
           done();
         }
       );
-
       _queue.start();
+    });
+
+    it('should process multiple elements at the same time', (done) => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 4 }, { id : 2 }, { id : 1 }]
+        , (item, next) => {
+          setTimeout(() => {
+            _nb.push(item.id);
+            next();
+          }, 10*item.id);
+        },
+        (err) => {
+          helper.assert(err+'', 'null');
+          helper.assert(_nb, [2, 1, 4]);
+          done();
+        },
+        2
+      );
+      _queue.start();
+    });
+
+    it('should process multiple elements at the same time (nb parallel higher than the number of items-', (done) => {
+      let _nb    = [];
+      let _queue = helper.genericQueue(
+        [{ id : 4 }, { id : 2 }, { id : 1 }]
+        , (item, next) => {
+          setTimeout(() => {
+            _nb.push(item.id);
+            next();
+          }, 10*item.id);
+        },
+        (err) => {
+          helper.assert(err+'', 'null');
+          helper.assert(_nb, [1, 2, 4]);
+          done();
+        },
+        100
+      );
+      _queue.start();
+    });
+
+    it('should return error with handleError callback and process all items', (done) => {
+      let _nb    = [];
+      let _errors = [];
+      let _queue = helper.genericQueue(
+        [{ id : 1 , error : 'error' }, { id : 2 }, { id : 3 , error : 'error'  }, { id : 4 }]
+        , (item, next) => {
+          if (item.error) {
+            return next(item.error);
+          }
+          _nb.push(item.id);
+          next();
+        }
+        , (err) => {
+          helper.assert(err+'', 'null');
+          helper.assert(_errors.length, 2);
+          helper.assert(_nb, [2, 4]);
+          done();
+        }
+        , 1
+        , (err) => {
+          _errors.push(err);
+          helper.assert(err, 'error');
+        }
+      );
+      _queue.start();
+    });
+
+    it('should return error with handleError callback and process all items with parallel render above 1', (done) => {
+      let _nb    = [];
+      let _errors = [];
+      let _queue = helper.genericQueue(
+        [{ id : 4 , error : 'error4' }, { id : 2 }, { id : 1 , error : 'error1'  }, { id : 0 }]
+        , (item, next) => {
+          setTimeout(() => {
+            if (item.error) {
+              return next(item.error);
+            }
+            _nb.push(item.id);
+            next();
+          }, 10*item.id);
+        }
+        , (err) => {
+          helper.assert(err+'', 'null');
+          helper.assert(_errors.length, 2);
+          helper.assert(_errors[0], 'error1');
+          helper.assert(_errors[1], 'error4');
+          helper.assert(_nb, [2, 0]);
+          done();
+        }
+        , 2
+        , (err) => {
+          _errors.push(err);
+        }
+      );
+      _queue.start();
+    });
+
+    it('should stop the queue on error when no handlerError is set', (done) => {
+      let _nb    = [];
+      let _items = [{ id : 1 }, { id : 2, error : 'error' }, { id : 3 }];
+      function handlerItem (item, next) {
+        if (item.error) {
+          return next(item.error);
+        }
+        _nb.push(item.id);
+        next();
+      }
+      function handlerEnd (err) {
+        helper.assert(_nb, [1]);
+        helper.assert(err, 'error');
+        done();
+      }
+      helper.genericQueue(_items, handlerItem, handlerEnd).start();
+    });
+
+    it('should stop the queue on error when no handlerError is set and parallel is higher than 1', (done) => {
+      let _nb    = [];
+      let _items = [{ id : 4 }, { id : 2, error : 'error' }, { id : 1 }];
+      function handlerItem (item, next) {
+        setTimeout(() => {
+          if (item.error) {
+            return next(item.error);
+          }
+          _nb.push(item.id);
+          next();
+        }, 10*item.id);
+      }
+      function handlerEnd (err) {
+        helper.assert(_nb, []);
+        helper.assert(err, 'error');
+        setTimeout(() => {
+          helper.assert(_nb, [4]);
+          // The handlerItem is called for the first item after 40ms
+          done();
+        }, 50);
+      }
+      helper.genericQueue(_items, handlerItem, handlerEnd, 2).start();
     });
 
     it('should not start the queue twice if .start is called twice', (done) => {
@@ -880,7 +951,6 @@ describe('helper', function () {
             next();
           }, 100 / item.id);
         }
-        , null
         , () => {
           helper.assert(_nb, [1, 2, 3]);
           done();
@@ -888,22 +958,6 @@ describe('helper', function () {
       );
       _queue.start();
       _queue.start();
-    });
-
-    it('should restart even after a first run', () => {
-      let _nb    = [];
-      let _queue = helper.genericQueue(
-        [{ id : 1 }]
-        , (item, next) => {
-          _nb.push(item.id);
-          next();
-        }
-      );
-      _queue.start();
-      helper.assert(_nb, [1]);
-      _queue.items.push({ id : 2 });
-      _queue.start();
-      helper.assert(_nb, [1, 2]);
     });
 
   });

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?mso-application progid="Word.Document"?>
+<w:wordDocument xmlns:aml="http://schemas.microsoft.com/aml/2001/core" xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:cr="http://schemas.microsoft.com/office/comments/2020/reactions" xmlns:dt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w="http://schemas.microsoft.com/office/word/2003/wordml" xmlns:w16du="http://schemas.microsoft.com/office/word/2023/wordml/word16du" xmlns:wx="http://schemas.microsoft.com/office/word/2003/auxHint" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wsp="http://schemas.microsoft.com/office/word/2003/wordml/sp2" xmlns:sl="http://schemas.microsoft.com/schemaLibrary/2003/core" w:macrosPresent="no" w:embeddedObjPresent="no" w:ocxPresent="no" xml:space="preserve">
+  <w:ignoreSubtree w:val="http://schemas.microsoft.com/office/word/2003/wordml/sp2"/>
+  <o:DocumentProperties>
+    <o:Author></o:Author>
+    <o:LastAuthor></o:LastAuthor>
+    <o:Revision>5</o:Revision>
+    <o:TotalTime>2</o:TotalTime>
+    <o:Created>2023-07-11T16:32:00Z</o:Created>
+    <o:LastSaved>2023-07-20T14:23:00Z</o:LastSaved>
+    <o:Pages>1</o:Pages>
+    <o:Words>1</o:Words>
+    <o:Characters>10</o:Characters>
+    <o:Lines>1</o:Lines>
+    <o:Paragraphs>1</o:Paragraphs>
+    <o:CharactersWithSpaces>10</o:CharactersWithSpaces>
+    <o:Version>16</o:Version>
+  </o:DocumentProperties>
+  <w:fonts>
+    <w:defaultFonts w:ascii="Calibri" w:fareast="Calibri" w:h-ansi="Calibri" w:cs="Times New Roman"/>
+    <w:font w:name="Times New Roman">
+      <w:panose-1 w:val="02020603050405020304"/>
+      <w:charset w:val="00"/>
+      <w:family w:val="Roman"/>
+      <w:pitch w:val="variable"/>
+      <w:sig w:usb-0="E0002EFF" w:usb-1="C000785B" w:usb-2="00000009" w:usb-3="00000000" w:csb-0="000001FF" w:csb-1="00000000"/>
+    </w:font>
+  </w:fonts>
+  <w:styles>
+    <w:versionOfBuiltInStylenames w:val="7"/>
+    <w:latentStyles w:defLockedState="off" w:latentStyleCount="376">
+      <w:lsdException w:name="Normal"/>
+    </w:latentStyles>
+    <w:style w:type="paragraph" w:default="on" w:styleId="Normal">
+      <w:name w:val="Normal"/>
+      <w:rsid w:val="00190D1E"/>
+      <w:rPr>
+        <wx:font wx:val="Calibri"/>
+        <w:kern w:val="2"/>
+        <w:sz w:val="24"/>
+        <w:sz-cs w:val="24"/>
+        <w:lang w:val="0C00" w:fareast="EN-GB" w:bidi="AR-SA"/>
+      </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:default="on" w:styleId="DefaultParagraphFont">
+      <w:name w:val="Default Paragraph Font"/>
+    </w:style>
+    <w:style w:type="table" w:default="on" w:styleId="TableNormal">
+      <w:name w:val="Normal Table"/>
+      <wx:uiName wx:val="Table Normal"/>
+      <w:rPr>
+        <wx:font wx:val="Calibri"/>
+        <w:lang w:val="0C00" w:fareast="EN-GB" w:bidi="AR-SA"/>
+      </w:rPr>
+      <w:tblPr>
+        <w:tblInd w:w="0" w:type="dxa"/>
+        <w:tblCellMar>
+          <w:top w:w="0" w:type="dxa"/>
+          <w:left w:w="108" w:type="dxa"/>
+          <w:bottom w:w="0" w:type="dxa"/>
+          <w:right w:w="108" w:type="dxa"/>
+        </w:tblCellMar>
+      </w:tblPr>
+    </w:style>
+    <w:style w:type="list" w:default="on" w:styleId="NoList">
+      <w:name w:val="No List"/>
+    </w:style>
+  </w:styles>
+  <w:docPr>
+    <w:view w:val="print"/>
+    <w:zoom w:percent="185"/>
+    <w:doNotEmbedSystemFonts/>
+    <w:defaultTabStop w:val="720"/>
+    <w:punctuationKerning/>
+    <w:characterSpacingControl w:val="DontCompress"/>
+    <w:optimizeForBrowser/>
+    <w:allowPNG/>
+    <w:validateAgainstSchema/>
+    <w:saveInvalidXML w:val="off"/>
+    <w:ignoreMixedContent w:val="off"/>
+    <w:alwaysShowPlaceholderText w:val="off"/>
+    <w:compat>
+      <w:breakWrappedTables/>
+      <w:snapToGridInCell/>
+      <w:wrapTextWithPunct/>
+      <w:useAsianBreakRules/>
+      <w:dontGrowAutofit/>
+    </w:compat>
+    <wsp:rsids>
+      <wsp:rsidRoot wsp:val="0068746C"/>
+      <wsp:rsid wsp:val="00190D1E"/>
+      <wsp:rsid wsp:val="0038604D"/>
+      <wsp:rsid wsp:val="0068746C"/>
+      <wsp:rsid wsp:val="00867A78"/>
+      <wsp:rsid wsp:val="008744B1"/>
+      <wsp:rsid wsp:val="009004BA"/>
+      <wsp:rsid wsp:val="00A341DB"/>
+      <wsp:rsid wsp:val="00BF1B57"/>
+      <wsp:rsid wsp:val="00C468D6"/>
+      <wsp:rsid wsp:val="00E70517"/>
+      <wsp:rsid wsp:val="00E846B7"/>
+      <wsp:rsid wsp:val="00EE2A94"/>
+      <wsp:rsid wsp:val="00F23EF8"/>
+    </wsp:rsids>
+  </w:docPr>
+  <w:body>
+    <wx:sect>
+      <w:p wsp:rsidR="00E70517" wsp:rsidRPr="00F23EF8" wsp:rsidRDefault="0068746C">
+        <w:r wsp:rsidRPr="00F23EF8">
+          <w:rPr>
+            <w:rFonts w:ascii="Arial Rounded MT Bold" w:h-ansi="Arial Rounded MT Bold" w:cs="Al Bayan Plain"/>
+            <wx:font wx:val="Arial Rounded MT Bold"/>
+            <w:b/>
+            <w:b-cs/>
+            <w:color w:val="FF0000"/>
+            <w:sz w:val="28"/>
+            <w:sz-cs w:val="28"/>
+            <w:highlight w:val="yellow"/>
+            <w:lang w:val="EN-US"/>
+          </w:rPr>
+          <w:t>{d.subArray[i].value}</w:t>
+        </w:r>
+      </w:p>
+      <w:p wsp:rsidR="00E70517" wsp:rsidRPr="00F23EF8" wsp:rsidRDefault="0068746C">
+        <w:r wsp:rsidRPr="00F23EF8">
+          <w:rPr>
+            <w:rFonts w:ascii="Arial Rounded MT Bold" w:h-ansi="Arial Rounded MT Bold" w:cs="Al Bayan Plain"/>
+            <wx:font wx:val="Arial Rounded MT Bold"/>
+            <w:b/>
+            <w:b-cs/>
+            <w:color w:val="FF0000"/>
+            <w:sz w:val="28"/>
+            <w:sz-cs w:val="28"/>
+            <w:highlight w:val="yellow"/>
+            <w:lang w:val="EN-US"/>
+          </w:rPr>
+          <w:t>{d.subArray[i+1].value}</w:t>
+        </w:r>
+      </w:p>
+      <w:sectPr wsp:rsidR="00E70517" wsp:rsidRPr="00F23EF8" wsp:rsidSect="00190D1E">
+        <w:pgSz w:w="11906" w:h="16838"/>
+        <w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/>
+        <w:cols w:space="708"/>
+        <w:docGrid w:line-pitch="360"/>
+      </w:sectPr>
+    </wx:sect>
+  </w:body>
+</w:wordDocument>

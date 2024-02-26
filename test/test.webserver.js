@@ -142,6 +142,8 @@ describe('Webserver', () => {
   before(() => {
     carbone.reset();
     writeConfigFile();
+    // clean job dir
+    helper.rmDirRecursive(path.join(os.tmpdir(), 'queue'));
   });
 
   after(() => {
@@ -1173,6 +1175,45 @@ describe('Webserver', () => {
             assert.strictEqual(_queueItemData.req.headers['carbone-webhook-test'], 'true');
             toDelete.push(...data);
             done();
+          });
+        });
+      });
+
+      it('should accept job batch and it should not accept too many job batch per tenant', (done) => {
+        const body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement   : {},
+          enum         : {},
+          renderPrefix : '',
+          batchSplitBy : 'd'
+        };
+        const _successUrl = 'https://carbone.io/callback';
+
+        get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
+          assert.strictEqual(data.success, true);
+          assert.strictEqual(data.message, 'A render ID will be sent to your callback URL when the document is generated');
+          assert.strictEqual(data.data.renderId, '');
+          get.concat(getBody(4000, `/render/${templateId}`, 'POST', body, null, { 'carbone-webhook-url' : _successUrl, 'carbone-webhook-test' : true }), (err, res, data) => {
+            assert.strictEqual(data.success, false);
+            assert.strictEqual(data.error, 'Maximum batch processing per tenant reached (1)');
+            assert.strictEqual(res.statusCode, 429);
+            fs.readdir(path.join(os.tmpdir(), 'queue'), function (err, data) {
+              assert.strictEqual(!err, true);
+              assert.strictEqual(data.length > 0, true);
+              const _queueItemData = JSON.parse(fs.readFileSync(path.join(os.tmpdir(), 'queue', data[0]), 'utf-8'));
+              assert.strictEqual(_queueItemData.successUrl, _successUrl);
+              assert.strictEqual(_queueItemData.templateAbsolutePath.length > 0, true);
+              body.requestId = _queueItemData.body.requestId;
+              assert.strictEqual(JSON.stringify(_queueItemData.body), JSON.stringify(body));
+              assert.strictEqual(_queueItemData.req.url.length > 0, true);
+              assert.strictEqual(_queueItemData.req.method, 'Webhook POST');
+              assert.strictEqual(_queueItemData.req.headers['carbone-webhook-test'], 'true');
+              toDelete.push(...data);
+              done();
+            });
           });
         });
       });

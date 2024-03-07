@@ -1,3 +1,5 @@
+## v4.XX.X
+  - [On-premise] Studio Light: Added button to copy the Template ID of the previewed template.
 
 ## v4.20.0
   - Release February 26th 2024

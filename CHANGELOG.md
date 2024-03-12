@@ -1,4 +1,7 @@
 
+## v4.21.0
+  - [EE] Fixes support for SVG image replacement in DOCX templates, especially when using LibreOffice 24 for document conversion.
+
 ## v4.20.0
   - Release February 26th 2024
   - [EE] Support batch processing of multiple documents (max 5000) with one API call. The result is a zip file of documents.

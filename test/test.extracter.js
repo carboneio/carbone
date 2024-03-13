@@ -19,6 +19,25 @@ describe('extracter', function () {
         text    : 'sd<w:tblGrid> a </w:tblGrid>sd1<w:tbl>2zdz'
       });
     });
+    it('should remove <w:tblGrid> of the last table the DOCX if the DOCX is coming from Google docs and contains nested tblGrid', function () {
+      helper.assert(extracter.removeLastTableGridDocx(''
+          + '<w:tbl>'
+          + '  <w:tblPr></w:tblPr>'
+          + '  <w:tblGrid>'
+          + '    <w:gridCol w:w="2385"/>'
+          + '    <w:gridCol w:w="2318"/>'
+          + '    <w:tblGridChange w:id="0">'
+          + '      <w:tblGrid>'
+          + '        <w:gridCol w:w="2385"/>'
+          + '        <w:gridCol w:w="2318"/>'
+          + '      </w:tblGrid>'
+          + '    </w:tblGridChange>'
+          + '  </w:tblGrid>'
+          + '  <tr>yes </tr>'), {
+        isFound : true,
+        text    : '<w:tbl>  <w:tblPr></w:tblPr>    <tr>yes </tr>'
+      });
+    });
   });
   describe('splitMarkers', function () {
     it('should return an empty descriptor if there are no markers', function () {

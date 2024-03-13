@@ -704,6 +704,40 @@ describe('preprocessor', function () {
           helper.assert(_template.files[0].data, _expectedResult);
         });
 
+        it('should also remove style:row-height if style:use-optimal-row-height=true in row style to force LibreOffice to recompute the row height', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<style:style style:name="ro1" style:family="table-row"> <style:table-row-properties style:row-height="0.178in" fo:break-before="auto" style:use-optimal-row-height="true"/> </style:style>'
+            }]
+          };
+          const _expectedResult = '<style:style style:name="ro1" style:family="table-row"> <style:table-row-properties fo:break-before="auto" style:use-optimal-row-height="true"/> </style:style>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+        it('should remove multiple style:row-height', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<style:style style:name="ro1" style:family="table-row"> <style:table-row-properties style:row-height="0.178in" fo:break-before="auto" style:use-optimal-row-height="true"/> </style:style><style:style style:name="ro1" style:family="table-row"> <style:table-row-properties style:row-height="0.178in" fo:break-before="auto" style:use-optimal-row-height="true"/> </style:style>'
+            }]
+          };
+          const _expectedResult = '<style:style style:name="ro1" style:family="table-row"> <style:table-row-properties fo:break-before="auto" style:use-optimal-row-height="true"/> </style:style><style:style style:name="ro1" style:family="table-row"> <style:table-row-properties fo:break-before="auto" style:use-optimal-row-height="true"/> </style:style>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+        it('should not remove style:row-height if style:use-optimal-row-height=false ', function () {
+          const _template = {
+            files : [{
+              name : 'content.xml',
+              data : '<style:style style:name="ro1" style:family="table-row"> <style:table-row-properties style:row-height="0.178in" fo:break-before="auto" style:use-optimal-row-height="false"/> </style:style>'
+            }]
+          };
+          const _expectedResult = '<style:style style:name="ro1" style:family="table-row"> <style:table-row-properties style:row-height="0.178in" fo:break-before="auto" style:use-optimal-row-height="false"/> </style:style>';
+          preprocessor.convertNumberMarkersIntoNumericFormat(_template);
+          helper.assert(_template.files[0].data, _expectedResult);
+        });
+
         it('should makes a number marker (:formatN) even if d is an array', function () {
           const _template = {
             files : [{

@@ -17,7 +17,7 @@
       <style:table-column-properties fo:break-before="auto" style:column-width="1.9402in"/>
     </style:style>
     <style:style style:name="ro1" style:family="table-row">
-      <style:table-row-properties style:row-height="0.178in" fo:break-before="auto" style:use-optimal-row-height="true"/>
+      <style:table-row-properties fo:break-before="auto" style:use-optimal-row-height="true"/>
     </style:style>
     <style:style style:name="ro2" style:family="table-row">
       <style:table-row-properties style:row-height="1.3264in" fo:break-before="auto" style:use-optimal-row-height="false"/>

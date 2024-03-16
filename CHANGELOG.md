@@ -1,5 +1,6 @@
 
 ## v4.21.0
+  - Release Mars 16th 2024
   - [On-premise] Studio Light: Added button to copy the Template ID of the previewed template.
   - [EE] Fixes support for SVG image replacement in DOCX templates, especially when using LibreOffice 24 for document conversion.
   - Fixes broken DOCX template with bi-directional loops when the template is created with Google Docs

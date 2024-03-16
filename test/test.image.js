@@ -16,6 +16,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
   const _imageDEBase64jpg            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageDE_base64_html_jpg.txt'  ), 'utf8');
   const _imageITBase64png            = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageIT_base64_html_png.txt'  ), 'utf8');
   const _imageLogoBase64jpg          = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'imageLogo_base64_html_jpg.txt'), 'utf8');
+  const _imageLogoBase64svg          = fs.readFileSync(path.join(__dirname, 'datasets', 'image', 'image_base64_svg.txt'), 'utf8');
 
   describe('[Full test] ODG', function () {
     it('should do nothing if there is no marker inside XML', function (done) {
@@ -934,6 +935,28 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         const _testedReport = 'image/docx-simple';
         const _data = {
           image : _imageDEBase64jpg
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('should update two reference ids for SVG image (or remove the svgBlip -> it works and it is simpler so I keep this solution)', function (done) {
+        const _testedReport = 'image/docx-svg';
+        const _data = {
+          img : _imageLogoBase64svg
+        };
+        carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assertFullReport(res, _testedReport);
+          done();
+        });
+      });
+      it('should remove references to SVG placeholder images (svgBlip) if the new image is not a SVG', function (done) {
+        const _testedReport = 'image/docx-svg-replaced-by-jpg';
+        const _data = {
+          img : _imageDEBase64jpg
         };
         carbone.render(helperTest.openTemplate(_testedReport), _data, (err, res) => {
           helperTest.assert(err+'', 'null');

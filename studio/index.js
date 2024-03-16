@@ -170,7 +170,7 @@ async function addTemplateAndRender (file) {
   if (result.success) {
     currentTemplate.id = result.data.templateId;
     document.getElementById('btn-copy-id').style.display = 'inline';
-    document.getElementById('template-id').textContent = `ID: ${currentTemplate.id.toUpperCase().substring(0, 8)}...`
+    document.getElementById('template-id').textContent = `ID: ${currentTemplate.id.substring(0, 10)}...`
     setContent('filename', `${file.name} (live editing)`);
     setConsoleMessage('success', 'Template added');
     refreshRender();

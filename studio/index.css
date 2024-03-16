@@ -258,21 +258,26 @@ select {
 #btn-copy-id {
   color: white;
   padding: 7px 10px;
-  background-color: #5b0e76;
+  font-size: 0.85rem;
+  /*background-color: #5b0e76;*/
   margin-left: 5px;
   display: none;
   position:relative;
   cursor: pointer;
   /* for animation */
   background-size: 200% 100%;
-  background-image: linear-gradient(to right, #5b0e76 50%, #490b5f 50%);
+  background-image: linear-gradient(to right, rgba(255,255,255,0) 50%, #490b5f 50%);
   -webkit-transition: background-position 0.3s;
   -moz-transition: background-position 0.3s;
   transition: background-position 0.3s;
 }
 
+#template-id {
+  font-size: 0.85rem;
+}
+
 #btn-copy-id:hover {
-  background-color: #490b5f;
+  /*background-color: #490b5f;*/
   background-position: -100% 0;
 }
 

@@ -252,3 +252,50 @@ select {
   background-position: right 15px top 14px, right 10px top 14px;
   background-size: 5px 5px, 5px 5px;
 }
+
+/* BTN COPY TEMPLATE ID */
+
+#btn-copy-id {
+  color: white;
+  padding: 7px 10px;
+  font-size: 0.85rem;
+  /*background-color: #5b0e76;*/
+  margin-left: 5px;
+  display: none;
+  position:relative;
+  cursor: pointer;
+  /* for animation */
+  background-size: 200% 100%;
+  background-image: linear-gradient(to right, rgba(255,255,255,0) 50%, #490b5f 50%);
+  -webkit-transition: background-position 0.3s;
+  -moz-transition: background-position 0.3s;
+  transition: background-position 0.3s;
+}
+
+#template-id {
+  font-size: 0.85rem;
+}
+
+#btn-copy-id:hover {
+  /*background-color: #490b5f;*/
+  background-position: -100% 0;
+}
+
+#btn-copy-id:hover > #btn-copy-id-tooltip {
+  opacity:1;
+  visibility: visible;
+}
+
+#btn-copy-id-tooltip {
+  transition: visibility 0.1s linear, opacity 0.1s linear;
+  position: absolute;
+  bottom: -30px;
+  left: -13px;
+  right: 0px;
+  width: 128px;
+  padding: 5px 10px;
+  background-color: #00000078;
+  border-radius: 10px;
+  opacity:0;
+  visibility: none;
+}

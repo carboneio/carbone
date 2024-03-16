@@ -169,6 +169,8 @@ async function addTemplateAndRender (file) {
 
   if (result.success) {
     currentTemplate.id = result.data.templateId;
+    document.getElementById('btn-copy-id').style.display = 'inline';
+    document.getElementById('template-id').textContent = `ID: ${currentTemplate.id.substring(0, 10)}...`
     setContent('filename', `${file.name} (live editing)`);
     setConsoleMessage('success', 'Template added');
     refreshRender();
@@ -300,3 +302,15 @@ const toolBar = {
     refreshRender();
   }
 };
+
+function copyTemplateId() {
+  if (!currentTemplate?.id) {
+    return;
+  }
+  navigator.clipboard.writeText(currentTemplate.id).then(function() {
+    setConsoleMessage('success', 'Template Id Copied: ' + currentTemplate.id);
+  }, function(err) {
+    console.error('Async: Could not copy text: ', err);
+    setConsoleMessage('error', 'Template ID copy did not work, contact the support.');
+  });
+}

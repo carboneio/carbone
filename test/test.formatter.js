@@ -1882,6 +1882,64 @@ describe('formatter', function () {
     });
   });
 
+  describe('XLSX formatters', function () {
+    it('should print a number value only if it is a valid number for Excel', function () {
+      const _xlsxVal = (v) => `<v>${v}</v>`;
+      helper.assert(numberFormatter.toExcelValue(5.44), _xlsxVal(5.44));
+      helper.assert(numberFormatter.toExcelValue(0), _xlsxVal(0));
+      helper.assert(numberFormatter.toExcelValue(-1), _xlsxVal(-1));
+      helper.assert(numberFormatter.toExcelValue(-1.54545454), _xlsxVal(-1.54545454));
+      helper.assert(numberFormatter.toExcelValue(99991.54545454), _xlsxVal(99991.54545454));
+      helper.assert(numberFormatter.toExcelValue(1e2), _xlsxVal(1e2));
+      helper.assert(numberFormatter.toExcelValue('99991.54545454'), _xlsxVal('99991.54545454'));
+      helper.assert(numberFormatter.toExcelValue('-891.33'), _xlsxVal('-891.33'));
+      helper.assert(numberFormatter.toExcelValue(null), _xlsxVal('')); // backward compatibility
+      helper.assert(numberFormatter.toExcelValue(undefined), _xlsxVal(''));  // backward compatibility
+    });
+
+    it('should print a string if it is not a valid number for Excel', function () {
+      const _xlsxStr = (s) => `<is><t>${s}</t></is>`;
+      helper.assert(numberFormatter.toExcelValue([121, 54]), _xlsxStr('121,54'));
+      helper.assert(numberFormatter.toExcelValue('1,330'), _xlsxStr('1,330')); // we never know it is is FR/US format so we must keep it as text
+      helper.assert(numberFormatter.toExcelValue('-891,33'), _xlsxStr('-891,33')); // we never know it is is FR/US format so we must keep it as text
+      helper.assert(numberFormatter.toExcelValue({ '10' : 4 }), _xlsxStr('[object Object]'));
+      helper.assert(numberFormatter.toExcelValue(NaN), _xlsxStr(NaN));
+      helper.assert(numberFormatter.toExcelValue(true), _xlsxStr(true));
+      helper.assert(numberFormatter.toExcelValue(false), _xlsxStr(false));
+      helper.assert(numberFormatter.toExcelValue('false'), _xlsxStr('false'));
+      helper.assert(numberFormatter.toExcelValue('aa b'), _xlsxStr('aa b'));
+      helper.assert(numberFormatter.toExcelValue(Infinity), _xlsxStr(Infinity));
+      helper.assert(numberFormatter.toExcelValue(-Infinity), _xlsxStr(-Infinity));
+    });
+
+    it('should return the cell type according the real value', function () {
+      helper.assert(numberFormatter.toExcelType(5.44), 'n');
+      helper.assert(numberFormatter.toExcelType(0), 'n');
+      helper.assert(numberFormatter.toExcelType(-1), 'n');
+      helper.assert(numberFormatter.toExcelType(-1.54545454), 'n');
+      helper.assert(numberFormatter.toExcelType(99991.54545454), 'n');
+      helper.assert(numberFormatter.toExcelType(1e2), 'n');
+      helper.assert(numberFormatter.toExcelType('99991.54545454'), 'n');
+      helper.assert(numberFormatter.toExcelType('-891.33'), 'n');
+      helper.assert(numberFormatter.toExcelType(null), 'n'); // Excel accept empty value
+      helper.assert(numberFormatter.toExcelType(undefined), 'n'); // Excel accept empty value (see toExcelValue)
+    });
+
+    it('should return the cell type according the real value', function () {
+      helper.assert(numberFormatter.toExcelType('1,330'), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType('-891,33'), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType([121, 54]), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType({ '10' : 4 }), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType(NaN), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType(true), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType(false), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType('false'), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType('aa b'), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType(Infinity), 'inlineStr');
+      helper.assert(numberFormatter.toExcelType(-Infinity), 'inlineStr');
+    });
+  });
+
   describe('formatN', function () {
     it('should format number according to the locale a percentage', function () {
       var _this = {lang : 'fr'};

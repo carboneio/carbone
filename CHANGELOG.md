@@ -1,4 +1,8 @@
 
+## v4.22.0
+  - Fix: Reduced the probability of generating corrupted XLSX files when using XLSX templates with `:formatN` to transform a JSON number into a native Excel number.
+    Previously, if at least one injected value was a string, the generated XLSX file would become corrupted.
+
 ## v4.21.0
   - Release Mars 16th 2024
   - [On-premise] Studio Light: Added button to copy the Template ID of the previewed template.

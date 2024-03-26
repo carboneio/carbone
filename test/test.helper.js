@@ -1005,6 +1005,18 @@ describe('helper', function () {
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg&name=John'), 'jpeg');
       helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt?name=john&age=2#lala'), 'txt');
     });
+    it('should find the extension in content-disposition if not available in URL', function () {
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few'), '');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', null), '');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', 'filename='), '');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', 'filename=""'), '');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', 'attachment;'), '');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', 'attachment; filename="file extension.pdf"'), 'pdf');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image#fewfw=223?lala=few', 'inline; filename="file extension.jpg"'), 'jpg');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image#fewfw=223?lala=few', 'inline; filename="file extension.JPG"'), 'jpg');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image#fewfw=223?lala=few', 'inline; filename=file.pdf; name="field2";'), 'pdf');
+      helper.assert(helper.getFileExtensionFromUrl('https://google.com/imagelotofpoints&name=John', 'attachment; filename="image.with.lot.of.points.jpeg"'), 'jpeg');
+    });
   });
 
   describe('Find the relative path between 2 markers', function () {

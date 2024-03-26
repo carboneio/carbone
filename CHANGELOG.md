@@ -1,4 +1,7 @@
 
+## v4.22.0
+  - Improve file type detection when inserting images or PDF coming from external URL. It can read file extension in Content-Disposition if Carbone cannot find it Content-Type and URL.
+
 ## v4.21.0
   - Release Mars 16th 2024
   - [On-premise] Studio Light: Added button to copy the Template ID of the previewed template.

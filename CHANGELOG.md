@@ -1,4 +1,14 @@
 
+## v4.22.0
+  - Accept to send an ephemeral template when calling the API `POST /render/template`. This template is never stored and it does not trigger the middleware `readTemplate`
+  ```
+    {
+      data      : {},
+      template  : "base64-encoded-file",
+      convertTo : "pdf"
+    }
+  ```
+
 ## v4.21.0
   - Release Mars 16th 2024
   - [On-premise] Studio Light: Added button to copy the Template ID of the previewed template.

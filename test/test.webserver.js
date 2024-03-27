@@ -379,7 +379,7 @@ describe('Webserver', () => {
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
         deleteRequiredFiles();
         webserver = require('../lib/webserver');
-        webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir(), '--maxDataSize', 20 * 1024 * 1024], () => {
+        webserver.handleParams(['--authentication', '--port', 4001, '--workdir', os.tmpdir(), '--maxDataSize', 30 * 1024 * 1024], () => {
           webserver.generateToken((_, newToken) => {
             token = newToken;
             done();
@@ -534,6 +534,81 @@ describe('Webserver', () => {
         });
       });
 
+      it('should render with en ephemeral template, passed in base64', (done) => {
+        let body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement : {},
+          template   : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'}),
+          enum       : {}
+        };
+        get.concat(getBody(4001, '/render/template', 'POST', body, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 200);
+          assert.strictEqual(data.success, true);
+          assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'titi' + data.data.renderId)), true);
+          assert.strictEqual(data.data.renderId.startsWith('REPORT'), true);
+          assert.strictEqual(data.data.renderId.endsWith('.html'), true);
+          get.concat({
+            url     : 'http://localhost:4001/render/' + data.data.renderId,
+            headers : {
+              Authorization : 'Bearer ' + token
+            }
+          }, (err, res, data) => {
+            assert.strictEqual(data.toString(), '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+            done();
+          });
+        });
+      });
+
+      it('should not render if the base64 template is greater than maxTemplateSize (approximately -> base64)', (done) => {
+        let _template = '<!DOCTYPE html><html>';
+        for (let i = 0; i < 160000; i++) {
+          _template += '<p>I\'m a Carbone template !</p><p>I AM {d.firstname} {d.lastname}</p> TEST TEST TEST TEST TEST TEST';
+        }
+        _template += '</html>';
+
+        let body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement : {},
+          template   : Buffer.from(_template).toString('base64'),
+          enum       : {}
+        };
+        get.concat(getBody(4001, '/render/template', 'POST', body, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.error, 'Template too large, the file size limit is 20 MB');
+          assert.strictEqual(data.code, 'w119');
+          assert.strictEqual(res.statusCode, 413);
+          done();
+        });
+      });
+
+      it('should not be able to upload not supported file templates in base64' , (done) => {
+        let body = {
+          data : {
+            firstname : 'John',
+            lastname  : 'Doe'
+          },
+          complement : {},
+          template   : fs.readFileSync(path.join(__dirname, 'datasets', 'test_unknown_file_type.zip'), { encoding : 'base64'}),
+          enum       : {}
+        };
+        get.concat(getBody(4001, '/render/template', 'POST', body, token), (err, res, data) => {
+          assert.strictEqual(err, null);
+          assert.strictEqual(res.statusCode, 415);
+          assert.strictEqual(data.success, false);
+          assert.strictEqual(data.code, 'w118');
+          assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG, XHTML, IDML, HTML or an XML file');
+          done();
+        });
+      });
+
       it('should NOT render a template if the beforeRender return an error', (done) => {
         let templateId = '9950a2403a6a6a3a924e6bddfa85307adada2c658613aa8fbf20b6d64c2b6b47';
         let body = {
@@ -566,7 +641,7 @@ describe('Webserver', () => {
           enum       : {}
         };
 
-        for (let i = 0; i < 100000; i++) {
+        for (let i = 0; i < 200000; i++) {
           body.data[i] = ' ' + body.data.firstname;          
         }
         get.concat(getBody(4001, `/render/${templateId}`, 'POST', body, token), (err, res, data) => {
@@ -574,7 +649,7 @@ describe('Webserver', () => {
           assert.strictEqual(res.statusCode, 413);
           assert.strictEqual(data.success , false);
           assert.strictEqual(data.code , 'w121');
-          assert.strictEqual(data.error , 'Content too large, the JSON size limit is 20 MB');
+          assert.strictEqual(data.error , 'Content too large, the JSON size limit is 30 MB');
           done();
         });
       });

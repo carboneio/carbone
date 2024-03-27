@@ -544,6 +544,7 @@ describe('Webserver', () => {
           template   : fs.readFileSync(path.join(__dirname, 'datasets', 'template.html'), { encoding : 'base64'}),
           enum       : {}
         };
+        const _nbTemplateBefore = fs.readdirSync(path.join(os.tmpdir(), 'template')).length;
         get.concat(getBody(4001, '/render/template', 'POST', body, token), (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(res.statusCode, 200);
@@ -551,6 +552,7 @@ describe('Webserver', () => {
           assert.strictEqual(fs.existsSync(path.join(os.tmpdir(), 'titi' + data.data.renderId)), true);
           assert.strictEqual(data.data.renderId.startsWith('REPORT'), true);
           assert.strictEqual(data.data.renderId.endsWith('.html'), true);
+          assert.strictEqual(_nbTemplateBefore, fs.readdirSync(path.join(os.tmpdir(), 'template')).length);
           get.concat({
             url     : 'http://localhost:4001/render/' + data.data.renderId,
             headers : {
@@ -579,12 +581,14 @@ describe('Webserver', () => {
           template   : Buffer.from(_template).toString('base64'),
           enum       : {}
         };
+        const _nbTemplateBefore = fs.readdirSync(path.join(os.tmpdir(), 'template')).length;
         get.concat(getBody(4001, '/render/template', 'POST', body, token), (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.error, 'Template too large, the file size limit is 20 MB');
           assert.strictEqual(data.code, 'w119');
           assert.strictEqual(res.statusCode, 413);
+          assert.strictEqual(_nbTemplateBefore, fs.readdirSync(path.join(os.tmpdir(), 'template')).length);
           done();
         });
       });
@@ -599,12 +603,14 @@ describe('Webserver', () => {
           template   : fs.readFileSync(path.join(__dirname, 'datasets', 'test_unknown_file_type.zip'), { encoding : 'base64'}),
           enum       : {}
         };
+        const _nbTemplateBefore = fs.readdirSync(path.join(os.tmpdir(), 'template')).length;
         get.concat(getBody(4001, '/render/template', 'POST', body, token), (err, res, data) => {
           assert.strictEqual(err, null);
           assert.strictEqual(res.statusCode, 415);
           assert.strictEqual(data.success, false);
           assert.strictEqual(data.code, 'w118');
           assert.strictEqual(data.error, 'Template format not supported, it must be an XML-based document: DOCX, XLSX, PPTX, ODT, ODS, ODP, ODG, XHTML, IDML, HTML or an XML file');
+          assert.strictEqual(_nbTemplateBefore, fs.readdirSync(path.join(os.tmpdir(), 'template')).length);
           done();
         });
       });

@@ -785,6 +785,22 @@ describe('helper', function () {
       _queue.start();
     });
 
+    it('should call the final callback if the array is empty', (done) => {
+      let _queue = helper.genericQueue(
+        []
+        , (item, next) => {
+          helper.assert('not', 'executed');
+          next();
+        },
+        (err) => {
+          helper.assert(err+'', 'null');
+          done();
+        }
+      );
+      _queue.start();
+    });
+
+
     it('should process multiple elements', (done) => {
       let _nb    = [];
       let _queue = helper.genericQueue(
@@ -1114,6 +1130,20 @@ describe('helper', function () {
       assert.throws(() => helper.compareStringFromPosition('blue', 'blue', 10), new Error('The index is outside of the text length range.'));
     });
   });
+
+  describe('cleanContentType', function () {
+    it('should clean content type', function () {
+      helper.assert(helper.cleanContentType(undefined), '');
+      helper.assert(helper.cleanContentType(null), '');
+      helper.assert(helper.cleanContentType(0), '');
+      helper.assert(helper.cleanContentType(1), '');
+      helper.assert(helper.cleanContentType('image/png; charset=UTF-8'), 'image/png');
+      helper.assert(helper.cleanContentType('image/png ; charset=UTF-8'), 'image/png');
+      helper.assert(helper.cleanContentType('  image/png '), 'image/png');
+      helper.assert(helper.cleanContentType('  image/png  ; charset=UTF-8 ; s '), 'image/png');
+    });
+  });
+
 });
 
 

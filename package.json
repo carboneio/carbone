@@ -41,6 +41,7 @@
     "formidable": "=2.1.1",
     "image-size": "=1.0.2",
     "kitten-jwt": "=2.0.0",
+    "pdf-lib": "=1.17.1",
     "restana": "=4.9.6",
     "rock-req": "=5.1.2",
     "which": "=2.0.2",
@@ -60,6 +61,7 @@
     "form-data": "=4.0.0",
     "mocha": "=9.2.2",
     "nock": "=13.2.7",
+    "pdf2json": "=3.0.5",
     "pdfjs-dist": "=2.14.305",
     "simple-get": "=4.0.1",
     "xml-beautifier": "=0.5.0"

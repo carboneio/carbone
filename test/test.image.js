@@ -2286,7 +2286,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
       it('should not crash if the URL is not encoded', function (done) {
         // this é character is encoded as two chars \u0065\u0301 (forbidden)
         image.downloadImage('https://google.com/é.png', {}, {}, function (err) {
-          helperTest.assert(err+'', 'Error Carbone: image URL contains unescaped characters: https://google.com/é.png');
+          helperTest.assert(err+'', 'Error: Unable to download file from URL: "https://google.com/é.png". This URL contains unescaped characters.');
           done();
         });
       });
@@ -2379,7 +2379,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .get('/image-flag-fr.txt')
           .replyWithFile(200, __dirname + '/datasets/image/imageFR_base64_jpg.txt');
         image.downloadImage('https://google.com/image-flag-fr.txt', {}, {}, function (err, imageInfo) {
-          assert(err.includes('Error Carbone: the file is not an image'));
+          helperTest.assert(err+'', 'Error: Unable to download file from URL: "https://google.com/image-flag-fr.txt". File type is unknown or not allowed. Accepted types: bmp, xmb, pbm, gif, jpg, jpeg, png, emf, webp, svg');
           assert(imageInfo+'' === 'undefined');
           done();
         });
@@ -2408,9 +2408,9 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         });
       });
 
-      it ('should return an error when the location url does not exist', function (done) {
+      it('should return an error when the location url does not exist', function (done) {
         image.downloadImage('https://carbone.io/fowjfioewj', {}, {}, function (err, imageInfo) {
-          assert(err.includes('can not download the image from the url'));
+          helperTest.assert(err+'', 'Error: Unable to download file from URL: "https://carbone.io/fowjfioewj". Status code: 404. Check URL and network access.');
           helperTest.assert(imageInfo+'', 'undefined');
           done();
         });
@@ -2789,18 +2789,6 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
         helperTest.assert(image.checkIfImageIncludedDocx('word/_rels/document.xml.rels', ['header3.xml', 'header2.xml', 'footer1.xml']), false);
         helperTest.assert(image.checkIfImageIncludedDocx('word/_rels/document.xml.rels', []), false);
         helperTest.assert(image.checkIfImageIncludedDocx('', ['header3.xml', 'header2.xml']), false);
-      });
-    });
-    describe('cleanContentType', function () {
-      it('should clean content type', function () {
-        helperTest.assert(image.cleanContentType(undefined), '');
-        helperTest.assert(image.cleanContentType(null), '');
-        helperTest.assert(image.cleanContentType(0), '');
-        helperTest.assert(image.cleanContentType(1), '');
-        helperTest.assert(image.cleanContentType('image/png; charset=UTF-8'), 'image/png');
-        helperTest.assert(image.cleanContentType('image/png ; charset=UTF-8'), 'image/png');
-        helperTest.assert(image.cleanContentType('  image/png '), 'image/png');
-        helperTest.assert(image.cleanContentType('  image/png  ; charset=UTF-8 ; s '), 'image/png');
       });
     });
   });

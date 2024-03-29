@@ -1,22 +1,28 @@
 
 
 /**
- * Merge an external file inside the generated the document
+ * Append an external file inside the generated the document
  *
  * Current limitation:
  *
- * Only external PDF files can be added at the end of the current generated document.
+ * Only PDF files can be added at the end of the current generated document.
  * If the generated file is not a PDF, the command is ignored.
+ *
+ * Carbone will return an error and will not generate the report in the following scenarios:
+ *   - If the provided URL returns an error (2 retries for Carbone Cloud).
+ *   - If the downloaded document is not recognized as a valid PDF.
+ *   - If more than 20 files are to be downloaded (On-Premise parameter: `maxDownloadFileCount`)
+ *   - If the total size of all downloaded files exceeds 10 MB (On-Premise parameter: `maxDownloadFileSizeTotal`).
+ * Carbone will ignore the formatter and proceed to generate the report in the following cases:
+ *   - If the provided URL is null, undefined, or an empty string.
+ *   - If the final report is not in PDF format
  *
  * @version 4.22.0
  *
  * @param  {String}  urlOrBase64  And external link to the PDF
- * @param  {String}  where        Only two values are accepted:
- *                                  - "end":    add the external PDF at the end of this document (default)
- *                                  - "begin":  add the external PDF at the beginning of this document
  * @return {String}               This tags prints nothing
  */
-function appendFile (urlOrBase64, where = 'end') {
+function appendFile (urlOrBase64, where = 'end' /* not implemented yet */ ) {
   if (!urlOrBase64) {
     return '';
   }

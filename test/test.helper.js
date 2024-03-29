@@ -1005,36 +1005,6 @@ describe('helper', function () {
     });
   });
 
-  describe('Get file extension from URL', function () {
-    it('should return a png/jpeg/gif/txt extension', function () {
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png'), 'png');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif'), 'gif');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg'), 'jpeg');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt'), 'txt');
-    });
-    it('should lower case extension to normalize', function () {
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.JPG'), 'jpg');
-    });
-    it('should return a png/jpeg/gif/txt extension with query parameters', function () {
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png?fewfw=223&lala=few'), 'png');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif#fewfw=223?lala=few'), 'gif');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg&name=John'), 'jpeg');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt?name=john&age=2#lala'), 'txt');
-    });
-    it('should find the extension in content-disposition if not available in URL', function () {
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few'), '');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', null), '');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', 'filename='), '');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', 'filename=""'), '');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', 'attachment;'), '');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr?fewfw=223&lala=few', 'attachment; filename="file extension.pdf"'), 'pdf');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image#fewfw=223?lala=few', 'inline; filename="file extension.jpg"'), 'jpg');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image#fewfw=223?lala=few', 'inline; filename="file extension.JPG"'), 'jpg');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image#fewfw=223?lala=few', 'inline; filename=file.pdf; name="field2";'), 'pdf');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/imagelotofpoints&name=John', 'attachment; filename="image.with.lot.of.points.jpeg"'), 'jpeg');
-    });
-  });
-
   describe('Find the relative path between 2 markers', function () {
     it('should find the relative path between 2 markers', function () {
       helper.assert(helper.getMarkerRelativePath('d.list[i].color', 'd.list[i].color2'), '.color2');
@@ -1128,19 +1098,6 @@ describe('helper', function () {
       // the index is out of the text range
       assert.throws(() => helper.compareStringFromPosition('blue', 'blue', -1), new Error('The index is outside of the text length range.'));
       assert.throws(() => helper.compareStringFromPosition('blue', 'blue', 10), new Error('The index is outside of the text length range.'));
-    });
-  });
-
-  describe('cleanContentType', function () {
-    it('should clean content type', function () {
-      helper.assert(helper.cleanContentType(undefined), '');
-      helper.assert(helper.cleanContentType(null), '');
-      helper.assert(helper.cleanContentType(0), '');
-      helper.assert(helper.cleanContentType(1), '');
-      helper.assert(helper.cleanContentType('image/png; charset=UTF-8'), 'image/png');
-      helper.assert(helper.cleanContentType('image/png ; charset=UTF-8'), 'image/png');
-      helper.assert(helper.cleanContentType('  image/png '), 'image/png');
-      helper.assert(helper.cleanContentType('  image/png  ; charset=UTF-8 ; s '), 'image/png');
     });
   });
 

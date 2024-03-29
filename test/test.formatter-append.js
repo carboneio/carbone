@@ -1,6 +1,7 @@
 const carbone   = require('../lib/index');
 const converter = require('../lib/converter');
 const helper    = require('../lib/helper');
+const file      = require('../lib/file');
 const path      = require('path');
 const fs        = require('fs');
 const pdfPath   = path.resolve('./test/datasets/merge-pdf');
@@ -17,11 +18,11 @@ describe('appendFile', function () {
     helper.rmDirRecursive(tempPath);
   });
 
-  describe('helper.mergePDF', function () {
+  describe('file.mergePDF', function () {
     it('should do nothing is fileDatabase is empty or undefined', function (done) {
-      helper.mergePDF('path', new Map(), 'path', (err) => {
+      file.mergePDF('path', new Map(), 'path', (err) => {
         helper.assert(err+'', 'null');
-        helper.mergePDF('path', undefined, 'path', (err) => {
+        file.mergePDF('path', undefined, 'path', (err) => {
           helper.assert(err+'', 'null');
           done();
         });
@@ -38,7 +39,7 @@ describe('appendFile', function () {
         position  : 'end',
         data      : fs.readFileSync(_pdfToAdd)
       });
-      helper.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
+      file.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
         helper.assert(err+'', 'null');
         pdfToJson(_expectedResult, (expected) => {
           pdfToJson(_outputFilePath, (result) => {
@@ -60,7 +61,7 @@ describe('appendFile', function () {
         position  : 'end',
         data      : fs.readFileSync(_pdfToAdd)
       });
-      helper.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
+      file.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
         helper.assert(err+'', 'null');
         pdfToJson(_expectedResult, (expected) => {
           pdfToJson(_outputFilePath, (result) => {
@@ -91,7 +92,7 @@ describe('appendFile', function () {
         });
       }
       const _start = process.hrtime();
-      helper.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
+      file.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
         const _diff = process.hrtime(_start);
         const _elapsed = ((_diff[0] * 1e9 + _diff[1]) / 1e6);
         helper.assert(err+'', 'null');
@@ -121,7 +122,7 @@ describe('appendFile', function () {
         data      : fs.readFileSync(_pdf2ToAdd),
         source    : '{d.pdf2}'
       });
-      helper.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
+      file.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
         helper.assert(err.message, 'Failed to parse the external PDF document "{d.pdf2}" or the main document. Unable to merge all PDFs together.');
         done();
       });
@@ -137,7 +138,7 @@ describe('appendFile', function () {
         data      : fs.readFileSync(_pdf1ToAdd),
         source    : '{d.pdf1}'
       });
-      helper.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
+      file.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
         helper.assert(err.message, 'Failed to parse the external PDF document "{d.pdf1}" or the main document. Unable to merge all PDFs together.');
         done();
       });

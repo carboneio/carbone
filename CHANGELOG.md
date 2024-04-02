@@ -1,4 +1,24 @@
 
+## v4.X.X
+  - [On-premise] Load custom formatters as Javascript in your Carbone instance:
+    1. Create a file named `formatters.js` under the `plugin` folder.
+    2. Write `module.exports = { }`, then insert your Javascript function between curly brackets: One function is equal to one formatter.
+    3. Here is the minimum code of a formatter:
+    ```js
+    function addText (d, text) {
+      return d + text;
+    }
+    /**
+     * Details:
+     * "d" the tag value
+     * "text" the first argument of the formatter
+     * A value must be returned otherwise it will print nothing in the document.
+     * Example usage: {d.value:addText(' euro')}
+     */
+    ```
+    Find formatters examples on the following page: https://github.com/carboneio/carbone/blob/master/formatters/string.js
+    
+
 ## v4.21.0
   - Release Mars 16th 2024
   - [On-premise] Studio Light: Added button to copy the Template ID of the previewed template.

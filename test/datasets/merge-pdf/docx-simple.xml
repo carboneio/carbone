@@ -18,7 +18,7 @@
     <o:Version>16</o:Version>
   </o:DocumentProperties>
   <w:fonts>
-    <w:defaultFonts w:ascii="Helvetica" w:fareast="Helvetica" w:h-ansi="Helvetica" w:cs="Times New Roman"/>
+    <w:defaultFonts w:ascii="DejaVu Sans" w:fareast="DejaVu Sans" w:h-ansi="DejaVu Sans" w:cs="Times New Roman"/>
     <w:font w:name="Times New Roman">
       <w:panose-1 w:val="02020603050405020304"/>
       <w:charset w:val="00"/>
@@ -26,7 +26,7 @@
       <w:pitch w:val="variable"/>
       <w:sig w:usb-0="E0002EFF" w:usb-1="C000785B" w:usb-2="00000009" w:usb-3="00000000" w:csb-0="000001FF" w:csb-1="00000000"/>
     </w:font>
-    <w:font w:name="Helvetica">
+    <w:font w:name="DejaVu Sans">
       <w:panose-1 w:val="020B0606030504020204"/>
       <w:charset w:val="00"/>
       <w:family w:val="auto"/>
@@ -417,7 +417,7 @@
     <w:style w:type="paragraph" w:default="on" w:styleId="Normal">
       <w:name w:val="Normal"/>
       <w:rPr>
-        <wx:font wx:val="Helvetica"/>
+        <wx:font wx:val="DejaVu Sans"/>
         <w:kern w:val="2"/>
         <w:sz w:val="24"/>
         <w:sz-cs w:val="24"/>
@@ -438,8 +438,8 @@
         <w:outlineLvl w:val="0"/>
       </w:pPr>
       <w:rPr>
-        <w:rFonts w:ascii="Helvetica" w:fareast="Times New Roman" w:h-ansi="Helvetica"/>
-        <wx:font wx:val="Helvetica"/>
+        <w:rFonts w:ascii="DejaVu Sans" w:fareast="Times New Roman" w:h-ansi="DejaVu Sans"/>
+        <wx:font wx:val="DejaVu Sans"/>
         <w:color w:val="0F4761"/>
         <w:sz w:val="40"/>
         <w:sz-cs w:val="40"/>
@@ -459,8 +459,8 @@
         <w:outlineLvl w:val="1"/>
       </w:pPr>
       <w:rPr>
-        <w:rFonts w:ascii="Helvetica" w:fareast="Times New Roman" w:h-ansi="Helvetica"/>
-        <wx:font wx:val="Helvetica"/>
+        <w:rFonts w:ascii="DejaVu Sans" w:fareast="Times New Roman" w:h-ansi="DejaVu Sans"/>
+        <wx:font wx:val="DejaVu Sans"/>
         <w:color w:val="0F4761"/>
         <w:sz w:val="32"/>
         <w:sz-cs w:val="32"/>
@@ -658,8 +658,8 @@
         <w:jc w:val="center"/>
       </w:pPr>
       <w:rPr>
-        <w:rFonts w:ascii="Helvetica" w:fareast="Times New Roman" w:h-ansi="Helvetica" w:cs="Tahoma"/>
-        <wx:font wx:val="Helvetica"/>
+        <w:rFonts w:ascii="DejaVu Sans" w:fareast="Times New Roman" w:h-ansi="DejaVu Sans" w:cs="Tahoma"/>
+        <wx:font wx:val="DejaVu Sans"/>
         <w:b-cs/>
         <w:color w:val="000000"/>
         <w:sz w:val="10"/>
@@ -671,7 +671,7 @@
       <w:link w:val="Heading1"/>
       <w:rsid w:val="005921D2"/>
       <w:rPr>
-        <w:rFonts w:ascii="Helvetica" w:fareast="Times New Roman" w:h-ansi="Helvetica" w:cs="Times New Roman"/>
+        <w:rFonts w:ascii="DejaVu Sans" w:fareast="Times New Roman" w:h-ansi="DejaVu Sans" w:cs="Times New Roman"/>
         <w:color w:val="0F4761"/>
         <w:sz w:val="40"/>
         <w:sz-cs w:val="40"/>
@@ -682,7 +682,7 @@
       <w:link w:val="Heading2"/>
       <w:rsid w:val="005921D2"/>
       <w:rPr>
-        <w:rFonts w:ascii="Helvetica" w:fareast="Times New Roman" w:h-ansi="Helvetica" w:cs="Times New Roman"/>
+        <w:rFonts w:ascii="DejaVu Sans" w:fareast="Times New Roman" w:h-ansi="DejaVu Sans" w:cs="Times New Roman"/>
         <w:color w:val="0F4761"/>
         <w:sz w:val="32"/>
         <w:sz-cs w:val="32"/>
@@ -770,8 +770,8 @@
         <w:contextualSpacing/>
       </w:pPr>
       <w:rPr>
-        <w:rFonts w:ascii="Helvetica" w:fareast="Times New Roman" w:h-ansi="Helvetica"/>
-        <wx:font wx:val="Helvetica"/>
+        <w:rFonts w:ascii="DejaVu Sans" w:fareast="Times New Roman" w:h-ansi="DejaVu Sans"/>
+        <wx:font wx:val="DejaVu Sans"/>
         <w:spacing w:val="-10"/>
         <w:kern w:val="28"/>
         <w:sz w:val="56"/>
@@ -783,7 +783,7 @@
       <w:link w:val="Title"/>
       <w:rsid w:val="005921D2"/>
       <w:rPr>
-        <w:rFonts w:ascii="Helvetica" w:fareast="Times New Roman" w:h-ansi="Helvetica" w:cs="Times New Roman"/>
+        <w:rFonts w:ascii="DejaVu Sans" w:fareast="Times New Roman" w:h-ansi="DejaVu Sans" w:cs="Times New Roman"/>
         <w:spacing w:val="-10"/>
         <w:kern w:val="28"/>
         <w:sz w:val="56"/>

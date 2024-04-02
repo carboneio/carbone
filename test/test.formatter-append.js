@@ -9,7 +9,7 @@ const tempPath  = path.join(__dirname, 'temp');
 const pdf2json  = require('pdf2json');
 const nock      = require('nock');
 
-describe('appendFile', function () {
+describe.only('appendFile', function () {
   beforeEach(function () {
     helper.rmDirRecursive(tempPath);
     fs.mkdirSync(tempPath, '0755');
@@ -172,13 +172,12 @@ describe('appendFile', function () {
         done();
       });
     });
-    it.only('should render a document and accept an empty PDF link. In that case, the PDF is not added and the document is generated', function (done) {
+    it('should render a document and accept an empty PDF link. In that case, the PDF is not added and the document is generated', function (done) {
       const data = {
         url : ''
       };
       carbone.render(path.join(pdfPath, 'docx-simple.xml'), data, {convertTo : 'pdf', renderPrefix : 'temp1' }, function (err, outputFilePath) {
         helper.assert(err+'', 'null');
-        console.log(outputFilePath)
         pdfToJson(path.join(pdfPath, 'docx-simple-expected-empty.pdf'), (expected) => {
           pdfToJson(outputFilePath, (result) => {
             helper.assert(result.Pages.length, 1);

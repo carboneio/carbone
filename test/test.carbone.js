@@ -12,7 +12,7 @@ var execSync = require('child_process').execSync;
 var pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 const helperTest = require('./helper');
 
-describe('Carbone', function () {
+describe.only('Carbone', function () {
 
 
   describe('set', function () {

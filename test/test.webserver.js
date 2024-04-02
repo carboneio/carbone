@@ -64,7 +64,9 @@ function getBody (port, route, method, body, token, headers) {
 function uploadFile (port, token, callback, error = false) {
   let form = new FormData();
 
-  if (error === true) {
+  if (typeof error === 'string') {
+    form.append('template', Buffer.from(error));
+  } else if (error === true) {
     form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template-error.html')));
   } else {
     form.append('template', fs.createReadStream(path.join(__dirname, 'datasets', 'template.html')));
@@ -87,7 +89,7 @@ function uploadFile (port, token, callback, error = false) {
     assert.strictEqual(err, null);
     data = JSON.parse(data);
     assert.strictEqual(data.success, true);
-    callback();
+    return callback(null, data.data.templateId);
   });
 }
 
@@ -117,6 +119,7 @@ function unlinkConfigFile () {
     path.join(os.tmpdir(), 'plugin', 'authentication.js'),
     path.join(os.tmpdir(), 'plugin', 'storage.js'),
     path.join(os.tmpdir(), 'plugin', 'middlewares.js'),
+    path.join(os.tmpdir(), 'plugin', 'formatters.js'),
     path.join(os.tmpdir(), 'beforeFile'),
     path.join(os.tmpdir(), 'beforeFile2'),
     path.join(os.tmpdir(), 'afterFile'),
@@ -138,7 +141,7 @@ function unlinkConfigFile () {
   fs.rmdirSync(path.join(os.tmpdir(), 'plugin'));
 }
 
-describe('Webserver', () => {
+describe.only('Webserver', () => {
   before(() => {
     carbone.reset();
     writeConfigFile();
@@ -366,7 +369,7 @@ describe('Webserver', () => {
     });
   });
 
-  describe('With authentication with plugins / middlewares', () => {
+  describe('With authentication with plugins / middlewares / formatter', () => {
     let token = null;
     let toDelete = [];
 
@@ -376,6 +379,7 @@ describe('Webserver', () => {
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'authentication.js'), path.join(os.tmpdir(), 'plugin', 'authentication.js'));
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'storage.js'), path.join(os.tmpdir(), 'plugin', 'storage.js'));
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'middlewares.js'), path.join(os.tmpdir(), 'plugin', 'middlewares.js'));
+        fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'plugin', 'formatters.js'), path.join(os.tmpdir(), 'plugin', 'formatters.js'));
         fs.copyFileSync(path.join(__dirname, 'datasets', 'webserver', 'config', 'key.pub'), path.join(os.tmpdir(), 'key.pub'));
         deleteRequiredFiles();
         webserver = require('../lib/webserver');
@@ -392,6 +396,7 @@ describe('Webserver', () => {
           path.join(os.tmpdir(), 'plugin', 'authentication.js'),
           path.join(os.tmpdir(), 'plugin', 'storage.js'),
           path.join(os.tmpdir(), 'plugin', 'middlewares.js'),
+          path.join(os.tmpdir(), 'plugin', 'formatters.js'),
           path.join(os.tmpdir(), 'beforeFile'),
           path.join(os.tmpdir(), 'beforeFile2'),
           path.join(os.tmpdir(), 'afterFile'),
@@ -419,6 +424,28 @@ describe('Webserver', () => {
         }
 
         toDelete = [];
+      });
+
+      it('should render a template', (done) => {
+        const body = {
+          data : {
+            value: [1, 2],
+            name: "John"
+          }
+        };
+
+        uploadFile(4001, token, function(err, templateIdCustom) {
+          toDelete.push(templateIdCustom);
+          get.concat(getBody(4001, `/render/${templateIdCustom}`, 'POST', body, token), (err, res, data) => {
+            assert.strictEqual(data.success, true);
+            const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
+            assert.strictEqual(_renderedFile, '<xml>1,2 / object / John Eric</xml>');
+            helper.assert(data.data.debug, undefined);
+            toDelete.push(data.data.renderId);
+            done();
+          });
+        }, '<xml>{d.value} / {d.value:typeof} / {d.name:addText(\' Eric\')}</xml>')
+        
       });
 
       it('should upload the template as form-data and use authentication and storage plugin', (done) => {

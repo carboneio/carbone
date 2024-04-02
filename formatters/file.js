@@ -26,9 +26,15 @@ function appendFile (urlOrBase64, where = 'end' /* not implemented yet */ ) {
   if (!urlOrBase64) {
     return '';
   }
+  const _existingFile = this.fileDatabase.get(urlOrBase64);
+  if (_existingFile) {
+    _existingFile.count++;
+    return '';
+  }
   this.fileDatabase.set(urlOrBase64, {
     id       : this.fileDatabase.size,
-    position : (where === 'begin' ? 'begin' : 'end')
+    position : (where === 'begin' ? 'begin' : 'end'),
+    count    : 1
   });
   return '';
 }

@@ -37,7 +37,8 @@ describe('appendFile', function () {
       _filesToAdd.set(_pdfToAdd, {
         extension : 'pdf',
         position  : 'end',
-        data      : fs.readFileSync(_pdfToAdd)
+        count     : 1,
+        data      : fs.readFileSync(_pdfToAdd),
       });
       file.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
         helper.assert(err+'', 'null');
@@ -59,6 +60,7 @@ describe('appendFile', function () {
       _filesToAdd.set(_pdfToAdd, {
         extension : 'pdf',
         position  : 'end',
+        count     : 1,
         data      : fs.readFileSync(_pdfToAdd)
       });
       file.mergePDF(_mainFile, _filesToAdd, _outputFilePath, (err) => {
@@ -88,6 +90,7 @@ describe('appendFile', function () {
         _filesToAdd.set(i+'file.pdf', {
           extension : 'pdf',
           position  : 'end',
+          count     : 1,
           data      : fs.readFileSync(path.join(pdfPath, (i % 2 === 0 ? 'test-E-1.4.pdf' : 'test-F-1.4.pdf')))
         });
       }
@@ -113,12 +116,14 @@ describe('appendFile', function () {
       _filesToAdd.set(_pdf1ToAdd, {
         extension : 'pdf',
         position  : 'end',
+        count     : 1,
         data      : fs.readFileSync(_pdf1ToAdd),
         source    : '{d.pdf1}'
       });
       _filesToAdd.set(_pdf2ToAdd, {
         extension : 'pdf', // it's a JPG but we test if relies on this
         position  : 'end',
+        count     : 1,
         data      : fs.readFileSync(_pdf2ToAdd),
         source    : '{d.pdf2}'
       });
@@ -135,6 +140,7 @@ describe('appendFile', function () {
       _filesToAdd.set(_pdf1ToAdd, {
         extension : 'pdf',
         position  : 'end',
+        count     : 1,
         data      : fs.readFileSync(_pdf1ToAdd),
         source    : '{d.pdf1}'
       });
@@ -163,10 +169,10 @@ describe('appendFile', function () {
       carbone.reset();
     });
     it.skip('should render a document, append a PDF from base64', function (done) {
-      const data = {
+      const _data = {
         url : fs.readFileSync(path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), { encoding : 'base64' })
       };
-      carbone.render(path.join(__dirname, 'datasets', 'merge-pdf', 'docx-simple.xml'), data, {convertTo : 'pdf'}, function (err, result) {
+      carbone.render(path.join(__dirname, 'datasets', 'merge-pdf', 'docx-simple.xml'), _data, {convertTo : 'pdf'}, function (err, result) {
         helper.assert(err+'', 'null');
         fs.writeFileSync('generatedDocument.pdf', result);
         done();
@@ -174,10 +180,10 @@ describe('appendFile', function () {
     });
     it('should render a document and accept an empty PDF link. In that case, the PDF is not added and the document is generated', function (done) {
       // If this test does not pass, install DejaVy Sans font on your computer
-      const data = {
+      const _data = {
         url : ''
       };
-      carbone.render(path.join(pdfPath, 'docx-simple.xml'), data, {convertTo : 'pdf', renderPrefix : 'temp1' }, function (err, outputFilePath) {
+      carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp1' }, function (err, outputFilePath) {
         helper.assert(err+'', 'null');
         pdfToJson(path.join(pdfPath, 'docx-simple-expected-empty.pdf'), (expected) => {
           pdfToJson(outputFilePath, (result) => {
@@ -194,10 +200,10 @@ describe('appendFile', function () {
         .replyWithFile(200, path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), {
           'Content-Type' : 'application/pdf',
         });
-      const data = {
+      const _data = {
         url : 'https://google.com/document-1.pdf'
       };
-      carbone.render(path.join(pdfPath, 'docx-simple.xml'), data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
+      carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
         helper.assert(err+'', 'null');
         pdfToJson(path.join(pdfPath, 'docx-simple-expected.pdf'), (expected) => {
           pdfToJson(outputFilePath, (result) => {
@@ -208,16 +214,72 @@ describe('appendFile', function () {
         });
       });
     });
+    it('should not download some document twice if appendFile is used in header and body (two differents XML file)', function (done) {
+      nock('https://google.com')
+        .get('/document-1.pdf')
+        .replyWithFile(200, path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), {
+          'Content-Type' : 'application/pdf',
+        });
+      nock('https://google.com')
+        .get('/document-2.pdf')
+        .replyWithFile(200, path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), {
+          'Content-Type' : 'application/pdf',
+        });
+      const _data = {
+        url    : 'https://google.com/document-1.pdf',
+        header : 'https://google.com/document-2.pdf'
+      };
+      carbone.render(path.join(pdfPath, 'docx-header-body.docx'), _data, {convertTo : 'pdf', renderPrefix : 'temp3' }, function (err, outputFilePath) {
+        helper.assert(err+'', 'null');
+        pdfToJson(outputFilePath, (result) => {
+          helper.assert(result.Pages.length, 3);
+          done();
+        });
+      });
+    });
+    it('should not download the document twice if the same document is added in header and body (two different XML file).\
+      But it should append the same document twice in the final report if appendFile is called two times for the same document.', function (done) {
+      nock('https://google.com')
+        .get('/document-1.pdf')
+        .replyWithFile(200, path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), {
+          'Content-Type' : 'application/pdf',
+        });
+      const _data = {
+        url    : 'https://google.com/document-1.pdf',
+        header : 'https://google.com/document-1.pdf'
+      };
+      carbone.render(path.join(pdfPath, 'docx-header-body.docx'), _data, {convertTo : 'pdf', renderPrefix : 'temp4' }, function (err, outputFilePath) {
+        helper.assert(err+'', 'null');
+        pdfToJson(outputFilePath, (result) => {
+          helper.assert(result.Pages.length, 3);
+          done();
+        });
+      });
+    });
+    it('should return an error if the same document is downloaded more than 5 times in the same document', function (done) {
+      const _data = [
+        { url : 'https://google.com/document-1.pdf' },
+        { url : 'https://google.com/document-1.pdf' },
+        { url : 'https://google.com/document-1.pdf' },
+        { url : 'https://google.com/document-1.pdf' },
+        { url : 'https://google.com/document-1.pdf' },
+        { url : 'https://google.com/document-1.pdf' }
+      ];
+      carbone.render(path.join(pdfPath, 'docx-loop.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp6' }, function (err) {
+        helper.assert(err+'', 'Error: The limit for appending identical files has been exceeded (limit: 5). The file was: "https://google.com/document-1.pdf"');
+        done();
+      });
+    });
     it('should render a document and it should ignore appendFile if the output is not a PDF', function (done) {
       nock('https://google.com')
         .get('/document-1.pdf')
         .replyWithFile(200, path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), {
           'Content-Type' : 'application/pdf',
         });
-      const data = {
+      const _data = {
         url : 'https://google.com/document-1.pdf'
       };
-      carbone.render(path.join(pdfPath, 'docx-simple.xml'), data, {convertTo : 'txt' }, function (err, buffer) {
+      carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'txt' }, function (err, buffer) {
         helper.assert(err+'', 'null');
         helper.assert(nock.isDone(), false); // should not call the URL
         // \uFEFF is the magic number
@@ -232,10 +294,10 @@ describe('appendFile', function () {
         .replyWithFile(500, path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), {
           'Content-Type' : 'application/pdf',
         });
-      const data = {
+      const _data = {
         url : 'https://google.com/document-1.pdf'
       };
-      carbone.render(path.join(pdfPath, 'docx-simple.xml'), data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
+      carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
         helper.assert(err+'', 'Error: Unable to download file from URL: "https://google.com/document-1.pdf". Status code: 500. Check URL and network access.');
         helper.assert(outputFilePath, null);
         done();
@@ -247,10 +309,10 @@ describe('appendFile', function () {
         .replyWithFile(200, path.join(__dirname, 'datasets', 'test_unknown_file_type.zip'), {
           'Content-Type' : 'application/zip',
         });
-      const data = {
+      const _data = {
         url : 'https://google.com/document-1.caca'
       };
-      carbone.render(path.join(pdfPath, 'docx-simple.xml'), data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
+      carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
         helper.assert(err+'', 'Error: Unable to download file from URL: "https://google.com/document-1.caca". File type is unknown or not allowed. Accepted types: pdf');
         helper.assert(outputFilePath, null);
         done();
@@ -263,10 +325,10 @@ describe('appendFile', function () {
         .replyWithFile(200, path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), {
           'Content-Type' : 'application/pdf',
         });
-      const data = {
+      const _data = {
         url : 'https://google.com/document-1.pdf'
       };
-      carbone.render(path.join(pdfPath, 'docx-simple.xml'), data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
+      carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
         helper.assert(err+'', 'Error: Maximum total file size exceeded (limit: 10 bytes). Last downloaded file was: "https://google.com/document-1.pdf"');
         helper.assert(outputFilePath, null);
         done();
@@ -284,11 +346,11 @@ describe('appendFile', function () {
         .replyWithFile(200, path.join(pdfPath, 'test-B-docx-landscape-svg-1.3.pdf'), {
           'Content-Type' : 'application/pdf',
         });
-      const data = {
+      const _data = {
         url   : 'https://google.com/document-1.pdf',
         empty : 'https://google.com/document-2.pdf'
       };
-      carbone.render(path.join(pdfPath, 'docx-simple.xml'), data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
+      carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
         helper.assert(err+'', 'Error: Maximum number of downloaded files exceeded (limit: 1).');
         helper.assert(outputFilePath, null);
         helper.assert(nock.isDone(), false); // should not call the URL
@@ -296,22 +358,6 @@ describe('appendFile', function () {
         done();
       });
     });
-    // it.skip('should download a PDF from an url even if the header.content-type is incorrect, and the URL does not contain the extension', function (done) {
-    //   // Google Drive example
-    //   nock('https://google.com')
-    //     .get('/pdf-doc-flag-fr')
-    //     .replyWithFile(200, __dirname + '/datasets/test_word_render_A.pdf', {
-    //       'Content-Type' : 'application/octet-stream',
-    //       'Content-Disposition' : 'attachment; filename="beautiful document.pdf"',
-    //     });
-    //   image.downloadImage('https://google.com/pdf-doc-flag-fr', {}, {}, function (err, imageInfo) {
-    //     helperTest.assert(err+'', 'null');
-    //     assert(imageInfo.data.length > 0);
-    //     helperTest.assert(imageInfo.mimetype, 'application/pdf');
-    //     helperTest.assert(imageInfo.extension, 'pdf');
-    //     done();
-    //   });
-    // });
 
   });
 

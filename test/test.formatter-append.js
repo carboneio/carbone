@@ -9,7 +9,7 @@ const tempPath  = path.join(__dirname, 'temp');
 const pdf2json  = require('pdf2json');
 const nock      = require('nock');
 
-describe.only('appendFile', function () {
+describe('appendFile', function () {
   beforeEach(function () {
     helper.rmDirRecursive(tempPath);
     fs.mkdirSync(tempPath, '0755');
@@ -173,6 +173,7 @@ describe.only('appendFile', function () {
       });
     });
     it('should render a document and accept an empty PDF link. In that case, the PDF is not added and the document is generated', function (done) {
+      // If this test does not pass, install DejaVy Sans font on your computer
       const data = {
         url : ''
       };

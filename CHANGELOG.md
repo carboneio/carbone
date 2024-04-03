@@ -1,4 +1,7 @@
 
+## v4.22.0
+  - Supports variables with absolute JSON paths starting with `d.` or `c.` in mathematical formatters: `add`, `sub`, `div`, `mul`. For example: `{d.total:add(d.val)}`.
+
 ## v4.21.0
   - Release Mars 16th 2024
   - [On-premise] Studio Light: Added button to copy the Template ID of the previewed template.

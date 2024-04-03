@@ -534,7 +534,7 @@ describe('Webserver', () => {
         });
       });
 
-      it('should render with en ephemeral template, passed in base64', (done) => {
+      it('should render with en volatile template, passed in base64', (done) => {
         let body = {
           data : {
             firstname : 'John',

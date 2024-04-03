@@ -1,6 +1,6 @@
 
 ## v4.22.0
-  - Accept to send an ephemeral template when calling the API `POST /render/template`. This template is never stored and it does not trigger the middleware `readTemplate`
+  - Accept to send a volatile template when calling the API `POST /render/template`. This template is never stored and it does not trigger the middleware `readTemplate`
   ```
     {
       data      : {},

@@ -5,7 +5,7 @@ RUN apt update && \
     apt install -y curl libnss3 libxinerama1 libdbus-glib-1-2 libcairo2 libcups2
     
 # Download LibreOffice
-RUN curl -L https://download.documentfoundation.org/libreoffice/stable/7.6.4/deb/x86_64/LibreOffice_7.6.4_Linux_x86-64_deb.tar.gz | \
+RUN curl -L https://downloadarchive.documentfoundation.org/libreoffice/old/7.6.6.3/deb/x86_64/LibreOffice_7.6.6.3_Linux_x86-64_deb.tar.gz | \
     tar -zx
 
 # Install LibreOffice
@@ -26,5 +26,10 @@ RUN chmod +x carbone-ee-linux
 RUN chown -R carbone:nogroup ${APP_ROOT}
 
 USER carbone
+
+RUN mkdir /app/template
+RUN mkdir /app/render
+RUN mkdir /app/config
+RUN mkdir /app/plugin
 
 ENTRYPOINT ./carbone-ee-linux webserver

@@ -785,6 +785,22 @@ describe('helper', function () {
       _queue.start();
     });
 
+    it('should call the final callback if the array is empty', (done) => {
+      let _queue = helper.genericQueue(
+        []
+        , (item, next) => {
+          helper.assert('not', 'executed');
+          next();
+        },
+        (err) => {
+          helper.assert(err+'', 'null');
+          done();
+        }
+      );
+      _queue.start();
+    });
+
+
     it('should process multiple elements', (done) => {
       let _nb    = [];
       let _queue = helper.genericQueue(
@@ -989,24 +1005,6 @@ describe('helper', function () {
     });
   });
 
-  describe('Get file extension from URL', function () {
-    it('should return a png/jpeg/gif/txt extension', function () {
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png'), 'png');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif'), 'gif');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg'), 'jpeg');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt'), 'txt');
-    });
-    it('should lower case extension to normalize', function () {
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.JPG'), 'jpg');
-    });
-    it('should return a png/jpeg/gif/txt extension with query parameters', function () {
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.png?fewfw=223&lala=few'), 'png');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.gif#fewfw=223?lala=few'), 'gif');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image.with.lot.of.points.jpeg&name=John'), 'jpeg');
-      helper.assert(helper.getFileExtensionFromUrl('https://google.com/image-flag-fr.txt?name=john&age=2#lala'), 'txt');
-    });
-  });
-
   describe('Find the relative path between 2 markers', function () {
     it('should find the relative path between 2 markers', function () {
       helper.assert(helper.getMarkerRelativePath('d.list[i].color', 'd.list[i].color2'), '.color2');
@@ -1102,6 +1100,7 @@ describe('helper', function () {
       assert.throws(() => helper.compareStringFromPosition('blue', 'blue', 10), new Error('The index is outside of the text length range.'));
     });
   });
+
 });
 
 

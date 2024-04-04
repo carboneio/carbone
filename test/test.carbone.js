@@ -1387,6 +1387,18 @@ describe('Carbone', function () {
           done();
         });
       });
+      it('should manage sum with absolute JSON path', function (done) {
+        const _xml = '<xml>{d.totalUnit:add(d.totalQty):add(c.ab)}</xml>';
+        const _data = {
+          totalQty  : 10,
+          totalUnit : 23
+        };
+        carbone.renderXML(_xml, _data, {complement : { ab : 2}}, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<xml>35</xml>');
+          done();
+        });
+      });
       it('should accept absolute path if d. and c. are used without quotes', function (done) {
         var data = {
           param     : 3,

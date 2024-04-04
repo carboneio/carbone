@@ -10,3 +10,5 @@ COPY carbone-fonts /usr/share/fonts/carbone-fonts
 RUN fc-cache -f -v
 
 USER carbone
+
+ENTRYPOINT ./carbone-ee-linux webserver

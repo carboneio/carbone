@@ -42,6 +42,20 @@ describe('parser', function () {
       const _resultCode = parser.parseMathematicalExpression('.id', _varParser);
       helper.assert(_resultCode, 'parseFloat(_id_)');
     });
+    it('should return one variable if there is one variable with absolute path (d.)', function () {
+      const _varParser = (v) => {
+        return '_'+ v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('d.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_d.id_)');
+    });
+    it('should return one variable if there is one variable with absolute path (c.)', function () {
+      const _varParser = (v) => {
+        return '_'+ v + '_';
+      };
+      const _resultCode = parser.parseMathematicalExpression('c.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_c.id_)');
+    });
     it('should return one float', function () {
       const _varParser = (v) => {
         return v;
@@ -94,6 +108,17 @@ describe('parser', function () {
       assert.throws(() => { parser.parseMathematicalExpression('10 ++ 10'  , _varParser); }, {  message : 'Bad Mathematical Expression in "10 ++ 10"' });
       assert.throws(() => { parser.parseMathematicalExpression('10 //// 10', _varParser); }, {  message : 'Bad Mathematical Expression in "10 //// 10"' });
       /* eslint-enable */
+    });
+    it('should parse more complex mathematical expression with absolute and relative path', function () {
+      const _varParser = (v) => {
+        helper.assert(['.aaa', 'c.b', 'd.parent-dash[0].sub.id', '.toto', '223.234', 'd.part.id'].includes(v), true);
+        if (v[0] === '.') {
+          return '_'+  v.slice(1) + '_';
+        }
+        return v;
+      };
+      const _resultCode = parser.parseMathematicalExpression('.aaa +    c.b   * d.parent-dash[0].sub.id    -  .toto + 223.234 / d.part.id', _varParser);
+      helper.assert(_resultCode, 'parseFloat(_aaa_)+parseFloat(c.b)*parseFloat(d.parent-dash[0].sub.id)-parseFloat(_toto_)+parseFloat(223.234)/parseFloat(d.part.id)');
     });
   });
   describe('findMarkers', function () {

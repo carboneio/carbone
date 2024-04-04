@@ -1,4 +1,13 @@
 
+## v4.22.0
+  - The execution order of multiple Carbone tags using the `:set` formatter is guaranteed within the same part of a document (body, header, footer, text box).
+    As a result, you can create new variables that depend on previously created ones. Example:
+    ```
+      {d.price:add(10):set(d.total1)}
+      {d.total1:add(20):set(d.total2)}
+      {d.total2} = 30
+    ```
+
 ## v4.21.0
   - Release Mars 16th 2024
   - [On-premise] Studio Light: Added button to copy the Template ID of the previewed template.

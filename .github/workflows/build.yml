@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
   BUILD:
     env:
-      PKG_VERSION: 5.11.4
+      PKG_VERSION: 5.11.5
       BUILD_TARGET: "node18-linux-x64,node18-macos-x64,node18-win-x64"
 
     runs-on: ubuntu-20.04

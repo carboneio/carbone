@@ -1,5 +1,6 @@
 
 ## v4.22.0
+  - Supports variables with absolute JSON paths starting with `d.` or `c.` in mathematical formatters: `add`, `sub`, `div`, `mul`. For example: `{d.total:add(d.val)}`.
   - Fix: Reduced the probability of generating corrupted XLSX files when using XLSX templates with `:formatN` to transform a JSON number into a native Excel number.
     Previously, if at least one injected value was a string, the generated XLSX file would become corrupted.
   - [On-premise] Load custom formatters as Javascript in your Carbone instance:

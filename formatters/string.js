@@ -4,7 +4,8 @@ var toMd5 = require('./md5');
 const LINEBREAK = {
   odt  : '<text:line-break/>',
   ods  : '</text:p><text:p>',
-  docx : '</w:t><w:br/><w:t>'
+  docx : '</w:t><w:br/><w:t>',
+  pptx : '</a:t></a:r><a:br/><a:r><a:t>'
 };
 
 /**

@@ -1,5 +1,12 @@
 
 ## v4.22.0
+  - The execution order of multiple Carbone tags using the `:set` formatter is guaranteed within the same part of a document (body, header, footer, text box).
+    As a result, you can create new variables that depend on previously created ones. Example:
+    ```
+      {d.price:add(10):set(d.total1)}
+      {d.total1:add(20):set(d.total2)}
+      {d.total2} = 30
+    ```
   - Supports variables with absolute JSON paths starting with `d.` or `c.` in mathematical formatters: `add`, `sub`, `div`, `mul`. For example: `{d.total:add(d.val)}`.
   - Fix: Reduced the probability of generating corrupted XLSX files when using XLSX templates with `:formatN` to transform a JSON number into a native Excel number.
     Previously, if at least one injected value was a string, the generated XLSX file would become corrupted.

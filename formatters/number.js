@@ -307,6 +307,31 @@ function abs (d) {
   return d;
 }
 
+/**
+ * Adapt the cell type in a Excel spreadsheet according to the value
+ *
+ * @private
+ * @param   {Number}  d   value
+ * @return  {Number}      return n or inlineStr
+ */
+function toExcelType(d) {
+  // only type 'n' is managed currently
+  return isNaN(parseFloat(d)) === false && isFinite(d) || d === null || d === undefined ? 'n' : 'inlineStr'; 
+}
+
+/**
+ * Adapt the cell value in a Excel spreadsheet according to the value type
+ * 
+ * @private
+ * @param   {Number}  d   value
+ * @return  {Number}      returns XML to insert the cell
+ */
+function toExcelValue(d) {
+  const _val = d === null || d === undefined ? '' : d;
+  return toExcelType(d) === 'n' ? '<v>' + _val + '</v>' : '<is><t>' + _val + '</t></is>'; 
+}
+toExcelValue.canInjectXML = true;
+
 
 module.exports = {
   formatN  : formatN,
@@ -319,6 +344,9 @@ module.exports = {
   mod      : mod,
   div      : div,
   abs      : abs,
+
+  toExcelType,
+  toExcelValue,
 
   /**
    * Converts a number to an INT

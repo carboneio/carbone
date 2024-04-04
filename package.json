@@ -27,6 +27,7 @@
     "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
     "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
     "build": "pkg -o ./build/carbone-ee .",
+    "postinstall": "rm -rf node_modules/pdf-lib/dist && rm -rf node_modules/pdf-lib/es && rm -rf node_modules/pdf-lib/src && rm -rf node_modules/pdf-lib/ts3.4",
     "publishBuild": "script/publishBuild.sh",
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },

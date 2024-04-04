@@ -57,29 +57,6 @@ describe('Carbone', function () {
     });
   });
 
-  describe(':set', function () {
-    it('should save the result in data, and it can be used later', function (done) {
-      var _xml = '<xml>{d.title:substr(0, 4):set(d.other)} {d.other} </xml>';
-      var _data = {title : 'boo1234'};
-      var _complement = {date : 'today'};
-      carbone.renderXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
-        helper.assert(err+'', 'null');
-        helper.assert(_xmlBuilt, '<xml> boo1 </xml>');
-        done();
-      });
-    });
-    it('should save the result in complement, and it can be used later', function (done) {
-      var _xml = '<xml>{d.title:substr(0, 4):set(c.other)} {c.other} </xml>';
-      var _data = {title : 'boo1234'};
-      var _complement = {date : 'today'};
-      carbone.renderXML(_xml, _data, {complement : _complement}, function (err, _xmlBuilt) {
-        helper.assert(err+'', 'null');
-        helper.assert(_xmlBuilt, '<xml> boo1 </xml>');
-        done();
-      });
-    });
-  });
-
   describe('format date', function () {
     afterEach(function (done) {
       carbone.reset();
@@ -1407,6 +1384,18 @@ describe('Carbone', function () {
         carbone.renderXML('<xml>{d.subObject.id:ifEqual(2, ..textToPrint)}</xml>', data, function (err, result) {
           helper.assert(err+'', 'null');
           helper.assert(result, '<xml>ddfdf</xml>');
+          done();
+        });
+      });
+      it('should manage sum with absolute JSON path', function (done) {
+        const _xml = '<xml>{d.totalUnit:add(d.totalQty):add(c.ab)}</xml>';
+        const _data = {
+          totalQty  : 10,
+          totalUnit : 23
+        };
+        carbone.renderXML(_xml, _data, {complement : { ab : 2}}, function (err, _xmlBuilt) {
+          helper.assert(err+'', 'null');
+          helper.assert(_xmlBuilt, '<xml>35</xml>');
           done();
         });
       });

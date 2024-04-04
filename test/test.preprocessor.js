@@ -604,7 +604,7 @@ describe('preprocessor', function () {
           );
         });
       });
-      describe('convertToInlineString', function () {
+      describe('convertToInlineString for XLSX', function () {
         it('should do nothing if the string is empty or null', function () {
           helper.assert(preprocessor.convertToInlineString(null), null);
           helper.assert(preprocessor.convertToInlineString(''), '');
@@ -638,48 +638,52 @@ describe('preprocessor', function () {
         it('should makes a number marker (:formatN applied) recognised as number type by changing the type t="s" to t="n", removing xml markups and formatter ":formatN() [One marker test]" ', function () {
           const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
           const _sharedString = ['<t xml:space="preserve">{d.nbr2:formatN()}</t>'];
-          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d.nbr2}</v></c>';
+          const _expectedResult = '<c r="A2" s="0" t="{d.nbr2:toExcelType}">{d.nbr2:toExcelValue}</c>';
           const _result = preprocessor.convertToInlineString(_xml, _sharedString);
           helper.assert(_result, _expectedResult);
-          helper.assert(!!/t="s"/.exec(_result), false);
-          helper.assert(!!/t="n"/.exec(_result), true);
         });
         it('should makes a number marker (:formatN applied) recognised as number type even if d is an array" ', function () {
           const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
           const _sharedString = ['<t xml:space="preserve">{d[0].id:formatN()}</t>'];
-          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d[0].id}</v></c>';
+          const _expectedResult = '<c r="A2" s="0" t="{d[0].id:toExcelType}">{d[0].id:toExcelValue}</c>';
           const _result = preprocessor.convertToInlineString(_xml, _sharedString);
           helper.assert(_result, _expectedResult);
-          helper.assert(!!/t="s"/.exec(_result), false);
-          helper.assert(!!/t="n"/.exec(_result), true);
         });
         it('should detect formatN without parenthesis" ', function () {
           const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
           const _sharedString = ['<t xml:space="preserve">{d[i].id:formatN}</t>'];
-          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d[i].id}</v></c>';
+          const _expectedResult = '<c r="A2" s="0" t="{d[i].id:toExcelType}">{d[i].id:toExcelValue}</c>';
           const _result = preprocessor.convertToInlineString(_xml, _sharedString);
           helper.assert(_result, _expectedResult);
-          helper.assert(!!/t="s"/.exec(_result), false);
-          helper.assert(!!/t="n"/.exec(_result), true);
         });
         it('should detect formatN with parenthesis and precision and whitespaces" ', function () {
           const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
           const _sharedString = ['<t xml:space="preserve">{d[0].id:formatN( 2 )}</t>'];
-          const _expectedResult = '<c r="A2" s="0" t="n"><v>{d[0].id}</v></c>';
+          const _expectedResult = '<c r="A2" s="0" t="{d[0].id:toExcelType}">{d[0].id:toExcelValue}</c>';
           const _result = preprocessor.convertToInlineString(_xml, _sharedString);
           helper.assert(_result, _expectedResult);
-          helper.assert(!!/t="s"/.exec(_result), false);
-          helper.assert(!!/t="n"/.exec(_result), true);
+        });
+        it('(TODO FIXME IN V5) -> if formatN is used, it should keep all text around it', function () {
+          const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
+          const _sharedString = ['<t xml:space="preserve">something {d[0].id:formatN( 2 )} bla</t>'];
+          const _expectedResult = '<c r="A2" s="0" t="{d[0].id:toExcelType}">{d[0].id:toExcelValue}</c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
+        });
+        it('(TODO FIXME IN V5)   -> if formatN is used, it should keep all tags ', function () {
+          const _xml = '<c r="A2" s="0" t="s"><v>0</v></c>';
+          const _sharedString = ['<t xml:space="preserve"> {d[1].id:formatN(2)}  {d[0].id:formatN(2)} </t>'];
+          const _expectedResult = '<c r="A2" s="0" t="{d[1].id:toExcelType}">{d[1].id:toExcelValue}</c>';
+          const _result = preprocessor.convertToInlineString(_xml, _sharedString);
+          helper.assert(_result, _expectedResult);
         });
 
         it('should makes a number marker (:formatN applied) recognised as number type by changing the type t="n", removing xml markups and formatter ":formatN()" [Multiple markers test]', function () {
           const _xml = '<c r="A1" s="1" t="s"><v>0</v></c><c r="A2" s="0" t="s"><v>1</v></c><c r="A3" s="0" t="s"><v>2</v></c>';
           const _sharedString = ['<t xml:space="preserve">1</t>', '<t xml:space="preserve">{d.nbr2:formatN()}</t>', '<t xml:space="preserve">{d.nbr3:formatN()}</t>'];
-          const _expectedResult = '<c r="A1" s="1" t="inlineStr"><is><t xml:space="preserve">1</t></is></c><c r="A2" s="0" t="n"><v>{d.nbr2}</v></c><c r="A3" s="0" t="n"><v>{d.nbr3}</v></c>';
+          const _expectedResult = '<c r="A1" s="1" t="inlineStr"><is><t xml:space="preserve">1</t></is></c><c r="A2" s="0" t="{d.nbr2:toExcelType}">{d.nbr2:toExcelValue}</c><c r="A3" s="0" t="{d.nbr3:toExcelType}">{d.nbr3:toExcelValue}</c>';
           const _result = preprocessor.convertToInlineString(_xml, _sharedString);
           helper.assert(_result, _expectedResult);
-          helper.assert(!!/t="s"/.exec(_result), false);
-          helper.assert(!!/t="n"/.exec(_result), true);
         });
 
         it('should not makes a number marker recognised as number type because of wrong formatN typing [testing regex]', function () {

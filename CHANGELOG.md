@@ -12,6 +12,41 @@
       - If the provided URL is null, undefined, or an empty string.
       - If the final report is not in PDF format
   - Improve file type detection when inserting images or PDF coming from external URL. It can read file extension in Content-Disposition if Carbone cannot find it Content-Type and URL.
+  - The execution order of multiple Carbone tags using the `:set` formatter is guaranteed within the same part of a document (body, header, footer, text box).
+    As a result, you can create new variables that depend on previously created ones. Example:
+    ```
+      {d.price:add(10):set(d.total1)}
+      {d.total1:add(20):set(d.total2)}
+      {d.total2} = 30
+    ```
+  - Supports variables with absolute JSON paths starting with `d.` or `c.` in mathematical formatters: `add`, `sub`, `div`, `mul`. For example: `{d.total:add(d.val)}`.
+  - Fix: Reduced the probability of generating corrupted XLSX files when using XLSX templates with `:formatN` to transform a JSON number into a native Excel number.
+    Previously, if at least one injected value was a string, the generated XLSX file would become corrupted.
+  - [On-premise] Load custom formatters as Javascript in your Carbone instance:
+    1. Create a file named `formatters.js` under the `plugin` folder.
+    2. Write `module.exports = { }`, then insert your Javascript function between curly brackets: One function is equal to one formatter.
+    3. Here is the minimum code of a formatter:
+    ```js
+    function addText (d, text) {
+      return d + text;
+    }
+    /**
+     * Details:
+     * "d" the tag value
+     * "text" the first argument of the formatter
+     * A value must be returned otherwise it will print nothing in the document.
+     * Example usage: {d.value:addText(' euro')}
+     */
+    ```
+    Find formatters examples on the following page: https://github.com/carboneio/carbone/blob/master/formatters/string.js
+  - Accept to send a volatile template when calling the API `POST /render/template`. This template is never stored and it does not trigger the middleware `readTemplate`
+  ```
+    {
+      data      : {},
+      template  : "base64-encoded-file",
+      convertTo : "pdf"
+    }
+  ```
 
 ## v4.21.0
   - Release Mars 16th 2024

@@ -1,5 +1,5 @@
 
-## v4.X.X
+## v4.22.0
   - [On-premise] Load custom formatters as Javascript in your Carbone instance:
     1. Create a file named `formatters.js` under the `plugin` folder.
     2. Write `module.exports = { }`, then insert your Javascript function between curly brackets: One function is equal to one formatter.

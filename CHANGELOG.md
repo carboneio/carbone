@@ -17,7 +17,14 @@
      */
     ```
     Find formatters examples on the following page: https://github.com/carboneio/carbone/blob/master/formatters/string.js
-    
+  - Accept to send a volatile template when calling the API `POST /render/template`. This template is never stored and it does not trigger the middleware `readTemplate`
+  ```
+    {
+      data      : {},
+      template  : "base64-encoded-file",
+      convertTo : "pdf"
+    }
+  ```
 
 ## v4.21.0
   - Release Mars 16th 2024

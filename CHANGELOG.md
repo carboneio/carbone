@@ -13,7 +13,9 @@
       - If the final report is not in PDF format
   - Improve file type detection when inserting images or PDF coming from external URL. It can read file extension in Content-Disposition if Carbone cannot find it Content-Type and URL.
   - The execution order of multiple Carbone tags using the `:set` formatter is guaranteed within the same part of a document (body, header, footer, text box).
-    As a result, you can create new variables that depend on previously created ones. Example:
+    As a result, you can create new variables that depend on previously created ones. 
+    When an existing set expression is used to create another set expression, the new expression must be define after or bellow the existing expression.
+    Example:
     ```
       {d.price:add(10):set(d.total1)}
       {d.total1:add(20):set(d.total2)}

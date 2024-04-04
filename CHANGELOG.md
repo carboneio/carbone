@@ -1,5 +1,7 @@
 
 ## v4.22.0
+  - Fix: Reduced the probability of generating corrupted XLSX files when using XLSX templates with `:formatN` to transform a JSON number into a native Excel number.
+    Previously, if at least one injected value was a string, the generated XLSX file would become corrupted.
   - [On-premise] Load custom formatters as Javascript in your Carbone instance:
     1. Create a file named `formatters.js` under the `plugin` folder.
     2. Write `module.exports = { }`, then insert your Javascript function between curly brackets: One function is equal to one formatter.

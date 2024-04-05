@@ -308,7 +308,7 @@ describe('appendFile', function () {
         url : 'bah'
       };
       carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
-        helper.assert(err+'', 'Error: Unable to download file from URL: "bah". Check URL and network access.');
+        helper.assert(err+'', 'Error: Unable to download file from URL: "bah" : ECONNREFUSED. Check URL and network access.');
         helper.assert(outputFilePath, null);
         done();
       });

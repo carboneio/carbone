@@ -3375,7 +3375,7 @@ describe('Carbone', function () {
         done();
       });
     });
-    it.only('should render a template and return a path instead of a buffer (with conversion).\
+    it('should render a template and return a path instead of a buffer (with conversion).\
       it should trim and lower case convertTo extension', function (done) {
       var data = {
         field1 : 'field_1',

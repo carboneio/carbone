@@ -2427,17 +2427,21 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
 
       it('should return different errors (ETIMEDOUT, ESOCKETTIMEDOUT, ...)', function (done) {
         const errorList = ['ETIMEDOUT', 'ESOCKETTIMEDOUT', 'ECONNREFUSED', 'EPIPE', 'ENOTFOUND', 'ECONNRESET'];
+        let _count = errorList.length;
         for (let i = 0, n = errorList.length; i < n; i++) {
           const errorCode = errorList[i];
           nock('https://google.com')
             .get('/random-image.jpeg')
             .replyWithError({code : errorCode});
           image.downloadImage('https://google.com/random-image.jpeg', {}, {}, function (err, imageInfo) {
-            helperTest.assert(err.code, errorCode);
+            helperTest.assert(err.message.indexOf(errorCode) !== -1, true);
             assert(imageInfo+'', 'undefined');
+            _count--;
+            if (_count === 0) {
+              done();
+            }
           });
         }
-        done();
       });
 
       it('should return an error when the request timeout', function (done) {
@@ -2446,7 +2450,7 @@ describe('Image processing in ODG, ODT, ODP, ODS, DOCX, and XSLX', function () {
           .delay(7000)
           .reply(200, '<html></html>');
         image.downloadImage('https://google.com/random-image.jpeg', {}, {}, function (err, imageInfo) {
-          helperTest.assert(err.message, 'TimeoutError');
+          helperTest.assert(err.message, 'Unable to download file from URL: "https://google.com/random-image.jpeg" : ETIMEDOUT. Check URL and network access.');
           assert(imageInfo+'', 'undefined');
           done();
         });

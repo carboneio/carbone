@@ -1224,6 +1224,19 @@ describe('Webserver', () => {
           assert.strictEqual(data.success, true);
           const _renderedFile = fs.readFileSync(path.join(os.tmpdir(), 'render', data.data.renderId)).toString();
           assert.strictEqual(_renderedFile, '<!DOCTYPE html> <html> <p>I\'m a Carbone template !</p> <p>I AM John Doe</p> </html> ');
+          helper.assert(data.data.debug.metrics.preProcessTime  > 1   , true);
+          helper.assert(data.data.debug.metrics.planTime        > 1   , true);
+          helper.assert(data.data.debug.metrics.mergeTime       > 1   , true);
+          helper.assert(data.data.debug.metrics.concatTime      > 1   , true);
+          helper.assert(data.data.debug.metrics.fetchImageTime  === 0 , true);
+          helper.assert(data.data.debug.metrics.fetchImageBytes === 0 , true);
+          helper.assert(data.data.debug.metrics.fetchFileTime   === 0 , true);
+          helper.assert(data.data.debug.metrics.fetchFileBytes  === 0 , true);
+          helper.assert(data.data.debug.metrics.postProcessTime > 1   , true);
+          helper.assert(data.data.debug.metrics.convertTime     === 0 , true);
+          helper.assert(data.data.debug.metrics.renderTime      > 1   , true);
+          helper.assert(data.data.debug.metrics.batchSize       === 1 , true);
+          delete data.data.debug.metrics;
           helper.assert(data.data.debug, {
             markers : ['{d.firstname}', '{d.lastname}'],
             sample  : {

@@ -2,16 +2,18 @@
 
 ## v4.22.0
   - [EE] new formatter `{d.pdf_url:appendFile}` to append one or several PDFs at the end of the generated document. 
-    This formatter accepts either a single URL or an array of URLs. It can be positioned anywhere within a template and does not produce any text output by itself.
+    This formatter accepts either a single URL. It can be positioned anywhere within a template and does not produce any text output by itself.
     Carbone will return an error and will not generate the report in the following scenarios:
       - If the provided URL returns an error (with 2 retries for Carbone Cloud).
       - If the downloaded document is not recognized as a valid PDF.
       - If more than 20 files are to be downloaded (On-Premise parameter: `maxDownloadFileCount`).
       - If the total size of all downloaded files exceeds 10 MB (On-Premise parameter: `maxDownloadFileSizeTotal`).
+      - If the same PDF document is included more than 5 times.
+    
     Carbone will ignore the formatter and proceed to generate the report in the following cases:
       - If the provided URL is null, undefined, or an empty string.
       - If the final report is not in PDF format
-  - Improve file type detection when inserting images or PDF coming from external URL. It can read file extension in Content-Disposition if Carbone cannot find it Content-Type and URL.
+  - Improve file type detection when inserting images or PDF coming from external URL. It can read file extension in `Content-Disposition` if Carbone cannot find it `Content-Type` and URL.
   - The execution order of multiple Carbone tags using the `:set` formatter is guaranteed within the same part of a document (body, header, footer, text box).
     As a result, you can create new variables that depend on previously created ones. 
     When an existing set expression is used to create another set expression, the new expression must be define after or bellow the existing expression.
@@ -25,30 +27,51 @@
   - Fix: Reduced the probability of generating corrupted XLSX files when using XLSX templates with `:formatN` to transform a JSON number into a native Excel number.
     Previously, if at least one injected value was a string, the generated XLSX file would become corrupted.
   - [On-premise] Load custom formatters as Javascript in your Carbone instance:
-    1. Create a file named `formatters.js` under the `plugin` folder.
-    2. Write `module.exports = { }`, then insert your Javascript function between curly brackets: One function is equal to one formatter.
-    3. Here is the minimum code of a formatter:
-    ```js
-    function addText (d, text) {
-      return d + text;
-    }
-    /**
-     * Details:
-     * "d" the tag value
-     * "text" the first argument of the formatter
-     * A value must be returned otherwise it will print nothing in the document.
-     * Example usage: {d.value:addText(' euro')}
-     */
-    ```
+    - Create a file named `formatters.js` under the `plugin` folder.
+    - Write `module.exports = { }`, then insert your Javascript function between curly brackets: One function is equal to one formatter.
+    - Here is the minimum code of a formatter:
+      ```js
+      function addText (d, text) {
+        return d + text;
+      }
+      /**
+       * Details:
+       * "d" the tag value
+       * "text" the first argument of the formatter
+       * A value must be returned otherwise it will print nothing in the document.
+       * Example usage: {d.value:addText(' euro')}
+       */ 
+      ```
     Find formatters examples on the following page: https://github.com/carboneio/carbone/blob/master/formatters/string.js
   - Accept to send a volatile template when calling the API `POST /render/template`. This template is never stored and it does not trigger the middleware `readTemplate`
-  ```
+    ```
+      {
+        data      : {},
+        template  : "base64-encoded-file",
+        convertTo : "pdf"
+      }
+    ```
+  - If `options.isDebugActive = true`. `POST /render` returns internal metrics information in `debug` sub-object. All `Time` values are in microsecond.
+    ```js
     {
-      data      : {},
-      template  : "base64-encoded-file",
-      convertTo : "pdf"
+      debug    : {
+        metrics : {
+          preProcessTime  : 0,
+          planTime        : 0,
+          mergeTime       : 0,
+          concatTime      : 0,
+          fetchImageTime  : 0,
+          fetchImageBytes : 0,
+          fetchFileTime   : 0,
+          fetchFileBytes  : 0,
+          postProcessTime : 0,
+          convertTime     : 0,
+          renderTime      : 0,
+          batchSize       : 1
+        }
+      }
     }
-  ```
+    ```
 
 ## v4.21.0
   - Release Mars 16th 2024

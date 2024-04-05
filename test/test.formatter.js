@@ -245,6 +245,9 @@ describe('formatter', function () {
     it('should add a paragraph in ODS', function () {
       helper.assert(stringFormatter.convCRLF.call({extension : 'ods'}, 'qsdqsd \n'), 'qsdqsd </text:p><text:p>');
     });
+    it('should add a paragraph in PPTX', function () {
+      helper.assert(stringFormatter.convCRLF.call({extension : 'pptx'}, 'qsdqsd \n'), 'qsdqsd </a:t></a:r><a:br/><a:r><a:t>');
+    });
   });
   describe('convCRLFH', function () {
     it('should convert LF and CR to <br>', function () {

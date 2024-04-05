@@ -2,6 +2,7 @@
 
 ## v4.22.0
   - Release April 5th 2024
+  - The formatter `convCRLF` supports PPTX templates
   - [EE] new formatter `{d.pdf_url:appendFile}` to append one or several PDFs at the end of the generated document. 
     This formatter accepts either a single URL. It can be positioned anywhere within a template and does not produce any text output by itself.
     Carbone will return an error and will not generate the report in the following scenarios:

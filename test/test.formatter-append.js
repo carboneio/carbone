@@ -303,6 +303,16 @@ describe('appendFile', function () {
         done();
       });
     });
+    it('should return an error if url is not an URL', function (done) {
+      const _data = {
+        url : 'bah'
+      };
+      carbone.render(path.join(pdfPath, 'docx-simple.xml'), _data, {convertTo : 'pdf', renderPrefix : 'temp2' }, function (err, outputFilePath) {
+        helper.assert(err+'', 'Error: Unable to download file from URL: "bah". Check URL and network access.');
+        helper.assert(outputFilePath, null);
+        done();
+      });
+    });
     it('should return an error if the appended file format is not allowed', function (done) {
       nock('https://google.com')
         .get('/document-1.caca')

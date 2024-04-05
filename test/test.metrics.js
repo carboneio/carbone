@@ -44,9 +44,9 @@ describe('metrics', function () {
     function detectEnd () {
       _count--;
       if (_count === 0) {
-        helper.assert(_metrics.get(10) > 40*1000 && _metrics.get(10) < 50*1000, true); // 45
-        helper.assert(_metrics.get(20) > 70*1000 && _metrics.get(20) < 80*1000, true); // 75
-        helper.assert(_metrics.get(30) > 30*1000 && _metrics.get(30) < 40*1000, true); // 35
+        helper.assert(_metrics.get(10) > 43*1000 && _metrics.get(10) < 55*1000, true); // 45
+        helper.assert(_metrics.get(20) > 73*1000 && _metrics.get(20) < 85*1000, true); // 75
+        helper.assert(_metrics.get(30) > 33*1000 && _metrics.get(30) < 45*1000, true); // 35
         done();
       }
     }

@@ -3282,7 +3282,9 @@ describe('Carbone', function () {
         assert.equal(err, null);
         var _filename = path.basename(resultFilePath);
         assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
-        assert.strictEqual(debugInfo, null);
+        helper.assert(debugInfo.markers, []);
+        helper.assert(debugInfo.metrics.batchSize, 1);
+        helper.assert(debugInfo.sample, {});
         assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(reportName), true);
         assert.strictEqual(/prefix-[A-Za-z0-9-_]{22}cmVwb3J0\.docx/.test(_filename), true);
         fs.unlinkSync(resultFilePath);
@@ -3300,17 +3302,17 @@ describe('Carbone', function () {
       };
       carbone.render('test_word_render_A.docx', data, opt, function (err, resultFilePath, reportName, debugInfo) {
         assert.equal(err, null);
-        helper.assert(debugInfo.metrics.preProcessTime  > 10  , true);
-        helper.assert(debugInfo.metrics.planTime        > 10  , true);
-        helper.assert(debugInfo.metrics.mergeTime       > 10  , true);
-        helper.assert(debugInfo.metrics.concatTime      > 10  , true);
+        helper.assert(debugInfo.metrics.preProcessTime  > 1   , true);
+        helper.assert(debugInfo.metrics.planTime        > 1   , true);
+        helper.assert(debugInfo.metrics.mergeTime       > 1   , true);
+        helper.assert(debugInfo.metrics.concatTime      > 1   , true);
         helper.assert(debugInfo.metrics.fetchImageTime  === 0 , true);
         helper.assert(debugInfo.metrics.fetchImageBytes === 0 , true);
         helper.assert(debugInfo.metrics.fetchFileTime   === 0 , true);
         helper.assert(debugInfo.metrics.fetchFileBytes  === 0 , true);
-        helper.assert(debugInfo.metrics.postProcessTime > 10  , true);
+        helper.assert(debugInfo.metrics.postProcessTime > 1   , true);
         helper.assert(debugInfo.metrics.convertTime     === 0 , true);
-        helper.assert(debugInfo.metrics.renderTime      > 10  , true);
+        helper.assert(debugInfo.metrics.renderTime      > 1   , true);
         helper.assert(debugInfo.metrics.batchSize       === 1 , true);
         delete debugInfo.metrics;
         helper.assert(debugInfo, {

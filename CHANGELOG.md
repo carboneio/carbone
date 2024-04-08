@@ -1,4 +1,7 @@
 
+## v4.22.1
+  - Release April 8th 2024
+  - Fix: Aggregators may return incorrect results when used in combination with :set formatters (bug introduced by v4.22.0).
 
 ## v4.22.0
   - Release April 5th 2024

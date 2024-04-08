@@ -37,4 +37,14 @@ describe('Formatter :set', function () {
     });
   });
 
+  it('should do two aggregations without issues', function (done) {
+    const _xml = '<xml>{d.arr[].id:aggSum:set(d.var1)} {d.arr[].id:aggSum:set(d.var2)} {d.var1} {d.var2}</xml>';
+    const _data = { arr : [{id : 1}, {id : 1}, {id : 1}] };
+    carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+      helper.assert(err+'', 'null');
+      helper.assert(_xmlBuilt, '<xml>  3 3</xml>');
+      done();
+    });
+  });
+
 });

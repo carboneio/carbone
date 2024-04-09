@@ -74,11 +74,12 @@ describe.only('Dynamic HTML', function () {
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 0);
           /** WITH STYLE */
-          _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
-          _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+          _templateContent = '<office:body><office:text><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
+          _expectedContent = '<office:body><office:text><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style><carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: ' fo:text-align="center"', text: '' }))
         });
 
         it('should accept convCRLF before :html, and replace it by an internal formatter which replace "\n" by "<br>"', function () {
@@ -89,11 +90,11 @@ describe.only('Dynamic HTML', function () {
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 0);
           /** WITH STYLE */
-          _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:convCRLF:html}</text:p></office:text></office:body>';
-          _expectedContent = '<office:body><office:text><carbone>{d.content:convCRLFH:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+          _templateContent = '<office:body><office:text><office:text><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style><text:p text:style-name="P5">{d.content:convCRLF:html}</text:p></office:text></office:body>';
+          _expectedContent = '<office:body><office:text><office:text><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style><carbone>{d.content:convCRLFH:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: ' fo:text-align="center"', text: '' }))
         });
 
 
@@ -101,63 +102,73 @@ describe.only('Dynamic HTML', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
+                '<style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style>'+
                 '<text:p text:style-name="P5">Some content before {d.content:html} and after</text:p>'+
               '</office:text></office:body>';
           const _expectedContent = '' +
               '<office:body><office:text>'+
+                '<style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style>'+
                 '<text:p text:style-name="P5">Some content before </text:p>'+
                 '<carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone>'+
                 '<text:p text:style-name="P5"> and after</text:p>'+
               '</office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: ' fo:text-align=\"center\"', text: '' }))
         });
 
         it('should find and seperate a single html formatter inside a <text:h> tag', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _template = '' +
             '<office:body><office:text>'+
+              '<style:style style:name="P2" style:family="paragraph"><style:paragraph-properties fo:text-align="end" style:writing-mode="rl-tb"/><style:text-properties fo:color="#c9211e"/></style:style>'+
               '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showBegin}{d.A[i].B} Summary: {d.A[i].O:html()}{d.A[i].O:ifNEM():showEnd}</text:h>' +
               '<text:h text:style-name="P2" text:outline-level="1">{d.A[i+1]}</text:h>' +
             '</office:text></office:body>';
           const _expected = '' +
             '<office:body>' +
               '<office:text>' +
+                '<style:style style:name="P2" style:family="paragraph"><style:paragraph-properties fo:text-align="end" style:writing-mode="rl-tb"/><style:text-properties fo:color="#c9211e"/></style:style>'+
                 '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showBegin}{d.A[i].B} Summary: </text:h>' +
-                '<carbone>{d.A[i].O:getHTMLContentOdt(\'style-P2\')}</carbone>' +
+                '<carbone>{d.A[i].O:getHTMLContentOdt(\'style-P2-P2\')}</carbone>' +
                 '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showEnd}</text:h>' +
                 '<text:h text:style-name="P2" text:outline-level="1">{d.A[i+1]}</text:h>' +
               '</office:text>' +
             '</office:body>'
+
+          
           assert.strictEqual(html.reorderXML(_template, _options), _expected);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P2')), JSON.stringify({ paragraph: 'text:style-name="P2"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P2-P2')), JSON.stringify({ paragraph: ' fo:text-align="end" style:writing-mode="rl-tb"', text: ' fo:color="#c9211e"' }))
         })
 
         it('should find and seperate a html formatter inside <text:h> <text:p> tags 1', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _template = '' +
             '<office:body><office:text>'+
+              '<style:style style:name="P3" style:family="paragraph"><style:paragraph-properties fo:text-align="end"/><style:text-properties style:font-name="Noto Sans" fo:font-style="italic"/></style:style>'+
               '<text:p text:style-name="P3">{d.text:html}</text:p>' +
               '<text:h text:style-name="Heading_20_1" text:outline-level="1">{d.text:html}</text:h>' +
             '</office:text></office:body>';
           const _expected = '' +
             '<office:body>' +
               '<office:text>' +
-                '<carbone>{d.text:getHTMLContentOdt(\'style-P3\')}</carbone>' +
+                '<style:style style:name="P3" style:family="paragraph"><style:paragraph-properties fo:text-align="end"/><style:text-properties style:font-name="Noto Sans" fo:font-style="italic"/></style:style>'+
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P3-P3\')}</carbone>' +
                 '<carbone>{d.text:getHTMLContentOdt}</carbone>' +
               '</office:text>' +
             '</office:body>'
           assert.strictEqual(html.reorderXML(_template, _options), _expected);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3')), JSON.stringify({ paragraph: 'text:style-name="P3"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3-P3')), JSON.stringify({ paragraph: ' fo:text-align="end"', text: ' style:font-name="Noto Sans" fo:font-style="italic"' }))
         })
 
         it('should find and seperate a html formatter inside <text:h> <text:p> tags 2', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _template = '' +
             '<office:body><office:text>'+
+              '<style:style style:name="P3" style:family="paragraph" style:parent-style-name="Footer"><style:paragraph-properties fo:text-align="center" /><style:text-properties style:font-name="Alef"/></style:style>'+
+              '<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="end" /><style:text-properties style:font-name="Aptos"/></style:style>' + 
               '<text:p text:style-name="P3">{d.text:html}</text:p>' +
               '<text:p text:style-name="P2"/>' +
               '<text:h text:style-name="Heading_20_1" text:outline-level="1">{d.text:html}</text:h>' +
@@ -167,46 +178,51 @@ describe.only('Dynamic HTML', function () {
           const _expected = '' +
             '<office:body>' +
               '<office:text>' +
-                '<carbone>{d.text:getHTMLContentOdt(\'style-P3\')}</carbone>' +
+                '<style:style style:name="P3" style:family="paragraph" style:parent-style-name="Footer"><style:paragraph-properties fo:text-align="center" /><style:text-properties style:font-name="Alef"/></style:style>'+
+                '<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="end" /><style:text-properties style:font-name="Aptos"/></style:style>' + 
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P3-P3\')}</carbone>' +
                 '<text:p text:style-name="P2"/>' +
                 '<carbone>{d.text:getHTMLContentOdt}</carbone>' +
                 '<text:p text:style-name="P2"/>' +
-                '<carbone>{d.text:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P1-P1\')}</carbone>' +
               '</office:text>' +
             '</office:body>'
+
+
           assert.strictEqual(html.reorderXML(_template, _options), _expected);
           assert.strictEqual(_options.htmlStylesDatabase.size, 2);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3')), JSON.stringify({ paragraph: 'text:style-name="P3"', text: '' }))
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3-P3')), JSON.stringify({ paragraph: ' fo:text-align="center"', text: ' style:font-name="Alef"' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1-P1')), JSON.stringify({ paragraph: ' fo:text-align="end"', text: ' style:font-name="Aptos"' }))
         })
 
         it('should seperate a single html formatter mixed inside a span', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
-                '<text:p text:style-name="P1">' +
+                '<text:p >' +
                   '<text:span text:style-name="T2">Content before{d.courseloop1:html}Content after</text:span>'+
                 '</text:p>' +
               '</office:text></office:body>';
           const _expectedContent = '' +
               '<office:body><office:text>'+
-                '<text:p text:style-name="P1">' +
+                '<text:p >' +
                   '<text:span text:style-name="T2">Content before</text:span>' +
                 '</text:p>' +
-                '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
-                '<text:p text:style-name="P1">' +
+                '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
+                '<text:p >' +
                   '<text:span text:style-name="T2">Content after</text:span>' +
                 '</text:p>' +
               '</office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
-          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
-        it('should seperate a single html formatter mixed inside multiple spans', function () {
+        it.only('should seperate a single html formatter mixed inside multiple spans', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
+              '<style:style style:name="P1" style:family="paragraph"><style:paragraph-properties fo:text-align="center" /></style:style>'+
+              '<style:style style:name="T2" style:family="paragraph"><style:text-properties style:font-name="Aptos"/></style:style>' + 
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T3"></text:span>'+
                   '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>'+
@@ -215,6 +231,8 @@ describe.only('Dynamic HTML', function () {
               '</office:text></office:body>';
           const _expectedContent = '' +
               '<office:body><office:text>'+
+                '<style:style style:name="P1" style:family="paragraph"><style:paragraph-properties fo:text-align="center" /></style:style>'+
+                '<style:style style:name="T2" style:family="paragraph"><style:text-properties style:font-name="Aptos"/></style:style>' + 
                 '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
               '</office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
@@ -2361,7 +2379,7 @@ describe.only('Dynamic HTML', function () {
         html.postProcessODT(_template, null, _options);
         helper.assert(_template.files[0].data, _expectedContent);
       });
-      it.only('should add a new style to the content.xml and the styles.xml (header/footer)', () => {
+      it('should add a new style to the content.xml and the styles.xml (header/footer)', () => {
 
         const getStyleContent = (res) => {
           return '<?xml version="1.0" encoding="UTF-8"?>'+
@@ -2586,7 +2604,7 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_postProcessFormatter.fn.apply(_options, _postProcessFormatter.args), '<text:p><text:a xlink:type="simple" xlink:href="https://carbone.io/link_on_error_test"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>');
       });
 
-      it.only('getHtmlStyleName for Headers / Footers + apply the previous paragraph style', () => {
+      it('getHtmlStyleName for Headers / Footers + apply the previous paragraph style', () => {
         const _options = {
           htmlDatabase : new Map(),
           extension : 'odt',
@@ -2596,14 +2614,14 @@ describe.only('Dynamic HTML', function () {
         // Prepare the style coming from the template
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
-        _htmlDefaultStyleObject.text += 'fo:font-style="italic" fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
-        _htmlDefaultStyleObject.paragraph += 'text:style-name="P3"';
+        _htmlDefaultStyleObject.text += ' fo:font-style="italic" fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
+        _htmlDefaultStyleObject.paragraph += ' fo:text-align="end" style:writing-mode="rl-tb"';
         html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
 
         const _content = '<em><b>This is some content</b></em>';
         const _uniqueID = _content + _styleId + 'styles';
-        const _expected = '<text:p text:style-name="P3"><text:span text:style-name="TC00">This is some content</text:span></text:p>';
-        const _style = '<style:style style:name=\"TC00\" style:family=\"text\"><style:text-properties fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:color=\"#ff00ec\" style:font-name=\"American Typewriter\" fo:font-size=\"18pt\" fo:background-color=\"#00ff19\" style:font-name-complex=\"Noto Sans\"/></style:style>';
+        const _expected = '<text:p text:style-name="TC0D"><text:span text:style-name="TC00">This is some content</text:span></text:p>';
+        const _style = '<style:style style:name=\"TC0D\" style:family=\"paragraph\"><style:paragraph-properties fo:text-align=\"end\" style:writing-mode=\"rl-tb\"/></style:style><style:style style:name=\"TC00\" style:family=\"text\"><style:text-properties fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:color=\"#ff00ec\" style:font-name=\"American Typewriter\" fo:font-size=\"18pt\" fo:background-color=\"#00ff19\" style:font-name-complex=\"Noto Sans\"/></style:style>';
 
         const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content, _styleId, 'styles.xml');
         const _properties = _options.htmlDatabase.get(_uniqueID);

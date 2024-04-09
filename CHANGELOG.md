@@ -1,4 +1,8 @@
 
+## v4.22.2
+  - Release April 9th 2024
+  - Fix corrupted Excel file when `aggSum:formatN` is used since 4.22.0
+
 ## v4.22.1
   - Release April 8th 2024
   - Fix: Aggregators may return incorrect results when used in combination with :set formatters (bug introduced by v4.22.0).

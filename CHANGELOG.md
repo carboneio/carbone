@@ -1,4 +1,9 @@
 
+## v4.22.3
+  - Release April 11th 2024
+  - [EE] Fix `drop(table)` for ODP templates
+  - [EE] Add support of `drop(item)` for ODP and ODT templates to delete an item inside a list
+
 ## v4.22.2
   - Release April 9th 2024
   - Fix corrupted Excel file when `aggSum:formatN` is used since 4.22.0

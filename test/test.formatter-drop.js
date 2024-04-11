@@ -799,6 +799,77 @@ describe('drop formatter', function () {
         helper.assert(_template.files[0]?.data, content(true));
         done();
       });
+      it('should delete item list', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<text:list text:style-name="L1">' +
+              '<text:list-item>' +
+                '<text:p text:style-name="P2">bla</text:p>' +
+              '</text:list-item>' +
+              (expected ? '<carbone>{d.details:ifEM:hideBegin}</carbone>' : '') +
+              '<text:list-item>' +
+                '<text:p text:style-name="P2">bla2' +
+                (expected ? '' : '{d.details:ifEM:drop(item)}') +
+                '</text:p>' +
+              '</text:list-item>' +
+              (expected ? '<carbone>{d.details:ifEM:hideEnd}</carbone>' : '') +
+              '<text:list-item>' +
+                '<text:p text:style-name="P2">bla3</text:p>' +
+              '</text:list-item>' +
+            '</text:list>';
+        };
+        const _templateODT = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleDropFormatter(_templateODT, 'odt');
+        helper.assert(_templateODT.files[0]?.data, content(true));
+        const _templateODP = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleDropFormatter(_templateODP, 'odp');
+        helper.assert(_templateODP.files[0]?.data, content(true));
+        done();
+      });
+      it('should delete table of ODP templates', function (done) {
+        const content = (expected) => {
+          expected = expected ?? false;
+          return '' +
+            '<draw:frame>'+
+              '<draw:text-box/>'+
+            '</draw:frame>'+
+            (expected ? '<carbone>{d.details:ifEM:hideBegin}</carbone>' : '') +
+            '<draw:frame>'+
+              '<table:table>'+
+                '<table:table-column/>'+
+                '<table:table-row>'+
+                  '<table:table-cell>'+
+                    '<text:p>'+
+                      (expected ? '' : '{d.details:ifEM:drop(table)}') +
+                    '</text:p>'+
+                  '</table:table-cell>'+
+                '</table:table-row>'+
+              '</table:table>'+
+              '<draw:image xlink:href="Pictures/TablePreview1.svm" xlink:show="embed"/>'+
+            '</draw:frame>'+
+            (expected ? '<carbone>{d.details:ifEM:hideEnd}</carbone>' : '') +
+            '<draw:frame>'+
+              '<draw:text-box/>'+
+            '</draw:frame>';
+        };
+        const _templateODP = {
+          files : [
+            { name : 'content.xml', parent : '', data : content()}
+          ]
+        };
+        preprocessor.handleDropFormatter(_templateODP, 'odp');
+        helper.assert(_templateODP.files[0]?.data, content(true));
+        done();
+      });
     });
 
     describe('ODS', function () {

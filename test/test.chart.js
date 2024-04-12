@@ -17,6 +17,29 @@ const echartLineSVGWaldenColor  = fs.readFileSync('test/datasets/chart/echartLin
 describe('chart', function () {
 
   describe('generateChartImage', function () {
+    it('should not crash if echart option is null or undefined', function (done) {
+      const _data = {
+        type   : 'echarts@v5',
+        width  : 600,
+        height : 400,
+        option : null
+      };
+      chartFormatter.generateChartImage(_data, {}, (err) => {
+        helperTest.assert(err+'', 'ECharts Error: no echarts option detected');
+        delete _data.option;
+        chartFormatter.generateChartImage(_data, {}, (err) => {
+          helperTest.assert(err+'', 'ECharts Error: no echarts option detected');
+          done();
+        });
+      });
+    });
+    it('should not crash if echart formatters is called with weird values', function () {
+      helperTest.assert(chartFormatter.chart(null), null);
+      helperTest.assert(chartFormatter.chart(), undefined);
+      helperTest.assert(chartFormatter.chart([]), []);
+      helperTest.assert(chartFormatter.chart(2), 2);
+      helperTest.assert(chartFormatter.chart('sd'), 'sd');
+    });
     it('should generate SVG', function (done) {
       const _data = {
         type   : 'echarts@v5',
@@ -81,6 +104,29 @@ describe('chart', function () {
         });
       });
     });
+    it('should generate SVG with valid font style for LibreOffice if version is echarts@v5a', function (done) {
+      const _echart = require('./datasets/chart/echartLineFont.js');
+      const _expectedV5 = fs.readFileSync('test/datasets/chart/echartLineFontV5.svg', 'utf8');
+      const _expectedV5a = fs.readFileSync('test/datasets/chart/echartLineFontV5a.svg', 'utf8');
+      const _data = {
+        type   : 'echarts@v5',
+        width  : 600,
+        height : 400,
+        option : _echart
+      };
+      chartFormatter.generateChartImage(_data, {}, (err, res) => {
+        helperTest.assert(err+'', 'null');
+        helperTest.assert(res.extension, 'svg');
+        helperTest.assert(res.data.toString(), _expectedV5);
+        _data.type = 'echarts@v5a';
+        chartFormatter.generateChartImage(_data, {}, (err, res) => {
+          helperTest.assert(err+'', 'null');
+          helperTest.assert(res.extension, 'svg');
+          helperTest.assert(res.data.toString(), _expectedV5a);
+          done();
+        });
+      });
+    });
   });
 
 
@@ -95,6 +141,44 @@ describe('chart', function () {
       helperTest.assert(chartLib.parseSpreadSheetRange('Sheet1!$AB$20:$AB$30') , { col : 'AB' , fromRow : 20, toRow : 30 });
       helperTest.assert(chartLib.parseSpreadSheetRange('Feuil1!$B$2')          , { col : 'B'  , fromRow : 2   });
       helperTest.assert(chartLib.parseSpreadSheetRange('Feuil1!$BCZ$212')      , { col : 'BCZ', fromRow : 212 });
+    });
+  });
+
+  describe('_convertSingleLineFontStyleSVG', function () {
+    it('should do nothing if the SVG is empty', function () {
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG(), '');
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG(null), '');
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG(''), '');
+    });
+    it('should replace single line font to multiple attributes', function () {
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('style="font: normal 600 14px Arial"'), 'style="font-style=normal;font-weight:600;font-size:14px;font-family:Arial"');
+    });
+    it('should replace single line font by multiple font parameters everywhere in the SVG', function () {
+      const _fontBefore = 'font: normal 600 14px Arial';
+      const _fontAfter = 'font-style=normal;font-weight:600;font-size:14px;font-family:Arial';
+      const _svg = (expected = false) => ''
+        + '<text text-anchor="start" style="'+(expected ? _fontAfter : _fontBefore)+'" x="-70.91000000000003" y="7" transform="translate(160.4759 841.3306)" fill="#373737">-21.576860801107834</text>'
+        + '<path d="M-70.9 0l141.8 0l0 14l-141.8 0Z" transform="translate(212.0138 771.2866)" fill="none"></path>'
+        + '<text style="'+(expected ? _fontAfter : _fontBefore)+'" x="-70.91000000000003" y="7" transform="translate(212.0138 771.2866)" fill="#373737" font="test">-12.370630504133285</text>'
+        + '<path d="M-67 0l134 0l0 14l-134 0Z" transform="translate(263.5517 742.8037)" fill="none"></path>'
+        + '<text style="'+(expected ? _fontAfter : _fontBefore)+'" x="-66.99000000000002" y="7" transform="translate(263.5517 742.8037)" fill="#373737">-8.626990445588245</text>'
+      ;
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG(_svg()), _svg(true));
+    });
+    it('should accept font family with whitespaces. The font family is always the last item', function () {
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('style="font: normal normal 1em Courier New"'), 'style="font-style=normal;font-weight:normal;font-size:1em;font-family:Courier New"');
+    });
+    it('should not add two ; at the end if there is already a ;', function () {
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('<text style="font: normal 400 10px Courier New;">'), '<text style="font-style=normal;font-weight:400;font-size:10px;font-family:Courier New;">');
+    });
+    it('should replace font without losing other style attributes which are declared after', function () {
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('<text style="font: normal 400 10px Courier New; margin-top:12px;">'), '<text style="font-style=normal;font-weight:400;font-size:10px;font-family:Courier New; margin-top:12px;">');
+    });
+    it('should not break style if other style attributes are before the font attribute', function () {
+      // In that case, the font is not replaced but I think echarts cannot generate such style in text.
+      // We will improve this only if someone is rising a issue. I prefer to keep the code simple and efficient.
+      // In theory, LibreOffice should fix SVG parse in the future and this function will become useless
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('<text style="margin-top:12px; font: normal 400 10px Courier New">'), '<text style="margin-top:12px; font: normal 400 10px Courier New">');
     });
   });
 

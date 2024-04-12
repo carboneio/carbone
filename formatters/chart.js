@@ -152,7 +152,7 @@ function _convertToEChartLocale (carboneLocale) {
  *
  * @private
  * @param    {string}  [svgString='']  The svg string
- * @return   {string}                  The SVG string with multiline font properties
+ * @return   {string}                  The SVG string with multiple font properties
  */
 function _convertSingleLineFontStyleSVG (svgString = '') {
   return svgString?.replace(/style="font: ([^;"]+)/g, function (a, font) {

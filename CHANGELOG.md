@@ -1,4 +1,6 @@
 
+## v4.XX.X
+  - [EE] The HTML formatter is now supported in headers and footers of DOCX/ODT/PDF. Be careful for DOCX templates: if the HTML contains `<img>` tags, a small image must be inserted into the header/footer of the template, otherwise the image won't be displayed. That's a temporary limitation.
 
 ## v4.22.0
   - Release April 5th 2024

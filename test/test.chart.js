@@ -3,6 +3,7 @@ const chartFormatter = require('../formatters/chart');
 const chartLib = require('../lib/chart');
 const helperTest = require('./helper');
 const carbone   = require('../lib/index');
+const image = require('../lib/image');
 
 // datasets
 const echartThemeWalden         = require('./datasets/chart/echartThemeWalden.js');
@@ -52,6 +53,30 @@ describe('chart', function () {
         helperTest.assert(res.extension, 'svg');
         helperTest.assert(res.data.toString(), echartCalendarSVGen);
         done();
+      });
+    });
+    it('image.downloadImage should call echart function and accept only available echart version', function (done) {
+      const _data = {
+        type   : 'echarts@v5',
+        width  : 600,
+        height : 400,
+        option : echartCalendar
+      };
+      image.downloadImage(_data, {}, {}, function (err, imageInfo) {
+        helperTest.assert(err+'', 'null');
+        helperTest.assert(imageInfo.extension, 'svg');
+        helperTest.assert(imageInfo.data.toString(), echartCalendarSVGen);
+        _data.type = 'echarts@v5a';
+        image.downloadImage(_data, {}, {}, function (err, imageInfo) {
+          helperTest.assert(err+'', 'null');
+          helperTest.assert(imageInfo.extension, 'svg');
+          helperTest.assert(imageInfo.data.toString(), echartCalendarSVGen);
+          _data.type = 'echarts@v6';
+          image.downloadImage(_data, {}, {}, function (err) {
+            helperTest.assert(err+'', 'ECharts Error: Bad echart version. Only "echarts@v5" or "echarts@v5" is accepted');
+            done();
+          });
+        });
       });
     });
     it('should encode character in SVG (echarts bug fixed in 5.4.0)', function (done) {

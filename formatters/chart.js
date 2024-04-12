@@ -115,6 +115,9 @@ function generateChartImage (chartData, options, callback) {
       // Transform font style to make it wotk in LibreOffice
       _svgImage = _convertSingleLineFontStyleSVG(_svgImage);
     }
+    else if (chartData.type !== 'echarts@v5') {
+      return callback('ECharts Error: Bad echart version. Only "echarts@v5" or "echarts@v5" is accepted');
+    }
 
     if (/^<svg/.test(_svgImage) === true) {
       return callback(null, {

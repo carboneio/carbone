@@ -18,8 +18,6 @@ function addHtmlDatabaseOdt (options, contentID, htmlContent, templateDefaultSty
     const id = html.generateStyleID(options.htmlDatabase.size);
     const { content, style, styleLists } = html.buildXMLContentOdt(id, descriptor, options, templateDefaultStyleId);
 
-    console.log(style);
-
     _htmlDatabaseProperties = {
       content,
       style,
@@ -43,7 +41,7 @@ const getHTMLContentOdt = function (htmlContent, templateDefaultStyleId, filenam
   filename = filename || '';
   
   const _contentID = htmlContent + templateDefaultStyleId + filename?.replace('.xml', '');
-  console.log(htmlContent, templateDefaultStyleId, filename, _contentID);
+
   addHtmlDatabaseOdt(this, _contentID, htmlContent, templateDefaultStyleId, filename);
   return {
     fn   : getHTMLContentOdtPostProcess,

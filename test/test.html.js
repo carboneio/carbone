@@ -6,6 +6,12 @@ const assert = require('assert');
 const image = require('../lib/image');
 const hyperlinks = require('../lib/hyperlinks');
 
+/**
+ * TODO DOCX:
+ * - buildXmlContentDOCX avec filename
+ * - addHtmlDatabaseDOCX
+ */
+
 describe.only('Dynamic HTML', function () {
 
   describe('patchStyleAttribute', function () {
@@ -860,6 +866,30 @@ describe.only('Dynamic HTML', function () {
               '<w:rPr>' +
                 '<w:lang w:val="en-US"/>' +
               '</w:rPr>', _options), '(\'style-rtl-textaligncenter\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-rtl-textaligncenter')), JSON.stringify({ paragraph: '<w:bidi/><w:jc w:val=\"center\"/>', text: '' }))
+        });
+
+        it('should return DOCX paragraph style: RTL and Text Alignment in the footer and header', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+            '<w:pPr>' +
+              '<w:bidi/>' +
+              '<w:jc w:val="center"/>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>', _options, '', 'word/footer2.xml'), '(\'style-rtl-textaligncenter\',\'word/footer2.xml\')');
+            helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+              '<w:pPr>' +
+                '<w:bidi/>' +
+                '<w:jc w:val="center"/>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>', _options, '', 'word/header1.xml'), '(\'style-rtl-textaligncenter\',\'word/header1.xml\')');
             assert.strictEqual(_options.htmlStylesDatabase.size, 1);
             assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-rtl-textaligncenter')), JSON.stringify({ paragraph: '<w:bidi/><w:jc w:val=\"center\"/>', text: '' }))
         });
@@ -2691,7 +2721,7 @@ describe.only('Dynamic HTML', function () {
       });
     });
   });
-  describe.skip('Docx Documents', function () {
+  describe('Docx Documents', function () {
     describe('preProcessDocx', function () {
       it('should do nothing is the content does not contain HTML markers', function () {
         const _expectedContent = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document><w:body><w:r><w:rPr><w:lang w:val="en-US"/></w:rPr><w:t>Some text 12345</w:t></w:r></w:p><w:sectPr w:rsidR="002B2418" w:rsidRPr="00ED3CF0"><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/><w:cols w:space="708"/><w:docGrid w:linePitch="360"/></w:sectPr></w:body></w:document>';
@@ -2903,7 +2933,7 @@ describe.only('Dynamic HTML', function () {
         const _expectedXMLfooter = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:ftr>' +
-            '<carbone>{d.strikedel:getHTMLContentDocx(\'style-textalignright\')}</carbone>' +
+            '<carbone>{d.strikedel:getHTMLContentDocx(\'style-textalignright\',\'word/footer1.xml\')}</carbone>' +
           '</w:ftr>';
         const _XMLheader = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -2911,6 +2941,8 @@ describe.only('Dynamic HTML', function () {
             '<w:p>' +
               '<w:r>' +
                 '<w:rPr>' +
+                  '<w:b/><w:bCs/>'+
+                  '<w:color w:val="FF0000"/>'+
                   '<w:lang w:val="en-US"/>' +
                 '</w:rPr>' +
                 '<w:t>{d.italic:html}</w:t>' +
@@ -2920,7 +2952,7 @@ describe.only('Dynamic HTML', function () {
         const _expectedXMLheader = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:hdr>' +
-            '<carbone>{d.italic:getHTMLContentDocx}</carbone>' +
+            '<carbone>{d.italic:getHTMLContentDocx(\'style-tcolorFF0000\',\'word/header1.xml\')}</carbone>' +
           '</w:hdr>';
         const _template = {
           files : [
@@ -4942,6 +4974,65 @@ describe.only('Dynamic HTML', function () {
         const _it = _options.imageDatabase.keys();
         helper.assert(_it.next().value, 'https://carbone.io/cat');
         helper.assert(_it.next().value, undefined);
+      });
+
+      it('should convert HTML with images and parapgraphs into a header and footer', function () {
+        const _options = {
+          imageDatabase : new Map()
+        };
+        const _descriptor = html.parseHTML('<img src="https://carbone.io/cat" width="300" height="50" alt="cat">');
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options, '', 'word/header2.xml');
+        html.buildXmlContentDOCX(_descriptor, _options, '', 'word/footer1.xml');
+        // update image aspect ratio. Simulate calls which are done before the final postprocess
+        image._computeImageSize(_options.imageDatabase.get('https://carbone.io/cat'));
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content.get(_options), '' +
+          '<w:p>' +
+            '<w:r><w:drawing>' +
+              '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
+                '<wp:extent cx="2857500" cy="476250"/>' +
+                '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                '<wp:docPr id="1000" name="" descr=""></wp:docPr>' +
+                '<wp:cNvGraphicFramePr>' +
+                  '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                '</wp:cNvGraphicFramePr>' +
+                '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                  '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                    '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                      '<pic:nvPicPr>' +
+                        '<pic:cNvPr id="1000" name="" descr=""></pic:cNvPr>' +
+                        '<pic:cNvPicPr>' +
+                          '<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>' +
+                        '</pic:cNvPicPr>' +
+                      '</pic:nvPicPr>' +
+                      '<pic:blipFill>' +
+                        '<a:blip r:embed="rIdCarbone0"></a:blip>' +
+                        '<a:stretch>' +
+                          '<a:fillRect/>' +
+                        '</a:stretch>' +
+                      '</pic:blipFill>' +
+                      '<pic:spPr bwMode="auto">' +
+                        '<a:xfrm>' +
+                          '<a:off x="0" y="0"/>' +
+                          '<a:ext cx="2857500" cy="476250"/>' +
+                        '</a:xfrm>' +
+                        '<a:prstGeom prst="rect">' +
+                          '<a:avLst/>' +
+                        '</a:prstGeom>' +
+                      '</pic:spPr>' +
+                    '</pic:pic>' +
+                  '</a:graphicData>' +
+                '</a:graphic>' +
+              '</wp:inline>' +
+            '</w:drawing></w:r>' +
+          '</w:p>'
+        );
+        const _it = _options.imageDatabase.entries();
+        const _value = _it.next();
+        helper.assert(_value.value[0], 'https://carbone.io/cat');
+        helper.assert(_value.value[1].sheetIds[0], 'footer1.xml');
+        helper.assert(_value.value[1].sheetIds[1], 'header2.xml');
       });
 
       it('should convert HTML with images and parapgraphs (width height are transformed into EMU)', function () {

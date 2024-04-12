@@ -77,7 +77,7 @@ function addHtmlDatabaseDOCX (options, contentId, htmlContent = '', templateDefa
 
   if (!options.htmlDatabase.has(contentId)) {
     const descriptor = html.parseHTML(html.convertHTMLEntities(htmlContent));
-    const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(descriptor, options, templateDefaultStyleId);
+    const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(descriptor, options, templateDefaultStyleId, filename);
     _htmlDatabaseProperties = {
       id : options.htmlDatabase.size,
       content,

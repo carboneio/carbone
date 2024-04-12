@@ -3288,7 +3288,7 @@ describe.only('Dynamic HTML', function () {
         helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
-            '<w:rPr><w:b/><w:bCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
+            '<w:rPr><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/><w:b/><w:bCs/></w:rPr>'+
             '<w:t xml:space="preserve">Hello</w:t>'+
           '</w:r>'+
           '<w:r>'+
@@ -3299,7 +3299,7 @@ describe.only('Dynamic HTML', function () {
         '<w:p/>' +
         '<w:p>'+
           '<w:r>'+
-            '<w:rPr><w:i/><w:iCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
+            '<w:rPr><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/><w:i/><w:iCs/></w:rPr>'+
             '<w:t xml:space="preserve">John</w:t>'+
           '</w:r>'+
         '</w:p>'
@@ -3337,11 +3337,11 @@ describe.only('Dynamic HTML', function () {
           '</w:pPr>'+
           '<w:r>'+
             '<w:rPr>'+
-              '<w:b/><w:bCs/>' +
               '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>' +
               '<w:sz w:val="18"/>' +
               '<w:color w:val="FF0000"/>' +
               '<w:highlight w:val="yellow"/>' +
+              '<w:b/><w:bCs/>' +
             '</w:rPr>'+
             '<w:t xml:space="preserve">Hello</w:t>'+
           '</w:r>'+
@@ -3366,11 +3366,11 @@ describe.only('Dynamic HTML', function () {
           '</w:pPr>'+
           '<w:r>'+
             '<w:rPr>'+
-              '<w:i/><w:iCs/>' +
               '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>' +
               '<w:sz w:val="18"/>' +
               '<w:color w:val="FF0000"/>' +
               '<w:highlight w:val="yellow"/>' +
+              '<w:i/><w:iCs/>' +
             '</w:rPr>'+
             '<w:t xml:space="preserve">John</w:t>'+
           '</w:r>'+
@@ -3656,7 +3656,8 @@ describe.only('Dynamic HTML', function () {
       
         helper.assert(content.get(), ''+ 
           '<w:p>'+
-            '<w:pPr>'+ 
+            '<w:pPr>'+               
+              /** HTML */
               '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
               /** Default paragraph style */
               '<w:sz w:val="22"/>'+
@@ -3664,12 +3665,13 @@ describe.only('Dynamic HTML', function () {
               '<w:rPr><w:sz w:val="18"/></w:rPr>'+
             '</w:pPr>'+
             '<w:r>'+
-              '<w:rPr><w:i/><w:iCs/><w:sz w:val="18"/></w:rPr>'+
+              '<w:rPr><w:sz w:val="18"/><w:i/><w:iCs/></w:rPr>'+
               '<w:t xml:space="preserve">Coffee</w:t>'+
             '</w:r>'+
           '</w:p>'+
           '<w:p>'+
             '<w:pPr>'+
+              /** HTML */
               '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
               /** Default paragraph style */
               '<w:sz w:val="22"/>'+
@@ -3677,7 +3679,7 @@ describe.only('Dynamic HTML', function () {
               '<w:rPr><w:sz w:val="18"/></w:rPr>'+
             '</w:pPr>'+
             '<w:r>'+
-              '<w:rPr><w:i/><w:iCs/><w:sz w:val="18"/></w:rPr>'+
+              '<w:rPr><w:sz w:val="18"/><w:i/><w:iCs/></w:rPr>'+
               '<w:t xml:space="preserve">Tea</w:t>'+
             '</w:r>'+
           '</w:p>'+
@@ -5351,7 +5353,7 @@ describe.only('Dynamic HTML', function () {
       it('should add content element to htmlDatabase with a FONT', () => {
         const _expected =  {
           id                : 0,
-          content           : '<w:p><w:r><w:rPr><w:b/><w:bCs/><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r></w:p>',
+          content           : '<w:p><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r></w:p>',
           listStyleAbstract : '',
           listStyleNum      : ''
         };

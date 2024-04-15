@@ -6119,6 +6119,7 @@ describe.only('Dynamic HTML', function () {
       it('should set default styles and add styles coming from the HTML, and should not add the XML tag twice [DOCX]', function () {
         helper.assert(html.buildXMLStyle('docx', ['u', 'i', 'del' ], { text: '<w:b/><w:bCs/>' }), '<w:b/><w:bCs/><w:u w:val=\"single\"/><w:i/><w:iCs/><w:strike/>');
         helper.assert(html.buildXMLStyle('docx', ['i', 'b', 'u', 'del' ], { text: '<w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/><w:strike/>' }), '<w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/><w:strike/>');
+        helper.assert(html.buildXMLStyle('docx', ['s'], { text: '<w:sz w:val="28"/>' }), '<w:sz w:val=\"28\"/><w:strike/>');
       });
 
       it('should set default styles and add styles coming from the HTML, and should not add the XML tag twice [ODT]', function () {

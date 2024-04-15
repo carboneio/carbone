@@ -1,4 +1,7 @@
 
+## v4.23.0
+  - Accept Microsoft Visio templates (.vsdx) with conversion to PDFs
+
 ## v4.22.3
   - Release April 11th 2024
   - [EE] Fix `drop(table)` for ODP templates

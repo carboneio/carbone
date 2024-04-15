@@ -12,7 +12,7 @@ const hyperlinks = require('../lib/hyperlinks');
  * - addHtmlDatabaseDOCX
  */
 
-describe.only('Dynamic HTML', function () {
+describe('Dynamic HTML', function () {
 
   describe('patchStyleAttribute', function () {
     it('should do nothing if the html string is empty', function () {

@@ -1,11 +1,21 @@
 
-## v4.23.0
-  - Accept Microsoft Visio templates (.vsdx) with conversion to PDFs
-
 ## v4.22.3
-  - Release April 11th 2024
+  - Accept Microsoft Visio templates (.vsdx) with conversion to PDFs
   - [EE] Fix `drop(table)` for ODP templates
   - [EE] Add support of `drop(item)` for ODP and ODT templates to delete an item inside a list
+  - [EE] Fix crash when `null` values are passed in Apache Echarts options.
+  - [EE] Previously, charts created with Apache ECharts did not support setting custom font styles (size, family, weight). 
+    We have now resolved this issue with our own modified version of ECharts, optimized for SVG compatibility with our main document converter, LibreOffice.
+    To ensure compatibility and prevent any impact on existing charts, please specify the ECharts version `echarts@v5a` instead of `echarts@v5` when configuring your JSON. 
+    This `@v5a` version will become the default in Carbone v5.
+    ```json
+    {
+      "chartOptions" : {
+        "type" : "echarts@v5a",
+        "option" : {}
+      }
+    }
+    ```
 
 ## v4.22.2
   - Release April 9th 2024

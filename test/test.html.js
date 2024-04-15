@@ -870,6 +870,18 @@ describe.only('Dynamic HTML', function () {
             assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-rtl-textaligncenter')), JSON.stringify({ paragraph: '<w:bidi/><w:jc w:val=\"center\"/>', text: '' }))
         });
 
+        it('should return DOCX paragraph style: spacing and indent', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+            '<w:pPr>' +
+              '<w:spacing w:line="600" w:lineRule="auto"/>' +
+              '<w:ind w:left="720"/>' +
+            '</w:pPr>' +
+            '<w:r><w:rPr><w:lang w:val="en-US"/></w:rPr>', _options), '(\'style-w:spacing-w:ind\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-w:spacing-w:ind')), JSON.stringify({ paragraph: '<w:spacing w:line=\"600\" w:lineRule=\"auto\"/><w:ind w:left=\"720\"/>', text: '' }))
+        });
+
         it('should return DOCX paragraph style: RTL and Text Alignment in the footer and header', function () {
           let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
           helper.assert(html.getTemplateDefaultStyles('<w:p>' +
@@ -934,6 +946,26 @@ describe.only('Dynamic HTML', function () {
           assert.strictEqual(_options.htmlStylesDatabase.size, 4);
           assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-tcolorFF0000-bgcoloryellow')), JSON.stringify({ paragraph: '', text: '<w:color w:val=\"FF0000\"/><w:highlight w:val=\"yellow\"/>' }))
         });
+
+
+        it('should return DOCX text styles: Bold / Italic / Underline / strike / <w:smallCaps/> / <w:vanish/> / <w:dstrike/> / <w:caps w:val="true" />', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+            '<w:pPr>' +
+              '<w:spacing w:line="600" w:lineRule="auto"/>' +
+              '<w:ind w:left="720"/>' +
+            '</w:pPr>' +
+            '<w:r><w:rPr>'+
+              '<w:b/><w:bCs/><w:i/><w:iCs/><w:u w:val="single"/><w:caps/>'+
+              '<w:smallCaps/><w:vanish/><w:dstrike/><w:caps w:val="true"/>' +
+            '</w:rPr>', _options), '(\'style-w:spacing-w:ind-w:b-w:bCs-w:i-w:iCs-w:uw:valsingle-w:caps-w:smallCaps-w:vanish-w:dstrike-w:capsw:valtrue\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-w:spacing-w:ind-w:b-w:bCs-w:i-w:iCs-w:uw:valsingle-w:caps-w:smallCaps-w:vanish-w:dstrike-w:capsw:valtrue')), JSON.stringify({ 
+              paragraph: '<w:spacing w:line=\"600\" w:lineRule=\"auto\"/><w:ind w:left=\"720\"/>', 
+              text: '<w:b/><w:bCs/><w:i/><w:iCs/><w:u w:val=\"single\"/><w:caps/><w:smallCaps/><w:vanish/><w:dstrike/><w:caps w:val=\"true\"/>' 
+            }))
+        });
+
       })
 
       describe('ODT', function () {
@@ -2952,7 +2984,7 @@ describe.only('Dynamic HTML', function () {
         const _expectedXMLheader = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:hdr>' +
-            '<carbone>{d.italic:getHTMLContentDocx(\'style-tcolorFF0000\',\'word/header1.xml\')}</carbone>' +
+            '<carbone>{d.italic:getHTMLContentDocx(\'style-tcolorFF0000-w:b-w:bCs\',\'word/header1.xml\')}</carbone>' +
           '</w:hdr>';
         const _template = {
           files : [
@@ -2978,6 +3010,10 @@ describe.only('Dynamic HTML', function () {
         helper.assert(_template.files[0].data, _expectedXMLTemplate);
         helper.assert(_template.files[1].data, _expectedXMLfooter);
         helper.assert(_template.files[2].data, _expectedXMLheader);
+        helper.assert(_options.htmlStylesDatabase.get('style-tcolorFF0000-w:b-w:bCs').paragraph, '')
+        helper.assert(_options.htmlStylesDatabase.get('style-tcolorFF0000-w:b-w:bCs').text, '<w:color w:val="FF0000"/><w:b/><w:bCs/>')
+        helper.assert(_options.htmlStylesDatabase.get('style-textalignright').paragraph, '<w:jc w:val=\"right\"/>')
+        helper.assert(_options.htmlStylesDatabase.get('style-textalignright').text, '')
       });
 
       it('should find one HTML formatter and pass the original font FAMILY as a formatter argument', function () {
@@ -6073,6 +6109,21 @@ describe.only('Dynamic HTML', function () {
       it('should do nothing if the list of tag provided is not recognized', function () {
         helper.assert(html.buildXMLStyle('docx', ['footer', 'header', 'div']), '');
         helper.assert(html.buildXMLStyle('docx', ['s', 'em', 'b', 'p', 'div', 'u']), '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>');
+      });
+
+      it('should set default styles', function () {
+        helper.assert(html.buildXMLStyle('docx', [], { text: '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>' }), '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>');
+        helper.assert(html.buildXMLStyle('odt', [], { text: '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>' }), '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>');
+      });
+
+      it('should set default styles and add styles coming from the HTML, and should not add the XML tag twice [DOCX]', function () {
+        helper.assert(html.buildXMLStyle('docx', ['u', 'i', 'del' ], { text: '<w:b/><w:bCs/>' }), '<w:b/><w:bCs/><w:u w:val=\"single\"/><w:i/><w:iCs/><w:strike/>');
+        helper.assert(html.buildXMLStyle('docx', ['i', 'b', 'u', 'del' ], { text: '<w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/><w:strike/>' }), '<w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/><w:strike/>');
+      });
+
+      it('should set default styles and add styles coming from the HTML, and should not add the XML tag twice [ODT]', function () {
+        helper.assert(html.buildXMLStyle('odt', ['i', 'u', 'del' ], { text: ' fo:font-weight="bold"' }), ' fo:font-weight=\"bold\" fo:font-style=\"italic\" style:text-underline-style=\"solid\" style:text-line-through-style=\"solid\"');
+        helper.assert(html.buildXMLStyle('odt', ['i', 'b', 'u', 'del' ], { text: ' fo:font-style="italic" fo:font-weight="bold" style:text-underline-style="solid" style:text-line-through-style="solid"' }), ' fo:font-style=\"italic\" fo:font-weight=\"bold\" style:text-underline-style=\"solid\" style:text-line-through-style=\"solid\"');
       });
     });
 

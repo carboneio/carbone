@@ -1,0 +1,64 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" viewBox="0 0 600 400">
+<rect width="600" height="400" x="0" y="0" id="0" fill="none"></rect>
+<path d="M40.2 373.5L582 373.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M40.2 321.5L582 321.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M40.2 268.5L582 268.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M40.2 216.5L582 216.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M40.2 164.5L582 164.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M40.2 112.5L582 112.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M40.2 60.5L582 60.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M40.2 373.5L582 373.5" fill="none" stroke="#6E7079" stroke-linecap="round"></path>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(32.16 373)" fill="#6E7079">-60</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(32.16 320.8333)" fill="#6E7079">-30</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(32.16 268.6667)" fill="#6E7079">0</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(32.16 216.5)" fill="#6E7079">30</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(32.16 164.3333)" fill="#6E7079">60</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(32.16 112.1667)" fill="#6E7079">90</text>
+<text dominant-baseline="central" text-anchor="end" style="font-size:12px;font-family:sans-serif;" transform="translate(32.16 60)" fill="#6E7079">120</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:12px;font-family:sans-serif;" y="6" transform="translate(40.16 388)" fill="#6E7079">1</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:12px;font-family:sans-serif;" y="6" transform="translate(311.08 388)" fill="#6E7079">2</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:12px;font-family:sans-serif;" y="6" transform="translate(582 388)" fill="#6E7079">3</text>
+<path d="M-5 -5l64.2 0l0 32l-64.2 0Z" transform="translate(5 5)" fill="rgb(0,0,0)" fill-opacity="0" stroke="#ccc" stroke-width="0"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:12px;font-family:sans-serif;" xml:space="preserve" y="16" transform="translate(5 5)" fill="#6E7079">Some text</text>
+<g clip-path="url(#zr0-c0)">
+<path d="M40.2 247.8L311.1 77.4L582 181.7" fill="none" stroke="#373737" stroke-width="1.5" stroke-linejoin="bevel"></path>
+</g>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,40.16,247.8)" fill="#fff" stroke="#373737" stroke-width="0.8"></path>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,311.08,77.3889)" fill="#fff" stroke="#373737" stroke-width="0.8"></path>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,582,181.7222)" fill="#fff" stroke="#373737" stroke-width="0.8"></path>
+<g clip-path="url(#zr0-c1)">
+<path d="M40.2 143.5L311.1 200.9L582 202.6" fill="none" stroke="#2769B6" stroke-width="1.5" stroke-linejoin="bevel"></path>
+</g>
+<g clip-path="url(#zr0-c2)">
+<path d="M40.2 336.5L311.1 315.6L582 305.2" fill="none" stroke="#965553" stroke-width="1.5" stroke-linejoin="bevel"></path>
+</g>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,40.16,143.4667)" fill="#fff" stroke="#2769B6" stroke-width="0.8"></path>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,311.08,200.85)" fill="#fff" stroke="#2769B6" stroke-width="0.8"></path>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,582,202.5889)" fill="#fff" stroke="#2769B6" stroke-width="0.8"></path>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,40.16,336.4833)" fill="#fff" stroke="#965553" stroke-width="0.8"></path>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,311.08,315.6167)" fill="#fff" stroke="#965553" stroke-width="0.8"></path>
+<path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,582,305.1833)" fill="#fff" stroke="#965553" stroke-width="0.8"></path>
+<path d="M-2.8 -5l5.6 0l0 5l-5.6 0Z" transform="translate(40.16 134.9667)" fill="none"></path>
+<text dominant-baseline="central" text-anchor="start" style="font: normal 600 5px Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(40.16 134.9667)" fill="#373737">72</text>
+<path d="M-2.8 -5l5.6 0l0 5l-5.6 0Z" transform="translate(311.08 192.35)" fill="none"></path>
+<text dominant-baseline="central" text-anchor="start" style="font: normal 600 5px Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(311.08 192.35)" fill="#373737">39</text>
+<path d="M-2.8 -5l5.6 0l0 5l-5.6 0Z" transform="translate(582 194.0889)" fill="none"></path>
+<text dominant-baseline="central" text-anchor="start" style="font: normal 600 5px Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(582 194.0889)" fill="#373737">38</text>
+<path d="M-10.1 0l20.3 0l0 14l-20.3 0Z" transform="translate(40.16 344.9833)" fill="none"></path>
+<text dominant-baseline="central" text-anchor="start" style="font: normal 600 14px Arial" x="-10.15" y="7" transform="translate(40.16 344.9833)" fill="#373737">-39</text>
+<path d="M-10.1 0l20.3 0l0 14l-20.3 0Z" transform="translate(311.08 324.1167)" fill="none"></path>
+<text dominant-baseline="central" text-anchor="start" style="font: normal 600 14px Arial" x="-10.15" y="7" transform="translate(311.08 324.1167)" fill="#373737">-27</text>
+<path d="M-10.1 0l20.3 0l0 14l-20.3 0Z" transform="translate(582 313.6833)" fill="none"></path>
+<text dominant-baseline="central" text-anchor="start" style="font: normal 600 14px Arial" x="-10.15" y="7" transform="translate(582 313.6833)" fill="#373737">-21</text>
+<defs >
+<clipPath id="zr0-c0">
+<path d="M39 59.3l543 0l0 314.5l-543 0Z" fill="#000"></path>
+</clipPath>
+<clipPath id="zr0-c1">
+<path d="M39 59.3l543 0l0 314.5l-543 0Z" fill="#000"></path>
+</clipPath>
+<clipPath id="zr0-c2">
+<path d="M39 59.3l543 0l0 314.5l-543 0Z" fill="#000"></path>
+</clipPath>
+</defs>
+</svg>

@@ -1,5 +1,6 @@
 
 ## v4.22.3
+  - Release April 15th 2024
   - Accept Microsoft Visio templates (.vsdx) with conversion to PDFs
   - [EE] Fix `drop(table)` for ODP templates
   - [EE] Add support of `drop(item)` for ODP and ODT templates to delete an item inside a list

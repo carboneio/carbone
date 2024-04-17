@@ -2119,6 +2119,14 @@ describe('formatter', function () {
       helper.assert(numberFormatter.mod(undefined, 1.1), undefined);
       helper.assert(numberFormatter.mod(null, 1.1), null);
     });
+    describe.only('Number with arbitrary-precision decimal arithmetic', function () {
+
+      it('should divide number', function () {
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, '87.22', '1000')+'', '0.08722');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : false }, '87.22', '1000')+'', '0.08721999999999999');
+      });
+
+    });
   });
 
   describe('Barcodes', function () {

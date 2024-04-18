@@ -126,6 +126,26 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should accept useHighPrecisionArithmetic with template options', function (done) {
+      const _data = {
+        val1 : '0.1',
+        val2 : '0.2'
+      };
+      let _xml = '<a> {d.val2:add(.val1)} </a>'
+               + '<a> {d.val2:add(.val1):formatN(20)} </a>'
+               + '<a> {d.val2:add(.val1):formatC(20)} </a>';
+      carbone.renderXML(_xml, _data , { useHighPrecisionArithmetic : false, lang : 'fr-FR' },  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<a> 0.30000000000000004 </a><a> 0,30000000000000004441 </a><a> 0,30000000000000004441 € </a>');
+        _xml += '{o.useHighPrecisionArithmetic=true}';
+        carbone.renderXML(_xml, _data , { useHighPrecisionArithmetic : true, lang : 'fr-FR'},  function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<a> 0.3 </a><a> 0,30000000000000000000 </a><a> 0,30000000000000000000 € </a>{o.useHighPrecisionArithmetic=true}');
+          done();
+        });
+      });
+    });
+    it.skip('should accept useHighPrecisionArithmetic with external options (only from template at the moment)');
     it('should change the timezone globally and localy', function (done) {
       carbone.set({timezone : 'Europe/Paris'});
       carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {

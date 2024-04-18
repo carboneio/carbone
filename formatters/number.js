@@ -211,17 +211,17 @@ function formatC (d, precisionOrFormat, targetCurrencyCode) {
  * @return {Number} Result
  */
 function add (d, value) {
-  if (this.useHighPrecisionArithmetic === true) {
-    try {
-      let _d   = new Big(d);
-      let _val = new Big(value);
-      return _d.add(_val);
-    }
-    catch (e) {
-      return NaN;
-    }
-  }
   if (d !== null && typeof d !== 'undefined') {
+    if (this.useHighPrecisionArithmetic === true) {
+      try {
+        let _d   = new Big(d);
+        let _val = new Big(value);
+        return _d.add(_val);
+      }
+      catch (e) {
+        return NaN;
+      }
+    }
     return parseFloat(d) + parseFloat(value);
   }
   return d;
@@ -240,17 +240,17 @@ add.isAcceptingMathExpression = true;
  * @return {Number} Result
  */
 function sub (d, value) {
-  if (this.useHighPrecisionArithmetic === true) {
-    try {
-      let _d   = new Big(d);
-      let _val = new Big(value);
-      return _d.sub(_val);
-    }
-    catch (e) {
-      return NaN;
-    }
-  }
   if (d !== null && typeof d !== 'undefined') {
+    if (this.useHighPrecisionArithmetic === true) {
+      try {
+        let _d   = new Big(d);
+        let _val = new Big(value);
+        return _d.sub(_val);
+      }
+      catch (e) {
+        return NaN;
+      }
+    }
     return parseFloat(d) - parseFloat(value);
   }
   return d;
@@ -269,17 +269,17 @@ sub.isAcceptingMathExpression = true;
  * @return {Number} Result
  */
 function mul (d, value) {
-  if (this.useHighPrecisionArithmetic === true) {
-    try {
-      let _d   = new Big(d);
-      let _val = new Big(value);
-      return _d.mul(_val);
-    }
-    catch (e) {
-      return NaN;
-    }
-  }
   if (d !== null && typeof d !== 'undefined') {
+    if (this.useHighPrecisionArithmetic === true) {
+      try {
+        let _d   = new Big(d);
+        let _val = new Big(value);
+        return _d.mul(_val);
+      }
+      catch (e) {
+        return NaN;
+      }
+    }
     return parseFloat(d) * parseFloat(value);
   }
   return d;
@@ -298,21 +298,23 @@ mul.isAcceptingMathExpression = true;
  * @return {Number} Result
  */
 function div (d, value) {
-  if (this.useHighPrecisionArithmetic === true) {
-    try {
-      let _d   = new Big(d);
-      let _val = new Big(value);
-      if (_val.eq(0) === true) {
+  if (d !== null && typeof d !== 'undefined') {
+    if (this.useHighPrecisionArithmetic === true) {
+      try {
+        let _d   = new Big(d);
+        let _val = new Big(value);
+        if (_val.eq(0) === true) {
+          return NaN;
+        }
+        return _d.div(_val);
+      }
+      catch (e) {
         return NaN;
       }
-      return _d.div(_val);
     }
-    catch (e) {
-      return NaN;
+    if (parseFloat(value) !== 0) {
+      return parseFloat(d) / parseFloat(value);
     }
-  }
-  if (d !== null && typeof d !== 'undefined' && parseFloat(value) !== 0) {
-    return parseFloat(d) / parseFloat(value);
   }
   return d;
 }

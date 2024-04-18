@@ -129,18 +129,21 @@ describe('Carbone', function () {
     it('should accept useHighPrecisionArithmetic with template options', function (done) {
       const _data = {
         val1 : '0.1',
-        val2 : '0.2'
+        val2 : '0.2',
+        nul  : null
       };
       let _xml = '<a> {d.val2:add(.val1)} </a>'
                + '<a> {d.val2:add(.val1):formatN(20)} </a>'
-               + '<a> {d.val2:add(.val1):formatC(20)} </a>';
+               + '<a> {d.val2:add(.val1):formatC(20)} </a>'
+               + '<a> {d.undef:add(.val1):formatC(20)} </a>'
+               + '<a> {d.nul:add(.val1):formatC(20)} </a>';
       carbone.renderXML(_xml, _data , { useHighPrecisionArithmetic : false, lang : 'fr-FR' },  function (err, result) {
         helper.assert(err+'', 'null');
-        helper.assert(result, '<a> 0.30000000000000004 </a><a> 0,30000000000000004441 </a><a> 0,30000000000000004441 € </a>');
+        helper.assert(result, '<a> 0.30000000000000004 </a><a> 0,30000000000000004441 </a><a> 0,30000000000000004441 € </a><a>  </a><a>  </a>');
         _xml += '{o.useHighPrecisionArithmetic=true}';
         carbone.renderXML(_xml, _data , { useHighPrecisionArithmetic : true, lang : 'fr-FR'},  function (err, result) {
           helper.assert(err+'', 'null');
-          helper.assert(result, '<a> 0.3 </a><a> 0,30000000000000000000 </a><a> 0,30000000000000000000 € </a>{o.useHighPrecisionArithmetic=true}');
+          helper.assert(result, '<a> 0.3 </a><a> 0,30000000000000000000 </a><a> 0,30000000000000000000 € </a><a>  </a><a>  </a>{o.useHighPrecisionArithmetic=true}');
           done();
         });
       });

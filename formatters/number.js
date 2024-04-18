@@ -311,10 +311,8 @@ function div (d, value) {
       return NaN;
     }
   }
-  if (d !== null && typeof d !== 'undefined') {
-    if (parseFloat(value) !== 0) {
-      return parseFloat(d) / parseFloat(value);
-    }
+  if (d !== null && typeof d !== 'undefined' && parseFloat(value) !== 0) {
+    return parseFloat(d) / parseFloat(value);
   }
   return d;
 }

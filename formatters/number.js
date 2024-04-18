@@ -1,6 +1,7 @@
 const locale   = require('./_locale.js');
 const currency = require('./_currency.js');
 const Big      = require('big.js');
+Big.DP = 20; // TODO ??????????????????
 
 /**
  * Convert from one currency to another
@@ -261,11 +262,25 @@ mul.isAcceptingMathExpression = true;
  * @return {Number} Result
  */
 function div (d, value) {
-  if (d !== null && typeof d !== 'undefined' && parseFloat(value) !== 0) {
-    if (this.useHighPrecisionArithmetic === true) {
-      return Big(d).div(Big(value));
+  if (this.useHighPrecisionArithmetic === true) {
+    let x;
+    let y;
+    try {
+      x = new Big(d);
+      y = new Big(value);
     }
-    return parseFloat(d) / parseFloat(value);
+    catch (e) {
+      return NaN;
+    }
+    if (y.eq(0) === true) {
+      return NaN;
+    }
+    return x.div(y);
+  }
+  if (d !== null && typeof d !== 'undefined') {
+    if (parseFloat(value) !== 0) {
+      return parseFloat(d) / parseFloat(value);
+    }
   }
   return d;
 }

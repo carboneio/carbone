@@ -176,11 +176,11 @@ describe('chart', function () {
       helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG(''), '');
     });
     it('should replace single line font to multiple attributes', function () {
-      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('style="font: normal 600 14px Arial"'), 'style="font-style=normal;font-weight:600;font-size:14px;font-family:Arial"');
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('style="font: normal 600 14px Arial"'), 'style="font-style:normal;font-weight:600;font-size:14px;font-family:Arial"');
     });
     it('should replace single line font by multiple font parameters everywhere in the SVG', function () {
       const _fontBefore = 'font: normal 600 14px Arial';
-      const _fontAfter = 'font-style=normal;font-weight:600;font-size:14px;font-family:Arial';
+      const _fontAfter = 'font-style:normal;font-weight:600;font-size:14px;font-family:Arial';
       const _svg = (expected = false) => ''
         + '<text text-anchor="start" style="'+(expected ? _fontAfter : _fontBefore)+'" x="-70.91000000000003" y="7" transform="translate(160.4759 841.3306)" fill="#373737">-21.576860801107834</text>'
         + '<path d="M-70.9 0l141.8 0l0 14l-141.8 0Z" transform="translate(212.0138 771.2866)" fill="none"></path>'
@@ -191,13 +191,13 @@ describe('chart', function () {
       helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG(_svg()), _svg(true));
     });
     it('should accept font family with whitespaces. The font family is always the last item', function () {
-      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('style="font: normal normal 1em Courier New"'), 'style="font-style=normal;font-weight:normal;font-size:1em;font-family:Courier New"');
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('style="font: normal normal 1em Courier New"'), 'style="font-style:normal;font-weight:normal;font-size:1em;font-family:Courier New"');
     });
     it('should not add two ; at the end if there is already a ;', function () {
-      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('<text style="font: normal 400 10px Courier New;">'), '<text style="font-style=normal;font-weight:400;font-size:10px;font-family:Courier New;">');
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('<text style="font: normal 400 10px Courier New;">'), '<text style="font-style:normal;font-weight:400;font-size:10px;font-family:Courier New;">');
     });
     it('should replace font without losing other style attributes which are declared after', function () {
-      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('<text style="font: normal 400 10px Courier New; margin-top:12px;">'), '<text style="font-style=normal;font-weight:400;font-size:10px;font-family:Courier New; margin-top:12px;">');
+      helperTest.assert(chartFormatter._convertSingleLineFontStyleSVG('<text style="font: normal 400 10px Courier New; margin-top:12px;">'), '<text style="font-style:normal;font-weight:400;font-size:10px;font-family:Courier New; margin-top:12px;">');
     });
     it('should not break style if other style attributes are before the font attribute', function () {
       // In that case, the font is not replaced but I think echarts cannot generate such style in text.

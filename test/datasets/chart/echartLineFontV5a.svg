@@ -39,17 +39,17 @@
 <path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,311.08,315.6167)" fill="#fff" stroke="#965553" stroke-width="0.8"></path>
 <path d="M1 0A1 1 0 1 1 1 -0.1A1 1 0 0 1 1 0" transform="matrix(2.5,0,0,2.5,582,305.1833)" fill="#fff" stroke="#965553" stroke-width="0.8"></path>
 <path d="M-2.8 -5l5.6 0l0 5l-5.6 0Z" transform="translate(40.16 134.9667)" fill="none"></path>
-<text dominant-baseline="central" text-anchor="start" style="font-style=normal;font-weight:600;font-size:5px;font-family:Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(40.16 134.9667)" fill="#373737">72</text>
+<text dominant-baseline="central" text-anchor="start" style="font-style:normal;font-weight:600;font-size:5px;font-family:Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(40.16 134.9667)" fill="#373737">72</text>
 <path d="M-2.8 -5l5.6 0l0 5l-5.6 0Z" transform="translate(311.08 192.35)" fill="none"></path>
-<text dominant-baseline="central" text-anchor="start" style="font-style=normal;font-weight:600;font-size:5px;font-family:Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(311.08 192.35)" fill="#373737">39</text>
+<text dominant-baseline="central" text-anchor="start" style="font-style:normal;font-weight:600;font-size:5px;font-family:Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(311.08 192.35)" fill="#373737">39</text>
 <path d="M-2.8 -5l5.6 0l0 5l-5.6 0Z" transform="translate(582 194.0889)" fill="none"></path>
-<text dominant-baseline="central" text-anchor="start" style="font-style=normal;font-weight:600;font-size:5px;font-family:Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(582 194.0889)" fill="#373737">38</text>
+<text dominant-baseline="central" text-anchor="start" style="font-style:normal;font-weight:600;font-size:5px;font-family:Courier New" x="-2.8000000000000003" y="-2.5" transform="translate(582 194.0889)" fill="#373737">38</text>
 <path d="M-10.1 0l20.3 0l0 14l-20.3 0Z" transform="translate(40.16 344.9833)" fill="none"></path>
-<text dominant-baseline="central" text-anchor="start" style="font-style=normal;font-weight:600;font-size:14px;font-family:Arial" x="-10.15" y="7" transform="translate(40.16 344.9833)" fill="#373737">-39</text>
+<text dominant-baseline="central" text-anchor="start" style="font-style:normal;font-weight:600;font-size:14px;font-family:Arial" x="-10.15" y="7" transform="translate(40.16 344.9833)" fill="#373737">-39</text>
 <path d="M-10.1 0l20.3 0l0 14l-20.3 0Z" transform="translate(311.08 324.1167)" fill="none"></path>
-<text dominant-baseline="central" text-anchor="start" style="font-style=normal;font-weight:600;font-size:14px;font-family:Arial" x="-10.15" y="7" transform="translate(311.08 324.1167)" fill="#373737">-27</text>
+<text dominant-baseline="central" text-anchor="start" style="font-style:normal;font-weight:600;font-size:14px;font-family:Arial" x="-10.15" y="7" transform="translate(311.08 324.1167)" fill="#373737">-27</text>
 <path d="M-10.1 0l20.3 0l0 14l-20.3 0Z" transform="translate(582 313.6833)" fill="none"></path>
-<text dominant-baseline="central" text-anchor="start" style="font-style=normal;font-weight:600;font-size:14px;font-family:Arial" x="-10.15" y="7" transform="translate(582 313.6833)" fill="#373737">-21</text>
+<text dominant-baseline="central" text-anchor="start" style="font-style:normal;font-weight:600;font-size:14px;font-family:Arial" x="-10.15" y="7" transform="translate(582 313.6833)" fill="#373737">-21</text>
 <defs >
 <clipPath id="zr0-c0">
 <path d="M39 59.3l543 0l0 314.5l-543 0Z" fill="#000"></path>

@@ -163,7 +163,7 @@ function _convertSingleLineFontStyleSVG (svgString = '') {
     if (_parts.length > 4) {
       _parts[3] = _parts.slice(3).join(' ');
     }
-    return `style="font-style=${_parts[0]};font-weight:${_parts[1]};font-size:${_parts[2]};font-family:${_parts[3]}`;
+    return `style="font-style:${_parts[0]};font-weight:${_parts[1]};font-size:${_parts[2]};font-family:${_parts[3]}`;
   }) ?? '';
 }
 

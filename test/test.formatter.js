@@ -2079,7 +2079,7 @@ describe('formatter', function () {
   });
 
 
-  describe.only('Number operations', function () {
+  describe('Number operations', function () {
     it('should add number', function () {
       helper.assert(numberFormatter.add('120', '67'), 187);
     });

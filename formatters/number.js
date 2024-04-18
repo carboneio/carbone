@@ -1,5 +1,10 @@
 const locale   = require('./_locale.js');
 const currency = require('./_currency.js');
+const Big      = require('big.js');
+Big.DP = 20; // number of decimal p
+Big.RM = 1;  // ROUND_HALF_UP
+Big.NE = -7; // The negative exponent value at and below which toString returns exponential notation.
+Big.PE = 21; // The positive exponent value at and above which toString returns exponential notation.
 
 /**
  * Convert from one currency to another
@@ -33,9 +38,11 @@ function convCurr (d, target, source) {
   }
   var _targetRate    = this.currency.rates[_target] || 1;
   var _sourceRate    = this.currency.rates[_source] || 1;
-  var _valueInEuro   = d / _sourceRate;
   this.modifiedCurrencyTarget = _target;
-  return _valueInEuro * _targetRate;
+  if ( this.useHighPrecisionArithmetic === true ) {
+    return d.div(_sourceRate).mul(_targetRate);
+  }
+  return (d / _sourceRate) * _targetRate;
   // raseError(this.currency[_target] === undefined, 'Unknown rate for currency target "'+_target+'"');
   // raseError(this.currency[_base] === undefined  , 'Unknown rate for currency base "'+_base+'"');
 }
@@ -87,11 +94,12 @@ function round (num, precision) {
  * @param  {Number} value
  * @param  {Number} value
  * @param  {Number} precision
+ * @param  {Boolean} useHighPrecisionArithmetic
  * @return {String}
  */
-function _format (value, format, precision = 3) {
+function _format (value, format, precision = 3, useHighPrecisionArithmetic = false) {
   var _re    = '\\d(?=(\\d{' + (format.group) + '})+' + (precision > 0 ? '\\D' : '$') + ')';
-  var _value = round(value, precision);
+  var _value = useHighPrecisionArithmetic === true ? value : round(value, precision);  // toFixed automatically round the value when useHighPrecisionArithmetic:true
   var _num   = _value.toFixed(Math.max(0, ~~precision));
 
   return (format.decimal ? _num.replace('.', format.decimal) : _num).replace(new RegExp(_re, 'g'), '$&' + (format.separator || ','));
@@ -116,7 +124,7 @@ function _format (value, format, precision = 3) {
 function formatN (d, precision) {
   if (d !== null && typeof d !== 'undefined') {
     var _locale = locale[this.lang] || locale.en;
-    return _format(d, _locale.number, precision);
+    return _format(d, _locale.number, precision, this.useHighPrecisionArithmetic);
   }
   return d;
 }
@@ -175,7 +183,7 @@ function formatC (d, precisionOrFormat, targetCurrencyCode) {
     else if ( _locale.currency[precisionOrFormat] instanceof Function ) {
       _formatFn = _locale.currency[precisionOrFormat];
     }
-    var _valueRaw  = _format(convCurr.call(this, d, targetCurrencyCode), _locale.number, _precision);
+    var _valueRaw  = _format(convCurr.call(this, d, targetCurrencyCode), _locale.number, _precision, this.useHighPrecisionArithmetic);
     // reset modifiedCurrencyTarget for next use
     this.modifiedCurrencyTarget = null;
     return _formatFn(_valueRaw,
@@ -203,6 +211,16 @@ function formatC (d, precisionOrFormat, targetCurrencyCode) {
  * @return {Number} Result
  */
 function add (d, value) {
+  if (this.useHighPrecisionArithmetic === true) {
+    try {
+      let _d   = new Big(d);
+      let _val = new Big(value);
+      return _d.add(_val);
+    }
+    catch (e) {
+      return NaN;
+    }
+  }
   if (d !== null && typeof d !== 'undefined') {
     return parseFloat(d) + parseFloat(value);
   }
@@ -222,6 +240,16 @@ add.isAcceptingMathExpression = true;
  * @return {Number} Result
  */
 function sub (d, value) {
+  if (this.useHighPrecisionArithmetic === true) {
+    try {
+      let _d   = new Big(d);
+      let _val = new Big(value);
+      return _d.sub(_val);
+    }
+    catch (e) {
+      return NaN;
+    }
+  }
   if (d !== null && typeof d !== 'undefined') {
     return parseFloat(d) - parseFloat(value);
   }
@@ -241,6 +269,16 @@ sub.isAcceptingMathExpression = true;
  * @return {Number} Result
  */
 function mul (d, value) {
+  if (this.useHighPrecisionArithmetic === true) {
+    try {
+      let _d   = new Big(d);
+      let _val = new Big(value);
+      return _d.mul(_val);
+    }
+    catch (e) {
+      return NaN;
+    }
+  }
   if (d !== null && typeof d !== 'undefined') {
     return parseFloat(d) * parseFloat(value);
   }
@@ -260,6 +298,19 @@ mul.isAcceptingMathExpression = true;
  * @return {Number} Result
  */
 function div (d, value) {
+  if (this.useHighPrecisionArithmetic === true) {
+    try {
+      let _d   = new Big(d);
+      let _val = new Big(value);
+      if (_val.eq(0) === true) {
+        return NaN;
+      }
+      return _d.div(_val);
+    }
+    catch (e) {
+      return NaN;
+    }
+  }
   if (d !== null && typeof d !== 'undefined' && parseFloat(value) !== 0) {
     return parseFloat(d) / parseFloat(value);
   }
@@ -288,7 +339,7 @@ function mod (d, value) {
 }
 
 /**
- * Get absolute value 
+ * Get absolute value
  *
  * @version 4.12.0 new
  *

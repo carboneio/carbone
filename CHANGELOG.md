@@ -1,4 +1,11 @@
 
+## v4.23.0
+  - Release April 18th 2024
+  - A new option `{o.useHighPrecisionArithmetic=true}` can be used within a template to activate arbitrary-precision decimal arithmetic for mathematical operations. 
+    When this tag is included in the template, the formatters `:add`, `:sub`, `:mul`, `:div`, `:formatC`, `:formatN` will maintain full decimal precision (Max 20).
+    By default, and for all other formatters (such as aggregators, `:abs`, `:mod`, as well as mathematical expressions inside formatters and conditions), calculations uses
+    double-precision floating-point numbers based on the 64-bit IEEE-754 standard.
+
 ## v4.22.3
   - Release April 15th 2024
   - Accept Microsoft Visio templates (.vsdx) with conversion to PDFs

@@ -6,6 +6,7 @@ var numberFormatter = require('../formatters/number');
 const barcodeFormatter = require('../formatters/barcode');
 const colorFormatter = require('../formatters/color');
 var helper = require('../lib/helper');
+const Big      = require('big.js');
 
 describe('formatter', function () {
   describe('convDate', function () {
@@ -2092,7 +2093,15 @@ describe('formatter', function () {
     });
 
     it('should divide number', function () {
-      helper.assert(numberFormatter.div('120', '80'), 1.5);
+      helper.assert(numberFormatter.div('120'     , '80')     , 1.5);
+      helper.assert(numberFormatter.div('120'     , null)     , null);
+      helper.assert(numberFormatter.div('120'     , undefined), null);
+      helper.assert(numberFormatter.div(null      , undefined), null);
+      helper.assert(numberFormatter.div(null      , null)     , null);
+      helper.assert(numberFormatter.div(null      , '100')    , null);
+      helper.assert(numberFormatter.div(undefined , 100)      , undefined);
+      helper.assert(numberFormatter.div(10        , 0)        , 10); // ???????
+      helper.assert(numberFormatter.div(100       , '0.0')    , 100); // ??????
     });
 
     it('should modulo number', function () {
@@ -2118,6 +2127,114 @@ describe('formatter', function () {
       helper.assert(numberFormatter.mod(1.8, 1.1), 0.7);
       helper.assert(numberFormatter.mod(undefined, 1.1), undefined);
       helper.assert(numberFormatter.mod(null, 1.1), null);
+    });
+    describe('Number with arbitrary-precision decimal arithmetic', function () {
+      const _forbiddenCombination = [
+        [ true          , 1          ],
+        [ 1             , true       ],
+        [ []            , 1          ],
+        [ 1             , []         ],
+        [ 1             , {}         ],
+        [ ['0.3']       , [0.2, 1]   ],
+        [ ['0.3', 2]    , [0.2, 1]   ],
+        [ ['0.3', 2]    , [0.2]      ],
+        [ ['0.3', 2]    , [null]     ],
+        [ ['0.3']       , [null]     ],
+        [ {}            , 1          ],
+        [ NaN           , 1          ],
+        [ 1             , NaN        ],
+        [ NaN           , NaN        ],
+        [ null          , null       ],
+        [ 0.3           , null       ],
+        [ 0.3           , undefined  ],
+        [ null          , 0.2        ],
+        [ 'null'        , 0.2        ],
+        [ undefined     , 0.2        ],
+        [ 'undefined'   , 0.2        ],
+        [ ' 0.3'        , '0.2'      ],
+        [ '87,22'       , '0.2'      ],
+        [ 0.3           , Infinity   ],
+        [ 0.3           , -Infinity  ],
+        [ Infinity      , 10         ],
+        [ -Infinity     , 10         ],
+        [ 'Infinity'    , 10         ],
+        [ '-Infinity'   , 10         ],
+        [ 'Infinity'    , 'Infinity' ],
+        [ Infinity      , Infinity   ],
+        [ Infinity      , -Infinity  ],
+        [ -Infinity     , Infinity   ],
+        [ Infinity      , '-Infinity'],
+        [ '-Infinity'   , '-Infinity']
+      ];
+      it('should add number', function () {
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, 0.1           , 0.2        )+'', '0.3');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true}, Big('0.1')     , Big('0.2') )+'', '0.3');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true}, Big('0.1')     , Big('0.2') )+'', '0.3');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : false}, 0.1           , 0.2        )+'', '0.30000000000000004');
+        _forbiddenCombination.forEach((params) => {
+          helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, params[0]    , params[1] )+'', 'NaN');
+        });
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, ['0.3']       , [0.2]      )+'', '0.5');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, [0.3]         , ['0.2']    )+'', '0.5');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, 0             , 0.2        )+'', '0.2');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, 0.3           , 0.2        )+'', '0.5');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, '0.3'         , '0.2'      )+'', '0.5');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, '-0.3'        , '0.2'      )+'', '-0.1');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, 0.3           , 0          )+'', '0.3');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, -0.3          , 0          )+'', '-0.3');
+        helper.assert(numberFormatter.add.call({ useHighPrecisionArithmetic : true }, '-932103672'  , '-0.31'    )+'', '-932103672.31');
+      });
+      it('should sub number', function () {
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, 0.3           , 0.2        )+'', '0.1');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, Big('0.3')    , Big('0.2') )+'', '0.1');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : false}, 0.3           , 0.2        )+'', '0.09999999999999998');
+        _forbiddenCombination.forEach((params) => {
+          helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, params[0]    , params[1] )+'', 'NaN');
+        });
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, ['0.3']       , [0.2]      )+'', '0.1');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, [0.3]         , ['0.2']    )+'', '0.1');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, 0             , 0.2        )+'', '-0.2');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, '0.3'         , '0.2'      )+'', '0.1');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, '-0.3'        , '0.2'      )+'', '-0.5');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, 0.3           , 0          )+'', '0.3');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, -0.3          , 0          )+'', '-0.3');
+        helper.assert(numberFormatter.sub.call({ useHighPrecisionArithmetic : true }, '-932103672'  , '-0.31'    )+'', '-932103671.69');
+      });
+      it('should mul number', function () {
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, 0.1           , 0.2        )+'', '0.02');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true}, Big('0.1')     , Big('0.2') )+'', '0.02');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : false}, 0.1           , 0.2        )+'', '0.020000000000000004');
+        _forbiddenCombination.forEach((params) => {
+          helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, params[0]    , params[1] )+'', 'NaN');
+        });
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, ['0.3']       , [0.2]      )+'', '0.06');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, [0.3]         , ['0.2']    )+'', '0.06');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, 0             , 0.2        )+'', '0');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, 0.3           , 0.2        )+'', '0.06');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, '0.3'         , '0.2'      )+'', '0.06');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, ' 0.3'        , '0.2'      )+'', 'NaN');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, '87,22'       , '0.2'      )+'', 'NaN');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, '-0.3'        , '0.2'      )+'', '-0.06');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, 0.3           , 0          )+'', '0');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, -0.3          , 0          )+'', '-0');
+        helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, '-932103672'  , '-0.31'    )+'', '288952138.32');
+      });
+      it('should divide number', function () {
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, '87.22'       , '1000'     )+'', '0.08722');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, Big('87.22')  , Big('1000'))+'', '0.08722');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : false}, '87.22'       , '1000'     )+'', '0.08721999999999999');
+        _forbiddenCombination.forEach((params) => {
+          helper.assert(numberFormatter.mul.call({ useHighPrecisionArithmetic : true }, params[0]    , params[1] )+'', 'NaN');
+        });
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, ['87.22']     , [1000]     )+'', '0.08722');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, [87.22]       , ['1000']   )+'', '0.08722');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, 0             , 1000       )+'', '0');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, 87.22         , 1000       )+'', '0.08722');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, '-87.22'      , '1000'     )+'', '-0.08722');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, 87.22         , 0          )+'', 'NaN');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, -87.22        , 0          )+'', 'NaN');
+        helper.assert(numberFormatter.div.call({ useHighPrecisionArithmetic : true }, '-932103672'  , '-0.31'    )+'',  '3006786038.70967741935483870968');
+      });
     });
   });
 

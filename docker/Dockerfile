@@ -2,15 +2,16 @@ FROM debian:stable-slim
 
 WORKDIR /tmp
 RUN apt update && \
-    apt install -y curl libnss3 libxinerama1 libdbus-glib-1-2 libcairo2 libcups2
+    apt install -y libnss3 libxinerama1 libdbus-glib-1-2 libcairo2 libcups2
     
-# Download LibreOffice
-RUN curl -L https://downloadarchive.documentfoundation.org/libreoffice/old/7.6.6.3/deb/x86_64/LibreOffice_7.6.6.3_Linux_x86-64_deb.tar.gz | \
-    tar -zx
+# Download LibreOffice 7.6.6.3
+COPY ./libreoffice.tar.gz .
+RUN tar -zxf libreoffice.tar.gz
 
 # Install LibreOffice
 RUN dpkg -i LibreOffice_*_Linux_x86-64_deb/DEBS/*.deb
 RUN rm -r /tmp/LibreOffice_*
+RUN rm /tmp/libreoffice.tar.gz
 
 # Create Carbone user
 RUN adduser carbone --home /app --no-create-home --disabled-password --system

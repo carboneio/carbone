@@ -1,7 +1,7 @@
 {
   "name": "carbone-ee",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "4.22.0",
+  "version": "4.22.4",
   "bin": "bin/carbone",
   "main": "./lib",
   "publishConfig": {
@@ -9,7 +9,7 @@
   },
   "author": "David Grelaud",
   "private": true,
-  "carbonePublicationDate": "2024-04-05T07:24:49.378Z",
+  "carbonePublicationDate": "2024-04-18T20:35:12.817Z",
   "license": "Carbone-Enterprise-Edition",
   "homepage": "https://carbone.io",
   "keywords": [
@@ -32,6 +32,7 @@
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag ee-$PACKAGE_VERSION && git push origin ee-$PACKAGE_VERSION"
   },
   "dependencies": {
+    "big.js": "=6.2.1",
     "body-parser": "=1.20.1",
     "bwip-js": "=3.4.0",
     "cors": "=2.8.5",

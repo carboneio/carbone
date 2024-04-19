@@ -11,6 +11,7 @@ var spawn = require('child_process').spawn;
 var execSync = require('child_process').execSync;
 var pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 const helperTest = require('./helper');
+const pdf2json  = require('pdf2json');
 
 describe('Carbone', function () {
 
@@ -125,6 +126,29 @@ describe('Carbone', function () {
         });
       });
     });
+    it('should accept useHighPrecisionArithmetic with template options', function (done) {
+      const _data = {
+        val1 : '0.1',
+        val2 : '0.2',
+        nul  : null
+      };
+      let _xml = '<a> {d.val2:add(.val1)} </a>'
+               + '<a> {d.val2:add(.val1):formatN(20)} </a>'
+               + '<a> {d.val2:add(.val1):formatC(20)} </a>'
+               + '<a> {d.undef:add(.val1):formatC(20)} </a>'
+               + '<a> {d.nul:add(.val1):formatC(20)} </a>';
+      carbone.renderXML(_xml, _data , { useHighPrecisionArithmetic : false, lang : 'fr-FR' },  function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<a> 0.30000000000000004 </a><a> 0,30000000000000004441 </a><a> 0,30000000000000004441 € </a><a>  </a><a>  </a>');
+        _xml += '{o.useHighPrecisionArithmetic=true}';
+        carbone.renderXML(_xml, _data , { useHighPrecisionArithmetic : true, lang : 'fr-FR'},  function (err, result) {
+          helper.assert(err+'', 'null');
+          helper.assert(result, '<a> 0.3 </a><a> 0,30000000000000000000 </a><a> 0,30000000000000000000 € </a><a>  </a><a>  </a>{o.useHighPrecisionArithmetic=true}');
+          done();
+        });
+      });
+    });
+    it.skip('should accept useHighPrecisionArithmetic with external options (only from template at the moment)');
     it('should change the timezone globally and localy', function (done) {
       carbone.set({timezone : 'Europe/Paris'});
       carbone.renderXML('<xml> {d.date:formatD(LTS)} </xml>', { date : '2014-06-01 14:00:00'}, function (err, result) {
@@ -3434,6 +3458,46 @@ describe('Carbone', function () {
         var _result = execSync('lsof -p '+process.pid).toString();
         assert.equal(/test_word_render_A\.docx/.test(_result), false);
         done();
+      });
+    });
+    it('should accept visio files', function (done) {
+      const _data = {
+        id      : 'field_1',
+        test    : 'hello world',
+        message : 'the earth'
+      };
+      carbone.render('test_visio_simple.vsdx', _data, { renderPrefix : 'prefix', convertTo : 'vsdx' }, function (err, resultFilePath) {
+        assert.equal(err, null);
+        assert.strictEqual(path.dirname(resultFilePath), params.renderPath);
+        fs.mkdirSync(testPath, parseInt('0755',8));
+        var _unzipPath = path.join(testPath, 'unzipVisio1');
+        unzipSystem(resultFilePath, _unzipPath, function (err, files) {
+          var _page1 = files['visio/pages/page1.xml'];
+          var _page2 = files['visio/pages/page2.xml'];
+          assert.notEqual(_page1.indexOf('field_1'), -1);
+          assert.notEqual(_page1.indexOf('the earth'), -1);
+          assert.notEqual(_page2.indexOf('hello world'), -1);
+          fs.unlinkSync(resultFilePath);
+          done();
+        });
+      });
+    });
+    it('should accept to convert visio files to PDF', function (done) {
+      const _data = {
+        id      : 'field_1',
+        test    : 'hello world',
+        message : 'the earth'
+      };
+      carbone.render('test_visio_simple.vsdx', _data, { renderPrefix : 'prefix', convertTo : 'pdf' }, function (err, resultFilePath) {
+        helper.assert(err+'', 'null');
+        const _pdf = new pdf2json();
+        _pdf.loadPDF(resultFilePath);
+        _pdf.on('pdfParser_dataReady', pdfData => {
+          helper.assert(pdfData.Meta.PDFFormatVersion !== undefined, true);
+          helper.assert(pdfData.Pages.length, 2);
+          helper.assert(pdfData.Pages[0].Texts[0].R[0].T, 'the%20earth%20');
+          done();
+        });
       });
     });
     it('should be fast to render a document without conversion', function (done) {

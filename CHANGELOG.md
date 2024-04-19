@@ -2,6 +2,41 @@
 ## v4.XX.X
   - [EE] The HTML formatter is now supported in headers and footers of DOCX/ODT/PDF. **Temporary exception for DOCX templates:** if the HTML contains `<img>` tags, a image must be pre-inserted into the header/footer of the template, otherwise the image won't be displayed.
 
+## v4.22.4
+  - Release April 18th 2024
+  - A new option `{o.useHighPrecisionArithmetic=true}` can be used within a template to activate arbitrary-precision decimal arithmetic for mathematical operations. 
+    When this tag is included in the template, the formatters `:add`, `:sub`, `:mul`, `:div`, `:formatC`, `:formatN` will maintain full decimal precision (Max 20).
+    By default, and for all other formatters (such as aggregators, `:abs`, `:mod`, as well as mathematical expressions inside formatters and conditions), calculations uses
+    double-precision floating-point numbers based on the 64-bit IEEE-754 standard.
+  - [EE] Fix bad CSS attributes in charts created with Apache ECharts@v5a
+
+## v4.22.3
+  - Release April 15th 2024
+  - Accept Microsoft Visio templates (.vsdx) with conversion to PDFs
+  - [EE] Fix `drop(table)` for ODP templates
+  - [EE] Add support of `drop(item)` for ODP and ODT templates to delete an item inside a list
+  - [EE] Fix crash when `null` values are passed in Apache Echarts options.
+  - [EE] Previously, charts created with Apache ECharts did not support setting custom font styles (size, family, weight). 
+    We have now resolved this issue with our own modified version of ECharts, optimized for SVG compatibility with our main document converter, LibreOffice.
+    To ensure compatibility and prevent any impact on existing charts, please specify the ECharts version `echarts@v5a` instead of `echarts@v5` when configuring your JSON. 
+    This `@v5a` version will become the default in Carbone v5.
+    ```json
+    {
+      "chartOptions" : {
+        "type" : "echarts@v5a",
+        "option" : {}
+      }
+    }
+    ```
+
+## v4.22.2
+  - Release April 9th 2024
+  - Fix corrupted Excel file when `aggSum:formatN` is used since 4.22.0
+
+## v4.22.1
+  - Release April 8th 2024
+  - Fix: Aggregators may return incorrect results when used in combination with :set formatters (bug introduced by v4.22.0).
+
 ## v4.22.0
   - Release April 5th 2024
   - The formatter `convCRLF` supports PPTX templates

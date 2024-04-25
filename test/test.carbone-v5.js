@@ -50,6 +50,22 @@ describe('Carbone v5', function () {
         });
       });
     });
+    it('should accept filter on objects', function (done) {
+      var _xml = '<body> {d.tool[.att = toto].val} </body>';
+      var _data = {
+        tool : {
+          bibi : 2,
+          toto : 3,
+          titi : 4
+        }
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<body> 3 </body>');
+        done();
+      });
+    });
+
     it('should accept loop inside an XML tag', function (done) {
       var _xml = '<body>  <p1>{d.tool[i].id} | {d.tool[i+1].id}</p1>  <p2></p2></body>';
       carbone.renderXML(_xml, {}, function (err, _xmlBuilt) {

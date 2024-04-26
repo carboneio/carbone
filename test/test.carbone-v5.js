@@ -50,22 +50,7 @@ describe('Carbone v5', function () {
         });
       });
     });
-    it('should accept filter on objects', function (done) {
-      var _xml = '<body> {d.tool[.att = toto].val} </body>';
-      var _data = {
-        tool : {
-          bibi : 2,
-          toto : 3,
-          titi : 4
-        }
-      };
-      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
-        helper.assert(err+'', 'null');
-        helper.assert(_xmlBuilt, '<body> 3 </body>');
-        done();
-      });
-    });
-
+   
     it('should accept loop inside an XML tag', function (done) {
       var _xml = '<body>  <p1>{d.tool[i].id} | {d.tool[i+1].id}</p1>  <p2></p2></body>';
       carbone.renderXML(_xml, {}, function (err, _xmlBuilt) {
@@ -843,5 +828,70 @@ describe('Carbone v5', function () {
     });
   });
 
+  describe('should accept filter on objets', function () {
+    it('should accept filter on objects', function (done) {
+      const _xml = '<body> {d.tool[.att = toto].val}  {d.tool[.val = 3].att} </body>';
+      const _data = {
+        tool : {
+          bibi : 2,
+          toto : 3,
+          titi : 4
+        }
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<body> 3  toto </body>');
+        done();
+      });
+    });
+    it('should accept filter on object, searching in values', function (done) {
+      const _xml = '<body> {d.tool[.val.id = 3].val.val.id} </body>';
+      const _data = {
+        tool : {
+          bibi : {
+            id  : 2,
+            val : { id : 20 }
+          },
+          toto : {
+            id  : 3,
+            val : { id : 30 }
+          },
+          titi : {
+            id  : 4,
+            val : { id : 40 }
+          }
+        }
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<body> 30 </body>');
+        done();
+      });
+    });
+    it('should accept filter on object with a loop', function (done) {
+      const _xml = '<body> {d.tool[i, .val.id = 3].val.val.id} ; {d.tool[i+1, .val.id = 3].val.val.id} </body>';
+      const _data = {
+        tool : {
+          bibi : {
+            id  : 2,
+            val : { id : 20 }
+          },
+          toto : {
+            id  : 3,
+            val : { id : 30 }
+          },
+          titi : {
+            id  : 3,
+            val : { id : 40 }
+          }
+        }
+      };
+      carbone.renderXML(_xml, _data, function (err, _xmlBuilt) {
+        helper.assert(err+'', 'null');
+        helper.assert(_xmlBuilt, '<body> 30 ; 40 ;  </body>');
+        done();
+      });
+    });
+  });
 });
 

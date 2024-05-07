@@ -1,4 +1,23 @@
 
+## v4.23.0
+  - Now accepts array filters on attributes of objects as if they were arrays:
+    ```js
+    {
+      myObject : {
+        paul : '10',
+        jack : '20',
+        bob  : '30'
+      }
+    }
+    ```
+    In the report:
+    ```js
+      {d.myObject[.att = jack].val} // 20
+      {d.myObject[.val = 20].att}   // jack
+    ```
+    - use .att to access the attribute (paul, jack, bob)
+    - use .val to print the value
+
 ## v4.22.4
   - Release April 18th 2024
   - A new option `{o.useHighPrecisionArithmetic=true}` can be used within a template to activate arbitrary-precision decimal arithmetic for mathematical operations. 

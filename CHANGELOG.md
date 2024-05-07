@@ -1,6 +1,7 @@
 
-## v4.23.0
-  - Now accepts array filters on attributes of objects as if they were arrays:
+## v4.22.5
+  - Release May 7th 2024
+  - Accepts filters on attributes of objects as if they were arrays:
     ```js
     {
       myObject : {

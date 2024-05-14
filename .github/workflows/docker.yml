@@ -38,7 +38,19 @@ jobs:
       name: Download LibreOffice
       # Download LO from a US mirror to make it faster
       # Downlaod here instead of dockerfile to avoid installing curl inside docker (more vulnerabilities)
-      run: curl -o docker/libreoffice.tar.gz -J -L https://mirror.fcix.net/tdf/libreoffice/_testing_/7.6.7/deb/x86_64/LibreOffice_7.6.7.1_Linux_x86-64_deb.tar.gz
+      run: curl -o docker/libreoffice.tar.gz -J -L https://mirror.fcix.net/tdf/libreoffice/_testing_/7.6.7/deb/x86_64/LibreOffice_7.6.7.2_Linux_x86-64_deb.tar.gz
+
+    -
+      name: Checkout s3 plugin
+      uses: actions/checkout@v4
+      with:
+        repository: carboneio/carbone-ee-plugin-s3
+        path: docker/carbone-ee-plugin-s3
+        ref: master
+
+    -
+      name: Install plugin dependency
+      run: cd docker/carbone-ee-plugin-s3 && npm i
 
     -
       name: Login to Docker Hub

@@ -1,7 +1,10 @@
 
 ## v4.XX.X
   - [EE] New feature for the `:HTML` formatter: the HTML is now supported in headers and footers of DOCX/ODT/PDF. **Temporary exception for DOCX templates:** if the HTML contains `<img>` tags, a image must be pre-inserted into the header/footer of the template, otherwise the image won't be displayed.
-  - [EE] Improvement for The `:HTML` formatter: all body style applied the html tag on a DOCX/ODT template is re-applied on the generated document.
+  - [EE] Improvement for The `:HTML` formatter: all body style applied the html tag on a DOCX/ODT template is re-applied to the generated document. List of new supported styles for paragraphs:
+    - DOCX: Spacing between paragraphs, Left indent, Small Caps, All Caps, Hidden text, Double strikethrough.
+    - ODT: Spacing between paragraphs, Left indent, Margin top/bottom, and Text Justify property.
+
 
 ## v4.22.4
   - Release April 18th 2024

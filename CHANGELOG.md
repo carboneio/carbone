@@ -1,6 +1,7 @@
 
 ## v4.XX.X
-  - [EE] The HTML formatter is now supported in headers and footers of DOCX/ODT/PDF. **Temporary exception for DOCX templates:** if the HTML contains `<img>` tags, a image must be pre-inserted into the header/footer of the template, otherwise the image won't be displayed.
+  - [EE] New feature for the `:HTML` formatter: the HTML is now supported in headers and footers of DOCX/ODT/PDF. **Temporary exception for DOCX templates:** if the HTML contains `<img>` tags, a image must be pre-inserted into the header/footer of the template, otherwise the image won't be displayed.
+  - [EE] Improvement for The `:HTML` formatter: all body style applied the html tag on a DOCX/ODT template is re-applied on the generated document.
 
 ## v4.22.4
   - Release April 18th 2024

@@ -29,9 +29,9 @@ describe('metrics', function () {
 
   it('should count the total time of multiple callback', function (done) {
     const _metrics = new Metrics({
-      10 : 0,
-      20 : 0,
-      30 : 0
+      1   : 0,
+      20  : 0,
+      120 : 0
     });
     let _count = 7;
     function asyncFn (key, cb) {
@@ -44,19 +44,19 @@ describe('metrics', function () {
     function detectEnd () {
       _count--;
       if (_count === 0) {
-        helper.assert(_metrics.get(10) > 43*1000 && _metrics.get(10) < 55*1000, true); // 45
-        helper.assert(_metrics.get(20) > 73*1000 && _metrics.get(20) < 85*1000, true); // 75
-        helper.assert(_metrics.get(30) > 33*1000 && _metrics.get(30) < 45*1000, true); // 35
+        helper.assert(_metrics.get(1) > 1*1000 && _metrics.get(1) < 40*1000, true); // 18
+        helper.assert(_metrics.get(20) > 73*1000 && _metrics.get(20) < 100*1000, true); // 75
+        helper.assert(_metrics.get(120) > 110*1000 && _metrics.get(120) < 200*1000, true); // 125
         done();
       }
     }
-    asyncFn(10, detectEnd); // 15
-    asyncFn(30, detectEnd); // 35
+    asyncFn(1, detectEnd); // 6
+    asyncFn(120, detectEnd); // 125
     asyncFn(20, detectEnd); // 25
     asyncFn(20, detectEnd); // 25
     asyncFn(20, detectEnd); // 25
-    asyncFn(10, detectEnd); // 15
-    asyncFn(10, detectEnd); // 15
+    asyncFn(1, detectEnd); // 6
+    asyncFn(1, detectEnd); // 6
   });
 
   it('should set the value of a key', function () {

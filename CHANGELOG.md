@@ -1,10 +1,11 @@
 
-## v4.XX.X
+## v4.22.6
+  - Release June 7th 2024
   - [EE] New feature for the `:HTML` formatter: the HTML is now supported in headers and footers of DOCX/ODT/PDF. **Temporary exception for DOCX templates:** if the HTML contains `<img>` tags, a image must be pre-inserted into the header/footer of the template, otherwise the image won't be displayed.
-  - [EE] Improvement for The `:HTML` formatter: all body style applied the html tag on a DOCX/ODT template is re-applied to the generated document. List of new supported styles for paragraphs:
-    - DOCX: Spacing between paragraphs, Left indent, Small Caps, All Caps, Hidden text, Double strikethrough.
-    - ODT: Spacing between paragraphs, Left indent, Margin top/bottom, and Text Justify property.
-
+  - [EE] Fix: more text editor styles applied to Carbone tags with the `:html` formatter are also applied to the injected HTML for DOCX/ODT templates. 
+    This fix addresses numerous spacing issues between paragraphs, before or after the injected HTML. List of new supported styles:
+    - DOCX: Spacing between paragraphs, left indent, small caps, all caps, hidden text, double strikethrough.
+    - ODT: Spacing between paragraphs, left indent, top/bottom margin, and text justify property
 
 ## v4.22.5
   - Release May 7th 2024

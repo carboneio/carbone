@@ -6,6 +6,12 @@ const assert = require('assert');
 const image = require('../lib/image');
 const hyperlinks = require('../lib/hyperlinks');
 
+/**
+ * TODO DOCX:
+ * - buildXmlContentDOCX avec filename
+ * - addHtmlDatabaseDOCX
+ */
+
 describe('Dynamic HTML', function () {
 
   describe('patchStyleAttribute', function () {
@@ -74,11 +80,12 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 0);
           /** WITH STYLE */
-          _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
-          _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+          _templateContent = '<office:body><office:text><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>';
+          _expectedContent = '<office:body><office:text><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style><carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: ' fo:text-align="center"', text: '' }))
         });
 
         it('should accept convCRLF before :html, and replace it by an internal formatter which replace "\n" by "<br>"', function () {
@@ -89,11 +96,11 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 0);
           /** WITH STYLE */
-          _templateContent = '<office:body><office:text><text:p text:style-name="P5">{d.content:convCRLF:html}</text:p></office:text></office:body>';
-          _expectedContent = '<office:body><office:text><carbone>{d.content:convCRLFH:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+          _templateContent = '<office:body><office:text><office:text><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style><text:p text:style-name="P5">{d.content:convCRLF:html}</text:p></office:text></office:body>';
+          _expectedContent = '<office:body><office:text><office:text><style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style><carbone>{d.content:convCRLFH:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: ' fo:text-align="center"', text: '' }))
         });
 
 
@@ -101,63 +108,73 @@ describe('Dynamic HTML', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
+                '<style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style>'+
                 '<text:p text:style-name="P5">Some content before {d.content:html} and after</text:p>'+
               '</office:text></office:body>';
           const _expectedContent = '' +
               '<office:body><office:text>'+
+                '<style:style style:name="P5" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="center"/></style:style>'+
                 '<text:p text:style-name="P5">Some content before </text:p>'+
                 '<carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone>'+
                 '<text:p text:style-name="P5"> and after</text:p>'+
               '</office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: ' fo:text-align=\"center\"', text: '' }))
         });
 
         it('should find and seperate a single html formatter inside a <text:h> tag', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _template = '' +
             '<office:body><office:text>'+
+              '<style:style style:name="P2" style:family="paragraph"><style:paragraph-properties fo:text-align="end" style:writing-mode="rl-tb"/><style:text-properties fo:color="#c9211e"/></style:style>'+
               '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showBegin}{d.A[i].B} Summary: {d.A[i].O:html()}{d.A[i].O:ifNEM():showEnd}</text:h>' +
               '<text:h text:style-name="P2" text:outline-level="1">{d.A[i+1]}</text:h>' +
             '</office:text></office:body>';
           const _expected = '' +
             '<office:body>' +
               '<office:text>' +
+                '<style:style style:name="P2" style:family="paragraph"><style:paragraph-properties fo:text-align="end" style:writing-mode="rl-tb"/><style:text-properties fo:color="#c9211e"/></style:style>'+
                 '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showBegin}{d.A[i].B} Summary: </text:h>' +
-                '<carbone>{d.A[i].O:getHTMLContentOdt(\'style-P2\')}</carbone>' +
+                '<carbone>{d.A[i].O:getHTMLContentOdt(\'style-P2-P2\')}</carbone>' +
                 '<text:h text:style-name="P2" text:outline-level="1">{d.A[i].O:ifNEM():showEnd}</text:h>' +
                 '<text:h text:style-name="P2" text:outline-level="1">{d.A[i+1]}</text:h>' +
               '</office:text>' +
             '</office:body>'
+
+          
           assert.strictEqual(html.reorderXML(_template, _options), _expected);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P2')), JSON.stringify({ paragraph: 'text:style-name="P2"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P2-P2')), JSON.stringify({ paragraph: ' fo:text-align="end" style:writing-mode="rl-tb"', text: ' fo:color="#c9211e"' }))
         })
 
         it('should find and seperate a html formatter inside <text:h> <text:p> tags 1', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _template = '' +
             '<office:body><office:text>'+
+              '<style:style style:name="P3" style:family="paragraph"><style:paragraph-properties fo:text-align="end"/><style:text-properties style:font-name="Noto Sans" fo:font-style="italic"/></style:style>'+
               '<text:p text:style-name="P3">{d.text:html}</text:p>' +
               '<text:h text:style-name="Heading_20_1" text:outline-level="1">{d.text:html}</text:h>' +
             '</office:text></office:body>';
           const _expected = '' +
             '<office:body>' +
               '<office:text>' +
-                '<carbone>{d.text:getHTMLContentOdt(\'style-P3\')}</carbone>' +
+                '<style:style style:name="P3" style:family="paragraph"><style:paragraph-properties fo:text-align="end"/><style:text-properties style:font-name="Noto Sans" fo:font-style="italic"/></style:style>'+
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P3-P3\')}</carbone>' +
                 '<carbone>{d.text:getHTMLContentOdt}</carbone>' +
               '</office:text>' +
             '</office:body>'
           assert.strictEqual(html.reorderXML(_template, _options), _expected);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3')), JSON.stringify({ paragraph: 'text:style-name="P3"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3-P3')), JSON.stringify({ paragraph: ' fo:text-align="end"', text: ' style:font-name="Noto Sans" fo:font-style="italic"' }))
         })
 
         it('should find and seperate a html formatter inside <text:h> <text:p> tags 2', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _template = '' +
             '<office:body><office:text>'+
+              '<style:style style:name="P3" style:family="paragraph" style:parent-style-name="Footer"><style:paragraph-properties fo:text-align="center" /><style:text-properties style:font-name="Alef"/></style:style>'+
+              '<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="end" /><style:text-properties style:font-name="Aptos"/></style:style>' + 
               '<text:p text:style-name="P3">{d.text:html}</text:p>' +
               '<text:p text:style-name="P2"/>' +
               '<text:h text:style-name="Heading_20_1" text:outline-level="1">{d.text:html}</text:h>' +
@@ -167,46 +184,53 @@ describe('Dynamic HTML', function () {
           const _expected = '' +
             '<office:body>' +
               '<office:text>' +
-                '<carbone>{d.text:getHTMLContentOdt(\'style-P3\')}</carbone>' +
+                '<style:style style:name="P3" style:family="paragraph" style:parent-style-name="Footer"><style:paragraph-properties fo:text-align="center" /><style:text-properties style:font-name="Alef"/></style:style>'+
+                '<style:style style:name="P1" style:family="paragraph" style:parent-style-name="Standard"><style:paragraph-properties fo:text-align="end" /><style:text-properties style:font-name="Aptos"/></style:style>' + 
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P3-P3\')}</carbone>' +
                 '<text:p text:style-name="P2"/>' +
                 '<carbone>{d.text:getHTMLContentOdt}</carbone>' +
                 '<text:p text:style-name="P2"/>' +
-                '<carbone>{d.text:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+                '<carbone>{d.text:getHTMLContentOdt(\'style-P1-P1\')}</carbone>' +
               '</office:text>' +
             '</office:body>'
+
+
           assert.strictEqual(html.reorderXML(_template, _options), _expected);
           assert.strictEqual(_options.htmlStylesDatabase.size, 2);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3')), JSON.stringify({ paragraph: 'text:style-name="P3"', text: '' }))
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P3-P3')), JSON.stringify({ paragraph: ' fo:text-align="center"', text: ' style:font-name="Alef"' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1-P1')), JSON.stringify({ paragraph: ' fo:text-align="end"', text: ' style:font-name="Aptos"' }))
         })
 
         it('should seperate a single html formatter mixed inside a span', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
-                '<text:p text:style-name="P1">' +
+                '<text:p >' +
                   '<text:span text:style-name="T2">Content before{d.courseloop1:html}Content after</text:span>'+
                 '</text:p>' +
               '</office:text></office:body>';
           const _expectedContent = '' +
               '<office:body><office:text>'+
-                '<text:p text:style-name="P1">' +
+                '<text:p >' +
                   '<text:span text:style-name="T2">Content before</text:span>' +
                 '</text:p>' +
-                '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
-                '<text:p text:style-name="P1">' +
+                '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
+                '<text:p >' +
                   '<text:span text:style-name="T2">Content after</text:span>' +
                 '</text:p>' +
               '</office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
-          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate a single html formatter mixed inside multiple spans', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _templateContent = '' +
               '<office:body><office:text>'+
+              '<office:automatic-styles>'+
+                '<style:style style:name="P1" style:family="paragraph"><style:paragraph-properties fo:text-align="center"/></style:style>'+
+                '<style:style style:name="T2" style:family="paragraph"><style:text-properties style:font-name="Aptos"/></style:style>' + 
+              '</office:automatic-styles>'+
                 '<text:p text:style-name="P1">' +
                   '<text:span text:style-name="T3"></text:span>'+
                   '<text:span text:style-name="T2">{d.courseloop1:html}</text:span>'+
@@ -215,11 +239,15 @@ describe('Dynamic HTML', function () {
               '</office:text></office:body>';
           const _expectedContent = '' +
               '<office:body><office:text>'+
-                '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+                '<office:automatic-styles>'+
+                  '<style:style style:name="P1" style:family="paragraph"><style:paragraph-properties fo:text-align="center"/></style:style>'+
+                  '<style:style style:name="T2" style:family="paragraph"><style:text-properties style:font-name="Aptos"/></style:style>' + 
+                '</office:automatic-styles>'+
+                '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1-T2\')}</carbone>' +
               '</office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1-T2')), JSON.stringify({ paragraph: ' fo:text-align=\"center\"', text: ' style:font-name=\"Aptos\"' }))
         });
 
         it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
@@ -237,18 +265,17 @@ describe('Dynamic HTML', function () {
           const _expectedContent = '' +
               '<office:body>' +
                 '<office:text>' +
-                  '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+                  '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
                   '<text:p text:style-name="P1">' +
                     '<text:span text:style-name="T2"></text:span>' +
                     '<text:span text:style-name="T3">Some Static content</text:span>' +
                     '<text:span text:style-name="T2"></text:span>' +
                   '</text:p>' +
-                  '<carbone>{d.courseloop2:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
                 '</office:text>' +
               '</office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
-          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
@@ -271,7 +298,7 @@ describe('Dynamic HTML', function () {
                     '<text:span text:style-name="T3">Before</text:span>' +
                     '<text:span text:style-name="T2"></text:span>' +
                   '</text:p>' +
-                  '<carbone>{d.courseloop2:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
                   '<text:p text:style-name="P1">' +
                     '<text:span text:style-name="T2"></text:span>' +
                     '<text:span text:style-name="T3">After</text:span>' +
@@ -280,8 +307,7 @@ describe('Dynamic HTML', function () {
                 '</office:text>' +
               '</office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
-          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate a single html formatter mixed inside multiple spans and static content', function () {
@@ -304,13 +330,13 @@ describe('Dynamic HTML', function () {
                     '<text:span text:style-name="T3"></text:span>' +
                     '<text:span text:style-name="T2"></text:span>' +
                   '</text:p>' +
-                  '<carbone>{d.courseloop1:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+                  '<carbone>{d.courseloop1:getHTMLContentOdt}</carbone>' +
                   '<text:p text:style-name="P1">' +
                     '<text:span text:style-name="T2"></text:span>' +
                     '<text:span text:style-name="T3">Some Static content</text:span>' +
                     '<text:span text:style-name="T2"></text:span>' +
                   '</text:p>' +
-                  '<carbone>{d.courseloop2:getHTMLContentOdt(\'style-P1\')}</carbone>' +
+                  '<carbone>{d.courseloop2:getHTMLContentOdt}</carbone>' +
                   '<text:p text:style-name="P1">' +
                     '<text:span text:style-name="T2"></text:span>' +
                     '<text:span text:style-name="T3"></text:span>' +
@@ -319,8 +345,7 @@ describe('Dynamic HTML', function () {
                 '</office:text>' +
               '</office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
-          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P1')), JSON.stringify({ paragraph: 'text:style-name="P1"', text: '' }))
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate multiple html formatter with other elements', function () {
@@ -332,14 +357,13 @@ describe('Dynamic HTML', function () {
           const _expectedContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P5">{d.list[i].name} some content1 </text:p>'+
-                '<carbone>{d.list[i].content:getHTMLContentOdt(\'style-P5\')}</carbone>'+
+                '<carbone>{d.list[i].content:getHTMLContentOdt}</carbone>'+
                 '<text:p text:style-name="P5"> after content </text:p>'+
-                '<carbone>{d.value:getHTMLContentOdt(\'style-P5\')}</carbone>'+
+                '<carbone>{d.value:getHTMLContentOdt}</carbone>'+
                 '<text:p text:style-name="P5"> end</text:p>'+
               '</office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
-          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
         it('should seperate a multiple html formatter with other elements inside multiple paragrpahs', function () {
@@ -352,15 +376,14 @@ describe('Dynamic HTML', function () {
           const _expectedContent = '' +
               '<office:body><office:text>'+
                 '<text:p text:style-name="P5">Some content before 1 </text:p>'+
-                '<carbone>{d.content1:getHTMLContentOdt(\'style-P5\')}</carbone>'+
+                '<carbone>{d.content1:getHTMLContentOdt}</carbone>'+
                 '<text:p text:style-name="P5"> and after 1</text:p>'+
                 '<text:p text:style-name="P5">Some content before 2 </text:p>'+
-                '<carbone>{d.content2:getHTMLContentOdt(\'style-P5\')}</carbone>'+
+                '<carbone>{d.content2:getHTMLContentOdt}</carbone>'+
                 '<text:p text:style-name="P5"> and after 2</text:p>'+
               '</office:text></office:body>';
           assert.strictEqual(html.reorderXML(_templateContent, _options), _expectedContent);
-          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
       });
 
@@ -847,6 +870,42 @@ describe('Dynamic HTML', function () {
             assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-rtl-textaligncenter')), JSON.stringify({ paragraph: '<w:bidi/><w:jc w:val=\"center\"/>', text: '' }))
         });
 
+        it('should return DOCX paragraph style: spacing and indent', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+            '<w:pPr>' +
+              '<w:spacing w:line="600" w:lineRule="auto"/>' +
+              '<w:ind w:left="720"/>' +
+            '</w:pPr>' +
+            '<w:r><w:rPr><w:lang w:val="en-US"/></w:rPr>', _options), '(\'style-w:spacing-w:ind\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-w:spacing-w:ind')), JSON.stringify({ paragraph: '<w:spacing w:line=\"600\" w:lineRule=\"auto\"/><w:ind w:left=\"720\"/>', text: '' }))
+        });
+
+        it('should return DOCX paragraph style: RTL and Text Alignment in the footer and header', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+            '<w:pPr>' +
+              '<w:bidi/>' +
+              '<w:jc w:val="center"/>' +
+            '</w:pPr>' +
+            '<w:r>' +
+              '<w:rPr>' +
+                '<w:lang w:val="en-US"/>' +
+              '</w:rPr>', _options, '', 'word/footer2.xml'), '(\'style-rtl-textaligncenter\',\'word/footer2.xml\')');
+            helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+              '<w:pPr>' +
+                '<w:bidi/>' +
+                '<w:jc w:val="center"/>' +
+              '</w:pPr>' +
+              '<w:r>' +
+                '<w:rPr>' +
+                  '<w:lang w:val="en-US"/>' +
+                '</w:rPr>', _options, '', 'word/header1.xml'), '(\'style-rtl-textaligncenter\',\'word/header1.xml\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-rtl-textaligncenter')), JSON.stringify({ paragraph: '<w:bidi/><w:jc w:val=\"center\"/>', text: '' }))
+        });
+
         it('should return DOCX text style: font family, font size and colors', function () {
           let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
           helper.assert(html.getTemplateDefaultStyles('<w:p>' +
@@ -887,6 +946,26 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(_options.htmlStylesDatabase.size, 4);
           assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-tcolorFF0000-bgcoloryellow')), JSON.stringify({ paragraph: '', text: '<w:color w:val=\"FF0000\"/><w:highlight w:val=\"yellow\"/>' }))
         });
+
+
+        it('should return DOCX text styles: Bold / Italic / Underline / strike / <w:smallCaps/> / <w:vanish/> / <w:dstrike/> / <w:caps w:val="true" />', function () {
+          let _options = { extension : 'docx', htmlStylesDatabase: new Map() };
+          helper.assert(html.getTemplateDefaultStyles('<w:p>' +
+            '<w:pPr>' +
+              '<w:spacing w:line="600" w:lineRule="auto"/>' +
+              '<w:ind w:left="720"/>' +
+            '</w:pPr>' +
+            '<w:r><w:rPr>'+
+              '<w:b/><w:bCs/><w:i/><w:iCs/><w:u w:val="single"/><w:caps/>'+
+              '<w:smallCaps/><w:vanish/><w:dstrike/><w:caps w:val="true"/>' +
+            '</w:rPr>', _options), '(\'style-w:spacing-w:ind-w:b-w:bCs-w:i-w:iCs-w:uw:valsingle-w:caps-w:smallCaps-w:vanish-w:dstrike-w:capsw:valtrue\')');
+            assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+            assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-w:spacing-w:ind-w:b-w:bCs-w:i-w:iCs-w:uw:valsingle-w:caps-w:smallCaps-w:vanish-w:dstrike-w:capsw:valtrue')), JSON.stringify({ 
+              paragraph: '<w:spacing w:line=\"600\" w:lineRule=\"auto\"/><w:ind w:left=\"720\"/>', 
+              text: '<w:b/><w:bCs/><w:i/><w:iCs/><w:u w:val=\"single\"/><w:caps/><w:smallCaps/><w:vanish/><w:dstrike/><w:caps w:val=\"true\"/>' 
+            }))
+        });
+
       })
 
       describe('ODT', function () {
@@ -896,16 +975,45 @@ describe('Dynamic HTML', function () {
           assert.strictEqual(_options.htmlStylesDatabase.size, 0);
         });
 
+        it('should return the style from a header and footer', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          const _htmlMarkerHeader = '<style:master-page><style:header><text:p text:style-name="MP1">{d.header:html}</text:p></style:header></style:master-page>';
+          const _htmlMarkerFooter = '<style:master-page><style:footer><text:p text:style-name="MP2">{d.footer:html}</text:p></style:footer></style:master-page>'
+          const _htmlStyle = '<style:style style:name="MP1" style:family="paragraph" style:parent-style-name="Header">'+
+                                '<style:paragraph-properties fo:text-align="end" style:justify-single-word="false" style:writing-mode="rl-tb"/>'+
+                                '<style:text-properties fo:color="#c9211e" loext:opacity="100%" style:font-name="Noto Sans" fo:font-size="16pt" fo:font-style="italic" officeooo:rsid="00042958" officeooo:paragraph-rsid="00042958" fo:background-color="#ffff00" style:font-style-asian="italic" style:font-size-complex="16pt" style:font-style-complex="italic"/>'+
+                              '</style:style>'+
+                              '<style:style style:name="MP2" style:family="paragraph" style:parent-style-name="Footer">'+
+                                '<style:text-properties style:font-name="Alef" fo:font-weight="bold" officeooo:rsid="00042958" officeooo:paragraph-rsid="00042958" style:font-weight-asian="bold" style:font-weight-complex="bold"/>'+
+                              '</style:style>';
+          helper.assert(html.getTemplateDefaultStyles(_htmlMarkerHeader, _options, _htmlStyle, "styles.xml"), '(\'style-MP1-MP1\',\'styles.xml\')');
+          helper.assert(html.getTemplateDefaultStyles(_htmlMarkerFooter, _options, _htmlStyle, "styles.xml"), '(\'style-MP2\',\'styles.xml\')');          
+        })
+
         it('should return ODT paragraph style', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
-          helper.assert(html.getTemplateDefaultStyles('<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>', _options), '(\'style-P5\')');
+          
+          const _htmlStyle = '<office:body><style:style style:name="P5" style:family="text"><style:paragraph-properties fo:text-align="end"/></style:style></office:body>'
+          const _htmlMarker = '<office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text>';
+          helper.assert(html.getTemplateDefaultStyles(_htmlMarker, _options, _htmlStyle), '(\'style-P5\')');
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: '' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5')), JSON.stringify({ paragraph: ' fo:text-align=\"end\"', text: '' }))
+        });
+
+        it('should return ODT paragraph style and the original filename', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          let _htmlStyle = '<style:style style:name="P5" style:family="text"><style:paragraph-properties fo:text-align="end"/><style:text-properties fo:color="#023f62" loext:opacity="100%" fo:font-weight="bold"/></style:style>'
+          helper.assert(html.getTemplateDefaultStyles('<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>', _options, _htmlStyle, 'content.xml'), '(\'style-P5-P5\',\'content.xml\')');
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5-P5')), JSON.stringify({ paragraph: ' fo:text-align=\"end\"', text: ' fo:color=\"#023f62\" fo:font-weight=\"bold\"' }))
         });
 
         it('should return ODT text style', function () {
           let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
           const _xmlStyle = '' +
+            '<style:style style:name="P5" style:family="paragraph" style:parent-style-name="Header">'+
+              '<style:paragraph-properties fo:text-align="end" style:justify-single-word="false" style:writing-mode="rl-tb"/>'+
+            '</style:style>'+
             '<style:style style:name="T5" style:family="text">' +
               '<style:text-properties fo:color="#ff0000" loext:opacity="100%" style:font-name="Noteworthy" fo:font-size="16pt" fo:language="en" fo:country="US" fo:background-color="#ffff00" loext:char-shading-value="0" style:font-name-complex="Noto Sans"/>' +
             '</style:style>';
@@ -913,8 +1021,28 @@ describe('Dynamic HTML', function () {
             html.getTemplateDefaultStyles('<office:body><office:text><text:p text:style-name="P5"><text:span text:style-name="T5">{d.content:html}</text:span></text:p></office:text></office:body>', _options, _xmlStyle),
             '(\'style-P5-T5\')'
           );
+          /** Test passing the original filename */
+          helper.assert(
+            html.getTemplateDefaultStyles('<office:body><office:text><text:p text:style-name="P5"><text:span text:style-name="T5">{d.content:html}</text:span></text:p></office:text></office:body>', _options, _xmlStyle, 'styles.xml'),
+            '(\'style-P5-T5\',\'styles.xml\')'
+          );
           assert.strictEqual(_options.htmlStylesDatabase.size, 1);
-          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5-T5')), JSON.stringify({ paragraph: 'text:style-name="P5"', text: ' fo:color=\"#ff0000\" style:font-name=\"Noteworthy\" fo:font-size=\"16pt\" fo:background-color=\"#ffff00\" style:font-name-complex=\"Noto Sans\"' }))
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5-T5')), JSON.stringify({ paragraph: ' fo:text-align=\"end\" style:justify-single-word=\"false\" style:writing-mode=\"rl-tb\"', text: ' fo:color=\"#ff0000\" style:font-name=\"Noteworthy\" fo:font-size=\"16pt\" fo:background-color=\"#ffff00\" style:font-name-complex=\"Noto Sans\"' }))
+        });
+
+        it('should return ODT text style with a Single style containing a paragraph AND text', function () {
+          let _options = { extension : 'odt', htmlStylesDatabase: new Map() };
+          const _xmlStyle = '' +
+            '<style:style style:name="P5" style:family="paragraph" style:parent-style-name="Header">'+
+              '<style:paragraph-properties fo:text-align="end" style:justify-single-word="false" style:writing-mode="rl-tb"/>'+
+              '<style:text-properties fo:color="#ff0000" loext:opacity="100%" style:font-name="Noteworthy" fo:font-size="16pt" fo:language="en" fo:country="US" fo:background-color="#ffff00" loext:char-shading-value="0" style:font-name-complex="Noto Sans"/>'+
+            '</style:style>';
+          helper.assert(
+            html.getTemplateDefaultStyles('<office:body><office:text><text:p text:style-name="P5"><text:span text:style-name="T5">{d.content:html}</text:span></text:p></office:text></office:body>', _options, _xmlStyle, 'styles.xml'),
+            '(\'style-P5-P5\',\'styles.xml\')'
+          );
+          assert.strictEqual(_options.htmlStylesDatabase.size, 1);
+          assert.strictEqual(JSON.stringify(_options.htmlStylesDatabase.get('style-P5-P5')), JSON.stringify({ paragraph: ' fo:text-align=\"end\" style:justify-single-word=\"false\" style:writing-mode=\"rl-tb\"', text: ' fo:color=\"#ff0000\" style:font-name=\"Noteworthy\" fo:font-size=\"16pt\" fo:background-color=\"#ffff00\" style:font-name-complex=\"Noto Sans\"' }))
         });
       });
     });
@@ -971,24 +1099,29 @@ describe('Dynamic HTML', function () {
         helper.assert(_template.files[2].data, _expectedContent);
       });
 
-      it('should replace the carbone tag on each XML files that contain in the file name "content", "document", "footer" or "header"', function () {
+      it('should replace the carbone tag on each XML files that contain in the file name "content", "styles", "document", "footer" or "header"', function () {
+        const _originalContent = '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>';
         const _expectedContent = '<office:body><office:text><text:p text:style-name="P5">HTML content</text:p></office:text></office:body>';
         const _template = {
           files : [{
             name : 'document.xml',
-            data : '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>'
+            data : _originalContent
           },
           {
             name : 'footer.xml',
-            data : '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>'
+            data : _originalContent
           },
           {
             name : 'header.xml',
-            data : '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>'
+            data : _originalContent
           },
           {
             name : 'content.xml',
-            data : '<office:body><office:text><text:p text:style-name="P5"><carbone>HTML content</carbone></text:p></office:text></office:body>'
+            data : _originalContent
+          },
+          {
+            name : 'styles.xml',
+            data : _originalContent
           }]
         };
         html.removeCarboneTags(_template);
@@ -1021,16 +1154,16 @@ describe('Dynamic HTML', function () {
         const _template = {
           files : [{
             name : 'content.xml',
-            data : '<office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>'
+            data : '<style:style style:name="P5" style:family="paragraph"><style:paragraph-properties fo:text-align="end" style:writing-mode="rl-tb"/></style:style><office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>'
           }]
         };
-        const _expectedContent = '<office:body><office:text><carbone>{d.content:getHTMLContentOdt(\'style-P5\')}</carbone></office:text></office:body>';
+        const _expectedContent = '<style:style style:name="P5" style:family="paragraph"><style:paragraph-properties fo:text-align="end" style:writing-mode="rl-tb"/></style:style><office:body><office:text><carbone>{d.content:getHTMLContentOdt(\'style-P5\',\'content.xml\')}</carbone></office:text></office:body>';
         html.preProcessODT(_template, _options);
         helper.assert(_template.files[0].data, _expectedContent);
         assert.strictEqual(_options.htmlStylesDatabase.size, 1);
       });
 
-      it('should convert multiple html markers into a marker + post process marker [multiple markers]', () => {
+      it('should convert html marker into a marker + post process marker [content.xml + styles.xml (headers/footers)]', () => {
         const _options = {
           extension: 'odt',
           htmlStylesDatabase: new Map()
@@ -1038,7 +1171,35 @@ describe('Dynamic HTML', function () {
         const _template = {
           files : [{
             name : 'content.xml',
+            data : '<style:style style:name="P5"><style:paragraph-properties fo:text-align="middle"/></style:style><office:body><office:text><text:p text:style-name="P5">{d.content:html}</text:p></office:text></office:body>'
+          },
+          {
+            name : 'styles.xml',
+            data : '<style:style style:name="MP1"><style:paragraph-properties fo:text-align="end" style:justify-single-word="false" style:writing-mode="rl-tb"/><style:text-properties fo:color="#c9211e" loext:opacity="100%" style:font-name="Noto Sans" fo:font-size="16pt" fo:font-style="italic" officeooo:rsid="00042958" officeooo:paragraph-rsid="00042958" fo:background-color="#ffff00" style:font-style-asian="italic" style:font-size-complex="16pt" style:font-style-complex="italic"/></style:style><style:style style:name="MP2"><style:text-properties style:font-name="Alef" fo:font-weight="bold" officeooo:rsid="00042958" officeooo:paragraph-rsid="00042958" style:font-weight-asian="bold" style:font-weight-complex="bold"/></style:style><office:master-styles><style:master-page style:name="Standard" style:page-layout-name="Mpm1"><style:header><text:p text:style-name="MP1">{d.header:html}</text:p></style:header><style:footer><text:p text:style-name="MP2">{d.footer:html}</text:p></style:footer></style:master-page></office:master-styles>'
+          }]
+        };
+        html.preProcessODT(_template, _options);
+        helper.assert(_template.files[0].data, '<style:style style:name="P5"><style:paragraph-properties fo:text-align="middle"/></style:style><office:body><office:text><carbone>{d.content:getHTMLContentOdt(\'style-P5\',\'content.xml\')}</carbone></office:text></office:body>');
+        helper.assert(_template.files[1].data, '<style:style style:name="MP1"><style:paragraph-properties fo:text-align="end" style:justify-single-word="false" style:writing-mode="rl-tb"/><style:text-properties fo:color="#c9211e" loext:opacity="100%" style:font-name="Noto Sans" fo:font-size="16pt" fo:font-style="italic" officeooo:rsid="00042958" officeooo:paragraph-rsid="00042958" fo:background-color="#ffff00" style:font-style-asian="italic" style:font-size-complex="16pt" style:font-style-complex="italic"/></style:style><style:style style:name="MP2"><style:text-properties style:font-name="Alef" fo:font-weight="bold" officeooo:rsid="00042958" officeooo:paragraph-rsid="00042958" style:font-weight-asian="bold" style:font-weight-complex="bold"/></style:style><office:master-styles><style:master-page style:name="Standard" style:page-layout-name="Mpm1"><style:header><carbone>{d.header:getHTMLContentOdt(\'style-MP1-MP1\',\'styles.xml\')}</carbone></style:header><style:footer><carbone>{d.footer:getHTMLContentOdt(\'style-MP2\',\'styles.xml\')}</carbone></style:footer></style:master-page></office:master-styles>');
+        assert.strictEqual(_options.htmlStylesDatabase.size, 3);
+        assert.strictEqual(_options.htmlStylesDatabase.get('style-MP2').paragraph, '')
+        assert.strictEqual(_options.htmlStylesDatabase.get('style-MP2').text, ' style:font-name="Alef" fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"')
+        assert.strictEqual(_options.htmlStylesDatabase.get('style-MP1-MP1').paragraph, ' fo:text-align="end" style:justify-single-word="false" style:writing-mode="rl-tb"')
+        assert.strictEqual(_options.htmlStylesDatabase.get('style-MP1-MP1').text, ' fo:color="#c9211e" style:font-name="Noto Sans" fo:font-size="16pt" fo:font-style="italic" fo:background-color="#ffff00"')
+      });
+
+      it('should convert multiple html markers into a marker + post process marker [multiple markers]', () => {
+        const _options = {
+          extension: 'odt',
+          htmlStylesDatabase: new Map()
+        }
+        
+        const _template = {
+          files : [{
+            name : 'content.xml',
             data : '' +
+                  '<style:style style:name="P5"><style:paragraph-properties fo:text-align="end" style:justify-single-word="false" style:writing-mode="rl-tb"/></style:style>'+
+                  '<style:style style:name="P3"><style:paragraph-properties fo:text-align="start"/></style:style>'+
                   '<office:body>' +
                   '<text:p text:style-name="P5">{d.value1:html} {d.element}</text:p>' +
                   '<text:p text:style-name="P1"/>' +
@@ -1049,13 +1210,15 @@ describe('Dynamic HTML', function () {
           }]
         };
         const _expectedContent = '' +
+                      '<style:style style:name="P5"><style:paragraph-properties fo:text-align="end" style:justify-single-word="false" style:writing-mode="rl-tb"/></style:style>'+
+                      '<style:style style:name="P3"><style:paragraph-properties fo:text-align="start"/></style:style>'+
                       '<office:body>' +
-                      '<carbone>{d.value1:getHTMLContentOdt(\'style-P5\')}</carbone>' +
+                      '<carbone>{d.value1:getHTMLContentOdt(\'style-P5\',\'content.xml\')}</carbone>' +
                       '<text:p text:style-name="P5"> {d.element}</text:p>' +
                       '<text:p text:style-name="P1"/>' +
                       '<text:p text:style-name="P5">This is some content</text:p>' +
                       '<text:p text:style-name="P1"/>' +
-                      '<carbone>{d.value3:getHTMLContentOdt(\'style-P3\')}</carbone>' +
+                      '<carbone>{d.value3:getHTMLContentOdt(\'style-P3\',\'content.xml\')}</carbone>' +
                       '</office:body>';
         html.preProcessODT(_template, _options);
         helper.assert(_template.files[0].data, _expectedContent);
@@ -1117,29 +1280,34 @@ describe('Dynamic HTML', function () {
         const _options = {
           htmlStylesDatabase: new Map()
         }
+
+        
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
-        _htmlDefaultStyleObject.text += 'fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
-        _htmlDefaultStyleObject.paragraph += 'text:style-name="P2"';
+        _htmlDefaultStyleObject.text += ' fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
+        _htmlDefaultStyleObject.paragraph += ' fo:line-height="150%"';
         _options.htmlStylesDatabase.set(_styleId, _htmlDefaultStyleObject)
 
         const _expected = {
           content : '' +
-            '<text:p text:style-name="P2">'+
+            '<text:p text:style-name="C01D">'+
               '<text:span text:style-name="C010">this</text:span>'+
               '<text:span text:style-name="C011"> is a bold</text:span>'+
               '<text:span text:style-name="C012">and italic</text:span>'+
               '<text:span text:style-name="C013"> text</text:span>'+
             '</text:p>',
           style : '' +
+            '<style:style style:name="C01D" style:family="paragraph">'+
+              '<style:paragraph-properties fo:line-height="150%"/>'+
+            '</style:style>'+
             '<style:style style:name="C010" style:family="text">' +
               '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
             '</style:style>'+
             '<style:style style:name="C011" style:family="text">' +
-              '<style:text-properties fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+              '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans" fo:font-weight="bold"/>'+
             '</style:style>'+
             '<style:style style:name="C012" style:family="text">'+
-              '<style:text-properties fo:font-style="italic" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+              '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans" fo:font-style="italic"/>'+
             '</style:style>'+
             '<style:style style:name="C013" style:family="text">'+
               '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
@@ -1168,7 +1336,7 @@ describe('Dynamic HTML', function () {
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
         _htmlDefaultStyleObject.text += ''
-        _htmlDefaultStyleObject.paragraph += 'text:style-name="P2"';
+        _htmlDefaultStyleObject.paragraph += ' fo:margin-left="0.4925in"';
         _options.htmlStylesDatabase.set(_styleId, _htmlDefaultStyleObject)
 
         let _res = html.buildXMLContentOdt(_uniqueID,
@@ -1184,13 +1352,16 @@ describe('Dynamic HTML', function () {
 
         let _expected = {
           content : '' +
-            '<text:p text:style-name="P2">'+
+            '<text:p text:style-name="C01D">'+
               '<text:span>this</text:span>'+
               '<text:span text:style-name="C011"> is a bold</text:span>'+
               '<text:span text:style-name="C012">and italic</text:span>'+
               '<text:span> text</text:span>'+
             '</text:p>',
           style : '' +
+            '<style:style style:name=\"C01D\" style:family=\"paragraph\">'+
+              '<style:paragraph-properties fo:margin-left=\"0.4925in\"/>'+
+            '</style:style>'+
             '<style:style style:name="C011" style:family="text">' +
               '<style:text-properties fo:font-weight="bold"/>'+
             '</style:style>'+
@@ -1211,7 +1382,7 @@ describe('Dynamic HTML', function () {
         const htmlDefaultStyleDatabase = new Map();
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
-        _htmlDefaultStyleObject.text += 'fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
+        _htmlDefaultStyleObject.text += ' fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
         _htmlDefaultStyleObject.paragraph += '';
         htmlDefaultStyleDatabase.set(_styleId, _htmlDefaultStyleObject)
 
@@ -1238,10 +1409,10 @@ describe('Dynamic HTML', function () {
               '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
             '</style:style>'+
             '<style:style style:name="C011" style:family="text">' +
-              '<style:text-properties fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+              '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans" fo:font-weight="bold"/>'+
             '</style:style>'+
             '<style:style style:name="C012" style:family="text">'+
-              '<style:text-properties fo:font-style="italic" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
+              '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans" fo:font-style="italic"/>'+
             '</style:style>'+
             '<style:style style:name="C013" style:family="text">'+
               '<style:text-properties fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"/>'+
@@ -1444,11 +1615,11 @@ describe('Dynamic HTML', function () {
           _styleId /** Default style ID as a last argument */
         );
         helper.assert(res.content.get(), '' +
-          '<text:p text:style-name="P1"><text:span>This is a paragraph</text:span></text:p>' +
-          '<text:p text:style-name="P1"/>' +
-          '<text:p text:style-name="P1"/>' +
-          '<text:p text:style-name="P1"><text:span> lala</text:span></text:p>' +
-          '<text:p text:style-name="P1"/>'
+          '<text:p text:style-name="C01D"><text:span>This is a paragraph</text:span></text:p>' +
+          '<text:p text:style-name="C01D"/>' +
+          '<text:p text:style-name="C01D"/>' +
+          '<text:p text:style-name="C01D"><text:span> lala</text:span></text:p>' +
+          '<text:p text:style-name="C01D"/>'
         );
       });
 
@@ -1768,26 +1939,27 @@ describe('Dynamic HTML', function () {
         // Prepare the style coming from the template
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
-        _htmlDefaultStyleObject.text += ''
-        _htmlDefaultStyleObject.paragraph += 'text:style-name="P2"';
+        _htmlDefaultStyleObject.text += ' fo:font-weight="bold"'
+        _htmlDefaultStyleObject.paragraph += ' fo:text-align="end"';
         html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
 
         let res = html.buildXMLContentOdt(_uniqueID, html.parseHTML(content), _options, _styleId);
         helper.assert(res.content.get(), '' +
           '<text:list text:style-name="LC010">' +
             '<text:list-item>' +
-              '<text:p text:style-name="P2">' +
+              '<text:p text:style-name=\"C01D\">' +
                 '<text:span text:style-name="C012">Felgen ALU</text:span>' +
               '</text:p>' +
             '</text:list-item>' +
             '<text:list-item>' +
-              '<text:p text:style-name="P2">' +
+              '<text:p text:style-name=\"C01D\">' +
                 '<text:span text:style-name="C015">Farbe rot</text:span>' +
               '</text:p>' +
             '</text:list-item>' +
           '</text:list>' +
-          '<text:p text:style-name="P2"/>'
+          '<text:p text:style-name=\"C01D\"/>'
         );
+        assert.strictEqual(_options.htmlStylesDatabase.size, 1);
       });
 
       it('should create a nexted list without text in the parent LI', function () {
@@ -2278,7 +2450,8 @@ describe('Dynamic HTML', function () {
         _options.htmlDatabase.set('<b>Text content</b>', {
           id      : 'C01',
           content : '<text:span text:style-name="C010">Text content</text:span>',
-          style   : '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
+          style   : '<style:style style:name="C010" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>',
+          filename: 'content.xml'
         });
         const _template = {
           files : [{
@@ -2297,17 +2470,20 @@ describe('Dynamic HTML', function () {
         _options.htmlDatabase.set('<i><u>This is a </u></i>', {
           id      : 'C01',
           content : 'This is a ',
-          style   : '<style:style style:name="C010" style:family="text"><style:text-properties style:text-underline-style="solid" fo:font-style="italic"/></style:style>'
+          style   : '<style:style style:name="C010" style:family="text"><style:text-properties style:text-underline-style="solid" fo:font-style="italic"/></style:style>',
+          filename: 'content.xml'
         });
         _options.htmlDatabase.set('<strong>strong text</strong>text', {
           id      : 'C02',
           content : 'strong text',
-          style   : '<style:style style:name="C020" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>'
+          style   : '<style:style style:name="C020" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>',
+          filename: 'content.xml'
         });
         _options.htmlDatabase.set('<s>striked text</s>', {
           id      : 'C03',
           content : 'content',
-          style   : '<style:style style:name="C015" style:family="text"><style:text-properties style:text-line-through-style="solid"/></style:style>'
+          style   : '<style:style style:name="C015" style:family="text"><style:text-properties style:text-line-through-style="solid"/></style:style>',
+          filename: 'content.xml'
         });
         const _template = {
           files : [{
@@ -2318,6 +2494,67 @@ describe('Dynamic HTML', function () {
         const _expectedContent = '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="C010" style:family="text"><style:text-properties style:text-underline-style="solid" fo:font-style="italic"/></style:style><style:style style:name="C020" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style><style:style style:name="C015" style:family="text"><style:text-properties style:text-line-through-style="solid"/></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>';
         html.postProcessODT(_template, null, _options);
         helper.assert(_template.files[0].data, _expectedContent);
+      });
+      it('should add a new style to the content.xml and the styles.xml (header/footer)', () => {
+
+        const getStyleContent = (res) => {
+          return '<?xml version="1.0" encoding="UTF-8"?>'+
+                  '<office:document-styles>'+
+                    '<office:automatic-styles>'+
+                      '<style:style style:name="MP1" style:family="paragraph" style:parent-style-name="Header">'+
+                        '<style:text-properties/>'+
+                      '</style:style>'+
+                      (res === true ? '<style:style style:name="TC00" style:family="text"><style:text-properties style:text-underline-style="solid"/></style:style><style:style style:name="TC10" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>' : '') +
+                    '</office:automatic-styles>'+
+                    '<office:master-styles>'+
+                      '<style:master-page>'+
+                        '<style:header>'+
+                          'HEADER CONTENT'+
+                        '</style:header>'+
+                        '<style:footer>'+
+                          'FOOTER CONTENT'+
+                        '</style:footer>'+
+                      '</style:master-page>'+
+                    '</office:master-styles>'+
+                  '</office:document-styles>';
+        }
+
+        const _options = {
+          htmlDatabase : new Map()
+        };
+
+        _options.htmlDatabase.set('<u>Underlined HEADER</u>styles', {
+          content : {}, // not used during post process, we can leave empty
+          style: '<style:style style:name="TC00" style:family="text"><style:text-properties style:text-underline-style="solid"/></style:style>',
+          filename: 'styles.xml'
+        });
+
+        _options.htmlDatabase.set('<i>Italic Footer</i>styles', {
+          content : {}, // not used during post process, we can leave empty
+          style   : '<style:style style:name="TC10" style:family="text"><style:text-properties fo:font-style="italic"/></style:style>',
+          filename: 'styles.xml'
+        });
+
+        _options.htmlDatabase.set('<b>BODY AS BOLD</b>style-P3content', {
+          content : {},  // not used during post process, we can leave empty
+          style   : '<style:style style:name="TC20" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style>',
+          filename: 'content.xml'
+        });
+        
+  
+        const _template = {
+          files : [{
+            name : 'content.xml',
+            data : '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>'
+          },
+          {
+            name : 'styles.xml',
+            data : getStyleContent()
+          }]
+        };
+        html.postProcessODT(_template, null, _options);
+        helper.assert(_template.files[0].data, '<?xml version="1.0" encoding="UTF-8"?><office:document-content><office:automatic-styles><style:style style:name="CS4" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="CS5" style:family="text"><style:text-properties style:text-line-through-style="solid" /></style:style><style:style style:name="TC20" style:family="text"><style:text-properties fo:font-weight="bold"/></style:style></office:automatic-styles><office:body><office:text>      Some content...    </office:text></office:body></office:document-content>');
+        helper.assert(_template.files[1].data, getStyleContent(true));
       });
     });
 
@@ -2394,14 +2631,19 @@ describe('Dynamic HTML', function () {
         // Prepare the style coming from the template
         const _styleId = 'styleId'
         const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
-        _htmlDefaultStyleObject.text += 'fo:font-style="italic" fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
-        _htmlDefaultStyleObject.paragraph += 'text:style-name="P3"';
+        _htmlDefaultStyleObject.text += ' fo:font-style="italic" fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
+        _htmlDefaultStyleObject.paragraph += ' fo:text-align="end" style:writing-mode="rl-tb"';
         html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
 
         const _content = '<em><b>This is some content</b></em>';
         const _uniqueID = _content + _styleId;
-        const _expected = '<text:p text:style-name="P3"><text:span text:style-name="TC00">This is some content</text:span></text:p>';
-        const _style = '<style:style style:name=\"TC00\" style:family=\"text\"><style:text-properties fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:color=\"#ff00ec\" style:font-name=\"American Typewriter\" fo:font-size=\"18pt\" fo:background-color=\"#00ff19\" style:font-name-complex=\"Noto Sans\"/></style:style>';
+        const _expected = '<text:p text:style-name=\"TC0D\"><text:span text:style-name="TC00">This is some content</text:span></text:p>';
+        const _style = '<style:style style:name=\"TC0D\" style:family=\"paragraph\">'+
+                          '<style:paragraph-properties fo:text-align=\"end\" style:writing-mode=\"rl-tb\"/>'+
+                        '</style:style>'+
+                        '<style:style style:name=\"TC00\" style:family=\"text\">'+
+                          '<style:text-properties fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:color=\"#ff00ec\" style:font-name=\"American Typewriter\" fo:font-size=\"18pt\" fo:background-color=\"#00ff19\" style:font-name-complex=\"Noto Sans\"/>'+
+                        '</style:style>';
 
         const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content, _styleId);
         const _properties = _options.htmlDatabase.get(_uniqueID);
@@ -2481,6 +2723,33 @@ describe('Dynamic HTML', function () {
         helper.assert(_properties.style, '')
         helper.assert(_properties.styleLists, '')
         helper.assert(_postProcessFormatter.fn.apply(_options, _postProcessFormatter.args), '<text:p><text:a xlink:type="simple" xlink:href="https://carbone.io/link_on_error_test"><text:span>TUSKLA WEBSITE</text:span></text:a></text:p>');
+      });
+
+      it('getHtmlStyleName for Headers / Footers + apply the previous paragraph style', () => {
+        const _options = {
+          htmlDatabase : new Map(),
+          extension : 'odt',
+          htmlStylesDatabase: new Map()
+        };
+
+        // Prepare the style coming from the template
+        const _styleId = 'styleId'
+        const _htmlDefaultStyleObject = { ...html.templateDefaultStyles }
+        _htmlDefaultStyleObject.text += ' fo:font-style="italic" fo:font-weight="bold" fo:color="#ff00ec" style:font-name="American Typewriter" fo:font-size="18pt" fo:background-color="#00ff19" style:font-name-complex="Noto Sans"'
+        _htmlDefaultStyleObject.paragraph += ' fo:text-align="end" style:writing-mode="rl-tb"';
+        html.addHtmlDefaultStylesDatabase(_options, _styleId, _htmlDefaultStyleObject)
+
+        const _content = '<em><b>This is some content</b></em>';
+        const _uniqueID = _content + _styleId + 'styles';
+        const _expected = '<text:p text:style-name="TC0D"><text:span text:style-name="TC00">This is some content</text:span></text:p>';
+        const _style = '<style:style style:name=\"TC0D\" style:family=\"paragraph\"><style:paragraph-properties fo:text-align=\"end\" style:writing-mode=\"rl-tb\"/></style:style><style:style style:name=\"TC00\" style:family=\"text\"><style:text-properties fo:font-style=\"italic\" fo:font-weight=\"bold\" fo:color=\"#ff00ec\" style:font-name=\"American Typewriter\" fo:font-size=\"18pt\" fo:background-color=\"#00ff19\" style:font-name-complex=\"Noto Sans\"/></style:style>';
+
+        const _postProcess = htmlFormatters.getHTMLContentOdt.call(_options, _content, _styleId, 'styles.xml');
+        const _properties = _options.htmlDatabase.get(_uniqueID);
+        helper.assert(_properties.content.get(_content), _expected);
+        helper.assert(_properties.style, _style)
+        helper.assert(_properties.styleLists, '')
+        helper.assert(_postProcess.fn.call(_options, _postProcess.args[0]), _expected);
       });
     });
   });
@@ -2696,7 +2965,7 @@ describe('Dynamic HTML', function () {
         const _expectedXMLfooter = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:ftr>' +
-            '<carbone>{d.strikedel:getHTMLContentDocx(\'style-textalignright\')}</carbone>' +
+            '<carbone>{d.strikedel:getHTMLContentDocx(\'style-textalignright\',\'word/footer1.xml\')}</carbone>' +
           '</w:ftr>';
         const _XMLheader = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -2704,6 +2973,8 @@ describe('Dynamic HTML', function () {
             '<w:p>' +
               '<w:r>' +
                 '<w:rPr>' +
+                  '<w:b/><w:bCs/>'+
+                  '<w:color w:val="FF0000"/>'+
                   '<w:lang w:val="en-US"/>' +
                 '</w:rPr>' +
                 '<w:t>{d.italic:html}</w:t>' +
@@ -2713,7 +2984,7 @@ describe('Dynamic HTML', function () {
         const _expectedXMLheader = '' +
           '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
           '<w:hdr>' +
-            '<carbone>{d.italic:getHTMLContentDocx}</carbone>' +
+            '<carbone>{d.italic:getHTMLContentDocx(\'style-tcolorFF0000-w:b-w:bCs\',\'word/header1.xml\')}</carbone>' +
           '</w:hdr>';
         const _template = {
           files : [
@@ -2739,6 +3010,10 @@ describe('Dynamic HTML', function () {
         helper.assert(_template.files[0].data, _expectedXMLTemplate);
         helper.assert(_template.files[1].data, _expectedXMLfooter);
         helper.assert(_template.files[2].data, _expectedXMLheader);
+        helper.assert(_options.htmlStylesDatabase.get('style-tcolorFF0000-w:b-w:bCs').paragraph, '')
+        helper.assert(_options.htmlStylesDatabase.get('style-tcolorFF0000-w:b-w:bCs').text, '<w:color w:val="FF0000"/><w:b/><w:bCs/>')
+        helper.assert(_options.htmlStylesDatabase.get('style-textalignright').paragraph, '<w:jc w:val=\"right\"/>')
+        helper.assert(_options.htmlStylesDatabase.get('style-textalignright').text, '')
       });
 
       it('should find one HTML formatter and pass the original font FAMILY as a formatter argument', function () {
@@ -3049,7 +3324,7 @@ describe('Dynamic HTML', function () {
         helper.assert(content.get(), '' +
         '<w:p>'+
           '<w:r>'+
-            '<w:rPr><w:b/><w:bCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
+            '<w:rPr><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/><w:b/><w:bCs/></w:rPr>'+
             '<w:t xml:space="preserve">Hello</w:t>'+
           '</w:r>'+
           '<w:r>'+
@@ -3060,7 +3335,7 @@ describe('Dynamic HTML', function () {
         '<w:p/>' +
         '<w:p>'+
           '<w:r>'+
-            '<w:rPr><w:i/><w:iCs/><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/></w:rPr>'+
+            '<w:rPr><w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/><w:sz w:val="18"/><w:i/><w:iCs/></w:rPr>'+
             '<w:t xml:space="preserve">John</w:t>'+
           '</w:r>'+
         '</w:p>'
@@ -3098,11 +3373,11 @@ describe('Dynamic HTML', function () {
           '</w:pPr>'+
           '<w:r>'+
             '<w:rPr>'+
-              '<w:b/><w:bCs/>' +
               '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>' +
               '<w:sz w:val="18"/>' +
               '<w:color w:val="FF0000"/>' +
               '<w:highlight w:val="yellow"/>' +
+              '<w:b/><w:bCs/>' +
             '</w:rPr>'+
             '<w:t xml:space="preserve">Hello</w:t>'+
           '</w:r>'+
@@ -3127,11 +3402,11 @@ describe('Dynamic HTML', function () {
           '</w:pPr>'+
           '<w:r>'+
             '<w:rPr>'+
-              '<w:i/><w:iCs/>' +
               '<w:rFonts w:ascii="Segoe Print" w:hAnsi="Segoe Print" w:cs="Segoe Print" w:eastAsia="Segoe Print"/>' +
               '<w:sz w:val="18"/>' +
               '<w:color w:val="FF0000"/>' +
               '<w:highlight w:val="yellow"/>' +
+              '<w:i/><w:iCs/>' +
             '</w:rPr>'+
             '<w:t xml:space="preserve">John</w:t>'+
           '</w:r>'+
@@ -3417,7 +3692,8 @@ describe('Dynamic HTML', function () {
       
         helper.assert(content.get(), ''+ 
           '<w:p>'+
-            '<w:pPr>'+ 
+            '<w:pPr>'+               
+              /** HTML */
               '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
               /** Default paragraph style */
               '<w:sz w:val="22"/>'+
@@ -3425,12 +3701,13 @@ describe('Dynamic HTML', function () {
               '<w:rPr><w:sz w:val="18"/></w:rPr>'+
             '</w:pPr>'+
             '<w:r>'+
-              '<w:rPr><w:i/><w:iCs/><w:sz w:val="18"/></w:rPr>'+
+              '<w:rPr><w:sz w:val="18"/><w:i/><w:iCs/></w:rPr>'+
               '<w:t xml:space="preserve">Coffee</w:t>'+
             '</w:r>'+
           '</w:p>'+
           '<w:p>'+
             '<w:pPr>'+
+              /** HTML */
               '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="1000"/></w:numPr>'+
               /** Default paragraph style */
               '<w:sz w:val="22"/>'+
@@ -3438,7 +3715,7 @@ describe('Dynamic HTML', function () {
               '<w:rPr><w:sz w:val="18"/></w:rPr>'+
             '</w:pPr>'+
             '<w:r>'+
-              '<w:rPr><w:i/><w:iCs/><w:sz w:val="18"/></w:rPr>'+
+              '<w:rPr><w:sz w:val="18"/><w:i/><w:iCs/></w:rPr>'+
               '<w:t xml:space="preserve">Tea</w:t>'+
             '</w:r>'+
           '</w:p>'+
@@ -4737,6 +5014,65 @@ describe('Dynamic HTML', function () {
         helper.assert(_it.next().value, undefined);
       });
 
+      it('should convert HTML with images and parapgraphs into a header and footer', function () {
+        const _options = {
+          imageDatabase : new Map()
+        };
+        const _descriptor = html.parseHTML('<img src="https://carbone.io/cat" width="300" height="50" alt="cat">');
+        const { content, listStyleAbstract, listStyleNum } = html.buildXmlContentDOCX(_descriptor, _options, '', 'word/header2.xml');
+        html.buildXmlContentDOCX(_descriptor, _options, '', 'word/footer1.xml');
+        // update image aspect ratio. Simulate calls which are done before the final postprocess
+        image._computeImageSize(_options.imageDatabase.get('https://carbone.io/cat'));
+        helper.assert(listStyleAbstract, '');
+        helper.assert(listStyleNum, '');
+        helper.assert(content.get(_options), '' +
+          '<w:p>' +
+            '<w:r><w:drawing>' +
+              '<wp:inline distT="0" distB="0" distL="0" distR="0">' +
+                '<wp:extent cx="2857500" cy="476250"/>' +
+                '<wp:effectExtent l="0" t="0" r="0" b="0"/>' +
+                '<wp:docPr id="1000" name="" descr=""></wp:docPr>' +
+                '<wp:cNvGraphicFramePr>' +
+                  '<a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/>' +
+                '</wp:cNvGraphicFramePr>' +
+                '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+                  '<a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                    '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">' +
+                      '<pic:nvPicPr>' +
+                        '<pic:cNvPr id="1000" name="" descr=""></pic:cNvPr>' +
+                        '<pic:cNvPicPr>' +
+                          '<a:picLocks noChangeAspect="1" noChangeArrowheads="1"/>' +
+                        '</pic:cNvPicPr>' +
+                      '</pic:nvPicPr>' +
+                      '<pic:blipFill>' +
+                        '<a:blip r:embed="rIdCarbone0"></a:blip>' +
+                        '<a:stretch>' +
+                          '<a:fillRect/>' +
+                        '</a:stretch>' +
+                      '</pic:blipFill>' +
+                      '<pic:spPr bwMode="auto">' +
+                        '<a:xfrm>' +
+                          '<a:off x="0" y="0"/>' +
+                          '<a:ext cx="2857500" cy="476250"/>' +
+                        '</a:xfrm>' +
+                        '<a:prstGeom prst="rect">' +
+                          '<a:avLst/>' +
+                        '</a:prstGeom>' +
+                      '</pic:spPr>' +
+                    '</pic:pic>' +
+                  '</a:graphicData>' +
+                '</a:graphic>' +
+              '</wp:inline>' +
+            '</w:drawing></w:r>' +
+          '</w:p>'
+        );
+        const _it = _options.imageDatabase.entries();
+        const _value = _it.next();
+        helper.assert(_value.value[0], 'https://carbone.io/cat');
+        helper.assert(_value.value[1].sheetIds[0], 'footer1.xml');
+        helper.assert(_value.value[1].sheetIds[1], 'header2.xml');
+      });
+
       it('should convert HTML with images and parapgraphs (width height are transformed into EMU)', function () {
         const _options = {
           imageDatabase : new Map()
@@ -5053,7 +5389,7 @@ describe('Dynamic HTML', function () {
       it('should add content element to htmlDatabase with a FONT', () => {
         const _expected =  {
           id                : 0,
-          content           : '<w:p><w:r><w:rPr><w:b/><w:bCs/><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r></w:p>',
+          content           : '<w:p><w:r><w:rPr><w:rFonts w:ascii="American Typewriter" w:hAnsi="American Typewriter" w:cs="American Typewriter" w:eastAsia="American Typewriter"/><w:b/><w:bCs/></w:rPr><w:t xml:space="preserve">This is some content</w:t></w:r></w:p>',
           listStyleAbstract : '',
           listStyleNum      : ''
         };
@@ -5773,6 +6109,22 @@ describe('Dynamic HTML', function () {
       it('should do nothing if the list of tag provided is not recognized', function () {
         helper.assert(html.buildXMLStyle('docx', ['footer', 'header', 'div']), '');
         helper.assert(html.buildXMLStyle('docx', ['s', 'em', 'b', 'p', 'div', 'u']), '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>');
+      });
+
+      it('should set default styles', function () {
+        helper.assert(html.buildXMLStyle('docx', [], { text: '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>' }), '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>');
+        helper.assert(html.buildXMLStyle('odt', [], { text: '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>' }), '<w:strike/><w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/>');
+      });
+
+      it('should set default styles and add styles coming from the HTML, and should not add the XML tag twice [DOCX]', function () {
+        helper.assert(html.buildXMLStyle('docx', ['u', 'i', 'del' ], { text: '<w:b/><w:bCs/>' }), '<w:b/><w:bCs/><w:u w:val=\"single\"/><w:i/><w:iCs/><w:strike/>');
+        helper.assert(html.buildXMLStyle('docx', ['i', 'b', 'u', 'del' ], { text: '<w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/><w:strike/>' }), '<w:i/><w:iCs/><w:b/><w:bCs/><w:u w:val="single"/><w:strike/>');
+        helper.assert(html.buildXMLStyle('docx', ['s'], { text: '<w:sz w:val="28"/>' }), '<w:sz w:val=\"28\"/><w:strike/>');
+      });
+
+      it('should set default styles and add styles coming from the HTML, and should not add the XML tag twice [ODT]', function () {
+        helper.assert(html.buildXMLStyle('odt', ['i', 'u', 'del' ], { text: ' fo:font-weight="bold"' }), ' fo:font-weight=\"bold\" fo:font-style=\"italic\" style:text-underline-style=\"solid\" style:text-line-through-style=\"solid\"');
+        helper.assert(html.buildXMLStyle('odt', ['i', 'b', 'u', 'del' ], { text: ' fo:font-style="italic" fo:font-weight="bold" style:text-underline-style="solid" style:text-line-through-style="solid"' }), ' fo:font-style=\"italic\" fo:font-weight=\"bold\" style:text-underline-style=\"solid\" style:text-line-through-style=\"solid\"');
       });
     });
 

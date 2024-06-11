@@ -48,6 +48,7 @@ Activating community features in the Docker Edition was much easier. This editio
 The Open Source Edition will be updated in v4 when the v5 will be released. The open source edition is always one major version behind (v3+)
 
 Feel free to contact us [on the chat](https://carbone.io) if you need further information or  **professional support**. 
+June 2023: A new Carbone website is coming with a free interactive tutorial (FR/EN) to learn Carbone language. Stay tuned 👋.
 
 
 ## Table of content

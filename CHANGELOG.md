@@ -1,4 +1,7 @@
 
+### v3.5.6
+  - Security fix: Removed the possibility of prototype pollution in formatters. This can only occur if the parent NodeJS application has the same security issue. CVSS:3.0/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:H.
+
 ### v3.5.5
   - Release February 15th 2023
   - Bump dependencies

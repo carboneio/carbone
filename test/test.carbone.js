@@ -252,6 +252,20 @@ describe('Carbone', function () {
       assert.notEqual(typeof input.formatters.yesOrNo, 'undefined');
       assert.equal(input.formatters.yesOrNo(true), 'yes');
     });
+    it('should not be able to inject code with prototype pollution of formatters', function (done) {
+      const _injectedCode = 'a;process.exit.call`-1`;//';
+      new Object()['__proto__'][_injectedCode] = 1;
+      Object.defineProperty(new Object()['__proto__'], _injectedCode, {
+        enumerable:false, // otherwhise it crashes elsewhere in the code (each time there is a loop on object)
+      });
+      const _xml = '<xml> {d.age:'+_injectedCode+'(3)} </xml>';
+      const _data = { age : '1' };
+      carbone.renderXML(_xml, _data, function (err, result) {
+        helper.assert(err+'', 'Error: Formatter \"a;process.exit.call`-1`;//\" does not exist. Do you mean \"and\"?');
+        helper.assert(result, null);
+        done();
+      });
+    });
   });
 
 

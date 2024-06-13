@@ -310,6 +310,57 @@ describe('Carbone', function () {
     });
   });
 
+  describe('renderXML with whitesapce', function () {
+    it('should accept whitespace in json keys, with single quotes', function (done) {
+      var data = {
+        'new param' : 1
+      };
+      carbone.renderXML('<xml>{d.\'new param\'}</xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>1</xml>');
+        done();
+      });
+    });
+    it('should accept whitespace in sub-objects', function (done) {
+      var data = {
+        'new param' : {
+          'second level yes' : 2
+        }
+      };
+      carbone.renderXML('<xml>{d.\'new param\'.\'second level yes\'}</xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>2</xml>');
+        done();
+      });
+    });
+    it('should accept whitespace in array names and children', function (done) {
+      var data = {
+        'new param' : {
+          'second level yes' : [ 
+            { 'sub obj' : 55 },
+            { 'sub obj' : 46 }
+          ]
+        }
+      };
+      carbone.renderXML('<xml>{d.\'new param\'.\'second level yes\'[1].\'sub obj\'}</xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>46</xml>');
+        done();
+      });
+    });
+    it.skip('should accept whitespace in formatters dynamic paramaters', function (done) {
+      var data = {
+        'new param' : 1,
+        'other param' : 2
+      };
+      carbone.renderXML('<xml>{d.new param:print(.\'other param\')}</xml>', data, function (err, result) {
+        helper.assert(err+'', 'null');
+        helper.assert(result, '<xml>2</xml>');
+        done();
+      });
+    });
+  });
+
   describe('renderXML with dash', function () {
     it('should render an XML string with dash in json keys', function (done) {
       var data = {

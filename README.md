@@ -39,7 +39,7 @@ Use the latest version (v4+) for free with our [Docker Edition](https://hub.dock
   docker pull carbone/carbone-ee
 ```
 
-No license is required to start the [On-Premise Docker Edition](https://hub.docker.com/r/carbone/carbone-ee) with the REST API (same API as the [Cloud Edition](https://carbone.io/pricing.html).
+No license is required to start the [On-Premise Docker Edition](https://hub.docker.com/r/carbone/carbone-ee) with the REST API (same API as the [Cloud Edition](https://carbone.io/pricing.html)).
 You will only need a license if you want to use some advanced features. By default, only community features are enabled.
 
 Why? We try to optimize our time as much as possible. We are working on many things for the [long-awaited Carbone v5](https://carbone.io/carbone-v5.html) (new studio, new website, IA, ...).

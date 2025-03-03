@@ -31,7 +31,9 @@
 
 <p><b>⚡️ Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using templates and your JSON data as input !</p>
 
-### News 2024/11
+### News 2025/03
+
+[Join us on our Discord](https://discord.gg/kKB3aPYqnh)
 
 Use the latest version (v4+) for free with our [Docker Edition](https://hub.docker.com/r/carbone/carbone-ee):
 

@@ -145,6 +145,24 @@ describe('file', function () {
       });
     });
   });
+  
+  describe('isZippedBuffer', function () {
+    it('should return true if the file is zipped', function (done) {
+      var buffer = fs.readFileSync(path.resolve('./test/datasets/test_word_render_A.docx'));
+      file.isZippedBuffer(buffer, function (err, isZipped) {
+        helper.assert(isZipped, true);
+        done();
+      });
+    });
+    it('should return false if the file is not zipped', function (done) {
+      var buffer = fs.readFileSync(path.resolve('./test/datasets/test_word_render_2003_XML.xml'));
+      file.isZippedBuffer(buffer, function (err, isZipped) {
+        helper.assert(isZipped, false);
+        done();
+      });
+    });
+  });
+  
 
   describe('unzip', function () {
     it('should unzip a file and return a array which contain its content', function (done) {
@@ -479,6 +497,31 @@ describe('file', function () {
     });
     it('should open embedded xlsx file', function (done) {
       file.openTemplate('test_word_with_embedded_excel.docx', function (err, template) {
+        helper.assert(err, null);
+        helper.assert(template.isZipped, true);
+        helper.assert(template.files.length, 29);
+        helper.assert(template.embeddings.length, 1);
+        helper.assert(template.embeddings, ['word/embeddings/Feuille_de_calcul_Microsoft_Excel1.xlsx']);
+        var _filesFromDocx = template.files.filter((file) => {
+          return file.parent === '';
+        });
+        helper.assert(_filesFromDocx.length, 16);
+        var _filesFromXslx = template.files.filter((file) => {
+          return file.parent === 'word/embeddings/Feuille_de_calcul_Microsoft_Excel1.xlsx';
+        });
+        helper.assert(_filesFromXslx.length, 13);
+        var _oneFileOfXlsx = _filesFromXslx.filter((file) => {
+          return file.name === 'xl/tables/table1.xml';
+        });
+        helper.assert(_oneFileOfXlsx.length, 1);
+        helper.assert(/Tableau1/.test(_oneFileOfXlsx[0].data), true);
+        done();
+      });
+    });
+
+    it('should open embedded xlsx buffer', function (done) {
+      const buffer = fs.readFileSync(path.resolve(__dirname, 'datasets', 'test_word_with_embedded_excel.docx'))
+      file.openTemplate(buffer, function (err, template) {
         helper.assert(err, null);
         helper.assert(template.isZipped, true);
         helper.assert(template.files.length, 29);

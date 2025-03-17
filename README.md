@@ -268,12 +268,12 @@ And now, you can use the converter, by passing options to render method.
 
 ## API Reference
 
-To check out the **[api reference](https://carbone.io/api-reference.html#carbone-js-api)** and the **[documentation](https://carbone.io/documentation)**, visit [carbone.io](http://carbone.io).
+To check out the **[api reference](https://carbone.io/documentation/developer/embedding/embedding-in-node.html)** and the **[documentation](https://carbone.io/documentation)**, visit [carbone.io](http://carbone.io).
 
 
 ## Command line tools
 
-To checkout out the Carbone CLI documentation, visit [carbone.io](https://carbone.io/api-reference.html#cli)
+To checkout out the Carbone CLI documentation, visit [carbone.io](https://carbone.io/documentation/developer/embedding/embedding-in-node.html#cli)
 
 ## Issues
 
@@ -300,7 +300,7 @@ There are two editions of Carbone:
 
 - Carbone Community Edition is freely available under the [CCL Agreement](LICENSE.md). Roughly speaking, as long as you are not offering Carbone Community Edition Software as a hosted
   Document-Generator-as-a-Service like [Carbone Cloud](https://carbone.io/pricing.html), you can use and modify all Community features for free.
-- Carbone Enterprise Edition (hosted and on-premise) includes additional features. [See comparison table](https://carbone.io/pricing.html#product-comparison)
+- Carbone Enterprise Edition (hosted and on-premise) includes additional features. Here is a [high-level comparison table](https://carbone.io/documentation/design/overview/template-feature.html#template-types) of community and enterprise features.
 
 The Community Edition is one major version behind the Enterprise Edition. This rule may change in the future.
 

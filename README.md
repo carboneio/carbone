@@ -92,7 +92,7 @@ Carbone is a mustache-like template engine `{d.companyName}`.
 
 Template language documentation : https://carbone.io/documentation.html
 
-- The template can be any XML-document coming from LibreOffice™ or Microsoft Office™  (ods, docx, odt, xslx...)
+- The template can be any XML-document coming from LibreOffice™ or Microsoft Office™  (ods, docx, odt, xlsx...)
 - The injected data must be a JSON object or array, coming directly from your existing APIs for example
 
 Carbone analyzes your template and inject data in the document. The generated document can be exported as is, or converted to another format (PDF, ...) using LibreOffice if it is installed on the system.
@@ -148,7 +148,7 @@ Carbone is working only on the server-side.
 
 Carbone uses efficiently LibreOffice to convert documents. Among all tested solutions, it is the most reliable and stable one in production for now.
 
-Carbone does a lot of thing for you behind the scene:
+Carbone does a lot of things for you behind the scene:
 
 - starts LibreOffice in "server-mode": headless, no User Interface loaded
 - manages multiple LibreOffice workers to maximize performance (configurable number of workers)
@@ -164,7 +164,7 @@ Carbone does a lot of thing for you behind the scene:
 
 ###### on Ubuntu Server & Ubuntu desktop
 
-> Be careful, LibreOffice which is provided by the PPA libreoffice/ppa does not bundled python (mandatory for Carbone). The best solution is to download the LibreOffice Package from the official website and install it manually:
+> Be careful, LibreOffice which is provided by the PPA libreoffice/ppa does not bundle python (mandatory for Carbone). The best solution is to download the LibreOffice Package from the official website and install it manually:
 
 ```bash
   # remove all old version of LibreOffice
@@ -272,11 +272,11 @@ To check out the **[api reference](https://carbone.io/documentation/developer/em
 
 ## Command line tools
 
-To checkout out the Carbone CLI documentation, visit [carbone.io](https://carbone.io/documentation/developer/embedding/embedding-in-node.html#cli)
+To check out the Carbone CLI documentation, visit [carbone.io](https://carbone.io/documentation/developer/embedding/embedding-in-node.html#cli)
 
 ## Issues
 
-If you're facing any issues with this Community Edition, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/carboneio/carbone/issues). Otherwhise, [create an issue to help us](https://github.com/carboneio/carbone/issues/new/choose).
+If you're facing any issues with this Community Edition, search a similar issue to ensure it doesn't already exist on [Github](https://github.com/carboneio/carbone/issues). Otherwise, [create an issue to help us](https://github.com/carboneio/carbone/issues/new/choose).
 
 ## Roadmap
 
@@ -284,7 +284,7 @@ The roadmap is pinned on the github issues list.
 
 ## Performance
 
-⚡️ Secret news of 14th Februrary 2023: we are building our own PDF converter, x200 faster than LibreOffice! Stay tuned.
+⚡️ Secret news of 14th February 2023: we are building our own PDF converter, x200 faster than LibreOffice! Stay tuned.
 
 Report generation speed (without network latency), using a basic one-page DOCX template:
 

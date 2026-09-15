@@ -44,6 +44,13 @@ Use the latest version (v5+) for free with our [Docker Edition](https://hub.dock
 No license is required to start the [On-Premise Docker Edition](https://hub.docker.com/r/carbone/carbone-ee) with the REST API (same API as the [Cloud Edition](https://carbone.io/pricing.html)).
 A license is only required for advanced features. By default, only community features are enabled.
 
+You can also deploy the Docker Edition with one click using the official Easypanel template:
+
+[![Deploy on Easypanel][easypanel-btn]][easypanel-deploy]
+
+[easypanel-btn]: https://easypanel.io/img/deploy-on-easypanel-40.svg
+[easypanel-deploy]: https://easypanel.io/templates/carbone
+
 Check out our [changelog](https://carbone.io/changelog.html)
 
 This open-source edition, which can be embedded in Node.js, is always one major version behind. We will update it to v4 as soon as possible. Thank you for your patience.

@@ -1,4 +1,7 @@
 
+### v3.8.3
+  - Fix corrupted document when a marker contains a double quote and is used in an XML attribute, such as a table of contents entry in ODT
+
 ### v3.8.2
   - Release: April 3rd 2026
   - Fix a critical security issue identified in a recent audit

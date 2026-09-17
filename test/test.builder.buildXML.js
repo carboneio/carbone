@@ -118,6 +118,16 @@ describe('builder.buildXML', function () {
       });
     });
   });
+  it('should escape double quotes, which break XML attributes (issue #251)', function (done) {
+    var _xml = '<xml office:name="{d.title}">{d.title}</xml>';
+    builder.buildXML(_xml, {title : 'a"b'}, function (err, _xmlBuilt) {
+      helper.assert(_xmlBuilt, '<xml office:name="a&quot;b">a&quot;b</xml>');
+      builder.buildXML(_xml, {title : 'a"b\'c&d<e>f'}, function (err, _xmlBuilt) {
+        helper.assert(_xmlBuilt, '<xml office:name="a&quot;b\'c&amp;d&lt;e&gt;f">a&quot;b\'c&amp;d&lt;e&gt;f</xml>');
+        done();
+      });
+    });
+  });
   it('should works with two nested objects', function (done) {
     var _xml = '<xml> {d.title} <br> {d.city.id} </xml>';
     var _data = {

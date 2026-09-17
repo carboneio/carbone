@@ -32,6 +32,8 @@ describe('builder.buildXML', function () {
         str += String.fromCharCode(i);
       }
     }
+    // \uFFFE and \uFFFF are forbidden in XML, LibreOffice cannot load the document if they are kept
+    str += String.fromCharCode(0xFFFE) + String.fromCharCode(0xFFFF);
     var _xml = '<xml> {d.title} </xml>';
     var _data = {title : str};
     builder.buildXML(_xml, _data, function (err, _xmlBuilt) {

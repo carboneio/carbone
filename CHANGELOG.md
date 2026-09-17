@@ -1,4 +1,7 @@
 
+### v3.8.3
+  - Fix corrupted document when data contains the characters `\uFFFE` or `\uFFFF`, which are forbidden in XML
+
 ### v3.8.2
   - Release: April 3rd 2026
   - Fix a critical security issue identified in a recent audit

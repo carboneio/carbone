@@ -604,6 +604,18 @@ describe('parser', function () {
         done();
       });
     });
+    it('should stay linear when a marker is split by many whitespace-only runs', function () {
+      // The old regex took ~1 s for 22 runs and doubled with each run: 26 runs would take ~16 s
+      var _xml = '<w:t>{</w:t>' + '<w:r><w:t xml:space="preserve"> </w:t></w:r>'.repeat(26) + '<w:t>d.island}</w:t>';
+      var _start = Date.now();
+      helper.assert(parser.translate(_xml, {}), _xml);
+      helper.assert(Date.now() - _start < 500, true);
+    });
+    it('should still translate a marker split by whitespace-only runs', function () {
+      var _xml = '<w:t>{</w:t>' + '<w:r><w:t xml:space="preserve"> </w:t></w:r>'.repeat(3) + '<w:t>t(Monday)}</w:t>';
+      var _translated = parser.translate(_xml, { lang : 'fr', translations : { fr : { Monday : 'Lundi' } } });
+      helper.assert(_translated, '<w:t>Lundi</w:t><w:r><w:t xml:space="preserve"></w:t></w:r><w:r><w:t xml:space="preserve"></w:t></w:r><w:r><w:t xml:space="preserve"></w:t></w:r><w:t></w:t>');
+    });
     /* it('not consider marker which starts by "t" and which is not a translation marker', function(done){
       var _objLang = {
         'Monday' : 'Lundi'
@@ -726,6 +738,28 @@ describe('parser', function () {
         helper.assert(err, null);
         helper.assert(xml, '');
         helper.assert(variables, []);
+        done();
+      });
+    });
+    it('should stay linear when a marker is split by many whitespace-only runs', function (done) {
+      // Same pattern as translate: the old regex doubled its work with each whitespace-only run
+      var _xml = '<w:t>{</w:t>' + '<w:r><w:t xml:space="preserve"> </w:t></w:r>'.repeat(26) + '<w:t>d.island}</w:t>';
+      var _start = Date.now();
+      parser.findVariables(_xml, function (err, xml, variables) {
+        helper.assert(err, null);
+        helper.assert(xml, _xml);
+        helper.assert(variables, []);
+        helper.assert(Date.now() - _start < 500, true);
+        done();
+      });
+    });
+    it('should still find a variable declared in a marker split by whitespace-only runs', function (done) {
+      var _xml = '<w:t>{</w:t>' + '<w:r><w:t xml:space="preserve"> </w:t></w:r>'.repeat(3) + '<w:t>#myVar = d.id}</w:t>';
+      parser.findVariables(_xml, function (err, xml, variables) {
+        helper.assert(err, null);
+        helper.assert(variables.length, 1);
+        helper.assert(variables[0].name, 'myVar');
+        helper.assert(variables[0].code, 'd.id');
         done();
       });
     });

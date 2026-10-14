@@ -287,6 +287,19 @@ describe('extras', function () {
         done();
       });
     });
+
+    it('should give each repetition of a picture its own drawing id', function (done) {
+      var _body = placeholderDrawing('{d.rows[i].img}') + placeholderDrawing('{d.rows[i+1].img}');
+      var _data = { rows : [{ img : DATA_URI_A }, { img : DATA_URI_B }, { img : DATA_URI_A }] };
+      renderDocx(_body, _data, {}, function (err, files, xml) {
+        assert.equal(err, null);
+        var _ids = xml.match(/<wp:docPr id="\d+"/g);
+        assert.equal(_ids.length, 3);
+        assert.equal(new Set(_ids).size, 3, 'duplicate docPr ids ' + _ids);
+        assert.equal(_ids[0], '<wp:docPr id="1"');
+        done();
+      });
+    });
   });
 
   describe('imageSize', function () {

@@ -33,6 +33,9 @@
   "devDependencies": {
     "mocha": "=9.2.2"
   },
+  "overrides": {
+    "yargs": "=16.2.2"
+  },
   "engines": {
     "node": ">= 12.14.0"
   }

@@ -284,7 +284,22 @@ The roadmap is pinned on the github issues list.
 
 ## Performance
 
-⚡️ Secret news of 14th Februrary 2023: we are building our own PDF converter, x200 faster than LibreOffice! Stay tuned.
+⚡️ Our own PDF converter, **Carbone ICE (Instant Converter Engine)**, is now available. It is much faster than LibreOffice. Select it with the `converter` option set to `"I"`.
+
+A public benchmark, including the API and the Docker image, is available here: [document-generator-benchmark](https://carboneio.github.io/document-generator-benchmark/).
+
+Results for a one-page DOCX invoice (`carbone/carbone-ee:full-5.15.0`, Apple M4 Max, September 2026):
+
+| Invoice DOCX                | Documents / min (1 CPU, 1 VU) | Documents / min (4 CPU, 5 VU) | Pages / s (large documents) |
+| --------------------------- | ----------------------------: | ----------------------------: | --------------------------: |
+| **DOCX → DOCX** (merge only) | 10,302 (7.5 ms)              | 17,871 (24 ms)                | 1,059                       |
+| **DOCX → PDF** Carbone ICE   | 2,842 (24 ms)                | 13,856 (29 ms)                | 141                         |
+| **DOCX → PDF** LibreOffice   | 1,144 (60 ms)                | 5,796 (63 ms)                 | 5                           |
+| **DOCX → PDF** OnlyOffice    | 245 (249 ms)                 | 934 (434 ms)                  | 26                          |
+
+Another public benchmark compares pure document conversion (DOCX → PDF, HTML → PDF) with other free converters (Gotenberg, Collabora, Jod-converter, Pandoc): [document-converter-benchmark](https://github.com/carboneio/document-converter-benchmark). It uses the free Community Edition of the Carbone Docker image, no license required. With 4 threads, Carbone converts a DOCX to PDF in ~17 ms with Carbone ICE (~400 ms with Gotenberg, which runs LibreOffice on a single thread), and an HTML to PDF in ~8 ms (~375 ms with Gotenberg).
+
+Older measurements of this npm package (`carbone` v3), kept for reference: they were made on older hardware and are a bit outdated. See the benchmarks above for up-to-date figures.
 
 Report generation speed (without network latency), using a basic one-page DOCX template:
 
@@ -297,8 +312,8 @@ On a MacBook Pro Mid-2015, 2,2 Ghz i7, 16Go.
 
 There are two editions of Carbone:
 
-- Carbone Community Edition is freely available under the [CCL Agreement](LICENSE.md). Roughly speaking, as long as you are not offering Carbone Community Edition Software as a hosted
-  Document-Generator-as-a-Service like [Carbone Cloud](https://carbone.io/pricing.html), you can use and modify all Community features for free.
+- Carbone Community Edition (this source code and the npm package `carbone`) is source-available and freely available under the [Carbone Code License (CCL)](LICENSE.md). Roughly speaking, as long as you are not offering the Carbone source code as a hosted
+  Document-Generator-as-a-Service like [Carbone Cloud](https://carbone.io/pricing.html), and you are not building a competing document generator with it, you can use all Community features for free, inside your own products. See [which license applies to each edition](https://carbone.io/company/licenses.html).
 - Carbone Enterprise Edition (hosted and on-premise) includes additional features. Here is a [high-level comparison table](https://carbone.io/documentation/design/overview/template-feature.html#template-types) of community and enterprise features.
 
 The Community Edition is one major version behind the Enterprise Edition. This rule may change in the future.

@@ -24,11 +24,11 @@
     "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin $PACKAGE_VERSION && git push github-origin $PACKAGE_VERSION"
   },
   "dependencies": {
+    "@carboneio/yazl": "=3.3.2",
     "dayjs": "=1.11.23",
     "debug": "=4.4.3",
     "which": "=6.0.1",
-    "yauzl": "=2.10.0",
-    "yazl": "=2.5.1"
+    "yauzl": "=3.4.0"
   },
   "devDependencies": {
     "mocha": "=9.2.2"

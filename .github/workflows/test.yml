@@ -7,8 +7,14 @@ on:
   # Automatic trigger
   pull_request:
     branches: [ master, main, enterprise-edition-master ]
-    # trigger the workflow only when the pull request title change, or someone is assigned
-    types: [edited, assigned]
+    # trigger the workflow when the pull request is opened, receives new commits (synchronize), is reopened,
+    # when its title changes (to run tests after removing "WIP:"), or when someone is assigned
+    types: [opened, synchronize, reopened, edited, assigned]
+
+# Cancel the previous run of the same pull request when a new commit is pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
   
 jobs:
   TEST:

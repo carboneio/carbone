@@ -10,6 +10,7 @@
       - `padl` and `padr` target length: maximum 10,000 characters
   - Test suite now runs on the latest release of Node 16, 18, 20, 22, 24 and 26 (CVE-2026-111497)
   - Fix: templates could not be opened on Node 26 (upgrade `yauzl` from 2.10.0 to 3.4.0)
+  - Fix: Carbone could crash with an uncaught `EPIPE` error if the LibreOffice Python process died just before receiving a new document to convert. The conversion now returns an error instead.
   - Replace `yazl` 2.5.1 with `@carboneio/yazl` 3.3.2, the same version as Carbone v5
 
 ### v3.8.2

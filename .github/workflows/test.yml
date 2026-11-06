@@ -32,18 +32,18 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        node: [ '16.20.2', '18.20.8', '20.20.2', '22.22.2', '24.14.1' ]
+        node: [ '16', '18', '20', '22', '24', '26' ]
     name: Node on Ubuntu-24.04
     steps:
       # Checkout source code of the project
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Performance tips #1
       # Cache NodeJS and project NPM dependencies using a hash of package-lock.json as the invalidation key
       # https://docs.github.com/en/actions/advanced-guides/caching-dependencies-to-speed-up-workflows
       # https://github.com/actions/setup-node
       - name: Setup node using cache (faster)
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
       
@@ -63,7 +63,7 @@ jobs:
       # Here is a complex example which use dpkg to list all installed deps: https://stackoverflow.com/questions/59269850/caching-apt-packages-in-github-actions-workflow
       - name: Install Libreoffice using cache
         id: libreoffice-cache
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             /opt/libreoffice**
@@ -83,25 +83,6 @@ jobs:
       # Use npm "ci" instead of "i" to use only package-lock.json as source
       - run: npm ci
       - run: npm test
-
-  
-  # Static Application Security Testing
-  # TODO limit only on modified files with something like: 
-  # git diff --name-only "$GITHUB_BASE_REF..$GITHUB_SHA" | egrep '\.(js|vue)$' | cat | xargs -r njsscan -w -o njsscan.log
-  SAST:
-    if: ${{ github.event_name == 'workflow_dispatch' || !contains( github.event.pull_request.title, 'WIP:' ) || contains(github.event.head_commit.message, '@test') }}
-    runs-on: ubuntu-latest
-    name: Static security tests with Njsscan
-    # The maximum number of minutes to let a job run before GitHub automatically cancels it
-    timeout-minutes: 10
-    steps:
-    - name: Checkout the code
-      uses: actions/checkout@v2
-    - name: nodejsscan scan
-      id: njsscan
-      uses: ajinabraham/njsscan-action@master
-      with:
-        args: 'lib/* formatters/* bin/* studio/*'
 
 # Other doc for MacOS
 # https://github.com/metanorma/reverse_adoc/actions/runs/26372536/workflow

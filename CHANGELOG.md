@@ -8,6 +8,7 @@
     - To prevent Denial of Service attacks, the following formatter arguments are now limited:
       - `formatN` and `formatC` decimal places: maximum 40
       - `padl` and `padr` target length: maximum 10,000 characters
+  - Test suite now runs on the latest release of Node 16, 18, 20, 22, 24 and 26 (CVE-2026-111497)
 
 ### v3.8.2
   - Release: April 3rd 2026

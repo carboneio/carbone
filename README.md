@@ -297,8 +297,8 @@ On a MacBook Pro Mid-2015, 2,2 Ghz i7, 16Go.
 
 There are two editions of Carbone:
 
-- Carbone Community Edition is freely available under the [CCL Agreement](LICENSE.md). Roughly speaking, as long as you are not offering Carbone Community Edition Software as a hosted
-  Document-Generator-as-a-Service like [Carbone Cloud](https://carbone.io/pricing.html), you can use and modify all Community features for free.
+- Carbone Community Edition (this source code and the npm package `carbone`) is source-available and freely available under the [Carbone Code License (CCL)](LICENSE.md). Roughly speaking, as long as you are not offering the Carbone source code as a hosted
+  Document-Generator-as-a-Service like [Carbone Cloud](https://carbone.io/pricing.html), and you are not building a competing document generator with it, you can use all Community features for free, inside your own products. See [which license applies to each edition](https://carbone.io/company/licenses.html).
 - Carbone Enterprise Edition (hosted and on-premise) includes additional features. Here is a [high-level comparison table](https://carbone.io/documentation/design/overview/template-feature.html#template-types) of community and enterprise features.
 
 The Community Edition is one major version behind the Enterprise Edition. This rule may change in the future.

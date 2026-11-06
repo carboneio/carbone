@@ -85,6 +85,10 @@ function round (num, precision) {
  * @return {String}
  */
 function _format (value, format, precision = 3) {
+  // `precision` can come from the data and the cost of toFixed grows quadratically, so it must stay bounded (security)
+  if (precision > 40) {
+    throw new Error('The number of decimals cannot be greater than 40');
+  }
   var _re    = '\\d(?=(\\d{' + (format.group) + '})+' + (precision > 0 ? '\\D' : '$') + ')';
   var _value = round(value, precision);
   var _num   = _value.toFixed(Math.max(0, ~~precision));

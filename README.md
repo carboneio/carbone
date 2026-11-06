@@ -14,11 +14,11 @@
   <a href="https://www.npmjs.com/package/carbone">
     <img src="https://badgen.net/npm/v/carbone" alt="carbone version badge">
   </a><br/>
-  <a href="https://carbone.io/documentation.html">
-    <img src="https://readthedocs.org/projects/ansicolortags/badge/?version=latest" alt="documentation badge">
+  <a href="https://carbone.io/documentation/design/overview/getting-started.html">
+    <img src="https://badgen.net/badge/docs/carbone.io/blue?icon=wiki" alt="documentation badge">
   </a>
-  <a href="https://bundlephobia.com/result?p=carbone">
-    <img src="https://badgen.net/bundlephobia/minzip/carbone" alt="minizip badge">
+  <a href="https://packagephobia.com/result?p=carbone">
+    <img src="https://badgen.net/packagephobia/install/carbone?icon=packagephobia" alt="install size badge">
   </a>
   <a href="https://hub.docker.com/r/carbone/carbone-ee">
     <img src="https://badgen.net/docker/pulls/carbone/carbone-ee?icon=docker" alt="docker badge">
@@ -31,7 +31,7 @@
 
 <p><b>⚡️ Fast, Simple and Powerful report generator</b> in any format PDF, DOCX, XLSX, ODT, PPTX, ODS, XML, CSV using templates and your JSON data as input !</p>
 
-### News 2026/04
+### News 2026/11
 
 [Join us on our Discord](https://discord.gg/kKB3aPYqnh)
 

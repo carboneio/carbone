@@ -5,8 +5,10 @@ var fs = require('fs');
 var os = require('os');
 var helper = require('../lib/helper');
 var converter = require('../lib/converter');
+var file = require('../lib/file');
 var params = require('../lib/params');
 var exec = require('child_process').exec;
+var which = require('which');
 var tempPath = path.join(__dirname, 'temp');
 
 var defaultOptions = {
@@ -359,6 +361,70 @@ describe('Converter', function () {
             }
           });
         }
+      });
+    });
+  });
+
+  describe('security', function () {
+    var SECRET_TEXT  = 'CARBONE_SECRET_LEAK_7192';
+    var CONTROL_TEXT = 'CONTROLVISIBLE';
+
+    /*
+     * This test is skipped instead of failing when LibreOffice is missing, so a contributor
+     * without it still gets a meaningful run.
+     */
+    function isLibreOfficeInstalled () {
+      if (which.sync('soffice', { nothrow : true }) !== null || which.sync('soffice.bin', { nothrow : true }) !== null) {
+        return true;
+      }
+      return fs.existsSync('/Applications/LibreOffice.app/Contents/MacOS/soffice');
+    }
+
+    after(function (done) {
+      converter.exit(done);
+    });
+
+    it('should not leak a local file through an ODT linked section (text:section-source)', function (done) {
+      if (isLibreOfficeInstalled() === false) {
+        return this.skip();
+      }
+      var _secretFile = path.join(tempPath, 'secret.txt');
+      fs.writeFileSync(_secretFile, SECRET_TEXT);
+      var _content = '<?xml version="1.0" encoding="UTF-8"?>'
+        + '<office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"'
+        + ' xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"'
+        + ' xmlns:xlink="http://www.w3.org/1999/xlink"'
+        + ' office:version="1.2"><office:body><office:text>'
+        + '<text:p>' + CONTROL_TEXT + '</text:p>'
+        + '<text:section text:name="LeakSection">'
+        + '<text:section-source xlink:href="file://' + _secretFile + '" xlink:show="embed" xlink:actuate="onLoad"/>'
+        + '</text:section>'
+        + '</office:text></office:body></office:document-content>';
+      var _manifest = '<?xml version="1.0" encoding="UTF-8"?>'
+        + '<manifest:manifest xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" manifest:version="1.2">'
+        + '<manifest:file-entry manifest:full-path="/" manifest:media-type="application/vnd.oasis.opendocument.text"/>'
+        + '<manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>'
+        + '<manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>'
+        + '</manifest:manifest>';
+      var _styles = '<?xml version="1.0" encoding="UTF-8"?>'
+        + '<office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.2"><office:styles/></office:document-styles>';
+      file.zip([
+        { name : 'mimetype',              data : Buffer.from('application/vnd.oasis.opendocument.text') },
+        { name : 'META-INF/manifest.xml', data : Buffer.from(_manifest) },
+        { name : 'content.xml',           data : Buffer.from(_content) },
+        { name : 'styles.xml',            data : Buffer.from(_styles) }
+      ], function (err, buffer) {
+        assert.equal(err, null);
+        var _templatePath = path.join(tempPath, 'leak-section-file.odt');
+        var _outputPath   = path.join(tempPath, 'leak-section-file.txt');
+        fs.writeFileSync(_templatePath, buffer);
+        converter.convertFile(_templatePath, 'Text', '', _outputPath, function (err, resultPath) {
+          assert.equal(err, null);
+          var _text = fs.readFileSync(resultPath, 'utf8');
+          helper.assert(_text.indexOf(CONTROL_TEXT) !== -1, true, 'control text missing: the document was not converted');
+          helper.assert(_text.indexOf(SECRET_TEXT) !== -1, false, 'the content of a local file leaked into the converted document');
+          done();
+        });
       });
     });
   });

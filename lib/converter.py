@@ -6,7 +6,7 @@ import uno, unohelper
 import time
 from com.sun.star.beans import PropertyValue
 from com.sun.star.connection import NoConnectException
-from com.sun.star.document.UpdateDocMode import QUIET_UPDATE
+from com.sun.star.document.UpdateDocMode import NO_UPDATE
 from com.sun.star.lang import DisposedException, IllegalArgumentException
 from com.sun.star.io import IOException, XOutputStream
 from com.sun.star.script import CannotConvertException
@@ -75,7 +75,9 @@ def convert(message):
         return
 
     document = None
-    inputprops = UnoProps(Hidden=True, ReadOnly=True, UpdateDocMode=QUIET_UPDATE)
+    # NO_UPDATE: never resolve the links a template carries (linked sections, linked objects).
+    # Totals, indexes and pagination do not rely on it, they are refreshed explicitly below.
+    inputprops = UnoProps(Hidden=True, ReadOnly=True, UpdateDocMode=NO_UPDATE)
     cwd = unohelper.systemPathToFileUrl( os.getcwd() )
     inputurl = uno.systemPathToFileUrl(os.path.abspath(fileOption['inputFile']))
 
@@ -97,13 +99,6 @@ def convert(message):
         document.calculateAll()
     except AttributeError:
         # the document doesn't implement the calculateAll interface
-        pass
-
-    ### Update document links (update sub-documents)
-    try:
-        document.updateLinks()
-    except AttributeError:
-        # the document doesn't implement the XLinkUpdate interface
         pass
 
     ### Update document indexes

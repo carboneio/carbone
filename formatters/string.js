@@ -1,5 +1,7 @@
 var toMd5 = require('./md5');
 
+// `targetLength` of padl/padr can come from the data, it must stay bounded to avoid generating a huge string (security)
+const MAX_PAD_LENGTH = 10000;
 
 const LINEBREAK = {
   odt  : '<text:line-break/>',
@@ -233,6 +235,9 @@ function substr (d, begin, end) {
  * @return {String} return the padded left string
  */
 function padl (d, targetLength, padString) {
+  if (targetLength > MAX_PAD_LENGTH) {
+    throw new Error('The target length cannot be greater than ' + MAX_PAD_LENGTH);
+  }
   var _padString = ' ';
   if (padString !== undefined) {
     _padString = padString;
@@ -265,6 +270,9 @@ function padl (d, targetLength, padString) {
  * @return {String} return the padded right string
  */
 function padr (d, targetLength, padString) {
+  if (targetLength > MAX_PAD_LENGTH) {
+    throw new Error('The target length cannot be greater than ' + MAX_PAD_LENGTH);
+  }
   var _padString = ' ';
   if (padString !== undefined) {
     _padString = padString;

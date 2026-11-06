@@ -1,4 +1,14 @@
 
+### v3.9.1
+  - Release: November 6th 2026
+  - Aligned with the Docker edition v3.9.1: this version includes all its security fixes and improvements that apply to the features of this edition.
+  - ⚠️ Important Security Update: Following an in-depth internal penetration test, we strongly recommend updating to this version to address two critical security fixes and other improvements that increase Carbone's overall security. Contact us if you want more details about the two critical security issues.
+    - **Critical:** The LibreOffice converter is now significantly more secure.
+    - **Critical:** For historical reasons, Carbone allowed changing the template file `extension` (file type) via the API without strict validation. This is now restricted: only recognized formats (like `docx`, `xlsx`, `xhtml`, etc.) are accepted.
+    - To prevent Denial of Service attacks, the following formatter arguments are now limited:
+      - `formatN` and `formatC` decimal places: maximum 40
+      - `padl` and `padr` target length: maximum 10,000 characters
+
 ### v3.8.2
   - Release: April 3rd 2026
   - Fix a critical security issue identified in a recent audit

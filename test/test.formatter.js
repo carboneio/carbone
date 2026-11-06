@@ -3,6 +3,7 @@ var conditionFormatter = require('../formatters/condition');
 var stringFormatter = require('../formatters/string');
 var arrayFormatter = require('../formatters/array');
 var numberFormatter = require('../formatters/number');
+const assert = require('assert');
 var helper = require('../lib/helper');
 
 describe('formatter', function () {
@@ -1131,6 +1132,11 @@ describe('formatter', function () {
     it('should not crash if data is array', () => {
       helper.assert(stringFormatter.padl([{id : 1}], 5), [{id : 1}], 'if data is array, should return it with no change');
     });
+    it('should reject a target length which is too high (security)', () => {
+      helper.assert(stringFormatter.padl('coucou', 10000).length, 10000);
+      assert.throws(() => stringFormatter.padl('coucou', 10001), /target length cannot be greater than 10000/);
+      assert.throws(() => stringFormatter.padl('coucou', '100000000'), /target length cannot be greater than 10000/);
+    });
   });
   describe('padr', function () {
     it('should be up to the target length with padding string to complete', () => {
@@ -1167,6 +1173,11 @@ describe('formatter', function () {
     });
     it('should not crash if data is array', () => {
       helper.assert(stringFormatter.padr([{id : 1}], 5), [{id : 1}], 'if data is array, should return it with no change');
+    });
+    it('should reject a target length which is too high (security)', () => {
+      helper.assert(stringFormatter.padr('coucou', 10000).length, 10000);
+      assert.throws(() => stringFormatter.padr('coucou', 10001), /target length cannot be greater than 10000/);
+      assert.throws(() => stringFormatter.padr('coucou', '100000000'), /target length cannot be greater than 10000/);
     });
   });
 
@@ -1300,6 +1311,16 @@ describe('formatter', function () {
     it.skip('should keep maximal precision if precision is not defined', function () {
       var _this = {lang : 'fr'};
       helper.assert(numberFormatter.formatN.call(_this, 10000.12345566789), '10 000,12345566789');
+    });
+
+    it('should reject a precision which is too high (security)', function () {
+      var _this = {lang : 'fr'};
+      helper.assert(numberFormatter.formatN.call(_this, 10000.1, 10), '10 000,1000000000');
+      assert.throws(() => numberFormatter.formatN.call(_this, 10000.1, 41), /number of decimals cannot be greater than 40/);
+      assert.throws(() => numberFormatter.formatN.call(_this, 10000.1, '200000'), /number of decimals cannot be greater than 40/);
+      // formatC uses the same argument
+      var _thisCurrency = { lang : 'fr', currency : { source : 'EUR', target : 'EUR', rates : { EUR : 1 } } };
+      assert.throws(() => numberFormatter.formatC.call(_thisCurrency, 1000.4, 200000), /number of decimals cannot be greater than 40/);
     });
 
     it('should round number', function () {

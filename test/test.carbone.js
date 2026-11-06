@@ -3032,6 +3032,41 @@ describe('Carbone', function () {
         done();
       });
     });
+    it('should ignore an extension which escapes the render directory, and detect the type itself', function (done) {
+      // the extension is concatenated into the name of the file written on disk. A traversal
+      // would relocate the report into the template store, under a tenant chosen by the caller.
+      var _renderPathBackup = params.renderPath;
+      var _renderPath       = path.join(testPath, 'render');
+      var _templateStore    = path.join(testPath, 'template');
+      var _stolenFile       = path.join(_templateStore, '9999-stolen');
+      fs.mkdirSync(_templateStore, { recursive : true }); // the store sits next to the render directory on a real deployment
+      carbone.set({ renderPath : _renderPath });
+      var _options = {
+        renderPrefix : '', // forces Carbone to write the report on disk, as the HTTP API does
+        extension    : 'zzq/../../template/9999-stolen'
+      };
+      carbone.render('test_word_render_A.docx', { field1 : 'field_1' }, _options, function (err, result) {
+        params.renderPath = _renderPathBackup;
+        helper.assert(err, null);
+        helper.assert(fs.existsSync(_stolenFile), false, 'the report was written outside of the render directory');
+        helper.assert(path.dirname(result), _renderPath);
+        helper.assert(path.extname(result), '.docx'); // the type detected by Carbone, not the one given
+        done();
+      });
+    });
+    it('should ignore an extension which contains a path separator, even without traversal', function (done) {
+      var _renderPathBackup = params.renderPath;
+      var _renderPath       = path.join(testPath, 'render');
+      fs.mkdirSync(testPath, { recursive : true });
+      carbone.set({ renderPath : _renderPath });
+      carbone.render('test_word_render_A.docx', { field1 : 'field_1' }, { renderPrefix : '', extension : 'docx/x' }, function (err, result) {
+        params.renderPath = _renderPathBackup;
+        helper.assert(err, null);
+        helper.assert(path.dirname(result), _renderPath);
+        helper.assert(path.extname(result), '.docx');
+        done();
+      });
+    });
     it('should accept XLSX files (needs preprocessing)', function (done) {
       var _data = [{
         name : 'Bouteille de sirop d’érable 25cl',

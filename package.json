@@ -1,7 +1,7 @@
 {
   "name": "carbone",
   "description": "Fast, Simple and Powerful report generator. Injects JSON and produces PDF, DOCX, XLSX, ODT, PPTX, ODS, ...!",
-  "version": "3.9.1",
+  "version": "3.9.2",
   "bin": "bin/carbone",
   "main": "./lib",
   "author": "David Grelaud",
@@ -21,7 +21,7 @@
     "test": "./node_modules/.bin/mocha test --timeout 100000 --exit",
     "lint": "eslint ./lib/**.js ./test/**.js ./formatters/**.js",
     "lint:fix": "eslint ./lib/**.js ./test/**.js ./formatters/**.js --fix",
-    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]') && git tag $PACKAGE_VERSION && git push origin $PACKAGE_VERSION && git push github-origin $PACKAGE_VERSION"
+    "postpublish": "git tag $npm_package_version && git push origin $npm_package_version"
   },
   "dependencies": {
     "@carboneio/yazl": "=3.3.2",

@@ -26,6 +26,17 @@ Please include the requested information listed below (as much as you can provid
 Thank you for improving the security of Carbone and its ecosystem. Your efforts and responsible disclosure are greatly appreciated and will be acknowledged.
 
 
+## Trust model / Out of scope
+
+The `carbone` npm package is a library. It has no HTTP server and no network attack surface: every input comes from the code of the application that integrates it.
+
+- Template paths given to `carbone.render()` and `carbone.getFileExtension()` are trusted and chosen by the developer. Relative paths (resolved from `templatePath`) and absolute paths are accepted by design, like `fs.readFile()`, `new sqlite3.Database(path)`, `sharp(path)` or `ejs.renderFile(path)`.
+- Options, `set()` parameters and custom formatters are also provided by the developer.
+- The application is responsible for validating any end-user input before passing it to Carbone (for example, only accept an ID that maps to a known template).
+
+Reports that require the integrating application to pass unvalidated end-user input as a file path, option or formatter are out of scope: the vulnerability would be in that application, not in Carbone. Carbone On-Premise and Carbone Cloud (the HTTP server editions) validate these inputs before calling the library.
+
+
 ## Comments on this Policy
 
 If you have suggestions on how this process could be improved please submit a

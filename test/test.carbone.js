@@ -238,6 +238,40 @@ describe('Carbone', function () {
       helper.rmDirRecursive(_templatePath);
       carbone.reset();
     });
+    it('should emit a deprecation warning only once for addTemplate and removeTemplate', function (done) {
+      var _originalEmitWarning = process.emitWarning;
+      var _warnings = [];
+      process.emitWarning = function (message, type, code) {
+        _warnings.push({ message, type, code });
+      };
+      carbone.addTemplate('deprecated.txt', 'a', function () {
+        carbone.addTemplate('deprecated.txt', 'b', function () {
+          carbone.removeTemplate('deprecated.txt', function () {
+            process.emitWarning = _originalEmitWarning;
+            helper.assert(_warnings.length, 1);
+            helper.assert(_warnings[0].type, 'DeprecationWarning');
+            helper.assert(_warnings[0].code, 'CARBONE_DEP001');
+            helper.assert(/addTemplate\(\) and carbone\.removeTemplate\(\) are deprecated/.test(_warnings[0].message), true);
+            done();
+          });
+        });
+      });
+    });
+    it('should accept only a plain file name and never write outside templatePath', function (done) {
+      var _invalidIds = ['../outside_target.html', 'a/../../outside_target.html', '/tmp/outside_target.html', '..\\outside_target.html', 'sub/outside_target.html', '', '.', '..', 'outside\0target.html', null, undefined, 12];
+      var _nbChecked = 0;
+      _invalidIds.forEach(function (fileId) {
+        carbone.addTemplate(fileId, 'pwned', function (err) {
+          helper.assert(err, 'Invalid template id: it must be a plain file name inside templatePath');
+          if (++_nbChecked === _invalidIds.length) {
+            helper.assert(fs.existsSync(path.join(__dirname, 'outside_target.html')), false);
+            helper.assert(fs.existsSync('/tmp/outside_target.html'), false);
+            helper.assert(fs.readdirSync(_templatePath).filter(function (f) { return f !== 'lang'; }).length, 0);
+            done();
+          }
+        });
+      });
+    });
     it('should save the template in the folder "templatePath"', function (done) {
       var _filePath = path.resolve('./test/datasets/test_word_render_2003_XML.xml');
       var _fileContent = fs.readFileSync(_filePath, 'utf8');
@@ -319,6 +353,22 @@ describe('Carbone', function () {
       carbone.removeTemplate(_fileId, function (err) {
         helper.assert(/unlink/.test(err+''), true);
         done();
+      });
+    });
+    it('should never delete a file outside templatePath', function (done) {
+      var _outsideFile = path.join(__dirname, 'carbone_outside_remove_target.txt');
+      fs.writeFileSync(_outsideFile, 'keep me');
+      var _invalidIds = ['../carbone_outside_remove_target.txt', _outsideFile, '..\\carbone_outside_remove_target.txt', 'a/../../carbone_outside_remove_target.txt', '..', null];
+      var _nbChecked = 0;
+      _invalidIds.forEach(function (fileId) {
+        carbone.removeTemplate(fileId, function (err) {
+          helper.assert(err, 'Invalid template id: it must be a plain file name inside templatePath');
+          if (++_nbChecked === _invalidIds.length) {
+            helper.assert(fs.existsSync(_outsideFile), true);
+            fs.unlinkSync(_outsideFile);
+            done();
+          }
+        });
       });
     });
   });
@@ -2680,6 +2730,36 @@ describe('Carbone', function () {
     });
     after(function () {
       carbone.reset();
+    });
+    describe('template path accepted by design (absolute and relative, even outside templatePath)', function () {
+      var _outsideTemplate = path.join(__dirname, 'carbone_outside_template_path.xml');
+      before(function () {
+        fs.writeFileSync(_outsideTemplate, '<xml>{d.val}</xml>');
+      });
+      after(function () {
+        fs.unlinkSync(_outsideTemplate);
+      });
+      it('should render a template from an absolute path', function (done) {
+        carbone.render(_outsideTemplate, { val : 'abs' }, function (err, result) {
+          helper.assert(err, null);
+          helper.assert(result, '<xml>abs</xml>');
+          done();
+        });
+      });
+      it('should render a template from a relative path outside templatePath', function (done) {
+        carbone.render('../carbone_outside_template_path.xml', { val : 'rel' }, function (err, result) {
+          helper.assert(err, null);
+          helper.assert(result, '<xml>rel</xml>');
+          done();
+        });
+      });
+      it('should return the extension of a template from an absolute path', function (done) {
+        carbone.getFileExtension(_outsideTemplate, function (err, extension) {
+          helper.assert(err, null);
+          helper.assert(extension, 'xml');
+          done();
+        });
+      });
     });
     it('should render a template and return a path instead of a buffer if renderPrefix is defined', function (done) {
       var data = {

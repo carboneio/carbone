@@ -1,5 +1,6 @@
 
 ### v3.9.2
+  - Release: November 12th 2026
   - Deprecated: `carbone.addTemplate()` and `carbone.removeTemplate()` will be removed in the next major version. They add nothing technically over a plain `fs.writeFile(path.join(templatePath, fileId), data)` and `fs.unlink(path.join(templatePath, fileId))`, but they have become a magnet for "next-generation" security researchers: a black hole into which every AI-powered scanner falls, filing CVEs for what is simply `fs.writeFile()` with extra steps. To respect semver, they stay in this version with an extra safeguard (defense in depth, not a vulnerability fix): they now accept only a plain file name without any path separator, as their documentation always stated. Otherwise, the callback receives an error and the file system is not touched. A `DeprecationWarning` (`CARBONE_DEP001`) is emitted once per process when they are used.
   - Reminder: `carbone.render()` and `carbone.getFileExtension()` accept relative and absolute template paths **by design**, like `fs.readFile()`, `new sqlite3.Database(path)`, `better-sqlite3`, `sharp(path)` or `ejs.renderFile(path)`. The template path is chosen by the developer: never pass unvalidated end-user input. See the trust model in `SECURITY.md`.
 
